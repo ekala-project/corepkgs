@@ -1,0 +1,7 @@
+{
+  "jobs": {
+    "ci": {
+      "file": "/eka-ci-jobs.nix"
+    }
+  }
+}
