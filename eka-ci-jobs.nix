@@ -1,4 +1,4 @@
 let
   pkgs = import ./. { };
 in
-  { inherit (pkgs) stdenv; }
+  { inherit (pkgs) stdenv gcc; }
