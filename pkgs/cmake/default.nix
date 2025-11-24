@@ -113,6 +113,7 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optional (stdenv.isDarwin && !isMinimalBuild) SystemConfiguration;
 
   preConfigure = ''
+    echo "hi, just need to change the drv"
     fixCmakeFiles .
     substituteInPlace Modules/Platform/UnixPaths.cmake \
       --subst-var-by libc_bin ${lib.getBin stdenv.cc.libc} \
