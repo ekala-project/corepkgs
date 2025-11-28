@@ -15,7 +15,7 @@ let
   filteredArgs = builtins.removeAttrs args [ "overlays" ];
 in
 
-import pins.stdenvRepo ({
+import ./stdenv/impure.nix ({
   overlays = [
     pkgsOverlay
     toplevelOverlay

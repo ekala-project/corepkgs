@@ -4,17 +4,101 @@
 
 final: prev: with final; {
 
-  inherit (final.lib) recurseIntoAttrs;
+  # TODO, corepkgs: deprecate lowPrio;
+  inherit (final.lib) recurseIntoAttrs lowPrio;
 
-  lib = prev.lib.extend(self: _: {
-    # Add maintainer information
-    maintainers = import ./maintainers/maintainer-list.nix;
-    teams = import ./maintainers/team-list.nix { lib = self; };
-  });
+  # Non-GNU/Linux OSes are currently "impure" platforms, with their libc
+  # outside of the store.  Thus, GCC, GFortran, & co. must always look for files
+  # in standard system directories (/usr/include, etc.)
+  noSysDirs = stdenv.buildPlatform.system != "x86_64-solaris"
+           && stdenv.buildPlatform.system != "x86_64-kfreebsd-gnu";
+
+  stdenvNoCC = stdenv.override (
+    { cc = null; hasCC = false; }
+
+    // lib.optionalAttrs (stdenv.hostPlatform.isDarwin && (stdenv.hostPlatform != stdenv.buildPlatform)) {
+      # TODO: This is a hack to use stdenvNoCC to produce a CF when cross
+      # compiling. It's not very sound. The cross stdenv has:
+      #   extraBuildInputs = [ targetPackages.darwin.apple_sdks.frameworks.CoreFoundation ]
+      # and uses stdenvNoCC. In order to make this not infinitely recursive, we
+      # need to exclude this extraBuildInput.
+      extraBuildInputs = [];
+    }
+  );
+
+  # TODO: move output of pkgs scope
+  threadsCross =
+    lib.optionalAttrs (stdenv.targetPlatform.isMinGW && !(stdenv.targetPlatform.useLLVM or false)) {
+      # other possible values: win32 or posix
+      model = "mcf";
+      # For win32 or posix set this to null
+      package = targetPackages.windows.mcfgthreads or windows.mcfgthreads;
+    };
+
+  # TODO: move out of pkgs scope
+  wrapBintoolsWith =
+    { bintools
+    , libc ? if stdenv.targetPlatform != stdenv.hostPlatform then libcCross else stdenv.cc.libc
+    , ...
+    } @ extraArgs:
+      callPackage ./build-support/bintools-wrapper (let self = {
+    nativeTools = stdenv.targetPlatform == stdenv.hostPlatform && stdenv.cc.nativeTools or false;
+    nativeLibc = stdenv.targetPlatform == stdenv.hostPlatform && stdenv.cc.nativeLibc or false;
+    nativePrefix = stdenv.cc.nativePrefix or "";
+
+    noLibc = (self.libc == null);
+
+    inherit bintools libc;
+  } // extraArgs; in self);
+
+  wrapCCWith =
+    { cc
+    , # This should be the only bintools runtime dep with this sort of logic. The
+      # Others should instead delegate to the next stage's choice with
+      # `targetPackages.stdenv.cc.bintools`. This one is different just to
+      # provide the default choice, avoiding infinite recursion.
+      # See the bintools attribute for the logic and reasoning. We need to provide
+      # a default here, since eval will hit this function when bootstrapping
+      # stdenv where the bintools attribute doesn't exist, but will never actually
+      # be evaluated -- callPackage ends up being too eager.
+      bintools ? pkgs.bintools
+    , libc ? bintools.libc
+    , # libc++ from the default LLVM version is bound at the top level, but we
+      # want the C++ library to be explicitly chosen by the caller, and null by
+      # default.
+      libcxx ? null
+    , extraPackages ? lib.optional (cc.isGNU or false && stdenv.targetPlatform.isMinGW) threadsCross.package
+    , nixSupport ? {}
+    , ...
+    } @ extraArgs:
+      callPackage ./build-support/cc-wrapper (let self = {
+    nativeTools = stdenv.targetPlatform == stdenv.hostPlatform && stdenv.cc.nativeTools or false;
+    nativeLibc = stdenv.targetPlatform == stdenv.hostPlatform && stdenv.cc.nativeLibc or false;
+    nativePrefix = stdenv.cc.nativePrefix or "";
+    noLibc = !self.nativeLibc && (self.libc == null);
+
+    isGNU = cc.isGNU or false;
+    isClang = cc.isClang or false;
+    isArocc = cc.isArocc or false;
+    isZig = cc.isZig or false;
+
+    inherit cc bintools libc libcxx extraPackages nixSupport zlib;
+  } // extraArgs; in self);
+
+  wrapCC = cc: wrapCCWith {
+    inherit cc;
+  };
 
   inherit (callPackages ./apparmor { })
     libapparmor apparmor-utils apparmor-bin-utils apparmor-parser apparmor-pam
     apparmor-profiles apparmor-kernel-patches apparmorRulesFromClosure;
+
+  # TODO: use mkManyVariant
+  autoconf269 = callPackage ./pkgs/autoconf/269.nix { };
+
+  autoreconfHook269 = autoreconfHook.override {
+    autoconf = autoconf269;
+  };
 
   autoPatchelfHook = makeSetupHook {
     name = "auto-patchelf-hook";
@@ -24,6 +108,56 @@ final: prev: with final; {
       autoPatchelfScript = ./build-support/setup-hooks/auto-patchelf.py;
     };
   } ./build-support/setup-hooks/auto-patchelf.sh;
+
+  # TODO: corepkgs, mkManyVariant
+  bash = lowPrio (callPackage ./pkgs/bash/5.nix { });
+  # WARNING: this attribute is used by nix-shell so it shouldn't be removed/renamed
+  bashInteractive = callPackage ./pkgs/bash/5.nix {
+    interactive = true;
+    withDocs = true;
+  };
+  bashInteractiveFHS = callPackage ./pkgs/bash/5.nix {
+    interactive = true;
+    withDocs = true;
+    forFHSEnv = true;
+  };
+
+  # Here we select the default bintools implementations to be used.  Note when
+  # cross compiling these are used not for this stage but the *next* stage.
+  # That is why we choose using this stage's target platform / next stage's
+  # host platform.
+  #
+  # Because this is the *next* stages choice, it's a bit non-modular to put
+  # here. In theory, bootstraping is supposed to not be a chain but at tree,
+  # where each stage supports many "successor" stages, like multiple possible
+  # futures. We don't have a better alternative, but with this downside in
+  # mind, please be judicious when using this attribute. E.g. for building
+  # things in *this* stage you should use probably `stdenv.cc.bintools` (from a
+  # default or alternate `stdenv`), at build time, and try not to "force" a
+  # specific bintools at runtime at all.
+  #
+  # In other words, try to only use this in wrappers, and only use those
+  # wrappers from the next stage.
+  bintools-unwrapped = let
+    inherit (stdenv.targetPlatform) linker;
+  in     if linker == "lld"     then llvmPackages.bintools-unwrapped
+    else if linker == "cctools" then darwin.binutils-unwrapped
+    else if linker == "bfd"     then binutils-unwrapped
+    else if linker == "gold"    then binutils-unwrapped.override { enableGoldDefault = true; }
+    else null;
+  bintoolsNoLibc = wrapBintoolsWith {
+    bintools = bintools-unwrapped;
+    libc = preLibcCrossHeaders;
+  };
+
+  bintools = wrapBintoolsWith {
+    bintools = bintools-unwrapped;
+  };
+
+  bintoolsDualAs = wrapBintoolsWith {
+    bintools = darwin.binutilsDualAs-unwrapped;
+    wrapGas = true;
+  };
 
   binutils-unwrapped = callPackage ./pkgs/binutils {
     autoreconfHook = autoreconfHook269;
@@ -73,7 +207,7 @@ final: prev: with final; {
 
   c-aresMinimal = callPackage ./pkgs/c-ares { withCMake = false; };
 
-  closureInfo = callPackage ../build-support/closure-info.nix { };
+  closureInfo = callPackage ./build-support/closure-info.nix { };
 
   cmakeMinimal = prev.cmake.override { isMinimalBuild = true; };
 
@@ -101,6 +235,11 @@ final: prev: with final; {
     brotliSupport = true;
   });
 
+  # Provided by libc on Operating Systems that use the Extensible Linker Format.
+  # TODO: core-pkgs: why is this here?
+  elf-header = if stdenv.hostPlatform.isElf then null else
+    throw "Non-elf builds are not supported yet in this repo";
+
   # TODO: core-pkgs: move to build-support
   ensureNewerSourcesHook = { year }: makeSetupHook {
     name = "ensure-newer-sources-hook";
@@ -120,6 +259,8 @@ final: prev: with final; {
   # wheel building fail with:
   # ValueError: ZIP does not support timestamps before 1980
   ensureNewerSourcesForZipFilesHook = ensureNewerSourcesHook { year = "1980"; };
+
+  expand-response-params = callPackage ./build-support/expand-response-params { };
 
   # TODO: support darwin builds
   darwin = {
@@ -266,6 +407,40 @@ final: prev: with final; {
 
   # TODO: Move this into an "updaters.*" package set
   genericUpdater = prev.generic-updater;
+
+  # TODO: don't use a top-level defined attr to define this
+  inherit (callPackage ./pkgs/gcc/all.nix { })
+  gcc6 gcc7 gcc8 gcc9 gcc10 gcc11 gcc12 gcc13 gcc14;
+
+  gcc_latest = gcc14;
+
+  default-gcc-version =
+    if (with stdenv.targetPlatform; isVc4 || libc == "relibc") then 6
+    else 13;
+  gcc = pkgs.${"gcc${toString default-gcc-version}"};
+  gccFun = callPackage ./gcc;
+  gcc-unwrapped = gcc.cc;
+
+  gccStdenv = if stdenv.cc.isGNU
+    then stdenv
+    else stdenv.override {
+      cc = buildPackages.gcc;
+      allowedRequisites = null;
+      # Remove libcxx/libcxxabi, and add clang for AS if on darwin (it uses
+      # clang's internal assembler).
+      extraBuildInputs = lib.optional stdenv.hostPlatform.isDarwin clang.cc;
+    };
+
+  gcc6Stdenv = overrideCC gccStdenv buildPackages.gcc6;
+  gcc7Stdenv = overrideCC gccStdenv buildPackages.gcc7;
+  gcc8Stdenv = overrideCC gccStdenv buildPackages.gcc8;
+  gcc9Stdenv = overrideCC gccStdenv buildPackages.gcc9;
+  gcc10Stdenv = overrideCC gccStdenv buildPackages.gcc10;
+  gcc11Stdenv = overrideCC gccStdenv buildPackages.gcc11;
+  gcc12Stdenv = overrideCC gccStdenv buildPackages.gcc12;
+  gcc13Stdenv = overrideCC gccStdenv buildPackages.gcc13;
+  gcc14Stdenv = overrideCC gccStdenv buildPackages.gcc14;
+
   gitUpdater = prev.git-updater;
   unstableGitUpdater = callPackage ./common-updater/unstable-updater.nix { };
 
@@ -303,7 +478,17 @@ final: prev: with final; {
     dbus = dbus.override { enableSystemd = false; };
   });
 
-  glibcLocalesUtf8 = prev.glibcLocales.override { allLocales = false; };
+  glibcLocales = callPackage ./pkgs/glibc/locales.nix { };
+  glibcLocalesUtf8 = glibcLocales.override { allLocales = false; };
+
+  # TODO: mkManyVariant
+  gmp4 = callPackage ./pkgs/gmp/4.3.2.nix { }; # required by older GHC versions
+  gmp5 = callPackage ./pkgs/gmp/5.1.x.nix { };
+  gmp6 = callPackage ./pkgs/gmp/6.x.nix { };
+  gmp = gmp6;
+  gmpxx = gmp.override { cxx = true; };
+
+
 
   # TODO: core-pkgs: determine if gnome pkgset should go in core or "pkgs"
   # If it shouldn't be in core, move gnome.update-script to this repo
@@ -320,9 +505,60 @@ final: prev: with final; {
 
   installShellFiles = callPackage ./build-support/install-shell-files { };
 
+  # TODO: mkManyVariant
+  isl = isl_0_20;
+  isl_0_11 = callPackage ./pkgs/isl/0.11.1.nix { };
+  isl_0_14 = callPackage ./pkgs/isl/0.14.1.nix { };
+  isl_0_17 = callPackage ./pkgs/isl/0.17.1.nix { };
+  isl_0_20 = callPackage ./pkgs/isl/0.20.0.nix { };
+  isl_0_24 = callPackage ./pkgs/isl/0.24.0.nix { };
+
+
   openjdk21 = javaPackages.compiler.openjdk21;
   jdk21 = openjdk21;
   jdk = jdk21;
+
+    # We can choose:
+  libcCrossChooser = name:
+    # libc is hackily often used from the previous stage. This `or`
+    # hack fixes the hack, *sigh*.
+    /**/ if name == null then null
+    else if name == "glibc" then targetPackages.glibcCross or glibcCross
+    else if name == "bionic" then targetPackages.bionic or bionic
+    else if name == "uclibc" then targetPackages.uclibcCross or uclibcCross
+    else if name == "avrlibc" then targetPackages.avrlibcCross or avrlibcCross
+    else if name == "newlib" && stdenv.targetPlatform.isMsp430 then targetPackages.msp430NewlibCross or msp430NewlibCross
+    else if name == "newlib" && stdenv.targetPlatform.isVc4 then targetPackages.vc4-newlib or vc4-newlib
+    else if name == "newlib" && stdenv.targetPlatform.isOr1k then targetPackages.or1k-newlib or or1k-newlib
+    else if name == "newlib" then targetPackages.newlibCross or newlibCross
+    else if name == "newlib-nano" then targetPackages.newlib-nanoCross or newlib-nanoCross
+    else if name == "musl" then targetPackages.muslCross or muslCross
+    else if name == "msvcrt" then targetPackages.windows.mingw_w64 or windows.mingw_w64
+    else if name == "ucrt" then targetPackages.windows.mingw_w64 or windows.mingw_w64
+    else if name == "libSystem" then
+      if stdenv.targetPlatform.useiOSPrebuilt
+      then targetPackages.darwin.iosSdkPkgs.libraries or darwin.iosSdkPkgs.libraries
+      else targetPackages.darwin.LibsystemCross or (throw "don't yet have a `targetPackages.darwin.LibsystemCross for ${stdenv.targetPlatform.config}`")
+    else if name == "fblibc" then targetPackages.freebsd.libc or freebsd.libc
+    else if name == "oblibc" then targetPackages.openbsd.libc or openbsd.libc
+    else if name == "nblibc" then targetPackages.netbsd.libc or netbsd.libc
+    else if name == "wasilibc" then targetPackages.wasilibc or wasilibc
+    else if name == "relibc" then targetPackages.relibc or relibc
+    else throw "Unknown libc ${name}";
+
+  libcCross = assert stdenv.targetPlatform != stdenv.buildPlatform; libcCrossChooser stdenv.targetPlatform.libc;
+
+  # TODO: mkManyVariant
+  libffi_3_3 = callPackage ./libffi/3.3.nix { };
+  libffiBoot = libffi.override {
+    doCheck = false;
+  };
+
+  libgcc = stdenv.cc.cc.libgcc or null;
+
+  inherit (callPackages ./stdenv/os-specific/linux/kernel-headers { inherit (pkgsBuildBuild) elf-header; })
+    linuxHeaders makeLinuxHeaders;
+
 
   # TODO: core-pkgs: move openGL into it's own file
   ## libGL/libGLU/Mesa stuff
@@ -385,6 +621,10 @@ final: prev: with final; {
   libkrb5 = prev.krb5.override { type = "lib"; };
 
   libsoup_3 = callPackage ./pkgs/libsoup/3.x.nix { };
+
+  # TODO: corepkgs: gross
+  libtool = callPackage ./pkgs/libtool/libtool2.nix { };
+  libtool_1 = callPackage ./pkgs/libtool { };
 
   # TODO: core-pkgs: just replace usages with util-linuxMinimal?
   libuuid = if stdenv.isLinux
@@ -488,6 +728,8 @@ final: prev: with final; {
     llvm_19
     bolt_19;
 
+  m4 = gnum4;
+
   makeBinaryWrapper = callPackage ./build-support/setup-hooks/make-binary-wrapper { };
 
   makeFontsConf = callPackage ./build-support/make-fonts-conf { };
@@ -503,6 +745,9 @@ final: prev: with final; {
 
   # TODO: support NixOS tests
   nixosTests = { };
+
+  # TODO: Create ekapkgs specific version
+  nix-update-script = { };
 
   opensshPackages = dontRecurseIntoAttrs (callPackage ./pkgs/openssh {});
 
@@ -537,6 +782,7 @@ final: prev: with final; {
     openssl_3_3
     ;
 
+  patch = gnupatch;
   patchutils_0_3_3 = callPackage ./pkgs/patchutils/0.3.3.nix { };
 
   patchutils_0_4_2 = callPackage ./pkgs/patchutils/0.4.2.nix { };
@@ -563,6 +809,7 @@ final: prev: with final; {
     python310
     python311
     python312
+    python3Minimal
     pypy
     ;
   python = python3;
@@ -586,6 +833,9 @@ final: prev: with final; {
   rubyPackages_3_1 = recurseIntoAttrs ruby_3_1.gems;
   rubyPackages_3_2 = recurseIntoAttrs ruby_3_2.gems;
   rubyPackages_3_3 = recurseIntoAttrs ruby_3_3.gems;
+
+  runtimeShell = "${runtimeShellPackage}${runtimeShellPackage.shellPath}";
+  runtimeShellPackage = bash;
 
   rust_1_80 = callPackage ./pkgs/rust/1_80.nix {
     llvm_18 = llvmPackages_18.libllvm;
@@ -629,15 +879,60 @@ final: prev: with final; {
   inherit (texlive.schemes) texliveBasic texliveBookPub texliveConTeXt texliveFull texliveGUST texliveInfraOnly texliveMedium texliveMinimal texliveSmall texliveTeTeX;
   texlivePackages = recurseIntoAttrs (lib.mapAttrs (_: v: v.build) texlive.pkgs);
 
+  # TODO: corepkgs, mkManyVariant
+  texinfoVersions = callPackage ./pkgs/texinfo/packages.nix { };
+  texinfo = texinfoVersions.texinfo7;
+
   tcl = tcl_8_6;
   tcl_8_6 = callPackage ./pkgs/tcl/8.6.nix { };
   tcl_8_5 = callPackage ./pkgs/tcl/8.5.nix { };
 
   tests = callPackage ./test { };
+  # TODO: corepkgs, bring back
+  testers = null;
 
   tk = tcl_8_6;
   tk_8_6 = callPackage ./pkgs/tk/8.6.nix { };
   tk_8_5 = callPackage ./pkgs/tk/8.5.nix { tcl = tcl_8_5; };
+
+  # GNU libc provides libiconv so systems with glibc don't need to
+  # build libiconv separately. Additionally, Apple forked/repackaged
+  # libiconv, so build and use the upstream one with a compatible ABI,
+  # and BSDs include libiconv in libc.
+  #
+  # We also provide `libiconvReal`, which will always be a standalone libiconv,
+  # just in case you want it regardless of platform.
+  libiconv =
+    if lib.elem stdenv.hostPlatform.libc [ "glibc" "musl" "nblibc" "wasilibc" "fblibc" ]
+      then libcIconv (if stdenv.hostPlatform != stdenv.buildPlatform
+        then libcCross
+        else stdenv.cc.libc)
+    else if stdenv.hostPlatform.isDarwin
+      then libiconv-darwin
+    else libiconvReal;
+
+  libcIconv = libc: let
+    inherit (libc) pname version;
+    libcDev = lib.getDev libc;
+  in runCommand "${pname}-iconv-${version}" { strictDeps = true; } ''
+    mkdir -p $out/include
+    ln -sv ${libcDev}/include/iconv.h $out/include
+  '';
+
+  libiconvReal = callPackage ../development/libraries/libiconv { };
+
+  iconv =
+    if lib.elem stdenv.hostPlatform.libc [ "glibc" "musl" ] then
+      lib.getBin stdenv.cc.libc
+    else if stdenv.hostPlatform.isDarwin then
+      lib.getBin libiconv
+    else if stdenv.hostPlatform.isFreeBSD then
+      lib.getBin freebsd.iconv
+    else
+      lib.getBin libiconvReal;
+
+  # On non-GNU systems we need GNU Gettext for libintl.
+  libintl = if stdenv.hostPlatform.libc != "glibc" then gettext else null;
 
   libxcrypt = prev.libxcrypt.override {
     # Prevent infinite recursion

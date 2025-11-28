@@ -6,6 +6,10 @@ be a high degree of scrutiny and quality put into the nix
 expressions in this repository, as it will impact the most
 use cases.
 
+## Major differences from Nixpkgs
+
+See [Major differences document](./docs/major-differences-nixpkgs.md).
+
 ## Structure
 
 ```
