@@ -328,6 +328,10 @@ let
     };
   };
 
+  pkgsOverlay = lib.mkAutoCalledPackageDir ../pkgs;
+  toplevelOverrides = import ../top-level.nix;
+
+
   # The complete chain of package set builders, applied from top to bottom.
   # stdenvOverlays must be last as it brings package forward from the
   # previous bootstrapping phases which have already been overlayed.
@@ -336,6 +340,8 @@ let
     stdenvAdapters
     trivialBuilders
     splice
+    pkgsOverlay
+    toplevelOverrides
     otherPackageSets
     aliases
     configOverrides

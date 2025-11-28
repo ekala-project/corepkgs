@@ -789,6 +789,7 @@ final: prev: with final; {
 
   perlInterpreters = callPackage ./pkgs/perl { };
   perl = perlInterpreters.perl538;
+
   perlPackages = perl.pkgs;
 
   pkg-config = callPackage ./build-support/pkg-config-wrapper { };
@@ -815,6 +816,10 @@ final: prev: with final; {
   python = python3;
   python3 = python311;
   python3Packages = recurseIntoAttrs python3.pkgs;
+
+  readline = readline_8_2;
+  readline_7_0 = callPackage ./pkgs/readline/7.0.nix { };
+  readline_8_2 = callPackage ./pkgs/readline/8.2.nix { };
 
   removeReferencesTo = callPackage ./build-support/remove-references-to {
     inherit (darwin) signingUtils;
