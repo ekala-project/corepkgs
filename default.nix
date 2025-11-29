@@ -8,16 +8,9 @@ let
 
   inherit (pins) lib;
 
-  pkgsOverlay = lib.mkAutoCalledPackageDir ./pkgs;
-
-  toplevelOverlay = import ./top-level.nix;
-
   filteredArgs = builtins.removeAttrs args [ "overlays" ];
 in
 
-import pins.stdenvRepo ({
-  overlays = [
-    pkgsOverlay
-    toplevelOverlay
-  ] ++ overlays;
+import ./stdenv/impure.nix ({
+  inherit overlays;
 } // filteredArgs)

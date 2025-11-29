@@ -12,7 +12,7 @@
 , pkgsHostHost
 , pkgsTargetTarget
 , zlib
-, config
+, config ? { }
 , passthruFun
 , perlAttr ? "perl${lib.versions.major version}${lib.versions.minor version}"
 , enableThreading ? true, coreutils, makeWrapper
