@@ -328,7 +328,7 @@ let
     };
   };
 
-  pkgsOverlay = lib.mkAutoCalledPackageDir ../pkgs;
+  pkgsOverlay = lib.packageSets.mkAutoCalledPackageDir ../pkgs;
   toplevelOverrides = import ../top-level.nix;
 
 

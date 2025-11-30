@@ -133,6 +133,7 @@ in
   callPackage = pkgs.newScope { };
 
   callPackages = lib.callPackagesWith splicedPackages;
+  callFromScope = lib.callFromScopeWith splicedPackages;
 
   newScope = extra: lib.callPackageWith (splicedPackages // extra);
 

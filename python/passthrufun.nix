@@ -22,7 +22,7 @@ assert lib.assertMsg (pythonPackagesExtensions == [ ])
   "pythonPackagesExtensions is not supported";
 
 let
-  autoCalledOverlay = lib.mkAutoCalledPackageDir ./pkgs;
+  autoCalledOverlay = lib.packageSets.mkAutoCalledPackageDir ./pkgs;
   pythonPackages = let
     ensurePythonModules = items: let
       exceptions = [
