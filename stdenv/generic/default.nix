@@ -1,5 +1,5 @@
 let
-  lib = import ../lib.nix;
+  lib = import ../../lib.nix;
   stdenv-overridable = lib.makeOverridable (
 
 argsStdenv@{ name ? "stdenv", preHook ? "", initialPath

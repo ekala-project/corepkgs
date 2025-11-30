@@ -1,7 +1,7 @@
 {
   lib = import (builtins.fetchGit {
     url = "https://github.com/ekala-project/nix-lib.git";
-    rev = "e74186eac912734bec7ff8d10389f64bdb606113";
+    rev = "153718892b30b8da079bff0c2c94f4ca1aa6bb2a";
   });
 }
 

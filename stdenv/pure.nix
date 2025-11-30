@@ -50,7 +50,7 @@ let # Rename the function arguments
   crossSystem0 = crossSystem;
 
 in let
-  lib = import ./lib.nix;
+  lib = import ../lib.nix;
 
   inherit (lib) throwIfNot;
 

@@ -1,8 +1,5 @@
 let
-  lib = import (builtins.fetchGit {
-  url = "https://github.com/jonringer/nix-lib.git";
-  rev = "f3baad9fc4df31152e6150712204bb391214fdd7";
-});
+  inherit (import ./pins.nix) lib;
 in lib.extend(self: _: {
   systems = import ./systems { lib = self; };
 
