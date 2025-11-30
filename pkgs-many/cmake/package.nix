@@ -1,3 +1,15 @@
+{
+  version,
+  src-hash,
+  isMinimalBuild ? false,
+  withNcurses ? false,
+  withQt ? false,
+  buildDocs ? !isMinimalBuild,
+  useOpenSSL ? !isMinimalBuild,
+  mkVersionPassthru,
+  ...
+}:
+
 { lib
 , stdenv
 , fetchurl
@@ -13,47 +25,30 @@
 , pkg-config
 , procps
 , rhash
-# TODO: support sphinx
-, sphinx ? null
+, sphinx
 , texinfo
 , xz
 , zlib
-, isBootstrap ? null
-, isMinimalBuild ? (
-  if isBootstrap != null
-  then lib.warn
-    "isBootstrap argument is deprecated and will be removed; use isMinimalBuild instead"
-    isBootstrap
-  else false)
-, useOpenSSL ? !isMinimalBuild
-, useSharedLibraries ? (!isMinimalBuild && !stdenv.isCygwin)
-, uiToolkits ? [] # can contain "ncurses" and/or "qt5"
-, buildDocs ? !(isMinimalBuild || (uiToolkits == []))
-, darwin
 , libsForQt5 ? null
 , gitUpdater
-}:
+}@args:
 
 let
-  inherit (darwin.apple_sdk.frameworks) CoreServices SystemConfiguration;
   inherit (libsForQt5) qtbase wrapQtAppsHook;
-  cursesUI = lib.elem "ncurses" uiToolkits;
-  qt5UI = lib.elem "qt5" uiToolkits;
+  useSharedLibraries = (!isMinimalBuild && !stdenv.isCygwin);
 in
-# Accepts only "ncurses" and "qt5" as possible uiToolkits
-assert lib.subtractLists [ "ncurses" "qt5" ] uiToolkits == [];
 # Minimal, bootstrap cmake does not have toolkits
-assert isMinimalBuild -> (uiToolkits == []);
+assert isMinimalBuild -> (!withNcurses && !withQt);
 stdenv.mkDerivation (finalAttrs: {
   pname = "cmake"
     + lib.optionalString isMinimalBuild "-minimal"
-    + lib.optionalString cursesUI "-cursesUI"
-    + lib.optionalString qt5UI "-qt5UI";
-  version = "3.29.6";
+    + lib.optionalString withNcurses "-cursesUI"
+    + lib.optionalString withQt "-qt5UI";
+  inherit version;
 
   src = fetchurl {
     url = "https://cmake.org/files/v${lib.versions.majorMinor finalAttrs.version}/cmake-${finalAttrs.version}.tar.gz";
-    hash = "sha256-E5ExMAO4PUjiqxFai1JaVX942MFURhi0jR2QGEoQ8K8=";
+    hash = src-hash;
   };
 
   patches = [
@@ -63,7 +58,8 @@ stdenv.mkDerivation (finalAttrs: {
     # Don't search in non-Nix locations such as /usr, but do search in our libc.
     ./001-search-path.diff
     # Don't depend on frameworks.
-    ./002-application-services.diff
+    # TODO: support darwin
+    # ./002-application-services.diff
     # Derived from https://github.com/libuv/libuv/commit/1a5d4f08238dd532c3718e210078de1186a5920d
     ./003-libuv-application-services.diff
   ]
@@ -94,7 +90,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
   ]
   ++ lib.optionals buildDocs [ texinfo ]
-  ++ lib.optionals qt5UI [ wrapQtAppsHook ];
+  ++ lib.optionals withQt [ wrapQtAppsHook ];
 
   buildInputs = lib.optionals useSharedLibraries [
     bzip2
@@ -107,10 +103,8 @@ stdenv.mkDerivation (finalAttrs: {
     rhash
   ]
   ++ lib.optional useOpenSSL openssl
-  ++ lib.optional cursesUI ncurses
-  ++ lib.optional qt5UI qtbase
-  ++ lib.optional stdenv.isDarwin CoreServices
-  ++ lib.optional (stdenv.isDarwin && !isMinimalBuild) SystemConfiguration;
+  ++ lib.optional withNcurses ncurses
+  ++ lib.optional withQt qtbase;
 
   preConfigure = ''
     fixCmakeFiles .
@@ -139,8 +133,8 @@ stdenv.mkDerivation (finalAttrs: {
         else [
           "--no-system-libs"
         ]) # FIXME: cleanup
-  ++ lib.optional qt5UI "--qt-gui"
-  ++ lib.optionals (buildDocs && sphinx != null) [
+  ++ lib.optional withQt "--qt-gui"
+  ++ lib.optionals buildDocs [
     "--sphinx-build=${sphinx}/bin/sphinx-build"
     "--sphinx-info"
     "--sphinx-man"
@@ -168,7 +162,7 @@ stdenv.mkDerivation (finalAttrs: {
       "${lib.getBin stdenv.cc.bintools.bintools}/bin/${stdenv.cc.targetPrefix}strip")
 
     (lib.cmakeBool "CMAKE_USE_OPENSSL" useOpenSSL)
-    (lib.cmakeBool "BUILD_CursesDialog" cursesUI)
+    (lib.cmakeBool "BUILD_CursesDialog" withNcurses)
   ];
 
   # `pkgsCross.musl64.cmake.override { stdenv = pkgsCross.musl64.llvmPackages_16.libcxxStdenv; }`
@@ -187,10 +181,12 @@ stdenv.mkDerivation (finalAttrs: {
 
   doCheck = false; # fails
 
-  passthru.updateScript = gitUpdater {
-    url = "https://gitlab.kitware.com/cmake/cmake.git";
-    rev-prefix = "v";
-    ignoredVersions = "-"; # -rc1 and friends
+  passthru = (mkVersionPassthru args) // {
+    updateScript = gitUpdater {
+      url = "https://gitlab.kitware.com/cmake/cmake.git";
+      rev-prefix = "v";
+      ignoredVersions = "-"; # -rc1 and friends
+    };
   };
 
   meta = {
@@ -208,6 +204,6 @@ stdenv.mkDerivation (finalAttrs: {
     maintainers = with lib.maintainers; [ ];
     platforms = lib.platforms.all;
     mainProgram = "cmake";
-    broken = (qt5UI && stdenv.isDarwin);
+    broken = (withQt && stdenv.isDarwin);
   };
 })

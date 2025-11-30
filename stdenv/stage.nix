@@ -329,18 +329,20 @@ let
   };
 
   pkgsOverlay = lib.packageSets.mkAutoCalledPackageDir ../pkgs;
+  pkgsManyVariantOverlay = lib.packageSets.mkAutoCalledManyVariantsDir ../pkgs-many;
   toplevelOverrides = import ../top-level.nix;
 
 
   # The complete chain of package set builders, applied from top to bottom.
   # stdenvOverlays must be last as it brings package forward from the
   # previous bootstrapping phases which have already been overlayed.
-  toFix = lib.foldl' (lib.flip lib.extends) (self: {inherit lib;}) ([
+  toFix = lib.foldl' (lib.flip lib.extends) (self: { inherit lib; }) ([
     stdenvBootstappingAndPlatforms
     stdenvAdapters
     trivialBuilders
     splice
     pkgsOverlay
+    pkgsManyVariantOverlay
     toplevelOverrides
     otherPackageSets
     aliases
