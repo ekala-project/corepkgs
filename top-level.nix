@@ -13,6 +13,8 @@ final: prev: with final; {
   noSysDirs = stdenv.buildPlatform.system != "x86_64-solaris"
            && stdenv.buildPlatform.system != "x86_64-kfreebsd-gnu";
 
+  mkManyVariants = callFromScope ./pkgs/mkManyVariants { };
+
   stdenvNoCC = stdenv.override (
     { cc = null; hasCC = false; }
 
@@ -209,7 +211,7 @@ final: prev: with final; {
 
   closureInfo = callPackage ./build-support/closure-info.nix { };
 
-  cmakeMinimal = prev.cmake.override { isMinimalBuild = true; };
+  cmakeMinimal = prev.cmake.minimal;
 
   clang = llvmPackages.clang;
   clang_12 = llvmPackages_12.clang;

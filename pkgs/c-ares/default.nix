@@ -23,7 +23,7 @@ stdenv.mkDerivation rec {
 
   outputs = [ "out" "dev" "man" ];
 
-  nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ] ++ lib.optionals withCMake [ cmake ];
+  nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ] ++ lib.optionals withCMake [ cmake.minimal ];
 
   cmakeFlags = [] ++ lib.optionals stdenv.hostPlatform.isStatic [
     "-DCARES_SHARED=OFF"
