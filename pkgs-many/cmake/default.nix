@@ -1,7 +1,7 @@
 { mkManyVariants }:
 
 mkManyVariants {
-  versions = ./versions.nix;
+  variants = ./versions.nix;
   aliases = { };
   defaultSelector = (p: p.v3);
   genericBuilder = ./package.nix;

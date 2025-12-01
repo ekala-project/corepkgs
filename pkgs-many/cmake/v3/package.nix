@@ -5,9 +5,9 @@
 , withQt ? false
 , buildDocs ? !isMinimalBuild
 , useOpenSSL ? !isMinimalBuild
-, mkVersionPassthru
+, mkVariantPassthru
 , ...
-}:
+}@variantArgs:
 
 { lib
 , stdenv
@@ -32,7 +32,7 @@
 , gitUpdater
 , darwin ? null
 , ps
-}@args:
+}@dependencies:
 
 let
   inherit (libsForQt5) qtbase wrapQtAppsHook;
@@ -182,7 +182,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   doCheck = false; # fails
 
-  passthru = (mkVersionPassthru args) // {
+  passthru = (mkVariantPassthru variantArgs dependencies) // {
     updateScript = gitUpdater {
       url = "https://gitlab.kitware.com/cmake/cmake.git";
       rev-prefix = "v";
