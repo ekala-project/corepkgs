@@ -3,7 +3,7 @@
 , gccStdenv
 , gcc7Stdenv
 , callPackage
-, isl_0_11, isl_0_14, isl_0_17, isl_0_20
+, isl
 , libcCross
 , threadsCross
 , noSysDirs
@@ -25,11 +25,11 @@ let
         libcCross = if stdenv.targetPlatform != stdenv.buildPlatform then args.libcCross else null;
         threadsCross = if stdenv.targetPlatform != stdenv.buildPlatform then threadsCross else { };
         isl = if       stdenv.isDarwin then null
-              else if    atLeast "9"   then isl_0_20
-              else if    atLeast "7"   then isl_0_17
-              else if    atLeast "6"   then (if stdenv.targetPlatform.isRedox then isl_0_17 else isl_0_14)
-              else if    atLeast "4.9" then isl_0_11
-              else            /* "4.8" */   isl_0_14;
+              else if    atLeast "9"   then isl.v0_20
+              else if    atLeast "7"   then isl.v0_17
+              else if    atLeast "6"   then (if stdenv.targetPlatform.isRedox then isl.v0_17 else isl.v0_14)
+              else if    atLeast "4.9" then isl.v0_11
+              else            /* "4.8" */   isl.v0_14;
       } // lib.optionalAttrs (atLeast "6" && !(atLeast "9")) {
         # gcc 10 is too strict to cross compile gcc <= 8
         stdenv = if (stdenv.targetPlatform != stdenv.buildPlatform) && stdenv.cc.isGNU then gcc7Stdenv else stdenv;
