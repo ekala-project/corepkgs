@@ -500,7 +500,7 @@ in
     assert            isFromBootstrapFiles prevStage.coreutils;
     assert            isFromBootstrapFiles prevStage.gnugrep;
     assert        isBuiltByNixpkgsCompiler prevStage.patchelf;
-    assert lib.all isBuiltByNixpkgsCompiler [ prevStage.gmp prevStage.isl_0_20 prevStage.libmpc prevStage.mpfr ];
+    assert lib.all isBuiltByNixpkgsCompiler [ prevStage.gmp prevStage.isl.v0_20 prevStage.libmpc prevStage.mpfr ];
     stageFun prevStage {
     name = "bootstrap-stage3";
 

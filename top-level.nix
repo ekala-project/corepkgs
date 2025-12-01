@@ -507,15 +507,6 @@ final: prev: with final; {
 
   installShellFiles = callPackage ./build-support/install-shell-files { };
 
-  # TODO: mkManyVariant
-  isl = isl_0_20;
-  isl_0_11 = callPackage ./pkgs/isl/0.11.1.nix { };
-  isl_0_14 = callPackage ./pkgs/isl/0.14.1.nix { };
-  isl_0_17 = callPackage ./pkgs/isl/0.17.1.nix { };
-  isl_0_20 = callPackage ./pkgs/isl/0.20.0.nix { };
-  isl_0_24 = callPackage ./pkgs/isl/0.24.0.nix { };
-
-
   openjdk21 = javaPackages.compiler.openjdk21;
   jdk21 = openjdk21;
   jdk = jdk21;
