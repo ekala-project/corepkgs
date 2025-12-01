@@ -1,22 +1,22 @@
 { lib, config }:
 
 {
-# Intended to be an attrset of { "<exposed version>" = { version = "<full version>"; src = <path>; } }
-# or a file containing such version information
+# Intended to be an attrset of { "<exposed variant>" = { variant = "<full variant>"; src = <path>; } }
+# or a file containing such variant information
 # Type: AttrSet AttrSet
-versions,
+variants,
 
-# Similar to versions, but instead contain deprecation and removal messages
+# Similar to variants, but instead contain deprecation and removal messages
 # Only added when `config.allowAliases` is true
-# This is passed the versions attr set to allow for directly referencing the version entries
+# This is passed the variants attr set to allow for directly referencing the variant entries
 # Type: AttrSet AttrSet -> AttrSet AttrSet.
 aliases ? { ... }: { },
 
-# A "projection" from the version set to a version to be used as the default
+# A "projection" from the variant set to a variant to be used as the default
 # Type: AttrSet package -> package
 defaultSelector,
 
-# Nix expression which takes version and package args, and returns an attrset to pass to mkDerivation
+# Nix expression which takes variant and package args, and returns an attrset to pass to mkDerivation
 # Type: AttrSet -> AttrSet -> AttrSet
 genericBuilder,
 }:
@@ -25,36 +25,36 @@ genericBuilder,
 assert builtins.isFunction defaultSelector;
 
 let
-  versionsRaw = if builtins.isPath versions then import versions else versions;
+  variantsRaw = if builtins.isPath variants then import variants else variants;
   aliasesExpr = if builtins.isPath aliases then import aliases else aliases;
   genericExpr = if builtins.isPath genericBuilder then import genericBuilder else genericBuilder;
 
   aliases' = if builtins.isFunction aliasesExpr
     then
-      aliasesExpr { inherit lib; versions = versionsRaw; }
+      aliasesExpr { inherit lib; variants = variantsRaw; }
     else aliasesExpr;
-  versions' = if config.allowAliases then
-      # Not sure if aliases or versions should have priority
-      versionsRaw // aliases'
-    else versionsRaw;
+  variants' = if config.allowAliases then
+      # Not sure if aliases or variants should have priority
+      variantsRaw // aliases'
+    else variantsRaw;
 
-  defaultVariant = defaultSelector versions';
+  defaultVariant = defaultSelector variants';
 
-  # This also allows for additional attrs to be passed through besides version and src
-  mkVersionArgs = { version, ... }@args: args // rec {
+  # This also allows for additional attrs to be passed through besides variant and src
+  mkVariantArgs = { version, ... }@args: args // rec {
     # Some helpers commonly used to determine packaging behavior
     packageOlder = lib.versionOlder version;
     packageAtLeast = lib.versionAtLeast version;
     packageBetween = lower: higher: packageAtLeast lower && packageOlder higher;
-    mkVersionPassthru = packageArgs: let
-      variants = builtins.mapAttrs (_: v: mkPackage  v packageArgs) versions';
+    mkVariantPassthru = variantArgs: packageArgs: let
+      variants = builtins.mapAttrs (_: v: mkPackage (variantArgs // v) packageArgs) variants';
     in variants // { inherit variants; };
   };
 
-  # Re-call the generic builder with new version args, re-wrap with makeOverridable
+  # Re-call the generic builder with new variant args, re-wrap with makeOverridable
   # to give it the same appearance as being called by callPackage
-  mkPackage = version: lib.makeOverridable (genericExpr (mkVersionArgs (defaultVariant // version)));
+  mkPackage = variant: lib.makeOverridable (genericExpr (mkVariantArgs (defaultVariant // variant)));
 in
   # The partially applied function doesn't need to be called with makeOverridable
   # As callPackage will be wrapping this in makeOverridable as well
-  genericExpr (mkVersionArgs defaultVariant)
+  genericExpr (mkVariantArgs defaultVariant)
