@@ -330,7 +330,7 @@ let
         targetPlatform = localSystem;
         cc = null;
       };
-      fetchurlBoot = import ../build-support/fetchurl {
+      fetchurlBoot = import ../../build-support/fetchurl {
         inherit lib stdenvNoCC;
         inherit (prevStage) curl;
       };
@@ -349,7 +349,7 @@ let
           ./unpack-source.sh
           ./always-patchelf.sh
         ];
-        cc = lib.makeOverridable (import ../build-support/cc-wrapper) {
+        cc = lib.makeOverridable (import ../../build-support/cc-wrapper) {
           inherit lib stdenvNoCC;
           name = "${name}-cc";
           inherit (prevStage.freebsd) libc;
@@ -370,7 +370,7 @@ let
           extraBuildCommands = lib.optionalString hascxx (
             mkExtraBuildCommands prevStage.llvmPackages.clang-unwrapped prevStage.llvmPackages.compiler-rt
           );
-          bintools = lib.makeOverridable (import ../build-support/bintools-wrapper) {
+          bintools = lib.makeOverridable (import ../../build-support/bintools-wrapper) {
             inherit lib stdenvNoCC;
             name = "${name}-bintools";
             inherit (prevStage.freebsd) libc;
@@ -422,7 +422,7 @@ in
           xz
           ;
         binutils-unwrapped = builtins.removeAttrs bootstrapTools.binutils-unwrapped [ "src" ];
-        fetchurl = import ../build-support/fetchurl {
+        fetchurl = import ../../build-support/fetchurl {
           inherit lib;
           inherit (self) stdenvNoCC;
           inherit (prevStage) curl;

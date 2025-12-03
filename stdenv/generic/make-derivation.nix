@@ -39,8 +39,8 @@ let
     unique
   ;
 
-  inherit (import ../build-support/lib/cmake.nix { inherit lib stdenv; }) makeCMakeFlags;
-  inherit (import ../build-support/lib/meson.nix { inherit lib stdenv; }) makeMesonFlags;
+  inherit (import ../../build-support/lib/cmake.nix { inherit lib stdenv; }) makeCMakeFlags;
+  inherit (import ../../build-support/lib/meson.nix { inherit lib stdenv; }) makeMesonFlags;
 
   mkDerivation =
     fnOrAttrs:
@@ -294,8 +294,8 @@ else let
          ++ optionals doCheck checkInputs
          ++ optionals doInstallCheck installCheckInputs;
   nativeBuildInputs' = nativeBuildInputs
-         ++ optional separateDebugInfo' ../build-support/setup-hooks/separate-debug-info.sh
-         ++ optional stdenv.hostPlatform.isWindows ../build-support/setup-hooks/win-dll-link.sh
+         ++ optional separateDebugInfo' ../../build-support/setup-hooks/separate-debug-info.sh
+         ++ optional stdenv.hostPlatform.isWindows ../../build-support/setup-hooks/win-dll-link.sh
          ++ optionals doCheck nativeCheckInputs
          ++ optionals doInstallCheck nativeInstallCheckInputs;
 

@@ -173,13 +173,13 @@ let
         shell = "${bootstrapTools}/bin/bash";
         initialPath = [bootstrapTools];
 
-        fetchurlBoot = import ../build-support/fetchurl/boot.nix {
+        fetchurlBoot = import ../../build-support/fetchurl/boot.nix {
           inherit system;
         };
 
         cc = if prevStage.gcc-unwrapped == null
              then null
-             else (lib.makeOverridable (import ../build-support/cc-wrapper) {
+             else (lib.makeOverridable (import ../../build-support/cc-wrapper) {
           name = "${name}-gcc-wrapper";
           nativeTools = false;
           nativeLibc = false;
@@ -255,7 +255,7 @@ in
         passthru.isFromBootstrapFiles = true;
       };
       gcc-unwrapped = bootstrapTools;
-      binutils = import ../build-support/bintools-wrapper {
+      binutils = import ../../build-support/bintools-wrapper {
         name = "bootstrap-stage0-binutils-wrapper";
         nativeTools = false;
         nativeLibc = false;
@@ -562,7 +562,7 @@ in
       # bootstrap, like guile: https://github.com/NixOS/nixpkgs/issues/181188
       gnumake = super.gnumake.override { inBootstrap = true; };
 
-      gcc = lib.makeOverridable (import ../build-support/cc-wrapper) {
+      gcc = lib.makeOverridable (import ../../build-support/cc-wrapper) {
         nativeTools = false;
         nativeLibc = false;
         isGNU = true;
