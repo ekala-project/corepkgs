@@ -15,6 +15,8 @@ final: prev: with final; {
 
   mkManyVariants = callFromScope ./pkgs/mkManyVariants { };
 
+  fetchFromGitHub = callFromScope ./pkgs/fetchFromGitHub { };
+
   stdenvNoCC = stdenv.override (
     { cc = null; hasCC = false; }
 
@@ -298,13 +300,7 @@ final: prev: with final; {
   docbook_xsl = docbook-xsl-nons;
   docbook_xsl_ns = docbook-xsl-ns;
 
-  fetchgit = (callPackage ./build-support/fetchgit {
-    git = buildPackages.git;
-    cacert = buildPackages.cacert;
-    git-lfs = buildPackages.git-lfs;
-  }) // { # fetchgit is a function, so we use // instead of passthru.
-    tests = pkgs.tests.fetchgit;
-  };
+  fetchgit = callFromScope ./build-support/fetchgit { };
 
   fetchFromGitLab = callPackage ./build-support/fetchgitlab { };
 
@@ -335,6 +331,7 @@ final: prev: with final; {
       lib.makeOverridable (import ./build-support/fetchurl) {
         inherit lib stdenvNoCC buildPackages;
         inherit cacert;
+        inherit config;
         curl = buildPackages.curlMinimal.override (old: rec {
           # break dependency cycles
           fetchurl = stdenv.fetchurlBoot;
