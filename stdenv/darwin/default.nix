@@ -91,7 +91,7 @@ let
         if prevStage.llvmPackages.clang-unwrapped == null then
           null
         else
-          lib.makeOverridable (import ../build-support/cc-wrapper) {
+          lib.makeOverridable (import ../../build-support/cc-wrapper) {
             name = "${name}-clang-wrapper";
 
             nativeTools = false;
@@ -173,7 +173,7 @@ let
           bootstrapTools
         ];
 
-        fetchurlBoot = import ../build-support/fetchurl {
+        fetchurlBoot = import ../../build-support/fetchurl {
           inherit lib;
           stdenvNoCC = prevStage.ccWrapperStdenv or thisStdenv;
           curl = bootstrapTools;
@@ -387,11 +387,11 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
                 export signingUtils=${selfDarwin.signingUtils}
 
                 wrap \
-                  install_name_tool ${../build-support/bintools-wrapper/darwin-install_name_tool-wrapper.sh} \
+                  install_name_tool ${../../build-support/bintools-wrapper/darwin-install_name_tool-wrapper.sh} \
                   "${selfDarwin.binutils-unwrapped}/bin/install_name_tool"
 
                 wrap \
-                  strip ${../build-support/bintools-wrapper/darwin-strip-wrapper.sh} \
+                  strip ${../../build-support/bintools-wrapper/darwin-strip-wrapper.sh} \
                   "${selfDarwin.binutils-unwrapped}/bin/strip"
               '';
             };
@@ -661,11 +661,11 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
                 export signingUtils=${selfDarwin.signingUtils}
 
                 wrap \
-                  install_name_tool ${../build-support/bintools-wrapper/darwin-install_name_tool-wrapper.sh} \
+                  install_name_tool ${../../build-support/bintools-wrapper/darwin-install_name_tool-wrapper.sh} \
                   "${selfDarwin.binutils-unwrapped}/bin/install_name_tool"
 
                 wrap \
-                  strip ${../build-support/bintools-wrapper/darwin-strip-wrapper.sh} \
+                  strip ${../../build-support/bintools-wrapper/darwin-strip-wrapper.sh} \
                   "${selfDarwin.binutils-unwrapped}/bin/strip"
               '';
             };
@@ -2033,7 +2033,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
                     libllvm
                     llvm
                     ;
-                  libcxxClang = lib.makeOverridable (import ../build-support/cc-wrapper) {
+                  libcxxClang = lib.makeOverridable (import ../../build-support/cc-wrapper) {
                     nativeTools = false;
                     nativeLibc = false;
 

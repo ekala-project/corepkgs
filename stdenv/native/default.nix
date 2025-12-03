@@ -125,12 +125,12 @@ in
         x86_64-solaris = "/opt/local/gcc47";
       }.${system} or "/usr";
     in
-    import ../build-support/cc-wrapper {
+    import ../../build-support/cc-wrapper {
       name = "cc-native";
       nativeTools = true;
       nativeLibc = true;
       inherit lib nativePrefix;
-      bintools = import ../build-support/bintools-wrapper {
+      bintools = import ../../build-support/bintools-wrapper {
         name = "bintools";
         inherit lib stdenvNoCC nativePrefix;
         nativeTools = true;
@@ -139,7 +139,7 @@ in
       inherit stdenvNoCC;
     };
 
-    fetchurl = import ../build-support/fetchurl {
+    fetchurl = import ../../build-support/fetchurl {
       inherit lib stdenvNoCC;
       # Curl should be in /usr/bin or so.
       curl = null;

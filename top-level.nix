@@ -546,7 +546,7 @@ final: prev: with final; {
 
   libgcc = stdenv.cc.cc.libgcc or null;
 
-  inherit (callPackages ./stdenv/os-specific/linux/kernel-headers { inherit (pkgsBuildBuild) elf-header; })
+  inherit (callPackages ./os-specific/linux/kernel-headers { inherit (pkgsBuildBuild) elf-header; })
     linuxHeaders makeLinuxHeaders;
 
 

@@ -264,8 +264,8 @@ rec {
   useMoldLinker = stdenv: let
     bintools = stdenv.cc.bintools.override {
       extraBuildCommands = ''
-        wrap ${stdenv.cc.bintools.targetPrefix}ld.mold ${./build-support/bintools-wrapper/ld-wrapper.sh} ${pkgs.mold}/bin/ld.mold
-        wrap ${stdenv.cc.bintools.targetPrefix}ld ${./build-support/bintools-wrapper/ld-wrapper.sh} ${pkgs.mold}/bin/ld.mold
+        wrap ${stdenv.cc.bintools.targetPrefix}ld.mold ${../build-support/bintools-wrapper/ld-wrapper.sh} ${pkgs.mold}/bin/ld.mold
+        wrap ${stdenv.cc.bintools.targetPrefix}ld ${../build-support/bintools-wrapper/ld-wrapper.sh} ${pkgs.mold}/bin/ld.mold
       '';
     };
   in stdenv.override (old: {

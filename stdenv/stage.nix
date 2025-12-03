@@ -99,7 +99,7 @@ let
     };
 
   trivialBuilders = self: super:
-    import ./build-support/trivial-builders {
+    import ../build-support/trivial-builders {
       inherit lib;
       inherit (self) config;
       inherit (self) runtimeShell stdenv stdenvNoCC;
