@@ -17,7 +17,7 @@ stdenv.mkDerivation rec {
 
   strictDeps = true;
   nativeBuildInputs = [ m4 perl texinfo ];
-  buildInputs = [ m4 ];
+
   postBuild = "
     make html
   ";
