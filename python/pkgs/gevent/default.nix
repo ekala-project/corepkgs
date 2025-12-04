@@ -40,7 +40,8 @@ buildPythonPackage rec {
     cython
     setuptools
     wheel
-  ] ++ lib.optionals (!isPyPy) [ cffi ];
+  ]
+  ++ lib.optionals (!isPyPy) [ cffi ];
 
   buildInputs = [
     libev
@@ -52,7 +53,8 @@ buildPythonPackage rec {
     importlib-metadata
     zope-event
     zope-interface
-  ] ++ lib.optionals (!isPyPy) [ greenlet ];
+  ]
+  ++ lib.optionals (!isPyPy) [ greenlet ];
 
   # Bunch of failures.
   doCheck = false;
@@ -69,7 +71,8 @@ buildPythonPackage rec {
       opentracing
       pika
       ;
-  } // lib.filterAttrs (k: v: lib.hasInfix "gevent" k) python.pkgs;
+  }
+  // lib.filterAttrs (k: v: lib.hasInfix "gevent" k) python.pkgs;
 
   GEVENTSETUP_EMBED = "0";
 

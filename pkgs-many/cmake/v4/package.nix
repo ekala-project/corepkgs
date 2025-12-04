@@ -1,12 +1,13 @@
-{ version
-, src-hash
-, isMinimalBuild ? false
-, withNcurses ? false
-, withQt ? false
-, buildDocs ? !isMinimalBuild
-, useOpenSSL ? !isMinimalBuild
-, mkVariantPassthru
-, ...
+{
+  version,
+  src-hash,
+  isMinimalBuild ? false,
+  withNcurses ? false,
+  withQt ? false,
+  buildDocs ? !isMinimalBuild,
+  useOpenSSL ? !isMinimalBuild,
+  mkVariantPassthru,
+  ...
 }@variantArgs:
 
 {

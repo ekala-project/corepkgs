@@ -1,16 +1,27 @@
-{ lib, stdenv, fetchurl, fixDarwinDylibNames, which, dieHook
-, fetchpatch
-, enableShared ? !stdenv.hostPlatform.isStatic
-, enableStatic ? stdenv.hostPlatform.isStatic
-# for passthru.tests
-, nix
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fixDarwinDylibNames,
+  which,
+  dieHook,
+  fetchpatch,
+  enableShared ? !stdenv.hostPlatform.isStatic,
+  enableStatic ? stdenv.hostPlatform.isStatic,
+  # for passthru.tests
+  nix,
 }:
 
 stdenv.mkDerivation rec {
   pname = "lowdown";
   version = "1.1.0";
 
-  outputs = [ "out" "lib" "dev" "man" ];
+  outputs = [
+    "out"
+    "lib"
+    "dev"
+    "man"
+  ];
 
   src = fetchurl {
     url = "https://kristaps.bsd.lv/lowdown/snapshots/lowdown-${version}.tar.gz";
@@ -51,8 +62,11 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  nativeBuildInputs = [ which dieHook ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [ fixDarwinDylibNames ];
+  nativeBuildInputs = [
+    which
+    dieHook
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ fixDarwinDylibNames ];
 
   preConfigure = lib.optionalString (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64) ''
     echo 'HAVE_SANDBOX_INIT=0' > configure.local
@@ -73,9 +87,11 @@ stdenv.mkDerivation rec {
 
   installTargets = [
     "install"
-  ] ++ lib.optionals enableShared [
+  ]
+  ++ lib.optionals enableShared [
     "install_shared"
-  ] ++ lib.optionals enableStatic [
+  ]
+  ++ lib.optionals enableStatic [
     "install_static"
   ];
 

@@ -1,11 +1,46 @@
-{ stdenv, lib, fetchurl, fetchpatch, fetchFromGitHub, bash, pkg-config, autoconf, cpio
-, file, which, unzip, zip, perl, cups, freetype, harfbuzz, alsa-lib, libjpeg, giflib
-, libpng, zlib, lcms2, libX11, libICE, libXrender, libXext, libXt, libXtst
-, libXi, libXinerama, libXcursor, libXrandr, fontconfig, openjdk17-bootstrap
-, setJavaClassPath
-, headless ? false
-, enableJavaFX ? false, openjfx
-, enableGtk ? true, gtk3, glib
+{
+  stdenv,
+  lib,
+  fetchurl,
+  fetchpatch,
+  fetchFromGitHub,
+  bash,
+  pkg-config,
+  autoconf,
+  cpio,
+  file,
+  which,
+  unzip,
+  zip,
+  perl,
+  cups,
+  freetype,
+  harfbuzz,
+  alsa-lib,
+  libjpeg,
+  giflib,
+  libpng,
+  zlib,
+  lcms2,
+  libX11,
+  libICE,
+  libXrender,
+  libXext,
+  libXt,
+  libXtst,
+  libXi,
+  libXinerama,
+  libXcursor,
+  libXrandr,
+  fontconfig,
+  openjdk17-bootstrap,
+  setJavaClassPath,
+  headless ? false,
+  enableJavaFX ? false,
+  openjfx,
+  enableGtk ? true,
+  gtk3,
+  glib,
 }:
 
 let
@@ -29,13 +64,44 @@ let
       sha256 = "sha256-aO4iSc9MklW/4q9U86WEfiiWnlq6iZSbxzq2fbsqd0A=";
     };
 
-    nativeBuildInputs = [ pkg-config autoconf unzip ];
+    nativeBuildInputs = [
+      pkg-config
+      autoconf
+      unzip
+    ];
     buildInputs = [
-      cpio file which zip perl zlib cups freetype harfbuzz alsa-lib libjpeg giflib
-      libpng zlib lcms2 libX11 libICE libXrender libXext libXtst libXt libXtst
-      libXi libXinerama libXcursor libXrandr fontconfig openjdk-bootstrap
-    ] ++ lib.optionals (!headless && enableGtk) [
-      gtk3 glib
+      cpio
+      file
+      which
+      zip
+      perl
+      zlib
+      cups
+      freetype
+      harfbuzz
+      alsa-lib
+      libjpeg
+      giflib
+      libpng
+      zlib
+      lcms2
+      libX11
+      libICE
+      libXrender
+      libXext
+      libXtst
+      libXt
+      libXtst
+      libXi
+      libXinerama
+      libXcursor
+      libXrandr
+      fontconfig
+      openjdk-bootstrap
+    ]
+    ++ lib.optionals (!headless && enableGtk) [
+      gtk3
+      glib
     ];
 
     patches = [
@@ -77,7 +143,8 @@ let
         url = "https://raw.githubusercontent.com/chimera-linux/cports/4614075d19e9c9636f3f7e476687247f63330a35/contrib/openjdk17/patches/lfs64.patch";
         hash = "sha256-t2mRbdEiumBAbIAC0zsJNwCn59WYWHsnRtuOSL6bWB4=";
       })
-    ] ++ lib.optionals (!headless && enableGtk) [
+    ]
+    ++ lib.optionals (!headless && enableGtk) [
       ./swing-use-gtk-jdk13.patch
     ];
 
@@ -89,7 +156,10 @@ let
     # JDK's build system attempts to specifically detect
     # and special-case WSL, and we don't want it to do that,
     # so pass the correct platform names explicitly
-    configurePlatforms = ["build" "host"];
+    configurePlatforms = [
+      "build"
+      "host"
+    ];
 
     configureFlags = [
       "--with-boot-jdk=${openjdk-bootstrap.home}"
@@ -120,11 +190,19 @@ let
 
     env.NIX_CFLAGS_COMPILE = "-Wno-error";
 
-    NIX_LDFLAGS = toString (lib.optionals (!headless) [
-      "-lfontconfig" "-lcups" "-lXinerama" "-lXrandr" "-lmagic"
-    ] ++ lib.optionals (!headless && enableGtk) [
-      "-lgtk-3" "-lgio-2.0"
-    ]);
+    NIX_LDFLAGS = toString (
+      lib.optionals (!headless) [
+        "-lfontconfig"
+        "-lcups"
+        "-lXinerama"
+        "-lXrandr"
+        "-lmagic"
+      ]
+      ++ lib.optionals (!headless && enableGtk) [
+        "-lgtk-3"
+        "-lgio-2.0"
+      ]
+    );
 
     # -j flag is explicitly rejected by the build system:
     #     Error: 'make -jN' is not supported, use 'make JOBS=N'
@@ -206,4 +284,5 @@ let
       inherit gtk3;
     };
   };
-in openjdk
+in
+openjdk

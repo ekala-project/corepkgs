@@ -10,10 +10,10 @@
   babel,
   markupsafe,
   pytestCheckHook,
-#  sphinxHook,
-#  pallets-sphinx-themes,
-#  sphinxcontrib-log-cabinet,
-#  sphinx-issues,
+  #  sphinxHook,
+  #  pallets-sphinx-themes,
+  #  sphinxcontrib-log-cabinet,
+  #  sphinx-issues,
 
   # Reverse dependency
   sage ? null,

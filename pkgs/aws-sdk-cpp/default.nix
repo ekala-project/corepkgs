@@ -1,28 +1,35 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, curl
-, openssl
-, zlib
-, aws-crt-cpp
-, CoreAudio
-, AudioToolbox
-, nix
-, arrow-cpp
-, aws-sdk-cpp
-, # Allow building a limited set of APIs, e.g. ["s3" "ec2"].
-  apis ? ["*"]
-, # Whether to enable AWS' custom memory management.
-  customMemoryManagement ? true
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  curl,
+  openssl,
+  zlib,
+  aws-crt-cpp,
+  CoreAudio,
+  AudioToolbox,
+  nix,
+  arrow-cpp,
+  aws-sdk-cpp,
+  # Allow building a limited set of APIs, e.g. ["s3" "ec2"].
+  apis ? [ "*" ],
+  # Whether to enable AWS' custom memory management.
+  customMemoryManagement ? true,
 }:
 
 let
-  host_os = if stdenv.hostPlatform.isDarwin then "APPLE"
-       else if stdenv.hostPlatform.isAndroid then "ANDROID"
-       else if stdenv.hostPlatform.isWindows then "WINDOWS"
-       else if stdenv.hostPlatform.isLinux then "LINUX"
-       else throw "Unknown host OS";
+  host_os =
+    if stdenv.hostPlatform.isDarwin then
+      "APPLE"
+    else if stdenv.hostPlatform.isAndroid then
+      "ANDROID"
+    else if stdenv.hostPlatform.isWindows then
+      "WINDOWS"
+    else if stdenv.hostPlatform.isLinux then
+      "LINUX"
+    else
+      throw "Unknown host OS";
 in
 
 stdenv.mkDerivation rec {
@@ -58,37 +65,51 @@ stdenv.mkDerivation rec {
     rm tests/aws-cpp-sdk-core-tests/aws/auth/AWSAuthSignerTest.cpp
     # TestRandomURLMultiThreaded fails
     rm tests/aws-cpp-sdk-core-tests/http/HttpClientTest.cpp
-  '' + lib.optionalString stdenv.isi686 ''
+  ''
+  + lib.optionalString stdenv.isi686 ''
     # EPSILON is exceeded
     rm tests/aws-cpp-sdk-core-tests/aws/client/AdaptiveRetryStrategyTest.cpp
   '';
 
   # FIXME: might be nice to put different APIs in different outputs
   # (e.g. libaws-cpp-sdk-s3.so in output "s3").
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
-  nativeBuildInputs = [ cmake curl ];
+  nativeBuildInputs = [
+    cmake
+    curl
+  ];
 
   buildInputs = [
-    curl openssl zlib
-  ] ++ lib.optionals (stdenv.isDarwin &&
-                        ((builtins.elem "text-to-speech" apis) ||
-                         (builtins.elem "*" apis)))
-         [ CoreAudio AudioToolbox ];
+    curl
+    openssl
+    zlib
+  ]
+  ++
+    lib.optionals
+      (stdenv.isDarwin && ((builtins.elem "text-to-speech" apis) || (builtins.elem "*" apis)))
+      [
+        CoreAudio
+        AudioToolbox
+      ];
 
   # propagation is needed for Security.framework to be available when linking
   propagatedBuildInputs = [ aws-crt-cpp ];
 
   cmakeFlags = [
     "-DBUILD_DEPS=OFF"
-  ] ++ lib.optional (!customMemoryManagement) "-DCUSTOM_MEMORY_MANAGEMENT=0"
+  ]
+  ++ lib.optional (!customMemoryManagement) "-DCUSTOM_MEMORY_MANAGEMENT=0"
   ++ lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
     "-DENABLE_TESTING=OFF"
     "-DCURL_HAS_H2=1"
     "-DCURL_HAS_TLS_PROXY=1"
     "-DTARGET_ARCH=${host_os}"
-  ] ++ lib.optional (apis != ["*"])
-    "-DBUILD_ONLY=${lib.concatStringsSep ";" apis}";
+  ]
+  ++ lib.optional (apis != [ "*" ]) "-DBUILD_ONLY=${lib.concatStringsSep ";" apis}";
 
   env.NIX_CFLAGS_COMPILE = toString [
     # openssl 3 generates several deprecation warnings

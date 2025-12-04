@@ -1,19 +1,20 @@
-{ lib
-, stdenv
-, fetchsvn
-, pkg-config
-, libjpeg
-, libpng
-, jbigkit
-, flex
-, zlib
-, perl
-, libxml2
-, makeWrapper
-, libtiff
-, enableX11 ? false
-, libX11
-, buildPackages
+{
+  lib,
+  stdenv,
+  fetchsvn,
+  pkg-config,
+  libjpeg,
+  libpng,
+  jbigkit,
+  flex,
+  zlib,
+  perl,
+  libxml2,
+  makeWrapper,
+  libtiff,
+  enableX11 ? false,
+  libX11,
+  buildPackages,
 }:
 
 stdenv.mkDerivation {
@@ -22,7 +23,11 @@ stdenv.mkDerivation {
   pname = "netpbm";
   version = "11.7.1";
 
-  outputs = [ "bin" "out" "dev" ];
+  outputs = [
+    "bin"
+    "out"
+    "dev"
+  ];
 
   src = fetchsvn {
     url = "https://svn.code.sf.net/p/netpbm/code/advanced";
@@ -44,8 +49,8 @@ stdenv.mkDerivation {
     libxml2
     libtiff
     jbigkit
-  ] ++ lib.optional enableX11 libX11;
-
+  ]
+  ++ lib.optional enableX11 libX11;
 
   strictDeps = true;
 
@@ -87,11 +92,13 @@ stdenv.mkDerivation {
 
     # Fix path to rgb.txt
     echo "RGB_DB_PATH = $out/share/netpbm/misc/rgb.txt" >> config.mk
-  '' + lib.optionalString stdenv.hostPlatform.isDarwin ''
+  ''
+  + lib.optionalString stdenv.hostPlatform.isDarwin ''
     echo "LDSHLIB=-dynamiclib -install_name $out/lib/libnetpbm.\$(MAJ).dylib" >> config.mk
     echo "NETPBMLIBTYPE = dylib" >> config.mk
     echo "NETPBMLIBSUFFIX = dylib" >> config.mk
-  '' + ''
+  ''
+  + ''
     runHook postConfigure
   '';
 

@@ -1,24 +1,44 @@
-{ lib, stdenv, fetchFromGitHub, fetchpatch
-, ncurses, boehmgc, gettext, zlib
-, sslSupport ? true, openssl
-, graphicsSupport ? !stdenv.hostPlatform.isDarwin, imlib2
-, x11Support ? graphicsSupport, libX11
-, mouseSupport ? !stdenv.hostPlatform.isDarwin, gpm
-, perl, man-db, pkg-config, buildPackages, w3m
-, testers, updateAutotoolsGnuConfigScriptsHook
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchpatch,
+  ncurses,
+  boehmgc,
+  gettext,
+  zlib,
+  sslSupport ? true,
+  openssl,
+  graphicsSupport ? !stdenv.hostPlatform.isDarwin,
+  imlib2,
+  x11Support ? graphicsSupport,
+  libX11,
+  mouseSupport ? !stdenv.hostPlatform.isDarwin,
+  gpm,
+  perl,
+  man-db,
+  pkg-config,
+  buildPackages,
+  w3m,
+  testers,
+  updateAutotoolsGnuConfigScriptsHook,
 }:
 
 let
   mktable = buildPackages.stdenv.mkDerivation {
     name = "w3m-mktable";
     inherit (w3m) src;
-    nativeBuildInputs = [ pkg-config boehmgc ];
+    nativeBuildInputs = [
+      pkg-config
+      boehmgc
+    ];
     makeFlags = [ "mktable" ];
     installPhase = ''
       install -D mktable $out/bin/mktable
     '';
   };
-in stdenv.mkDerivation rec {
+in
+stdenv.mkDerivation rec {
   pname = "w3m";
   version = "0.5.3+git20230121";
 
@@ -55,12 +75,20 @@ in stdenv.mkDerivation rec {
 
   # updateAutotoolsGnuConfigScriptsHook necessary to build on FreeBSD native pending inclusion of
   # https://git.savannah.gnu.org/cgit/config.git/commit/?id=e4786449e1c26716e3f9ea182caf472e4dbc96e0
-  nativeBuildInputs = [ pkg-config gettext updateAutotoolsGnuConfigScriptsHook ];
-  buildInputs = [ ncurses boehmgc zlib ]
-    ++ lib.optional sslSupport openssl
-    ++ lib.optional mouseSupport gpm
-    ++ lib.optional graphicsSupport imlib2
-    ++ lib.optional x11Support libX11;
+  nativeBuildInputs = [
+    pkg-config
+    gettext
+    updateAutotoolsGnuConfigScriptsHook
+  ];
+  buildInputs = [
+    ncurses
+    boehmgc
+    zlib
+  ]
+  ++ lib.optional sslSupport openssl
+  ++ lib.optional mouseSupport gpm
+  ++ lib.optional graphicsSupport imlib2
+  ++ lib.optional x11Support libX11;
 
   postInstall = lib.optionalString graphicsSupport ''
     ln -s $out/libexec/w3m/w3mimgdisplay $out/bin
@@ -68,13 +96,15 @@ in stdenv.mkDerivation rec {
 
   hardeningDisable = [ "format" ];
 
-  configureFlags =
-    [ "--with-ssl=${openssl.dev}" "--with-gc=${boehmgc.dev}" ]
-    ++ lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
-      "ac_cv_func_setpgrp_void=yes"
-    ]
-    ++ lib.optional graphicsSupport "--enable-image=${lib.optionalString x11Support "x11,"}fb"
-    ++ lib.optional (graphicsSupport && !x11Support) "--without-x";
+  configureFlags = [
+    "--with-ssl=${openssl.dev}"
+    "--with-gc=${boehmgc.dev}"
+  ]
+  ++ lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
+    "ac_cv_func_setpgrp_void=yes"
+  ]
+  ++ lib.optional graphicsSupport "--enable-image=${lib.optionalString x11Support "x11,"}fb"
+  ++ lib.optional (graphicsSupport && !x11Support) "--without-x";
 
   preConfigure = ''
     substituteInPlace ./configure --replace "/lib /usr/lib /usr/local/lib /usr/ucblib /usr/ccslib /usr/ccs/lib /lib64 /usr/lib64" /no-such-path

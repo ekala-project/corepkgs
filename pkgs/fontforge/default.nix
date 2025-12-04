@@ -1,15 +1,35 @@
-{ stdenv, fetchFromGitHub, lib, fetchpatch
-, cmake, uthash, pkg-config
-, python, freetype, zlib, glib, giflib, libpng, libjpeg, libtiff, libxml2, cairo, pango
-, readline, woff2, zeromq
-, withSpiro ? false, libspiro ? null
-, withGTK ? false, gtk3
-, withGUI ? withGTK
-, withPython ? true
-, withExtras ? true
-# Darwin
-, Carbon ? null
-, Cocoa ? null
+{
+  stdenv,
+  fetchFromGitHub,
+  lib,
+  fetchpatch,
+  cmake,
+  uthash,
+  pkg-config,
+  python,
+  freetype,
+  zlib,
+  glib,
+  giflib,
+  libpng,
+  libjpeg,
+  libtiff,
+  libxml2,
+  cairo,
+  pango,
+  readline,
+  woff2,
+  zeromq,
+  withSpiro ? false,
+  libspiro ? null,
+  withGTK ? false,
+  gtk3,
+  withGUI ? withGTK,
+  withPython ? true,
+  withExtras ? true,
+  # Darwin
+  Carbon ? null,
+  Cocoa ? null,
 }:
 
 assert withGTK -> withGUI;
@@ -49,20 +69,43 @@ stdenv.mkDerivation rec {
   # do not use x87's 80-bit arithmetic, rouding errors result in very different font binaries
   env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.isi686 "-msse2 -mfpmath=sse";
 
-  nativeBuildInputs = [ pkg-config cmake ];
+  nativeBuildInputs = [
+    pkg-config
+    cmake
+  ];
   buildInputs = [
-    readline uthash woff2 zeromq
-    python freetype zlib glib giflib libpng libjpeg libtiff libxml2
+    readline
+    uthash
+    woff2
+    zeromq
+    python
+    freetype
+    zlib
+    glib
+    giflib
+    libpng
+    libjpeg
+    libtiff
+    libxml2
   ]
-    ++ lib.optionals withSpiro [ libspiro ]
-    ++ lib.optionals withGUI [ gtk3 cairo pango ]
-    ++ lib.optionals stdenv.isDarwin [ Carbon Cocoa ];
+  ++ lib.optionals withSpiro [ libspiro ]
+  ++ lib.optionals withGUI [
+    gtk3
+    cairo
+    pango
+  ]
+  ++ lib.optionals stdenv.isDarwin [
+    Carbon
+    Cocoa
+  ];
 
-  cmakeFlags = [ "-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON" ]
-    ++ lib.optional (!withSpiro) "-DENABLE_LIBSPIRO=OFF"
-    ++ lib.optional (!withGUI) "-DENABLE_GUI=OFF"
-    ++ lib.optional (!withGTK) "-DENABLE_X11=ON"
-    ++ lib.optional withExtras "-DENABLE_FONTFORGE_EXTRAS=ON";
+  cmakeFlags = [
+    "-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON"
+  ]
+  ++ lib.optional (!withSpiro) "-DENABLE_LIBSPIRO=OFF"
+  ++ lib.optional (!withGUI) "-DENABLE_GUI=OFF"
+  ++ lib.optional (!withGTK) "-DENABLE_X11=ON"
+  ++ lib.optional withExtras "-DENABLE_FONTFORGE_EXTRAS=ON";
 
   preConfigure = ''
     # The way $version propagates to $version of .pe-scripts (https://github.com/dejavu-fonts/dejavu-fonts/blob/358190f/scripts/generate.pe#L19)

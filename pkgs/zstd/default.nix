@@ -1,26 +1,31 @@
-{ lib, stdenv, fetchFromGitHub, bash, gnugrep
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  bash,
+  gnugrep,
 
-# Avoid cycles with cmake and libarchive
-, cmakeMinimal
+  # Avoid cycles with cmake and libarchive
+  cmakeMinimal,
 
-, fixDarwinDylibNames ? null
-, file
-, legacySupport ? false
-, static ? stdenv.hostPlatform.isStatic # generates static libraries *only*
-, enableStatic ? static
-# these need to be ran on the host, thus disable when cross-compiling
-, buildContrib ? stdenv.hostPlatform == stdenv.buildPlatform
-, doCheck ? stdenv.hostPlatform == stdenv.buildPlatform
-, nix-update-script
+  fixDarwinDylibNames ? null,
+  file,
+  legacySupport ? false,
+  static ? stdenv.hostPlatform.isStatic, # generates static libraries *only*
+  enableStatic ? static,
+  # these need to be ran on the host, thus disable when cross-compiling
+  buildContrib ? stdenv.hostPlatform == stdenv.buildPlatform,
+  doCheck ? stdenv.hostPlatform == stdenv.buildPlatform,
+  nix-update-script,
 
-# for passthru.tests
-, libarchive
-, rocksdb ? null
-, arrow-cpp
-, libzip ? null
-, curl
-, python3Packages ? null
-, haskellPackages ? null
+  # for passthru.tests
+  libarchive,
+  rocksdb ? null,
+  arrow-cpp,
+  libzip ? null,
+  curl,
+  python3Packages ? null,
+  haskellPackages ? null,
 }:
 
 assert stdenv.isDarwin -> fixDarwinDylibNames != null;
@@ -36,8 +41,7 @@ stdenv.mkDerivation rec {
     hash = "sha256-qcd92hQqVBjMT3hyntjcgk29o9wGQsg5Hg7HE5C0UNc=";
   };
 
-  nativeBuildInputs = [ cmakeMinimal ]
-   ++ lib.optional stdenv.isDarwin fixDarwinDylibNames;
+  nativeBuildInputs = [ cmakeMinimal ] ++ lib.optional stdenv.isDarwin fixDarwinDylibNames;
   buildInputs = lib.optional stdenv.hostPlatform.isUnix bash;
 
   patches = [
@@ -56,15 +60,16 @@ stdenv.mkDerivation rec {
       tests/playTests.sh
   '';
 
-  cmakeFlags = lib.attrsets.mapAttrsToList
-    (name: value: "-DZSTD_${name}:BOOL=${if value then "ON" else "OFF"}") {
-      BUILD_SHARED = !static;
-      BUILD_STATIC = enableStatic;
-      BUILD_CONTRIB = buildContrib;
-      PROGRAMS_LINK_SHARED = !static;
-      LEGACY_SUPPORT = legacySupport;
-      BUILD_TESTS = doCheck;
-    };
+  cmakeFlags =
+    lib.attrsets.mapAttrsToList (name: value: "-DZSTD_${name}:BOOL=${if value then "ON" else "OFF"}")
+      {
+        BUILD_SHARED = !static;
+        BUILD_STATIC = enableStatic;
+        BUILD_CONTRIB = buildContrib;
+        PROGRAMS_LINK_SHARED = !static;
+        LEGACY_SUPPORT = legacySupport;
+        BUILD_TESTS = doCheck;
+      };
 
   cmakeDir = "../build/cmake";
   dontUseCmakeBuildDir = true;
@@ -90,17 +95,22 @@ stdenv.mkDerivation rec {
 
     substituteInPlace ../programs/zstdless \
       --replace "zstdcat" "$bin/bin/zstdcat"
-  '' + lib.optionalString buildContrib (
+  ''
+  + lib.optionalString buildContrib (
     ''
       cp contrib/pzstd/pzstd $bin/bin/pzstd
-    '' + lib.optionalString stdenv.isDarwin ''
+    ''
+    + lib.optionalString stdenv.isDarwin ''
       install_name_tool -change @rpath/libzstd.1.dylib $out/lib/libzstd.1.dylib $bin/bin/pzstd
     ''
   );
 
-  outputs = [ "bin" "dev" ]
-    ++ lib.optional stdenv.hostPlatform.isUnix "man"
-    ++ [ "out" ];
+  outputs = [
+    "bin"
+    "dev"
+  ]
+  ++ lib.optional stdenv.hostPlatform.isUnix "man"
+  ++ [ "out" ];
 
   passthru = {
     updateScript = nix-update-script { };

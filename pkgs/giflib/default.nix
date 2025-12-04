@@ -1,8 +1,9 @@
-{ stdenv
-, lib
-, fetchurl
-, fixDarwinDylibNames
-, pkgsStatic
+{
+  stdenv,
+  lib,
+  fetchurl,
+  fixDarwinDylibNames,
+  pkgsStatic,
 }:
 
 stdenv.mkDerivation rec {
@@ -16,7 +17,8 @@ stdenv.mkDerivation rec {
 
   patches = [
     ./CVE-2021-40633.patch
-  ] ++ lib.optionals stdenv.hostPlatform.isMinGW [
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isMinGW [
     # Build dll libraries.
     (fetchurl {
       url = "https://aur.archlinux.org/cgit/aur.git/plain/001-mingw-build.patch?h=mingw-w64-giflib&id=b7311edf54824ac797c7916cd3ddc3a4b2368a19";
@@ -39,7 +41,8 @@ stdenv.mkDerivation rec {
     # we don't want to build HTML documentation
     substituteInPlace doc/Makefile \
       --replace-fail "all: allhtml manpages" "all: manpages"
-  '' + lib.optionalString stdenv.hostPlatform.isStatic ''
+  ''
+  + lib.optionalString stdenv.hostPlatform.isStatic ''
     # Upstream build system does not support NOT building shared libraries.
     sed -i '/all:/ s/$(LIBGIFSO)//' Makefile
     sed -i '/all:/ s/$(LIBUTILSO)//' Makefile

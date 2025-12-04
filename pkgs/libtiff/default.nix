@@ -1,30 +1,31 @@
-{ lib
-, stdenv
-, fetchFromGitLab
-, fetchpatch
-, nix-update-script
+{
+  lib,
+  stdenv,
+  fetchFromGitLab,
+  fetchpatch,
+  nix-update-script,
 
-, autoreconfHook
-, pkg-config
-, sphinx
+  autoreconfHook,
+  pkg-config,
+  sphinx,
 
-, lerc
-, libdeflate
-, libjpeg
-, libwebp
-, xz
-, zlib
-, zstd
+  lerc,
+  libdeflate,
+  libjpeg,
+  libwebp,
+  xz,
+  zlib,
+  zstd,
 
   # for passthru.tests
-, libgeotiff ? null
-, python3Packages ? { }
-, imagemagick ? null
-, graphicsmagick ? null
-, gdal ? null
-, openimageio ? null
-, freeimage ? null
-, testers ? {}
+  libgeotiff ? null,
+  python3Packages ? { },
+  imagemagick ? null,
+  graphicsmagick ? null,
+  gdal ? null,
+  openimageio ? null,
+  freeimage ? null,
+  testers ? { },
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -59,7 +60,14 @@ stdenv.mkDerivation (finalAttrs: {
     mv VERSION VERSION.txt
   '';
 
-  outputs = [ "bin" "dev" "dev_private" "out" "man" "doc" ];
+  outputs = [
+    "bin"
+    "dev"
+    "dev_private"
+    "out"
+    "man"
+    "doc"
+  ];
 
   postFixup = ''
     moveToOutput include/tif_config.h $dev_private
@@ -70,7 +78,11 @@ stdenv.mkDerivation (finalAttrs: {
 
   # If you want to change to a different build system, please make
   # sure cross-compilation works first!
-  nativeBuildInputs = [ autoreconfHook pkg-config sphinx ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    sphinx
+  ];
 
   buildInputs = [
     lerc
@@ -95,7 +107,14 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     tests = {
-      inherit libgeotiff imagemagick graphicsmagick gdal openimageio freeimage;
+      inherit
+        libgeotiff
+        imagemagick
+        graphicsmagick
+        gdal
+        openimageio
+        freeimage
+        ;
       inherit (python3Packages) pillow imread;
       pkg-config = testers.hasPkgConfigModules {
         package = finalAttrs.finalPackage;

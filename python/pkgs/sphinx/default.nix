@@ -68,28 +68,27 @@ buildPythonPackage rec {
 
   build-system = [ flit-core ];
 
-  dependencies =
-    [
-      alabaster
-      babel
-      docutils
-      imagesize
-      jinja2
-      packaging
-      pygments
-      requests
-      snowballstemmer
-      sphinxcontrib-applehelp
-      sphinxcontrib-devhelp
-      sphinxcontrib-htmlhelp
-      sphinxcontrib-jsmath
-      sphinxcontrib-qthelp
-      sphinxcontrib-serializinghtml
-      # extra[docs]
-      sphinxcontrib-websupport
-    ]
-    ++ lib.optionals (pythonOlder "3.11") [ tomli ]
-    ++ lib.optionals (pythonOlder "3.10") [ importlib-metadata ];
+  dependencies = [
+    alabaster
+    babel
+    docutils
+    imagesize
+    jinja2
+    packaging
+    pygments
+    requests
+    snowballstemmer
+    sphinxcontrib-applehelp
+    sphinxcontrib-devhelp
+    sphinxcontrib-htmlhelp
+    sphinxcontrib-jsmath
+    sphinxcontrib-qthelp
+    sphinxcontrib-serializinghtml
+    # extra[docs]
+    sphinxcontrib-websupport
+  ]
+  ++ lib.optionals (pythonOlder "3.11") [ tomli ]
+  ++ lib.optionals (pythonOlder "3.10") [ importlib-metadata ];
 
   __darwinAllowLocalNetworking = true;
 
@@ -105,44 +104,43 @@ buildPythonPackage rec {
     export HOME=$TMPDIR
   '';
 
-  disabledTests =
-    [
-      # requires network access
-      "test_latex_images"
-      # racy
-      "test_defaults"
-      "test_check_link_response_only"
-      "test_anchors_ignored_for_url"
-      "test_autodoc_default_options"
-      "test_too_many_requests_retry_after_int_delay"
-      # racy with pytest-xdist
-      "test_domain_cpp_build_semicolon"
-      "test_class_alias"
-      "test_class_alias_having_doccomment"
-      "test_class_alias_for_imported_object_having_doccomment"
-      "test_decorators"
-      # requires cython_0, but fails miserably on 3.11
-      "test_cython"
-      # Could not fetch remote image: http://localhost:7777/sphinx.png
-      "test_copy_images"
-    ]
-    ++ lib.optionals (pythonAtLeast "3.12") [
-      # https://github.com/sphinx-doc/sphinx/issues/12430
-      "test_autodoc_type_aliases"
-    ]
-    ++ lib.optionals isPyPy [
-      # PyPy has not __builtins__ which get asserted
-      # https://doc.pypy.org/en/latest/cpython_differences.html#miscellaneous
-      "test_autosummary_generate_content_for_module"
-      "test_autosummary_generate_content_for_module_skipped"
-      # internals are asserted which are sightly different in PyPy
-      "test_autodoc_inherited_members_None"
-      "test_automethod_for_builtin"
-      "test_builtin_function"
-      "test_isattributedescriptor"
-      "test_methoddescriptor"
-      "test_partialfunction"
-    ];
+  disabledTests = [
+    # requires network access
+    "test_latex_images"
+    # racy
+    "test_defaults"
+    "test_check_link_response_only"
+    "test_anchors_ignored_for_url"
+    "test_autodoc_default_options"
+    "test_too_many_requests_retry_after_int_delay"
+    # racy with pytest-xdist
+    "test_domain_cpp_build_semicolon"
+    "test_class_alias"
+    "test_class_alias_having_doccomment"
+    "test_class_alias_for_imported_object_having_doccomment"
+    "test_decorators"
+    # requires cython_0, but fails miserably on 3.11
+    "test_cython"
+    # Could not fetch remote image: http://localhost:7777/sphinx.png
+    "test_copy_images"
+  ]
+  ++ lib.optionals (pythonAtLeast "3.12") [
+    # https://github.com/sphinx-doc/sphinx/issues/12430
+    "test_autodoc_type_aliases"
+  ]
+  ++ lib.optionals isPyPy [
+    # PyPy has not __builtins__ which get asserted
+    # https://doc.pypy.org/en/latest/cpython_differences.html#miscellaneous
+    "test_autosummary_generate_content_for_module"
+    "test_autosummary_generate_content_for_module_skipped"
+    # internals are asserted which are sightly different in PyPy
+    "test_autodoc_inherited_members_None"
+    "test_automethod_for_builtin"
+    "test_builtin_function"
+    "test_isattributedescriptor"
+    "test_methoddescriptor"
+    "test_partialfunction"
+  ];
 
   meta = {
     description = "Python documentation generator";

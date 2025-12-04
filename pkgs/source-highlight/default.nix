@@ -1,10 +1,22 @@
-{ lib, stdenv, fetchpatch, fetchurl, boost, updateAutotoolsGnuConfigScriptsHook, llvmPackages }:
+{
+  lib,
+  stdenv,
+  fetchpatch,
+  fetchurl,
+  boost,
+  updateAutotoolsGnuConfigScriptsHook,
+  llvmPackages,
+}:
 
 stdenv.mkDerivation rec {
   pname = "source-highlight";
   version = "3.1.9";
 
-  outputs = [ "out" "doc" "dev" ];
+  outputs = [
+    "out"
+    "doc"
+    "dev"
+  ];
 
   src = fetchurl {
     url = "mirror://gnu/src-highlite/${pname}-${version}.tar.gz";
@@ -25,7 +37,8 @@ stdenv.mkDerivation rec {
       url = "https://git.savannah.gnu.org/cgit/src-highlite.git/patch/?id=ab9fe5cb9b85c5afab94f2a7f4b6d7d473c14ee9";
       hash = "sha256-wmSLgLnLuFE+IC6AjxzZp/HEnaOCS1VfY2cac0T7Y+w=";
     })
-  ] ++ lib.optionals stdenv.cc.isClang [
+  ]
+  ++ lib.optionals stdenv.cc.isClang [
     # Adds compatibility with C++17 by removing the `register` storage class specifier.
     (fetchpatch {
       name = "remove-register-keyword";
@@ -46,10 +59,14 @@ stdenv.mkDerivation rec {
   # necessary to build on FreeBSD native pending inclusion of
   # https://git.savannah.gnu.org/cgit/config.git/commit/?id=e4786449e1c26716e3f9ea182caf472e4dbc96e0
   nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ];
-  buildInputs = [ boost ]
-    ++ lib.optional (stdenv.targetPlatform.useLLVM or false) (llvmPackages.compiler-rt.override {
+  buildInputs = [
+    boost
+  ]
+  ++ lib.optional (stdenv.targetPlatform.useLLVM or false) (
+    llvmPackages.compiler-rt.override {
       doFakeLibgcc = true;
-    });
+    }
+  );
 
   configureFlags = [
     "--with-boost=${boost.out}"
@@ -74,7 +91,8 @@ stdenv.mkDerivation rec {
     platforms = platforms.unix;
     maintainers = [ ];
   };
-} // lib.optionalAttrs (stdenv.targetPlatform.useLLVM or false) {
+}
+// lib.optionalAttrs (stdenv.targetPlatform.useLLVM or false) {
   # Force linking to "libgcc" so tests pass
   NIX_CFLAGS_COMPILE = "-lgcc";
 }

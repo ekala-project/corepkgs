@@ -1,23 +1,24 @@
-{ lib
-, stdenv
-, fetchurl
-, meson
-, ninja
-, pkg-config
-, libpng
-, glib /*just passthru*/
+{
+  lib,
+  stdenv,
+  fetchurl,
+  meson,
+  ninja,
+  pkg-config,
+  libpng,
+  glib, # just passthru
 
-# for passthru.tests
-, cairo ? null
-, qemu ? null
-, scribus ? null
-, tigervnc ? null
-, wlroots_0_17 ? null
-, wlroots_0_18 ? null
-, xwayland ? null
+  # for passthru.tests
+  cairo ? null,
+  qemu ? null,
+  scribus ? null,
+  tigervnc ? null,
+  wlroots_0_17 ? null,
+  wlroots_0_18 ? null,
+  xwayland ? null,
 
-, gitUpdater
-, testers
+  gitUpdater,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -40,7 +41,11 @@ stdenv.mkDerivation (finalAttrs: {
 
   separateDebugInfo = !stdenv.hostPlatform.isStatic;
 
-  nativeBuildInputs = [ meson ninja pkg-config ];
+  nativeBuildInputs = [
+    meson
+    ninja
+    pkg-config
+  ];
 
   buildInputs = [ libpng ];
 
@@ -67,7 +72,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     tests = {
-      inherit cairo qemu scribus tigervnc wlroots_0_17 wlroots_0_18 xwayland;
+      inherit
+        cairo
+        qemu
+        scribus
+        tigervnc
+        wlroots_0_17
+        wlroots_0_18
+        xwayland
+        ;
       pkg-config = testers.hasPkgConfigModules {
         package = finalAttrs.finalPackage;
       };

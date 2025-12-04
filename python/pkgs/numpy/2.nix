@@ -83,15 +83,14 @@ buildPythonPackage rec {
       --replace-fail 'py.full_path()' "'python'"
   '';
 
-  build-system =
-    [
-      cython
-      gfortran
-      meson-python
-      pkg-config
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [ xcbuild.xcrun ]
-    ++ lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [ mesonEmulatorHook ];
+  build-system = [
+    cython
+    gfortran
+    meson-python
+    pkg-config
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ xcbuild.xcrun ]
+  ++ lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [ mesonEmulatorHook ];
 
   # we default openblas to build with 64 threads
   # if a machine has more than 64 threads, it will segfault

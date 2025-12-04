@@ -4,11 +4,16 @@
 # each bootstrapping stage. See `./booter.nix` for exactly what this list should
 # contain.
 
-{ # Args just for stdenvs' usage
-  lib
+{
+  # Args just for stdenvs' usage
+  lib,
   # Args to pass on to the pkgset builder, too
-, localSystem, crossSystem, config, overlays, crossOverlays ? []
-} @ args:
+  localSystem,
+  crossSystem,
+  config,
+  overlays,
+  crossOverlays ? [ ],
+}@args:
 
 let
   # The native (i.e., impure) build environment.  This one uses the
@@ -36,14 +41,21 @@ let
 
   # Select the appropriate stages for the platform `system'.
 in
-  if crossSystem != localSystem || crossOverlays != [] then stagesCross
-  else if config ? replaceStdenv then stagesCustom
-  else if localSystem.isLinux then stagesLinux
-  else if localSystem.isDarwin then stagesDarwin
-  else # misc special cases
-  { # switch
+if crossSystem != localSystem || crossOverlays != [ ] then
+  stagesCross
+else if config ? replaceStdenv then
+  stagesCustom
+else if localSystem.isLinux then
+  stagesLinux
+else if localSystem.isDarwin then
+  stagesDarwin
+# misc special cases
+else
+  {
+    # switch
     x86_64-solaris = stagesNix;
     i686-cygwin = stagesNative;
     x86_64-cygwin = stagesNative;
     x86_64-freebsd = stagesFreeBSD;
-  }.${localSystem.system} or stagesNative
+  }
+  .${localSystem.system} or stagesNative

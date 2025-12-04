@@ -1,15 +1,16 @@
-{ lib
-, stdenv
-, fetchurl
-, cmake
-, pkg-config
-, hidapi
-, libcbor
-, openssl
-, udev
-, zlib
-, withPcsclite ? true
-, pcsclite
+{
+  lib,
+  stdenv,
+  fetchurl,
+  cmake,
+  pkg-config,
+  hidapi,
+  libcbor,
+  openssl,
+  udev,
+  zlib,
+  withPcsclite ? true,
+  pcsclite,
 }:
 
 stdenv.mkDerivation rec {
@@ -22,25 +23,38 @@ stdenv.mkDerivation rec {
     hash = "sha256-q6qxMY0h0mLs5Bb7inEy+pN0vaifb6UrhqmKL1cSth4=";
   };
 
-  nativeBuildInputs = [ cmake pkg-config ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+  ];
 
-  buildInputs = [ libcbor zlib ]
-    ++ lib.optionals stdenv.isDarwin [ hidapi ]
-    ++ lib.optionals stdenv.isLinux [ udev ]
-    ++ lib.optionals (stdenv.isLinux && withPcsclite) [ pcsclite ];
+  buildInputs = [
+    libcbor
+    zlib
+  ]
+  ++ lib.optionals stdenv.isDarwin [ hidapi ]
+  ++ lib.optionals stdenv.isLinux [ udev ]
+  ++ lib.optionals (stdenv.isLinux && withPcsclite) [ pcsclite ];
 
   propagatedBuildInputs = [ openssl ];
 
-  outputs = [ "out" "dev" "man" ];
+  outputs = [
+    "out"
+    "dev"
+    "man"
+  ];
 
   cmakeFlags = [
     "-DUDEV_RULES_DIR=${placeholder "out"}/etc/udev/rules.d"
     "-DCMAKE_INSTALL_LIBDIR=lib"
-  ] ++ lib.optionals stdenv.isDarwin [
+  ]
+  ++ lib.optionals stdenv.isDarwin [
     "-DUSE_HIDAPI=1"
-  ] ++ lib.optionals stdenv.isLinux [
+  ]
+  ++ lib.optionals stdenv.isLinux [
     "-DNFC_LINUX=1"
-  ] ++ lib.optionals (stdenv.isLinux && withPcsclite) [
+  ]
+  ++ lib.optionals (stdenv.isLinux && withPcsclite) [
     "-DUSE_PCSC=1"
   ];
 

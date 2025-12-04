@@ -1,29 +1,36 @@
-{ stdenv
-, lib
-, fetchurl
-, glib
-, meson
-, ninja
-, pkg-config
-, gnome
-, libsysprof-capture
-, sqlite
-, buildPackages
-, gobject-introspection
-, withIntrospection ? lib.meta.availableOn stdenv.hostPlatform gobject-introspection && stdenv.hostPlatform.emulatorAvailable buildPackages
-, vala
-, libpsl
-, python3
-, gi-docgen
-, brotli
-, libnghttp2
+{
+  stdenv,
+  lib,
+  fetchurl,
+  glib,
+  meson,
+  ninja,
+  pkg-config,
+  gnome,
+  libsysprof-capture,
+  sqlite,
+  buildPackages,
+  gobject-introspection,
+  withIntrospection ?
+    lib.meta.availableOn stdenv.hostPlatform gobject-introspection
+    && stdenv.hostPlatform.emulatorAvailable buildPackages,
+  vala,
+  libpsl,
+  python3,
+  gi-docgen,
+  brotli,
+  libnghttp2,
 }:
 
 stdenv.mkDerivation rec {
   pname = "libsoup";
   version = "3.4.4";
 
-  outputs = [ "out" "dev" ] ++ lib.optional withIntrospection "devdoc";
+  outputs = [
+    "out"
+    "dev"
+  ]
+  ++ lib.optional withIntrospection "devdoc";
 
   src = fetchurl {
     url = "mirror://gnome/sources/${pname}/${lib.versions.majorMinor version}/${pname}-${version}.tar.xz";
@@ -40,7 +47,8 @@ stdenv.mkDerivation rec {
     pkg-config
     glib
     python3
-  ] ++ lib.optionals withIntrospection [
+  ]
+  ++ lib.optionals withIntrospection [
     gi-docgen
     gobject-introspection
     vala
@@ -52,7 +60,8 @@ stdenv.mkDerivation rec {
     glib.out
     brotli
     libnghttp2
-  ] ++ lib.optionals stdenv.isLinux [
+  ]
+  ++ lib.optionals stdenv.isLinux [
     libsysprof-capture
   ];
 

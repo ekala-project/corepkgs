@@ -1,29 +1,41 @@
-{ lib, stdenv, fetchurl
-# Image file formats
-, libjpeg, libtiff, giflib, libpng, libwebp, libjxl
-, libspectre
-# imlib2 can load images from ID3 tags.
-, libid3tag, librsvg, libheif
-, freetype , bzip2, pkg-config
-, x11Support ? true
-, webpSupport ? true
-, svgSupport ? false
-, heifSupport ? false
-, jxlSupport ? false
-, psSupport ? false
+{
+  lib,
+  stdenv,
+  fetchurl,
+  # Image file formats
+  libjpeg,
+  libtiff,
+  giflib,
+  libpng,
+  libwebp,
+  libjxl,
+  libspectre,
+  # imlib2 can load images from ID3 tags.
+  libid3tag,
+  librsvg,
+  libheif,
+  freetype,
+  bzip2,
+  pkg-config,
+  x11Support ? true,
+  webpSupport ? true,
+  svgSupport ? false,
+  heifSupport ? false,
+  jxlSupport ? false,
+  psSupport ? false,
 
-# for passthru.tests
-, libcaca ? null
-, diffoscopeMinimal ? null
-, feh ? null
-, icewm ? null
-, openbox ? null
-, fluxbox ? null
-, enlightenment ? null
-, xorg ? null
-, testers ? null
+  # for passthru.tests
+  libcaca ? null,
+  diffoscopeMinimal ? null,
+  feh ? null,
+  icewm ? null,
+  openbox ? null,
+  fluxbox ? null,
+  enlightenment ? null,
+  xorg ? null,
+  testers ? null,
 
-, gitUpdater
+  gitUpdater,
 }:
 
 let
@@ -39,14 +51,23 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   buildInputs = [
-    libjpeg libtiff giflib libpng
-    bzip2 freetype libid3tag
-  ] ++ optionals x11Support [ xorg.libXft xorg.libXext ]
-    ++ optional heifSupport libheif
-    ++ optional svgSupport librsvg
-    ++ optional webpSupport libwebp
-    ++ optional jxlSupport libjxl
-    ++ optional psSupport libspectre;
+    libjpeg
+    libtiff
+    giflib
+    libpng
+    bzip2
+    freetype
+    libid3tag
+  ]
+  ++ optionals x11Support [
+    xorg.libXft
+    xorg.libXext
+  ]
+  ++ optional heifSupport libheif
+  ++ optional svgSupport librsvg
+  ++ optional webpSupport libwebp
+  ++ optional jxlSupport libjxl
+  ++ optional psSupport libspectre;
 
   nativeBuildInputs = [ pkg-config ];
 
@@ -54,12 +75,17 @@ stdenv.mkDerivation (finalAttrs: {
 
   # Do not build amd64 assembly code on Darwin, because it fails to compile
   # with unknow directive errors
-  configureFlags = optional stdenv.hostPlatform.isDarwin "--enable-amd64=no"
+  configureFlags =
+    optional stdenv.hostPlatform.isDarwin "--enable-amd64=no"
     ++ optional (!svgSupport) "--without-svg"
     ++ optional (!heifSupport) "--without-heif"
     ++ optional (!x11Support) "--without-x";
 
-  outputs = [ "bin" "out" "dev" ];
+  outputs = [
+    "bin"
+    "out"
+    "dev"
+  ];
 
   passthru = {
     tests = {
@@ -70,7 +96,8 @@ stdenv.mkDerivation (finalAttrs: {
         icewm
         openbox
         fluxbox
-        enlightenment;
+        enlightenment
+        ;
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
     };
     updateScript = gitUpdater {

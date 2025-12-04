@@ -55,13 +55,15 @@ buildPythonPackage rec {
   propagatedBuildInputs = [
     attrs
     sortedcontainers
-  ] ++ lib.optionals (pythonOlder "3.11") [ exceptiongroup ];
+  ]
+  ++ lib.optionals (pythonOlder "3.11") [ exceptiongroup ];
 
   nativeCheckInputs = [
     pexpect
     pytest-xdist
     pytestCheckHook
-  ] ++ lib.optionals isPyPy [ tzdata ];
+  ]
+  ++ lib.optionals isPyPy [ tzdata ];
 
   inherit doCheck;
 
@@ -72,19 +74,18 @@ buildPythonPackage rec {
 
   pytestFlagsArray = [ "tests/cover" ];
 
-  disabledTests =
-    [
-      # racy, fails to find a file sometimes
-      "test_recreate_charmap"
-      "test_uses_cached_charmap"
-    ]
-    ++ lib.optionals (pythonOlder "3.10") [
-      # not sure why these tests fail with only 3.9
-      # FileNotFoundError: [Errno 2] No such file or directory: 'git'
-      "test_observability"
-      "test_assume_has_status_reason"
-      "test_observability_captures_stateful_reprs"
-    ];
+  disabledTests = [
+    # racy, fails to find a file sometimes
+    "test_recreate_charmap"
+    "test_uses_cached_charmap"
+  ]
+  ++ lib.optionals (pythonOlder "3.10") [
+    # not sure why these tests fail with only 3.9
+    # FileNotFoundError: [Errno 2] No such file or directory: 'git'
+    "test_observability"
+    "test_assume_has_status_reason"
+    "test_observability_captures_stateful_reprs"
+  ];
 
   pythonImportsCheck = [ "hypothesis" ];
 

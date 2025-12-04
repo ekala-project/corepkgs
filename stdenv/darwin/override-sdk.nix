@@ -348,7 +348,8 @@ let
     let
       newVersion = {
         inherit (stdenv.hostPlatform) darwinMinVersion darwinSdkVersion;
-      } // (if lib.isAttrs sdkVersion then sdkVersion else { darwinSdkVersion = sdkVersion; });
+      }
+      // (if lib.isAttrs sdkVersion then sdkVersion else { darwinSdkVersion = sdkVersion; });
 
       inherit (newVersion) darwinMinVersion darwinSdkVersion;
 

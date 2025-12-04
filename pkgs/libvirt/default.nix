@@ -1,106 +1,112 @@
-{ lib
-, bash
-, bash-completion
-, bridge-utils
-, coreutils
-, curl
-, darwin
-, dbus
-, dnsmasq
-, docutils
-, fetchFromGitLab
-, gettext
-, glib
-, gnutls
-, iproute2
-, iptables
-, libgcrypt
-, libpcap
-, libtasn1
-, libxml2
-, libxslt
-, makeWrapper
-, meson
-, ninja
-, openssh
-, perl
-, perlPackages
-, polkit
-, pkg-config
-, pmutils
-, python3
-, readline
-, rpcsvc-proto
-, stdenv
-, substituteAll
-, xhtml1
-, yajl
-, writeScript
-, nixosTests
+{
+  lib,
+  bash,
+  bash-completion,
+  bridge-utils,
+  coreutils,
+  curl,
+  darwin,
+  dbus,
+  dnsmasq,
+  docutils,
+  fetchFromGitLab,
+  gettext,
+  glib,
+  gnutls,
+  iproute2,
+  iptables,
+  libgcrypt,
+  libpcap,
+  libtasn1,
+  libxml2,
+  libxslt,
+  makeWrapper,
+  meson,
+  ninja,
+  openssh,
+  perl,
+  perlPackages,
+  polkit,
+  pkg-config,
+  pmutils,
+  python3,
+  readline,
+  rpcsvc-proto,
+  stdenv,
+  substituteAll,
+  xhtml1,
+  yajl,
+  writeScript,
+  nixosTests,
 
   # Linux
-, acl ? null
-, attr ? null
-, audit ? null
-, dmidecode ? null
-, fuse3 ? null
-, kmod ? null
-, libapparmor ? null
-, libcap_ng ? null
-, libnl ? null
-, libpciaccess ? null
-, libtirpc ? null
-, lvm2 ? null
-, numactl ? null
-, numad ? null
-, parted ? null
-, systemd ? null
-, util-linux ? null
+  acl ? null,
+  attr ? null,
+  audit ? null,
+  dmidecode ? null,
+  fuse3 ? null,
+  kmod ? null,
+  libapparmor ? null,
+  libcap_ng ? null,
+  libnl ? null,
+  libpciaccess ? null,
+  libtirpc ? null,
+  lvm2 ? null,
+  numactl ? null,
+  numad ? null,
+  parted ? null,
+  systemd ? null,
+  util-linux ? null,
 
   # Darwin
-, gmp
-, libiconv
-, qemu
-, Carbon
-, AppKit
+  gmp,
+  libiconv,
+  qemu,
+  Carbon,
+  AppKit,
 
   # Options
-, enableCeph ? false
-, ceph
-, enableGlusterfs ? false
-, glusterfs
-, enableIscsi ? false
-, openiscsi
-, libiscsi
-, enableXen ? stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isx86_64
-, xen
-, enableZfs ? stdenv.hostPlatform.isLinux
-, zfs
+  enableCeph ? false,
+  ceph,
+  enableGlusterfs ? false,
+  glusterfs,
+  enableIscsi ? false,
+  openiscsi,
+  libiscsi,
+  enableXen ? stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isx86_64,
+  xen,
+  enableZfs ? stdenv.hostPlatform.isLinux,
+  zfs,
 }:
 
 let
   inherit (stdenv.hostPlatform) isDarwin isLinux isx86_64;
-  binPath = lib.makeBinPath ([
-    dnsmasq
-  ] ++ lib.optionals isLinux [
-    bridge-utils
-    dmidecode
-    dnsmasq
-    iproute2
-    iptables
-    kmod
-    lvm2
-    numactl
-    numad
-    openssh
-    pmutils
-    systemd
-  ] ++ lib.optionals enableIscsi [
-    libiscsi
-    openiscsi
-  ] ++ lib.optionals enableZfs [
-    zfs
-  ]);
+  binPath = lib.makeBinPath (
+    [
+      dnsmasq
+    ]
+    ++ lib.optionals isLinux [
+      bridge-utils
+      dmidecode
+      dnsmasq
+      iproute2
+      iptables
+      kmod
+      lvm2
+      numactl
+      numad
+      openssh
+      pmutils
+      systemd
+    ]
+    ++ lib.optionals enableIscsi [
+      libiscsi
+      openiscsi
+    ]
+    ++ lib.optionals enableZfs [
+      zfs
+    ]
+  );
 in
 
 assert enableXen -> isLinux && isx86_64;
@@ -126,7 +132,8 @@ stdenv.mkDerivation rec {
 
   patches = [
     ./0001-meson-patch-in-an-install-prefix-for-building-on-nix.patch
-  ] ++ lib.optionals enableZfs [
+  ]
+  ++ lib.optionals enableZfs [
     (substituteAll {
       src = ./0002-substitute-zfs-and-zpool-commands.patch;
       zfs = "${zfs}/bin/zfs";
@@ -141,20 +148,24 @@ stdenv.mkDerivation rec {
     # delete only the first occurrence of this
     sed -i '0,/qemuxmlconftest/{/qemuxmlconftest/d;}' tests/meson.build
 
-  '' + lib.optionalString isLinux ''
+  ''
+  + lib.optionalString isLinux ''
     for binary in mount umount mkfs; do
       substituteInPlace meson.build \
         --replace "find_program('$binary'" "find_program('${lib.getBin util-linux}/bin/$binary'"
     done
 
-  '' + ''
+  ''
+  + ''
     substituteInPlace meson.build \
       --replace "'dbus-daemon'," "'${lib.getBin dbus}/bin/dbus-daemon',"
-  '' + lib.optionalString isLinux ''
+  ''
+  + lib.optionalString isLinux ''
     sed -i 's,define PARTED "parted",define PARTED "${parted}/bin/parted",' \
       src/storage/storage_backend_disk.c \
       src/storage/storage_util.c
-  '' + lib.optionalString isDarwin ''
+  ''
+  + lib.optionalString isDarwin ''
     # Darwin doesn’t support -fsemantic-interposition, but the problem doesn’t seem to affect Mach-O.
     # See https://gitlab.com/libvirt/libvirt/-/merge_requests/235
     sed -i "s/not supported_cc_flags.contains('-fsemantic-interposition')/false/" meson.build
@@ -163,7 +174,8 @@ stdenv.mkDerivation rec {
     sed -i '/qemuvhostusertest/d' tests/meson.build
     sed -i '/qemuxml2xmltest/d' tests/meson.build
     sed -i '/domaincapstest/d' tests/meson.build
-  '' + lib.optionalString enableXen ''
+  ''
+  + lib.optionalString enableXen ''
     # Has various hardcoded paths that don't exist outside of a Xen dom0.
     sed -i '/libxlxml2domconfigtest/d' tests/meson.build
     substituteInPlace src/libxl/libxl_capabilities.h \
@@ -203,7 +215,8 @@ stdenv.mkDerivation rec {
     readline
     xhtml1
     yajl
-  ] ++ lib.optionals isLinux [
+  ]
+  ++ lib.optionals isLinux [
     acl
     attr
     audit
@@ -219,7 +232,8 @@ stdenv.mkDerivation rec {
     parted
     systemd
     util-linux
-  ] ++ lib.optionals isDarwin [
+  ]
+  ++ lib.optionals isDarwin [
     AppKit
     Carbon
     gmp
@@ -227,7 +241,10 @@ stdenv.mkDerivation rec {
   ]
   ++ lib.optionals enableCeph [ ceph ]
   ++ lib.optionals enableGlusterfs [ glusterfs ]
-  ++ lib.optionals enableIscsi [ libiscsi openiscsi ]
+  ++ lib.optionals enableIscsi [
+    libiscsi
+    openiscsi
+  ]
   ++ lib.optionals enableXen [ xen ]
   ++ lib.optionals enableZfs [ zfs ];
 
@@ -258,7 +275,9 @@ stdenv.mkDerivation rec {
         --replace '"/usr/bin/pkttyagent"' '"${if isLinux then polkit.bin else "/usr"}/bin/pkttyagent"'
 
       substituteInPlace src/util/virpci.c \
-         --replace '/lib/modules' '${if isLinux then "/run/booted-system/kernel-modules" else ""}/lib/modules'
+         --replace '/lib/modules' '${
+           if isLinux then "/run/booted-system/kernel-modules" else ""
+         }/lib/modules'
 
       patchShebangs .
     ''
@@ -359,7 +378,8 @@ stdenv.mkDerivation rec {
     # Added in nixpkgs:
     gettext() { "${gettext}/bin/gettext" "$@"; }
     '
-  '' + lib.optionalString isLinux ''
+  ''
+  + lib.optionalString isLinux ''
     for f in $out/lib/systemd/system/*.service ; do
       substituteInPlace $f --replace /bin/kill ${coreutils}/bin/kill
     done

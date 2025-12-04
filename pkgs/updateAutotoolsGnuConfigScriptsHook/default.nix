@@ -2,5 +2,7 @@
 
 makeSetupHook {
   name = "update-autotools-gnu-config-scripts-hook";
-  substitutions = { gnu_config = gnu-config; };
+  substitutions = {
+    gnu_config = gnu-config;
+  };
 } ./update-autotools-gnu-config-scripts.sh

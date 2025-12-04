@@ -42,7 +42,8 @@ buildPythonPackage rec {
   propagatedBuildInputs = [
     packaging
     pyproject-hooks
-  ] ++ lib.optionals (pythonOlder "3.11") [ tomli ];
+  ]
+  ++ lib.optionals (pythonOlder "3.11") [ tomli ];
 
   # We need to disable tests because this package is part of the bootstrap chain
   # and its test dependencies cannot be built yet when this is being built.
@@ -75,21 +76,20 @@ buildPythonPackage rec {
 
       __darwinAllowLocalNetworking = true;
 
-      disabledTests =
-        [
-          # Tests often fail with StopIteration
-          "test_isolat"
-          "test_default_pip_is_never_too_old"
-          "test_build"
-          "test_with_get_requires"
-          "test_init"
-          "test_output"
-          "test_wheel_metadata"
-        ]
-        ++ lib.optionals stdenv.isDarwin [
-          # Expects Apple's Python and its quirks
-          "test_can_get_venv_paths_with_conflicting_default_scheme"
-        ];
+      disabledTests = [
+        # Tests often fail with StopIteration
+        "test_isolat"
+        "test_default_pip_is_never_too_old"
+        "test_build"
+        "test_with_get_requires"
+        "test_init"
+        "test_output"
+        "test_wheel_metadata"
+      ]
+      ++ lib.optionals stdenv.isDarwin [
+        # Expects Apple's Python and its quirks
+        "test_can_get_venv_paths_with_conflicting_default_scheme"
+      ];
     };
   };
 

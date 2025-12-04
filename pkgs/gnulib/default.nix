@@ -1,4 +1,10 @@
-{ lib, stdenv, fetchFromSavannah, python3, perl }:
+{
+  lib,
+  stdenv,
+  fetchFromSavannah,
+  python3,
+  perl,
+}:
 
 stdenv.mkDerivation rec {
   pname = "gnulib";

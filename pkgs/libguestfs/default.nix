@@ -1,44 +1,45 @@
-{ lib
-, stdenv
-, fetchurl
-, pkg-config
-, autoreconfHook
-, makeWrapper
-, libxcrypt
-, ncurses
-, cpio
-, gperf
-, cdrkit
-, flex
-, bison
-, qemu
-, pcre2
-, augeas
-, libxml2
-, acl
-, libcap
-, libcap_ng
-, libconfig
-, systemd
-, fuse
-, yajl
-, libvirt
-, hivex
-, db
-, gmp
-, readline
-, file
-, numactl
-, libapparmor
-, jansson
-, getopt
-, perlPackages
-, ocamlPackages
-, libtirpc
-, appliance ? null
-, javaSupport ? false
-, jdk ? null
-, zstd
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  autoreconfHook,
+  makeWrapper,
+  libxcrypt,
+  ncurses,
+  cpio,
+  gperf,
+  cdrkit,
+  flex,
+  bison,
+  qemu,
+  pcre2,
+  augeas,
+  libxml2,
+  acl,
+  libcap,
+  libcap_ng,
+  libconfig,
+  systemd,
+  fuse,
+  yajl,
+  libvirt,
+  hivex,
+  db,
+  gmp,
+  readline,
+  file,
+  numactl,
+  libapparmor,
+  jansson,
+  getopt,
+  perlPackages,
+  ocamlPackages,
+  libtirpc,
+  appliance ? null,
+  javaSupport ? false,
+  jdk ? null,
+  zstd,
 }:
 
 assert appliance == null || lib.isDerivation appliance;
@@ -65,8 +66,17 @@ stdenv.mkDerivation rec {
     pkg-config
     qemu
     zstd
-  ] ++ (with perlPackages; [ perl libintl-perl GetoptLong ModuleBuild ])
-  ++ (with ocamlPackages; [ ocaml findlib ]);
+  ]
+  ++ (with perlPackages; [
+    perl
+    libintl-perl
+    GetoptLong
+    ModuleBuild
+  ])
+  ++ (with ocamlPackages; [
+    ocaml
+    findlib
+  ]);
   buildInputs = [
     libxcrypt
     ncurses
@@ -91,7 +101,13 @@ stdenv.mkDerivation rec {
     libapparmor
     perlPackages.ModuleBuild
     libtirpc
-  ] ++ (with ocamlPackages; [ ocamlbuild ocaml_libvirt gettext-stub ounit ])
+  ]
+  ++ (with ocamlPackages; [
+    ocamlbuild
+    ocaml_libvirt
+    gettext-stub
+    ounit
+  ])
   ++ lib.optional javaSupport jdk;
 
   prePatch = ''
@@ -111,7 +127,8 @@ stdenv.mkDerivation rec {
     "--disable-daemon"
     "--with-distro=NixOS"
     "--with-guestfs-path=${placeholder "out"}/lib/guestfs"
-  ] ++ lib.optionals (!javaSupport) [ "--without-java" ];
+  ]
+  ++ lib.optionals (!javaSupport) [ "--without-java" ];
   patches = [
     ./libguestfs-syms.patch
   ];
@@ -158,7 +175,10 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "Tools for accessing and modifying virtual machine disk images";
-    license = with licenses; [ gpl2Plus lgpl21Plus ];
+    license = with licenses; [
+      gpl2Plus
+      lgpl21Plus
+    ];
     homepage = "https://libguestfs.org/";
     maintainers = [ ];
     platforms = platforms.linux;

@@ -73,4 +73,3 @@
     name = "Jonathan Ringer";
   };
 }
-

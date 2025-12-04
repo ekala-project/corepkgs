@@ -1,14 +1,48 @@
-{ stdenv, lib, fetchurl, fetchpatch, fetchFromGitHub, bash, pkg-config, autoconf, cpio
-, file, which, unzip, zip, perl, cups, freetype, alsa-lib, libjpeg, giflib
-, libpng, zlib, lcms2, libX11, libICE, libXrender, libXext, libXt, libXtst
-, libXi, libXinerama, libXcursor, libXrandr, fontconfig, openjdk21-bootstrap
-, ensureNewerSourcesForZipFilesHook
-, setJavaClassPath
-# TODO(@sternenseemann): gtk3 fails to evaluate in pkgsCross.ghcjs.buildPackages
-# which should be fixable, this is a no-rebuild workaround for GHC.
-, headless ? stdenv.targetPlatform.isGhcjs
-, enableJavaFX ? false, openjfx
-, enableGtk ? true, gtk3, glib
+{
+  stdenv,
+  lib,
+  fetchurl,
+  fetchpatch,
+  fetchFromGitHub,
+  bash,
+  pkg-config,
+  autoconf,
+  cpio,
+  file,
+  which,
+  unzip,
+  zip,
+  perl,
+  cups,
+  freetype,
+  alsa-lib,
+  libjpeg,
+  giflib,
+  libpng,
+  zlib,
+  lcms2,
+  libX11,
+  libICE,
+  libXrender,
+  libXext,
+  libXt,
+  libXtst,
+  libXi,
+  libXinerama,
+  libXcursor,
+  libXrandr,
+  fontconfig,
+  openjdk21-bootstrap,
+  ensureNewerSourcesForZipFilesHook,
+  setJavaClassPath,
+  # TODO(@sternenseemann): gtk3 fails to evaluate in pkgsCross.ghcjs.buildPackages
+  # which should be fixable, this is a no-rebuild workaround for GHC.
+  headless ? stdenv.targetPlatform.isGhcjs,
+  enableJavaFX ? false,
+  openjfx,
+  enableGtk ? true,
+  gtk3,
+  glib,
 }:
 
 let
@@ -32,13 +66,44 @@ let
       hash = "sha256-zRN16lrc5gtDlTVIQJRRx103w/VbRkatCLeEc9AXWPE=";
     };
 
-    nativeBuildInputs = [ pkg-config autoconf unzip ensureNewerSourcesForZipFilesHook ];
+    nativeBuildInputs = [
+      pkg-config
+      autoconf
+      unzip
+      ensureNewerSourcesForZipFilesHook
+    ];
     buildInputs = [
-      cpio file which zip perl zlib cups freetype alsa-lib libjpeg giflib
-      libpng zlib lcms2 libX11 libICE libXrender libXext libXtst libXt libXtst
-      libXi libXinerama libXcursor libXrandr fontconfig openjdk-bootstrap
-    ] ++ lib.optionals (!headless && enableGtk) [
-      gtk3 glib
+      cpio
+      file
+      which
+      zip
+      perl
+      zlib
+      cups
+      freetype
+      alsa-lib
+      libjpeg
+      giflib
+      libpng
+      zlib
+      lcms2
+      libX11
+      libICE
+      libXrender
+      libXext
+      libXtst
+      libXt
+      libXtst
+      libXi
+      libXinerama
+      libXcursor
+      libXrandr
+      fontconfig
+      openjdk-bootstrap
+    ]
+    ++ lib.optionals (!headless && enableGtk) [
+      gtk3
+      glib
     ];
 
     patches = [
@@ -64,7 +129,8 @@ let
         url = "https://github.com/openjdk/jdk/commit/9341d135b855cc208d48e47d30cd90aafa354c36.patch";
         hash = "sha256-Qcm3ZmGCOYLZcskNjj7DYR85R4v07vYvvavrVOYL8vg=";
       })
-    ] ++ lib.optionals (!headless && enableGtk) [
+    ]
+    ++ lib.optionals (!headless && enableGtk) [
       ./swing-use-gtk-jdk13.patch
     ];
 
@@ -76,7 +142,10 @@ let
     # JDK's build system attempts to specifically detect
     # and special-case WSL, and we don't want it to do that,
     # so pass the correct platform names explicitly
-    configurePlatforms = ["build" "host"];
+    configurePlatforms = [
+      "build"
+      "host"
+    ];
 
     configureFlags = [
       "--with-boot-jdk=${openjdk-bootstrap.home}"
@@ -106,11 +175,19 @@ let
 
     env.NIX_CFLAGS_COMPILE = "-Wno-error";
 
-    NIX_LDFLAGS = toString (lib.optionals (!headless) [
-      "-lfontconfig" "-lcups" "-lXinerama" "-lXrandr" "-lmagic"
-    ] ++ lib.optionals (!headless && enableGtk) [
-      "-lgtk-3" "-lgio-2.0"
-    ]);
+    NIX_LDFLAGS = toString (
+      lib.optionals (!headless) [
+        "-lfontconfig"
+        "-lcups"
+        "-lXinerama"
+        "-lXrandr"
+        "-lmagic"
+      ]
+      ++ lib.optionals (!headless && enableGtk) [
+        "-lgtk-3"
+        "-lgio-2.0"
+      ]
+    );
 
     # -j flag is explicitly rejected by the build system:
     #     Error: 'make -jN' is not supported, use 'make JOBS=N'
@@ -192,4 +269,5 @@ let
       inherit gtk3;
     };
   };
-in openjdk
+in
+openjdk

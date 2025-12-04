@@ -1,5 +1,9 @@
-{ lib, stdenv, rustPlatform, buildPackages
-, originalCargoToml ? null
+{
+  lib,
+  stdenv,
+  rustPlatform,
+  buildPackages,
+  originalCargoToml ? null,
 }:
 
 stdenv.mkDerivation {

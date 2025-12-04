@@ -1,20 +1,22 @@
-{ version
-, src-urls
-, src-hash
-, configureFlags ? []
-, patches ? []
-, packageAtLeast
-, packageOlder
-, mkVariantPassthru
-, ...
+{
+  version,
+  src-urls,
+  src-hash,
+  configureFlags ? [ ],
+  patches ? [ ],
+  packageAtLeast,
+  packageOlder,
+  mkVariantPassthru,
+  ...
 }@variantArgs:
 
-{ lib
-, stdenv
-, fetchurl
-, gmp
-, autoreconfHook
-, buildPackages
+{
+  lib,
+  stdenv,
+  fetchurl,
+  gmp,
+  autoreconfHook,
+  buildPackages,
 }@args:
 
 stdenv.mkDerivation {
@@ -30,7 +32,9 @@ stdenv.mkDerivation {
 
   strictDeps = true;
   depsBuildBuild = lib.optionals (packageAtLeast "0.24") [ buildPackages.stdenv.cc ];
-  nativeBuildInputs = lib.optionals (stdenv.hostPlatform.isRiscV && packageOlder "0.24") [ autoreconfHook ];
+  nativeBuildInputs = lib.optionals (stdenv.hostPlatform.isRiscV && packageOlder "0.24") [
+    autoreconfHook
+  ];
   buildInputs = [ gmp ];
 
   inherit configureFlags;

@@ -1,4 +1,11 @@
-{ lib, stdenv, fetchFromGitHub, fetchpatch, perl, coreutils }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchpatch,
+  perl,
+  coreutils,
+}:
 
 stdenv.mkDerivation rec {
   pname = "libfaketime";
@@ -23,7 +30,8 @@ stdenv.mkDerivation rec {
       url = "https://github.com/wolfcw/libfaketime/commit/f32986867addc9d22b0fab29c1c927f079d44ac1.patch";
       hash = "sha256-fIXuxxcV9J2IcgwcwSrMo4maObkH9WYv1DC/wdtbq/g=";
     })
-  ] ++ (lib.optionals stdenv.cc.isClang [
+  ]
+  ++ (lib.optionals stdenv.cc.isClang [
     # https://github.com/wolfcw/libfaketime/issues/277
     ./0001-Remove-unsupported-clang-flags.patch
   ]);

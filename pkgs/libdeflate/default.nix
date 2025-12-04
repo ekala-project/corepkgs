@@ -1,10 +1,11 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, fixDarwinDylibNames
-, pkgsStatic
-, cmake
-, testers
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fixDarwinDylibNames,
+  pkgsStatic,
+  cmake,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -20,8 +21,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeFlags = lib.optionals stdenv.hostPlatform.isStatic [ "-DLIBDEFLATE_BUILD_SHARED_LIB=OFF" ];
 
-  nativeBuildInputs = [ cmake ]
-    ++ lib.optional stdenv.hostPlatform.isDarwin fixDarwinDylibNames;
+  nativeBuildInputs = [ cmake ] ++ lib.optional stdenv.hostPlatform.isDarwin fixDarwinDylibNames;
 
   passthru.tests = {
     static = pkgsStatic.libdeflate;

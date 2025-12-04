@@ -1,18 +1,25 @@
-{ stdenv, lib, buildPackages, fetchurl, attr, runtimeShell
-, usePam ? !isStatic, pam ? null
-, isStatic ? stdenv.hostPlatform.isStatic
+{
+  stdenv,
+  lib,
+  buildPackages,
+  fetchurl,
+  attr,
+  runtimeShell,
+  usePam ? !isStatic,
+  pam ? null,
+  isStatic ? stdenv.hostPlatform.isStatic,
 
-# passthru.tests
-, bind ? null
-, chrony ? null
-, htop ? null
-, libgcrypt ? null
-, libvirt ? null
-, ntp ? null
-, qemu ? null
-, squid ? null
-, tor ? null
-, uwsgi ? null
+  # passthru.tests
+  bind ? null,
+  chrony ? null,
+  htop ? null,
+  libgcrypt ? null,
+  libvirt ? null,
+  ntp ? null,
+  qemu ? null,
+  squid ? null,
+  tor ? null,
+  uwsgi ? null,
 }:
 
 assert usePam -> pam != null;
@@ -26,8 +33,14 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-I6bviq2vHj6HX2M7stEWz++JUtunvHxWmxNFjhlSsw8=";
   };
 
-  outputs = [ "out" "dev" "lib" "man" "doc" ]
-    ++ lib.optional usePam "pam";
+  outputs = [
+    "out"
+    "dev"
+    "lib"
+    "man"
+    "doc"
+  ]
+  ++ lib.optional usePam "pam";
 
   depsBuildBuild = [ buildPackages.stdenv.cc ];
 
@@ -41,7 +54,11 @@ stdenv.mkDerivation rec {
     "BUILD_CC=$(CC_FOR_BUILD)"
     "CC:=$(CC)"
     "CROSS_COMPILE=${stdenv.cc.targetPrefix}"
-  ] ++ lib.optionals isStatic [ "SHARED=no" "LIBCSTATIC=yes" ];
+  ]
+  ++ lib.optionals isStatic [
+    "SHARED=no"
+    "LIBCSTATIC=yes"
+  ];
 
   postPatch = ''
     patchShebangs ./progs/mkcapshdoc.sh
@@ -64,7 +81,8 @@ stdenv.mkDerivation rec {
     ${lib.optionalString (!isStatic) ''rm "$lib"/lib/*.a''}
     mkdir -p "$doc/share/doc/${pname}-${version}"
     cp License "$doc/share/doc/${pname}-${version}/"
-  '' + lib.optionalString usePam ''
+  ''
+  + lib.optionalString usePam ''
     mkdir -p "$pam/lib/security"
     mv "$lib"/lib/security "$pam/lib"
   '';
@@ -80,7 +98,8 @@ stdenv.mkDerivation rec {
       qemu
       squid
       tor
-      uwsgi;
+      uwsgi
+      ;
   };
 
   meta = {

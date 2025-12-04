@@ -1,6 +1,6 @@
 {
-  overlays ? [ ]
-, ...
+  overlays ? [ ],
+  ...
 }@args:
 
 let
@@ -11,6 +11,9 @@ let
   filteredArgs = builtins.removeAttrs args [ "overlays" ];
 in
 
-import ./stdenv/impure.nix ({
-  inherit overlays;
-} // filteredArgs)
+import ./stdenv/impure.nix (
+  {
+    inherit overlays;
+  }
+  // filteredArgs
+)

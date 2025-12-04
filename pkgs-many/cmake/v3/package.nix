@@ -1,37 +1,39 @@
-{ version
-, src-hash
-, isMinimalBuild ? false
-, withNcurses ? false
-, withQt ? false
-, buildDocs ? !isMinimalBuild
-, useOpenSSL ? !isMinimalBuild
-, mkVariantPassthru
-, ...
+{
+  version,
+  src-hash,
+  isMinimalBuild ? false,
+  withNcurses ? false,
+  withQt ? false,
+  buildDocs ? !isMinimalBuild,
+  useOpenSSL ? !isMinimalBuild,
+  mkVariantPassthru,
+  ...
 }@variantArgs:
 
-{ lib
-, stdenv
-, fetchurl
-, replaceVars
-, buildPackages
-, bzip2
-, curlMinimal
-, expat
-, libarchive
-, libuv
-, ncurses
-, openssl
-, pkg-config
-, rhash
-, sphinx
-, sysctl
-, texinfo
-, xz
-, zlib
-, libsForQt5 ? null
-, gitUpdater
-, darwin ? null
-, ps
+{
+  lib,
+  stdenv,
+  fetchurl,
+  replaceVars,
+  buildPackages,
+  bzip2,
+  curlMinimal,
+  expat,
+  libarchive,
+  libuv,
+  ncurses,
+  openssl,
+  pkg-config,
+  rhash,
+  sphinx,
+  sysctl,
+  texinfo,
+  xz,
+  zlib,
+  libsForQt5 ? null,
+  gitUpdater,
+  darwin ? null,
+  ps,
 }@dependencies:
 
 let
@@ -41,7 +43,8 @@ in
 # Minimal, bootstrap cmake does not have toolkits
 assert isMinimalBuild -> (!withNcurses && !withQt);
 stdenv.mkDerivation (finalAttrs: {
-  pname = "cmake"
+  pname =
+    "cmake"
     + lib.optionalString isMinimalBuild "-minimal"
     + lib.optionalString withNcurses "-cursesUI"
     + lib.optionalString withQt "-qt5UI";
@@ -74,9 +77,16 @@ stdenv.mkDerivation (finalAttrs: {
     replaceVars ./007-darwin-bsd-ps-abspath.diff {
       ps = lib.getExe ps;
       sysctl = lib.getExe sysctl;
-    });
+    }
+  );
 
-  outputs = [ "out" ] ++ lib.optionals buildDocs [ "man" "info" ];
+  outputs = [
+    "out"
+  ]
+  ++ lib.optionals buildDocs [
+    "man"
+    "info"
+  ];
   separateDebugInfo = true;
   setOutputFlags = false;
 
@@ -87,25 +97,28 @@ stdenv.mkDerivation (finalAttrs: {
 
   depsBuildBuild = [ buildPackages.stdenv.cc ];
 
-  nativeBuildInputs = finalAttrs.setupHooks ++ [
-    pkg-config
-  ]
+  nativeBuildInputs =
+    finalAttrs.setupHooks
+    ++ [
+      pkg-config
+    ]
     ++ lib.optionals buildDocs [ texinfo ]
     ++ lib.optionals withQt [ wrapQtAppsHook ];
 
-  buildInputs = lib.optionals useSharedLibraries [
-    bzip2
-    curlMinimal
-    expat
-    libarchive
-    xz
-    zlib
-    libuv
-    rhash
-  ]
-  ++ lib.optional useOpenSSL openssl
-  ++ lib.optional withNcurses ncurses
-  ++ lib.optional withQt qtbase;
+  buildInputs =
+    lib.optionals useSharedLibraries [
+      bzip2
+      curlMinimal
+      expat
+      libarchive
+      xz
+      zlib
+      libuv
+      rhash
+    ]
+    ++ lib.optional useOpenSSL openssl
+    ++ lib.optional withNcurses ncurses
+    ++ lib.optional withQt qtbase;
 
   preConfigure = ''
     fixCmakeFiles .
@@ -125,15 +138,19 @@ stdenv.mkDerivation (finalAttrs: {
   configureFlags = [
     "CXXFLAGS=-Wno-elaborated-enum-base"
     "--docdir=share/doc/${finalAttrs.pname}-${finalAttrs.version}"
-  ] ++ (if useSharedLibraries
-  then [
-    "--no-system-cppdap"
-    "--no-system-jsoncpp"
-    "--system-libs"
   ]
-  else [
-    "--no-system-libs"
-  ]) # FIXME: cleanup
+  ++ (
+    if useSharedLibraries then
+      [
+        "--no-system-cppdap"
+        "--no-system-jsoncpp"
+        "--system-libs"
+      ]
+    else
+      [
+        "--no-system-libs"
+      ]
+  ) # FIXME: cleanup
   ++ lib.optional withQt "--qt-gui"
   ++ lib.optionals buildDocs [
     "--sphinx-build=${sphinx}/bin/sphinx-build"
@@ -155,12 +172,9 @@ stdenv.mkDerivation (finalAttrs: {
     # package being built.
     (lib.cmakeFeature "CMAKE_CXX_COMPILER" "${stdenv.cc.targetPrefix}c++")
     (lib.cmakeFeature "CMAKE_C_COMPILER" "${stdenv.cc.targetPrefix}cc")
-    (lib.cmakeFeature "CMAKE_AR"
-      "${lib.getBin stdenv.cc.bintools.bintools}/bin/${stdenv.cc.targetPrefix}ar")
-    (lib.cmakeFeature "CMAKE_RANLIB"
-      "${lib.getBin stdenv.cc.bintools.bintools}/bin/${stdenv.cc.targetPrefix}ranlib")
-    (lib.cmakeFeature "CMAKE_STRIP"
-      "${lib.getBin stdenv.cc.bintools.bintools}/bin/${stdenv.cc.targetPrefix}strip")
+    (lib.cmakeFeature "CMAKE_AR" "${lib.getBin stdenv.cc.bintools.bintools}/bin/${stdenv.cc.targetPrefix}ar")
+    (lib.cmakeFeature "CMAKE_RANLIB" "${lib.getBin stdenv.cc.bintools.bintools}/bin/${stdenv.cc.targetPrefix}ranlib")
+    (lib.cmakeFeature "CMAKE_STRIP" "${lib.getBin stdenv.cc.bintools.bintools}/bin/${stdenv.cc.targetPrefix}strip")
 
     (lib.cmakeBool "CMAKE_USE_OPENSSL" useOpenSSL)
     (lib.cmakeBool "BUILD_CursesDialog" withNcurses)

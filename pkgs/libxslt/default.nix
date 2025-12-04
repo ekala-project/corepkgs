@@ -1,25 +1,33 @@
-{ lib
-, stdenv
-, fetchurl
-, pkg-config
-, autoreconfHook
-, libxml2
-, findXMLCatalogs
-, gettext
-, python
-, ncurses
-, libxcrypt
-, libgcrypt
-, cryptoSupport ? false
-, pythonSupport ? libxml2.pythonSupport
-, gnome
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  autoreconfHook,
+  libxml2,
+  findXMLCatalogs,
+  gettext,
+  python,
+  ncurses,
+  libxcrypt,
+  libgcrypt,
+  cryptoSupport ? false,
+  pythonSupport ? libxml2.pythonSupport,
+  gnome,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxslt";
   version = "1.1.42";
 
-  outputs = [ "bin" "dev" "out" "doc" "devdoc" ] ++ lib.optional pythonSupport "py";
+  outputs = [
+    "bin"
+    "dev"
+    "out"
+    "doc"
+    "devdoc"
+  ]
+  ++ lib.optional pythonSupport "py";
   outputMan = "bin";
 
   src = fetchurl {
@@ -35,14 +43,18 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
-    libxml2.dev libxcrypt
-  ] ++ lib.optionals stdenv.isDarwin [
+    libxml2.dev
+    libxcrypt
+  ]
+  ++ lib.optionals stdenv.isDarwin [
     gettext
-  ] ++ lib.optionals pythonSupport [
+  ]
+  ++ lib.optionals pythonSupport [
     libxml2.py
     python
     ncurses
-  ] ++ lib.optionals cryptoSupport [
+  ]
+  ++ lib.optionals cryptoSupport [
     libgcrypt
   ];
 
@@ -56,7 +68,8 @@ stdenv.mkDerivation (finalAttrs: {
     "--without-debugger"
     (lib.withFeature pythonSupport "python")
     (lib.optionalString pythonSupport "PYTHON=${python.pythonOnBuildForHost.interpreter}")
-  ] ++ lib.optionals (!cryptoSupport) [
+  ]
+  ++ lib.optionals (!cryptoSupport) [
     "--without-crypto"
   ];
 
@@ -65,7 +78,8 @@ stdenv.mkDerivation (finalAttrs: {
   postFixup = ''
     moveToOutput bin/xslt-config "$dev"
     moveToOutput lib/xsltConf.sh "$dev"
-  '' + lib.optionalString pythonSupport ''
+  ''
+  + lib.optionalString pythonSupport ''
     mkdir -p $py/nix-support
     echo ${libxml2.py} >> $py/nix-support/propagated-build-inputs
     moveToOutput ${python.sitePackages} "$py"

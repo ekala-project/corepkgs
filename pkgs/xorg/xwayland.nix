@@ -1,50 +1,52 @@
-{ egl-wayland
-, bash
-, libepoxy
-, fetchurl
-, fontutil
-, lib
-, libdecor
-, libei
-, libGL
-, libGLU
-, libX11
-, libXau
-, libXaw
-, libXdmcp
-, libXext
-, libXfixes
-, libXfont2
-, libXmu
-, libXpm
-, libXrender
-, libXres
-, libXt
-, libdrm
-, libtirpc
-, withLibunwind ? true, libunwind
-, libxcb
-, libxkbfile
-, libxshmfence
-, libxcvt
-, mesa
-, meson
-, ninja
-, openssl
-, pkg-config
-, pixman
-, stdenv
-, systemd
-, wayland
-, wayland-protocols
-, wayland-scanner
-, xkbcomp
-, xkeyboard_config
-, xorgproto
-, xtrans
-, zlib
-, defaultFontPath ? ""
-, gitUpdater
+{
+  egl-wayland,
+  bash,
+  libepoxy,
+  fetchurl,
+  fontutil,
+  lib,
+  libdecor,
+  libei,
+  libGL,
+  libGLU,
+  libX11,
+  libXau,
+  libXaw,
+  libXdmcp,
+  libXext,
+  libXfixes,
+  libXfont2,
+  libXmu,
+  libXpm,
+  libXrender,
+  libXres,
+  libXt,
+  libdrm,
+  libtirpc,
+  withLibunwind ? true,
+  libunwind,
+  libxcb,
+  libxkbfile,
+  libxshmfence,
+  libxcvt,
+  mesa,
+  meson,
+  ninja,
+  openssl,
+  pkg-config,
+  pixman,
+  stdenv,
+  systemd,
+  wayland,
+  wayland-protocols,
+  wayland-scanner,
+  xkbcomp,
+  xkeyboard_config,
+  xorgproto,
+  xtrans,
+  zlib,
+  defaultFontPath ? "",
+  gitUpdater,
 }:
 
 stdenv.mkDerivation rec {
@@ -106,7 +108,8 @@ stdenv.mkDerivation rec {
     xorgproto
     xtrans
     zlib
-  ] ++ lib.optionals withLibunwind [
+  ]
+  ++ lib.optionals withLibunwind [
     libunwind
   ];
   mesonFlags = [

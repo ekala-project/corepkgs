@@ -475,9 +475,11 @@ let
               hash = "sha256-fqw5gTSEOGs3kAguR4tINFG7Xja1RAje+q67HJt2nGg=";
             })
           ];
-        pollyPatches =
-          [ (metadata.getVersionFile "llvm/gnu-install-dirs-polly.patch") ]
-          ++ lib.optional (lib.versionAtLeast metadata.release_version "15")
+        pollyPatches = [
+          (metadata.getVersionFile "llvm/gnu-install-dirs-polly.patch")
+        ]
+        ++
+          lib.optional (lib.versionAtLeast metadata.release_version "15")
             # Just like the `llvm-lit-cfg` patch, but for `polly`.
             (metadata.getVersionFile "llvm/polly-lit-cfg-add-libs-to-dylib-path.patch");
       };
@@ -487,40 +489,40 @@ let
       llvm = tools.libllvm;
 
       libclang = callPackage ./clang {
-        patches =
-          [
-            (metadata.getVersionFile "clang/purity.patch")
-            # https://reviews.llvm.org/D51899
-            (metadata.getVersionFile "clang/gnu-install-dirs.patch")
-          ]
-          ++ lib.optional (lib.versions.major metadata.release_version == "13")
+        patches = [
+          (metadata.getVersionFile "clang/purity.patch")
+          # https://reviews.llvm.org/D51899
+          (metadata.getVersionFile "clang/gnu-install-dirs.patch")
+        ]
+        ++
+          lib.optional (lib.versions.major metadata.release_version == "13")
             # Revert of https://reviews.llvm.org/D100879
             # The malloc alignment assumption is incorrect for jemalloc and causes
             # mis-compilation in firefox.
             # See: https://bugzilla.mozilla.org/show_bug.cgi?id=1741454
             (metadata.getVersionFile "clang/revert-malloc-alignment-assumption.patch")
-          ++ [
-            ./clang/add-nostdlibinc-flag.patch
-            (substituteAll {
-              src =
-                if (lib.versionOlder metadata.release_version "16") then
-                  ./clang/clang-11-15-LLVMgold-path.patch
-                else
-                  ./clang/clang-at-least-16-LLVMgold-path.patch;
-              libllvmLibdir = "${tools.libllvm.lib}/lib";
-            })
-          ]
-          ++ lib.optional (lib.versions.major metadata.release_version == "18") (fetchpatch {
-            name = "tweak-tryCaptureVariable-for-unevaluated-lambdas.patch";
-            url = "https://github.com/llvm/llvm-project/commit/3d361b225fe89ce1d8c93639f27d689082bd8dad.patch";
-            # TreeTransform.h is not affected in LLVM 18.
-            excludes = [
-              "docs/ReleaseNotes.rst"
-              "lib/Sema/TreeTransform.h"
-            ];
-            stripLen = 1;
-            hash = "sha256-1NKej08R9SPlbDY/5b0OKUsHjX07i9brR84yXiPwi7E=";
-          });
+        ++ [
+          ./clang/add-nostdlibinc-flag.patch
+          (substituteAll {
+            src =
+              if (lib.versionOlder metadata.release_version "16") then
+                ./clang/clang-11-15-LLVMgold-path.patch
+              else
+                ./clang/clang-at-least-16-LLVMgold-path.patch;
+            libllvmLibdir = "${tools.libllvm.lib}/lib";
+          })
+        ]
+        ++ lib.optional (lib.versions.major metadata.release_version == "18") (fetchpatch {
+          name = "tweak-tryCaptureVariable-for-unevaluated-lambdas.patch";
+          url = "https://github.com/llvm/llvm-project/commit/3d361b225fe89ce1d8c93639f27d689082bd8dad.patch";
+          # TreeTransform.h is not affected in LLVM 18.
+          excludes = [
+            "docs/ReleaseNotes.rst"
+            "lib/Sema/TreeTransform.h"
+          ];
+          stripLen = 1;
+          hash = "sha256-1NKej08R9SPlbDY/5b0OKUsHjX07i9brR84yXiPwi7E=";
+        });
       };
 
       clang-unwrapped = tools.libclang;
@@ -569,23 +571,24 @@ let
       };
 
       lld = callPackage ./lld {
-        patches =
-          [ (metadata.getVersionFile "lld/gnu-install-dirs.patch") ]
-          ++ lib.optional (lib.versions.major metadata.release_version == "14") (
-            metadata.getVersionFile "lld/fix-root-src-dir.patch"
-          )
-          ++ lib.optional (
-            lib.versionAtLeast metadata.release_version "16" && lib.versionOlder metadata.release_version "18"
-          ) (metadata.getVersionFile "lld/add-table-base.patch")
-          ++ lib.optional (lib.versions.major metadata.release_version == "18") (
-            # https://github.com/llvm/llvm-project/pull/97122
-            fetchpatch {
-              name = "more-openbsd-program-headers.patch";
-              url = "https://github.com/llvm/llvm-project/commit/d7fd8b19e560fbb613159625acd8046d0df75115.patch";
-              stripLen = 1;
-              hash = "sha256-7wTy7XDTx0+fhWQpW1KEuz7xJvpl42qMTUfd20KGOfA=";
-            }
-          );
+        patches = [
+          (metadata.getVersionFile "lld/gnu-install-dirs.patch")
+        ]
+        ++ lib.optional (lib.versions.major metadata.release_version == "14") (
+          metadata.getVersionFile "lld/fix-root-src-dir.patch"
+        )
+        ++ lib.optional (
+          lib.versionAtLeast metadata.release_version "16" && lib.versionOlder metadata.release_version "18"
+        ) (metadata.getVersionFile "lld/add-table-base.patch")
+        ++ lib.optional (lib.versions.major metadata.release_version == "18") (
+          # https://github.com/llvm/llvm-project/pull/97122
+          fetchpatch {
+            name = "more-openbsd-program-headers.patch";
+            url = "https://github.com/llvm/llvm-project/commit/d7fd8b19e560fbb613159625acd8046d0df75115.patch";
+            stripLen = 1;
+            hash = "sha256-7wTy7XDTx0+fhWQpW1KEuz7xJvpl42qMTUfd20KGOfA=";
+          }
+        );
       };
 
       lldb = callPackage ./lldb.nix (
@@ -655,11 +658,12 @@ let
           cc = tools.clang-unwrapped;
           libcxx = targetLlvmLibraries.libcxx;
           bintools = bintools';
-          extraPackages =
-            [ targetLlvmLibraries.compiler-rt ]
-            ++ lib.optionals (!stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD) [
-              targetLlvmLibraries.libunwind
-            ];
+          extraPackages = [
+            targetLlvmLibraries.compiler-rt
+          ]
+          ++ lib.optionals (!stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD) [
+            targetLlvmLibraries.libunwind
+          ];
           extraBuildCommands =
             lib.optionalString (lib.versions.major metadata.release_version == "13") (
               ''
@@ -680,21 +684,20 @@ let
             + mkExtraBuildCommands cc;
         }
         // lib.optionalAttrs (lib.versionAtLeast metadata.release_version "14") {
-          nixSupport.cc-cflags =
-            [
-              "-rtlib=compiler-rt"
-              "-Wno-unused-command-line-argument"
-              "-B${targetLlvmLibraries.compiler-rt}/lib"
-            ]
-            ++ lib.optional (
-              !stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD
-            ) "--unwindlib=libunwind"
-            ++ lib.optional (
-              !stdenv.targetPlatform.isWasm
-              && !stdenv.targetPlatform.isFreeBSD
-              && stdenv.targetPlatform.useLLVM or false
-            ) "-lunwind"
-            ++ lib.optional stdenv.targetPlatform.isWasm "-fno-exceptions";
+          nixSupport.cc-cflags = [
+            "-rtlib=compiler-rt"
+            "-Wno-unused-command-line-argument"
+            "-B${targetLlvmLibraries.compiler-rt}/lib"
+          ]
+          ++ lib.optional (
+            !stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD
+          ) "--unwindlib=libunwind"
+          ++ lib.optional (
+            !stdenv.targetPlatform.isWasm
+            && !stdenv.targetPlatform.isFreeBSD
+            && stdenv.targetPlatform.useLLVM or false
+          ) "-lunwind"
+          ++ lib.optional stdenv.targetPlatform.isWasm "-fno-exceptions";
           nixSupport.cc-ldflags =
             lib.optionals (!stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD)
               (
@@ -709,11 +712,12 @@ let
           cc = tools.clang-unwrapped;
           libcxx = targetLlvmLibraries.libcxx;
           bintools = bintools';
-          extraPackages =
-            [ targetLlvmLibraries.compiler-rt-no-libc ]
-            ++ lib.optionals (!stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD) [
-              targetLlvmLibraries.libunwind
-            ];
+          extraPackages = [
+            targetLlvmLibraries.compiler-rt-no-libc
+          ]
+          ++ lib.optionals (!stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD) [
+            targetLlvmLibraries.libunwind
+          ];
           extraBuildCommands =
             lib.optionalString (lib.versions.major metadata.release_version == "13") (
               ''
@@ -734,21 +738,20 @@ let
             + mkExtraBuildCommandsBasicRt cc;
         }
         // lib.optionalAttrs (lib.versionAtLeast metadata.release_version "14") {
-          nixSupport.cc-cflags =
-            [
-              "-rtlib=compiler-rt"
-              "-Wno-unused-command-line-argument"
-              "-B${targetLlvmLibraries.compiler-rt-no-libc}/lib"
-            ]
-            ++ lib.optional (
-              !stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD
-            ) "--unwindlib=libunwind"
-            ++ lib.optional (
-              !stdenv.targetPlatform.isWasm
-              && !stdenv.targetPlatform.isFreeBSD
-              && stdenv.targetPlatform.useLLVM or false
-            ) "-lunwind"
-            ++ lib.optional stdenv.targetPlatform.isWasm "-fno-exceptions";
+          nixSupport.cc-cflags = [
+            "-rtlib=compiler-rt"
+            "-Wno-unused-command-line-argument"
+            "-B${targetLlvmLibraries.compiler-rt-no-libc}/lib"
+          ]
+          ++ lib.optional (
+            !stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD
+          ) "--unwindlib=libunwind"
+          ++ lib.optional (
+            !stdenv.targetPlatform.isWasm
+            && !stdenv.targetPlatform.isFreeBSD
+            && stdenv.targetPlatform.useLLVM or false
+          ) "-lunwind"
+          ++ lib.optional stdenv.targetPlatform.isWasm "-fno-exceptions";
           nixSupport.cc-ldflags = lib.optionals (
             !stdenv.targetPlatform.isWasm && !stdenv.targetPlatform.isFreeBSD
           ) [ "-L${targetLlvmLibraries.libunwind}/lib" ];
@@ -770,15 +773,14 @@ let
             + mkExtraBuildCommandsBasicRt cc;
         }
         // lib.optionalAttrs (lib.versionAtLeast metadata.release_version "14") {
-          nixSupport.cc-cflags =
-            [
-              "-rtlib=compiler-rt"
-              "-B${targetLlvmLibraries.compiler-rt-no-libc}/lib"
-              "-nostdlib++"
-            ]
-            ++ lib.optional (
-              lib.versionAtLeast metadata.release_version "15" && stdenv.targetPlatform.isWasm
-            ) "-fno-exceptions";
+          nixSupport.cc-cflags = [
+            "-rtlib=compiler-rt"
+            "-B${targetLlvmLibraries.compiler-rt-no-libc}/lib"
+            "-nostdlib++"
+          ]
+          ++ lib.optional (
+            lib.versionAtLeast metadata.release_version "15" && stdenv.targetPlatform.isWasm
+          ) "-fno-exceptions";
         }
       );
 
@@ -796,14 +798,13 @@ let
             + mkExtraBuildCommandsBasicRt cc;
         }
         // lib.optionalAttrs (lib.versionAtLeast metadata.release_version "14") {
-          nixSupport.cc-cflags =
-            [
-              "-rtlib=compiler-rt"
-              "-B${targetLlvmLibraries.compiler-rt-no-libc}/lib"
-            ]
-            ++ lib.optional (
-              lib.versionAtLeast metadata.release_version "15" && stdenv.targetPlatform.isWasm
-            ) "-fno-exceptions";
+          nixSupport.cc-cflags = [
+            "-rtlib=compiler-rt"
+            "-B${targetLlvmLibraries.compiler-rt-no-libc}/lib"
+          ]
+          ++ lib.optional (
+            lib.versionAtLeast metadata.release_version "15" && stdenv.targetPlatform.isWasm
+          ) "-fno-exceptions";
         }
       );
 
@@ -820,11 +821,12 @@ let
             + mkExtraBuildCommands0 cc;
         }
         // lib.optionalAttrs (lib.versionAtLeast metadata.release_version "14") {
-          nixSupport.cc-cflags =
-            [ "-nostartfiles" ]
-            ++ lib.optional (
-              lib.versionAtLeast metadata.release_version "15" && stdenv.targetPlatform.isWasm
-            ) "-fno-exceptions";
+          nixSupport.cc-cflags = [
+            "-nostartfiles"
+          ]
+          ++ lib.optional (
+            lib.versionAtLeast metadata.release_version "15" && stdenv.targetPlatform.isWasm
+          ) "-fno-exceptions";
         }
       );
 

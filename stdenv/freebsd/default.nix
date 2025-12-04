@@ -8,11 +8,15 @@
   overlays,
   crossOverlays ? [ ],
   bootstrapFiles ?
-    let table = {
-      x86_64-freebsd = import ./bootstrap-files/x86_64-unknown-freebsd.nix;
-    };
-    files = table.${localSystem.system} or (throw "unsupported platform ${localSystem.system} for the pure FreeBSD stdenv");
-    in files
+    let
+      table = {
+        x86_64-freebsd = import ./bootstrap-files/x86_64-unknown-freebsd.nix;
+      };
+      files =
+        table.${localSystem.system}
+          or (throw "unsupported platform ${localSystem.system} for the pure FreeBSD stdenv");
+    in
+    files,
 }:
 
 assert crossSystem == localSystem;
@@ -39,7 +43,10 @@ let
       pname = "bootstrap-archive";
       version = "9.9.9";
       builder = "${bootstrapFiles.unpack}/libexec/ld-elf.so.1";
-      args = [ "${bootstrapFiles.unpack}/bin/bash" ./unpack-bootstrap-files.sh ];
+      args = [
+        "${bootstrapFiles.unpack}/bin/bash"
+        ./unpack-bootstrap-files.sh
+      ];
       LD_LIBRARY_PATH = "${bootstrapFiles.unpack}/lib";
       src = bootstrapFiles.unpack;
       inherit (bootstrapFiles) bootstrapTools;
@@ -434,21 +441,21 @@ in
         tzdata = super.tzdata.overrideAttrs { NIX_CFLAGS_COMPILE = "-DHAVE_GETTEXT=0"; };
 
         # make it so libcxx/libunwind are built in this stdenv and not the next
-        freebsd = super.freebsd.overrideScope (self': super': {
-          inherit (prevStage.freebsd) locales;
-              stdenvNoLibcxx =
-                self.overrideCC (self.stdenv // { name = "stdenv-freebsd-boot-0.4"; })
-                  (
-                    self.stdenv.cc.override {
-                      name = "freebsd-boot-0.4-cc";
-                      libc = self.freebsd.libc;
-                      bintools = self.stdenv.cc.bintools.override {
-                        name = "freebsd-boot-0.4-bintools";
-                        libc = self.freebsd.libc;
-                      };
-                    }
-                  );
-        });
+        freebsd = super.freebsd.overrideScope (
+          self': super': {
+            inherit (prevStage.freebsd) locales;
+            stdenvNoLibcxx = self.overrideCC (self.stdenv // { name = "stdenv-freebsd-boot-0.4"; }) (
+              self.stdenv.cc.override {
+                name = "freebsd-boot-0.4-cc";
+                libc = self.freebsd.libc;
+                bintools = self.stdenv.cc.bintools.override {
+                  name = "freebsd-boot-0.4-bintools";
+                  libc = self.freebsd.libc;
+                };
+              }
+            );
+          }
+        );
         llvmPackages = super.llvmPackages // {
           libcxx =
             (super.llvmPackages.libcxx.override {

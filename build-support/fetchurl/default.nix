@@ -13,7 +13,8 @@ let
 
   inherit (config)
     hashedMirrors
-    rewriteURL;
+    rewriteURL
+    ;
 
   mirrors = import ./mirrors.nix // {
     inherit hashedMirrors;
