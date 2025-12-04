@@ -91,7 +91,7 @@ let
   mkTest =
     crateArgs:
     let
-      crate = mkHostCrate (builtins.removeAttrs crateArgs [ "expectedTestOutput" ]);
+      crate = mkHostCrate (removeAttrs crateArgs [ "expectedTestOutput" ]);
       hasTests = crateArgs.buildTests or false;
       expectedTestOutputs = crateArgs.expectedTestOutputs or null;
       binaries = map (v: lib.escapeShellArg v.name) (crateArgs.crateBin or [ ]);
@@ -182,7 +182,7 @@ let
     assert (builtins.isList expectedFiles);
 
     let
-      crate = mkCrate (builtins.removeAttrs crateArgs [ "expectedTestOutput" ]);
+      crate = mkCrate (removeAttrs crateArgs [ "expectedTestOutput" ]);
       crateOutput = if output == null then crate else crate."${output}";
       expectedFilesFile = writeTextFile {
         name = "expected-files-${name}";
@@ -228,7 +228,7 @@ let
 in
 rec {
 
-  tests =
+  tests = lib.recurseIntoAttrs (
     let
       cases = rec {
         libPath = {
@@ -590,7 +590,7 @@ rec {
             expectedTestOutputs = [ "test build_foo_check ... ok" ];
           };
         # Regression test for https://github.com/NixOS/nixpkgs/issues/74071
-        # Whenevever a build.rs file is generating files those should not be overlayed onto the actual source dir
+        # Whenevever a build.rs file is generating files those should not be overlaid onto the actual source dir
         buildRsOutDirOverlay = {
           src = symlinkJoin {
             name = "buildrs-out-dir-overlay";
@@ -681,7 +681,7 @@ rec {
           # By default ".", meaning the top level directory is assumed.
           # Using null will trigger a search.
           workspace_member = null;
-          src = symlinkJoin rec {
+          src = symlinkJoin {
             name = "find-cargo-toml";
             paths = [
               (mkCargoToml { name = "ignoreMe"; })
@@ -706,7 +706,7 @@ rec {
 
         rustCargoTomlInTopDir =
           let
-            withoutCargoTomlSearch = builtins.removeAttrs rustCargoTomlInSubDir [ "workspace_member" ];
+            withoutCargoTomlSearch = removeAttrs rustCargoTomlInSubDir [ "workspace_member" ];
           in
           withoutCargoTomlSearch
           // {
@@ -737,7 +737,7 @@ rec {
       ) cases;
     in
     tests
-    // rec {
+    // {
 
       crateBinWithPathOutputs = assertOutputs {
         name = "crateBinWithPath";
@@ -774,6 +774,7 @@ rec {
           # On Darwin, the debug symbols are in a separate directory.
           "./bin/test_binary1.dSYM/Contents/Info.plist"
           "./bin/test_binary1.dSYM/Contents/Resources/DWARF/test_binary1"
+          "./bin/test_binary1.dSYM/Contents/Resources/Relocations/${stdenv.hostPlatform.rust.platform.arch}/test_binary1.yml"
         ];
       };
 
@@ -838,6 +839,19 @@ rec {
         ];
       };
 
+      crateWasm32BinHyphens = assertOutputs {
+        name = "wasm32-crate-bin-hyphens";
+        mkCrate = mkCrate pkgsCross.wasm32-unknown-none.buildRustCrate;
+        crateArgs = {
+          crateName = "wasm32-crate-bin-hyphens";
+          crateBin = [ { name = "wasm32-crate-bin-hyphens"; } ];
+          src = mkBin "src/main.rs";
+        };
+        expectedFiles = [
+          "./bin/wasm32-crate-bin-hyphens.wasm"
+        ];
+      };
+
       brotliTest =
         let
           pkg = brotliCrates.brotli_2_5_0 { };
@@ -897,13 +911,14 @@ rec {
                 test -x '${pkg}/bin/rcgen' && touch $out
               ''
           );
-    };
+    }
+  );
   test = releaseTools.aggregate {
     name = "buildRustCrate-tests";
     meta = {
       description = "Test cases for buildRustCrate";
       maintainers = [ ];
     };
-    constituents = builtins.attrValues tests;
+    constituents = builtins.attrValues (lib.filterAttrs (_: v: lib.isDerivation v) tests);
   };
 }

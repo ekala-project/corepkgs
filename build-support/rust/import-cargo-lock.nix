@@ -16,7 +16,7 @@
   # Cargo lock file contents as string
   lockFileContents ? null,
 
-  # Allow `builtins.fetchGit` to be used to not require hashes for git dependencies
+  # Allow `fetchGit` to be used to not require hashes for git dependencies
   allowBuiltinFetchGit ? false,
 
   # Additional registries to pull sources from
@@ -57,7 +57,11 @@ let
   # shadows args.lockFileContents
   lockFileContents = if lockFile != null then builtins.readFile lockFile else args.lockFileContents;
 
-  parsedLockFile = builtins.fromTOML lockFileContents;
+  parsedLockFile = fromTOML lockFileContents;
+
+  # lockfile v1 and v2 don't have the `version` key, so assume v2
+  # we can implement more fine-grained detection later, if needed
+  lockFileVersion = parsedLockFile.version or 2;
 
   packages = parsedLockFile.package;
 
@@ -71,11 +75,11 @@ let
   # Force evaluation of the git SHA -> hash mapping, so that an error is
   # thrown if there are stale hashes. We cannot rely on gitShaOutputHash
   # being evaluated otherwise, since there could be no git dependencies.
-  depCrates = builtins.deepSeq gitShaOutputHash (builtins.map mkCrate depPackages);
+  depCrates = builtins.deepSeq gitShaOutputHash (map mkCrate depPackages);
 
   # Map package name + version to git commit SHA for packages with a git source.
   namesGitShas = builtins.listToAttrs (
-    builtins.map nameGitSha (builtins.filter (pkg: lib.hasPrefix "git+" pkg.source) depPackages)
+    map nameGitSha (builtins.filter (pkg: lib.hasPrefix "git+" pkg.source) depPackages)
   );
 
   nameGitSha =
@@ -184,7 +188,7 @@ let
               sha256 = gitShaOutputHash.${gitParts.sha};
             }
           else if allowBuiltinFetchGit then
-            builtins.fetchGit {
+            fetchGit {
               inherit (gitParts) url;
               rev = gitParts.sha;
               allRefs = true;
@@ -225,7 +229,7 @@ let
         echo Found crate ${pkg.name} at $crateCargoTOML
         tree=$(dirname $crateCargoTOML)
 
-        cp -prvL "$tree/" $out
+        cp -prvL "$tree" "$out" || echo "Warning: certain files couldn't be copied!" >&2
         chmod u+w $out
 
         if grep -q workspace "$out/Cargo.toml"; then
@@ -236,13 +240,20 @@ let
         # Cargo is happy with empty metadata.
         printf '{"files":{},"package":null}' > "$out/.cargo-checksum.json"
 
+        ${lib.optionalString (gitParts ? type) ''
+          gitPartsValue=${lib.escapeShellArg gitParts.value}
+          # starting with lockfile version v4 the git source url contains encoded query parameters
+          # our regex parser does not know how to unescape them to get the actual value, so we do it here
+          ${lib.optionalString (lockFileVersion >= 4) ''
+            gitPartsValue=$(${lib.getExe python3Packages.python} -c "import sys, urllib.parse; print(urllib.parse.unquote(sys.argv[1]))" "$gitPartsValue")
+          ''}
+        ''}
+
         # Set up configuration for the vendor directory.
         cat > $out/.cargo-config <<EOF
-        [source."${gitParts.url}${
-          lib.optionalString (gitParts ? type) "?${gitParts.type}=${gitParts.value}"
-        }"]
+        [source."${pkg.source}"]
         git = "${gitParts.url}"
-        ${lib.optionalString (gitParts ? type) "${gitParts.type} = \"${gitParts.value}\""}
+        ${lib.optionalString (gitParts ? type) "${gitParts.type} = \"$gitPartsValue\""}
         replace-with = "vendored-sources"
         EOF
       ''
@@ -274,7 +285,7 @@ let
                 "cp $lockFileContentsPath $out/Cargo.lock"
             }
 
-            cat > $out/.cargo/config <<EOF
+            cat > $out/.cargo/config.toml <<EOF
         [source.crates-io]
         replace-with = "vendored-sources"
 
@@ -285,7 +296,7 @@ let
             declare -A keysSeen
 
             for registry in ${toString (builtins.attrNames extraRegistries)}; do
-              cat >> $out/.cargo/config <<EOF
+              cat >> $out/.cargo/config.toml <<EOF
 
         [source."$registry"]
         registry = "$registry"
@@ -301,7 +312,7 @@ let
                 key=$(sed 's/\[source\."\(.*\)"\]/\1/; t; d' < "$crate/.cargo-config")
                 if [[ -z ''${keysSeen[$key]} ]]; then
                   keysSeen[$key]=1
-                  cat "$crate/.cargo-config" >> $out/.cargo/config
+                  cat "$crate/.cargo-config" >> $out/.cargo/config.toml
                 fi
               fi
             done

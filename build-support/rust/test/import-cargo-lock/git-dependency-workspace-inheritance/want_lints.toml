@@ -8,12 +8,8 @@ keywords = [
     "third_thing",
 ]
 
+[lints]
+dbg_macro = "warn"
+
 [dependencies]
 bar = "1.0.0"
-
-[dependencies.foo]
-version = "1.0.0"
-features = [
-    "cat",
-    "meow",
-]

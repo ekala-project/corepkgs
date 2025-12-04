@@ -10,10 +10,3 @@ keywords = [
 
 [dependencies]
 bar = "1.0.0"
-
-[dependencies.foo]
-version = "1.0.0"
-features = [
-    "cat",
-    "meow",
-]

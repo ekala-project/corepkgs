@@ -10,7 +10,6 @@
   clang,
   cmake,
   curl,
-  darwin,
   dbus,
   dbus-glib,
   fontconfig,
@@ -35,7 +34,7 @@
   openssl,
   pango,
   pkg-config,
-  postgresql,
+  libpq,
   protobuf,
   python3,
   rdkafka,
@@ -48,9 +47,6 @@
   ...
 }:
 
-let
-  inherit (darwin.apple_sdk.frameworks) CoreFoundation Security;
-in
 {
   alsa-sys = attrs: {
     nativeBuildInputs = [ pkg-config ];
@@ -76,10 +72,6 @@ in
       openssl
       zlib
       curl
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      CoreFoundation
-      Security
     ];
   };
 
@@ -264,7 +256,7 @@ in
       nettle
       clang
     ];
-    LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
+    LIBCLANG_PATH = "${lib.getLib llvmPackages.libclang}/lib";
   };
 
   openssl = attrs: {
@@ -291,7 +283,7 @@ in
 
   pq-sys = attr: {
     nativeBuildInputs = [ pkg-config ];
-    buildInputs = [ postgresql ];
+    buildInputs = [ libpq ];
   };
 
   prost-build = attr: {
@@ -315,10 +307,6 @@ in
         path = "src/bin/rink.rs";
       }
     ];
-  };
-
-  security-framework-sys = attr: {
-    propagatedBuildInputs = lib.optional stdenv.hostPlatform.isDarwin Security;
   };
 
   sequoia-openpgp = attrs: {
@@ -365,10 +353,6 @@ in
     ];
   };
 
-  serde_derive = attrs: {
-    buildInputs = lib.optional stdenv.hostPlatform.isDarwin Security;
-  };
-
   servo-fontconfig-sys = attrs: {
     nativeBuildInputs = [ pkg-config ];
     buildInputs = [
@@ -408,16 +392,16 @@ in
   };
 
   # Assumes it can run Command::new(env::var("CARGO")).arg("locate-project")
-  # https://github.com/bkchr/proc-macro-crate/blame/master/src/lib.rs#L244
+  # https://github.com/bkchr/proc-macro-crate/blame/master/src/lib.rs#L242
   proc-macro-crate =
     attrs:
     lib.optionalAttrs (lib.versionAtLeast attrs.version "2.0") {
-      prePatch = (attrs.prePatch or "") + ''
+      postPatch = (attrs.postPatch or "") + ''
         substituteInPlace \
           src/lib.rs \
           --replace-fail \
-          'env::var("CARGO").map_err(|_| Error::CargoEnvVariableNotSet)?' \
-          '"${lib.getBin buildPackages.cargo}/bin/cargo"'
+          'env::var("CARGO")' \
+          'Ok::<_, core::convert::Infallible>("${lib.getBin buildPackages.cargo}/bin/cargo")'
       '';
     };
 }
