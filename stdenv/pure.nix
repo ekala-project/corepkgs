@@ -128,7 +128,7 @@ in let
   # via `evalModules` is not idempotent. In other words, if you add `config` to
   # `newArgs`, expect strange very hard to debug errors! (Yes, I'm speaking from
   # experience here.)
-  nixpkgsFun = newArgs: import ./. (args // newArgs);
+  nixpkgsFun = newArgs: import ../. (args // newArgs);
 
   # Partially apply some arguments for building bootstraping stage pkgs
   # sets. Only apply arguments which no stdenv would want to override.
