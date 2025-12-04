@@ -28,6 +28,6 @@ default.nix   # Entry point for people to import
 *WARNING*: This is a personal server, and should be considered untrusted
 
 ```
-substituters = https://cache.jonringer.us
-trusted-public-keys = cache.jonringer.us:BZogIwFAp94LYcmaOi6xkHGJeRhMcQtFO8l6AmJNsng=
+substituters = https://ekala-corepkgs.cachix.org
+trusted-public-keys = ekala-corepkgs.cachix.org-1:DcZV+vegWoEzacbSdXFXU4S7728C0eS9RfGpKeyHd6w=
 ```
