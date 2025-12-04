@@ -6,7 +6,7 @@
   pkgsTargetTarget,
 }:
 
-rec {
+{
   # These environment variables must be set when using `cargo-c` and
   # several other tools which do not deal well with cross
   # compilation.  The symptom of the problem they fix is errors due
@@ -16,20 +16,11 @@ rec {
   envVars =
     let
 
-      # As a workaround for https://github.com/rust-lang/rust/issues/89626 use lld on pkgsStatic aarch64
-      shouldUseLLD = platform: platform.isAarch64 && platform.isStatic && !stdenv.hostPlatform.isDarwin;
-
       ccForBuild = "${pkgsBuildHost.stdenv.cc}/bin/${pkgsBuildHost.stdenv.cc.targetPrefix}cc";
       cxxForBuild = "${pkgsBuildHost.stdenv.cc}/bin/${pkgsBuildHost.stdenv.cc.targetPrefix}c++";
-      linkerForBuild = ccForBuild;
 
       ccForHost = "${stdenv.cc}/bin/${stdenv.cc.targetPrefix}cc";
       cxxForHost = "${stdenv.cc}/bin/${stdenv.cc.targetPrefix}c++";
-      linkerForHost =
-        if shouldUseLLD stdenv.targetPlatform && !stdenv.cc.bintools.isLLVM then
-          "${pkgsBuildHost.llvmPackages.bintools}/bin/${stdenv.cc.targetPrefix}ld.lld"
-        else
-          ccForHost;
 
       # Unfortunately we must use the dangerous `pkgsTargetTarget` here
       # because hooks are artificially phase-shifted one slot earlier
@@ -37,13 +28,6 @@ rec {
       # a targetPlatform to them).
       ccForTarget = "${pkgsTargetTarget.stdenv.cc}/bin/${pkgsTargetTarget.stdenv.cc.targetPrefix}cc";
       cxxForTarget = "${pkgsTargetTarget.stdenv.cc}/bin/${pkgsTargetTarget.stdenv.cc.targetPrefix}c++";
-      linkerForTarget =
-        if
-          shouldUseLLD pkgsTargetTarget.stdenv.targetPlatform && !pkgsTargetTarget.stdenv.cc.bintools.isLLVM # whether stdenv's linker is lld already
-        then
-          "${pkgsBuildTarget.llvmPackages.bintools}/bin/${pkgsTargetTarget.stdenv.cc.targetPrefix}ld.lld"
-        else
-          ccForTarget;
 
       rustBuildPlatform = stdenv.buildPlatform.rust.rustcTarget;
       rustBuildPlatformSpec = stdenv.buildPlatform.rust.rustcTargetSpec;
@@ -56,17 +40,14 @@ rec {
       inherit
         ccForBuild
         cxxForBuild
-        linkerForBuild
         rustBuildPlatform
         rustBuildPlatformSpec
         ccForHost
         cxxForHost
-        linkerForHost
         rustHostPlatform
         rustHostPlatformSpec
         ccForTarget
         cxxForTarget
-        linkerForTarget
         rustTargetPlatform
         rustTargetPlatformSpec
         ;
@@ -76,6 +57,17 @@ rec {
       #
       setEnv = ''
         env \
+          "CC_${stdenv.buildPlatform.rust.cargoEnvVarTarget}=${ccForBuild}" \
+          "CXX_${stdenv.buildPlatform.rust.cargoEnvVarTarget}=${cxxForBuild}" \
+          "CARGO_TARGET_${stdenv.buildPlatform.rust.cargoEnvVarTarget}_LINKER=${ccForBuild}" \
+          "CARGO_BUILD_TARGET=${rustBuildPlatform}" \
+          "HOST_CC=${pkgsBuildHost.stdenv.cc}/bin/cc" \
+          "HOST_CXX=${pkgsBuildHost.stdenv.cc}/bin/c++" \
+      ''
+      + ''
+        "CC_${stdenv.hostPlatform.rust.cargoEnvVarTarget}=${ccForHost}" \
+        "CXX_${stdenv.hostPlatform.rust.cargoEnvVarTarget}=${cxxForHost}" \
+        "CARGO_TARGET_${stdenv.hostPlatform.rust.cargoEnvVarTarget}_LINKER=${ccForHost}" \
       ''
       # Due to a bug in how splicing and pkgsTargetTarget works, in
       # situations where pkgsTargetTarget is irrelevant
@@ -85,20 +77,7 @@ rec {
       + lib.optionalString (rustTargetPlatform != rustHostPlatform) ''
         "CC_${stdenv.targetPlatform.rust.cargoEnvVarTarget}=${ccForTarget}" \
         "CXX_${stdenv.targetPlatform.rust.cargoEnvVarTarget}=${cxxForTarget}" \
-        "CARGO_TARGET_${stdenv.targetPlatform.rust.cargoEnvVarTarget}_LINKER=${linkerForTarget}" \
-      ''
-      + ''
-        "CC_${stdenv.hostPlatform.rust.cargoEnvVarTarget}=${ccForHost}" \
-        "CXX_${stdenv.hostPlatform.rust.cargoEnvVarTarget}=${cxxForHost}" \
-        "CARGO_TARGET_${stdenv.hostPlatform.rust.cargoEnvVarTarget}_LINKER=${linkerForHost}" \
-      ''
-      + ''
-        "CC_${stdenv.buildPlatform.rust.cargoEnvVarTarget}=${ccForBuild}" \
-        "CXX_${stdenv.buildPlatform.rust.cargoEnvVarTarget}=${cxxForBuild}" \
-        "CARGO_TARGET_${stdenv.buildPlatform.rust.cargoEnvVarTarget}_LINKER=${linkerForBuild}" \
-        "CARGO_BUILD_TARGET=${rustBuildPlatform}" \
-        "HOST_CC=${pkgsBuildHost.stdenv.cc}/bin/cc" \
-        "HOST_CXX=${pkgsBuildHost.stdenv.cc}/bin/c++" \
+        "CARGO_TARGET_${stdenv.targetPlatform.rust.cargoEnvVarTarget}_LINKER=${ccForTarget}" \
       '';
     };
 }

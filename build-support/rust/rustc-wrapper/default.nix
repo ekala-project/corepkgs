@@ -42,6 +42,9 @@ runCommand "${rustc-unwrapped.pname}-wrapper-${rustc-unwrapped.version}"
         src
         llvm
         llvmPackages
+        targetPlatforms
+        targetPlatformsWithHostTools
+        badTargetPlatforms
         ;
       unwrapped = rustc-unwrapped;
     };

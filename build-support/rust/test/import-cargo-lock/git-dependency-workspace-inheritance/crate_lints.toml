@@ -1,6 +1,6 @@
 [package]
 name = "im_using_workspaces"
-version = "1.0.0"
+version = { workspace = true }
 publish = false
 keywords = [
     "workspace",
@@ -8,12 +8,8 @@ keywords = [
     "third_thing",
 ]
 
+[lints]
+workspace = true
+
 [dependencies]
 bar = "1.0.0"
-
-[dependencies.foo]
-version = "1.0.0"
-features = [
-    "cat",
-    "meow",
-]
