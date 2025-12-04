@@ -34,6 +34,7 @@ IGNORE_DIRS = [
     "maintainers",   # Maintainer information
     "pkgs-many",     # Many packages directory
     "patches",       # Generated patch files directory
+    "pkgs/rust",     # Synced 2025-05-12
 ]
 
 IGNORE_FILES = [
@@ -177,13 +178,13 @@ def get_directory_path(rel_path: str) -> str:
 def map_directory_path(dir_path: str, nixpkgs: Path, files_in_dir: list[tuple[str, Path, Path]]) -> Optional[Path]:
     """Map corepkgs directory path to nixpkgs directory path."""
     if dir_path == ".":
-        return files_in_dir[0][2].parent if files_in_dir else None
+        return files_in_dir[0][2].parent if files_in_dir and files_in_dir[0][2] is not None else None
     if mapped := map_path_using_mappings(dir_path, nixpkgs, check_file=False):
         if mapped.exists():
             return mapped
     if (direct := nixpkgs / dir_path).exists():
         return direct
-    return files_in_dir[0][2].parent if files_in_dir else None
+    return files_in_dir[0][2].parent if files_in_dir and files_in_dir[0][2] is not None else None
 
 
 def extract_relative_path(absolute_path: str, base_path: str) -> str:
@@ -204,6 +205,85 @@ def replace_diff_path(line: str, prefix: str, base_path: str, dir_path: str) -> 
     return f"{prefix_slash}{full_path}\t{parts[1].split('\t', 1)[1]}" if has_timestamp else f"{prefix_slash}{full_path}\n"
 
 
+def filter_maintainer_changes(diff_content: str) -> tuple[str, bool]:
+    """Filter out maintainer-related changes from diff content.
+    
+    Strategy: Remove entire hunks that ONLY contain maintainer changes.
+    This preserves hunk line counts and ensures valid patches.
+    
+    Returns:
+        tuple: (filtered_diff_content, has_non_maintainer_changes)
+    """
+    if not diff_content:
+        return diff_content, False
+    
+    lines = diff_content.splitlines(keepends=True)
+    result_lines = []
+    has_non_maintainer_changes = False
+    
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        
+        # Keep file headers
+        if line.startswith("diff ") or line.startswith("---") or line.startswith("+++") or line.startswith("\\"):
+            result_lines.append(line)
+            i += 1
+            continue
+        
+        # Process hunk markers
+        if line.startswith("@@"):
+            hunk_start = i
+            hunk_lines = []
+            i += 1
+            
+            # Collect all lines in this hunk
+            change_lines = []
+            while i < len(lines):
+                hunk_line = lines[i]
+                # Stop at next hunk or file boundary
+                if hunk_line.startswith("@@") or hunk_line.startswith("diff ") or hunk_line.startswith("---"):
+                    break
+                hunk_lines.append(hunk_line)
+                if hunk_line.startswith("+") or hunk_line.startswith("-"):
+                    change_lines.append(hunk_line[1:].strip().lower())
+                i += 1
+            
+            # Check if all changes are maintainer-related
+            all_maintainer = True
+            if change_lines:
+                all_changes_text = " ".join(change_lines)
+                if "maintainers" not in all_changes_text:
+                    all_maintainer = False
+                else:
+                    # Check if there are non-maintainer changes
+                    # Remove maintainer patterns and see if anything remains
+                    test_text = all_changes_text
+                    for pattern in ["maintainers", "with", "[", "]", "=", ";"]:
+                        test_text = test_text.replace(pattern, "")
+                    test_text = "".join(c for c in test_text if c.isalnum() or c.isspace())
+                    if len(test_text.strip()) > 20:  # Significant non-maintainer content
+                        all_maintainer = False
+            
+            # Keep hunk if it has non-maintainer changes
+            if not all_maintainer or not change_lines:
+                has_non_maintainer_changes = True
+                result_lines.append(line)  # Add hunk marker
+                result_lines.extend(hunk_lines)
+            # else: skip entire hunk (maintainer-only)
+        else:
+            # Shouldn't happen, but keep it
+            result_lines.append(line)
+            i += 1
+    
+    filtered_content = "".join(result_lines)
+    # Ensure patch ends with newline
+    if filtered_content and not filtered_content.endswith("\n"):
+        filtered_content += "\n"
+    
+    return filtered_content, has_non_maintainer_changes
+
+
 def generate_directory_patch(
     dir_path: str,
     files_in_dir: list[tuple[str, Path, Path]],
@@ -212,11 +292,22 @@ def generate_directory_patch(
     patches_dir: Path,
 ) -> Optional[Path]:
     """Generate a patch file for an entire directory."""
+    # Skip generating patches for root-level files
+    if dir_path == ".":
+        return None
+    
     nixpkgs_dir = map_directory_path(dir_path, nixpkgs, files_in_dir)
     if not nixpkgs_dir:
         return None
     
-    corepkgs_dir = corepkgs if dir_path == "." else corepkgs / dir_path
+    corepkgs_dir = corepkgs / dir_path
+    
+    # Validate that both paths exist and are directories before running diff
+    if not corepkgs_dir.exists() or not corepkgs_dir.is_dir():
+        return None
+    if not nixpkgs_dir.exists() or not nixpkgs_dir.is_dir():
+        return None
+    
     result = subprocess.run(
         ["diff", "-urN", str(corepkgs_dir), str(nixpkgs_dir)],
         capture_output=True,
@@ -239,6 +330,17 @@ def generate_directory_patch(
             lines[i] = replace_diff_path(line, "+++ b", nixpkgs_str, dir_path)
     
     diff_content = "".join(lines)
+    
+    # Filter out maintainer changes from the diff
+    filtered_diff, has_non_maintainer_changes = filter_maintainer_changes(diff_content)
+    
+    # Skip generating patches if there are no non-maintainer changes
+    if not has_non_maintainer_changes:
+        return None
+    
+    # Use the filtered diff (without maintainer changes)
+    diff_content = filtered_diff
+    
     patch_file = patches_dir / f"{'root' if dir_path == '.' else dir_path.replace('/', '_')}.patch"
     patch_file.parent.mkdir(parents=True, exist_ok=True)
     

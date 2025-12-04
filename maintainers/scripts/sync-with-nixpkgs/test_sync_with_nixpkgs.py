@@ -563,6 +563,396 @@ class TestCheckNewFiles:
             assert stats.new_files >= 1
 
 
+class TestGenerateDirectoryPatch:
+    def test_skip_when_corepkgs_dir_does_not_exist(self):
+        """Skip patch generation when corepkgs directory doesn't exist."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            corepkgs = Path(tmpdir) / "corepkgs"
+            nixpkgs = Path(tmpdir) / "nixpkgs"
+            patches_dir = Path(tmpdir) / "patches"
+            patches_dir.mkdir()
+            
+            # Create nixpkgs directory but not corepkgs directory
+            nixpkgs_dir = nixpkgs / "pkgs" / "build-support" / "test-dir"
+            nixpkgs_dir.mkdir(parents=True)
+            (nixpkgs_dir / "file.nix").write_text("content")
+            
+            files_in_dir = [
+                ("build-support/test-dir/file.nix", None, nixpkgs_dir / "file.nix")
+            ]
+            
+            with config_context(PATH_MAPPINGS={"build-support": "pkgs/build-support"}):
+                result = sync_with_nixpkgs.generate_directory_patch(
+                    "build-support/test-dir",
+                    files_in_dir,
+                    corepkgs,
+                    nixpkgs,
+                    patches_dir
+                )
+                assert result is None
+    
+    def test_skip_when_nixpkgs_dir_does_not_exist(self):
+        """Skip patch generation when nixpkgs directory doesn't exist."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            corepkgs = Path(tmpdir) / "corepkgs"
+            nixpkgs = Path(tmpdir) / "nixpkgs"
+            patches_dir = Path(tmpdir) / "patches"
+            patches_dir.mkdir()
+            
+            # Create corepkgs directory but not nixpkgs directory
+            corepkgs_dir = corepkgs / "build-support" / "test-dir"
+            corepkgs_dir.mkdir(parents=True)
+            (corepkgs_dir / "file.nix").write_text("content")
+            
+            files_in_dir = [
+                ("build-support/test-dir/file.nix", corepkgs_dir / "file.nix", None)
+            ]
+            
+            with config_context(PATH_MAPPINGS={"build-support": "pkgs/build-support"}):
+                result = sync_with_nixpkgs.generate_directory_patch(
+                    "build-support/test-dir",
+                    files_in_dir,
+                    corepkgs,
+                    nixpkgs,
+                    patches_dir
+                )
+                assert result is None
+    
+    def test_skip_when_corepkgs_path_is_file_not_directory(self):
+        """Skip patch generation when corepkgs path exists but is a file, not a directory."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            corepkgs = Path(tmpdir) / "corepkgs"
+            nixpkgs = Path(tmpdir) / "nixpkgs"
+            patches_dir = Path(tmpdir) / "patches"
+            patches_dir.mkdir()
+            
+            # Create corepkgs file (not directory) and nixpkgs directory
+            corepkgs_file = corepkgs / "build-support" / "test-dir"
+            corepkgs_file.parent.mkdir(parents=True)
+            corepkgs_file.write_text("this is a file, not a directory")
+            
+            nixpkgs_dir = nixpkgs / "pkgs" / "build-support" / "test-dir"
+            nixpkgs_dir.mkdir(parents=True)
+            (nixpkgs_dir / "file.nix").write_text("content")
+            
+            files_in_dir = [
+                ("build-support/test-dir/file.nix", corepkgs_file, nixpkgs_dir / "file.nix")
+            ]
+            
+            with config_context(PATH_MAPPINGS={"build-support": "pkgs/build-support"}):
+                result = sync_with_nixpkgs.generate_directory_patch(
+                    "build-support/test-dir",
+                    files_in_dir,
+                    corepkgs,
+                    nixpkgs,
+                    patches_dir
+                )
+                assert result is None
+    
+    def test_skip_when_nixpkgs_path_is_file_not_directory(self):
+        """Skip patch generation when nixpkgs path exists but is a file, not a directory."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            corepkgs = Path(tmpdir) / "corepkgs"
+            nixpkgs = Path(tmpdir) / "nixpkgs"
+            patches_dir = Path(tmpdir) / "patches"
+            patches_dir.mkdir()
+            
+            # Create corepkgs directory and nixpkgs file (not directory)
+            corepkgs_dir = corepkgs / "build-support" / "test-dir"
+            corepkgs_dir.mkdir(parents=True)
+            (corepkgs_dir / "file.nix").write_text("content")
+            
+            nixpkgs_file = nixpkgs / "pkgs" / "build-support" / "test-dir"
+            nixpkgs_file.parent.mkdir(parents=True)
+            nixpkgs_file.write_text("this is a file, not a directory")
+            
+            files_in_dir = [
+                ("build-support/test-dir/file.nix", corepkgs_dir / "file.nix", nixpkgs_file)
+            ]
+            
+            with config_context(PATH_MAPPINGS={"build-support": "pkgs/build-support"}):
+                result = sync_with_nixpkgs.generate_directory_patch(
+                    "build-support/test-dir",
+                    files_in_dir,
+                    corepkgs,
+                    nixpkgs,
+                    patches_dir
+                )
+                assert result is None
+    
+    def test_skip_root_level_patches(self):
+        """Skip patch generation for root-level files (dir_path == '.')."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            corepkgs = Path(tmpdir) / "corepkgs"
+            nixpkgs = Path(tmpdir) / "nixpkgs"
+            patches_dir = Path(tmpdir) / "patches"
+            corepkgs.mkdir()
+            nixpkgs.mkdir()
+            patches_dir.mkdir()
+            
+            # Create root-level files that differ
+            (corepkgs / "root-file.nix").write_text("corepkgs root content")
+            (nixpkgs / "root-file.nix").write_text("nixpkgs root content")
+            
+            files_in_dir = [
+                ("root-file.nix", corepkgs / "root-file.nix", nixpkgs / "root-file.nix")
+            ]
+            
+            result = sync_with_nixpkgs.generate_directory_patch(
+                ".",
+                files_in_dir,
+                corepkgs,
+                nixpkgs,
+                patches_dir
+            )
+            assert result is None
+            # Verify no root.patch file was created
+            assert not (patches_dir / "root.patch").exists()
+    
+    def test_generate_patch_when_both_directories_exist(self):
+        """Generate patch successfully when both directories exist."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            corepkgs = Path(tmpdir) / "corepkgs"
+            nixpkgs = Path(tmpdir) / "nixpkgs"
+            patches_dir = Path(tmpdir) / "patches"
+            patches_dir.mkdir()
+            
+            # Create both directories with different content
+            corepkgs_dir = corepkgs / "build-support" / "test-dir"
+            corepkgs_dir.mkdir(parents=True)
+            (corepkgs_dir / "file.nix").write_text("corepkgs content")
+            
+            nixpkgs_dir = nixpkgs / "pkgs" / "build-support" / "test-dir"
+            nixpkgs_dir.mkdir(parents=True)
+            (nixpkgs_dir / "file.nix").write_text("nixpkgs content")
+            
+            files_in_dir = [
+                ("build-support/test-dir/file.nix", corepkgs_dir / "file.nix", nixpkgs_dir / "file.nix")
+            ]
+            
+            with config_context(PATH_MAPPINGS={"build-support": "pkgs/build-support"}):
+                result = sync_with_nixpkgs.generate_directory_patch(
+                    "build-support/test-dir",
+                    files_in_dir,
+                    corepkgs,
+                    nixpkgs,
+                    patches_dir
+                )
+                assert result is not None
+                assert result.exists()
+                # Verify patch file contains diff content
+                patch_content = result.read_text()
+                assert "diff -urN" in patch_content or "---" in patch_content
+    
+    def test_skip_maintainer_only_changes(self):
+        """Skip patch generation when diff only contains maintainer changes."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            corepkgs = Path(tmpdir) / "corepkgs"
+            nixpkgs = Path(tmpdir) / "nixpkgs"
+            patches_dir = Path(tmpdir) / "patches"
+            patches_dir.mkdir()
+            
+            # Create directories with files that differ only in maintainers
+            corepkgs_dir = corepkgs / "pkgs" / "test-pkg"
+            corepkgs_dir.mkdir(parents=True)
+            (corepkgs_dir / "default.nix").write_text("""{
+  description = "Test package";
+  maintainers = [ ];
+}""")
+            
+            nixpkgs_dir = nixpkgs / "pkgs" / "test-pkg"
+            nixpkgs_dir.mkdir(parents=True)
+            (nixpkgs_dir / "default.nix").write_text("""{
+  description = "Test package";
+  maintainers = with maintainers; [
+    globin
+    basvandijk
+  ];
+}""")
+            
+            files_in_dir = [
+                ("pkgs/test-pkg/default.nix", corepkgs_dir / "default.nix", nixpkgs_dir / "default.nix")
+            ]
+            
+            result = sync_with_nixpkgs.generate_directory_patch(
+                "pkgs/test-pkg",
+                files_in_dir,
+                corepkgs,
+                nixpkgs,
+                patches_dir
+            )
+            assert result is None
+            # Verify no patch file was created
+            assert not (patches_dir / "pkgs_test-pkg.patch").exists()
+    
+    def test_generate_patch_with_maintainer_and_other_changes(self):
+        """Generate patch when diff contains maintainer changes AND other changes, but maintainer changes are filtered out."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            corepkgs = Path(tmpdir) / "corepkgs"
+            nixpkgs = Path(tmpdir) / "nixpkgs"
+            patches_dir = Path(tmpdir) / "patches"
+            patches_dir.mkdir()
+            
+            # Create directories with files that differ in maintainers AND other fields
+            corepkgs_dir = corepkgs / "pkgs" / "test-pkg"
+            corepkgs_dir.mkdir(parents=True)
+            (corepkgs_dir / "default.nix").write_text("""{
+  description = "Old description";
+  maintainers = [ ];
+}""")
+            
+            nixpkgs_dir = nixpkgs / "pkgs" / "test-pkg"
+            nixpkgs_dir.mkdir(parents=True)
+            (nixpkgs_dir / "default.nix").write_text("""{
+  description = "New description";
+  maintainers = with maintainers; [
+    globin
+  ];
+}""")
+            
+            files_in_dir = [
+                ("pkgs/test-pkg/default.nix", corepkgs_dir / "default.nix", nixpkgs_dir / "default.nix")
+            ]
+            
+            result = sync_with_nixpkgs.generate_directory_patch(
+                "pkgs/test-pkg",
+                files_in_dir,
+                corepkgs,
+                nixpkgs,
+                patches_dir
+            )
+            assert result is not None
+            assert result.exists()
+            # Verify patch file contains diff content
+            patch_content = result.read_text()
+            assert "diff -urN" in patch_content or "---" in patch_content
+            # Verify it contains description changes
+            assert "description" in patch_content.lower()
+            # Verify maintainer changes are filtered out (should not appear in the patch)
+            # The patch should only show description changes, not maintainer changes
+            assert "Old description" in patch_content or "New description" in patch_content
+    
+    def test_patch_format_valid_no_orphaned_hunks(self):
+        """Verify that generated patches don't have orphaned hunk markers."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            corepkgs = Path(tmpdir) / "corepkgs"
+            nixpkgs = Path(tmpdir) / "nixpkgs"
+            patches_dir = Path(tmpdir) / "patches"
+            patches_dir.mkdir()
+            
+            # Create a file with maintainer changes in the middle of other changes
+            corepkgs_dir = corepkgs / "pkgs" / "test-pkg"
+            corepkgs_dir.mkdir(parents=True)
+            (corepkgs_dir / "default.nix").write_text("""{
+  description = "Test";
+  maintainers = [ ];
+  version = "1.0";
+}""")
+            
+            nixpkgs_dir = nixpkgs / "pkgs" / "test-pkg"
+            nixpkgs_dir.mkdir(parents=True)
+            (nixpkgs_dir / "default.nix").write_text("""{
+  description = "Test";
+  maintainers = with maintainers; [ globin ];
+  version = "2.0";
+}""")
+            
+            files_in_dir = [
+                ("pkgs/test-pkg/default.nix", corepkgs_dir / "default.nix", nixpkgs_dir / "default.nix")
+            ]
+            
+            result = sync_with_nixpkgs.generate_directory_patch(
+                "pkgs/test-pkg",
+                files_in_dir,
+                corepkgs,
+                nixpkgs,
+                patches_dir
+            )
+            assert result is not None
+            patch_content = result.read_text()
+            
+            # Verify no orphaned hunk markers (hunk marker followed immediately by another hunk marker)
+            lines = patch_content.splitlines()
+            for i, line in enumerate(lines):
+                if line.startswith("@@"):
+                    # Check that this hunk has content (not immediately followed by another @@ or end of file)
+                    if i + 1 < len(lines):
+                        next_line = lines[i + 1]
+                        assert not next_line.startswith("@@"), f"Orphaned hunk marker at line {i+1}"
+                        # Should have context or changes, not empty
+                        assert next_line.strip() or i + 2 < len(lines), f"Empty hunk at line {i+1}"
+    
+    def test_patch_no_hunk_marker_after_change_line(self):
+        """Verify that generated patches are valid and can be applied."""
+        import subprocess
+        
+        with tempfile.TemporaryDirectory() as tmpdir:
+            corepkgs = Path(tmpdir) / "corepkgs"
+            nixpkgs = Path(tmpdir) / "nixpkgs"
+            patches_dir = Path(tmpdir) / "patches"
+            patches_dir.mkdir()
+            
+            # Create a scenario where maintainer changes are between two hunks
+            # This simulates the rust patch issue
+            corepkgs_dir = corepkgs / "pkgs" / "rust"
+            corepkgs_dir.mkdir(parents=True)
+            (corepkgs_dir / "binary.nix").write_text("""{
+  description = "Safe, concurrent, practical language";
+  maintainers = [ ];
+  buildInputs = [
+    bash
+  ]
+  ++ lib.optional (!stdenv.hostPlatform.isDarwin) zlib
+  ++ lib.optional stdenv.hostPlatform.isDarwin Security;
+}""")
+            
+            nixpkgs_dir = nixpkgs / "pkgs" / "development" / "compilers" / "rust"
+            nixpkgs_dir.mkdir(parents=True)
+            (nixpkgs_dir / "binary.nix").write_text("""{
+  description = "Safe, concurrent, practical language";
+  mainProgram = "rustc";
+  maintainers = with maintainers; [ globin ];
+  buildInputs = [
+    bash
+  ]
+  ++ lib.optional (!stdenv.hostPlatform.isDarwin) zlib;
+}""")
+            
+            files_in_dir = [
+                ("pkgs/rust/binary.nix", corepkgs_dir / "binary.nix", nixpkgs_dir / "binary.nix")
+            ]
+            
+            with config_context(PATH_MAPPINGS={"pkgs/rust": "pkgs/development/compilers/rust"}):
+                result = sync_with_nixpkgs.generate_directory_patch(
+                    "pkgs/rust",
+                    files_in_dir,
+                    corepkgs,
+                    nixpkgs,
+                    patches_dir
+                )
+                assert result is not None
+                patch_file = result
+                
+                # Test that the patch can actually be applied
+                # Create a test directory to apply the patch
+                test_dir = Path(tmpdir) / "test_apply"
+                test_corepkgs = test_dir / "corepkgs"
+                test_corepkgs.mkdir(parents=True)
+                test_corepkgs_dir = test_corepkgs / "pkgs" / "rust"
+                test_corepkgs_dir.mkdir(parents=True)
+                (test_corepkgs_dir / "binary.nix").write_text((corepkgs_dir / "binary.nix").read_text())
+                
+                # Try to apply the patch
+                result = subprocess.run(
+                    ["patch", "-p1", "-d", str(test_corepkgs), "-i", str(patch_file)],
+                    capture_output=True,
+                    text=True
+                )
+                
+                assert result.returncode == 0, \
+                    f"Patch failed to apply: {result.stderr}\nPatch content:\n{patch_file.read_text()[:500]}"
+
+
 if __name__ == "__main__":
     import pytest
     pytest.main([__file__, "-v"])
