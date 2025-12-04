@@ -236,22 +236,6 @@ final: prev: with final; {
     libc = preLibcCrossHeaders;
   };
 
-  boostPackages = callPackage ./pkgs/boost { };
-  inherit (boostPackages)
-    boost175
-    boost177
-    boost178
-    boost179
-    boost180
-    boost181
-    boost182
-    boost183
-    boost184
-    boost185
-    boost186
-    ;
-  boost = boost186;
-
   buildcatrust = with python3.pkgs; toPythonApplication buildcatrust;
 
   buildEnv = callPackage ./build-support/buildenv { }; # not actually a package

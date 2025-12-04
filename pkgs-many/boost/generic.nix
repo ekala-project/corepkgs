@@ -1,53 +1,39 @@
 {
-  lib,
-  stdenv,
-  icu,
-  expat,
-  zlib,
-  bzip2,
-  zstd,
-  xz,
-  python ? null,
-  fixDarwinDylibNames,
-  libiconv,
-  libxcrypt,
-  makePkgconfigItem,
-  copyPkgconfigItems,
-  boost-build,
-  fetchpatch,
-  which,
-  toolset ?
-    if stdenv.cc.isClang then
-      "clang"
-    else if stdenv.cc.isGNU then
-      "gcc"
-    else
-      null,
-  enableRelease ? true,
-  enableDebug ? false,
-  enableSingleThreaded ? false,
-  enableMultiThreaded ? true,
-  enableShared ? !(with stdenv.hostPlatform; isStatic || isMinGW), # problems for now
-  enableStatic ? !enableShared,
-  enablePython ? false,
-  enableNumpy ? false,
-  enableIcu ? stdenv.hostPlatform == stdenv.buildPlatform,
-  taggedLayout ? (
-    (enableRelease && enableDebug)
-    || (enableSingleThreaded && enableMultiThreaded)
-    || (enableShared && enableStatic)
-  ),
-  patches ? [ ],
-  boostBuildPatches ? [ ],
-  useMpi ? false,
-  mpi,
-  extraB2Args ? [ ],
-
-  # Attributes inherit from specific versions
   version,
-  src,
+  src-hash,
+  packageAtLeast,
+  packageOlder,
+  mkVariantPassthru,
   ...
-}:
+}@variantArgs:
+
+{ lib, stdenv, icu, expat, zlib, bzip2, zstd, xz, python ? null, fixDarwinDylibNames, libiconv, libxcrypt
+, makePkgconfigItem
+, copyPkgconfigItems
+, fetchurl
+, fetchpatch
+, fetchFromGitHub
+, bison
+, which
+, toolset ? /**/ if stdenv.cc.isClang  then "clang"
+            else if stdenv.cc.isGNU    then "gcc"
+            else null
+, enableRelease ? true
+, enableDebug ? false
+, enableSingleThreaded ? false
+, enableMultiThreaded ? true
+, enableShared ? !(with stdenv.hostPlatform; isStatic || isMinGW) # problems for now
+, enableStatic ? !enableShared
+, enablePython ? false
+, enableNumpy ? false
+, enableIcu ? stdenv.hostPlatform == stdenv.buildPlatform
+, taggedLayout ? ((enableRelease && enableDebug) || (enableSingleThreaded && enableMultiThreaded) || (enableShared && enableStatic))
+, patches ? []
+, boostBuildPatches ? []
+, useMpi ? false
+, mpi
+, extraB2Args ? []
+}@packageArgs:
 
 # We must build at least one type of libraries
 assert enableShared || enableStatic;
@@ -56,9 +42,19 @@ assert enableNumpy -> enablePython;
 
 let
 
-  variant = lib.concatStringsSep "," (
-    lib.optional enableRelease "release" ++ lib.optional enableDebug "debug"
-  );
+  src = fetchurl {
+    url =
+      "mirror://sourceforge/boost/boost_${builtins.replaceStrings [ "." ] [ "_" ] version}.tar.bz2";
+    hash = src-hash;
+  };
+
+  boost-build = import ./boost-build.nix {
+    inherit lib stdenv bison fetchFromGitHub src version boostBuildPatches packageAtLeast packageOlder;
+  };
+
+  variant = lib.concatStringsSep ","
+    (lib.optional enableRelease "release" ++
+     lib.optional enableDebug "debug");
 
   threading = lib.concatStringsSep "," (
     lib.optional enableSingleThreaded "single" ++ lib.optional enableMultiThreaded "multi"
@@ -153,53 +149,43 @@ stdenv.mkDerivation {
 
   patchFlags = [ ];
 
-  patches =
-    patches
-    ++ lib.optional stdenv.isDarwin ./darwin-no-system-python.patch
-    ++ [ ./cmake-paths-173.patch ]
-    ++ lib.optional (version == "1.77.0") (fetchpatch {
-      url = "https://github.com/boostorg/math/commit/7d482f6ebc356e6ec455ccb5f51a23971bf6ce5b.patch";
+  patches = patches
+  ++ lib.optional stdenv.isDarwin ./darwin-no-system-python.patch
+  ++ [ ./cmake-paths-173.patch ]
+  ++ lib.optional (version == "1.77.0") (fetchpatch {
+    url = "https://github.com/boostorg/math/commit/7d482f6ebc356e6ec455ccb5f51a23971bf6ce5b.patch";
+    relative = "include";
+    sha256 = "sha256-KlmIbixcds6GyKYt1fx5BxDIrU7msrgDdYo9Va/KJR4=";
+  })
+  # This fixes another issue regarding ill-formed constant expressions, which is a default error
+  # in clang 16 and will be a hard error in clang 17.
+  ++ lib.optional (packageOlder "1.80") (fetchpatch {
+    url = "https://github.com/boostorg/log/commit/77f1e20bd69c2e7a9e25e6a9818ae6105f7d070c.patch";
+    relative = "include";
+    hash = "sha256-6qOiGJASm33XzwoxVZfKJd7sTlQ5yd+MMFQzegXm5RI=";
+  })
+  ++ lib.optionals (lib.versionOlder version "1.81") [
+    # libc++ 15 dropped support for `std::unary_function` and `std::binary_function` in C++17+.
+    # C++17 is the default for clang 16, but clang 15 is also affected in that language mode.
+    # This patch is for Boost 1.80, but it also applies to earlier versions.
+    (fetchpatch {
+      url = "https://www.boost.org/patches/1_80_0/0005-config-libcpp15.patch";
+      hash = "sha256-ULFMzKphv70unvPZ3o4vSP/01/xbSM9a2TlIV67eXDQ=";
+    })
+    # This fixes another ill-formed contant expressions issue flagged by clang 16.
+    (fetchpatch {
+      url = "https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a.patch";
       relative = "include";
       sha256 = "sha256-KlmIbixcds6GyKYt1fx5BxDIrU7msrgDdYo9Va/KJR4=";
     })
-    # Fixes ABI detection
-    ++ lib.optional (version == "1.83.0") (fetchpatch {
-      url = "https://github.com/boostorg/context/commit/6fa6d5c50d120e69b2d8a1c0d2256ee933e94b3b.patch";
-      stripLen = 1;
-      extraPrefix = "libs/context/";
-      sha256 = "sha256-bCfLL7bD1Rn4Ie/P3X+nIcgTkbXdCX6FW7B9lHsmVW8=";
-    })
-    # This fixes another issue regarding ill-formed constant expressions, which is a default error
-    # in clang 16 and will be a hard error in clang 17.
-    ++ lib.optional (lib.versionOlder version "1.80") (fetchpatch {
-      url = "https://github.com/boostorg/log/commit/77f1e20bd69c2e7a9e25e6a9818ae6105f7d070c.patch";
-      relative = "include";
-      hash = "sha256-6qOiGJASm33XzwoxVZfKJd7sTlQ5yd+MMFQzegXm5RI=";
-    })
-    ++ lib.optionals (lib.versionOlder version "1.81") [
-      # libc++ 15 dropped support for `std::unary_function` and `std::binary_function` in C++17+.
-      # C++17 is the default for clang 16, but clang 15 is also affected in that language mode.
-      # This patch is for Boost 1.80, but it also applies to earlier versions.
-      (fetchpatch {
-        url = "https://www.boost.org/patches/1_80_0/0005-config-libcpp15.patch";
-        hash = "sha256-ULFMzKphv70unvPZ3o4vSP/01/xbSM9a2TlIV67eXDQ=";
-      })
-      # This fixes another ill-formed contant expressions issue flagged by clang 16.
-      (fetchpatch {
-        url = "https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a.patch";
-        relative = "include";
-        hash = "sha256-dq4SVgxkPJSC7Fvr59VGnXkM4Lb09kYDaBksCHo9C0s=";
-      })
-      # This fixes an issue in Python 3.11 about Py_TPFLAGS_HAVE_GC
-      (fetchpatch {
-        name = "python311-compatibility.patch";
-        url = "https://github.com/boostorg/python/commit/a218babc8daee904a83f550fb66e5cb3f1cb3013.patch";
-        hash = "sha256-IHxLtJBx0xSy7QEr8FbCPofsjcPuSYzgtPwDlx1JM+4=";
-        stripLen = 1;
-        extraPrefix = "libs/python/";
-      })
-    ]
-    ++ lib.optional (lib.versionAtLeast version "1.81" && stdenv.cc.isClang) ./fix-clang-target.patch;
+  ]
+  # Fixes ABI detection
+  ++ lib.optional (version == "1.83.0") (fetchpatch {
+    url = "https://github.com/boostorg/context/commit/6fa6d5c50d120e69b2d8a1c0d2256ee933e94b3b.patch";
+    stripLen = 1;
+    extraPrefix = "libs/context/";
+    sha256 = "sha256-bCfLL7bD1Rn4Ie/P3X+nIcgTkbXdCX6FW7B9lHsmVW8=";
+  });
 
   meta = with lib; {
     homepage = "http://boost.org/";
@@ -213,8 +199,8 @@ stdenv.mkDerivation {
     maintainers = with maintainers; [ ];
   };
 
-  passthru = {
-    inherit boostBuildPatches;
+  passthru = mkVariantPassthru variantArgs packageArgs // {
+    inherit boostBuildPatches boost-build;
   };
 
   preConfigure =
