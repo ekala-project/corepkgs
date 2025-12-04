@@ -1,4 +1,11 @@
-{ lib, stdenv, fetchurl, perl, autoconf, updateAutotoolsGnuConfigScriptsHook }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  perl,
+  autoconf,
+  updateAutotoolsGnuConfigScriptsHook,
+}:
 
 stdenv.mkDerivation rec {
   pname = "automake";
@@ -10,7 +17,11 @@ stdenv.mkDerivation rec {
   };
 
   strictDeps = true;
-  nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook autoconf perl ];
+  nativeBuildInputs = [
+    updateAutotoolsGnuConfigScriptsHook
+    autoconf
+    perl
+  ];
   buildInputs = [ autoconf ];
 
   setupHook = ./setup-hook.sh;
@@ -38,4 +49,3 @@ stdenv.mkDerivation rec {
     platforms = platforms.all;
   };
 }
-

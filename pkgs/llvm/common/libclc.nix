@@ -1,10 +1,22 @@
-{ lib, stdenv, version, runCommand, monorepoSrc, llvm, buildPackages, buildLlvmTools, ninja, cmake, python3 }:
+{
+  lib,
+  stdenv,
+  version,
+  runCommand,
+  monorepoSrc,
+  llvm,
+  buildPackages,
+  buildLlvmTools,
+  ninja,
+  cmake,
+  python3,
+}:
 
 stdenv.mkDerivation rec {
   pname = "libclc";
   inherit version;
 
-  src = runCommand "${pname}-src-${version}" {} ''
+  src = runCommand "${pname}-src-${version}" { } ''
     mkdir -p "$out"
     cp -r ${monorepoSrc}/cmake "$out"
     cp -r ${monorepoSrc}/${pname} "$out"
@@ -12,7 +24,10 @@ stdenv.mkDerivation rec {
 
   sourceRoot = "${src.name}/${pname}";
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   patches = [
     ./libclc/libclc-gnu-install-dirs.patch
@@ -30,13 +45,20 @@ stdenv.mkDerivation rec {
       --replace 'find_program( LLVM_OPT opt PATHS ''${LLVM_TOOLS_BINARY_DIR} NO_DEFAULT_PATH )' \
                 'find_program( LLVM_OPT opt PATHS "${buildLlvmTools.llvm}/bin" NO_DEFAULT_PATH )' \
       --replace 'find_program( LLVM_SPIRV llvm-spirv PATHS ''${LLVM_TOOLS_BINARY_DIR} NO_DEFAULT_PATH )' \
-                'find_program( LLVM_SPIRV llvm-spirv PATHS "${buildPackages.spirv-llvm-translator.override { inherit (buildLlvmTools) llvm; }}/bin" NO_DEFAULT_PATH )'
-  '' + lib.optionalString (stdenv.hostPlatform != stdenv.buildPlatform) ''
+                'find_program( LLVM_SPIRV llvm-spirv PATHS "${
+                  buildPackages.spirv-llvm-translator.override { inherit (buildLlvmTools) llvm; }
+                }/bin" NO_DEFAULT_PATH )'
+  ''
+  + lib.optionalString (stdenv.hostPlatform != stdenv.buildPlatform) ''
     substituteInPlace CMakeLists.txt \
       --replace 'COMMAND prepare_builtins' 'COMMAND ${buildLlvmTools.libclc.dev}/bin/prepare_builtins'
   '';
 
-  nativeBuildInputs = [ cmake ninja python3 ];
+  nativeBuildInputs = [
+    cmake
+    ninja
+    python3
+  ];
   buildInputs = [ llvm ];
   strictDeps = true;
 

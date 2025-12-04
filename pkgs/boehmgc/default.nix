@@ -1,12 +1,13 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, autoreconfHook
-# doc: https://github.com/ivmai/bdwgc/blob/v8.2.6/doc/README.macros (LARGE_CONFIG)
-, enableLargeConfig ? false
-, enableMmap ? true
-, enableStatic ? false
-, nixVersions ? { }
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  autoreconfHook,
+  # doc: https://github.com/ivmai/bdwgc/blob/v8.2.6/doc/README.macros (LARGE_CONFIG)
+  enableLargeConfig ? false,
+  enableMmap ? true,
+  enableStatic ? false,
+  nixVersions ? { },
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -20,7 +21,11 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-y6hU5qU4qO9VvQvKNH9dvReCrf3+Ih2HHbF6IS1V3WQ=";
   };
 
-  outputs = [ "out" "dev" "doc" ];
+  outputs = [
+    "out"
+    "dev"
+    "doc"
+  ];
   separateDebugInfo = stdenv.hostPlatform.isLinux && stdenv.hostPlatform.libc != "musl";
 
   nativeBuildInputs = [
@@ -41,18 +46,20 @@ stdenv.mkDerivation (finalAttrs: {
   # don't forget to disable the fix (and if the next release does
   # not fix the problem the test failure will be a reminder to
   # extend the set of versions requiring the workaround).
-  makeFlags = lib.optionals (stdenv.hostPlatform.isPower64 &&
-                  finalAttrs.version == "8.2.6")
-    [
-      # do not use /proc primitives to track dirty bits; see:
-      # https://github.com/ivmai/bdwgc/issues/479#issuecomment-1279687537
-      # https://github.com/ivmai/bdwgc/blob/54522af853de28f45195044dadfd795c4e5942aa/include/private/gcconfig.h#L741
-      "CFLAGS_EXTRA=-DNO_SOFT_VDB"
-    ];
+  makeFlags = lib.optionals (stdenv.hostPlatform.isPower64 && finalAttrs.version == "8.2.6") [
+    # do not use /proc primitives to track dirty bits; see:
+    # https://github.com/ivmai/bdwgc/issues/479#issuecomment-1279687537
+    # https://github.com/ivmai/bdwgc/blob/54522af853de28f45195044dadfd795c4e5942aa/include/private/gcconfig.h#L741
+    "CFLAGS_EXTRA=-DNO_SOFT_VDB"
+  ];
 
   # `gctest` fails under x86_64 emulation on aarch64-darwin
   # and also on aarch64-linux (qemu-user)
-  doCheck = !((stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isx86_64) || (stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isAarch64));
+  doCheck =
+    !(
+      (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isx86_64)
+      || (stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isAarch64)
+    );
 
   enableParallelBuilding = true;
 

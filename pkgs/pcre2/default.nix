@@ -1,8 +1,9 @@
-{ lib
-, stdenv
-, fetchurl
-, updateAutotoolsGnuConfigScriptsHook
-, withJitSealloc ? true
+{
+  lib,
+  stdenv,
+  fetchurl,
+  updateAutotoolsGnuConfigScriptsHook,
+  withJitSealloc ? true,
 }:
 
 stdenv.mkDerivation rec {
@@ -25,7 +26,14 @@ stdenv.mkDerivation rec {
   # fix pcre jit in systemd units that set MemoryDenyWriteExecute=true like gitea
   ++ lib.optional withJitSealloc "--enable-jit-sealloc";
 
-  outputs = [ "bin" "dev" "out" "doc" "man" "devdoc" ];
+  outputs = [
+    "bin"
+    "dev"
+    "out"
+    "doc"
+    "man"
+    "devdoc"
+  ];
 
   postFixup = ''
     moveToOutput bin/pcre2-config "$dev"

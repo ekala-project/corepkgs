@@ -1,15 +1,17 @@
-{ lib
-, stdenv
-, fetchurl
-, gettext
-, libgpg-error
-, enableCapabilities ? false, libcap
-, buildPackages
+{
+  lib,
+  stdenv,
+  fetchurl,
+  gettext,
+  libgpg-error,
+  enableCapabilities ? false,
+  libcap,
+  buildPackages,
 
-# for passthru.tests
-, gnupg ? null
-, libotr ? null
-, rsyslog ? null
+  # for passthru.tests
+  gnupg ? null,
+  libotr ? null,
+  rsyslog ? null,
 }:
 
 assert enableCapabilities -> stdenv.isLinux;
@@ -23,7 +25,13 @@ stdenv.mkDerivation rec {
     hash = "sha256-iwhwiXrFrGfe1Wjc+t9Flpz6imvrD9YK8qnq3Coycqo=";
   };
 
-  outputs = [ "bin" "lib" "dev" "info" "out" ];
+  outputs = [
+    "bin"
+    "lib"
+    "dev"
+    "info"
+    "out"
+  ];
 
   # The CPU Jitter random number generator must not be compiled with
   # optimizations and the optimize -O0 pragma only works for gcc.
@@ -32,20 +40,31 @@ stdenv.mkDerivation rec {
 
   depsBuildBuild = [ buildPackages.stdenv.cc ];
 
-  buildInputs = [ libgpg-error ]
-    ++ lib.optional stdenv.isDarwin gettext
-    ++ lib.optional enableCapabilities libcap;
+  buildInputs = [
+    libgpg-error
+  ]
+  ++ lib.optional stdenv.isDarwin gettext
+  ++ lib.optional enableCapabilities libcap;
 
   strictDeps = true;
 
-  configureFlags = [ "--with-libgpg-error-prefix=${libgpg-error.dev}" ]
-      ++ lib.optional (stdenv.hostPlatform.isMusl || (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64)) "--disable-asm" # for darwin see https://dev.gnupg.org/T5157
-      # Fix undefined reference errors with version script under LLVM.
-      ++ lib.optional (stdenv.cc.bintools.isLLVM && lib.versionAtLeast stdenv.cc.bintools.version "17") "LDFLAGS=-Wl,--undefined-version";
+  configureFlags = [
+    "--with-libgpg-error-prefix=${libgpg-error.dev}"
+  ]
+  ++ lib.optional (
+    stdenv.hostPlatform.isMusl || (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64)
+  ) "--disable-asm" # for darwin see https://dev.gnupg.org/T5157
+  # Fix undefined reference errors with version script under LLVM.
+  ++ lib.optional (
+    stdenv.cc.bintools.isLLVM && lib.versionAtLeast stdenv.cc.bintools.version "17"
+  ) "LDFLAGS=-Wl,--undefined-version";
 
   # Necessary to generate correct assembly when compiling for aarch32 on
   # aarch64
-  configurePlatforms = [ "host" "build" ];
+  configurePlatforms = [
+    "host"
+    "build"
+  ];
 
   postConfigure = ''
     sed -i configure \
@@ -65,7 +84,8 @@ stdenv.mkDerivation rec {
   # instead.
   + ''
     moveToOutput bin/libgcrypt-config $dev
-  '' + lib.optionalString enableCapabilities ''
+  ''
+  + lib.optionalString enableCapabilities ''
     sed -i 's,\(-lcap\),-L${libcap.lib}/lib \1,' $lib/lib/libgcrypt.la
   '';
 

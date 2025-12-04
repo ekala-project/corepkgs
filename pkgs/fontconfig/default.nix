@@ -1,26 +1,34 @@
-{ stdenv
-, lib
-, fetchurl
-, pkg-config
-, python3
-, freetype
-, expat
-, libxslt
-, gperf
-, dejavu-fonts
-, autoreconfHook
-, CoreFoundation ? null
-, testers
+{
+  stdenv,
+  lib,
+  fetchurl,
+  pkg-config,
+  python3,
+  freetype,
+  expat,
+  libxslt,
+  gperf,
+  dejavu-fonts,
+  autoreconfHook,
+  CoreFoundation ? null,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "fontconfig";
   version = "2.15.0";
 
-  outputs = [ "bin" "dev" "lib" "out" ]; # $out contains all the config
+  outputs = [
+    "bin"
+    "dev"
+    "lib"
+    "out"
+  ]; # $out contains all the config
 
   src = fetchurl {
-    url = with finalAttrs; "https://www.freedesktop.org/software/fontconfig/release/${pname}-${version}.tar.xz";
+    url =
+      with finalAttrs;
+      "https://www.freedesktop.org/software/fontconfig/release/${pname}-${version}.tar.xz";
     hash = "sha256-Y6BljQ4G4PqIYQZFK1jvBPIfWCAuoCqUw53g0zNdfA4=";
   };
 
@@ -34,7 +42,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [
     expat
-  ] ++ lib.optional stdenv.isDarwin CoreFoundation;
+  ]
+  ++ lib.optional stdenv.isDarwin CoreFoundation;
 
   propagatedBuildInputs = [
     freetype
@@ -51,7 +60,8 @@ stdenv.mkDerivation (finalAttrs: {
     "--with-cache-dir=/var/cache/fontconfig" # otherwise the fallback is in $out/
     # just <1MB; this is what you get when loading config fails for some reason
     "--with-default-fonts=${dejavu-fonts.minimal}"
-  ] ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
+  ]
+  ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
     "--with-arch=${stdenv.hostPlatform.parsed.cpu.name}"
   ];
 

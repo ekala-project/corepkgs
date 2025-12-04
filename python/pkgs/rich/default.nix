@@ -46,7 +46,8 @@ buildPythonPackage rec {
   propagatedBuildInputs = [
     markdown-it-py
     pygments
-  ] ++ lib.optionals (pythonOlder "3.9") [ typing-extensions ];
+  ]
+  ++ lib.optionals (pythonOlder "3.9") [ typing-extensions ];
 
   optional-dependencies = {
     jupyter = [ ipywidgets ];

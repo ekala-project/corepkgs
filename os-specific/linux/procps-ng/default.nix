@@ -1,23 +1,24 @@
-{ lib
-, stdenv
-, fetchurl
-, ncurses
-, pkg-config
-, fetchpatch
+{
+  lib,
+  stdenv,
+  fetchurl,
+  ncurses,
+  pkg-config,
+  fetchpatch,
 
   # `ps` with systemd support is able to properly report different
   # attributes like unit name, so we want to have it on linux.
-, withSystemd ? lib.meta.availableOn stdenv.hostPlatform systemd
-, systemd
+  withSystemd ? lib.meta.availableOn stdenv.hostPlatform systemd,
+  systemd,
 
   # procps is mostly Linux-only. Most commands require a running Linux
   # system (or very similar like that found in Cygwin). The one
   # exception is ‘watch’ which is portable enough to run on pretty much
   # any UNIX-compatible system.
-, watchOnly ? !(stdenv.isLinux || stdenv.isCygwin)
+  watchOnly ? !(stdenv.isLinux || stdenv.isCygwin),
 
-, binlore
-, procps
+  binlore,
+  procps,
 }:
 
 stdenv.mkDerivation rec {
@@ -32,7 +33,8 @@ stdenv.mkDerivation rec {
 
   patches = [
     ./v3-CVE-2023-4016.patch
-  ] ++ lib.optionals stdenv.hostPlatform.isMusl [
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isMusl [
     # NOTE: Starting from 4.x we will not need a patch anymore, but need to add
     # "--disable-w" to configureFlags instead to prevent the utmp errors
     (fetchpatch {
@@ -42,19 +44,26 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  buildInputs = [ ncurses ]
-    ++ lib.optional withSystemd systemd;
+  buildInputs = [ ncurses ] ++ lib.optional withSystemd systemd;
   nativeBuildInputs = [ pkg-config ];
 
-  makeFlags = [ "usrbin_execdir=$(out)/bin" ]
-    ++ lib.optionals watchOnly [ "watch" "PKG_LDFLAGS=" ];
+  makeFlags = [
+    "usrbin_execdir=$(out)/bin"
+  ]
+  ++ lib.optionals watchOnly [
+    "watch"
+    "PKG_LDFLAGS="
+  ];
 
   enableParallelBuilding = true;
 
   # Too red; 8bit support for fixing https://github.com/NixOS/nixpkgs/issues/275220
-  configureFlags = [ "--disable-modern-top" "--enable-watch8bit" ]
-    ++ lib.optional withSystemd "--with-systemd"
-    ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
+  configureFlags = [
+    "--disable-modern-top"
+    "--enable-watch8bit"
+  ]
+  ++ lib.optional withSystemd "--with-systemd"
+  ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
     "ac_cv_func_malloc_0_nonnull=yes"
     "ac_cv_func_realloc_0_nonnull=yes"
   ];

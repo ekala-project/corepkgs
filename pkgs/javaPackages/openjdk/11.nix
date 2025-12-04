@@ -1,11 +1,45 @@
-{ stdenv, lib, fetchpatch, fetchFromGitHub, bash, pkg-config, autoconf, cpio, file, which, unzip
-, zip, perl, cups, freetype, harfbuzz, alsa-lib, libjpeg, giflib, libpng, zlib, lcms2
-, libX11, libICE, libXrender, libXext, libXt, libXtst, libXi, libXinerama
-, libXcursor, libXrandr, fontconfig, openjdk11-bootstrap
-, setJavaClassPath
-, headless ? false
-, enableJavaFX ? false, openjfx
-, enableGtk ? true, gtk3, glib
+{
+  stdenv,
+  lib,
+  fetchpatch,
+  fetchFromGitHub,
+  bash,
+  pkg-config,
+  autoconf,
+  cpio,
+  file,
+  which,
+  unzip,
+  zip,
+  perl,
+  cups,
+  freetype,
+  harfbuzz,
+  alsa-lib,
+  libjpeg,
+  giflib,
+  libpng,
+  zlib,
+  lcms2,
+  libX11,
+  libICE,
+  libXrender,
+  libXext,
+  libXt,
+  libXtst,
+  libXi,
+  libXinerama,
+  libXcursor,
+  libXrandr,
+  fontconfig,
+  openjdk11-bootstrap,
+  setJavaClassPath,
+  headless ? false,
+  enableJavaFX ? false,
+  openjfx,
+  enableGtk ? true,
+  gtk3,
+  glib,
 }:
 
 let
@@ -28,13 +62,44 @@ let
       sha256 = "sha256-6y6wge8ZuSKBpb5QNihvAlD4Pv/0d3AQCPOkxUm/sJk=";
     };
 
-    nativeBuildInputs = [ pkg-config autoconf unzip ];
+    nativeBuildInputs = [
+      pkg-config
+      autoconf
+      unzip
+    ];
     buildInputs = [
-      cpio file which zip perl zlib cups freetype harfbuzz alsa-lib libjpeg giflib
-      libpng zlib lcms2 libX11 libICE libXrender libXext libXtst libXt libXtst
-      libXi libXinerama libXcursor libXrandr fontconfig openjdk-bootstrap
-    ] ++ lib.optionals (!headless && enableGtk) [
-      gtk3 glib
+      cpio
+      file
+      which
+      zip
+      perl
+      zlib
+      cups
+      freetype
+      harfbuzz
+      alsa-lib
+      libjpeg
+      giflib
+      libpng
+      zlib
+      lcms2
+      libX11
+      libICE
+      libXrender
+      libXext
+      libXtst
+      libXt
+      libXtst
+      libXi
+      libXinerama
+      libXcursor
+      libXrandr
+      fontconfig
+      openjdk-bootstrap
+    ]
+    ++ lib.optionals (!headless && enableGtk) [
+      gtk3
+      glib
     ];
 
     patches = [
@@ -51,7 +116,8 @@ let
         url = "https://github.com/openjdk/jdk/commit/9341d135b855cc208d48e47d30cd90aafa354c36.patch";
         hash = "sha256-Qcm3ZmGCOYLZcskNjj7DYR85R4v07vYvvavrVOYL8vg=";
       })
-    ] ++ lib.optionals (!headless && enableGtk) [
+    ]
+    ++ lib.optionals (!headless && enableGtk) [
       ./swing-use-gtk-jdk10.patch
     ];
 
@@ -95,11 +161,19 @@ let
     # when building jtreg
     env.NIX_CFLAGS_COMPILE = "-Wformat";
 
-    NIX_LDFLAGS = toString (lib.optionals (!headless) [
-      "-lfontconfig" "-lcups" "-lXinerama" "-lXrandr" "-lmagic"
-    ] ++ lib.optionals (!headless && enableGtk) [
-      "-lgtk-3" "-lgio-2.0"
-    ]);
+    NIX_LDFLAGS = toString (
+      lib.optionals (!headless) [
+        "-lfontconfig"
+        "-lcups"
+        "-lXinerama"
+        "-lXrandr"
+        "-lmagic"
+      ]
+      ++ lib.optionals (!headless && enableGtk) [
+        "-lgtk-3"
+        "-lgio-2.0"
+      ]
+    );
 
     # -j flag is explicitly rejected by the build system:
     #     Error: 'make -jN' is not supported, use 'make JOBS=N'
@@ -178,4 +252,5 @@ let
       inherit gtk3;
     };
   };
-in openjdk
+in
+openjdk

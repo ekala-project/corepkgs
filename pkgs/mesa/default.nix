@@ -1,47 +1,48 @@
-{ lib
-, bison
-, buildPackages
-, directx-headers
-, elfutils
-, expat
-, fetchCrate
-, fetchurl
-, fetchpatch
-, file
-, flex
-, glslang
-, intltool
-, jdupes
-, libdrm
-, libglvnd
-, libomxil-bellagio
-, libunwind
-, libva-minimal
-, libvdpau
-, llvmPackages
-, lm_sensors
-, meson
-, ninja
-, pkg-config
-, python3Packages
-, rust-bindgen
-, rust-cbindgen
-, rustPlatform
-, rustc
-, spirv-llvm-translator
-, stdenv
-, udev
-, valgrind-light
-, vulkan-loader
-, wayland
-, wayland-protocols
-, wayland-scanner
-, xcbutilkeysyms
-, xorg
-, zstd
-, enablePatentEncumberedCodecs ? true
+{
+  lib,
+  bison,
+  buildPackages,
+  directx-headers,
+  elfutils,
+  expat,
+  fetchCrate,
+  fetchurl,
+  fetchpatch,
+  file,
+  flex,
+  glslang,
+  intltool,
+  jdupes,
+  libdrm,
+  libglvnd,
+  libomxil-bellagio,
+  libunwind,
+  libva-minimal,
+  libvdpau,
+  llvmPackages,
+  lm_sensors,
+  meson,
+  ninja,
+  pkg-config,
+  python3Packages,
+  rust-bindgen,
+  rust-cbindgen,
+  rustPlatform,
+  rustc,
+  spirv-llvm-translator,
+  stdenv,
+  udev,
+  valgrind-light,
+  vulkan-loader,
+  wayland,
+  wayland-protocols,
+  wayland-scanner,
+  xcbutilkeysyms,
+  xorg,
+  zstd,
+  enablePatentEncumberedCodecs ? true,
 
-, galliumDrivers ? [
+  galliumDrivers ? [
     "d3d12" # WSL emulated GPU (aka Dozen)
     "iris" # new Intel (Broadwell+)
     "kmsro" # special "render only" driver for GPUs without a display controller
@@ -53,45 +54,57 @@
     "svga" # VMWare virtualized GPU
     "virgl" # QEMU virtualized GPU (aka VirGL)
     "zink" # generic OpenGL over Vulkan, experimental
-  ] ++ lib.optionals (stdenv.isAarch64 || stdenv.isAarch32) [
+  ]
+  ++ lib.optionals (stdenv.isAarch64 || stdenv.isAarch32) [
     "etnaviv" # Vivante GPU designs (mostly NXP/Marvell SoCs)
     "freedreno" # Qualcomm Adreno (all Qualcomm SoCs)
     "lima" # ARM Mali 4xx
     "panfrost" # ARM Mali Midgard and up (T/G series)
     "vc4" # Broadcom VC4 (Raspberry Pi 0-3)
-  ] ++ lib.optionals stdenv.isAarch64 [
+  ]
+  ++ lib.optionals stdenv.isAarch64 [
     "tegra" # Nvidia Tegra SoCs
     "v3d" # Broadcom VC5 (Raspberry Pi 4)
-  ] ++ lib.optionals stdenv.hostPlatform.isx86 [
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isx86 [
     "crocus" # Intel legacy, x86 only
     "i915" # Intel extra legacy, x86 only
-  ]
-, vulkanDrivers ? [
+  ],
+  vulkanDrivers ? [
     "amd" # AMD (aka RADV)
     "intel" # new Intel (aka ANV)
     "microsoft-experimental" # WSL virtualized GPU (aka DZN/Dozen)
     "nouveau" # Nouveau (aka NVK)
     "swrast" # software renderer (aka Lavapipe)
-  ] ++ lib.optionals (stdenv.hostPlatform.isAarch -> lib.versionAtLeast stdenv.hostPlatform.parsed.cpu.version "6") [
-    # QEMU virtualized GPU (aka VirGL)
-    # Requires ATOMIC_INT_LOCK_FREE == 2.
-    "virtio"
-  ] ++ lib.optionals stdenv.isAarch64 [
+  ]
+  ++
+    lib.optionals
+      (stdenv.hostPlatform.isAarch -> lib.versionAtLeast stdenv.hostPlatform.parsed.cpu.version "6")
+      [
+        # QEMU virtualized GPU (aka VirGL)
+        # Requires ATOMIC_INT_LOCK_FREE == 2.
+        "virtio"
+      ]
+  ++ lib.optionals stdenv.isAarch64 [
     "broadcom" # Broadcom VC5 (Raspberry Pi 4, aka V3D)
     "freedreno" # Qualcomm Adreno (all Qualcomm SoCs)
     "imagination-experimental" # PowerVR Rogue (currently N/A)
     "panfrost" # ARM Mali Midgard and up (T/G series)
-  ] ++ lib.optionals stdenv.hostPlatform.isx86 [
-    "intel_hasvk" # Intel Haswell/Broadwell, "legacy" Vulkan driver (https://www.phoronix.com/news/Intel-HasVK-Drop-Dead-Code)
   ]
-, eglPlatforms ? [ "x11" "wayland" ]
-, vulkanLayers ? [
+  ++ lib.optionals stdenv.hostPlatform.isx86 [
+    "intel_hasvk" # Intel Haswell/Broadwell, "legacy" Vulkan driver (https://www.phoronix.com/news/Intel-HasVK-Drop-Dead-Code)
+  ],
+  eglPlatforms ? [
+    "x11"
+    "wayland"
+  ],
+  vulkanLayers ? [
     "device-select"
     "overlay"
     "intel-nullhw"
-  ]
-, mesa
-, makeSetupHook
+  ],
+  mesa,
+  makeSetupHook,
 }:
 
 let
@@ -133,8 +146,14 @@ let
   needNativeCLC = !stdenv.buildPlatform.canExecute stdenv.hostPlatform;
 
   common = import ./common.nix { inherit lib fetchurl; };
-in stdenv.mkDerivation {
-  inherit (common) pname version src meta;
+in
+stdenv.mkDerivation {
+  inherit (common)
+    pname
+    version
+    src
+    meta
+    ;
 
   patches = [
     ./opencl.patch
@@ -162,7 +181,13 @@ in stdenv.mkDerivation {
   '';
 
   outputs = [
-    "out" "dev" "drivers" "driversdev" "opencl" "teflon" "osmesa"
+    "out"
+    "dev"
+    "drivers"
+    "driversdev"
+    "opencl"
+    "teflon"
+    "osmesa"
     # the Dozen drivers depend on libspirv2dxil, but link it statically, and
     # libspirv2dxil itself is pretty chonky, so relocate it to its own output in
     # case anything wants to use it at some point
@@ -221,9 +246,11 @@ in stdenv.mkDerivation {
     # meson auto_features enables this, but we do not want it
     (lib.mesonEnable "android-libbacktrace" false)
     (lib.mesonEnable "microsoft-clc" false) # Only relevant on Windows (OpenCL 1.2 API on top of D3D12)
-  ] ++ lib.optionals enablePatentEncumberedCodecs [
+  ]
+  ++ lib.optionals enablePatentEncumberedCodecs [
     (lib.mesonOption "video-codecs" "all")
-  ] ++ lib.optionals needNativeCLC [
+  ]
+  ++ lib.optionals needNativeCLC [
     (lib.mesonOption "intel-clc" "system")
   ];
 
@@ -288,7 +315,8 @@ in stdenv.mkDerivation {
     rust-cbindgen
     rustPlatform.bindgenHook
     wayland-scanner
-  ] ++ lib.optionals needNativeCLC [
+  ]
+  ++ lib.optionals needNativeCLC [
     buildPackages.mesa.driversdev
   ];
 
@@ -389,7 +417,10 @@ in stdenv.mkDerivation {
       buildCommand = ''
         echo ${mesa.dev} >>$out
       '';
-      disallowedRequisites = [ llvmPackages.llvm mesa.drivers ];
+      disallowedRequisites = [
+        llvmPackages.llvm
+        mesa.drivers
+      ];
     };
 
     llvmpipeHook = makeSetupHook {

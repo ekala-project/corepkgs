@@ -1,53 +1,56 @@
-{ stdenv
-, lib
-, boehmgc
-, boost
-, cairo
-, callPackage
-, cmake
-, desktopToDarwinBundle
-, fetchurl
-, fetchpatch
-, gettext
-, ghostscript
-, glib
-, glibmm
-, gobject-introspection
-, gsl
-, gspell
-, gtk-mac-integration
-, gtkmm3
-, gdk-pixbuf
-, imagemagick
-, lcms
-, lib2geom
-, libcdr
-, libexif
-, libpng
-, librevenge
-, librsvg
-, libsigcxx
-, libsoup
-, libvisio
-, libwpg
-, libXft
-, libxml2
-, libxslt
-, ninja
-, perlPackages
-, pkg-config
-, poppler
-, popt
-, potrace
-, python3
-, substituteAll
-, wrapGAppsHook3
-, libepoxy
-, zlib
+{
+  stdenv,
+  lib,
+  boehmgc,
+  boost,
+  cairo,
+  callPackage,
+  cmake,
+  desktopToDarwinBundle,
+  fetchurl,
+  fetchpatch,
+  gettext,
+  ghostscript,
+  glib,
+  glibmm,
+  gobject-introspection,
+  gsl,
+  gspell,
+  gtk-mac-integration,
+  gtkmm3,
+  gdk-pixbuf,
+  imagemagick,
+  lcms,
+  lib2geom,
+  libcdr,
+  libexif,
+  libpng,
+  librevenge,
+  librsvg,
+  libsigcxx,
+  libsoup,
+  libvisio,
+  libwpg,
+  libXft,
+  libxml2,
+  libxslt,
+  ninja,
+  perlPackages,
+  pkg-config,
+  poppler,
+  popt,
+  potrace,
+  python3,
+  substituteAll,
+  wrapGAppsHook3,
+  libepoxy,
+  zlib,
 }:
 let
-  python3Env = python3.withPackages
-    (ps: with ps; [
+  python3Env = python3.withPackages (
+    ps:
+    with ps;
+    [
       appdirs
       beautifulsoup4
       cachecontrol
@@ -65,7 +68,9 @@ let
       pyserial
       requests
       pygobject3
-    ] ++ inkex.propagatedBuildInputs);
+    ]
+    ++ inkex.propagatedBuildInputs
+  );
 in
 stdenv.mkDerivation rec {
   pname = "inkscape";
@@ -131,10 +136,12 @@ stdenv.mkDerivation rec {
     gdk-pixbuf # for setup hook
     wrapGAppsHook3
     gobject-introspection
-  ] ++ (with perlPackages; [
+  ]
+  ++ (with perlPackages; [
     perl
     XMLParser
-  ]) ++ lib.optionals stdenv.hostPlatform.isDarwin [
+  ])
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
     desktopToDarwinBundle
   ];
 
@@ -168,9 +175,11 @@ stdenv.mkDerivation rec {
     python3Env
     zlib
     libepoxy
-  ] ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [
+  ]
+  ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [
     gspell
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
     cairo
     gtk-mac-integration
   ];

@@ -1,8 +1,23 @@
-{ stdenv, lib, fetchFromGitHub
-, autoreconfHook, autoconf-archive, pkg-config, doxygen, perl
-, openssl, json_c, curl, libgcrypt
-, cmocka, uthash, ibm-sw-tpm2, iproute2, procps, which
-, libuuid
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  autoreconfHook,
+  autoconf-archive,
+  pkg-config,
+  doxygen,
+  perl,
+  openssl,
+  json_c,
+  curl,
+  libgcrypt,
+  cmocka,
+  uthash,
+  ibm-sw-tpm2,
+  iproute2,
+  procps,
+  which,
+  libuuid,
 }:
 let
   # Avoid a circular dependency on Linux systems (systemd depends on tpm2-tss,
@@ -24,14 +39,27 @@ stdenv.mkDerivation rec {
     hash = "sha256-BP28utEUI9g1VNv3lCXuiKrDtEImFQxxZfIjLiE3Wr8=";
   };
 
-  outputs = [ "out" "man" "dev" ];
+  outputs = [
+    "out"
+    "man"
+    "dev"
+  ];
 
   nativeBuildInputs = [
-    autoreconfHook autoconf-archive pkg-config doxygen perl
+    autoreconfHook
+    autoconf-archive
+    pkg-config
+    doxygen
+    perl
   ];
 
   buildInputs = [
-    openssl json_c curl libgcrypt uthash libuuid
+    openssl
+    json_c
+    curl
+    libgcrypt
+    uthash
+    libuuid
   ]
   # cmocka is checked in the configure script
   # when unit and/or integration testing is enabled
@@ -40,7 +68,12 @@ stdenv.mkDerivation rec {
   ++ lib.optional doInstallCheck cmocka;
 
   nativeInstallCheckInputs = [
-    cmocka which openssl procps_pkg iproute2 ibm-sw-tpm2
+    cmocka
+    which
+    openssl
+    procps_pkg
+    iproute2
+    ibm-sw-tpm2
   ];
 
   strictDeps = true;

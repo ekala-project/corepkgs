@@ -1,6 +1,12 @@
-{ lib, stdenv, fetchurl, autoreconfHook, updateAutotoolsGnuConfigScriptsHook
-, libintl
-, aclSupport ? lib.meta.availableOn stdenv.hostPlatform acl, acl
+{
+  lib,
+  stdenv,
+  fetchurl,
+  autoreconfHook,
+  updateAutotoolsGnuConfigScriptsHook,
+  libintl,
+  aclSupport ? lib.meta.availableOn stdenv.hostPlatform acl,
+  acl,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -31,9 +37,13 @@ stdenv.mkDerivation rec {
     substituteInPlace src/system.c --replace '_(' 'N_('
   '';
 
-  outputs = [ "out" "info" ];
+  outputs = [
+    "out"
+    "info"
+  ];
 
-  nativeBuildInputs = lib.optional stdenv.isDarwin autoreconfHook
+  nativeBuildInputs =
+    lib.optional stdenv.isDarwin autoreconfHook
     ++ lib.optional (!stdenv.isDarwin) updateAutotoolsGnuConfigScriptsHook;
   # Add libintl on Darwin specifically as it fails to link (or skip)
   # NLS on it's own:
@@ -44,11 +54,17 @@ stdenv.mkDerivation rec {
 
   # May have some issues with root compilation because the bootstrap tool
   # cannot be used as a login shell for now.
-  FORCE_UNSAFE_CONFIGURE = lib.optionalString (stdenv.hostPlatform.system == "armv7l-linux" || stdenv.isSunOS) "1";
+  FORCE_UNSAFE_CONFIGURE = lib.optionalString (
+    stdenv.hostPlatform.system == "armv7l-linux" || stdenv.isSunOS
+  ) "1";
 
-  preConfigure = if stdenv.isCygwin then ''
-    sed -i gnu/fpending.h -e 's,include <stdio_ext.h>,,'
-  '' else null;
+  preConfigure =
+    if stdenv.isCygwin then
+      ''
+        sed -i gnu/fpending.h -e 's,include <stdio_ext.h>,,'
+      ''
+    else
+      null;
 
   doCheck = false; # fails
   doInstallCheck = false; # fails

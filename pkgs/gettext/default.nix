@@ -1,4 +1,10 @@
-{ stdenv, lib, fetchurl, libiconv ? null, bash, updateAutotoolsGnuConfigScriptsHook
+{
+  stdenv,
+  lib,
+  fetchurl,
+  libiconv ? null,
+  bash,
+  updateAutotoolsGnuConfigScriptsHook,
 }:
 
 # TODO: Support darwin bootstrap
@@ -24,15 +30,21 @@ stdenv.mkDerivation rec {
     ./0001-msginit-Do-not-use-POT-Creation-Date.patch
   ];
 
-  outputs = [ "out" "man" "doc" "info" ];
+  outputs = [
+    "out"
+    "man"
+    "doc"
+    "info"
+  ];
 
   hardeningDisable = [ "format" ];
 
   LDFLAGS = lib.optionalString stdenv.isSunOS "-lm -lmd -lmp -luutil -lnvpair -lnsl -lidmap -lavl -lsec";
 
   configureFlags = [
-     "--disable-csharp"
-  ] ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
+    "--disable-csharp"
+  ]
+  ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
     # On cross building, gettext supposes that the wchar.h from libc
     # does not fulfill gettext needs, so it tries to work with its
     # own wchar.h file, which does not cope well with the system's
@@ -41,14 +53,16 @@ stdenv.mkDerivation rec {
   ];
 
   postPatch = ''
-   substituteAllInPlace gettext-runtime/src/gettext.sh.in
-   substituteInPlace gettext-tools/projects/KDE/trigger --replace "/bin/pwd" pwd
-   substituteInPlace gettext-tools/projects/GNOME/trigger --replace "/bin/pwd" pwd
-   substituteInPlace gettext-tools/src/project-id --replace "/bin/pwd" pwd
-  '' + lib.optionalString stdenv.hostPlatform.isCygwin ''
+    substituteAllInPlace gettext-runtime/src/gettext.sh.in
+    substituteInPlace gettext-tools/projects/KDE/trigger --replace "/bin/pwd" pwd
+    substituteInPlace gettext-tools/projects/GNOME/trigger --replace "/bin/pwd" pwd
+    substituteInPlace gettext-tools/src/project-id --replace "/bin/pwd" pwd
+  ''
+  + lib.optionalString stdenv.hostPlatform.isCygwin ''
     sed -i -e "s/\(cldr_plurals_LDADD = \)/\\1..\/gnulib-lib\/libxml_rpl.la /" gettext-tools/src/Makefile.in
     sed -i -e "s/\(libgettextsrc_la_LDFLAGS = \)/\\1..\/gnulib-lib\/libxml_rpl.la /" gettext-tools/src/Makefile.in
-  '' + lib.optionalString stdenv.hostPlatform.isMinGW ''
+  ''
+  + lib.optionalString stdenv.hostPlatform.isMinGW ''
     sed -i "s/@GNULIB_CLOSE@/1/" */*/unistd.in.h
   '';
 
@@ -56,13 +70,14 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [
     updateAutotoolsGnuConfigScriptsHook
   ];
-  buildInputs = lib.optionals (!stdenv.hostPlatform.isMinGW) [
-    bash
-  ]
-  ++ lib.optionals (!stdenv.isLinux && !stdenv.hostPlatform.isCygwin) [
-    # HACK, see #10874 (and 14664)
-    libiconv
-  ];
+  buildInputs =
+    lib.optionals (!stdenv.hostPlatform.isMinGW) [
+      bash
+    ]
+    ++ lib.optionals (!stdenv.isLinux && !stdenv.hostPlatform.isCygwin) [
+      # HACK, see #10874 (and 14664)
+      libiconv
+    ];
 
   setupHooks = [
     ../../build-support/setup-hooks/role.bash

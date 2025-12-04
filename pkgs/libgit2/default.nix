@@ -1,23 +1,24 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, pkg-config
-, python3
-, zlib
-, libssh2
-, openssl
-, pcre
-, libiconv
-, Security
-, staticBuild ? stdenv.hostPlatform.isStatic
-# for passthru.tests
-, libgit2-glib
-, python3Packages
-, gitstatus
-, llhttp
-, withGssapi ? false
-, krb5
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  python3,
+  zlib,
+  libssh2,
+  openssl,
+  pcre,
+  libiconv,
+  Security,
+  staticBuild ? stdenv.hostPlatform.isStatic,
+  # for passthru.tests
+  libgit2-glib,
+  python3Packages,
+  gitstatus,
+  llhttp,
+  withGssapi ? false,
+  krb5,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -25,7 +26,11 @@ stdenv.mkDerivation (finalAttrs: {
   version = "1.8.1";
   # also check the following packages for updates: python3Packages.pygit2 and libgit2-glib
 
-  outputs = ["lib" "dev" "out"];
+  outputs = [
+    "lib"
+    "dev"
+    "out"
+  ];
 
   src = fetchFromGitHub {
     owner = "libgit2";
@@ -39,17 +44,28 @@ stdenv.mkDerivation (finalAttrs: {
     "-DUSE_SSH=ON"
     (lib.cmakeBool "USE_GSSAPI" withGssapi)
     "-DBUILD_SHARED_LIBS=${if staticBuild then "OFF" else "ON"}"
-  ] ++ lib.optionals stdenv.hostPlatform.isWindows [
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isWindows [
     "-DDLLTOOL=${stdenv.cc.bintools.targetPrefix}dlltool"
     # For ws2_32, refered to by a `*.pc` file
     "-DCMAKE_LIBRARY_PATH=${stdenv.cc.libc}/lib"
   ];
 
-  nativeBuildInputs = [ cmake python3 pkg-config ];
+  nativeBuildInputs = [
+    cmake
+    python3
+    pkg-config
+  ];
 
-  buildInputs = [ zlib libssh2 openssl pcre llhttp ]
-    ++ lib.optional withGssapi krb5
-    ++ lib.optional stdenv.isDarwin Security;
+  buildInputs = [
+    zlib
+    libssh2
+    openssl
+    pcre
+    llhttp
+  ]
+  ++ lib.optional withGssapi krb5
+  ++ lib.optional stdenv.isDarwin Security;
 
   propagatedBuildInputs = lib.optional (!stdenv.isLinux) libiconv;
 

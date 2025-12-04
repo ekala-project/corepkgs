@@ -1,59 +1,59 @@
-{ lib
-, stdenv
-, fetchurl
-, fetchpatch2
-, zlib
-, lzo
-, libtasn1
-, nettle
-, pkg-config
-, lzip
-, perl
-, gmp
-, autoconf269
-, automake
-, libidn2
-, libiconv
-, texinfo
-, unbound
-, dns-root-data
-, gettext
-, util-linuxMinimal
-, cxxBindings ? !stdenv.hostPlatform.isStatic # tries to link libstdc++.so
-, tpmSupport ? false
-, trousers
-, which
-, nettools
-, libunistring
-, withP11-kit ? !stdenv.hostPlatform.isStatic
-, p11-kit
-, Security ? null # darwin Security.framework
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fetchpatch2,
+  zlib,
+  lzo,
+  libtasn1,
+  nettle,
+  pkg-config,
+  lzip,
+  perl,
+  gmp,
+  autoconf269,
+  automake,
+  libidn2,
+  libiconv,
+  texinfo,
+  unbound,
+  dns-root-data,
+  gettext,
+  util-linuxMinimal,
+  cxxBindings ? !stdenv.hostPlatform.isStatic, # tries to link libstdc++.so
+  tpmSupport ? false,
+  trousers,
+  which,
+  nettools,
+  libunistring,
+  withP11-kit ? !stdenv.hostPlatform.isStatic,
+  p11-kit,
+  Security ? null, # darwin Security.framework
   # certificate compression - only zlib now, more possible: zstd, brotli
 
   # for passthru.tests
-, curlWithGnuTls ? null
-, emacs ? null
-, ffmpeg ? null
-, haskellPackages ? { }
-, knot-resolver ? null
-, ngtcp2-gnutls ? null
-, ocamlPackages ? null
-, pkgsStatic ? null
-, python3Packages
-, qemu ? null
-, rsyslog ? null
-, openconnect ? null
-, samba ? null
+  curlWithGnuTls ? null,
+  emacs ? null,
+  ffmpeg ? null,
+  haskellPackages ? { },
+  knot-resolver ? null,
+  ngtcp2-gnutls ? null,
+  ocamlPackages ? null,
+  pkgsStatic ? null,
+  python3Packages,
+  qemu ? null,
+  rsyslog ? null,
+  openconnect ? null,
+  samba ? null,
 
-, gitUpdater
+  gitUpdater,
 }:
 
 let
 
   # XXX: Gnulib's `test-select' fails on FreeBSD:
   # https://hydra.nixos.org/build/2962084/nixlog/1/raw .
-  doCheck = !stdenv.isFreeBSD && !stdenv.isDarwin
-    && stdenv.buildPlatform == stdenv.hostPlatform;
+  doCheck = !stdenv.isFreeBSD && !stdenv.isDarwin && stdenv.buildPlatform == stdenv.hostPlatform;
 
   inherit (stdenv.hostPlatform) isDarwin;
 in
@@ -67,8 +67,15 @@ stdenv.mkDerivation rec {
     hash = "sha256-LhWIquU8sy1Dk38fTsoo/r2cDHqhc0/F3WGn6B4OvN0=";
   };
 
-  outputs = [ "bin" "dev" "out" ]
-    ++ lib.optionals (!stdenv.hostPlatform.isMinGW) [ "man" "devdoc" ];
+  outputs = [
+    "bin"
+    "dev"
+    "out"
+  ]
+  ++ lib.optionals (!stdenv.hostPlatform.isMinGW) [
+    "man"
+    "devdoc"
+  ];
 
   # Not normally useful docs.
   outputInfo = "devdoc";
@@ -97,8 +104,10 @@ stdenv.mkDerivation rec {
     sed '2iexit 77' -i tests/{pkgconfig,fastopen}.sh
     sed '/^void doit(void)/,/^{/ s/{/{ exit(77);/' -i tests/{trust-store,psk-file}.c
     sed 's:/usr/lib64/pkcs11/ /usr/lib/pkcs11/ /usr/lib/x86_64-linux-gnu/pkcs11/:`pkg-config --variable=p11_module_path p11-kit-1`:' -i tests/p11-kit-trust.sh
-  '' + lib.optionalString stdenv.hostPlatform.isMusl '' # See https://gitlab.com/gnutls/gnutls/-/issues/945
-    sed '2iecho "certtool tests skipped in musl build"\nexit 0' -i tests/cert-tests/certtool.sh
+  ''
+  + lib.optionalString stdenv.hostPlatform.isMusl ''
+    # See https://gitlab.com/gnutls/gnutls/-/issues/945
+       sed '2iecho "certtool tests skipped in musl build"\nexit 0' -i tests/cert-tests/certtool.sh
   '';
 
   preConfigure = "patchShebangs .";
@@ -106,13 +115,15 @@ stdenv.mkDerivation rec {
     lib.optionals withP11-kit [
       "--with-default-trust-store-file=/etc/ssl/certs/ca-certificates.crt"
       "--with-default-trust-store-pkcs11=pkcs11:"
-    ] ++ [
+    ]
+    ++ [
       "--disable-dependency-tracking"
       "--enable-fast-install"
       "--with-unbound-root-key-file=${dns-root-data}/root.key"
       (lib.withFeature withP11-kit "p11-kit")
       (lib.enableFeature cxxBindings "cxx")
-    ] ++ lib.optionals (stdenv.hostPlatform.isMinGW) [
+    ]
+    ++ lib.optionals (stdenv.hostPlatform.isMinGW) [
       "--disable-doc"
     ];
 
@@ -120,16 +131,41 @@ stdenv.mkDerivation rec {
 
   hardeningDisable = [ "trivialautovarinit" ];
 
-  buildInputs = [ lzo lzip libtasn1 libidn2 zlib gmp libunistring unbound gettext libiconv ]
-    ++ lib.optional (withP11-kit) p11-kit
-    ++ lib.optional (tpmSupport && stdenv.isLinux) trousers;
+  buildInputs = [
+    lzo
+    lzip
+    libtasn1
+    libidn2
+    zlib
+    gmp
+    libunistring
+    unbound
+    gettext
+    libiconv
+  ]
+  ++ lib.optional (withP11-kit) p11-kit
+  ++ lib.optional (tpmSupport && stdenv.isLinux) trousers;
 
-  nativeBuildInputs = [ perl pkg-config texinfo ] ++ [ autoconf269 automake ]
-    ++ lib.optionals doCheck [ which nettools util-linuxMinimal ];
+  nativeBuildInputs = [
+    perl
+    pkg-config
+    texinfo
+  ]
+  ++ [
+    autoconf269
+    automake
+  ]
+  ++ lib.optionals doCheck [
+    which
+    nettools
+    util-linuxMinimal
+  ];
 
-  propagatedBuildInputs = [ nettle ]
-    # Builds dynamically linking against gnutls seem to need the framework now.
-    ++ lib.optional isDarwin Security;
+  propagatedBuildInputs = [
+    nettle
+  ]
+  # Builds dynamically linking against gnutls seem to need the framework now.
+  ++ lib.optional isDarwin Security;
 
   inherit doCheck;
   # stdenv's `NIX_SSL_CERT_FILE=/no-cert-file.crt` breaks tests.
@@ -137,25 +173,35 @@ stdenv.mkDerivation rec {
   preCheck = "NIX_SSL_CERT_FILE=${./dummy.crt}";
 
   # Fixup broken libtool and pkg-config files
-  preFixup = lib.optionalString (!isDarwin) ''
-    sed ${lib.optionalString tpmSupport "-e 's,-ltspi,-L${trousers}/lib -ltspi,'"} \
-        -e 's,-lz,-L${zlib.out}/lib -lz,' \
-        -e 's,-L${gmp.dev}/lib,-L${gmp.out}/lib,' \
-        -e 's,-lgmp,-L${gmp.out}/lib -lgmp,' \
-        -i $out/lib/*.la "$dev/lib/pkgconfig/gnutls.pc"
-  '' + ''
-    # It seems only useful for static linking but basically noone does that.
-    substituteInPlace "$out/lib/libgnutls.la" \
-      --replace "-lunistring" ""
-  '';
-
+  preFixup =
+    lib.optionalString (!isDarwin) ''
+      sed ${lib.optionalString tpmSupport "-e 's,-ltspi,-L${trousers}/lib -ltspi,'"} \
+          -e 's,-lz,-L${zlib.out}/lib -lz,' \
+          -e 's,-L${gmp.dev}/lib,-L${gmp.out}/lib,' \
+          -e 's,-lgmp,-L${gmp.out}/lib -lgmp,' \
+          -i $out/lib/*.la "$dev/lib/pkgconfig/gnutls.pc"
+    ''
+    + ''
+      # It seems only useful for static linking but basically noone does that.
+      substituteInPlace "$out/lib/libgnutls.la" \
+        --replace "-lunistring" ""
+    '';
 
   passthru.updateScript = gitUpdater {
     url = "https://gitlab.com/gnutls/gnutls.git";
   };
 
   passthru.tests = {
-    inherit ngtcp2-gnutls curlWithGnuTls ffmpeg emacs qemu knot-resolver samba openconnect;
+    inherit
+      ngtcp2-gnutls
+      curlWithGnuTls
+      ffmpeg
+      emacs
+      qemu
+      knot-resolver
+      samba
+      openconnect
+      ;
     inherit (ocamlPackages) ocamlnet;
     haskell-gnutls = haskellPackages.gnutls;
     python3-gnutls = python3Packages.python3-gnutls;

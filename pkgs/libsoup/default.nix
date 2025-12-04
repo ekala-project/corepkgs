@@ -1,28 +1,34 @@
-{ stdenv
-, lib
-, fetchurl
-, glib
-, libxml2
-, meson
-, ninja
-, pkg-config
-, gnome
-, libsysprof-capture
-, gobject-introspection
-, vala
-, libpsl
-, brotli
-, gnomeSupport ? true
-, sqlite
-, buildPackages
-, withIntrospection ? lib.meta.availableOn stdenv.hostPlatform gobject-introspection && stdenv.hostPlatform.emulatorAvailable buildPackages
+{
+  stdenv,
+  lib,
+  fetchurl,
+  glib,
+  libxml2,
+  meson,
+  ninja,
+  pkg-config,
+  gnome,
+  libsysprof-capture,
+  gobject-introspection,
+  vala,
+  libpsl,
+  brotli,
+  gnomeSupport ? true,
+  sqlite,
+  buildPackages,
+  withIntrospection ?
+    lib.meta.availableOn stdenv.hostPlatform gobject-introspection
+    && stdenv.hostPlatform.emulatorAvailable buildPackages,
 }:
 
 stdenv.mkDerivation rec {
   pname = "libsoup";
   version = "2.74.3";
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   src = fetchurl {
     url = "mirror://gnome/sources/${pname}/${lib.versions.majorMinor version}/${pname}-${version}.tar.xz";
@@ -38,7 +44,8 @@ stdenv.mkDerivation rec {
     ninja
     pkg-config
     glib
-  ] ++ lib.optionals withIntrospection [
+  ]
+  ++ lib.optionals withIntrospection [
     gobject-introspection
     vala
   ];
@@ -48,7 +55,8 @@ stdenv.mkDerivation rec {
     libpsl
     glib.out
     brotli
-  ] ++ lib.optionals stdenv.isLinux [
+  ]
+  ++ lib.optionals stdenv.isLinux [
     libsysprof-capture
   ];
 
@@ -64,7 +72,8 @@ stdenv.mkDerivation rec {
     "-Dintrospection=${if withIntrospection then "enabled" else "disabled"}"
     "-Dgnome=${lib.boolToString gnomeSupport}"
     "-Dntlm=disabled"
-  ] ++ lib.optionals (!stdenv.isLinux) [
+  ]
+  ++ lib.optionals (!stdenv.isLinux) [
     "-Dsysprof=disabled"
   ];
 

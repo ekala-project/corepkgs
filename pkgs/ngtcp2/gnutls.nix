@@ -1,7 +1,13 @@
-{ lib, stdenv, fetchFromGitHub
-, autoreconfHook, pkg-config
-, gnutls
-, cunit, ncurses, knot-dns
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  autoreconfHook,
+  pkg-config,
+  gnutls,
+  cunit,
+  ncurses,
+  knot-dns,
 }:
 
 stdenv.mkDerivation rec {
@@ -15,17 +21,22 @@ stdenv.mkDerivation rec {
     hash = "sha256-7DesCT8swwk9E1ckYrj3mGsdx37HrJxd+svKpJRrhoI=";
   };
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
-  nativeBuildInputs = [ autoreconfHook pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+  ];
   buildInputs = [ gnutls ];
 
   configureFlags = [ "--with-gnutls=yes" ];
   enableParallelBuilding = true;
 
   doCheck = true;
-  nativeCheckInputs = [ cunit ]
-    ++ lib.optional stdenv.isDarwin ncurses;
+  nativeCheckInputs = [ cunit ] ++ lib.optional stdenv.isDarwin ncurses;
 
   passthru.tests = knot-dns.passthru.tests; # the only consumer so far
 
@@ -50,4 +61,3 @@ stdenv.mkDerivation rec {
   on a single version might be hard sometimes.  That's why it seemed simpler
   to completely separate the nix expressions, too.
 */
-

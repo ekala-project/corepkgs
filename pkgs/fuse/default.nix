@@ -1,10 +1,13 @@
 { callPackage, util-linuxMinimal }:
 
 let
-  mkFuse = args: callPackage (import ./common.nix args) {
-    util-linux = util-linuxMinimal;
-  };
-in {
+  mkFuse =
+    args:
+    callPackage (import ./common.nix args) {
+      util-linux = util-linuxMinimal;
+    };
+in
+{
   fuse_2 = mkFuse {
     version = "2.9.9";
     hash = "sha256-dgjM6M7xk5MHi9xPyCyvF0vq0KM8UCsEYBcMhkrdvfs=";

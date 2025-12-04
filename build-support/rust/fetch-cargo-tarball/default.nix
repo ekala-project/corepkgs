@@ -77,7 +77,8 @@ stdenv.mkDerivation (
       git
       cargo-vendor-normalise
       cargo
-    ] ++ nativeBuildInputs;
+    ]
+    ++ nativeBuildInputs;
 
     buildPhase = ''
       runHook preBuild

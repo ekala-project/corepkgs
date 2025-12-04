@@ -41,18 +41,17 @@ buildPythonPackage rec {
     hatchling
   ];
 
-  propagatedBuildInputs =
-    [
-      click
-      mypy-extensions
-      packaging
-      pathspec
-      platformdirs
-    ]
-    ++ lib.optionals (pythonOlder "3.11") [
-      tomli
-      typing-extensions
-    ];
+  propagatedBuildInputs = [
+    click
+    mypy-extensions
+    packaging
+    pathspec
+    platformdirs
+  ]
+  ++ lib.optionals (pythonOlder "3.11") [
+    tomli
+    typing-extensions
+  ];
 
   passthru.optional-dependencies = {
     colorama = [ colorama ];
@@ -71,38 +70,37 @@ buildPythonPackage rec {
   nativeCheckInputs = [
     pytestCheckHook
     parameterized
-  ] ++ lib.flatten (lib.attrValues passthru.optional-dependencies);
+  ]
+  ++ lib.flatten (lib.attrValues passthru.optional-dependencies);
 
   pytestFlagsArray = [
     "-W"
     "ignore::DeprecationWarning"
   ];
 
-  preCheck =
-    ''
-      export PATH="$PATH:$out/bin"
+  preCheck = ''
+    export PATH="$PATH:$out/bin"
 
-      # The top directory /build matches black's DEFAULT_EXCLUDE regex.
-      # Make /build the project root for black tests to avoid excluding files.
-      touch ../.git
-    ''
-    + lib.optionalString stdenv.isDarwin ''
-      # Work around https://github.com/psf/black/issues/2105
-      export TMPDIR="/tmp"
-    '';
+    # The top directory /build matches black's DEFAULT_EXCLUDE regex.
+    # Make /build the project root for black tests to avoid excluding files.
+    touch ../.git
+  ''
+  + lib.optionalString stdenv.isDarwin ''
+    # Work around https://github.com/psf/black/issues/2105
+    export TMPDIR="/tmp"
+  '';
 
-  disabledTests =
-    [
-      # requires network access
-      "test_gen_check_output"
-    ]
-    ++ lib.optionals stdenv.isDarwin [
-      # fails on darwin
-      "test_expression_diff"
-      # Fail on Hydra, see https://github.com/NixOS/nixpkgs/pull/130785
-      "test_bpo_2142_workaround"
-      "test_skip_magic_trailing_comma"
-    ];
+  disabledTests = [
+    # requires network access
+    "test_gen_check_output"
+  ]
+  ++ lib.optionals stdenv.isDarwin [
+    # fails on darwin
+    "test_expression_diff"
+    # Fail on Hydra, see https://github.com/NixOS/nixpkgs/pull/130785
+    "test_bpo_2142_workaround"
+    "test_skip_magic_trailing_comma"
+  ];
   # multiple tests exceed max open files on hydra builders
   doCheck = !(stdenv.isLinux && stdenv.isAarch64);
 

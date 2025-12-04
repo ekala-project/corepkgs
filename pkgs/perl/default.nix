@@ -70,7 +70,8 @@ let
       };
     };
 
-in rec {
+in
+rec {
   # Maint version
   perl536 = callPackage ./interpreter.nix {
     self = perl536;

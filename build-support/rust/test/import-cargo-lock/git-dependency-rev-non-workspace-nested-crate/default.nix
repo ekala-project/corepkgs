@@ -1,4 +1,11 @@
-{ rustPlatform, pkg-config, openssl, lib, darwin, stdenv }:
+{
+  rustPlatform,
+  pkg-config,
+  openssl,
+  lib,
+  darwin,
+  stdenv,
+}:
 let
   fs = lib.fileset;
 in
@@ -21,7 +28,8 @@ rustPlatform.buildRustPackage {
 
   buildInputs = [
     openssl
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
     darwin.apple_sdk.frameworks.Security
   ];
 

@@ -1,14 +1,15 @@
-{ lib
-, stdenv
-, fetchurl
+{
+  lib,
+  stdenv,
+  fetchurl,
 
-# updater
-, git
-, coreutils
-, gawk
-, gnused
-, writeScript
-, nix-update
+  # updater
+  git,
+  coreutils,
+  gawk,
+  gnused,
+  writeScript,
+  nix-update,
 }:
 
 stdenv.mkDerivation rec {
@@ -34,7 +35,15 @@ stdenv.mkDerivation rec {
   '';
 
   passthru.updateScript = writeScript "update-mailcap" ''
-    export PATH=${lib.makeBinPath [ git coreutils gawk gnused nix-update ]}:$PATH
+    export PATH=${
+      lib.makeBinPath [
+        git
+        coreutils
+        gawk
+        gnused
+        nix-update
+      ]
+    }:$PATH
     VERSION="$(git ls-remote --tags --sort="v:refname" https://pagure.io/mailcap.git | \
       awk '{ print $2 }' | \
       grep "refs/tags/r" | \

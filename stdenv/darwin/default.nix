@@ -2278,18 +2278,17 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
 
         inherit (prevStage.stdenv) fetchurlBoot;
 
-        extraAttrs =
-          {
-            inherit bootstrapTools;
-            libc = prevStage.darwin.Libsystem;
-            shellPackage = prevStage.bash;
-          }
-          // lib.optionalAttrs useAppleSDKLibs {
-            # This objc4 will be propagated to all builds using the final stdenv,
-            # and we shouldn't mix different builds, because they would be
-            # conflicting LLVM modules. Export it here so we can grab it later.
-            inherit (prevStage.darwin) objc4;
-          };
+        extraAttrs = {
+          inherit bootstrapTools;
+          libc = prevStage.darwin.Libsystem;
+          shellPackage = prevStage.bash;
+        }
+        // lib.optionalAttrs useAppleSDKLibs {
+          # This objc4 will be propagated to all builds using the final stdenv,
+          # and we shouldn't mix different builds, because they would be
+          # conflicting LLVM modules. Export it here so we can grab it later.
+          inherit (prevStage.darwin) objc4;
+        };
 
         disallowedRequisites = [ bootstrapTools.out ];
 

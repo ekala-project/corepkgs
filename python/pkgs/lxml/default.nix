@@ -34,7 +34,8 @@ buildPythonPackage rec {
     pkgs.libxslt
     cython
     setuptools
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [ xcodebuild ];
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ xcodebuild ];
 
   buildInputs = [
     pkgs.libxml2

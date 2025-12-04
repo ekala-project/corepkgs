@@ -1,24 +1,31 @@
-{ lib
-, stdenv
-, fetchurl
-, autoreconfHook
-, buildPackages
-, libiconv
-, perl
-, texinfo
-, xz
-, binlore ? null
-, coreutils
-, gmpSupport ? true, gmp
-, aclSupport ? lib.meta.availableOn stdenv.hostPlatform acl, acl ? null
-, attrSupport ? lib.meta.availableOn stdenv.hostPlatform attr, attr ? null
-, selinuxSupport ? false, libselinux ? null, libsepol ? null
-# No openssl in default version, so openssl-induced rebuilds aren't too big.
-# It makes *sum functions significantly faster.
-, minimal ? true
-, withOpenssl ? !minimal, openssl ? null
-, withPrefix ? false
-, singleBinary ? "symlinks" # you can also pass "shebangs" or false
+{
+  lib,
+  stdenv,
+  fetchurl,
+  autoreconfHook,
+  buildPackages,
+  libiconv,
+  perl,
+  texinfo,
+  xz,
+  binlore ? null,
+  coreutils,
+  gmpSupport ? true,
+  gmp,
+  aclSupport ? lib.meta.availableOn stdenv.hostPlatform acl,
+  acl ? null,
+  attrSupport ? lib.meta.availableOn stdenv.hostPlatform attr,
+  attr ? null,
+  selinuxSupport ? false,
+  libselinux ? null,
+  libsepol ? null,
+  # No openssl in default version, so openssl-induced rebuilds aren't too big.
+  # It makes *sum functions significantly faster.
+  minimal ? true,
+  withOpenssl ? !minimal,
+  openssl ? null,
+  withPrefix ? false,
+  singleBinary ? "symlinks", # you can also pass "shebangs" or false
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus cannot use
@@ -29,7 +36,14 @@ assert aclSupport -> acl != null;
 assert selinuxSupport -> libselinux != null && libsepol != null;
 
 let
-  inherit (lib) concatStringsSep isString optional optionalAttrs optionals optionalString;
+  inherit (lib)
+    concatStringsSep
+    isString
+    optional
+    optionalAttrs
+    optionals
+    optionalString
+    ;
   isCross = (stdenv.hostPlatform != stdenv.buildPlatform);
 in
 stdenv.mkDerivation rec {
@@ -47,7 +61,8 @@ stdenv.mkDerivation rec {
     # after the patch was applied and autoreconf was run, since adding autoreconf
     # here causes infinite recursion.
     ./fix-mix-flags-deps-libintl.patch
-  ] ++ lib.optionals stdenv.hostPlatform.isMusl [
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isMusl [
     # https://lists.gnu.org/archive/html/bug-coreutils/2024-03/msg00089.html
     ./fix-test-failure-musl.patch
   ];
@@ -93,17 +108,24 @@ stdenv.mkDerivation rec {
 
     # intermittent failures on builders, unknown reason
     sed '2i echo Skipping du basic test && exit 77' -i ./tests/du/basic.sh
-  '' + (optionalString (stdenv.hostPlatform.libc == "musl") (concatStringsSep "\n" [
-    ''
-      echo "int main() { return 77; }" > gnulib-tests/test-parse-datetime.c
-      echo "int main() { return 77; }" > gnulib-tests/test-getlogin.c
-    ''
-  ])) + (optionalString stdenv.isAarch64 ''
+  ''
+  + (optionalString (stdenv.hostPlatform.libc == "musl") (
+    concatStringsSep "\n" [
+      ''
+        echo "int main() { return 77; }" > gnulib-tests/test-parse-datetime.c
+        echo "int main() { return 77; }" > gnulib-tests/test-getlogin.c
+      ''
+    ]
+  ))
+  + (optionalString stdenv.isAarch64 ''
     # Sometimes fails: https://github.com/NixOS/nixpkgs/pull/143097#issuecomment-954462584
     sed '2i echo Skipping cut huge range test && exit 77' -i ./tests/cut/cut-huge-range.sh
   '');
 
-  outputs = [ "out" "info" ];
+  outputs = [
+    "out"
+    "info"
+  ];
   separateDebugInfo = true;
 
   nativeBuildInputs = [
@@ -116,43 +138,51 @@ stdenv.mkDerivation rec {
     texinfo
   ];
 
-  buildInputs = [ ]
+  buildInputs =
+    [ ]
     ++ optional aclSupport acl
     ++ optional attrSupport attr
     ++ optional gmpSupport gmp
     ++ optional withOpenssl openssl
-    ++ optionals selinuxSupport [ libselinux libsepol ]
+    ++ optionals selinuxSupport [
+      libselinux
+      libsepol
+    ]
     # TODO(@Ericson2314): Investigate whether Darwin could benefit too
     ++ optional (isCross && stdenv.hostPlatform.libc != "glibc") libiconv;
 
   hardeningDisable = [ "trivialautovarinit" ];
 
-  configureFlags = [ "--with-packager=https://nixos.org" ]
-    ++ optional (singleBinary != false)
-      ("--enable-single-binary" + optionalString (isString singleBinary) "=${singleBinary}")
-    ++ optional withOpenssl "--with-openssl"
-    ++ optional stdenv.hostPlatform.isSunOS "ac_cv_func_inotify_init=no"
-    ++ optional withPrefix "--program-prefix=g"
-    # the shipped configure script doesn't enable nls, but using autoreconfHook
-    # does so which breaks the build
-    ++ optional stdenv.isDarwin "--disable-nls"
-    ++ optionals (isCross && stdenv.hostPlatform.libc == "glibc") [
-      # TODO(19b98110126fde7cbb1127af7e3fe1568eacad3d): Needed for fstatfs() I
-      # don't know why it is not properly detected cross building with glibc.
-      "fu_cv_sys_stat_statfs2_bsize=yes"
-    ]
-    # /proc/uptime is available on Linux and produces accurate results even if
-    # the boot time is set to the epoch because the system has no RTC. We
-    # explicitly enable it for cases where it can't be detected automatically,
-    # such as when cross-compiling.
-    ++ optional stdenv.hostPlatform.isLinux "gl_cv_have_proc_uptime=yes";
+  configureFlags = [
+    "--with-packager=https://nixos.org"
+  ]
+  ++ optional (singleBinary != false) (
+    "--enable-single-binary" + optionalString (isString singleBinary) "=${singleBinary}"
+  )
+  ++ optional withOpenssl "--with-openssl"
+  ++ optional stdenv.hostPlatform.isSunOS "ac_cv_func_inotify_init=no"
+  ++ optional withPrefix "--program-prefix=g"
+  # the shipped configure script doesn't enable nls, but using autoreconfHook
+  # does so which breaks the build
+  ++ optional stdenv.isDarwin "--disable-nls"
+  ++ optionals (isCross && stdenv.hostPlatform.libc == "glibc") [
+    # TODO(19b98110126fde7cbb1127af7e3fe1568eacad3d): Needed for fstatfs() I
+    # don't know why it is not properly detected cross building with glibc.
+    "fu_cv_sys_stat_statfs2_bsize=yes"
+  ]
+  # /proc/uptime is available on Linux and produces accurate results even if
+  # the boot time is set to the epoch because the system has no RTC. We
+  # explicitly enable it for cases where it can't be detected automatically,
+  # such as when cross-compiling.
+  ++ optional stdenv.hostPlatform.isLinux "gl_cv_have_proc_uptime=yes";
 
   # The tests are known broken on Cygwin
   # (http://article.gmane.org/gmane.comp.gnu.core-utils.bugs/19025),
   # Darwin (http://article.gmane.org/gmane.comp.gnu.core-utils.bugs/19351),
   # and {Open,Free}BSD.
   # With non-standard storeDir: https://github.com/NixOS/nix/issues/512
-  doCheck = (!isCross)
+  doCheck =
+    (!isCross)
     && (stdenv.hostPlatform.libc == "glibc" || stdenv.hostPlatform.libc == "musl")
     && !stdenv.isAarch32;
 
@@ -163,10 +193,12 @@ stdenv.mkDerivation rec {
 
   NIX_LDFLAGS = optionalString selinuxSupport "-lsepol";
   FORCE_UNSAFE_CONFIGURE = optionalString stdenv.hostPlatform.isSunOS "1";
-  env.NIX_CFLAGS_COMPILE = toString ([]
+  env.NIX_CFLAGS_COMPILE = toString (
+    [ ]
     # Work around a bogus warning in conjunction with musl.
     ++ optional stdenv.hostPlatform.isMusl "-Wno-error"
-    ++ optional stdenv.hostPlatform.isAndroid "-D__USE_FORTIFY_LEVEL=0");
+    ++ optional stdenv.hostPlatform.isAndroid "-D__USE_FORTIFY_LEVEL=0"
+  );
 
   # Works around a bug with 8.26:
   # Makefile:3440: *** Recursive variable 'INSTALL' references itself (eventually).  Stop.
@@ -174,14 +206,15 @@ stdenv.mkDerivation rec {
     sed -i Makefile -e 's|^INSTALL =.*|INSTALL = ${buildPackages.coreutils}/bin/install -c|'
   '';
 
-  postInstall = optionalString (isCross && !minimal) ''
-    rm $out/share/man/man1/*
-    cp ${buildPackages.coreutils-full}/share/man/man1/* $out/share/man/man1
-  ''
-  # du: 8.7 M locale + 0.4 M man pages
-  + optionalString minimal ''
-    rm -r "$out/share"
-  '';
+  postInstall =
+    optionalString (isCross && !minimal) ''
+      rm $out/share/man/man1/*
+      cp ${buildPackages.coreutils-full}/share/man/man1/* $out/share/man/man1
+    ''
+    # du: 8.7 M locale + 0.4 M man pages
+    + optionalString minimal ''
+      rm -r "$out/share"
+    '';
 
   # TODO: determine if this is sitll needed post bootstrapping
   # passthru = {} // optionalAttrs (singleBinary != false) {

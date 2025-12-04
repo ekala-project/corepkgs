@@ -50,16 +50,15 @@ buildPythonPackage rec {
     ];
   };
 
-  nativeCheckInputs =
-    [
-      cryptography
-      ephemeral-port-reserve
-      pytest-timeout
-      pytest-xprocess
-      pytestCheckHook
-    ]
-    ++ lib.optionals (pythonOlder "3.11") [ greenlet ]
-    ++ lib.flatten (builtins.attrValues optional-dependencies);
+  nativeCheckInputs = [
+    cryptography
+    ephemeral-port-reserve
+    pytest-timeout
+    pytest-xprocess
+    pytestCheckHook
+  ]
+  ++ lib.optionals (pythonOlder "3.11") [ greenlet ]
+  ++ lib.flatten (builtins.attrValues optional-dependencies);
 
   pythonImportsCheck = [ "werkzeug" ];
 

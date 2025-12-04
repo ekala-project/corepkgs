@@ -1,17 +1,18 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, asciidoc ? null
-, docbook_xml_dtd_45
-, docbook_xsl
-, installShellFiles
-, libxslt
-, python3
-, re2c
-, buildPackages
-# TODO: core-pkgs: flip this to true, requires asciidoc
-, buildDocs ? false
-, nix-update-script
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  asciidoc ? null,
+  docbook_xml_dtd_45,
+  docbook_xsl,
+  installShellFiles,
+  libxslt,
+  python3,
+  re2c,
+  buildPackages,
+  # TODO: core-pkgs: flip this to true, requires asciidoc
+  buildDocs ? false,
+  nix-update-script,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -58,11 +59,13 @@ stdenv.mkDerivation (finalAttrs: {
     python configure.py
 
     source rebuild_args
-  '' + lib.optionalString buildDocs ''
+  ''
+  + lib.optionalString buildDocs ''
     # "./ninja -vn manual" output copied here to support cross compilation.
     asciidoc -b docbook -d book -o build/manual.xml doc/manual.asciidoc
     xsltproc --nonet doc/docbook.xsl build/manual.xml > doc/manual.html
-  '' + ''
+  ''
+  + ''
 
     runHook postBuild
   '';
@@ -74,16 +77,18 @@ stdenv.mkDerivation (finalAttrs: {
     installShellCompletion --name ninja \
       --bash misc/bash-completion \
       --zsh misc/zsh-completion
-  '' + lib.optionalString buildDocs ''
+  ''
+  + lib.optionalString buildDocs ''
     install -Dm444 -t $out/share/doc/ninja doc/manual.asciidoc doc/manual.html
-  '' + ''
+  ''
+  + ''
 
     runHook postInstall
   '';
 
   setupHook = ./setup-hook.sh;
 
-  passthru.updateScript = nix-update-script {};
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Small build system with a focus on speed";

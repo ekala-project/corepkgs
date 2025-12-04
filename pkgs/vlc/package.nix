@@ -1,95 +1,96 @@
-{ lib
-, SDL
-, SDL_image
-, a52dec
-, alsa-lib
-, autoreconfHook
-, avahi
-, curl
-, dbus
-, faad2
-, fetchpatch
-, fetchurl
-, ffmpeg
-, flac
-, fluidsynth
-, freefont_ttf
-, freetype
-, fribidi
-, genericUpdater
-, gnutls
-, libSM
-, libXext
-, libXinerama
-, libXpm
-, libXv
-, libXvMC
-, libarchive
-, libass
-, libbluray
-, libcaca
-, libcddb
-, libdc1394
-, libdvbpsi
-, libdvdnav
-, libebml
-, libgcrypt
-, libgpg-error
-, libjack2
-, libkate
-, libmad
-, libmatroska
-, libmicrodns
-, libmodplug
-, libmtp
-, liboggz
-, libopus
-, libplacebo_5
-, libpulseaudio
-, libraw1394
-, librsvg
-, libsForQt5
-, libsamplerate
-, libspatialaudio
-, libssh2
-, libtheora
-, libtiger
-, libupnp
-, libv4l
-, libva
-, libvdpau
-, libvorbis
-, libxml2
-, live555
-, lua5
-, mpeg2dec
-, ncurses
-, perl
-, pkg-config
-, pkgsBuildBuild
-, protobuf
-, removeReferencesTo
-, samba
-, schroedinger
-, speex
-, srt
-, stdenv
-, systemd
-, taglib
-, unzip
-, wayland
-, wayland-protocols
-, wrapGAppsHook3
-, writeShellScript
-, xcbutilkeysyms
-, zlib
+{
+  lib,
+  SDL,
+  SDL_image,
+  a52dec,
+  alsa-lib,
+  autoreconfHook,
+  avahi,
+  curl,
+  dbus,
+  faad2,
+  fetchpatch,
+  fetchurl,
+  ffmpeg,
+  flac,
+  fluidsynth,
+  freefont_ttf,
+  freetype,
+  fribidi,
+  genericUpdater,
+  gnutls,
+  libSM,
+  libXext,
+  libXinerama,
+  libXpm,
+  libXv,
+  libXvMC,
+  libarchive,
+  libass,
+  libbluray,
+  libcaca,
+  libcddb,
+  libdc1394,
+  libdvbpsi,
+  libdvdnav,
+  libebml,
+  libgcrypt,
+  libgpg-error,
+  libjack2,
+  libkate,
+  libmad,
+  libmatroska,
+  libmicrodns,
+  libmodplug,
+  libmtp,
+  liboggz,
+  libopus,
+  libplacebo_5,
+  libpulseaudio,
+  libraw1394,
+  librsvg,
+  libsForQt5,
+  libsamplerate,
+  libspatialaudio,
+  libssh2,
+  libtheora,
+  libtiger,
+  libupnp,
+  libv4l,
+  libva,
+  libvdpau,
+  libvorbis,
+  libxml2,
+  live555,
+  lua5,
+  mpeg2dec,
+  ncurses,
+  perl,
+  pkg-config,
+  pkgsBuildBuild,
+  protobuf,
+  removeReferencesTo,
+  samba,
+  schroedinger,
+  speex,
+  srt,
+  stdenv,
+  systemd,
+  taglib,
+  unzip,
+  wayland,
+  wayland-protocols,
+  wrapGAppsHook3,
+  writeShellScript,
+  xcbutilkeysyms,
+  zlib,
 
-, chromecastSupport ? true
-, jackSupport ? false
-, onlyLibVLC ? false
-, skins2Support ? !onlyLibVLC
-, waylandSupport ? true
-, withQt5 ? true
+  chromecastSupport ? true,
+  jackSupport ? false,
+  onlyLibVLC ? false,
+  skins2Support ? !onlyLibVLC,
+  waylandSupport ? true,
+  withQt5 ? true,
 }:
 
 # chromecastSupport requires TCP port 8010 to be open for it to work.
@@ -192,19 +193,28 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ optionals (!stdenv.hostPlatform.isAarch && !onlyLibVLC) [ live555 ]
   ++ optionals jackSupport [ libjack2 ]
-  ++ optionals chromecastSupport [ libmicrodns protobuf ]
+  ++ optionals chromecastSupport [
+    libmicrodns
+    protobuf
+  ]
   ++ optionals skins2Support [
     freetype
     libXext
     libXinerama
     libXpm
   ]
-  ++ optionals waylandSupport [ wayland wayland-protocols ]
-  ++ optionals withQt5 (with libsForQt5; [
-    qtbase
-    qtsvg
-    qtx11extras
-  ])
+  ++ optionals waylandSupport [
+    wayland
+    wayland-protocols
+  ]
+  ++ optionals withQt5 (
+    with libsForQt5;
+    [
+      qtbase
+      qtsvg
+      qtx11extras
+    ]
+  )
   ++ optionals (waylandSupport && withQt5) [ libsForQt5.qtwayland ];
 
   env = {
@@ -212,7 +222,8 @@ stdenv.mkDerivation (finalAttrs: {
     # set the path to the compiler
     BUILDCC = "${pkgsBuildBuild.stdenv.cc}/bin/gcc";
     PKG_CONFIG_WAYLAND_SCANNER_WAYLAND_SCANNER = "wayland-scanner";
-  } // lib.optionalAttrs (!stdenv.hostPlatform.isAarch) {
+  }
+  // lib.optionalAttrs (!stdenv.hostPlatform.isAarch) {
     LIVE555_PREFIX = live555;
   };
 
@@ -235,8 +246,8 @@ stdenv.mkDerivation (finalAttrs: {
   # instead of bytecode:
   # https://www.lua.org/wshop13/Jericke.pdf#page=39
   + lib.optionalString (!stdenv.hostPlatform.canExecute stdenv.buildPlatform) ''
-      substituteInPlace share/Makefile.am \
-        --replace $'.luac \\\n' $'.lua \\\n'
+    substituteInPlace share/Makefile.am \
+      --replace $'.luac \\\n' $'.lua \\\n'
   '';
 
   enableParallelBuilding = true;
@@ -287,8 +298,11 @@ stdenv.mkDerivation (finalAttrs: {
   # should be the same as pkgsBuildBuild.qt5.qttranslations.
   postFixup = ''
     find $out/lib/vlc/plugins -exec touch -d @1 '{}' ';'
-    ${if stdenv.buildPlatform.canExecute stdenv.hostPlatform then "$out" else pkgsBuildBuild.libvlc}/lib/vlc/vlc-cache-gen $out/vlc/plugins
-  '' + optionalString withQt5 ''
+    ${
+      if stdenv.buildPlatform.canExecute stdenv.hostPlatform then "$out" else pkgsBuildBuild.libvlc
+    }/lib/vlc/vlc-cache-gen $out/vlc/plugins
+  ''
+  + optionalString withQt5 ''
     remove-references-to -t "${libsForQt5.qtbase.dev}" $out/lib/vlc/plugins/gui/libqt_plugin.so
   '';
 

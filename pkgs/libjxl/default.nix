@@ -1,24 +1,27 @@
-{ stdenv, lib, fetchFromGitHub
-, brotli
-, cmake
-, giflib
-, gperftools
-, gtest
-, libhwy
-, libjpeg
-, libpng
-, libwebp
-, gdk-pixbuf
-, openexr_3
-, pkg-config
-, makeWrapper
-, zlib
-, asciidoc
-, graphviz
-, doxygen
-, python3
-, lcms2
-, enablePlugins ? stdenv.buildPlatform.canExecute stdenv.hostPlatform
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  brotli,
+  cmake,
+  giflib,
+  gperftools,
+  gtest,
+  libhwy,
+  libjpeg,
+  libpng,
+  libwebp,
+  gdk-pixbuf,
+  openexr_3,
+  pkg-config,
+  makeWrapper,
+  zlib,
+  asciidoc,
+  graphviz,
+  doxygen,
+  python3,
+  lcms2,
+  enablePlugins ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
 }:
 
 let
@@ -29,7 +32,10 @@ stdenv.mkDerivation rec {
   pname = "libjxl";
   version = "0.10.3";
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   src = fetchFromGitHub {
     owner = "libjxl";
@@ -107,14 +113,17 @@ stdenv.mkDerivation rec {
     # TODO: Update this package to enable this (overridably via an option):
     # Viewer tools for evaluation.
     # "-DJPEGXL_ENABLE_VIEWERS=ON"
-  ] ++ lib.optionals enablePlugins [
+  ]
+  ++ lib.optionals enablePlugins [
     # Enable plugins, such as:
     # * the `gdk-pixbuf` one, which allows applications like `eog` to load jpeg-xl files
     # * the `gimp` one, which allows GIMP to load jpeg-xl files
     "-DJPEGXL_ENABLE_PLUGINS=ON"
-  ] ++ lib.optionals stdenv.hostPlatform.isStatic [
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isStatic [
     "-DJPEGXL_STATIC=ON"
-  ] ++ lib.optionals stdenv.hostPlatform.isAarch32 [
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isAarch32 [
     "-DJPEGXL_FORCE_NEON=ON"
   ];
 

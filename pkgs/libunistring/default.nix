@@ -4,7 +4,7 @@
   stdenv,
   libiconv ? null,
   updateAutotoolsGnuConfigScriptsHook,
-  darwin ? null
+  darwin ? null,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus

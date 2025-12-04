@@ -1,12 +1,32 @@
-{ lib, stdenv, fetchurl
-, pkg-config, texinfo
-, gettext, libassuan, libgcrypt, libgpg-error, libiconv, libksba, npth
-, adns, bzip2, gnutls, libusb1, openldap, readline, sqlite, zlib
-, enableMinimal ? false
-, withPcsc ? !enableMinimal, pcsclite
-, guiSupport ? stdenv.isDarwin, pinentry
-, withTpm2Tss ? !stdenv.isDarwin && !enableMinimal, tpm2-tss
-, nixosTests
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  texinfo,
+  gettext,
+  libassuan,
+  libgcrypt,
+  libgpg-error,
+  libiconv,
+  libksba,
+  npth,
+  adns,
+  bzip2,
+  gnutls,
+  libusb1,
+  openldap,
+  readline,
+  sqlite,
+  zlib,
+  enableMinimal ? false,
+  withPcsc ? !enableMinimal,
+  pcsclite,
+  guiSupport ? stdenv.isDarwin,
+  pinentry,
+  withTpm2Tss ? !stdenv.isDarwin && !enableMinimal,
+  tpm2-tss,
+  nixosTests,
 }:
 
 assert guiSupport -> !enableMinimal;
@@ -20,12 +40,30 @@ stdenv.mkDerivation rec {
     hash = "sha256-9o99ddBssWNcM2002ESvl0NsP2TqFLy3yGl4L5b0Qnc=";
   };
 
-  nativeBuildInputs = [ pkg-config texinfo ];
+  nativeBuildInputs = [
+    pkg-config
+    texinfo
+  ];
   buildInputs = [
-    gettext libassuan libgcrypt libgpg-error libiconv libksba npth
-  ] ++ lib.optionals (!enableMinimal) [
-    adns bzip2 gnutls libusb1 openldap readline sqlite zlib
-  ] ++ lib.optionals withTpm2Tss [ tpm2-tss ];
+    gettext
+    libassuan
+    libgcrypt
+    libgpg-error
+    libiconv
+    libksba
+    npth
+  ]
+  ++ lib.optionals (!enableMinimal) [
+    adns
+    bzip2
+    gnutls
+    libusb1
+    openldap
+    readline
+    sqlite
+    zlib
+  ]
+  ++ lib.optionals withTpm2Tss [ tpm2-tss ];
 
   patches = [
     ./fix-libusb-include-path.patch
@@ -39,9 +77,10 @@ stdenv.mkDerivation rec {
 
   postPatch = ''
     sed -i 's,\(hkps\|https\)://keyserver.ubuntu.com,hkps://keys.openpgp.org,g' configure configure.ac doc/dirmngr.texi doc/gnupg.info-1
-    '' + lib.optionalString (stdenv.isLinux && withPcsc) ''
-      sed -i 's,"libpcsclite\.so[^"]*","${lib.getLib pcsclite}/lib/libpcsclite.so",g' scd/scdaemon.c
-    '';
+  ''
+  + lib.optionalString (stdenv.isLinux && withPcsc) ''
+    sed -i 's,"libpcsclite\.so[^"]*","${lib.getLib pcsclite}/lib/libpcsclite.so",g' scd/scdaemon.c
+  '';
 
   configureFlags = [
     "--sysconfdir=/etc"
@@ -51,32 +90,37 @@ stdenv.mkDerivation rec {
     "--with-ksba-prefix=${libksba.dev}"
     "GPGRT_CONFIG=${lib.getDev libgpg-error}/bin/gpgrt-config"
   ]
-  ++ lib.optional guiSupport "--with-pinentry-pgm=${pinentry}/${pinentry.binaryPath or "bin/pinentry"}"
+  ++ lib.optional guiSupport "--with-pinentry-pgm=${pinentry}/${
+    pinentry.binaryPath or "bin/pinentry"
+  }"
   ++ lib.optional withTpm2Tss "--with-tss=intel"
   ++ lib.optional stdenv.isDarwin "--disable-ccid-driver";
 
-  postInstall = if enableMinimal
-  then ''
-    rm -r $out/{libexec,sbin,share}
-    for f in $(find $out/bin -type f -not -name gpg)
-    do
-      rm $f
-    done
-  '' else ''
-    # add gpg2 symlink to make sure git does not break when signing commits
-    ln -s $out/bin/gpg $out/bin/gpg2
+  postInstall =
+    if enableMinimal then
+      ''
+        rm -r $out/{libexec,sbin,share}
+        for f in $(find $out/bin -type f -not -name gpg)
+        do
+          rm $f
+        done
+      ''
+    else
+      ''
+        # add gpg2 symlink to make sure git does not break when signing commits
+        ln -s $out/bin/gpg $out/bin/gpg2
 
-    # Make libexec tools available in PATH
-    for f in $out/libexec/; do
-      if [[ "$(basename $f)" == "gpg-wks-client" ]]; then continue; fi
-      ln -s $f $out/bin/$(basename $f)
-    done
+        # Make libexec tools available in PATH
+        for f in $out/libexec/; do
+          if [[ "$(basename $f)" == "gpg-wks-client" ]]; then continue; fi
+          ln -s $f $out/bin/$(basename $f)
+        done
 
-    for f in $out/libexec/; do
-      if [[ "$(basename $f)" == "gpg-wks-client" ]]; then continue; fi
-      ln -s $f $out/bin/$(basename $f)
-    done
-  '';
+        for f in $out/libexec/; do
+          if [[ "$(basename $f)" == "gpg-wks-client" ]]; then continue; fi
+          ln -s $f $out/bin/$(basename $f)
+        done
+      '';
 
   enableParallelBuilding = true;
 

@@ -1,10 +1,11 @@
-{ buildRubyGem
-, fetchFromGitHub
-, makeWrapper
-, lib
-, bundler
-, nix
-, nix-prefetch-git
+{
+  buildRubyGem,
+  fetchFromGitHub,
+  makeWrapper,
+  lib,
+  bundler,
+  nix,
+  nix-prefetch-git,
 }:
 
 buildRubyGem rec {
@@ -21,7 +22,10 @@ buildRubyGem rec {
     hash = "sha256-QnNdseCSwQYhO/ybzWsflMEk68TMgPU3HqXJ7av3SHE=";
   };
 
-  buildInputs = [ ruby bundler ];
+  buildInputs = [
+    ruby
+    bundler
+  ];
   nativeBuildInputs = [ makeWrapper ];
 
   preFixup = ''

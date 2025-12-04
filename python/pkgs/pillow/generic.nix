@@ -27,26 +27,26 @@ buildPythonPackage rec {
     rm Tests/test_imagefont.py
   '';
 
-  disabledTests =
-    [
-      # Code quality mismathch 9 vs 10
-      "test_pyroma"
+  disabledTests = [
+    # Code quality mismathch 9 vs 10
+    "test_pyroma"
 
-      # pillow-simd
-      "test_roundtrip"
-      "test_basic"
-      "test_custom_metadata"
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      # Disable darwin tests which require executables: `iconutil` and `screencapture`
-      "test_grab"
-      "test_grabclipboard"
-      "test_save"
-    ];
+    # pillow-simd
+    "test_roundtrip"
+    "test_basic"
+    "test_custom_metadata"
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    # Disable darwin tests which require executables: `iconutil` and `screencapture`
+    "test_grab"
+    "test_grabclipboard"
+    "test_save"
+  ];
 
   propagatedBuildInputs = [
     olefile
-  ] ++ lib.optionals (lib.versionAtLeast version "8.2.0") [ defusedxml ];
+  ]
+  ++ lib.optionals (lib.versionAtLeast version "8.2.0") [ defusedxml ];
 
   nativeCheckInputs = [
     pytestCheckHook
@@ -55,24 +55,23 @@ buildPythonPackage rec {
 
   nativeBuildInputs = [ setuptools ];
 
-  buildInputs =
-    [
-      freetype
-      libjpeg
-      openjpeg
-      libimagequant
-      zlib
-      libtiff
-      libwebp
-      libxcrypt
-      tcl
-      lcms2
-    ]
-    ++ lib.optionals (lib.versionAtLeast version "7.1.0") [ libxcb ]
-    ++ lib.optionals (isPyPy) [
-      tk
-      libX11
-    ];
+  buildInputs = [
+    freetype
+    libjpeg
+    openjpeg
+    libimagequant
+    zlib
+    libtiff
+    libwebp
+    libxcrypt
+    tcl
+    lcms2
+  ]
+  ++ lib.optionals (lib.versionAtLeast version "7.1.0") [ libxcb ]
+  ++ lib.optionals (isPyPy) [
+    tk
+    libX11
+  ];
 
   # NOTE: we use LCMS_ROOT as WEBP root since there is not other setting for webp.
   # NOTE: The Pillow install script will, by default, add paths like /usr/lib

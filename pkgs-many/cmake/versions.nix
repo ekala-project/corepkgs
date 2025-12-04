@@ -10,4 +10,3 @@
   minimal.isMinimalBuild = true;
   curses.withNcurses = true;
 }
-
