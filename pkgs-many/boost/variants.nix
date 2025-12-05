@@ -44,4 +44,16 @@
     version = "1.86.0";
     src-hash = "sha256-G+2I5AQBsst6H3bUurSZ41L6TQxfMcDbrmTiTTTXUTs=";
   };
+  v1_87 = {
+    version = "1.87.0";
+    src-hash = "sha256-r1e+JctMT0tBPtaS/jeK/7Q1LqUPvilKEe9Uj01SfYk=";
+  };
+  v1_88 = {
+    version = "1.88.0";
+    src-hash = "sha256-RtnSwGY3shknCHfJ4WFVy9AVttyENJrwZMCI6bWxL3s=";
+  };
+  v1_89 = {
+    version = "1.89.0";
+    src-hash = "sha256-haM/oiYhtPMU+OheGl4qk2PSLk9JkpJdS7O8YxtaDHo=";
+  };
 }
