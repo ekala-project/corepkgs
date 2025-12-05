@@ -946,13 +946,11 @@ final: prev: with final; {
   runtimeShell = "${runtimeShellPackage}${runtimeShellPackage.shellPath}";
   runtimeShellPackage = bash;
 
-  rust_1_80 = callPackage ./pkgs/rust/1_80.nix {
-    llvm_18 = llvmPackages_18.libllvm;
-  };
-  rust = rust_1_80;
+  rust_1_91 = callPackage ./pkgs/rust/1_91.nix { };
+  rust = rust_1_91;
 
-  rustPackages_1_80 = rust_1_80.packages.stable;
-  rustPackages = rustPackages_1_80;
+  rustPackages_1_91 = rust_1_91.packages.stable;
+  rustPackages = rustPackages_1_91;
 
   inherit (rustPackages)
     cargo
