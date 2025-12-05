@@ -945,7 +945,9 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
     assert isBuiltByNixpkgsCompiler prevStage.gnugrep;
     assert isBuiltByNixpkgsCompiler prevStage.patchelf;
     {
-      inherit (prevStage) config overlays stdenv;
+      inherit (prevStage) stdenv;
+      # TODO(corepkgs): is this a bug in nixpkgs?
+      inherit config overlays;
     }
   )
 ]

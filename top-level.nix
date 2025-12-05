@@ -661,6 +661,18 @@ with final; {
 
   runtimeShell = "${runtimeShellPackage}${runtimeShellPackage.shellPath}";
   runtimeShellPackage = bashNonInteractive;
+  bash = callPackage ./pkgs/bash/5.nix { };
+  bashNonInteractive = lowPrio (
+    callPackage ./pkgs/bash/5.nix {
+      interactive = false;
+    }
+  );
+  # WARNING: this attribute is used by nix-shell so it shouldn't be removed/renamed
+  bashInteractive = bash;
+  bashFHS = callPackage ./pkgs/bash/5.nix {
+    forFHSEnv = true;
+  };
+  bashInteractiveFHS = bashFHS;
 
   # TODO(corepkgs): use mkManyVariants
   flex_2_5_35 = callPackage ./pkgs/flex/2.5.35.nix { };
@@ -853,6 +865,85 @@ with final; {
     openssl_3
     openssl_3_6
     ;
+
+  # TODO(corepkgs): move build-support hooks into pkgs
+  makeShellWrapper = makeSetupHook {
+    name = "make-shell-wrapper-hook";
+    propagatedBuildInputs = [ dieHook ];
+    substitutions = {
+      # targetPackages.runtimeShell only exists when pkgs == targetPackages (when targetPackages is not  __raw)
+      shell =
+        if targetPackages ? runtimeShell then
+          targetPackages.runtimeShell
+        else
+          throw "makeWrapper/makeShellWrapper must be in nativeBuildInputs";
+    };
+    passthru = {
+      tests = tests.makeWrapper;
+    };
+  } ./build-support/setup-hooks/make-wrapper.sh;
+  __flattenIncludeHackHook = callPackage ./build-support/setup-hooks/flatten-include-hack { };
+  arrayUtilities =
+    let
+      arrayUtilitiesPackages = makeScopeWithSplicing' {
+        otherSplices = generateSplicesForMkScope "arrayUtilities";
+        f =
+          finalArrayUtilities:
+          {
+            callPackages = lib.callPackagesWith (pkgs // finalArrayUtilities);
+          }
+          // lib.packagesFromDirectoryRecursive {
+            inherit (finalArrayUtilities) callPackage;
+            directory = ./build-support/setup-hooks/arrayUtilities;
+          };
+      };
+    in
+    recurseIntoAttrs arrayUtilitiesPackages;
+  addBinToPathHook = callPackage (
+    { makeSetupHook }:
+    makeSetupHook {
+      name = "add-bin-to-path-hook";
+    } ./build-support/setup-hooks/add-bin-to-path.sh
+  ) { };
+  autoPatchelfHook = makeSetupHook {
+    name = "auto-patchelf-hook";
+    propagatedBuildInputs = [
+      auto-patchelf
+      bintools
+    ];
+    substitutions = {
+      hostPlatform = stdenv.hostPlatform.config;
+    };
+  } ./build-support/setup-hooks/auto-patchelf.sh;
+
+   stripJavaArchivesHook = makeSetupHook {
+    name = "strip-java-archives-hook";
+    propagatedBuildInputs = [ strip-nondeterminism ];
+  } ./build-support/setup-hooks/strip-java-archives.sh;
+
+  updateAutotoolsGnuConfigScriptsHook = makeSetupHook {
+    name = "update-autotools-gnu-config-scripts-hook";
+    substitutions = {
+      gnu_config = gnu-config;
+    };
+  } ./build-support/setup-hooks/update-autotools-gnu-config-scripts.sh;
+
+  testers = callPackage ./build-support/testers { };
+
+  readline70 = callPackage ./pkgs/readline/7.0.nix { };
+  readline = callPackage ./pkgs/readline/8.3.nix { };
+
+  util-linuxMinimal = util-linux.override {
+    fetchurl = stdenv.fetchurlBoot;
+    cryptsetupSupport = false;
+    nlsSupport = false;
+    ncursesSupport = false;
+    pamSupport = false;
+    shadowSupport = false;
+    systemdSupport = false;
+    translateManpages = false;
+    withLastlog = false;
+  };
 
   # unixtools = lib.recurseIntoAttrs (callPackages ./unixtools.nix { });
   # inherit (unixtools)

@@ -42,7 +42,7 @@ in
   # collections of packages.  These collection of packages are part of the
   # fix-point made by Nixpkgs.
   overlays ? [ ],
-  # TODO(corepkgs): document removal o this
+  # TODO(corepkgs): document removal of this
   # overlays ? import ./impure-overlays.nix,
 
   crossOverlays ? [ ],
