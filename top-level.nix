@@ -10,7 +10,13 @@ let
   inherit (lib) lowPrio;
 in
 with final; {
-  inherit lib;
+  inherit lib config;
+
+   # TODO(corepkgs): support NixOS tests
+  nixosTests = { };
+
+  # TODO(corepkgs): Create ekapkg specific version
+  nix-update-script = { };
 
   # Non-GNU/Linux OSes are currently "impure" platforms, with their libc
   # outside of the store.  Thus, GCC, GFortran, & co. must always look for files
@@ -300,6 +306,7 @@ with final; {
   dbus = callPackage ./pkgs/dbus { };
   makeDBusConf = callPackage ./pkgs/dbus/make-dbus-conf.nix { };
 
+  # TODO(corepkgs): move these fetchers into pkgs
   fetchpatch = callPackage ./build-support/fetchpatch {
       # 0.3.4 would change hashes: https://github.com/NixOS/nixpkgs/issues/25154
       patchutils = __splicedPackages.patchutils_0_3_3;
@@ -312,6 +319,7 @@ with final; {
       version = 2;
     };
   fetchFromGitLab = callPackage ./build-support/fetchgitlab { };
+  fetchFromGitHub = callPackage ./build-support/fetchgithub { };
 
   # Default libGL implementation.
   #
@@ -867,6 +875,7 @@ with final; {
     ;
 
   # TODO(corepkgs): move build-support hooks into pkgs
+  makeWrapper = makeShellWrapper;
   makeShellWrapper = makeSetupHook {
     name = "make-shell-wrapper-hook";
     propagatedBuildInputs = [ dieHook ];
@@ -944,6 +953,37 @@ with final; {
     translateManpages = false;
     withLastlog = false;
   };
+
+  # TODO(corepkgs): use mkManyVariants, move to perl
+  perlInterpreters = callPackage ./pkgs/perl { inherit callPackage; };
+  inherit (perlInterpreters) perl538 perl540;
+  perl538Packages = recurseIntoAttrs perl538.pkgs;
+  perl540Packages = recurseIntoAttrs perl540.pkgs;
+  perl = perl540;
+  perlPackages = perl540Packages;
+
+  # TODO(corepkgs): use mkManyVariants
+  texinfoPackages = callPackages ./pkgs/texinfo/packages.nix {
+    inherit freebsd gawk libintl ncurses procps;
+   };
+  inherit (texinfoPackages)
+    texinfo6
+    texinfo7
+    ;
+  texinfo = texinfo7;
+  texinfoInteractive = texinfo.override { interactive = true; };
+
+  # On non-GNU systems we need GNU Gettext for libintl.
+  libintl = if stdenv.hostPlatform.libc != "glibc" then gettext else null;
+
+  # TODO(corepkgs): cleanup and move into pkgs
+  common-updater-scripts = callPackage ./common-updater/scripts.nix { };
+  genericUpdater = callPackage ./common-updater/generic-updater.nix { };
+  _experimental-update-script-combinators = callPackage ./common-updater/combinators.nix { };
+  directoryListingUpdater = callPackage ./common-updater/directory-listing-updater.nix { };
+  gitUpdater = callPackage ./common-updater/git-updater.nix { };
+  httpTwoLevelsUpdater = callPackage ./common-updater/http-two-levels-updater.nix { };
+  unstableGitUpdater = callPackage ./common-updater/unstable-updater.nix { };
 
   # unixtools = lib.recurseIntoAttrs (callPackages ./unixtools.nix { });
   # inherit (unixtools)
