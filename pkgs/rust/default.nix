@@ -17,9 +17,6 @@
   lib,
   newScope,
   callPackage,
-  CoreFoundation ? null,
-  Security ? null,
-  SystemConfiguration ? null,
   pkgsBuildBuild,
   pkgsBuildHost,
   pkgsBuildTarget,
@@ -92,15 +89,10 @@ in
       in
       {
         # Packages suitable for build-time, e.g. `build.rs`-type stuff.
-        buildRustPackages = (selectRustPackage pkgsBuildHost).packages.stable // {
-          # Prevent `pkgs/top-level/release-attrpaths-superset.nix` from recursing more than one level here.
-          buildRustPackages = self.buildRustPackages // {
-            __attrsFailEvaluation = true;
-          };
-        };
+        buildRustPackages = (selectRustPackage pkgsBuildHost).packages.stable;
         # Analogous to stdenv
         rustPlatform = makeRustPlatform self.buildRustPackages;
-        rustc-unwrapped = self.callPackage ./rustc.nix ({
+        rustc-unwrapped = self.callPackage ./rustc.nix {
           version = rustcVersion;
           sha256 = rustcSha256;
           inherit enableRustcDev;
@@ -117,13 +109,12 @@ in
 
           # Use boot package set to break cycle
           inherit (bootstrapRustPackages) cargo rustc rustfmt;
-        });
+        };
         rustc = wrapRustcWith {
           inherit (self) rustc-unwrapped;
           sysroot = if fastCross then self.rustc-unwrapped else null;
         };
         rustfmt = self.callPackage ./rustfmt.nix {
-          inherit Security;
           inherit (self.buildRustPackages) rustc;
         };
         cargo =
@@ -131,19 +122,13 @@ in
             self.callPackage ./cargo.nix {
               # Use boot package set to break cycle
               rustPlatform = bootRustPlatform;
-              inherit CoreFoundation Security;
             }
           else
             self.callPackage ./cargo_cross.nix { };
         cargo-auditable = self.callPackage ./cargo-auditable.nix { };
         cargo-auditable-cargo-wrapper = self.callPackage ./cargo-auditable-cargo-wrapper.nix { };
-        clippy = self.callPackage ./clippy.nix {
-          # We want to use self, not buildRustPackages, so that
-          # buildPackages.clippy uses the cross compiler and supports
-          # linting for the target platform.
-          rustPlatform = makeRustPlatform self;
-          inherit Security;
-        };
+        clippy-unwrapped = self.callPackage ./clippy.nix { };
+        clippy = if !fastCross then self.clippy-unwrapped else self.callPackage ./clippy-wrapper.nix { };
       }
     );
   };

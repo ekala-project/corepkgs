@@ -1,13 +1,14 @@
 {
   lib,
   stdenv,
+  cargo,
+  makeWrapper,
   rustPlatform,
   rustc,
-  Security,
   asNightly ? false,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "rustfmt" + lib.optionalString asNightly "-nightly";
   inherit (rustc) version src;
 
@@ -18,10 +19,13 @@ rustPlatform.buildRustPackage rec {
   # changes hash of vendor directory otherwise
   dontUpdateAutotoolsGnuConfigScripts = true;
 
+  nativeBuildInputs = [
+    makeWrapper
+  ];
+
   buildInputs = [
     rustc.llvm
-  ]
-  ++ lib.optional stdenv.hostPlatform.isDarwin Security;
+  ];
 
   # rustfmt uses the rustc_driver and std private libraries, and Rust's build process forces them to have
   # an install name of `@rpath/...` [0] [1] instead of the standard on macOS, which is an absolute path
@@ -41,6 +45,11 @@ rustPlatform.buildRustPackage rec {
   # https://github.com/rust-lang/rust/pull/72001)
   CFG_RELEASE = rustc.version;
   CFG_RELEASE_CHANNEL = if asNightly then "nightly" else "stable";
+
+  postInstall = ''
+    wrapProgram $out/bin/cargo-fmt \
+      --suffix PATH : ${lib.makeBinPath [ cargo ]}
+  '';
 
   meta = with lib; {
     description = "Tool for formatting Rust code according to style guidelines";
