@@ -666,8 +666,7 @@ with final; {
   flex_2_5_35 = callPackage ./pkgs/flex/2.5.35.nix { };
   flex = callPackage ./pkgs/flex { };
 
-
- # Python interpreters. All standard library modules are included except for tkinter, which is
+  # Python interpreters. All standard library modules are included except for tkinter, which is
   # available as `pythonPackages.tkinter` and can be used as any other Python package.
   # When switching these sets, please update docs at ../../doc/languages-frameworks/python.md
   python2 = python27;
@@ -776,6 +775,84 @@ with final; {
     withPrefix = true;
     singleBinary = false;
   };
+
+  # GNU libc provides libiconv so systems with glibc don't need to
+  # build libiconv separately. Additionally, Apple forked/repackaged
+  # libiconv, so build and use the upstream one with a compatible ABI,
+  # and BSDs include libiconv in libc.
+  #
+  # We also provide `libiconvReal`, which will always be a standalone libiconv,
+  # just in case you want it regardless of platform.
+  # TODO(corepkgs): use mkManyVariants
+  libiconv =
+    if
+      lib.elem stdenv.hostPlatform.libc [
+        "glibc"
+        "musl"
+        "nblibc"
+        "wasilibc"
+        "fblibc"
+      ]
+    then
+      libcIconv pkgs.libc
+    else if stdenv.hostPlatform.isDarwin then
+      darwin.libiconv
+    else
+      libiconvReal;
+
+  libcIconv =
+    libc:
+    let
+      inherit (libc) pname version;
+      libcDev = lib.getDev libc;
+    in
+    runCommand "${pname}-iconv-${version}" { strictDeps = true; } ''
+      mkdir -p $out/include
+      ln -sv ${libcDev}/include/iconv.h $out/include
+    '';
+
+  libiconvReal = callPackage ./pkgs/libiconv { };
+
+  iconv =
+    if
+      lib.elem stdenv.hostPlatform.libc [
+        "glibc"
+        "musl"
+      ]
+    then
+      lib.getBin libc
+    else if stdenv.hostPlatform.isDarwin then
+      lib.getBin libiconv
+    else if stdenv.hostPlatform.isFreeBSD then
+      lib.getBin freebsd.iconv
+    else
+      lib.getBin libiconvReal;
+
+  # TODO(corepkgs): use mkManyVariants
+  openssl = openssl_3_6;
+  openssl_oqs = openssl.override {
+    providers = [
+      {
+        name = "oqsprovider";
+        package = pkgs.oqs-provider;
+      }
+    ];
+    autoloadProviders = true;
+
+    extraINIConfig = {
+      tls_system_default = {
+        Groups = "X25519MLKEM768:X25519:P-256:X448:P-521:ffdhe2048:ffdhe3072";
+      };
+    };
+  };
+  openssl_legacy = openssl.override {
+    conf = ./pkgs/openssl/3.0/legacy.cnf;
+  };
+  inherit (callPackages ./pkgs/openssl { })
+    openssl_1_1
+    openssl_3
+    openssl_3_6
+    ;
 
   # unixtools = lib.recurseIntoAttrs (callPackages ./unixtools.nix { });
   # inherit (unixtools)
