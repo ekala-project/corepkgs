@@ -1,29 +1,14 @@
 {
+  # TODO(corepkgs): all of those are not strictly needed to run stdenv, watch for upstream changes
   callPackage,
   lib,
-  config,
   stdenv,
-  makeWrapper,
-  fetchurl,
   fetchpatch,
   fetchFromGitLab,
   buildPackages,
   automake,
   autoconf,
-  libiconv,
-  libtool,
-  intltool,
-  gettext,
-  gzip,
-  python3,
-  perl,
-  freetype,
-  tradcpp,
-  fontconfig,
-  meson,
-  ninja,
   ed,
-  fontforge,
   libGL,
   spice-protocol,
   zlib,
@@ -31,26 +16,16 @@
   dbus,
   libunwind,
   libdrm,
-  netbsd,
-  ncompress,
-  updateAutotoolsGnuConfigScriptsHook,
   mesa,
   udev,
-  bootstrap_cmds,
-  bison,
-  flex,
-  clangStdenv,
+  # TODO(corepkgs): support darwin
+  bootstrap_cmds? null,
+  clangStdenv ? null,
   autoreconfHook,
   mcpp,
   libepoxy,
-  openssl,
-  pkg-config,
-  llvm,
-  libxslt,
   libxcrypt,
-  hwdata,
   xorg,
-  windows,
   libgbm,
   mesa-gl-headers,
   dri-pkgconfig-stub,
@@ -749,9 +724,4 @@ self: super:
   });
 
   xwd = addMainProgram super.xwd { };
-}
-
-# deprecate some packages
-// lib.optionalAttrs config.allowAliases {
-  fontbitstreamspeedo = throw "Bitstream Speedo is an obsolete font format that hasn't been supported by Xorg since 2005"; # added 2025-09-24
 }
