@@ -95,8 +95,6 @@ lib.makeOverridable (
           fetchTags ? false,
           # make this subdirectory the root of the result
           rootDir ? "",
-          # GIT_CONFIG_GLOBAL (as a file)
-          gitConfigFile ? config.gitConfigFile,
           # Additional stdenvNoCC.mkDerivation arguments.
           # It is typically for derived fetchers to pass down additional arguments,
           # and the specified arguments have lower precedence than other mkDerivation arguments.
@@ -169,7 +167,6 @@ lib.makeOverridable (
               postFetch
               fetchTags
               rootDir
-              gitConfigFile
               ;
             inherit tag;
             revCustom = rev;
