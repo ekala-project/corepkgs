@@ -1,0 +1,5 @@
+result*
+sanitize-maintainers
+patches/
+__pycache__/
+.pytest_cache/
