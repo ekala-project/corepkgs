@@ -4,7 +4,6 @@
   stdenv,
   libiconv,
   libunistring,
-  # TODO(corepkgs): support darwin
   help2man ? null,
   texinfo,
   buildPackages,

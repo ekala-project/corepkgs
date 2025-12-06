@@ -202,6 +202,8 @@ let
 
       mkDerivation = mkDerivationFromStdenv stdenv;
 
+      isCross = hostPlatform != buildPlatform;
+
       inherit fetchurlBoot;
 
       inherit overrides;

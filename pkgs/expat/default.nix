@@ -5,11 +5,11 @@
   updateAutotoolsGnuConfigScriptsHook,
   # for passthru.tests
   python3,
-  perlPackages,
-  haskellPackages,
-  luaPackages,
-  ocamlPackages,
-  testers,
+  perlPackages ? {},
+  haskellPackages ? {},
+  luaPackages ? {},
+  ocamlPackages ? {},
+  testers ? {},
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus

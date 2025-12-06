@@ -8,11 +8,12 @@
   ncurses,
 
   # for tests
-  python3Packages,
-  sqldiff,
-  sqlite-analyzer,
-  sqlite-rsync,
-  tinysparql,
+  # TODO(corepkgs): enable tests
+  python3Packages ? {},
+  sqldiff ? null,
+  sqlite-analyzer ? null,
+  sqlite-rsync ? null,
+  tinysparql ? null,
 
   # uses readline & ncurses for a better interactive experience if set to true
   interactive ? false,

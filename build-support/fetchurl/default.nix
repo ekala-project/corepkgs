@@ -6,11 +6,11 @@
   stdenvNoCC,
   curl, # Note that `curl' may be `null', in case of the native stdenvNoCC.
   cacert ? null,
-  rewriteURL,
-  hashedMirrors,
+  config,
 }:
 
 let
+  inherit (config) hashedMirrors rewriteURL;
 
   mirrors = import ./mirrors.nix // {
     inherit hashedMirrors;

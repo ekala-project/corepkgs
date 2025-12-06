@@ -38,14 +38,13 @@
   windows ? null,
 
   # optional dependencies
-  # TODO(corepkgs): recheck disabled dependencies
   bluezSupport ? !withMinimalDeps && stdenv.hostPlatform.isLinux,
-  bluez-headers ? null,
+  bluez-headers,
   mimetypesSupport ? !withMinimalDeps,
-  mailcap ? null,
-  tzdata ? null,
+  mailcap,
+  tzdata,
   withGdbm ? !withMinimalDeps && !stdenv.hostPlatform.isWindows,
-  gdbm ? null,
+  gdbm,
   withReadline ? !withMinimalDeps && !stdenv.hostPlatform.isWindows,
   readline,
 

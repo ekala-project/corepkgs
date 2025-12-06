@@ -8,7 +8,7 @@
   writeShellScript,
   makeBinaryWrapper,
   withCryptodev ? false,
-  cryptodev,
+  cryptodev ? null,
   withZlib ? false,
   zlib,
   enableSSL2 ? false,

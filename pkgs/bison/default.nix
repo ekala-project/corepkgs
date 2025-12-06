@@ -4,7 +4,6 @@
   fetchurl,
   m4,
   perl,
-  # TODO(corepkgs): add
   help2man ? null,
 }:
 

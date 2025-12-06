@@ -10,10 +10,10 @@ let
   inherit (lib) lowPrio;
 in
 with final; {
-  inherit lib config;
-
+  inherit lib;
    # TODO(corepkgs): support NixOS tests
   nixosTests = { };
+  tests = { };
 
   # TODO(corepkgs): Create ekapkg specific version
   nix-update-script = { };
@@ -287,7 +287,7 @@ with final; {
 
       # TODO(corepkgs): Move xorg's generated to a generated.nix, and move the package set
       # logic into a default.nix
-      generatedPackages = lib.callPackageWith __splicedPackages ./pkgs/xorg { inherit lib; };
+      generatedPackages = lib.callPackageWith __splicedPackages ./pkgs/xorg { };
 
       xorgPackages = makeScopeWithSplicing' {
         otherSplices = generateSplicesForMkScope "xorg";
@@ -339,6 +339,65 @@ with final; {
   fetchgitLocal = callPackage ./build-support/fetchgitlocal { };
   fetchFromGitLab = callPackage ./build-support/fetchgitlab { };
   fetchFromGitHub = callPackage ./build-support/fetchgithub { };
+  fetchurl =
+    if stdenv.isCross then
+      buildPackages.fetchurl # No need to do special overrides twice,
+    else
+      lib.makeOverridable (import ./build-support/fetchurl) {
+        inherit lib stdenvNoCC buildPackages;
+        inherit cacert;
+        inherit config;
+        curl = buildPackages.curlMinimal.override (old: rec {
+          # break dependency cycles
+          fetchurl = stdenv.fetchurlBoot;
+          zlib = buildPackages.zlib.override { fetchurl = stdenv.fetchurlBoot; };
+          pkg-config = buildPackages.pkg-config.override (old: {
+            pkg-config-unwrapped = old.pkg-config-unwrapped.override {
+              inherit fetchurl;
+            };
+          });
+          perl = buildPackages.perl.override {
+            inherit zlib;
+            fetchurl = stdenv.fetchurlBoot;
+          };
+          openssl = buildPackages.openssl.override {
+            fetchurl = stdenv.fetchurlBoot;
+            buildPackages = {
+              coreutils = buildPackages.coreutils.override {
+                fetchurl = stdenv.fetchurlBoot;
+                inherit perl;
+                xz = buildPackages.xz.override { fetchurl = stdenv.fetchurlBoot; };
+                gmpSupport = false;
+                aclSupport = false;
+                attrSupport = false;
+              };
+              inherit perl;
+            };
+            inherit perl;
+          };
+          libssh2 = buildPackages.libssh2.override {
+            fetchurl = stdenv.fetchurlBoot;
+            inherit zlib openssl;
+          };
+          # On darwin, libkrb5 needs bootstrap_cmds which would require
+          # converting many packages to fetchurl_boot to avoid evaluation cycles.
+          # So turn gssSupport off there, and on Windows.
+          # On other platforms, keep the previous value.
+          gssSupport =
+            if stdenv.isDarwin || stdenv.hostPlatform.isWindows then false else old.gssSupport or true; # `? true` is the default
+          libkrb5 = buildPackages.libkrb5.override {
+            fetchurl = stdenv.fetchurlBoot;
+            inherit pkg-config perl openssl;
+            keyutils = buildPackages.keyutils.override { fetchurl = stdenv.fetchurlBoot; };
+          };
+          nghttp2 = buildPackages.nghttp2.override {
+            fetchurl = stdenv.fetchurlBoot;
+            inherit pkg-config;
+            enableApp = false; # curl just needs libnghttp2
+            enableTests = false; # avoids bringing `cunit` and `tzdata` into scope
+          };
+        });
+      };
   
   # Default libGL implementation.
   #
@@ -414,7 +473,7 @@ with final; {
 
   default-gcc-version = 14;
   gcc = pkgs.${"gcc${toString default-gcc-version}"};
-  gccFun = callPackage ./pkgs/gcc;
+  gccFun = callPackage ./pkgs/gcc { };
   gcc-unwrapped = gcc.cc;
   libgcc = stdenv.cc.cc.libgcc or null;
 
@@ -647,6 +706,7 @@ with final; {
           isZig = cc.isZig or false;
 
           inherit
+            lib
             cc
             bintools
             libc
@@ -686,6 +746,9 @@ with final; {
       self
     );
   removeReferencesTo = callPackage ./build-support/remove-references-to { };
+  replaceVarsWith = callPackage ./build-support/replace-vars/replace-vars-with.nix { };
+  replaceVars = callPackage ./build-support/replace-vars/replace-vars.nix { };
+  replaceDirectDependencies = callPackage ./build-support/replace-direct-dependencies.nix { };
 
   runtimeShell = "${runtimeShellPackage}${runtimeShellPackage.shellPath}";
   runtimeShellPackage = bashNonInteractive;
@@ -708,7 +771,6 @@ with final; {
 
   # Python interpreters. All standard library modules are included except for tkinter, which is
   # available as `pythonPackages.tkinter` and can be used as any other Python package.
-  # When switching these sets, please update docs at ../../doc/languages-frameworks/python.md
   python2 = python27;
   python3 = python313;
 
@@ -750,7 +812,7 @@ with final; {
     enableGIL = false;
   };
 
-  pythonInterpreters = callPackage ./pkgs/python { };
+  pythonInterpreters = callPackage ./pkgs/python { inherit config; };
   inherit (pythonInterpreters)
     python27
     python310
@@ -766,7 +828,7 @@ with final; {
     ;
 
   # List of extensions with overrides to apply to all Python package sets.
-  pythonPackagesExtensions = [ ];
+  pythonPackagesExtensions = [ ] ;
 
   # Python package sets.
   python27Packages = python27.pkgs;
@@ -918,6 +980,9 @@ with final; {
   dieHook = makeSetupHook {
     name = "die-hook";
   } ./build-support/setup-hooks/die.sh;
+  findXMLCatalogs = makeSetupHook {
+    name = "find-xml-catalogs-hook";
+  } ./build-support/setup-hooks/find-xml-catalogs.sh;
   arrayUtilities =
     let
       arrayUtilitiesPackages = makeScopeWithSplicing' {
@@ -981,7 +1046,7 @@ with final; {
   };
 
   # TODO(corepkgs): use mkManyVariants, move to perl
-  perlInterpreters = callPackage ./pkgs/perl { };
+  perlInterpreters = callPackage ./pkgs/perl { inherit config; };
   inherit (perlInterpreters) perl538 perl540;
   perl538Packages = recurseIntoAttrs perl538.pkgs;
   perl540Packages = recurseIntoAttrs perl540.pkgs;
@@ -1083,7 +1148,136 @@ with final; {
   # TODO(corepkgs): alias?
   patch = gnupatch;
 
+  # TODO(corepkgs): use mkManyVariants
+  tcl = tcl-8_6;
+  tcl-8_5 = callPackage ./pkgs/tcl/8.5.nix { };
+  tcl-8_6 = callPackage ./pkgs/tcl/8.6.nix { };
+  tcl-9_0 = callPackage ./pkgs/tcl/9.0.nix { };
+  # We don't need versioned package sets thanks to the tcl stubs mechanism
+  tclPackages = recurseIntoAttrs (callPackage ./pkgs/tcl/packages.nix { });
 
+  # TODO(corepkgs): use mkManyVariants
+  tk = tk-8_6;
+  tk-9_0 = callPackage ./pkgs/tk/9.0.nix { tcl = tcl-9_0; };
+  tk-8_6 = callPackage ./pkgs/tk/8.6.nix { };
+  tk-8_5 = callPackage ./pkgs/tk/8.5.nix { tcl = tcl-8_5; };
+
+  gpm-ncurses = gpm.override { withNcurses = true; };
+
+  pam =
+    if stdenv.hostPlatform.isLinux then
+      linux-pam
+    else if stdenv.hostPlatform.isFreeBSD then
+      freebsd.libpam
+    else
+      openpam;
+
+  # TODO(corepkgs): alias?
+  su = shadow;
+
+  systemd = callPackage ./os-specific/linux/systemd {
+    # break some cyclic dependencies
+    util-linux = util-linuxMinimal;
+    # provide a super minimal gnupg used for systemd-machined
+    gnupg = gnupg.override {
+      enableMinimal = true;
+      guiSupport = false;
+    };
+  };
+  systemdMinimal = systemd.override {
+    pname = "systemd-minimal";
+    withAcl = false;
+    withAnalyze = false;
+    withApparmor = false;
+    withAudit = false;
+    withCompression = false;
+    withCoredump = false;
+    withCryptsetup = false;
+    withRepart = false;
+    withDocumentation = false;
+    withEfi = false;
+    withFido2 = false;
+    withGcrypt = false;
+    withHostnamed = false;
+    withHomed = false;
+    withHwdb = false;
+    withImportd = false;
+    withLibBPF = false;
+    withLibidn2 = false;
+    withLocaled = false;
+    withLogind = false;
+    withMachined = false;
+    withNetworkd = false;
+    withNss = false;
+    withOomd = false;
+    withOpenSSL = false;
+    withPCRE2 = false;
+    withPam = false;
+    withPolkit = false;
+    withPortabled = false;
+    withRemote = false;
+    withResolved = false;
+    withShellCompletions = false;
+    withSysupdate = false;
+    withSysusers = false;
+    withTimedated = false;
+    withTimesyncd = false;
+    withTpm2Tss = false;
+    withUserDb = false;
+    withUkify = false;
+    withBootloader = false;
+    withPasswordQuality = false;
+    withVmspawn = false;
+    withQrencode = false;
+    withLibarchive = false;
+    withVConsole = false;
+    # withKmod = false; # breaks udevCheckHook of bcache-tools
+    withFirstboot = false;
+    withKexectools = false;
+    withLibseccomp = false;
+    withNspawn = false;
+  };
+  systemdLibs = systemdMinimal.override {
+    pname = "systemd-minimal-libs";
+    buildLibsOnly = true;
+  };
+  # We do not want to include ukify in the normal systemd attribute as it
+  # relies on Python at runtime.
+  systemdUkify = systemd.override {
+    withUkify = true;
+  };
+  udev = if lib.meta.availableOn stdenv.hostPlatform systemdLibs then systemdLibs else libudev-zero;
+
+  inherit (callPackages ./pkgs/docbook-xsl { })
+    docbook_xsl
+    docbook_xsl_ns
+    ;
+
+  inherit (callPackage ./pkgs/libxml2 { })
+    libxml2_13
+    libxml2
+    ;
+
+
+  # Should always be the version with the most features
+  w3m-full = w3m;
+  # Version without X11
+  w3m-nox = w3m.override {
+    x11Support = false;
+    imlib2 = imlib2-nox;
+  };
+  # Version without X11 or graphics
+  w3m-nographics = w3m.override {
+    x11Support = false;
+    graphicsSupport = false;
+  };
+  # Version for batch text processing, not a good browser
+  w3m-batch = w3m.override {
+    graphicsSupport = false;
+    mouseSupport = false;
+    x11Support = false;
+    imlib2 = imlib2-nox;
+  };
 
   # unixtools = lib.recurseIntoAttrs (callPackages ./unixtools.nix { });
   # inherit (unixtools)

@@ -1,5 +1,4 @@
 result*
-sanitize-maintainers
-patches/
+/patches
 __pycache__/
 .pytest_cache/
