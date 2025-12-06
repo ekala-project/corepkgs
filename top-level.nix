@@ -297,6 +297,10 @@ with final; {
     in
     lib.recurseIntoAttrs xorgPackages;
 
+    inherit (xorg)
+    xorgproto
+    ;
+
   # TODO(corepkgs): use mkManyVariants
   autoconf = callPackage ./pkgs/autoconf { };
   autoconf269 = callPackage ./pkgs/autoconf/2.69.nix { };
@@ -1257,7 +1261,6 @@ with final; {
     libxml2
     ;
 
-
   # Should always be the version with the most features
   w3m-full = w3m;
   # Version without X11
@@ -1300,6 +1303,39 @@ with final; {
 
   patchutils_0_3_3 = callPackage ./pkgs/patchutils/0.3.3.nix { };
   patchutils_0_4_2 = callPackage ./pkgs/patchutils/0.4.2.nix { };
+
+  git = callPackage ./pkgs/git {
+    perlLibs = [
+      perlPackages.LWP
+      perlPackages.URI
+      perlPackages.TermReadKey
+    ];
+    smtpPerlLibs = [
+      perlPackages.libnet
+      perlPackages.NetSMTPSSL
+      perlPackages.IOSocketSSL
+      perlPackages.NetSSLeay
+      perlPackages.AuthenSASL
+      perlPackages.DigestHMAC
+    ];
+  };
+
+  # The full-featured Git.
+  gitFull = git.override {
+    svnSupport = stdenv.buildPlatform == stdenv.hostPlatform;
+    guiSupport = true;
+    sendEmailSupport = stdenv.buildPlatform == stdenv.hostPlatform;
+    withSsh = true;
+    withLibsecret = !stdenv.hostPlatform.isDarwin;
+  };
+
+  deterministic-host-uname = deterministic-uname.override {
+    forPlatform = stdenv.targetPlatform; # offset by 1 so it works in nativeBuildInputs
+  };
+
+  makeFontsConf = callPackage ./build-support/make-fonts-conf { };
+  makeFontsCache = callPackage ./build-support/make-fonts-cache { };
+
 
   # unixtools = lib.recurseIntoAttrs (callPackages ./unixtools.nix { });
   # inherit (unixtools)

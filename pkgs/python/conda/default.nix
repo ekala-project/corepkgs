@@ -14,7 +14,7 @@
     ++ (with pkgs.xorg; [
       libSM
       libICE
-      libX11
+      libx11
       libXau
       libXdamage
       libXi

@@ -26,7 +26,12 @@
   pythonABITags ? [ "none" ],
   self, # is pythonOnHostForTarget
 }:
+
+# TODO: core-pkgs, add support for config.pythonOverlays
+assert lib.assertMsg (pythonPackagesExtensions == [ ]) "pythonPackagesExtensions is not supported";
+
 let
+  autoCalledOverlay = lib.packageSets.mkAutoCalledPackageDir ./pkgs;
   pythonPackages =
     let
       ensurePythonModules =
@@ -78,16 +83,13 @@ let
             hooks = import ./hooks/default.nix;
             keep = self: hooks self { };
             optionalExtensions = cond: as: lib.optionals cond as;
-            pythonExtension = import ../../../top-level/python-packages.nix;
-            python2Extension = import ../../../top-level/python2-packages.nix;
+            pythonExtension = import ./packages.nix;
             extensions = lib.composeManyExtensions (
               [
                 hooks
                 pythonExtension
+                autoCalledOverlay
               ]
-              ++ (optionalExtensions (!self.isPy3k) [
-                python2Extension
-              ])
               ++ pythonPackagesExtensions
               ++ [
                 overrides
@@ -95,7 +97,7 @@ let
             );
             aliases =
               self: super:
-              lib.optionalAttrs config.allowAliases (import ../../../top-level/python-aliases.nix lib self super);
+              lib.optionalAttrs config.allowAliases (import ./aliases.nix self super);
           in
           makeScopeWithSplicing' {
             inherit otherSplices keep;

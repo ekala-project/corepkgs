@@ -646,7 +646,7 @@ self: super:
           attrs.propagatedBuildInputs or [ ]
           ++ [ xorg.xauth ]
           ++ lib.optionals isDarwin [
-            xorg.libX11
+            xorg.libx11
             xorg.xorgproto
           ];
         postFixup = ''

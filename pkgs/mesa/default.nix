@@ -271,7 +271,7 @@ stdenv.mkDerivation {
       libpng
       libunwind
       libva-minimal
-      libX11
+      libx11
       libxcb
       libXext
       libXfixes

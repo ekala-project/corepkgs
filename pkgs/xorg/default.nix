@@ -1,11 +1,7 @@
 # THIS IS A GENERATED FILE.  DO NOT EDIT!
 {
-  # TODO(corepkgs): add all the packages back
+  # TODO(corepkgs): upstream changes
   lib,
-  appres ? null,
-  bdftopcf ? null,
-  bitmap ? null,
-  editres ? null,
   font-adobe-100dpi ? null,
   font-adobe-75dpi ? null,
   font-adobe-utopia-100dpi ? null,
@@ -40,27 +36,17 @@
   font-screen-cyrillic ? null,
   font-sony-misc ? null,
   font-sun-misc ? null,
-  fonttosfnt ? null,
   font-util ? null,
   font-winitzki-cyrillic ? null,
   font-xfree86-type1 ? null,
-  gccmakedep ? null,
-  iceauth ? null,
-  ico ? null,
-  imake ? null,
   libapplewm ? null,
-  libdmx ? null,
-  libfontenc ? null,
   libfs ? null,
   libice ? null,
-  libpciaccess ? null,
   libpthread-stubs ? null,
   libsm ? null,
   libwindowswm ? null,
-  libx11 ? null,
   libxau ? null,
   libxaw ? null,
-  libxcb ? null,
   libxcb-cursor ? null,
   libxcb-errors ? null,
   libxcb-image ? null,
@@ -70,17 +56,14 @@
   libxcb-wm ? null,
   libxcomposite ? null,
   libxcursor ? null,
-  libxcvt ? null,
   libxdamage ? null,
   libxdmcp ? null,
   libxext ? null,
   libxfixes ? null,
   libxfont_1 ? null,
   libxfont_2 ? null,
-  libxft ? null,
   libxi ? null,
   libxinerama ? null,
-  libxkbfile ? null,
   libxmu ? null,
   libxp ? null,
   libxpm ? null,
@@ -89,7 +72,6 @@
   libxrender ? null,
   libxres ? null,
   libxscrnsaver ? null,
-  libxshmfence ? null,
   libxt ? null,
   libxtst ? null,
   libxv ? null,
@@ -97,136 +79,17 @@
   libxxf86dga ? null,
   libxxf86misc ? null,
   libxxf86vm ? null,
-  listres ? null,
-  lndir ? null,
-  luit ? null,
-  makedepend ? null,
-  mkfontscale ? null,
-  oclock ? null,
-  pixman ? null,
-  sessreg ? null,
-  setxkbmap ? null,
-  smproxy ? null,
   tab-window-manager ? null,
-  transset ? null,
   util-macros ? null,
-  viewres ? null,
-  x11perf ? null,
-  xauth ? null,
-  xbacklight ? null,
-  xbitmaps ? null,
-  xcalc ? null,
   xcb-proto ? null,
-  xcmsdb ? null,
-  xcompmgr ? null,
-  xconsole ? null,
-  xcursorgen ? null,
   xcursor-themes ? null,
-  xdriinfo ? null,
-  xev ? null,
-  xeyes ? null,
-  xfontsel ? null,
-  xfsinfo ? null,
-  xgamma ? null,
-  xgc ? null,
-  xhost ? null,
-  xkbutils ? null,
   xkeyboard-config ? null,
-  xkill ? null,
-  xlsatoms ? null,
-  xlsclients ? null,
-  xlsfonts ? null,
-  xmag ? null,
-  xmessage ? null,
-  xmodmap ? null,
-  xmore ? null,
   xorg-cf-files ? null,
   xorg-docs ? null,
-  xorgproto ? null,
   xorg-sgml-doctools ? null ,
-  xprop ? null,
-  xrandr ? null,
-  xrefresh ? null,
-  xset ? null,
-  xsetroot ? null,
-  xsm ? null,
-  xstdcmap ? null,
-  xtrans ? null,
-  xvinfo ? null,
-  xwininfo ? null,
-  xwud ? null,
 }:
 
 self: with self; {
-
-  inherit
-    appres
-    bdftopcf
-    bitmap
-    editres
-    fonttosfnt
-    gccmakedep
-    iceauth
-    ico
-    imake
-    libdmx
-    libfontenc
-    libpciaccess
-    libxcb
-    libxcvt
-    libxkbfile
-    libxshmfence
-    listres
-    lndir
-    luit
-    makedepend
-    mkfontscale
-    oclock
-    pixman
-    sessreg
-    setxkbmap
-    smproxy
-    transset
-    viewres
-    x11perf
-    xauth
-    xbacklight
-    xbitmaps
-    xcalc
-    xcmsdb
-    xcompmgr
-    xconsole
-    xcursorgen
-    xdriinfo
-    xev
-    xeyes
-    xfontsel
-    xfsinfo
-    xgamma
-    xgc
-    xhost
-    xkbutils
-    xkill
-    xlsatoms
-    xlsclients
-    xlsfonts
-    xmag
-    xmessage
-    xmodmap
-    xmore
-    xorgproto
-    xprop
-    xrandr
-    xrefresh
-    xset
-    xsetroot
-    xsm
-    xstdcmap
-    xtrans
-    xvinfo
-    xwininfo
-    xwud
-    ;
   encodings = font-encodings;
   fontadobe100dpi = font-adobe-100dpi;
   fontadobe75dpi = font-adobe-75dpi;
@@ -270,7 +133,6 @@ self: with self; {
   libpthreadstubs = libpthread-stubs;
   libSM = libsm;
   libWindowsWM = libwindowswm;
-  libX11 = libx11;
   libXau = libxau;
   libXaw = libxaw;
   libXcomposite = libxcomposite;
@@ -281,7 +143,6 @@ self: with self; {
   libXfixes = libxfixes;
   libXfont2 = libxfont_2;
   libXfont = libxfont_1;
-  libXft = libxft;
   libXi = libxi;
   libXinerama = libxinerama;
   libXmu = libxmu;
@@ -322,7 +183,7 @@ self: with self; {
       pkg-config,
       fetchurl,
       xorgproto,
-      libX11,
+      libx11,
       libXext,
       libXt,
       testers,
@@ -343,7 +204,7 @@ self: with self; {
       nativeBuildInputs = [ pkg-config ];
       buildInputs = [
         xorgproto
-        libX11
+        libx11
         libXext
         libXt
       ];
@@ -361,9 +222,9 @@ self: with self; {
       stdenv,
       pkg-config,
       fetchurl,
-      libX11,
+      libx11,
       libXaw,
-      libXft,
+      libxft,
       libxkbfile,
       libXmu,
       xorgproto,
@@ -390,9 +251,9 @@ self: with self; {
         wrapWithXFileSearchPathHook
       ];
       buildInputs = [
-        libX11
+        libx11
         libXaw
-        libXft
+        libxft
         libxkbfile
         libXmu
         xorgproto
@@ -413,12 +274,12 @@ self: with self; {
       stdenv,
       pkg-config,
       fetchurl,
-      libX11,
+      libx11,
       libXau,
       libXaw,
       libXdmcp,
       libXext,
-      libXft,
+      libxft,
       libXinerama,
       libXmu,
       libXpm,
@@ -446,12 +307,12 @@ self: with self; {
         wrapWithXFileSearchPathHook
       ];
       buildInputs = [
-        libX11
+        libx11
         libXau
         libXaw
         libXdmcp
         libXext
-        libXft
+        libxft
         libXinerama
         libXmu
         libXpm
@@ -474,7 +335,7 @@ self: with self; {
       pkg-config,
       fetchurl,
       libdmx,
-      libX11,
+      libx11,
       libxcb,
       libXcomposite,
       libXext,
@@ -504,7 +365,7 @@ self: with self; {
       nativeBuildInputs = [ pkg-config ];
       buildInputs = [
         libdmx
-        libX11
+        libx11
         libxcb
         libXcomposite
         libXext
@@ -721,7 +582,7 @@ self: with self; {
       fetchurl,
       xorgproto,
       libevdev,
-      libX11,
+      libx11,
       libXi,
       xorgserver,
       libXtst,
@@ -744,7 +605,7 @@ self: with self; {
       buildInputs = [
         xorgproto
         libevdev
-        libX11
+        libx11
         libXi
         xorgserver
         libXtst
@@ -1385,7 +1246,7 @@ self: with self; {
       libpng,
       udev,
       libpciaccess,
-      libX11,
+      libx11,
       xcbutil,
       libxcb,
       libXcursor,
@@ -1421,7 +1282,7 @@ self: with self; {
         libpng
         udev
         libpciaccess
-        libX11
+        libx11
         xcbutil
         libxcb
         libXcursor
@@ -1685,7 +1546,7 @@ self: with self; {
       libdrm,
       udev,
       libpciaccess,
-      libX11,
+      libx11,
       libXext,
       xorgserver,
       libXvMC,
@@ -1710,7 +1571,7 @@ self: with self; {
         libdrm
         udev
         libpciaccess
-        libX11
+        libx11
         libXext
         xorgserver
         libXvMC
@@ -2345,7 +2206,7 @@ self: with self; {
       libdrm,
       udev,
       libpciaccess,
-      libX11,
+      libx11,
       libXext,
       xorgserver,
       testers,
@@ -2369,7 +2230,7 @@ self: with self; {
         libdrm
         udev
         libpciaccess
-        libX11
+        libx11
         libXext
         xorgserver
       ];
@@ -2464,7 +2325,7 @@ self: with self; {
       libxkbfile,
       fontconfig,
       libXaw,
-      libXft,
+      libxft,
       libXmu,
       xorgproto,
       libXrender,
@@ -2495,7 +2356,7 @@ self: with self; {
         libxkbfile
         fontconfig
         libXaw
-        libXft
+        libxft
         libXmu
         xorgproto
         libXrender
@@ -2553,7 +2414,7 @@ self: with self; {
       stdenv,
       pkg-config,
       fetchurl,
-      libX11,
+      libx11,
       xorgproto,
       testers,
     }:
@@ -2572,7 +2433,7 @@ self: with self; {
       strictDeps = true;
       nativeBuildInputs = [ pkg-config ];
       buildInputs = [
-        libX11
+        libx11
         xorgproto
       ];
       passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
@@ -2590,7 +2451,7 @@ self: with self; {
       pkg-config,
       fetchurl,
       xorgproto,
-      libX11,
+      libx11,
       libXext,
       libXi,
       libXinerama,
@@ -2613,7 +2474,7 @@ self: with self; {
       nativeBuildInputs = [ pkg-config ];
       buildInputs = [
         xorgproto
-        libX11
+        libx11
         libXext
         libXi
         libXinerama
@@ -2633,7 +2494,7 @@ self: with self; {
       stdenv,
       pkg-config,
       fetchurl,
-      libX11,
+      libx11,
       libxkbfile,
       xorgproto,
       testers,
@@ -2653,7 +2514,7 @@ self: with self; {
       strictDeps = true;
       nativeBuildInputs = [ pkg-config ];
       buildInputs = [
-        libX11
+        libx11
         libxkbfile
         xorgproto
       ];
@@ -2671,7 +2532,7 @@ self: with self; {
       stdenv,
       pkg-config,
       fetchurl,
-      libX11,
+      libx11,
       libxkbfile,
       testers,
     }:
@@ -2690,7 +2551,7 @@ self: with self; {
       strictDeps = true;
       nativeBuildInputs = [ pkg-config ];
       buildInputs = [
-        libX11
+        libx11
         libxkbfile
       ];
       passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
@@ -2707,7 +2568,7 @@ self: with self; {
       stdenv,
       pkg-config,
       fetchurl,
-      libX11,
+      libx11,
       libxkbfile,
       xorgproto,
       testers,
@@ -2727,7 +2588,7 @@ self: with self; {
       strictDeps = true;
       nativeBuildInputs = [ pkg-config ];
       buildInputs = [
-        libX11
+        libx11
         libxkbfile
         xorgproto
       ];
@@ -2745,7 +2606,7 @@ self: with self; {
       stdenv,
       pkg-config,
       fetchurl,
-      libX11,
+      libx11,
       libXaw,
       libXmu,
       xorgproto,
@@ -2773,7 +2634,7 @@ self: with self; {
         wrapWithXFileSearchPathHook
       ];
       buildInputs = [
-        libX11
+        libx11
         libXaw
         libXmu
         xorgproto
@@ -2795,7 +2656,7 @@ self: with self; {
       fetchurl,
       xorgproto,
       openssl,
-      libX11,
+      libx11,
       libXau,
       libxcb,
       xcbutil,
@@ -2825,7 +2686,7 @@ self: with self; {
       buildInputs = [
         xorgproto
         openssl
-        libX11
+        libx11
         libXau
         libxcb
         xcbutil
@@ -2851,7 +2712,7 @@ self: with self; {
       stdenv,
       pkg-config,
       fetchurl,
-      libX11,
+      libx11,
       libXmu,
       xorgproto,
       testers,
@@ -2871,7 +2732,7 @@ self: with self; {
       strictDeps = true;
       nativeBuildInputs = [ pkg-config ];
       buildInputs = [
-        libX11
+        libx11
         libXmu
         xorgproto
       ];
@@ -2889,7 +2750,7 @@ self: with self; {
       stdenv,
       pkg-config,
       fetchurl,
-      libX11,
+      libx11,
       libXmu,
       xorgproto,
       testers,
@@ -2909,7 +2770,7 @@ self: with self; {
       strictDeps = true;
       nativeBuildInputs = [ pkg-config ];
       buildInputs = [
-        libX11
+        libx11
         libXmu
         xorgproto
       ];
@@ -2927,7 +2788,7 @@ self: with self; {
       stdenv,
       pkg-config,
       fetchurl,
-      libX11,
+      libx11,
       libXt,
       libXTrap,
       testers,
@@ -2947,7 +2808,7 @@ self: with self; {
       strictDeps = true;
       nativeBuildInputs = [ pkg-config ];
       buildInputs = [
-        libX11
+        libx11
         libXt
         libXTrap
       ];
@@ -2966,7 +2827,7 @@ self: with self; {
       pkg-config,
       fetchurl,
       libxkbfile,
-      libX11,
+      libx11,
       xorgproto,
       testers,
     }:
@@ -2986,7 +2847,7 @@ self: with self; {
       nativeBuildInputs = [ pkg-config ];
       buildInputs = [
         libxkbfile
-        libX11
+        libx11
         xorgproto
       ];
       passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;

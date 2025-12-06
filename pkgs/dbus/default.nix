@@ -72,7 +72,7 @@ stdenv.mkDerivation rec {
     lib.optionals x11Support (
       with xorg;
       [
-        libX11
+        libx11
         libICE
         libSM
       ]

@@ -11,7 +11,7 @@
   libei,
   libGL,
   libGLU,
-  libX11,
+  libx11,
   libXau,
   libXaw,
   libXdmcp,
@@ -85,7 +85,7 @@ stdenv.mkDerivation rec {
     fontutil
     libGL
     libGLU
-    libX11
+    libx11
     libXau
     libXaw
     libXdmcp
