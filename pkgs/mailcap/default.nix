@@ -57,7 +57,7 @@ stdenv.mkDerivation rec {
     description = "Helper application and MIME type associations for file types";
     homepage = "https://pagure.io/mailcap";
     license = licenses.mit;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
     platforms = platforms.all;
   };
 }

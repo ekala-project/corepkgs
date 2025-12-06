@@ -54,7 +54,7 @@ let
       description = "Generic syntax highlighter";
       mainProgram = "pygmentize";
       license = lib.licenses.bsd2;
-      maintainers = with lib.maintainers; [ ];
+      maintainers = [ ];
     };
   };
 in

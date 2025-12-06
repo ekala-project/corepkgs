@@ -64,6 +64,6 @@ stdenv.mkDerivation rec {
       gpl3Plus
     ];
     platforms = lib.platforms.all;
-    maintainers = with lib.maintainers; [ ];
+    maintainers = [ ];
   };
 }

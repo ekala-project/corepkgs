@@ -61,7 +61,7 @@ in
 
     extraConfigureFlags = [ "--with-hpn" ];
     extraMeta = {
-      maintainers = with lib.maintainers; [ ];
+      maintainers = [ ];
     };
   };
 

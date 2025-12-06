@@ -72,7 +72,7 @@ stdenv.mkDerivation (finalAttrs: {
               http://www.ietf.org/id/draft-alakuijala-brotli
     '';
     license = licenses.mit;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
     pkgConfigModules = [
       "libbrotlidec"
       "libbrotlienc"

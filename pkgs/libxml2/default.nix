@@ -141,7 +141,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "XML parsing library for C";
     license = licenses.mit;
     platforms = platforms.all;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
     pkgConfigModules = [ "libxml-2.0" ];
   };
 })

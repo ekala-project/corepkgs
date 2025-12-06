@@ -59,6 +59,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.libssh2.org";
     platforms = platforms.all;
     license = with licenses; [ bsd3 ];
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
   };
 }

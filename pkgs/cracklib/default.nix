@@ -64,7 +64,7 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/cracklib/cracklib";
     description = "Library for checking the strength of passwords";
     license = licenses.lgpl21; # Different license for the wordlist: http://www.openwall.com/wordlists
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
     platforms = platforms.unix;
   };
 }

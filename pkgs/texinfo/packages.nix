@@ -29,7 +29,7 @@ let
     changelog = "https://git.savannah.gnu.org/cgit/texinfo.git/plain/NEWS";
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.all;
-    maintainers = with lib.maintainers; [ oxij ];
+    maintainers = [ ];
 
     longDescription = ''
       Texinfo is the official documentation format of the GNU project.

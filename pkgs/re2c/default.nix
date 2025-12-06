@@ -53,6 +53,6 @@ stdenv.mkDerivation rec {
     homepage = "https://re2c.org";
     license = licenses.publicDomain;
     platforms = platforms.all;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
   };
 }

@@ -43,7 +43,7 @@ rustPlatform.buildRustPackage {
     homepage = "https://rust-lang.github.io/rust-clippy/";
     description = "Bunch of lints to catch common mistakes and improve your Rust code";
     mainProgram = "cargo-clippy";
-    maintainers = with maintainers; [ basvandijk ];
+    maintainers = [ ];
     teams = [ teams.rust ];
     license = with licenses; [
       mit

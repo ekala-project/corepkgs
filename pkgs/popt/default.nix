@@ -46,7 +46,7 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     homepage = "https://github.com/rpm-software-management/popt";
     description = "Command line option parsing library";
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
     license = licenses.mit;
     platforms = platforms.unix;
   };

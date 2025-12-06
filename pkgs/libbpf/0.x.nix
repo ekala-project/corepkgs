@@ -58,7 +58,7 @@ stdenv.mkDerivation rec {
       lgpl21 # or
       bsd2
     ];
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
     platforms = platforms.linux;
   };
 }

@@ -55,7 +55,7 @@ stdenv.mkDerivation rec {
       asl20
       cc0
     ];
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
     mainProgram = "argon2";
     platforms = platforms.all;
   };

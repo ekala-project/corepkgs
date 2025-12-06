@@ -110,6 +110,6 @@ buildPythonPackage rec {
     changelog = "https://github.com/psf/black/blob/${version}/CHANGES.md";
     license = licenses.mit;
     mainProgram = "black";
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
   };
 }

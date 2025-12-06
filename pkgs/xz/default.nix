@@ -93,7 +93,7 @@ stdenv.mkDerivation (finalAttrs: {
       gpl2Plus
       lgpl21Plus
     ];
-    maintainers = with maintainers; [ sander ];
+    maintainers = [ ];
     platforms = platforms.all;
     pkgConfigModules = [ "liblzma" ];
   };

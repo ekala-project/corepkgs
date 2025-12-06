@@ -43,7 +43,7 @@ python3.pkgs.buildPythonApplication rec {
     inherit (src.meta) homepage;
     changelog = "https://github.com/Mic92/nix-update/releases/tag/${version}";
     license = licenses.mit;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
     mainProgram = "nix-update";
     platforms = platforms.all;
   };

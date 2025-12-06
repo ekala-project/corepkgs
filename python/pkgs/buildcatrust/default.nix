@@ -35,6 +35,6 @@ buildPythonPackage rec {
     mainProgram = "buildcatrust";
     homepage = "https://github.com/lukegb/buildcatrust";
     license = licenses.mit;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
   };
 }

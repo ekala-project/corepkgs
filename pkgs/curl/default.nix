@@ -287,7 +287,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Command line tool for transferring files with URL syntax";
     homepage = "https://curl.se/";
     license = lib.licenses.curl;
-    maintainers = with lib.maintainers; [ ];
+    maintainers = [ ];
     platforms = lib.platforms.all;
     # Fails to link against static brotli or gss
     broken =
