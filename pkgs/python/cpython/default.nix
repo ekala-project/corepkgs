@@ -35,16 +35,17 @@
 
   # platform-specific dependencies
   bashNonInteractive,
-  windows,
+  windows ? null,
 
   # optional dependencies
+  # TODO(corepkgs): recheck disabled dependencies
   bluezSupport ? !withMinimalDeps && stdenv.hostPlatform.isLinux,
-  bluez-headers,
+  bluez-headers ? null,
   mimetypesSupport ? !withMinimalDeps,
-  mailcap,
-  tzdata,
+  mailcap ? null,
+  tzdata ? null,
   withGdbm ? !withMinimalDeps && !stdenv.hostPlatform.isWindows,
-  gdbm,
+  gdbm ? null,
   withReadline ? !withMinimalDeps && !stdenv.hostPlatform.isWindows,
   readline,
 

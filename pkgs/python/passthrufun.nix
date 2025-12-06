@@ -5,7 +5,6 @@
   pythonPackagesExtensions,
   config,
   makeScopeWithSplicing',
-  ...
 }:
 
 {

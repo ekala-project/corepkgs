@@ -910,7 +910,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
             ${localSystem.libc} = prevStage.${localSystem.libc};
 
             # Hack: avoid libidn2.{bin,dev} referencing bootstrap tools.  There's a logical cycle.
-            libidn2 = import ../../development/libraries/libidn2/no-bootstrap-reference.nix {
+            libidn2 = import ../../pkgs/libidn2/no-bootstrap-reference.nix {
               inherit lib;
               inherit (prevStage) libidn2;
               inherit (self)

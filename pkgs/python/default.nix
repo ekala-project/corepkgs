@@ -1,18 +1,19 @@
 {
   __splicedPackages,
   callPackage,
+  config,
   db,
   lib,
   makeScopeWithSplicing',
   pythonPackagesExtensions,
   stdenv,
-}@args:
+}:
 
 (
   let
 
     # Common passthru for all Python interpreters.
-    passthruFun = import ./passthrufun.nix args;
+    passthruFun = import ./passthrufun.nix { inherit lib config makeScopeWithSplicing' stdenv callPackage pythonPackagesExtensions; };
 
     sources = {
       python313 = {

@@ -10,7 +10,7 @@ let
   inherit (lib) lowPrio;
 in
 with final; {
-  inherit lib;
+  inherit lib config;
 
    # TODO(corepkgs): support NixOS tests
   nixosTests = { };
@@ -304,8 +304,8 @@ with final; {
 
   # TODO(corepkgs): use mkManyVariants
   automake = automake118x;
-  automake116x = callPackage ./pkgs/automake/1.16.x.nix { };
-  automake118x = callPackage ./pkgs/automake/1.18.x.nix { };
+  automake116x = callPackage ./pkgs/automake/automake-1.16.x.nix { };
+  automake118x = callPackage ./pkgs/automake/automake-1.18.x.nix { };
 
   # TODO(corepkgs): use mkManyVariants
   autoreconfHook269 = autoreconfHook.override { autoconf = autoconf269; };
@@ -326,9 +326,20 @@ with final; {
       tests = pkgs.tests.fetchpatch2;
       version = 2;
     };
+  fetchgit =
+    (callPackage ./build-support/fetchgit {
+      git = buildPackages.gitMinimal;
+      cacert = buildPackages.cacert;
+      git-lfs = buildPackages.git-lfs;
+    })
+    // {
+      # fetchgit is a function, so we use // instead of passthru.
+      tests = pkgs.tests.fetchgit;
+    };
+  fetchgitLocal = callPackage ./build-support/fetchgitlocal { };
   fetchFromGitLab = callPackage ./build-support/fetchgitlab { };
   fetchFromGitHub = callPackage ./build-support/fetchgithub { };
-
+  
   # Default libGL implementation.
   #
   # Android NDK provides an OpenGL implementation, we can just use that.
@@ -674,6 +685,7 @@ with final; {
       in
       self
     );
+  removeReferencesTo = callPackage ./build-support/remove-references-to { };
 
   runtimeShell = "${runtimeShellPackage}${runtimeShellPackage.shellPath}";
   runtimeShellPackage = bashNonInteractive;
@@ -903,6 +915,9 @@ with final; {
     };
   } ./build-support/setup-hooks/make-wrapper.sh;
   __flattenIncludeHackHook = callPackage ./build-support/setup-hooks/flatten-include-hack { };
+  dieHook = makeSetupHook {
+    name = "die-hook";
+  } ./build-support/setup-hooks/die.sh;
   arrayUtilities =
     let
       arrayUtilitiesPackages = makeScopeWithSplicing' {
@@ -966,7 +981,7 @@ with final; {
   };
 
   # TODO(corepkgs): use mkManyVariants, move to perl
-  perlInterpreters = callPackage ./pkgs/perl { inherit callPackage config; };
+  perlInterpreters = callPackage ./pkgs/perl { };
   inherit (perlInterpreters) perl538 perl540;
   perl538Packages = recurseIntoAttrs perl538.pkgs;
   perl540Packages = recurseIntoAttrs perl540.pkgs;
@@ -1007,6 +1022,68 @@ with final; {
   db6 = db60;
   db60 = callPackage ./pkgs/db/db-6.0.nix { };
   db62 = callPackage ./pkgs/db/db-6.2.nix { };
+
+  bzip2 = callPackage ./pkgs/bzip2 { };
+  bzip2_1_1 = callPackage ./pkgs/bzip2/1_1.nix { };
+
+  # Use Apple’s fork of libffi by default, which provides APIs and trampoline functionality that is not yet
+  # merged upstream. This is needed by some packages (such as cffi).
+  #
+  # `libffiReal` is provided in case the upstream libffi package is needed on Darwin instead of the fork.
+  libffiReal = callPackage ./pkgs/libffi { };
+  libffi = if stdenv.hostPlatform.isDarwin then darwin.libffi else libffiReal;
+  libffi_3_3 = callPackage ./pkgs/libffi/3.3.nix { };
+
+  libuuid = if stdenv.hostPlatform.isLinux then util-linuxMinimal else null;
+
+  # TODO(corepkgs): use mkManyVariants
+  ncurses5 = ncurses.override { abiVersion = "5"; };
+  ncurses6 = ncurses.override { abiVersion = "6"; };
+  ncurses =
+    if stdenv.hostPlatform.useiOSPrebuilt then
+      null
+    else
+      callPackage ./pkgs/ncurses {
+        # ncurses is included in the SDK. Avoid an infinite recursion by using a bootstrap stdenv.
+        stdenv = if stdenv.hostPlatform.isDarwin then darwin.bootstrapStdenv else stdenv;
+      };
+
+  pkgconf = callPackage ./build-support/pkg-config-wrapper {
+    pkg-config = pkgconf-unwrapped;
+    baseBinName = "pkgconf";
+  };
+  pkg-config = callPackage ./build-support/pkg-config-wrapper {
+    pkg-config = pkg-config-unwrapped;
+  };
+  pkg-configUpstream = lowPrio (
+    pkg-config.override (old: {
+      pkg-config = old.pkg-config.override {
+        vanilla = true;
+      };
+    })
+  );
+
+  sqlite = lowPrio (callPackage ./pkgs/sqlite { });
+  inherit
+    (callPackage ./pkgs/sqlite/tools.nix {
+    })
+    sqlite-analyzer
+    sqldiff
+    sqlite-rsync
+    ;
+  sqlar = callPackage ./pkgs/sqlite/sqlar.nix { };
+  sqlite-interactive = (sqlite.override { interactive = true; }).bin;
+
+  gawk-with-extensions = callPackage ./pkgs/gawk/gawk-with-extensions.nix {
+    extensions = gawkextlib.full;
+  };
+  gawkextlib = callPackage ./pkgs/gawk/gawkextlib.nix { };
+  gawkInteractive = gawk.override { interactive = true; };
+
+  # TODO(corepkgs): alias?
+  patch = gnupatch;
+
+
 
   # unixtools = lib.recurseIntoAttrs (callPackages ./unixtools.nix { });
   # inherit (unixtools)
