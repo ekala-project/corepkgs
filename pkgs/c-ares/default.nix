@@ -8,7 +8,7 @@
 
   # sensitive downstream packages
   curl,
-  grpc, # consumes cmake config
+  grpc ? null, # consumes cmake config
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus

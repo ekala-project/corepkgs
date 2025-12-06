@@ -6,7 +6,7 @@
   cmakeMinimal,
   bashNonInteractive,
   gnugrep,
-  fixDarwinDylibNames,
+  fixDarwinDylibNames ? null,
   file,
   legacySupport ? false,
   static ? stdenv.hostPlatform.isStatic, # generates static libraries *only*
@@ -17,13 +17,13 @@
   nix-update-script,
 
   # for passthru.tests
-  libarchive,
-  rocksdb,
-  arrow-cpp,
-  libzip,
+  libarchive ? null,
+  rocksdb ? null,
+  arrow-cpp ? null,
+  libzip ? null,
   curl,
-  python3Packages,
-  haskellPackages,
+  python3Packages ? null,
+  haskellPackages ? null,
   testers,
 }:
 

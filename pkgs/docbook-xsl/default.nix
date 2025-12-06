@@ -6,7 +6,7 @@
   fetchpatch,
   findXMLCatalogs,
   writeScriptBin,
-  ruby,
+  ruby ? null,
   bash,
   withManOptDedupPatch ? false,
 }:

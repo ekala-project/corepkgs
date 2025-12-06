@@ -9,6 +9,7 @@ let
 in
 with final; {
    # TODO(corepkgs): support NixOS tests
+  testers = { };
   nixosTests = { };
   tests = { };
 
@@ -338,6 +339,7 @@ with final; {
   fetchgit = callFromScope ./build-support/fetchgit { };
   fetchgitLocal = callPackage ./build-support/fetchgitlocal { };
   fetchFromGitLab = callPackage ./build-support/fetchgitlab { };
+  fetchPypi = callPackage ./build-support/fetchpypi { };
   # TODO(corepkgs): uppercase them?
   fetchzip = callPackage ./build-support/fetchzip { };
   fetchurl =
@@ -1033,8 +1035,6 @@ with final; {
     };
   } ./build-support/setup-hooks/update-autotools-gnu-config-scripts.sh;
 
-  testers = callPackage ./build-support/testers { };
-
   readline70 = callPackage ./pkgs/readline/7.0.nix { };
   readline = callPackage ./pkgs/readline/8.3.nix { };
 
@@ -1355,7 +1355,7 @@ with final; {
   makeFontsCache = callPackage ./build-support/make-fonts-cache { };
 
     # can't use override - it triggers infinite recursion
-  cmakeMinimal = callPackage ./pkgs/cmake/package.nix {
+  cmakeMinimal = callPackage ./pkgs/cmake {
     isMinimalBuild = true;
   };
   cmakeCurses = cmake.override {
@@ -1373,23 +1373,111 @@ with final; {
 
   buildcatrust = with python3.pkgs; toPythonApplication buildcatrust;
 
-  # unixtools = lib.recurseIntoAttrs (callPackages ./unixtools.nix { });
-  # inherit (unixtools)
-  #   hexdump
-  #   ps
-  #   logger
-  #   eject
-  #   umount
-  #   mount
-  #   wall
-  #   hostname
-  #   more
-  #   sysctl
-  #   getconf
-  #   getent
-  #   locale
-  #   killall
-  #   xxd
-  #   watch
-  #   ;
+  docbook_sgml_dtd_31 = callPackage ./pkgs/docbook-sgml-dtd/3.1.nix { };
+  docbook_sgml_dtd_41 = callPackage ./pkgs/docbook-sgml-dtd/4.1.nix { };
+  docbook_xml_dtd_412 = callPackage ./pkgs/docbook-xml-dtd/4.1.2.nix { };
+  docbook_xml_dtd_42 = callPackage ./pkgs/docbook-xml-dtd/4.2.nix { };
+  docbook_xml_dtd_43 = callPackage ./pkgs/docbook-xml-dtd/4.3.nix { };
+  docbook_xml_dtd_44 = callPackage ./pkgs/docbook-xml-dtd/4.4.nix { };
+  docbook_xml_dtd_45 = callPackage ./pkgs/docbook-xml-dtd/4.5.nix { };
+
+  opensshPackages = dontRecurseIntoAttrs (callPackage ./pkgs/openssh { });
+  openssh = opensshPackages.openssh.override {
+    etcDir = "/etc/ssh";
+  };
+  opensshTest = openssh.tests.openssh;
+  opensshWithKerberos = openssh.override {
+    withKerberos = true;
+  };
+  openssh_hpn = opensshPackages.openssh_hpn.override {
+    etcDir = "/etc/ssh";
+  };
+  openssh_hpnWithKerberos = openssh_hpn.override {
+    withKerberos = true;
+  };
+  openssh_gssapi = opensshPackages.openssh_gssapi.override {
+    etcDir = "/etc/ssh";
+    withKerberos = true;
+  };
+
+  unixtools = lib.recurseIntoAttrs (callPackages ./unixtools.nix { });
+  inherit (unixtools)
+    hexdump
+    ps
+    logger
+    eject
+    umount
+    mount
+    wall
+    hostname
+    more
+    sysctl
+    getconf
+    getent
+    locale
+    killall
+    xxd
+    watch
+    ;
+
+    sphinx = with python3.pkgs; toPythonApplication sphinx;
+
+  nixDependencies = recurseIntoAttrs (
+    callPackage ./pkgs/nix/dependencies-scope.nix { }
+  );
+  nixVersions = recurseIntoAttrs (
+    callPackage ./pkgs/nix {
+      storeDir = config.nix.storeDir or "/nix/store";
+      stateDir = config.nix.stateDir or "/nix/var";
+    }
+  );
+  nix = nixVersions.stable;
+  nixStatic = pkgsStatic.nix;
+
+  icu-versions = callPackages ./pkgs/icu { };
+  inherit (icu-versions)
+    icu60
+    icu63
+    icu64
+    icu66
+    icu67
+    icu69
+    icu70
+    icu71
+    icu72
+    icu73
+    icu74
+    icu75
+    icu76
+    icu77
+    icu78
+    ;
+  icu = icu76;
+
+  # TODO(corepkgs): move into build-support
+  ensureNewerSourcesHook =
+    { year }:
+    makeSetupHook
+      {
+        name = "ensure-newer-sources-hook";
+      }
+      (
+        writeScript "ensure-newer-sources-hook.sh" ''
+          postUnpackHooks+=(_ensureNewerSources)
+          _ensureNewerSources() {
+            local r=$sourceRoot
+            # Avoid passing option-looking directory to find. The example is diffoscope-269:
+            #   https://salsa.debian.org/reproducible-builds/diffoscope/-/issues/378
+            [[ $r == -* ]] && r="./$r"
+            '${findutils}/bin/find' "$r" \
+              '!' -newermt '${year}-01-01' -exec touch -h -d '${year}-01-02' '{}' '+'
+          }
+        ''
+      );
+  # Zip file format only allows times after year 1980, which makes e.g. Python
+  # wheel building fail with:
+  # ValueError: ZIP does not support timestamps before 1980
+  ensureNewerSourcesForZipFilesHook = ensureNewerSourcesHook { year = "1980"; };
+
+
 }

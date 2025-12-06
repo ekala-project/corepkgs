@@ -5,7 +5,7 @@
   fetchurl,
   pkg-config,
   gettext,
-  docbook-xsl-nons,
+  docbook_xsl,
   docbook_xml_dtd_43,
   gtk-doc,
   meson,
@@ -120,7 +120,7 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals withIntrospection [
     gobject-introspection
     docbook_xml_dtd_43
-    docbook-xsl-nons
+    docbook_xsl
     gtk-doc
     # For xmllint
     libxml2

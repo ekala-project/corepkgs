@@ -13,7 +13,6 @@
   toPythonModule,
   namePrefix,
   nix-update-script,
-  setuptools,
   pypaBuildHook,
   pypaInstallHook,
   pythonCatchConflictsHook,

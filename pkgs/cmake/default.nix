@@ -31,7 +31,7 @@
   useSharedLibraries ? (!isMinimalBuild && !stdenv.hostPlatform.isCygwin),
   uiToolkits ? [ ], # can contain "ncurses" and/or "qt5"
   buildDocs ? !(isMinimalBuild || (uiToolkits == [ ])),
-  libsForQt5,
+  libsForQt5 ? null,
   gitUpdater,
 }:
 
