@@ -48,7 +48,7 @@
   # A function booting the final package set for a specific standard
   # environment. See below for the arguments given to that function, the type of
   # list it returns.
-  stdenvStages ? import ./stdenv.nix,
+  stdenvStages ? import ./.,
 
   # Ignore unexpected args.
   ...

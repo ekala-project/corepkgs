@@ -1,6 +1,5 @@
 {
   lib,
-  repoRevToNameMaybe,
   fetchgit,
   fetchzip,
 }:
@@ -11,8 +10,7 @@ lib.makeOverridable (
     repo,
     tag ? null,
     rev ? null,
-    # TODO(@ShamrockLee): Add back after reconstruction with lib.extendMkDerivation
-    # name ? repoRevToNameMaybe finalAttrs.repo (lib.revOrTag finalAttrs.revCustom finalAttrs.tag) "github",
+    name ? lib.sources.repoRevToName repo (lib.revOrTag rev tag) "github",
     fetchSubmodules ? false,
     leaveDotGit ? null,
     deepClone ? false,
@@ -179,10 +177,7 @@ lib.makeOverridable (
       )
       // privateAttrs
       // {
-        # TODO(@ShamrockLee): Change back to `inherit name;` after reconstruction with lib.extendMkDerivation
-        name =
-          args.name
-            or (repoRevToNameMaybe finalAttrs.repo (lib.revOrTag finalAttrs.revCustom finalAttrs.tag) "github");
+        inherit name;
         meta = newMeta;
       };
   in

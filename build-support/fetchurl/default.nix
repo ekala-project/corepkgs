@@ -10,7 +10,11 @@
 }:
 
 let
-  inherit (config) hashedMirrors rewriteURL;
+
+  inherit (config)
+    hashedMirrors
+    rewriteURL
+    ;
 
   mirrors = import ./mirrors.nix // {
     inherit hashedMirrors;
@@ -308,8 +312,6 @@ lib.extendMkDerivation {
         ;
 
       impureEnvVars = impureEnvVars ++ netrcImpureEnvVars;
-
-      nixpkgsVersion = lib.trivial.release;
 
       inherit preferLocalBuild;
 

@@ -51,9 +51,8 @@
   nukeReferences,
   callPackage,
   majorMinorVersion,
-  # TODO(corepkgs): support darwin
-  apple-sdk ? null,
-  darwin ? null,
+  apple-sdk,
+  darwin,
 }:
 
 let

@@ -18,8 +18,7 @@
   libdrm,
   mesa,
   udev,
-  # TODO(corepkgs): support darwin
-  bootstrap_cmds? null,
+  bootstrap_cmds,
   clangStdenv ? null,
   autoreconfHook,
   mcpp,

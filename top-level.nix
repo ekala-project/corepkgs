@@ -4,13 +4,10 @@
 
 final: prev:
 let
-  # FIXME(corepkgs): i can't get eval to work without this line
-  lib = import ./lib.nix;
   # TODO(corepkgs): deprecate lowPrio
-  inherit (lib) lowPrio;
+  inherit (final.lib) lowPrio;
 in
 with final; {
-  inherit lib;
    # TODO(corepkgs): support NixOS tests
   nixosTests = { };
   tests = { };
@@ -25,6 +22,9 @@ with final; {
     signingUtils = null;
     configd = null;
   };
+  bootstrap_cmds = null;
+  apple-sdk = null;
+  windows = null;
 
   # Non-GNU/Linux OSes are currently "impure" platforms, with their libc
   # outside of the store.  Thus, GCC, GFortran, & co. must always look for files
@@ -318,42 +318,36 @@ with final; {
   fetchpatch = callPackage ./build-support/fetchpatch {
       # 0.3.4 would change hashes: https://github.com/NixOS/nixpkgs/issues/25154
       patchutils = __splicedPackages.patchutils_0_3_3;
+      }
+      // {
       tests = pkgs.tests.fetchpatch;
       version = 1;
     };
   fetchpatch2 = callPackage ../build-support/fetchpatch {
       patchutils = __splicedPackages.patchutils_0_4_2;
+      }
+      // {
       tests = pkgs.tests.fetchpatch2;
       version = 2;
     };
-  fetchgit =
-    (callPackage ./build-support/fetchgit {
-      git = buildPackages.gitMinimal;
-      cacert = buildPackages.cacert;
-      git-lfs = buildPackages.git-lfs;
-    })
-    // {
-      # fetchgit is a function, so we use // instead of passthru.
-      tests = pkgs.tests.fetchgit;
-    };
+  fetchgit = callFromScope ./build-support/fetchgit { };
   fetchgitLocal = callPackage ./build-support/fetchgitlocal { };
   fetchFromGitLab = callPackage ./build-support/fetchgitlab { };
-  fetchFromGitHub = callPackage ./build-support/fetchgithub { };
+  # TODO(corepkgs): uppercase them?
+  fetchzip = callPackage ./build-support/fetchzip { };
   fetchurl =
-    if stdenv.isCross then
+    if stdenv.buildPlatform != stdenv.hostPlatform then
       buildPackages.fetchurl # No need to do special overrides twice,
     else
       lib.makeOverridable (import ./build-support/fetchurl) {
-        inherit lib stdenvNoCC buildPackages;
-        inherit cacert;
-        inherit config;
+        inherit lib stdenvNoCC buildPackages cacert config;
         curl = buildPackages.curlMinimal.override (old: rec {
           # break dependency cycles
           fetchurl = stdenv.fetchurlBoot;
           zlib = buildPackages.zlib.override { fetchurl = stdenv.fetchurlBoot; };
           pkg-config = buildPackages.pkg-config.override (old: {
-            pkg-config-unwrapped = old.pkg-config-unwrapped.override {
-              inherit fetchurl;
+            pkg-config = old.pkg-config.override {
+              fetchurl = stdenv.fetchurlBoot;
             };
           });
           perl = buildPackages.perl.override {
@@ -384,10 +378,15 @@ with final; {
           # So turn gssSupport off there, and on Windows.
           # On other platforms, keep the previous value.
           gssSupport =
-            if stdenv.isDarwin || stdenv.hostPlatform.isWindows then false else old.gssSupport or true; # `? true` is the default
-          libkrb5 = buildPackages.libkrb5.override {
+            if stdenv.hostPlatform.isDarwin || stdenv.hostPlatform.isWindows then
+              false
+            else
+              old.gssSupport or true; # `? true` is the default
+          libkrb5 = buildPackages.krb5.override {
             fetchurl = stdenv.fetchurlBoot;
             inherit pkg-config perl openssl;
+            withLibedit = false;
+            byacc = buildPackages.byacc.override { fetchurl = stdenv.fetchurlBoot; };
             keyutils = buildPackages.keyutils.override { fetchurl = stdenv.fetchurlBoot; };
           };
           nghttp2 = buildPackages.nghttp2.override {
@@ -1278,6 +1277,29 @@ with final; {
     x11Support = false;
     imlib2 = imlib2-nox;
   };
+
+  curlMinimal = prev.curl;
+  curl = curlMinimal.override (
+   {
+      idnSupport = true;
+      pslSupport = true;
+      zstdSupport = true;
+      http3Support = true;
+      c-aresSupport = true;
+    }
+    // lib.optionalAttrs (!stdenv.hostPlatform.isStatic) {
+      brotliSupport = true;
+    }
+  );
+
+  c-aresMinimal = callPackage ./pkgs/c-ares { withCMake = false; };
+
+  libkrb5 = krb5; # TODO(de11n) Try to make krb5 reuse libkrb5 as a dependency
+
+  ngtcp2-gnutls = callPackage ./pkgs/ngtcp2/gnutls.nix { };
+
+  patchutils_0_3_3 = callPackage ./pkgs/patchutils/0.3.3.nix { };
+  patchutils_0_4_2 = callPackage ./pkgs/patchutils/0.4.2.nix { };
 
   # unixtools = lib.recurseIntoAttrs (callPackages ./unixtools.nix { });
   # inherit (unixtools)

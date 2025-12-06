@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
     perl
     texinfo
   ];
-  buildInputs = [ m4 ];
+  # buildInputs = [ m4 ];
   postBuild = "
     make html
   ";
