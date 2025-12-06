@@ -819,7 +819,7 @@ with final; {
     enableGIL = false;
   };
 
-  pythonInterpreters = callPackage ./pkgs/python { inherit config; };
+  pythonInterpreters = callPackage ./python { inherit config; };
   inherit (pythonInterpreters)
     python27
     python310
@@ -852,14 +852,14 @@ with final; {
   pypy310Packages = pypy310.pkgs;
   pypy311Packages = pypy311.pkgs;
 
-  pythonManylinuxPackages = callPackage ./pkgs/python/manylinux { };
+  pythonManylinuxPackages = callPackage ./python/manylinux { };
 
-  pythonCondaPackages = callPackage ./pkgs/python/conda { };
+  pythonCondaPackages = callPackage ./python/conda { };
 
   # Should eventually be moved inside Python interpreters.
-  python-setup-hook = buildPackages.callPackage ./pkgs/python/setup-hook.nix { };
+  python-setup-hook = buildPackages.callPackage ./python/setup-hook.nix { };
 
-  pythonDocs = recurseIntoAttrs (callPackage ./pkgs/python/cpython/docs { });
+  pythonDocs = recurseIntoAttrs (callPackage ./python/cpython/docs { });
 
   # Provided by libc on Operating Systems that use the Extensible Linker Format.
   elf-header = if stdenv.hostPlatform.isElf then null else elf-header-real;
