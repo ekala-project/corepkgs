@@ -1,7 +1,6 @@
 {
   __splicedPackages,
   callPackage,
-  config,
   db,
   lib,
   makeScopeWithSplicing',
@@ -233,8 +232,5 @@
       pythonVersion = "3.11";
       inherit passthruFun;
     };
-  }
-  // lib.optionalAttrs config.allowAliases {
-    pypy39_prebuilt = throw "pypy 3.9 has been removed, use pypy 3.10 instead"; # Added 2025-01-03
   }
 )

@@ -10,13 +10,21 @@ let
   inherit (lib) lowPrio;
 in
 with final; {
-  inherit lib config;
+  inherit lib;
 
    # TODO(corepkgs): support NixOS tests
   nixosTests = { };
 
   # TODO(corepkgs): Create ekapkg specific version
   nix-update-script = { };
+
+  # TODO(corepkgs): support darwin builds
+  darwin = {
+    autoSignDarwinBinariesHook = null;
+    bootstrap_cmds = null;
+    signingUtils = null;
+    configd = null;
+  };
 
   # Non-GNU/Linux OSes are currently "impure" platforms, with their libc
   # outside of the store.  Thus, GCC, GFortran, & co. must always look for files
@@ -772,6 +780,9 @@ with final; {
 
   pythonDocs = recurseIntoAttrs (callPackage ./pkgs/python/cpython/docs { });
 
+  # Provided by libc on Operating Systems that use the Extensible Linker Format.
+  elf-header = if stdenv.hostPlatform.isElf then null else elf-header-real;
+
   inherit (callPackages ./os-specific/linux/kernel-headers { inherit (pkgsBuildBuild) elf-header; })
     linuxHeaders
     makeLinuxHeaders
@@ -955,7 +966,7 @@ with final; {
   };
 
   # TODO(corepkgs): use mkManyVariants, move to perl
-  perlInterpreters = callPackage ./pkgs/perl { inherit callPackage; };
+  perlInterpreters = callPackage ./pkgs/perl { inherit callPackage config; };
   inherit (perlInterpreters) perl538 perl540;
   perl538Packages = recurseIntoAttrs perl538.pkgs;
   perl540Packages = recurseIntoAttrs perl540.pkgs;
@@ -984,6 +995,18 @@ with final; {
   gitUpdater = callPackage ./common-updater/git-updater.nix { };
   httpTwoLevelsUpdater = callPackage ./common-updater/http-two-levels-updater.nix { };
   unstableGitUpdater = callPackage ./common-updater/unstable-updater.nix { };
+
+  # Make bdb5 the default as it is the last release under the custom
+  # bsd-like license
+  # TODO(corepkgs): use mkManyVariants
+  db = db5;
+  db4 = db48;
+  db48 = callPackage ./pkgs/db/db-4.8.nix { };
+  db5 = db53;
+  db53 = callPackage ./pkgs/db/db-5.3.nix { };
+  db6 = db60;
+  db60 = callPackage ./pkgs/db/db-6.0.nix { };
+  db62 = callPackage ./pkgs/db/db-6.2.nix { };
 
   # unixtools = lib.recurseIntoAttrs (callPackages ./unixtools.nix { });
   # inherit (unixtools)
