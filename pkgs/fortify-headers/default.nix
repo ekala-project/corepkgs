@@ -35,6 +35,6 @@ stdenv.mkDerivation {
     homepage = "https://git.2f30.org/fortify-headers";
     license = lib.licenses.bsd0;
     platforms = lib.platforms.all;
-    maintainers = with lib.maintainers; [ ];
+    maintainers = [ ];
   };
 }

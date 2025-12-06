@@ -29,6 +29,6 @@ stdenv.mkDerivation rec {
     homepage = "https://fzf-obc.readthedocs.io";
     description = "Completion script adding fzf over all know bash completion functions";
     license = licenses.unfree;
-    maintainers = with maintainers; [ loicreynier ];
+    maintainers = [ ];
   };
 }

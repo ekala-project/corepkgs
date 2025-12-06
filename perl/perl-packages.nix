@@ -418,7 +418,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -1329,7 +1329,7 @@ with self;
       homepage = "https://spwhitton.name/tech/code/papersway/";
       license = lib.licenses.gpl3Plus;
       mainProgram = "papersway";
-      maintainers = with lib.maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -1513,7 +1513,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -1541,7 +1541,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -1569,7 +1569,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -4694,7 +4694,7 @@ with self;
       description = "Communicate with a smart card using PC/SC";
       homepage = "https://pcsc-perl.apdu.fr/";
       license = with lib.licenses; [ gpl2Plus ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -8149,7 +8149,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
       mainProgram = "hexdump";
     };
   };
@@ -8597,7 +8597,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -11763,7 +11763,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
       mainProgram = "msgconvert";
     };
   };
@@ -11846,7 +11846,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -11920,7 +11920,7 @@ with self;
       description = "High speed Base32 encoding using GMP with BigInt and MD5 support";
       homepage = "https://metacpan.org/release/Encode-Base32-GMP";
       license = with lib.licenses; [ mit ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -12215,7 +12215,7 @@ with self;
       description = "Simplified safe evaluation of Perl code";
       homepage = "https://github.com/mkende/perl-eval-safe";
       license = licenses.mit;
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -12831,7 +12831,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -12896,7 +12896,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -12922,7 +12922,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -12948,7 +12948,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -12971,7 +12971,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -13370,7 +13370,7 @@ with self;
     meta = {
       description = "File locking with fcntl(2)";
       license = with lib.licenses; [ artistic1 ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -13408,7 +13408,7 @@ with self;
       description = "FileHandle which supports multi-byte unget";
       homepage = "https://github.com/coppit/filehandle-unget";
       license = with lib.licenses; [ gpl2Only ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -13777,7 +13777,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -14100,7 +14100,7 @@ with self;
       changelog = "https://github.com/finance-quote/finance-quote/releases/tag/v${version}";
       description = "Get stock and mutual fund quotes from various exchanges";
       license = with lib.licenses; [ gpl2Plus ];
-      maintainers = with lib.maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -15094,7 +15094,7 @@ with self;
       description = "Search mailboxes for mail matching a regular expression";
       homepage = "https://github.com/coppit/grepmail";
       license = with lib.licenses; [ gpl2Only ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -16915,7 +16915,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -17813,7 +17813,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -18274,7 +18274,7 @@ with self;
       description = "Transforms TeX and LaTeX into XML/HTML/MathML";
       homepage = "https://dlmf.nist.gov/LaTeXML/";
       license = with lib.licenses; [ publicDomain ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
       mainProgram = "latexmlc";
     };
   };
@@ -18763,7 +18763,7 @@ with self;
       description = "Embed / expand oEmbed resources and other URL / links";
       homepage = "https://github.com/jhthorsen/linkembedder";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -19459,7 +19459,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -20120,7 +20120,7 @@ with self;
       description = "Fast and simple mbox folder reader";
       homepage = "https://github.com/coppit/mail-mbox-messageparser";
       license = with lib.licenses; [ gpl2Only ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -20391,7 +20391,7 @@ with self;
       homepage = "https://github.com/Grinnz/Math-Calc-Parser";
       broken = true;
       license = with lib.licenses; [ artistic2 ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -20557,7 +20557,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -21129,7 +21129,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -21352,7 +21352,7 @@ with self;
       homepage = "https://github.com/Difegue/Minion-Backend-Redis";
       description = "Redis backend for Minion job queue";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -22287,7 +22287,7 @@ with self;
       description = "Real-time web framework";
       homepage = "https://mojolicious.org";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
       mainProgram = "mojo";
     };
   };
@@ -22308,7 +22308,7 @@ with self;
       description = "Compress and convert css, less, sass, javascript and coffeescript files";
       homepage = "https://github.com/jhthorsen/mojolicious-plugin-assetpack";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -22326,7 +22326,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -22405,7 +22405,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -22464,7 +22464,7 @@ with self;
       homepage = "https://github.com/Grinnz/Mojolicious-Plugin-TemplateToolkit";
       description = "Template Toolkit renderer plugin for Mojolicious";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -23314,7 +23314,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -24530,7 +24530,7 @@ with self;
         gpl1Plus # or
         artistic1
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -24687,7 +24687,7 @@ with self;
         gpl1Plus # or
         artistic1
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -24704,7 +24704,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -26680,7 +26680,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -26973,7 +26973,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -31933,7 +31933,7 @@ with self;
     };
     meta = {
       description = "Use mmap to map in a file as a Perl variable";
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
       license = with lib.licenses; [ gpl2Plus ];
     };
   };
@@ -31996,7 +31996,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -33001,7 +33001,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -33024,7 +33024,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -35446,7 +35446,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -36652,7 +36652,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -37028,7 +37028,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
     };
   };
 
@@ -38857,7 +38857,7 @@ with self;
     meta = {
       description = "Run Zonemaster tests from the command line";
       license = with lib.licenses; [ bsd3 ];
-      maintainers = with lib.maintainers; [ ];
+      maintainers = [ ];
     };
   };
 

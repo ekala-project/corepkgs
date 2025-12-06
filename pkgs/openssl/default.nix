@@ -276,7 +276,7 @@ let
         description = "Cryptographic library that implements the SSL and TLS protocols";
         license = lib.licenses.openssl;
         mainProgram = "openssl";
-        maintainers = with lib.maintainers; [ ];
+        maintainers = [ ];
         pkgConfigModules = [
           "libcrypto"
           "libssl"

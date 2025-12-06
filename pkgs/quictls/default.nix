@@ -202,7 +202,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "TLS/SSL and crypto library with QUIC APIs";
     homepage = "https://quictls.github.io";
     license = lib.licenses.openssl;
-    maintainers = with lib.maintainers; [ ];
+    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

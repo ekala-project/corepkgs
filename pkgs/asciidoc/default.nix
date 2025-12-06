@@ -344,6 +344,6 @@ python3.pkgs.buildPythonApplication rec {
     changelog = "https://github.com/asciidoc-py/asciidoc-py/blob/${version}/CHANGELOG.adoc";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix;
-    maintainers = with lib.maintainers; [ ];
+    maintainers = [ ];
   };
 }

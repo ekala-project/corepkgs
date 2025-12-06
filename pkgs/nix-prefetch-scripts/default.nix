@@ -51,7 +51,7 @@ let
 
       meta = with lib; {
         description = "Script used to obtain source hashes for fetch${tool}";
-        maintainers = with maintainers; [ bennofs ];
+        maintainers = [ ];
         platforms = platforms.unix;
         mainProgram = "nix-prefetch-${tool}";
       };
@@ -105,7 +105,7 @@ rec {
 
     meta = with lib; {
       description = "Collection of all the nix-prefetch-* scripts which may be used to obtain source hashes";
-      maintainers = with maintainers; [ bennofs ];
+      maintainers = [ ];
       platforms = platforms.unix;
     };
   };

@@ -78,6 +78,6 @@ stdenv.mkDerivation rec {
     mainProgram = "aria2c";
     license = licenses.gpl2Plus;
     platforms = platforms.unix;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
   };
 }

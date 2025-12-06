@@ -26,7 +26,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Matsui's C preprocessor";
     mainProgram = "mcpp";
     license = licenses.bsd2;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
     platforms = platforms.unix;
   };
 })

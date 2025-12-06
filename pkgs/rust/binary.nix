@@ -34,7 +34,7 @@ rec {
       sourceProvenance = with sourceTypes; [ binaryNativeCode ];
       description = "Safe, concurrent, practical language";
       mainProgram = "rustc";
-      maintainers = with maintainers; [ qknight ];
+      maintainers = [ ];
       license = [
         licenses.mit
         licenses.asl20

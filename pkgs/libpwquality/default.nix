@@ -65,7 +65,7 @@ stdenv.mkDerivation rec {
       bsd3 # or
       gpl2Plus
     ];
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
     platforms = platforms.unix;
   };
 }

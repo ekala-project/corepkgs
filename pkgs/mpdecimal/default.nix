@@ -60,7 +60,7 @@ stdenv.mkDerivation rec {
 
     license = lib.licenses.bsd2;
 
-    maintainers = with lib.maintainers; [ kaction ];
+    maintainers = [ ];
 
     platforms = lib.platforms.unix ++ lib.platforms.windows;
   };

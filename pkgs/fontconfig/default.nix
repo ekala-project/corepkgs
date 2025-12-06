@@ -99,7 +99,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "http://fontconfig.org/";
     license = licenses.bsd2; # custom but very bsd-like
     platforms = platforms.all;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
     pkgConfigModules = [ "fontconfig" ];
   };
 })

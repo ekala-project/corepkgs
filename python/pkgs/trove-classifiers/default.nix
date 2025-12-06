@@ -45,7 +45,7 @@ let
       homepage = "https://github.com/pypa/trove-classifiers";
       changelog = "https://github.com/pypa/trove-classifiers/releases/tag/${version}";
       license = lib.licenses.asl20;
-      maintainers = with lib.maintainers; [ ];
+      maintainers = [ ];
     };
   };
 in

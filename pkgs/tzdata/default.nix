@@ -90,6 +90,6 @@ stdenv.mkDerivation (finalAttrs: {
       publicDomain # tzdata
     ];
     platforms = platforms.all;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
   };
 })

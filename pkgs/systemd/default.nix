@@ -908,7 +908,7 @@ stdenv.mkDerivation (finalAttrs: {
       ofl
       publicDomain
     ];
-    maintainers = with lib.maintainers; [ ];
+    maintainers = [ ];
     platforms = lib.platforms.linux;
     priority = 10;
     badPlatforms = [

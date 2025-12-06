@@ -43,7 +43,7 @@ let
         gpl2Only
         lgpl21Only
       ];
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
       platforms = platforms.linux;
     };
 
