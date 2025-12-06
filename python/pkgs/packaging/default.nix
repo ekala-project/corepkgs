@@ -58,7 +58,7 @@ let
         asl20
       ];
       maintainers = with maintainers; [ bennofs ];
-      teams = [ teams.python ];
+       
     };
   };
 in

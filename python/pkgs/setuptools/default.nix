@@ -2,9 +2,11 @@
   stdenv,
   lib,
   buildPythonPackage,
-  distutils,
   fetchFromGitHub,
   python,
+
+  # tests
+  distutils ? null,
 }:
 
 buildPythonPackage rec {
@@ -47,6 +49,6 @@ buildPythonPackage rec {
     }";
     license = with licenses; [ mit ];
     platforms = python.meta.platforms;
-    teams = [ teams.python ];
+     
   };
 }

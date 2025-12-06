@@ -5,7 +5,7 @@
   db,
   lib,
   makeScopeWithSplicing',
-  pythonPackagesExtensions,
+  pythonPackagesExtensions ? [ ],
   stdenv,
 }:
 

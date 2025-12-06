@@ -105,6 +105,5 @@ buildPythonPackage rec {
     changelog = "https://github.com/pypa/build/blob/${src.tag}/CHANGELOG.rst";
     license = licenses.mit;
     maintainers = [ maintainers.fab ];
-    teams = [ teams.python ];
   };
 }

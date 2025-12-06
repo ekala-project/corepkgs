@@ -27,6 +27,7 @@ with final; {
   bootstrap_cmds = null;
   apple-sdk = null;
   windows = null;
+  xcodebuild = null;
 
   # Non-GNU/Linux OSes are currently "impure" platforms, with their libc
   # outside of the store.  Thus, GCC, GFortran, & co. must always look for files
@@ -833,10 +834,7 @@ with final; {
     pypy310
     pypy311
     ;
-
-  # List of extensions with overrides to apply to all Python package sets.
-  pythonPackagesExtensions = [ ] ;
-
+    
   # Python package sets.
   python27Packages = python27.pkgs;
   python310Packages = python310.pkgs;
