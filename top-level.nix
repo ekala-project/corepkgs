@@ -14,6 +14,7 @@ with final; {
 
   # TODO(corepkgs): Create ekapkg specific version
   nix-update-script = { };
+  nix-update = null;
 
   # TODO(corepkgs): support darwin builds
   darwin = {
@@ -774,6 +775,7 @@ with final; {
 
   # Python interpreters. All standard library modules are included except for tkinter, which is
   # available as `pythonPackages.tkinter` and can be used as any other Python package.
+  python = python3;
   python2 = python27;
   python3 = python313;
 
@@ -1329,6 +1331,22 @@ with final; {
     withLibsecret = !stdenv.hostPlatform.isDarwin;
   };
 
+  git-doc = lib.addMetaAttrs {
+    description = "Additional documentation for Git";
+    longDescription = ''
+      This package contains additional documentation (HTML and text files) that
+      is referenced in the man pages of Git.
+    '';
+  } gitFull.doc;
+
+  gitMinimal = git.override {
+    withManual = false;
+    osxkeychainSupport = false;
+    pythonSupport = false;
+    perlSupport = false;
+    withpcre2 = false;
+  };
+
   deterministic-host-uname = deterministic-uname.override {
     forPlatform = stdenv.targetPlatform; # offset by 1 so it works in nativeBuildInputs
   };
@@ -1336,6 +1354,24 @@ with final; {
   makeFontsConf = callPackage ./build-support/make-fonts-conf { };
   makeFontsCache = callPackage ./build-support/make-fonts-cache { };
 
+    # can't use override - it triggers infinite recursion
+  cmakeMinimal = callPackage ./pkgs/cmake/package.nix {
+    isMinimalBuild = true;
+  };
+  cmakeCurses = cmake.override {
+    uiToolkits = [ "ncurses" ];
+  };
+  cmakeWithGui = cmake.override {
+    uiToolkits = [
+      "ncurses"
+      "qt5"
+    ];
+  };
+
+  gtk3 = callPackage ./pkgs/gtk/3.x.nix { };
+  gtk4 = callPackage ./pkgs/gtk/4.x.nix { };
+
+  buildcatrust = with python3.pkgs; toPythonApplication buildcatrust;
 
   # unixtools = lib.recurseIntoAttrs (callPackages ./unixtools.nix { });
   # inherit (unixtools)
