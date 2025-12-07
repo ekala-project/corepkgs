@@ -39,6 +39,6 @@ buildPythonPackage rec {
     description = "Next generation YAML parser and emitter for Python";
     homepage = "https://github.com/yaml/pyyaml";
     license = licenses.mit;
-    maintainers = with maintainers; [ dotlambda ];
+    maintainers = [ ];
   };
 }

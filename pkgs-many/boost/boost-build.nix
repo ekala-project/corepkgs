@@ -56,6 +56,6 @@ stdenv.mkDerivation {
     homepage = "https://www.boost.org/build/";
     license = lib.licenses.boost;
     platforms = platforms.unix;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
   };
 }
