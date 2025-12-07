@@ -415,7 +415,27 @@ with final; {
     name = "shorten-perl-shebang-hook";
     propagatedBuildInputs = [ dieHook ];
   } ./build-support/setup-hooks/shorten-perl-shebang.sh;
-  
+
+   copyPkgconfigItems = makeSetupHook {
+    name = "copy-pkg-config-items-hook";
+  } ./build-support/setup-hooks/copy-pkgconfig-items.sh;
+  fixDarwinDylibNames = callPackage (
+    {
+      lib,
+      targetPackages,
+      makeSetupHook,
+    }:
+    makeSetupHook {
+      name = "fix-darwin-dylib-names-hook";
+      substitutions = { inherit (targetPackages.stdenv.cc) targetPrefix; };
+      meta.platforms = lib.platforms.darwin;
+    } ./build-support/setup-hooks/fix-darwin-dylib-names.sh
+  ) { };
+    makePkgconfigItem = callPackage ./build-support/make-pkgconfigitem { };
+
+  # TODO(corepkgs): alias?
+  mpi = openmpi; # this attribute should used to build MPI applications
+
   # Default libGL implementation.
   #
   # Android NDK provides an OpenGL implementation, we can just use that.
