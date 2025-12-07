@@ -1076,6 +1076,15 @@ with final;
     };
   } ./build-support/setup-hooks/auto-patchelf.sh;
 
+  separateDebugInfo = makeSetupHook {
+    name = "separate-debug-info-hook";
+  } ./build-support/setup-hooks/separate-debug-info.sh;
+
+  setupDebugInfoDirs = makeSetupHook {
+    name = "setup-debug-info-dirs-hook";
+  } ./build-support/setup-hooks/setup-debug-info-dirs.sh;
+
+
   stripJavaArchivesHook = makeSetupHook {
     name = "strip-java-archives-hook";
     propagatedBuildInputs = [ strip-nondeterminism ];
