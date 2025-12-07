@@ -560,6 +560,20 @@ with final;
     else
       ccWrapper;
 
+  # TODO(corepkgs): mkManyVariant this
+  go_1_25 = callPackage ./pkgs/go/1.25.nix { };
+  go_1_24 = callPackage ./pkgs/go/1.24.nix { };
+  go = go_1_25;
+
+  buildGo125Module = callPackage ../build-support/go/module.nix {
+    go = buildPackages.go_1_25;
+  };
+  buildGo124Module = callPackage ../build-support/go/module.nix {
+    go = buildPackages.go_1_24;
+  };
+
+
+
   gnuStdenv =
     if stdenv.cc.isGNU then
       stdenv
