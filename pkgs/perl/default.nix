@@ -29,7 +29,7 @@ let
               makeScopeWithSplicing',
             }:
             let
-              perlPackagesFun = callPackage ../../../top-level/perl-packages.nix {
+              perlPackagesFun = callPackage ../../perl/perl-packages.nix {
                 inherit stdenv pkgs;
                 perl = self;
               };

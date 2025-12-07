@@ -337,9 +337,11 @@ with final; {
       tests = pkgs.tests.fetchpatch2;
       version = 2;
     };
+  fetchDebianPatch = callPackage ./build-support/fetchdebianpatch { };
   fetchgit = callFromScope ./build-support/fetchgit { };
   fetchgitLocal = callPackage ./build-support/fetchgitlocal { };
   fetchFromGitLab = callPackage ./build-support/fetchgitlab { };
+  fetchFromSourcehut = callPackage ./build-support/fetchsourcehut { };
   fetchPypi = callPackage ./build-support/fetchpypi { };
   # TODO(corepkgs): uppercase them?
   fetchzip = callPackage ./build-support/fetchzip { };
@@ -405,6 +407,10 @@ with final; {
           };
         });
       };
+  shortenPerlShebang = makeSetupHook {
+    name = "shorten-perl-shebang-hook";
+    propagatedBuildInputs = [ dieHook ];
+  } ./build-support/setup-hooks/shorten-perl-shebang.sh;
   
   # Default libGL implementation.
   #
@@ -1647,4 +1653,19 @@ with final; {
     texliveTeTeX
     ;
   texlivePackages = recurseIntoAttrs (lib.mapAttrs (_: v: v.build) texlive.pkgs);
+
+  imlib2Full = imlib2.override {
+    # Compilation error on Darwin with librsvg. For more information see:
+    # https://github.com/NixOS/nixpkgs/pull/166452#issuecomment-1090725613
+    svgSupport = !stdenv.hostPlatform.isDarwin;
+    heifSupport = !stdenv.hostPlatform.isDarwin;
+    webpSupport = true;
+    jxlSupport = true;
+    psSupport = true;
+  };
+  imlib2-nox = imlib2.override {
+    x11Support = false;
+  };
+  # TODO(corepkgs): alias
+  man = man-db;
 }

@@ -5,7 +5,7 @@
   updateAutotoolsGnuConfigScriptsHook,
   # for passthru.tests
   python3,
-  perlPackages ? {},
+  perlPackages,
   haskellPackages ? {},
   luaPackages ? {},
   ocamlPackages ? {},
