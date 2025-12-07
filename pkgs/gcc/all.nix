@@ -6,7 +6,7 @@
   buildPackages,
   targetPackages,
   callPackage,
-  isl_0_20,
+  isl,
   noSysDirs,
   wrapCC,
 }@args:
@@ -36,7 +36,7 @@ let
                 targetPackages.threads or pkgs.threads
               else
                 { };
-            isl = if stdenv.hostPlatform.isDarwin then null else isl_0_20;
+            isl = if stdenv.hostPlatform.isDarwin then null else isl;
             # do not allow version skew when cross-building gcc
             #
             # When `gcc` is cross-built (`build` != `target` && `host` == `target`)

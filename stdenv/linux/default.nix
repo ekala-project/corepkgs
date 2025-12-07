@@ -606,7 +606,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
     assert isBuiltByNixpkgsCompiler prevStage.patchelf;
     assert lib.all isBuiltByNixpkgsCompiler [
       prevStage.gmp
-      prevStage.isl_0_20
+      prevStage.isl
       prevStage.libmpc
       prevStage.mpfr
     ];

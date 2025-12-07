@@ -1,10 +1,14 @@
 {
   version,
-  urls,
-  sha256,
+  src-urls,
+  src-hash,
   configureFlags ? [ ],
   patches ? [ ],
-}:
+  packageAtLeast,
+  packageOlder,
+  mkVariantPassthru,
+  ...
+}@variantArgs:
 
 {
   lib,
@@ -14,22 +18,23 @@
   autoreconfHook,
   buildPackages,
   updateAutotoolsGnuConfigScriptsHook,
-}:
+}@args:
 
 stdenv.mkDerivation {
   pname = "isl";
   inherit version;
 
   src = fetchurl {
-    inherit urls sha256;
+    urls = src-urls;
+    hash = src-hash;
   };
 
   inherit patches;
 
   strictDeps = true;
-  depsBuildBuild = lib.optionals (lib.versionAtLeast version "0.23") [ buildPackages.stdenv.cc ];
+  depsBuildBuild = lib.optionals (packageAtLeast "0.23") [ buildPackages.stdenv.cc ];
   nativeBuildInputs =
-    lib.optionals (stdenv.hostPlatform.isRiscV && lib.versionOlder version "0.23") [
+    lib.optionals (stdenv.hostPlatform.isRiscV && packageOlder "0.23") [
       autoreconfHook
     ]
     ++ [
@@ -41,6 +46,7 @@ stdenv.mkDerivation {
   inherit configureFlags;
 
   enableParallelBuilding = true;
+  passthru = mkVariantPassthru variantArgs args;
 
   meta = {
     homepage = "https://libisl.sourceforge.io/";

@@ -623,7 +623,7 @@ with final; {
         reproducibleBuild = true;
         profiledCompiler = false;
 
-        isl = if !stdenv.hostPlatform.isDarwin then isl_0_20 else null;
+        isl = if !stdenv.hostPlatform.isDarwin then isl else null;
 
         withoutTargetLibc = true;
         langCC = stdenv.targetPlatform.isCygwin; # can't compile libcygwin1.a without C++
@@ -668,20 +668,6 @@ with final; {
     langJit = true;
     enableLTO = false;
   };
-
-  # TODO(corepkgs): use mkManyVariants
-  inherit
-    (rec {
-      isl = isl_0_20;
-      isl_0_20 = callPackage ./pkgs/isl/0.20.0.nix { };
-      isl_0_23 = callPackage ./pkgs/isl/0.23.0.nix { };
-      isl_0_27 = callPackage ./pkgs/isl/0.27.0.nix { };
-    })
-    isl
-    isl_0_20
-    isl_0_23
-    isl_0_27
-    ;
 
   wrapCCWith =
     {
