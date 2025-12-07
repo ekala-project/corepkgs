@@ -421,6 +421,10 @@ with final;
           };
         });
       };
+
+  # TODO: proper freebsd port
+  freebsd = { };
+
   shortenPerlShebang = makeSetupHook {
     name = "shorten-perl-shebang-hook";
     propagatedBuildInputs = [ dieHook ];
