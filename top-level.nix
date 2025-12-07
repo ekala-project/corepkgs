@@ -441,6 +441,17 @@ with final;
       meta.platforms = lib.platforms.darwin;
     } ./build-support/setup-hooks/fix-darwin-dylib-names.sh
   ) { };
+
+  # TODO(corepkgs): Use mkManyVariants
+  inherit (callPackage ./pkgs/fmt { })
+    fmt_9
+    fmt_10
+    fmt_11
+    fmt_12
+    ;
+
+  fmt = fmt_12;
+
   makePkgconfigItem = callPackage ./build-support/make-pkgconfigitem { };
 
   # TODO(corepkgs): alias?
