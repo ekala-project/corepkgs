@@ -6,7 +6,7 @@
   pkg-config,
   python3,
   docbook_xml_dtd_43,
-  docbook_xsl,
+  docbook-xsl-nons,
   libxslt,
   gettext,
   gnome ? null,
@@ -56,7 +56,7 @@ python3.pkgs.buildPythonApplication rec {
 
   buildInputs = [
     docbook_xml_dtd_43
-    docbook_xsl
+    docbook-xsl-nons
     libxslt
   ]
   ++ lib.optionals withDblatex [

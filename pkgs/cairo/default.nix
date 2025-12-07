@@ -8,7 +8,7 @@
   ninja,
   pkg-config,
   python3,
-  docbook_xsl,
+  docbook-xsl-nons,
   fontconfig,
   freetype,
   libpng,
@@ -60,7 +60,7 @@ stdenv.mkDerivation (
     ];
 
     buildInputs = [
-      docbook_xsl
+      docbook-xsl-nons
       lzo
     ];
 

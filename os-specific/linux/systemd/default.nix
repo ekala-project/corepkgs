@@ -177,7 +177,7 @@
   pname ? "systemd",
 
   libxslt,
-  docbook_xsl,
+  docbook-xsl-nons,
   docbook_xml_dtd_42,
   docbook_xml_dtd_45,
   withLogTrace ? false,
@@ -341,7 +341,7 @@ stdenv.mkDerivation (finalAttrs: {
     gettext
 
     libxslt
-    docbook_xsl
+    docbook-xsl-nons
     docbook_xml_dtd_42
     docbook_xml_dtd_45
     bash

@@ -7,7 +7,7 @@
   bison,
   flex,
   docbook_xml_dtd_45,
-  docbook_xsl,
+  docbook-xsl-nons,
   itstool,
   libxml2,
   libxslt,
@@ -53,7 +53,7 @@ stdenv.mkDerivation rec {
     bison
     flex
     docbook_xml_dtd_45
-    docbook_xsl
+    docbook-xsl-nons
     itstool
     libxml2
     libxslt

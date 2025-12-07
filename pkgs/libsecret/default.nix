@@ -10,7 +10,7 @@
   libxslt,
   python3,
   python3Packages,
-  docbook_xsl,
+  docbook-xsl-nons,
   docbook_xml_dtd_42,
   libgcrypt,
   gobject-introspection,
@@ -94,7 +94,7 @@ stdenv.mkDerivation rec {
     pkg-config
     gettext
     libxslt # for xsltproc for building man pages
-    docbook_xsl
+    docbook-xsl-nons
     docbook_xml_dtd_42
     libintl
     vala

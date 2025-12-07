@@ -2,7 +2,7 @@
   autoreconfHook,
   bash,
   coreutils,
-  docbook_xsl,
+  docbook-xsl-nons,
   fetchgit,
   findutils,
   getopt,
@@ -41,7 +41,7 @@ stdenv.mkDerivation (finalAttrs: {
 
     for f in format/docbook/* xmlto.in; do
       substituteInPlace $f \
-        --replace-fail "http://docbook.sourceforge.net/release/xsl/current" "${docbook_xsl}/xml/xsl/docbook"
+        --replace-fail "http://docbook.sourceforge.net/release/xsl/current" "${docbook-xsl-nons}/xml/xsl/docbook"
     done
   '';
 

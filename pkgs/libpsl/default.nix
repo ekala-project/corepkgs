@@ -4,7 +4,7 @@
   fetchurl,
   fetchpatch,
   autoreconfHook,
-  docbook_xsl,
+  docbook-xsl-nons,
   docbook_xml_dtd_43,
   gtk-doc,
   lzip,
@@ -42,7 +42,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     autoreconfHook
-    docbook_xsl
+    docbook-xsl-nons
     docbook_xml_dtd_43
     gtk-doc
     lzip

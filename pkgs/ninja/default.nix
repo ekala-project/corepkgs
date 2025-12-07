@@ -5,7 +5,7 @@
   fetchpatch,
   asciidoc,
   docbook_xml_dtd_45,
-  docbook_xsl,
+  docbook-xsl-nons,
   installShellFiles,
   libxslt,
   python3,
@@ -48,7 +48,7 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals buildDocs [
     asciidoc
     docbook_xml_dtd_45
-    docbook_xsl
+    docbook-xsl-nons
     libxslt.bin
   ];
 

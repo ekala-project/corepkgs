@@ -97,7 +97,7 @@ in
 {
 
   docbook-xsl-nons = common {
-    pname = "docbook_xsl";
+    pname = "docbook-xsl-nons";
     suffix = "-nons";
     sha256 = "00i1hdyxim8jymv2dz68ix3wbs5w6isxm8ijb03qk3vs1g59x2zf";
   };
