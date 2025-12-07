@@ -357,10 +357,7 @@ stdenv.mkDerivation (
 
           license = licenses.lgpl2Plus;
 
-          maintainers = with maintainers; [
-            ma27
-            connorbaker
-          ];
+          maintainers = [ ];
           platforms = platforms.linux;
         }
         // (args.meta or { });

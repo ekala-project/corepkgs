@@ -57,9 +57,8 @@ let
         bsd2
         asl20
       ];
-      maintainers = with maintainers; [ bennofs ];
-       
-    };
+      maintainers = [ ];
+};
   };
 in
 packaging

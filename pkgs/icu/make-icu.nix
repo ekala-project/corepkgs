@@ -84,7 +84,7 @@ let
     meta = with lib; {
       description = "Unicode and globalization support library";
       homepage = "https://icu.unicode.org/";
-      maintainers = with maintainers; [ raskin ];
+      maintainers = [ ];
       pkgConfigModules = [
         "icu-i18n"
         "icu-io"

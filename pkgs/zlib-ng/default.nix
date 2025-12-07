@@ -52,6 +52,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/zlib-ng/zlib-ng";
     license = licenses.zlib;
     platforms = platforms.all;
-    maintainers = with maintainers; [ izorkin ];
+    maintainers = [ ];
   };
 }

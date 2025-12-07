@@ -55,7 +55,7 @@ let
         psfl
         gpl3Plus
       ];
-      maintainers = with lib.maintainers; [ jherland ];
+      maintainers = [ ];
       mainProgram = "docutils";
     };
   };

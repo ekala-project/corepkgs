@@ -78,7 +78,7 @@ stdenv.mkDerivation (
       license = licenses.bsdOriginal;
       pkgConfigModules = [ "bzip2" ];
       platforms = platforms.all;
-      maintainers = with maintainers; [ mic92 ];
+      maintainers = [ ];
     };
   }
 )

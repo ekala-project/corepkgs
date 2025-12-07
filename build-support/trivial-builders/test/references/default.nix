@@ -138,10 +138,7 @@ testers.runNixOSTest (
       inherit guestTestScriptBin;
     };
     meta = {
-      maintainers = with lib.maintainers; [
-        roberth
-        ShamrockLee
-      ];
+      maintainers = [ ];
     };
   }
 )

@@ -119,13 +119,7 @@ let
       nixComponentsAttributeName
     ];
 
-  maintainers = [
-    lib.maintainers.artturin
-    lib.maintainers.philiptaron
-    lib.maintainers.lovesegfault
-  ];
-  teams = [ lib.teams.nix ];
-
+  maintainers = [ ];
 in
 lib.makeExtensible (
   self:

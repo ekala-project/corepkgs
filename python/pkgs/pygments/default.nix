@@ -9,6 +9,7 @@
   # tests
   pytestCheckHook,
   wcag-contrast-ratio,
+  pythonOlder,
 }:
 
 let
@@ -51,10 +52,7 @@ let
       description = "Generic syntax highlighter";
       mainProgram = "pygmentize";
       license = lib.licenses.bsd2;
-      maintainers = with lib.maintainers; [
-        sigmanificient
-        ryand56
-      ];
+      maintainers = [ ];
     };
   };
 in

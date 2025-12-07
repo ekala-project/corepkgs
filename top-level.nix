@@ -498,7 +498,7 @@ with final; {
    inherit
     (rec {
       # NOTE: keep this with the "NG" label until we're ready to drop the monolithic GCC
-      gccNGPackagesSet = recurseIntoAttrs (callPackages ./pkgs/gcc/ng { });
+      gccNGPackagesSet = lib.recurseIntoAttrs (callPackages ./pkgs/gcc/ng { });
       gccNGPackages_15 = gccNGPackagesSet."15";
       mkGCCNGPackages = gccNGPackagesSet.mkPackage;
     })
@@ -783,8 +783,8 @@ with final; {
   python3 = python313;
 
   # pythonPackages further below, but assigned here because they need to be in sync
-  python2Packages = dontRecurseIntoAttrs python27Packages;
-  python3Packages = dontRecurseIntoAttrs python313Packages;
+  python2Packages = lib.dontRecurseIntoAttrs python27Packages;
+  python3Packages = lib.dontRecurseIntoAttrs python313Packages;
 
   pypy = pypy2;
   pypy2 = pypy27;
@@ -839,8 +839,8 @@ with final; {
   python27Packages = python27.pkgs;
   python310Packages = python310.pkgs;
   python311Packages = python311.pkgs;
-  python312Packages = recurseIntoAttrs python312.pkgs;
-  python313Packages = recurseIntoAttrs python313.pkgs;
+  python312Packages = lib.recurseIntoAttrs python312.pkgs;
+  python313Packages = lib.recurseIntoAttrs python313.pkgs;
   python314Packages = python314.pkgs;
   python315Packages = python315.pkgs;
   pypyPackages = pypy.pkgs;
@@ -857,7 +857,7 @@ with final; {
   # Should eventually be moved inside Python interpreters.
   python-setup-hook = buildPackages.callPackage ./python/setup-hook.nix { };
 
-  pythonDocs = recurseIntoAttrs (callPackage ./python/cpython/docs { });
+  pythonDocs = lib.recurseIntoAttrs (callPackage ./python/cpython/docs { });
 
   # Provided by libc on Operating Systems that use the Extensible Linker Format.
   elf-header = if stdenv.hostPlatform.isElf then null else elf-header-real;
@@ -1003,7 +1003,7 @@ with final; {
           };
       };
     in
-    recurseIntoAttrs arrayUtilitiesPackages;
+    lib.recurseIntoAttrs arrayUtilitiesPackages;
   addBinToPathHook = callPackage (
     { makeSetupHook }:
     makeSetupHook {
@@ -1051,8 +1051,8 @@ with final; {
   # TODO(corepkgs): use mkManyVariants, move to perl
   perlInterpreters = callPackage ./pkgs/perl { inherit config; };
   inherit (perlInterpreters) perl538 perl540;
-  perl538Packages = recurseIntoAttrs perl538.pkgs;
-  perl540Packages = recurseIntoAttrs perl540.pkgs;
+  perl538Packages = lib.recurseIntoAttrs perl538.pkgs;
+  perl540Packages = lib.recurseIntoAttrs perl540.pkgs;
   perl = perl540;
   perlPackages = perl540Packages;
 
@@ -1157,7 +1157,7 @@ with final; {
   tcl-8_6 = callPackage ./pkgs/tcl/8.6.nix { };
   tcl-9_0 = callPackage ./pkgs/tcl/9.0.nix { };
   # We don't need versioned package sets thanks to the tcl stubs mechanism
-  tclPackages = recurseIntoAttrs (callPackage ./pkgs/tcl/packages.nix { });
+  tclPackages = lib.recurseIntoAttrs (callPackage ./pkgs/tcl/packages.nix { });
 
   # TODO(corepkgs): use mkManyVariants
   tk = tk-8_6;
@@ -1379,7 +1379,7 @@ with final; {
   docbook_xml_dtd_44 = callPackage ./pkgs/docbook-xml-dtd/4.4.nix { };
   docbook_xml_dtd_45 = callPackage ./pkgs/docbook-xml-dtd/4.5.nix { };
 
-  opensshPackages = dontRecurseIntoAttrs (callPackage ./pkgs/openssh { });
+  opensshPackages = lib.dontRecurseIntoAttrs (callPackage ./pkgs/openssh { });
   openssh = opensshPackages.openssh.override {
     etcDir = "/etc/ssh";
   };
@@ -1420,10 +1420,10 @@ with final; {
 
     sphinx = with python3.pkgs; toPythonApplication sphinx;
 
-  nixDependencies = recurseIntoAttrs (
+  nixDependencies = lib.recurseIntoAttrs (
     callPackage ./pkgs/nix/dependencies-scope.nix { }
   );
-  nixVersions = recurseIntoAttrs (
+  nixVersions = lib.recurseIntoAttrs (
     callPackage ./pkgs/nix {
       storeDir = config.nix.storeDir or "/nix/store";
       stateDir = config.nix.stateDir or "/nix/var";
@@ -1477,5 +1477,174 @@ with final; {
   # ValueError: ZIP does not support timestamps before 1980
   ensureNewerSourcesForZipFilesHook = ensureNewerSourcesHook { year = "1980"; };
 
+  libclang = llvmPackages.libclang;
+  clang-manpages = llvmPackages.clang-manpages;
+  clang = llvmPackages.clang;
+  clang-tools = llvmPackages.clang-tools;
+  clangStdenv = if stdenv.cc.isClang then stdenv else lowPrio llvmPackages.stdenv;
+  libcxxStdenv = if stdenv.hostPlatform.isDarwin then stdenv else lowPrio llvmPackages.libcxxStdenv;
 
+   lld = llvmPackages.lld;
+
+  lldb = llvmPackages.lldb;
+
+  llvm = llvmPackages.llvm;
+  flang = llvmPackages_20.flang;
+
+  libclc = llvmPackages.libclc;
+  libllvm = llvmPackages.libllvm;
+  llvm-manpages = llvmPackages.llvm-manpages;
+
+  llvmPackages = llvmPackages_21;
+
+  # TODO(corepkgs): use mkManyVariants
+  inherit
+    (rec {
+      llvmPackagesSet = lib.recurseIntoAttrs (callPackages ./pkgs/llvm { });
+
+      llvmPackages_18 = llvmPackagesSet."18";
+      clang_18 = llvmPackages_18.clang;
+      lld_18 = llvmPackages_18.lld;
+      lldb_18 = llvmPackages_18.lldb;
+      llvm_18 = llvmPackages_18.llvm;
+
+      llvmPackages_19 = llvmPackagesSet."19";
+      clang_19 = llvmPackages_19.clang;
+      lld_19 = llvmPackages_19.lld;
+      lldb_19 = llvmPackages_19.lldb;
+      llvm_19 = llvmPackages_19.llvm;
+      bolt_19 = llvmPackages_19.bolt;
+
+      llvmPackages_20 = llvmPackagesSet."20";
+      clang_20 = llvmPackages_20.clang;
+      lld_20 = llvmPackages_20.lld;
+      lldb_20 = llvmPackages_20.lldb;
+      llvm_20 = llvmPackages_20.llvm;
+      bolt_20 = llvmPackages_20.bolt;
+      flang_20 = llvmPackages_20.flang;
+
+      llvmPackages_21 = llvmPackagesSet."21";
+      clang_21 = llvmPackages_21.clang;
+      lld_21 = llvmPackages_21.lld;
+      lldb_21 = llvmPackages_21.lldb;
+      llvm_21 = llvmPackages_21.llvm;
+      bolt_21 = llvmPackages_21.bolt;
+      flang_21 = llvmPackages_21.flang;
+
+      mkLLVMPackages = llvmPackagesSet.mkPackage;
+    })
+    llvmPackages_18
+    clang_18
+    lld_18
+    lldb_18
+    llvm_18
+    llvmPackages_19
+    clang_19
+    lld_19
+    lldb_19
+    llvm_19
+    bolt_19
+    llvmPackages_20
+    clang_20
+    lld_20
+    lldb_20
+    llvm_20
+    bolt_20
+    flang_20
+    llvmPackages_21
+    clang_21
+    lld_21
+    lldb_21
+    llvm_21
+    bolt_21
+    flang_21
+    mkLLVMPackages
+    ;
+
+  asciidoc = callPackage ./pkgs/asciidoc {
+    inherit (python3.pkgs)
+      pygments
+      matplotlib
+      numpy
+      aafigure
+      recursive-pth-loader
+      ;
+    w3m = w3m-batch;
+    enableStandardFeatures = false;
+  };
+  asciidoc-full = asciidoc.override {
+    enableStandardFeatures = true;
+  };
+  asciidoc-full-with-plugins = asciidoc.override {
+    enableStandardFeatures = true;
+    enableExtraPlugins = true;
+  };
+
+  imagemagick6_light = imagemagick6.override {
+    bzip2Support = false;
+    zlibSupport = false;
+    libX11Support = false;
+    libXtSupport = false;
+    fontconfigSupport = false;
+    freetypeSupport = false;
+    ghostscriptSupport = false;
+    libjpegSupport = false;
+    djvulibreSupport = false;
+    lcms2Support = false;
+    openexrSupport = false;
+    libpngSupport = false;
+    liblqr1Support = false;
+    librsvgSupport = false;
+    libtiffSupport = false;
+    libxml2Support = false;
+    openjpegSupport = false;
+    libwebpSupport = false;
+    libheifSupport = false;
+    libde265Support = false;
+  };
+  imagemagick6 = callPackage ./pkgs/imagemagick/6.x.nix { };
+  imagemagick6Big = imagemagick6.override {
+    ghostscriptSupport = true;
+  };
+  imagemagick_light = lowPrio (
+    imagemagick.override {
+      bzip2Support = false;
+      zlibSupport = false;
+      libX11Support = false;
+      libXtSupport = false;
+      fontconfigSupport = false;
+      freetypeSupport = false;
+      libraqmSupport = false;
+      libjpegSupport = false;
+      djvulibreSupport = false;
+      lcms2Support = false;
+      openexrSupport = false;
+      libjxlSupport = false;
+      libpngSupport = false;
+      liblqr1Support = false;
+      librsvgSupport = false;
+      libtiffSupport = false;
+      libxml2Support = false;
+      openjpegSupport = false;
+      libwebpSupport = false;
+      libheifSupport = false;
+    }
+  );
+  imagemagickBig = imagemagick.override {
+    ghostscriptSupport = true;
+  };
+
+  inherit (texlive.schemes)
+    texliveBasic
+    texliveBookPub
+    texliveConTeXt
+    texliveFull
+    texliveGUST
+    texliveInfraOnly
+    texliveMedium
+    texliveMinimal
+    texliveSmall
+    texliveTeTeX
+    ;
+  texlivePackages = recurseIntoAttrs (lib.mapAttrs (_: v: v.build) texlive.pkgs);
 }

@@ -57,7 +57,7 @@ replaceVarsWith {
       different results.
     '';
     license = [ licenses.mit ];
-    maintainers = with maintainers; [ artturin ];
+    maintainers = [ ];
     platforms = platforms.all;
   };
 }

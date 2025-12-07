@@ -30,6 +30,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/pfmoore/editables";
     changelog = "https://github.com/pfmoore/editables/blob/${version}/CHANGELOG.md";
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [ getchoo ];
+    maintainers = [ ];
   };
 }

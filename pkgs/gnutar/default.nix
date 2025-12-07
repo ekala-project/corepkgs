@@ -85,7 +85,7 @@ stdenv.mkDerivation rec {
 
     license = lib.licenses.gpl3Plus;
 
-    maintainers = with lib.maintainers; [ RossComputerGuy ];
+    maintainers = [ ];
     mainProgram = "tar";
     platforms = lib.platforms.all;
 

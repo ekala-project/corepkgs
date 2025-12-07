@@ -48,9 +48,7 @@ stdenv.mkDerivation rec {
     description = "Effort to implement RFC9000 QUIC protocol";
     license = licenses.mit;
     platforms = platforms.unix;
-    maintainers = with maintainers; [
-      vcunat # for knot-dns
-    ];
+    maintainers = [ ];
   };
 }
 

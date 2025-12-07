@@ -108,10 +108,7 @@ stdenv.mkDerivation {
 
     license = licenses.gpl3Plus;
 
-    maintainers = [
-      maintainers.das_j
-      maintainers.m00wl
-    ];
+    maintainers = [ ];
     platforms = platforms.all;
     mainProgram = "grep";
   };

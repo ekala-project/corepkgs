@@ -843,8 +843,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkgConfigModules = [ "python3" ];
     platforms = platforms.linux ++ platforms.darwin ++ platforms.windows ++ platforms.freebsd;
     mainProgram = executable;
-    teams = [ lib.teams.python ];
-    # static build on x86_64-darwin/aarch64-darwin breaks with:
+# static build on x86_64-darwin/aarch64-darwin breaks with:
     # configure: error: C compiler cannot create executables
 
     # mingw patches only apply to Python 3.11 currently

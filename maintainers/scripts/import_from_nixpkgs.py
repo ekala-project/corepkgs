@@ -11,7 +11,7 @@ from pathlib import Path
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Copy a package directory from ../nixpkgs into this repository. "
+            "Copy one or more package directories from ../nixpkgs into this repository. "
             "By default copies pkgs/by-name/<xx>/<name> -> pkgs/<name>. "
             "With --python, copies pkgs/development/python-modules/<name> -> python/pkgs/<name>."
         )
@@ -19,7 +19,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--name",
         required=True,
-        help="Package name to import (used to locate source and destination directories).",
+        nargs="+",
+        help="Package name(s) to import (used to locate source and destination directories).",
     )
     parser.add_argument(
         "--python",
@@ -40,7 +41,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def resolve_paths(args: argparse.Namespace) -> tuple[Path, Path]:
+def resolve_paths(args: argparse.Namespace, name: str) -> tuple[Path, Path]:
     # This script lives in maintainers/scripts/, so go up two levels to reach repo root.
     repo_root = Path(__file__).resolve().parents[2]
     nixpkgs_root = (
@@ -50,12 +51,12 @@ def resolve_paths(args: argparse.Namespace) -> tuple[Path, Path]:
     )
 
     if args.python:
-        src = nixpkgs_root / "pkgs" / "development" / "python-modules" / args.name
-        dest = repo_root / "python" / "pkgs" / args.name
+        src = nixpkgs_root / "pkgs" / "development" / "python-modules" / name
+        dest = repo_root / "python" / "pkgs" / name
     else:
-        prefix = args.name[:2]
-        src = nixpkgs_root / "pkgs" / "by-name" / prefix / args.name
-        dest = repo_root / "pkgs" / args.name
+        prefix = name[:2]
+        src = nixpkgs_root / "pkgs" / "by-name" / prefix / name
+        dest = repo_root / "pkgs" / name
 
     return src, dest
 
@@ -77,11 +78,28 @@ def copy_tree(src: Path, dest: Path, force: bool) -> None:
     shutil.copytree(src, dest, symlinks=True)
 
 
+def rename_package_nix(dest: Path) -> None:
+    """Rename package.nix to default.nix when present."""
+    package_nix = dest / "package.nix"
+    if not package_nix.exists():
+        return
+
+    default_nix = dest / "default.nix"
+    if default_nix.exists():
+        print(f"Note: both package.nix and default.nix exist in {dest}; leaving as-is.")
+        return
+
+    package_nix.rename(default_nix)
+    print(f"Renamed {package_nix} -> {default_nix}")
+
+
 def main() -> None:
     args = parse_args()
-    src, dest = resolve_paths(args)
-    copy_tree(src, dest, args.force)
-    print(f"Imported {src} -> {dest}")
+    for name in args.name:
+        src, dest = resolve_paths(args, name)
+        copy_tree(src, dest, args.force)
+        rename_package_nix(dest)
+        print(f"Imported {src} -> {dest}")
 
 
 if __name__ == "__main__":

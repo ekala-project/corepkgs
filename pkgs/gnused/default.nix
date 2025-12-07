@@ -45,7 +45,7 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3Plus;
 
     platforms = lib.platforms.unix;
-    maintainers = with lib.maintainers; [ mic92 ];
+    maintainers = [ ];
     mainProgram = "sed";
   };
 }

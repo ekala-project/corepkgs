@@ -41,6 +41,6 @@ stdenv.mkDerivation {
     description = "SQLite Archive utilities";
     license = licenses.bsd2;
     platforms = platforms.all;
-    maintainers = with maintainers; [ dtzWill ];
+    maintainers = [ ];
   };
 }

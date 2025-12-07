@@ -214,10 +214,6 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3Plus;
 
     platforms = with lib.platforms; linux ++ cygwin ++ freebsd ++ darwin;
-    maintainers = with lib.maintainers; [
-      pierron
-      globin
-      lsix
-    ];
+    maintainers = [ ];
   };
 }

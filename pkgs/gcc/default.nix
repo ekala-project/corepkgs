@@ -418,7 +418,6 @@ pipe
           description
           longDescription
           platforms
-          teams
           mainProgram
           identifiers
           ;

@@ -44,7 +44,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.gnu.org/software/gsasl/";
     license = lib.licenses.gpl3Plus;
 
-    maintainers = with lib.maintainers; [ shlevy ];
+    maintainers = [ ];
     pkgConfigModules = [ "libgsasl" ];
     platforms = lib.platforms.all;
   };

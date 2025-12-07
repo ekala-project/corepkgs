@@ -188,7 +188,7 @@ python3.pkgs.buildPythonApplication rec {
       code.
     '';
     license = lib.licenses.asl20;
-    maintainers = with lib.maintainers; [ qyliss ];
+    maintainers = [ ];
     inherit (python3.meta) platforms;
   };
 }

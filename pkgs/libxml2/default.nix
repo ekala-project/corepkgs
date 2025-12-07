@@ -44,9 +44,7 @@ let
       ];
       freezeUpdateScript = true;
       extraMeta = {
-        maintainers = with lib.maintainers; [
-          gepbird
-        ];
+        maintainers = [ ];
       };
     };
     libxml2 = callPackage ./common.nix {
@@ -59,9 +57,7 @@ let
         hash = "sha256-FUfYMq5xT2i88JdIw9OtSofraUL3yjsyOVund+mfJKQ=";
       };
       extraMeta = {
-        maintainers = with lib.maintainers; [
-          jtojnar
-        ];
+        maintainers = [ ];
       };
     };
   };

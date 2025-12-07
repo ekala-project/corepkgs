@@ -274,7 +274,7 @@ lib.warnIf (withDocs != null)
       platforms = lib.platforms.all;
       # https://github.com/NixOS/nixpkgs/issues/333338
       badPlatforms = [ lib.systems.inspect.patterns.isMinGW ];
-      maintainers = with lib.maintainers; [ infinisil ];
+      maintainers = [ ];
       mainProgram = "bash";
       identifiers.cpeParts =
         let

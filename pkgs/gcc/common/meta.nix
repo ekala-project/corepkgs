@@ -27,8 +27,7 @@ in
   '';
 
   platforms = platforms.unix;
-  teams = [ ];
-  mainProgram = "${targetPrefix}gcc";
+mainProgram = "${targetPrefix}gcc";
 
   identifiers.cpeParts.vendor = "gnu";
 }

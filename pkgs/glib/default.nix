@@ -366,12 +366,8 @@ stdenv.mkDerivation (finalAttrs: {
     description = "C library of programming buildings blocks";
     homepage = "https://gitlab.gnome.org/GNOME/glib";
     license = licenses.lgpl21Plus;
-    maintainers = with maintainers; [
-      lovek323
-      raskin
-    ];
-    teams = [ teams.gnome ];
-    pkgConfigModules = [
+    maintainers = [ ];
+pkgConfigModules = [
       "gio-2.0"
       "gobject-2.0"
       "gthread-2.0"

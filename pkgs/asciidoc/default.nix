@@ -7,23 +7,23 @@
   autoreconfHook,
   installShellFiles,
   enableStandardFeatures ? false,
-  sourceHighlight,
-  highlight,
+  sourceHighlight ? null,
+  highlight ? null,
   pygments,
   graphviz,
   texliveMinimal,
-  dblatexFull,
+  dblatexFull ? null,
   libxslt,
   w3m,
-  lynx,
+  lynx ? null,
   imagemagick,
-  lilypond,
+  lilypond ? null,
   libxml2,
   docbook_xml_dtd_45,
   docbook_xsl_ns,
   docbook_xsl,
-  fop,
-  epubcheck,
+  fop ? null,
+  epubcheck ? null,
   gnused,
   coreutils,
 
@@ -34,21 +34,21 @@
   unzip,
   # filters
   enableDitaaFilter ? false,
-  jre,
+  jre ? null,
   enableMscgenFilter ? false,
-  mscgen,
+  mscgen ? null,
   enableDiagFilter ? false,
-  blockdiag,
-  seqdiag,
-  actdiag,
-  nwdiag,
+  blockdiag ? null,
+  seqdiag ? null,
+  actdiag ? null,
+  nwdiag ? null,
   enableQrcodeFilter ? false,
-  qrencode,
+  qrencode ? null,
   enableMatplotlibFilter ? false,
-  matplotlib,
+  matplotlib ? null,
   numpy,
   enableAafigureFilter ? false,
-  aafigure,
+  aafigure ? null,
   recursive-pth-loader,
   # backends
   enableDeckjsBackend ? false,
@@ -338,9 +338,6 @@ python3.pkgs.buildPythonApplication rec {
     changelog = "https://github.com/asciidoc-py/asciidoc-py/blob/${version}/CHANGELOG.adoc";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix;
-    maintainers = with lib.maintainers; [
-      bjornfor
-      dotlambda
-    ];
+    maintainers = [ ];
   };
 }

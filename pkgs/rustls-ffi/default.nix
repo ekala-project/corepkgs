@@ -76,6 +76,6 @@ stdenv.mkDerivation (finalAttrs: {
       asl20
       isc
     ];
-    maintainers = [ maintainers.lesuisse ];
+    maintainers = [ ];
   };
 })

@@ -36,6 +36,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/pytest-dev/pytest-rerunfailures";
     changelog = "https://github.com/pytest-dev/pytest-rerunfailures/blob/${src.tag}/CHANGES.rst";
     license = licenses.mpl20;
-    maintainers = with maintainers; [ das-g ];
+    maintainers = [ ];
   };
 }

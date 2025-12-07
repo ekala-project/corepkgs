@@ -12,8 +12,7 @@
 rec {
   gcc_meta = {
     license = with lib.licenses; [ gpl3Plus ];
-    teams = [ lib.teams.gcc ];
-  };
+};
 
   releaseInfo =
     if gitRelease != null then

@@ -104,9 +104,6 @@ stdenv.mkDerivation (finalAttrs: {
       publicDomain # tzdata
     ];
     platforms = platforms.all;
-    maintainers = with maintainers; [
-      ajs124
-      fpletz
-    ];
+    maintainers = [ ];
   };
 })

@@ -138,7 +138,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.freedesktop.org/wiki/Software/dbus/";
     changelog = "https://gitlab.freedesktop.org/dbus/dbus/-/blob/dbus-${version}/NEWS";
     license = licenses.gpl2Plus; # most is also under AFL-2.1
-    teams = [ teams.freedesktop ];
-    platforms = platforms.unix;
+platforms = platforms.unix;
   };
 }

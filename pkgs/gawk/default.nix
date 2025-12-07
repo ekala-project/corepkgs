@@ -112,7 +112,6 @@ stdenv.mkDerivation rec {
     '';
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.unix ++ lib.platforms.windows;
-    teams = [ lib.teams.helsinki-systems ];
-    mainProgram = "gawk";
+mainProgram = "gawk";
   };
 }

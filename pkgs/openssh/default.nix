@@ -29,12 +29,8 @@ in
       ./ssh-keysign-8.5.patch
     ];
     extraMeta = {
-      maintainers = with lib.maintainers; [
-        philiptaron
-        numinit
-      ];
-      teams = [ lib.teams.helsinki-systems ];
-    };
+      maintainers = [ ];
+};
   };
 
   openssh_hpn = common rec {
@@ -76,7 +72,7 @@ in
 
     extraConfigureFlags = [ "--with-hpn" ];
     extraMeta = {
-      maintainers = with lib.maintainers; [ abbe ];
+      maintainers = [ ];
     };
   };
 
