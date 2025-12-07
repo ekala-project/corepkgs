@@ -1,6 +1,5 @@
 {
   lib,
-  repoRevToNameMaybe,
   fetchgit,
   fetchhg,
   fetchzip,
@@ -20,7 +19,7 @@ makeOverridable (
     repo,
     rev ? null,
     tag ? null,
-    name ? repoRevToNameMaybe repo (lib.revOrTag rev tag) "sourcehut",
+    name ? lib.sources.repoRevToName repo (lib.revOrTag rev tag) "sourcehut",
     domain ? "sr.ht",
     vc ? "git",
     fetchSubmodules ? false,

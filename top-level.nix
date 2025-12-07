@@ -343,6 +343,7 @@ with final; {
   fetchFromGitLab = callPackage ./build-support/fetchgitlab { };
   fetchFromSourcehut = callPackage ./build-support/fetchsourcehut { };
   fetchPypi = callPackage ./build-support/fetchpypi { };
+  fetchhg = callPackage ./build-support/fetchhg { };
   # TODO(corepkgs): uppercase them?
   fetchzip = callPackage ./build-support/fetchzip { };
   fetchurl =
@@ -1258,8 +1259,8 @@ with final; {
   udev = if lib.meta.availableOn stdenv.hostPlatform systemdLibs then systemdLibs else libudev-zero;
 
   inherit (callPackages ./pkgs/docbook-xsl { })
-    docbook_xsl
-    docbook_xsl_ns
+    docbook_xsl # was docbook-xsl-nons
+    docbook_xsl_ns # was docbook-xsl-ns
     ;
 
   inherit (callPackage ./pkgs/libxml2 { })

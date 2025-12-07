@@ -402,7 +402,7 @@ with self;
       url = "mirror://cpan/authors/id/P/PL/PLICEASE/Alien-FFI-0.27.tar.gz";
       hash = "sha256-Kbsgg/P5gqOfSFIkP09qEZFpZvIObneGTpkmnRHotl4=";
     };
-    patches = [ ../development/perl-modules/Alien-FFI-dont-download.patch ];
+    patches = [ ./patches/Alien-FFI-dont-download.patch ];
     nativeBuildInputs = [ pkgs.pkg-config ];
     buildInputs = [
       pkgs.libffi
@@ -546,7 +546,7 @@ with self;
       url = "mirror://cpan/authors/id/F/FR/FROGGS/Alien-SDL-1.446.tar.gz";
       hash = "sha256-yaosncPGPYl3PH1yA/KkbRuSTQxy2fgBrxR6Pci8USo=";
     };
-    patches = [ ../development/perl-modules/alien-sdl.patch ];
+    patches = [ ./patches/alien-sdl.patch ];
 
     installPhase = "./Build install --prefix $out";
 
@@ -1521,7 +1521,7 @@ with self;
       url = "mirror://cpan/authors/id/P/PL/PLICEASE/Archive-Libarchive-0.09.tar.gz";
       hash = "sha256-avdG7P9/GjUwzmtaWNCtR0MaaZjUWduw8VYqEiPn3v8=";
     };
-    patches = [ ../development/perl-modules/ArchiveLibarchive-set-findlib-path.patch ];
+    patches = [ ./patches/ArchiveLibarchive-set-findlib-path.patch ];
     postPatch = ''
       substituteInPlace lib/Archive/Libarchive/Lib.pm --replace-fail "@@libarchive@@" "${lib.getLib pkgs.libarchive}/lib"
     '';
@@ -2495,7 +2495,7 @@ with self;
     };
   };
 
-  BioExtAlign = callPackage ../development/perl-modules/Bio-Ext-Align { };
+  BioExtAlign = callPackage ./patches/Bio-Ext-Align { };
 
   BioDBHTS = buildPerlModule {
     pname = "Bio-DB-HTS";
@@ -2523,7 +2523,7 @@ with self;
     };
   };
 
-  BioBigFile = callPackage ../development/perl-modules/Bio-BigFile { };
+  BioBigFile = callPackage ./patches/Bio-BigFile { };
 
   BioPerl = buildPerlPackage {
     pname = "BioPerl";
@@ -2636,7 +2636,7 @@ with self;
     };
     patches = [
       # Fix out of memory error on Perl 5.19.4 and later.
-      ../development/perl-modules/boost-geometry-utils-fix-oom.patch
+      ./patches/boost-geometry-utils-fix-oom.patch
     ];
     buildInputs = [
       ExtUtilsCppGuess
@@ -3392,7 +3392,7 @@ with self;
       CatalystPluginAuthentication
     ];
     patches = [
-      ../development/perl-modules/CatalystAuthenticationStoreHtpasswd-test-replace-DES-hash-with-bcrypt.patch
+      ./patches/CatalystAuthenticationStoreHtpasswd-test-replace-DES-hash-with-bcrypt.patch
     ];
     meta = {
       description = "Authen::Htpasswd based user storage/authentication";
@@ -4103,7 +4103,7 @@ with self;
       url = "mirror://cpan/authors/id/I/IL/ILMARI/Catalyst-Plugin-Static-Simple-0.37.tar.gz";
       hash = "sha256-Wk2Fo1iM1Og/GwAlgUEufXG31X9mBW5dh6Nvk9icnnw=";
     };
-    patches = [ ../development/perl-modules/catalyst-plugin-static-simple-etag.patch ];
+    patches = [ ./patches/catalyst-plugin-static-simple-etag.patch ];
     propagatedBuildInputs = [
       CatalystRuntime
       MIMETypes
@@ -4306,7 +4306,7 @@ with self;
     };
     patches = [
       # See Nixpkgs issues #16074 and #17624
-      ../development/perl-modules/CatalystXScriptServerStarman-fork-arg.patch
+      ./patches/CatalystXScriptServerStarman-fork-arg.patch
     ];
     buildInputs = [ TestWWWMechanizeCatalyst ];
     propagatedBuildInputs = [
@@ -6663,7 +6663,7 @@ with self;
       url = "mirror://cpan/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-4.37.tar.gz";
       hash = "sha256-wkFhWg4X/3Raqoa79Gam4pzSQFFeZfBqegUBe2GebUs=";
     };
-    patches = [ ../development/perl-modules/Cpanel-JSON-XS-CVE-2025-40929.patch ];
+    patches = [ ./patches/Cpanel-JSON-XS-CVE-2025-40929.patch ];
     meta = {
       description = "CPanel fork of JSON::XS, fast and correct serializing";
       license = with lib.licenses; [
@@ -6959,7 +6959,7 @@ with self;
     patches = [
       # Fix build error with gcc14. See https://rt.cpan.org/Public/Bug/Display.html?id=133363.
       # Source: https://rt.cpan.org/Public/Ticket/Attachment/1912753/1024508/0001-_des.h-expose-perl_des_expand_key-and-perl_des_crypt.patch
-      ../development/perl-modules/CryptDES-expose-perl_des_expand_key-and-perl_des_crypt.patch
+      ./patches/CryptDES-expose-perl_des_expand_key-and-perl_des_crypt.patch
     ];
     meta = {
       description = "Perl DES encryption module";
@@ -7562,7 +7562,7 @@ with self;
     };
     patches = [
       # See https://github.com/NixOS/nixpkgs/pull/93599
-      ../development/perl-modules/crypt-openpgp-remove-impure-keygen-tests.patch
+      ./patches/crypt-openpgp-remove-impure-keygen-tests.patch
     ];
     buildInputs = [ TestException ];
     propagatedBuildInputs = [
@@ -7838,7 +7838,7 @@ with self;
     patches = [
       # Replace apostrophe as package separator
       # https://rt.cpan.org/Public/Bug/Display.html?id=146661
-      ../development/perl-modules/CSSDOM-replace-apostrophe.patch
+      ./patches/CSSDOM-replace-apostrophe.patch
     ];
 
     propagatedBuildInputs = [ Clone ];
@@ -8019,7 +8019,7 @@ with self;
     };
     buildInputs = [ TestRequires ];
     patches = [
-      ../development/perl-modules/Data-Clone-fix-apostrophe-package-separator.patch
+      ./patches/Data-Clone-fix-apostrophe-package-separator.patch
     ];
     meta = {
       description = "Polymorphic data cloning";
@@ -8738,7 +8738,7 @@ with self;
       hash = "sha256-CT1X/6DUEalLr6+uSVaX2yb1ydAncZj+P3zyviKZZFM=";
     };
     patches = [
-      ../development/perl-modules/Data-UUID-CVE-2013-4184.patch
+      ./patches/Data-UUID-CVE-2013-4184.patch
     ];
     meta = {
       description = "Globally/Universally Unique Identifiers (GUIDs/UUIDs)";
@@ -9705,7 +9705,7 @@ with self;
       hash = "sha256-SzZ+YbH63ed/tvtynzzVrNHUbnEhjZb0Bry6ONQ7S+8=";
     };
     buildInputs = [ TestException ];
-    patches = [ ../development/perl-modules/Device-OUI-1.04-hash.patch ];
+    patches = [ ./patches/Device-OUI-1.04-hash.patch ];
     propagatedBuildInputs = [
       ClassAccessorGrouped
       LWP
@@ -9777,7 +9777,7 @@ with self;
 
     patches = [
       # Support building against our own sqlite.
-      ../development/perl-modules/DBD-SQLite/external-sqlite.patch
+      ./patches/DBD-SQLite/external-sqlite.patch
 
       # Pull upstream fix for test failures against sqlite-3.37.
       (fetchpatch {
@@ -12096,7 +12096,7 @@ with self;
       ];
     };
     patches = [
-      ../development/perl-modules/encode-imaputf7.patch
+      ./patches/encode-imaputf7.patch
     ];
   };
 
@@ -12358,7 +12358,7 @@ with self;
     };
     buildInputs = [ TestUnitLite ];
     patches = [
-      ../development/perl-modules/Exception-Base-remove-smartmatch-when-5.38.0.patch
+      ./patches/Exception-Base-remove-smartmatch-when-5.38.0.patch
     ];
     meta = {
       description = "Lightweight exceptions";
@@ -12567,7 +12567,7 @@ with self;
       hash = "sha256-aTPQ6WO2IoHvdWEGjmrsrIxKwrR2srugmrC5D7rJ11c=";
     };
     patches = [
-      ../development/perl-modules/ExtUtils-Constant-fix-indirect-method-call-in-test.patch
+      ./patches/ExtUtils-Constant-fix-indirect-method-call-in-test.patch
     ];
     meta = {
       description = "Generate XS code to import C header constants";
@@ -13409,7 +13409,7 @@ with self;
       hash = "sha256-fm8WzDPrHyn/Jb7lHVE/S4qElHu/oY7bLTzECi1kyv4=";
     };
     patches = [
-      ../development/perl-modules/FileFindRule-CVE-2011-10007.patch
+      ./patches/FileFindRule-CVE-2011-10007.patch
     ];
     propagatedBuildInputs = [
       NumberCompare
@@ -15069,7 +15069,7 @@ with self;
       ClassAccessor
       ParseRecDescent
     ];
-    patches = [ ../development/perl-modules/Google-ProtocolBuffers-multiline-comments.patch ];
+    patches = [ ./patches/Google-ProtocolBuffers-multiline-comments.patch ];
     meta = {
       description = "Simple interface to Google Protocol Buffers";
       homepage = "https://github.com/csirtgadgets/google-protocolbuffers-perl";
@@ -15335,7 +15335,7 @@ with self;
     };
     patches = [
       # Fix incompatible function pointer conversion (assigning `GdkNativeWindow` to `guint32`).
-      ../development/perl-modules/Gtk2-fix-incompatible-pointer-conversion.patch
+      ./patches/Gtk2-fix-incompatible-pointer-conversion.patch
     ];
     buildInputs = [ pkgs.gtk2 ];
     # https://rt.cpan.org/Public/Bug/Display.html?id=130742
@@ -15584,7 +15584,7 @@ with self;
     ];
     nativeBuildInputs = lib.optional stdenv.hostPlatform.isDarwin shortenPerlShebang;
     patches = [
-      ../development/perl-modules/Hailo-fix-test-gld.patch
+      ./patches/Hailo-fix-test-gld.patch
     ];
     postPatch = ''
       patchShebangs bin
@@ -17446,7 +17446,7 @@ with self;
     };
   };
 
-  IOCompressBrotli = callPackage ../development/perl-modules/IOCompressBrotli { };
+  IOCompressBrotli = callPackage ./patches/IOCompressBrotli { };
 
   IODigest = buildPerlPackage {
     pname = "IO-Digest";
@@ -18012,7 +18012,7 @@ with self;
     };
   };
 
-  ImageExifTool = callPackage ../development/perl-modules/ImageExifTool { };
+  ImageExifTool = callPackage ./patches/ImageExifTool { };
 
   Inline = buildPerlPackage {
     pname = "Inline";
@@ -18352,7 +18352,7 @@ with self;
       url = "mirror://cpan/authors/id/M/ML/MLEHMANN/JSON-XS-4.03.tar.gz";
       hash = "sha256-UVU29F8voafojIgkUzdY0BIdJnq5y0U6G1iHyKVrkGg=";
     };
-    patches = [ ../development/perl-modules/JSON-XS-CVE-2025-40928.patch ];
+    patches = [ ./patches/JSON-XS-CVE-2025-40928.patch ];
     propagatedBuildInputs = [ TypesSerialiser ];
     buildInputs = [ CanaryStability ];
     meta = {
@@ -20008,7 +20008,7 @@ with self;
       url = "mirror://cpan/authors/id/O/OA/OALDERS/LWP-Protocol-https-6.11.tar.gz";
       hash = "sha256-ATLdvwNmFWXKhQUPKlCU+5Jjy7w8yxpNnEGsm7CDuRc=";
     };
-    patches = [ ../development/perl-modules/lwp-protocol-https-cert-file.patch ];
+    patches = [ ./patches/lwp-protocol-https-cert-file.patch ];
     propagatedBuildInputs = [
       IOSocketSSL
       LWP
@@ -20159,7 +20159,7 @@ with self;
     };
   };
 
-  maatkit = callPackage ../development/perl-modules/maatkit { };
+  maatkit = callPackage ./patches/maatkit { };
 
   MacPasteboard = buildPerlPackage {
     pname = "Mac-Pasteboard";
@@ -20499,7 +20499,7 @@ with self;
       url = "mirror://cpan/authors/id/J/JM/JMEHNLE/mail-spf/Mail-SPF-v2.9.0.tar.gz";
       hash = "sha256-YctZFfHHrMepMf/Bv8EpG9+sVV4qRusjkbmV6p7LYWI=";
     };
-    # remove this patch patches = [ ../development/perl-modules/Mail-SPF.patch ];
+    # remove this patch patches = [ ./patches/Mail-SPF.patch ];
 
     buildInputs = [
       ModuleBuild
@@ -21685,7 +21685,7 @@ with self;
     };
   };
 
-  MNI-Perllib = callPackage ../development/perl-modules/MNI { };
+  MNI-Perllib = callPackage ./patches/MNI { };
 
   Mo = buildPerlPackage {
     pname = "Mo";
@@ -22324,7 +22324,7 @@ with self;
     };
     patches = [
       # !!! merge this patch into Perl itself (which contains Module::Pluggable as well)
-      ../development/perl-modules/module-pluggable.patch
+      ./patches/module-pluggable.patch
     ];
     buildInputs = [ AppFatPacker ];
     meta = {
@@ -24742,7 +24742,7 @@ with self;
     };
   };
 
-  MozillaLdap = callPackage ../development/perl-modules/Mozilla-LDAP { };
+  MozillaLdap = callPackage ./patches/Mozilla-LDAP { };
 
   MROCompat = buildPerlPackage {
     pname = "MRO-Compat";
@@ -25052,7 +25052,7 @@ with self;
       url = "mirror://cpan/authors/id/M/MT/MTURK/Net-Amazon-MechanicalTurk-1.02.tar.gz";
       hash = "sha256-jQlewUjglLJ/TMzHnhyvnDHzzA5t2CzoqORCyNx7D44=";
     };
-    patches = [ ../development/perl-modules/net-amazon-mechanicalturk.patch ];
+    patches = [ ./patches/net-amazon-mechanicalturk.patch ];
     propagatedBuildInputs = [
       DigestHMAC
       LWPProtocolHttps
@@ -25973,7 +25973,7 @@ with self;
     };
   };
 
-  NetRemctl = callPackage ../development/perl-modules/NetRemctl { };
+  NetRemctl = callPackage ./patches/NetRemctl { };
 
   NetServer = buildPerlPackage {
     pname = "Net-Server";
@@ -26146,7 +26146,7 @@ with self;
         url = "https://src.fedoraproject.org/rpms/perl-Net-SNMP/raw/6e1d3e8ff2b9bd38dab48301a9d8b5d81ef3b7fe/f/Net-SNMP-v6.0.1-Rewrite_from_Digest-SHA1-to-Digest-SHA.patch";
         hash = "sha256-dznhj1Fcy0iBBl92p825InjkNZixR2MURVQ/b9bVjtc=";
       })
-      ../development/perl-modules/net-snmp-add-sha-algorithms.patch
+      ./patches/net-snmp-add-sha-algorithms.patch
     ];
     preCheck = lib.optionalString stdenv.hostPlatform.isLinux ''
       export NIX_REDIRECTS=/etc/protocols=${pkgs.iana-etc}/etc/protocols
@@ -26703,13 +26703,13 @@ with self;
       pkgs.xdummy
     ];
 
-    patches = [ ../development/perl-modules/perl-opengl.patch ];
+    patches = [ ./patches/perl-opengl.patch ];
 
     configurePhase = ''
       substituteInPlace Makefile.PL \
         --replace "@@libpaths@@" '${lib.concatStringsSep "\n" (map (f: "-L${f}/lib") buildInputs)}'
 
-      cp -v ${../development/perl-modules/perl-opengl-gl-extensions.txt} utils/glversion.txt
+      cp -v ${./patches/perl-opengl-gl-extensions.txt} utils/glversion.txt
 
       perl Makefile.PL PREFIX=$out INSTALLDIRS=site $makeMakerFlags
     '';
@@ -27190,7 +27190,7 @@ with self;
       url = "mirror://cpan/authors/id/C/CO/CORLISS/Paranoid/Paranoid-2.10.tar.gz";
       hash = "sha256-vvS25l1cmk72C8qjF0hvOg0jm/2rRQqnEgLCl5i4dSk=";
     };
-    patches = [ ../development/perl-modules/Paranoid-blessed-path.patch ];
+    patches = [ ./patches/Paranoid-blessed-path.patch ];
     preConfigure = ''
       # Capture the path used when compiling this module as the "blessed"
       # system path, analogous to the module's own use of '/bin:/sbin'.
@@ -27730,7 +27730,7 @@ with self;
     };
   };
 
-  PerconaToolkit = callPackage ../development/perl-modules/Percona-Toolkit { };
+  PerconaToolkit = callPackage ./patches/Percona-Toolkit { };
 
   Perl5lib = buildPerlPackage {
     pname = "perl5lib";
@@ -28189,7 +28189,7 @@ with self;
       TryTiny
     ];
     patches = [
-      ../development/perl-modules/Plack-test-replace-DES-hash-with-bcrypt.patch
+      ./patches/Plack-test-replace-DES-hash-with-bcrypt.patch
     ];
     meta = {
       description = "Perl Superglue for Web frameworks and Web Servers (PSGI toolkit)";
@@ -28509,7 +28509,7 @@ with self;
     };
   };
 
-  Po4a = callPackage ../development/perl-modules/Po4a { };
+  Po4a = callPackage ./patches/Po4a { };
 
   PodMinimumVersion = buildPerlPackage {
     pname = "Pod-MinimumVersion";
@@ -30387,10 +30387,10 @@ with self;
     };
     patches = [
       # https://github.com/PerlGameDev/SDL/pull/304
-      ../development/perl-modules/sdl-modern-perl.patch
+      ./patches/sdl-modern-perl.patch
       # sdl-compat correctly reports the bit depth of the test image,
       # while SDL_classic rounded to the next byte
-      ../development/perl-modules/sdl-compat-bit-depth.patch
+      ./patches/sdl-compat-bit-depth.patch
       (fetchpatch {
         url = "https://aur.archlinux.org/cgit/aur.git/plain/surface-xs-declare-calc-offset-earlier.diff?h=perl-sdl&id=d4b6da86d33046cde0e84fa2cd6eaccff1667cab";
         hash = "sha256-dQ2O4dO18diSAilSZrZj6II+mBuKKI3cx9fR1SJqUvo=";
@@ -30782,7 +30782,7 @@ with self;
     };
     setOutputFlags = false;
     nativeBuildInputs = [ pkgs.which ];
-    patches = [ ../development/perl-modules/Socket6-sv_undef.patch ];
+    patches = [ ./patches/Socket6-sv_undef.patch ];
     preConfigure = lib.optionalString (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
       substituteInPlace configure \
         --replace-fail 'cross_compiling=no' 'cross_compiling=yes;ipv6_cv_can_inet_ntop=yes'
@@ -31911,7 +31911,7 @@ with self;
     };
   };
 
-  strip-nondeterminism = callPackage ../development/perl-modules/strip-nondeterminism { };
+  strip-nondeterminism = callPackage ./patches/strip-nondeterminism { };
 
   StructDumb = buildPerlModule {
     pname = "Struct-Dumb";
@@ -35765,7 +35765,7 @@ with self;
       hash = "sha256-iKeOvwiOx1AvQBxaKxOMhiz1RYU0t3MiO786r0EiQZY=";
     };
     # libbtparse.so: cannot open shared object file
-    patches = [ ../development/perl-modules/TextBibTeX-use-lib.patch ];
+    patches = [ ./patches/TextBibTeX-use-lib.patch ];
     perlPostHook = lib.optionalString stdenv.hostPlatform.isDarwin ''
       oldPath="$(pwd)/btparse/src/libbtparse.dylib"
       newPath="$out/lib/libbtparse.dylib"
@@ -37119,7 +37119,7 @@ with self;
     };
   };
 
-  Tirex = callPackage ../development/perl-modules/Tirex { };
+  Tirex = callPackage ./patches/Tirex { };
 
   Tk = buildPerlPackage {
     pname = "Tk";
@@ -37131,7 +37131,7 @@ with self;
     patches = [
       # Fix failing configure test due to implicit int return value of main, which results
       # in an error with clang 16.
-      ../development/perl-modules/tk-configure-implicit-int-fix.patch
+      ./patches/tk-configure-implicit-int-fix.patch
     ];
     postPatch = ''
       substituteInPlace pTk/mTk/additions/imgWindow.c \
@@ -38103,7 +38103,7 @@ with self;
     };
   };
 
-  WWWYoutubeViewer = callPackage ../development/perl-modules/WWW-YoutubeViewer { };
+  WWWYoutubeViewer = callPackage ./patches/WWW-YoutubeViewer { };
 
   Want = buildPerlPackage {
     pname = "Want";
@@ -38574,7 +38574,7 @@ with self;
     propagatedBuildInputs = [ libxml_perl ];
 
     #patch from https://bugzilla.redhat.com/show_bug.cgi?id=226285
-    patches = [ ../development/perl-modules/xml-grove-utf8.patch ];
+    patches = [ ./patches/xml-grove-utf8.patch ];
     meta = {
       description = "Perl-style XML objects";
       license = with lib.licenses; [
@@ -38620,7 +38620,7 @@ with self;
     );
     patches = [
       # https://github.com/shlomif/perl-XML-LibXML/pull/87
-      ../development/perl-modules/XML-LibXML-fix-tests-libxml-2.13.0.patch
+      ./patches/XML-LibXML-fix-tests-libxml-2.13.0.patch
     ];
     propagatedBuildInputs = [ XMLSAX ];
     meta = {
@@ -38708,7 +38708,7 @@ with self;
       url = "mirror://cpan/authors/id/T/TO/TODDR/XML-Parser-2.46.tar.gz";
       hash = "sha256-0zEzJJHFHMz7TLlP/ET5zXM3jmGEmNSjffngQ2YcUV0=";
     };
-    patches = [ ../development/perl-modules/xml-parser-0001-HACK-Assumes-Expat-paths-are-good.patch ];
+    patches = [ ./patches/xml-parser-0001-HACK-Assumes-Expat-paths-are-good.patch ];
     postPatch =
       lib.optionalString (stdenv.buildPlatform != stdenv.hostPlatform) ''
         substituteInPlace Expat/Makefile.PL --replace 'use English;' '#'
