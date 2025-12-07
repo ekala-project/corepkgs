@@ -132,10 +132,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://git.sr.ht/~rkta/w3m";
     changelog = "https://git.sr.ht/~rkta/w3m/tree/v${finalAttrs.version}/item/NEWS";
     description = "Text-mode web browser";
-    maintainers = with lib.maintainers; [
-      anthonyroussel
-      toastal
-    ];
+    maintainers = [ ];
     platforms = lib.platforms.unix;
     license = lib.licenses.mit;
     mainProgram = "w3m";

@@ -1,5 +1,6 @@
 {
   lib,
+  concatAttrValues,
   stdenv,
   buildPythonPackage,
   fetchFromGitHub,
@@ -110,7 +111,7 @@ buildPythonPackage rec {
     setuptools
     tomli
   ]
-  ++ lib.concatAttrValues optional-dependencies;
+  ++ concatAttrValues optional-dependencies;
 
   disabledTests = [
     # fails with typing-extensions>=4.10

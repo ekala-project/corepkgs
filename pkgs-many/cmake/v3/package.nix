@@ -1,4 +1,16 @@
 {
+  version,
+  src-hash,
+  isMinimalBuild ? false,
+  withNcurses ? false,
+  withQt ? false,
+  buildDocs ? !isMinimalBuild,
+  useOpenSSL ? !isMinimalBuild,
+  mkVariantPassthru,
+  ...
+}@variantArgs:
+
+{
   lib,
   stdenv,
   fetchurl,
@@ -12,77 +24,61 @@
   ncurses,
   openssl,
   pkg-config,
-  ps,
-  sysctl,
   rhash,
   sphinx,
+  sysctl,
   texinfo,
   xz,
   zlib,
-  darwin,
-  isBootstrap ? null,
-  isMinimalBuild ? (
-    if isBootstrap != null then
-      lib.warn "isBootstrap argument is deprecated and will be removed; use isMinimalBuild instead" isBootstrap
-    else
-      false
-  ),
-  useOpenSSL ? !isMinimalBuild,
-  useSharedLibraries ? (!isMinimalBuild && !stdenv.hostPlatform.isCygwin),
-  uiToolkits ? [ ], # can contain "ncurses" and/or "qt5"
-  buildDocs ? !(isMinimalBuild || (uiToolkits == [ ])),
   libsForQt5 ? null,
   gitUpdater,
-}:
+  darwin ? null,
+  ps,
+}@dependencies:
 
 let
   inherit (libsForQt5) qtbase wrapQtAppsHook;
-  cursesUI = lib.elem "ncurses" uiToolkits;
-  qt5UI = lib.elem "qt5" uiToolkits;
+  useSharedLibraries = (!isMinimalBuild && !stdenv.isCygwin);
 in
-# Accepts only "ncurses" and "qt5" as possible uiToolkits
-assert lib.subtractLists [ "ncurses" "qt5" ] uiToolkits == [ ];
 # Minimal, bootstrap cmake does not have toolkits
-assert isMinimalBuild -> (uiToolkits == [ ]);
+assert isMinimalBuild -> (!withNcurses && !withQt);
 stdenv.mkDerivation (finalAttrs: {
   pname =
     "cmake"
     + lib.optionalString isMinimalBuild "-minimal"
-    + lib.optionalString cursesUI "-cursesUI"
-    + lib.optionalString qt5UI "-qt5UI";
-  version = "4.1.2";
+    + lib.optionalString withNcurses "-cursesUI"
+    + lib.optionalString withQt "-qt5UI";
+  inherit version;
 
   src = fetchurl {
     url = "https://cmake.org/files/v${lib.versions.majorMinor finalAttrs.version}/cmake-${finalAttrs.version}.tar.gz";
-    hash = "sha256-ZD8EGCt7oyOrMfUm94UTT7ecujGIqFIgbvBHP+4oKhU=";
+    hash = src-hash;
   };
 
   patches = [
     # Add NIXPKGS_CMAKE_PREFIX_PATH to cmake which is like CMAKE_PREFIX_PATH
     # except it is not searched for programs
-    ./nixpkgs-cmake-prefix-path.patch
-
-    # Add the libc paths from the compiler wrapper.
-    ./add-nixpkgs-libc-paths.patch
+    ./000-nixpkgs-cmake-prefix-path.diff
+    # Don't search in non-Nix locations such as /usr, but do search in our libc.
+    ./001-search-path.diff
+    # Don't depend on frameworks.
+    # TODO: support darwin
+    # ./002-application-services.diff
+    # Derived from https://github.com/libuv/libuv/commit/1a5d4f08238dd532c3718e210078de1186a5920d
+    ./003-libuv-application-services.diff
   ]
-  ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    (replaceVars ./darwin-binary-paths.patch {
-      sw_vers = lib.getExe' darwin.DarwinTools "sw_vers";
-      vm_stat = lib.getExe' darwin.system_cmds "vm_stat";
-    })
-  ]
-  ++ lib.optionals (stdenv.hostPlatform.isDarwin || stdenv.hostPlatform.isFreeBSD) [
-    (replaceVars ./darwin-bsd-binary-paths.patch {
-      # `ps(1)` is theoretically used on Linux too, but only when
-      # `/proc` is inaccessible, so we can skip the dependency.
+  ++ lib.optional stdenv.isCygwin ./004-cygwin.diff
+  # Derived from https://github.com/curl/curl/commit/31f631a142d855f069242f3e0c643beec25d1b51
+  ++ lib.optional (stdenv.isDarwin && isMinimalBuild) ./005-remove-systemconfiguration-dep.diff
+  # On Darwin, always set CMAKE_SHARED_LIBRARY_RUNTIME_C_FLAG.
+  ++ lib.optional stdenv.isDarwin ./006-darwin-always-set-runtime-c-flag.diff
+  # On platforms where ps is not part of stdenv, patch the invocation of ps to use an absolute path.
+  ++ lib.optional (stdenv.isDarwin || stdenv.isFreeBSD) (
+    replaceVars ./007-darwin-bsd-ps-abspath.diff {
       ps = lib.getExe ps;
       sysctl = lib.getExe sysctl;
-    })
-  ]
-  ++ [
-    # Remove references to non‐Nix search paths.
-    ./remove-impure-search-paths.patch
-  ];
+    }
+  );
 
   outputs = [
     "out"
@@ -95,8 +91,8 @@ stdenv.mkDerivation (finalAttrs: {
   setOutputFlags = false;
 
   setupHooks = [
-    ./setup-hook.sh
-    ./check-pc-files-hook.sh
+    ../setup-hook.sh
+    ../check-pc-files-hook.sh
   ];
 
   depsBuildBuild = [ buildPackages.stdenv.cc ];
@@ -107,7 +103,7 @@ stdenv.mkDerivation (finalAttrs: {
       pkg-config
     ]
     ++ lib.optionals buildDocs [ texinfo ]
-    ++ lib.optionals qt5UI [ wrapQtAppsHook ];
+    ++ lib.optionals withQt [ wrapQtAppsHook ];
 
   buildInputs =
     lib.optionals useSharedLibraries [
@@ -121,10 +117,11 @@ stdenv.mkDerivation (finalAttrs: {
       rhash
     ]
     ++ lib.optional useOpenSSL openssl
-    ++ lib.optional cursesUI ncurses
-    ++ lib.optional qt5UI qtbase;
+    ++ lib.optional withNcurses ncurses
+    ++ lib.optional withQt qtbase;
 
   preConfigure = ''
+    fixCmakeFiles .
     substituteInPlace Modules/Platform/UnixPaths.cmake \
       --subst-var-by libc_bin ${lib.getBin stdenv.cc.libc} \
       --subst-var-by libc_dev ${lib.getDev stdenv.cc.libc} \
@@ -139,6 +136,7 @@ stdenv.mkDerivation (finalAttrs: {
   configurePlatforms = [ ];
 
   configureFlags = [
+    "CXXFLAGS=-Wno-elaborated-enum-base"
     "--docdir=share/doc/${finalAttrs.pname}-${finalAttrs.version}"
   ]
   ++ (
@@ -153,11 +151,16 @@ stdenv.mkDerivation (finalAttrs: {
         "--no-system-libs"
       ]
   ) # FIXME: cleanup
-  ++ lib.optional qt5UI "--qt-gui"
+  ++ lib.optional withQt "--qt-gui"
   ++ lib.optionals buildDocs [
     "--sphinx-build=${sphinx}/bin/sphinx-build"
     "--sphinx-info"
     "--sphinx-man"
+  ]
+  # Workaround https://gitlab.kitware.com/cmake/cmake/-/issues/20568
+  ++ lib.optionals stdenv.hostPlatform.is32bit [
+    "CFLAGS=-D_FILE_OFFSET_BITS=64"
+    "CXXFLAGS=-D_FILE_OFFSET_BITS=64"
   ]
   ++ [
     "--"
@@ -174,12 +177,18 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeFeature "CMAKE_STRIP" "${lib.getBin stdenv.cc.bintools.bintools}/bin/${stdenv.cc.targetPrefix}strip")
 
     (lib.cmakeBool "CMAKE_USE_OPENSSL" useOpenSSL)
-    (lib.cmakeBool "BUILD_CursesDialog" cursesUI)
+    (lib.cmakeBool "BUILD_CursesDialog" withNcurses)
   ];
+
+  # `pkgsCross.musl64.cmake.override { stdenv = pkgsCross.musl64.llvmPackages_16.libcxxStdenv; }`
+  # fails with `The C++ compiler does not support C++11 (e.g.  std::unique_ptr).`
+  # The cause is a compiler warning `warning: argument unused during compilation: '-pie' [-Wunused-command-line-argument]`
+  # interfering with the feature check.
+  env.NIX_CFLAGS_COMPILE = "-Wno-unused-command-line-argument";
 
   # make install attempts to use the just-built cmake
   preInstall = lib.optionalString (stdenv.hostPlatform != stdenv.buildPlatform) ''
-    sed -i 's|bin/cmake|${buildPackages.cmakeMinimal}/bin/cmake|g' Makefile
+    sed -i 's|bin/cmake|${buildPackages.cmake.minimal}/bin/cmake|g' Makefile
   '';
 
   dontUseCmakeConfigure = true;
@@ -187,10 +196,12 @@ stdenv.mkDerivation (finalAttrs: {
 
   doCheck = false; # fails
 
-  passthru.updateScript = gitUpdater {
-    url = "https://gitlab.kitware.com/cmake/cmake.git";
-    rev-prefix = "v";
-    ignoredVersions = "-"; # -rc1 and friends
+  passthru = (mkVariantPassthru variantArgs dependencies) // {
+    updateScript = gitUpdater {
+      url = "https://gitlab.kitware.com/cmake/cmake.git";
+      rev-prefix = "v";
+      ignoredVersions = "-"; # -rc1 and friends
+    };
   };
 
   meta = {
@@ -208,6 +219,6 @@ stdenv.mkDerivation (finalAttrs: {
     maintainers = [ ];
     platforms = lib.platforms.all;
     mainProgram = "cmake";
-    broken = (qt5UI && stdenv.hostPlatform.isDarwin);
+    broken = (withQt && stdenv.isDarwin);
   };
 })

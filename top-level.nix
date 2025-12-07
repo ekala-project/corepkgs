@@ -8,6 +8,9 @@ let
   inherit (final.lib) lowPrio;
 in
 with final; {
+
+  # FIXME(corepkgs): update lib and use function from it
+  concatAttrValues = set: lib.concatLists (lib.attrValues set);
    # TODO(corepkgs): support NixOS tests
   testers = { };
   nixosTests = { };
@@ -330,7 +333,7 @@ with final; {
       tests = pkgs.tests.fetchpatch;
       version = 1;
     };
-  fetchpatch2 = callPackage ../build-support/fetchpatch {
+  fetchpatch2 = callPackage ./build-support/fetchpatch {
       patchutils = __splicedPackages.patchutils_0_4_2;
       }
       // {
@@ -1336,6 +1339,12 @@ with final; {
     pythonSupport = false;
     perlSupport = false;
     withpcre2 = false;
+    withZlibNg = false;
+    # FIXME(corepkgs): these are hacks to break the infinite recursion
+    # Prefer plain zlib and curl without HTTP/3 to keep bootstrap cycle small.
+    zlib-ng = zlib;
+    # Avoid curl with HTTP/3 (nghttp3) to break the cmake→git→curl→nghttp3→cmake cycle.
+    curl = curlMinimal;
   };
 
   deterministic-host-uname = deterministic-uname.override {
@@ -1345,19 +1354,7 @@ with final; {
   makeFontsConf = callPackage ./build-support/make-fonts-conf { };
   makeFontsCache = callPackage ./build-support/make-fonts-cache { };
 
-    # can't use override - it triggers infinite recursion
-  cmakeMinimal = callPackage ./pkgs/cmake {
-    isMinimalBuild = true;
-  };
-  cmakeCurses = cmake.override {
-    uiToolkits = [ "ncurses" ];
-  };
-  cmakeWithGui = cmake.override {
-    uiToolkits = [
-      "ncurses"
-      "qt5"
-    ];
-  };
+  cmakeMinimal = prev.cmake.minimal;
 
   gtk3 = callPackage ./pkgs/gtk/3.x.nix { };
   gtk4 = callPackage ./pkgs/gtk/4.x.nix { };

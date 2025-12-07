@@ -39,7 +39,7 @@
   typing-extensions,
 
   # reverse dependencies to test
-  breathe,
+  breathe ? null,
 }:
 
 buildPythonPackage rec {

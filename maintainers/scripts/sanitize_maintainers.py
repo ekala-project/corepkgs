@@ -15,11 +15,9 @@ MAINTAINERS_PATTERN = re.compile(
     r"(?ms)(?P<indent>^[ \t]*)maintainers\s*=\s*(?:with\s+[^\s;]+?\s*;\s*)?\[.*?\]\s*;"
 )
 
-# Matches `teams = [ ... ];` assignments (single or multi-line) and removes them.
-# Restricts to array assignments to avoid false positives (e.g., functions or attrs).
-TEAMS_PATTERN = re.compile(
-    r"(?ms)^[ \t]*teams\s*=\s*(?:with\s+[^\s;]+?\s*;\s*)?\[.*?\]\s*;\s*\n?"
-)
+# Matches `teams = ...;` assignments (single or multi-line) and removes them.
+# Keep it permissive so non-list assignments like `teams = sphinx.meta.teams;` are covered.
+TEAMS_PATTERN = re.compile(r"(?ms)^[ \t]*teams\s*=.*?;\s*\n?")
 
 
 def parse_args() -> argparse.Namespace:
@@ -56,7 +54,7 @@ def iter_nix_files(paths: Iterable[str]) -> list[Path]:
         path = Path(raw)
         if path.is_dir():
             for f in sorted(path.rglob("*.nix")):
-                if f not in seen:
+                if f.is_file() and f not in seen:
                     seen.add(f)
                     files.append(f)
         elif path.is_file() and path.suffix == ".nix":

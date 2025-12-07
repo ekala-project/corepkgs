@@ -8,8 +8,10 @@
   filelock,
   execnet,
   pytest,
+
+  # optional-dependencies
   psutil,
-  setproctitle,
+  setproctitle ? null,
 }:
 
 buildPythonPackage rec {
