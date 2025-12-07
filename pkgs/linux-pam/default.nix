@@ -21,7 +21,7 @@
   libxml2,
   w3m-batch,
   findXMLCatalogs,
-  docbook_xsl_ns,
+  docbook-xsl-ns,
   nix-update-script,
   withLogind ? lib.meta.availableOn stdenv.hostPlatform systemdLibs,
   withAudit ?
@@ -73,7 +73,7 @@ stdenv.mkDerivation (finalAttrs: {
     libxml2
     w3m-batch
     findXMLCatalogs
-    docbook_xsl_ns
+    docbook-xsl-ns
     docbook5
   ];
 

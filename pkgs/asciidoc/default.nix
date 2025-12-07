@@ -20,7 +20,7 @@
   lilypond ? null,
   libxml2,
   docbook_xml_dtd_45,
-  docbook_xsl_ns,
+  docbook-xsl-ns,
   docbook_xsl,
   fop ? null,
   epubcheck ? null,
@@ -257,7 +257,7 @@ python3.pkgs.buildPythonApplication rec {
         # cannot find their neighbours (e.g. pdflatex doesn't find mktextfm).
         # We can remove PATH= when those impurities are fixed.
         # TODO: Is this still necessary when using texlive?
-        sed -e "s|^ENV =.*|ENV = dict(XML_CATALOG_FILES='${docbook_xml_dtd_45}/xml/dtd/docbook/catalog.xml ${docbook_xsl_ns}/xml/xsl/docbook/catalog.xml ${docbook_xsl}/xml/xsl/docbook/catalog.xml', PATH='${
+        sed -e "s|^ENV =.*|ENV = dict(XML_CATALOG_FILES='${docbook_xml_dtd_45}/xml/dtd/docbook/catalog.xml ${docbook-xsl-ns}/xml/xsl/docbook/catalog.xml ${docbook_xsl}/xml/xsl/docbook/catalog.xml', PATH='${
           lib.makeBinPath [
             texlive
             coreutils
@@ -276,7 +276,7 @@ python3.pkgs.buildPythonApplication rec {
       ''
     else
       ''
-        sed -e "s|^ENV =.*|ENV = dict(XML_CATALOG_FILES='${docbook_xml_dtd_45}/xml/dtd/docbook/catalog.xml ${docbook_xsl_ns}/xml/xsl/docbook/catalog.xml ${docbook_xsl}/xml/xsl/docbook/catalog.xml', **(dict(filter(lambda v: v[0] == 'SOURCE_DATE_EPOCH', os.environ.items()))))|" \
+        sed -e "s|^ENV =.*|ENV = dict(XML_CATALOG_FILES='${docbook_xml_dtd_45}/xml/dtd/docbook/catalog.xml ${docbook-xsl-ns}/xml/xsl/docbook/catalog.xml ${docbook_xsl}/xml/xsl/docbook/catalog.xml', **(dict(filter(lambda v: v[0] == 'SOURCE_DATE_EPOCH', os.environ.items()))))|" \
             -e "s|^XSLTPROC =.*|XSLTPROC = '${libxslt.bin}/bin/xsltproc'|" \
             -e "s|^XMLLINT =.*|XMLLINT = '${libxml2.bin}/bin/xmllint'|" \
             -i asciidoc/a2x.py

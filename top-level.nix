@@ -1298,8 +1298,8 @@ with final;
   udev = if lib.meta.availableOn stdenv.hostPlatform systemdLibs then systemdLibs else libudev-zero;
 
   inherit (callPackages ./pkgs/docbook-xsl { })
-    docbook_xsl # was docbook-xsl-nons
-    docbook_xsl_ns # was docbook-xsl-ns
+    docbook-xsl-nons
+    docbook-xsl-ns # was docbook-xsl-ns
     ;
 
   inherit (callPackage ./pkgs/libxml2 { })
