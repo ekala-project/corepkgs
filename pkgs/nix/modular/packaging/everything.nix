@@ -228,7 +228,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = nix-cli.meta.homepage;
     license = nix-cli.meta.license;
     maintainers = maintainers;
-platforms = nix-cli.meta.platforms;
+    platforms = nix-cli.meta.platforms;
     outputsToInstall = [
       "out"
       "man"

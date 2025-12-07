@@ -304,7 +304,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.gtk.org/";
     license = licenses.lgpl2Plus;
     maintainers = [ ];
-platforms = platforms.all;
+    platforms = platforms.all;
     changelog = "https://gitlab.gnome.org/GNOME/gtk/-/raw/${finalAttrs.version}/NEWS";
     pkgConfigModules = [
       "gtk4"

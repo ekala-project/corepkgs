@@ -1,6 +1,7 @@
-{ lib
-, fetchPypi
-, python3
+{
+  lib,
+  fetchPypi,
+  python3,
 }:
 
 python3.pkgs.buildPythonApplication rec {
@@ -16,11 +17,14 @@ python3.pkgs.buildPythonApplication rec {
     sha256 = "0kmggnfbv6bba75l3zfzqwk0swi90brjka307m2kcz2w35kr8jvn";
   };
 
-  propagatedBuildInputs = (with python3.pkgs; [
-    jinja2
-    pyyaml
-    six
-  ]);
+  propagatedBuildInputs = (
+    with python3.pkgs;
+    [
+      jinja2
+      pyyaml
+      six
+    ]
+  );
 
   doCheck = false;
 

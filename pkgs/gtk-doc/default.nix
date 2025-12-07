@@ -96,5 +96,5 @@ python3.pkgs.buildPythonApplication rec {
     homepage = "https://gitlab.gnome.org/GNOME/gtk-doc";
     license = licenses.gpl2Plus;
     maintainers = [ ];
-};
+  };
 }

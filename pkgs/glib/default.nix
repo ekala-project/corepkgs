@@ -367,7 +367,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://gitlab.gnome.org/GNOME/glib";
     license = licenses.lgpl21Plus;
     maintainers = [ ];
-pkgConfigModules = [
+    pkgConfigModules = [
       "gio-2.0"
       "gobject-2.0"
       "gthread-2.0"

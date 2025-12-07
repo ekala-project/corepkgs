@@ -58,7 +58,7 @@ let
         asl20
       ];
       maintainers = [ ];
-};
+    };
   };
 in
 packaging

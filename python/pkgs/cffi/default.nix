@@ -41,5 +41,5 @@ buildPythonPackage rec {
     downloadPage = "https://github.com/python-cffi/cffi";
     homepage = "https://cffi.readthedocs.org/";
     license = lib.licenses.mit0;
-};
+  };
 }

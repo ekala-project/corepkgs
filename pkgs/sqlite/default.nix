@@ -9,7 +9,7 @@
 
   # for tests
   # TODO(corepkgs): enable tests
-  python3Packages ? {},
+  python3Packages ? { },
   sqldiff ? null,
   sqlite-analyzer ? null,
   sqlite-rsync ? null,

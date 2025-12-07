@@ -56,8 +56,7 @@ let
       };
     });
 in
-self: super:
-{
+self: super: {
   wrapWithXFileSearchPathHook = callPackage (
     {
       makeBinaryWrapper,

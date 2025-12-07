@@ -313,7 +313,7 @@ stdenv.mkDerivation (
       description = "Standard implementation of the Perl 5 programming language";
       license = lib.licenses.artistic1;
       maintainers = [ ];
-platforms = lib.platforms.all;
+      platforms = lib.platforms.all;
       priority = 6; # in `buildEnv' (including the one inside `perl.withPackages') the library files will have priority over files in `perl`
       mainProgram = "perl";
     };

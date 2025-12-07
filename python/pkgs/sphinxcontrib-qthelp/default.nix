@@ -31,5 +31,5 @@ buildPythonPackage rec {
     description = "Sphinx extension which outputs QtHelp document";
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-qthelp";
     license = licenses.bsd2;
-};
+  };
 }

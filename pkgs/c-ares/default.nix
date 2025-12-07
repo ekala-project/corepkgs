@@ -32,7 +32,10 @@ stdenv.mkDerivation rec {
     "man"
   ];
 
-  nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ] ++ lib.optionals withCMake [ cmake.minimal ];
+  nativeBuildInputs = [
+    updateAutotoolsGnuConfigScriptsHook
+  ]
+  ++ lib.optionals withCMake [ cmake.minimal ];
 
   cmakeFlags =
     [ ]

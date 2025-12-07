@@ -31,5 +31,5 @@ buildPythonPackage rec {
     description = "Sphinx extension which outputs \"serialized\" HTML files (json and pickle)";
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-serializinghtml";
     license = licenses.bsd2;
-};
+  };
 }

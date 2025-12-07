@@ -1045,7 +1045,7 @@ stdenv.mkDerivation (finalAttrs: {
       ofl
       publicDomain
     ];
-pkgConfigModules = [
+    pkgConfigModules = [
       "libsystemd"
       "libudev"
       "systemd"

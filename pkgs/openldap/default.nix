@@ -160,6 +160,6 @@ stdenv.mkDerivation rec {
     description = "Open source implementation of the Lightweight Directory Access Protocol";
     license = licenses.openldap;
     maintainers = [ ];
-platforms = platforms.unix;
+    platforms = platforms.unix;
   };
 }

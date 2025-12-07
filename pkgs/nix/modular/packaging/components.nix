@@ -201,7 +201,7 @@ let
         '';
       license = prevAttrs.meta.license or lib.licenses.lgpl21Plus;
       maintainers = prevAttrs.meta.maintainers or [ ] ++ scope.maintainers;
-platforms = prevAttrs.meta.platforms or (lib.platforms.unix ++ lib.platforms.windows);
+      platforms = prevAttrs.meta.platforms or (lib.platforms.unix ++ lib.platforms.windows);
     };
   };
 

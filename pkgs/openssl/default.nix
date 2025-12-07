@@ -378,7 +378,7 @@ let
         license = lib.licenses.openssl;
         mainProgram = "openssl";
         maintainers = [ ];
-pkgConfigModules = [
+        pkgConfigModules = [
           "libcrypto"
           "libssl"
           "openssl"

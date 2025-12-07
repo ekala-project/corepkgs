@@ -143,7 +143,7 @@ let
         description = "Header files and scripts for Linux kernel";
         license = lib.licenses.gpl2Only;
         platforms = lib.platforms.linux;
-};
+      };
     };
 in
 {

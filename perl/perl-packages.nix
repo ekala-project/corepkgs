@@ -2728,7 +2728,7 @@ with self;
     meta = {
       description = "BSD process resource limit and priority functions";
       license = with lib.licenses; [ artistic2 ];
-};
+    };
   };
 
   BSON = buildPerlPackage {
@@ -5019,7 +5019,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-};
+    };
   };
 
   ClassFactory = buildPerlPackage {
@@ -6028,7 +6028,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-};
+    };
   };
 
   ConfigMerge = buildPerlPackage {
@@ -13471,7 +13471,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-};
+    };
   };
 
   FileFcntlLock = buildPerlPackage {
@@ -13501,7 +13501,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-};
+    };
   };
 
   FileHandleUnget = buildPerlPackage {
@@ -13815,7 +13815,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-};
+    };
   };
 
   Filepushd = buildPerlPackage {
@@ -14059,7 +14059,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-};
+    };
   };
 
   FileTouch = buildPerlPackage {
@@ -14076,7 +14076,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-};
+    };
   };
 
   FileTreeCreate = buildPerlModule {
@@ -14779,7 +14779,7 @@ with self;
     meta = {
       description = "This is the Git.pm, plus the other files in the perl/Git directory, from github's git/git";
       license = with lib.licenses; [ gpl2Plus ];
-};
+    };
   };
 
   GitAutofixup = buildPerlPackage {
@@ -15311,7 +15311,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-};
+    };
   };
 
   Gtk2 = buildPerlPackage {
@@ -18984,7 +18984,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-};
+    };
   };
 
   LinuxDesktopFiles = buildPerlModule {
@@ -20475,7 +20475,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-};
+    };
   };
 
   MailSPF = buildPerlPackage {
@@ -26812,7 +26812,7 @@ with self;
       homepage = "https://github.com/mark-5/p5-net-zookeeper";
       license = with lib.licenses; [ asl20 ];
       maintainers = [ ];
-};
+    };
   };
 
   nsdiff = buildPerlPackage {
@@ -27183,7 +27183,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-};
+    };
   };
 
   PARDist = buildPerlPackage {
@@ -27370,7 +27370,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-};
+    };
   };
 
   ParsePMFile = buildPerlPackage {
@@ -28055,7 +28055,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-};
+    };
   };
 
   PerlMagick = ImageMagick; # added 2021-08-02
@@ -28127,7 +28127,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-mainProgram = "ppkg-config";
+      mainProgram = "ppkg-config";
     };
   };
 
@@ -28546,7 +28546,7 @@ mainProgram = "ppkg-config";
         artistic1
         gpl1Plus
       ];
-};
+    };
   };
 
   POETestLoops = buildPerlPackage {
@@ -28563,7 +28563,7 @@ mainProgram = "ppkg-config";
         artistic1
         gpl1Plus
       ];
-mainProgram = "poe-gen-tests";
+      mainProgram = "poe-gen-tests";
     };
   };
 

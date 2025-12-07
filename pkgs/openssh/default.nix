@@ -30,7 +30,7 @@ in
     ];
     extraMeta = {
       maintainers = [ ];
-};
+    };
   };
 
   openssh_hpn = common rec {

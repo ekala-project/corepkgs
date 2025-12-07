@@ -20,7 +20,7 @@ rec {
           asl20
           llvm-exception
         ];
-# See llvm/cmake/config-ix.cmake.
+    # See llvm/cmake/config-ix.cmake.
     platforms =
       lib.platforms.aarch64
       ++ lib.platforms.arm

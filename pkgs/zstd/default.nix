@@ -38,7 +38,10 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-tNFWIT9ydfozB8dWcmTMuZLCQmQudTFJIkSr0aG7S44=";
   };
 
-  nativeBuildInputs = [ cmakeMinimal ] ++ lib.optional stdenv.hostPlatform.isDarwin fixDarwinDylibNames;
+  nativeBuildInputs = [
+    cmakeMinimal
+  ]
+  ++ lib.optional stdenv.hostPlatform.isDarwin fixDarwinDylibNames;
   buildInputs = lib.optional stdenv.hostPlatform.isUnix bashNonInteractive;
 
   patches = [

@@ -30,10 +30,11 @@ buildPythonPackage rec {
 
   buildInputs = [ pytest ];
 
-  dependencies = [ ]
-  ++ lib.optionals (pythonOlder "3.13") [
-    typing-extensions
-  ];
+  dependencies =
+    [ ]
+    ++ lib.optionals (pythonOlder "3.13") [
+      typing-extensions
+    ];
 
   postInstall = ''
     mkdir $testout

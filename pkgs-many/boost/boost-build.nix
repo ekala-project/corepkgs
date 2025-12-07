@@ -1,12 +1,13 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, bison
-, src
-, version
-, boostBuildPatches ? []
-, packageAtLeast
-, packageOlder
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  bison,
+  src,
+  version,
+  boostBuildPatches ? [ ],
+  packageAtLeast,
+  packageOlder,
 }:
 
 stdenv.mkDerivation {
@@ -24,7 +25,8 @@ stdenv.mkDerivation {
   postPatch = ''
     substituteInPlace src/build-system.jam \
     --replace "default-toolset = darwin" "default-toolset = clang-darwin"
-  '' + lib.optionalString (packageAtLeast "1.82") ''
+  ''
+  + lib.optionalString (packageAtLeast "1.82") ''
     patchShebangs --build src/engine/build.sh
   '';
 
@@ -57,4 +59,3 @@ stdenv.mkDerivation {
     maintainers = with maintainers; [ ];
   };
 }
-

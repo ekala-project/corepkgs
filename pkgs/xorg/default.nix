@@ -86,7 +86,7 @@
   xkeyboard-config ? null,
   xorg-cf-files ? null,
   xorg-docs ? null,
-  xorg-sgml-doctools ? null ,
+  xorg-sgml-doctools ? null,
 }:
 
 self: with self; {

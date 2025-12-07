@@ -7,11 +7,12 @@ let
   # TODO(corepkgs): deprecate lowPrio
   inherit (final.lib) lowPrio;
 in
-with final; {
+with final;
+{
 
   # FIXME(corepkgs): update lib and use function from it
   concatAttrValues = set: lib.concatLists (lib.attrValues set);
-   # TODO(corepkgs): support NixOS tests
+  # TODO(corepkgs): support NixOS tests
   testers = { };
   nixosTests = { };
   tests = { };
@@ -87,7 +88,7 @@ with final; {
     else
       mkStdenvNoLibs stdenv;
 
-    stdenvNoLibc =
+  stdenvNoLibc =
     if stdenvNoCC.hostPlatform != stdenvNoCC.buildPlatform then
       (
         if stdenvNoCC.hostPlatform.isDarwin || stdenvNoCC.hostPlatform.useLLVM or false then
@@ -147,53 +148,54 @@ with final; {
     glibc32 = pkgsi686Linux.buildPackages.glibc;
   };
 
-   libc = let
-        inherit (stdenv.hostPlatform) libc;
-        # libc is hackily often used from the previous stage. This `or`
-        # hack fixes the hack, *sigh*.
-      in
-      if libc == null then
-        null
-      else if libc == "glibc" then
-        glibc
-      else if libc == "bionic" then
-        bionic
-      else if libc == "uclibc" then
-        uclibc
-      else if libc == "avrlibc" then
-        avrlibc
-      else if libc == "newlib" && stdenv.hostPlatform.isMsp430 then
-        msp430Newlib
-      else if libc == "newlib" && stdenv.hostPlatform.isVc4 then
-        vc4-newlib
-      else if libc == "newlib" && stdenv.hostPlatform.isOr1k then
-        or1k-newlib
-      else if libc == "newlib" then
-        newlib
-      else if libc == "newlib-nano" then
-        newlib-nano
-      else if libc == "musl" then
-        musl
-      else if libc == "msvcrt" then
-        windows.mingw_w64
-      else if libc == "ucrt" then
-        windows.mingw_w64
-      else if libc == "libSystem" then
-        if stdenv.hostPlatform.useiOSPrebuilt then darwin.iosSdkPkgs.libraries else darwin.libSystem
-      else if libc == "fblibc" then
-        freebsd.libc
-      else if libc == "oblibc" then
-        openbsd.libc
-      else if libc == "nblibc" then
-        netbsd.libc
-      else if libc == "wasilibc" then
-        wasilibc
-      else if libc == "relibc" then
-        relibc
-      else if name == "llvm" then
-        llvmPackages_20.libc
-      else
-        throw "Unknown libc ${libc}";
+  libc =
+    let
+      inherit (stdenv.hostPlatform) libc;
+      # libc is hackily often used from the previous stage. This `or`
+      # hack fixes the hack, *sigh*.
+    in
+    if libc == null then
+      null
+    else if libc == "glibc" then
+      glibc
+    else if libc == "bionic" then
+      bionic
+    else if libc == "uclibc" then
+      uclibc
+    else if libc == "avrlibc" then
+      avrlibc
+    else if libc == "newlib" && stdenv.hostPlatform.isMsp430 then
+      msp430Newlib
+    else if libc == "newlib" && stdenv.hostPlatform.isVc4 then
+      vc4-newlib
+    else if libc == "newlib" && stdenv.hostPlatform.isOr1k then
+      or1k-newlib
+    else if libc == "newlib" then
+      newlib
+    else if libc == "newlib-nano" then
+      newlib-nano
+    else if libc == "musl" then
+      musl
+    else if libc == "msvcrt" then
+      windows.mingw_w64
+    else if libc == "ucrt" then
+      windows.mingw_w64
+    else if libc == "libSystem" then
+      if stdenv.hostPlatform.useiOSPrebuilt then darwin.iosSdkPkgs.libraries else darwin.libSystem
+    else if libc == "fblibc" then
+      freebsd.libc
+    else if libc == "oblibc" then
+      openbsd.libc
+    else if libc == "nblibc" then
+      netbsd.libc
+    else if libc == "wasilibc" then
+      wasilibc
+    else if libc == "relibc" then
+      relibc
+    else if name == "llvm" then
+      llvmPackages_20.libc
+    else
+      throw "Unknown libc ${libc}";
 
   binutils-unwrapped = callPackage ./pkgs/binutils {
     # FHS sys dirs presumably only have stuff for the build platform
@@ -303,7 +305,7 @@ with final; {
     in
     lib.recurseIntoAttrs xorgPackages;
 
-    inherit (xorg)
+  inherit (xorg)
     xorgproto
     ;
 
@@ -325,18 +327,20 @@ with final; {
   makeDBusConf = callPackage ./pkgs/dbus/make-dbus-conf.nix { };
 
   # TODO(corepkgs): move these fetchers into pkgs
-  fetchpatch = callPackage ./build-support/fetchpatch {
+  fetchpatch =
+    callPackage ./build-support/fetchpatch {
       # 0.3.4 would change hashes: https://github.com/NixOS/nixpkgs/issues/25154
       patchutils = __splicedPackages.patchutils_0_3_3;
-      }
-      // {
+    }
+    // {
       tests = pkgs.tests.fetchpatch;
       version = 1;
     };
-  fetchpatch2 = callPackage ./build-support/fetchpatch {
+  fetchpatch2 =
+    callPackage ./build-support/fetchpatch {
       patchutils = __splicedPackages.patchutils_0_4_2;
-      }
-      // {
+    }
+    // {
       tests = pkgs.tests.fetchpatch2;
       version = 2;
     };
@@ -354,7 +358,13 @@ with final; {
       buildPackages.fetchurl # No need to do special overrides twice,
     else
       lib.makeOverridable (import ./build-support/fetchurl) {
-        inherit lib stdenvNoCC buildPackages cacert config;
+        inherit
+          lib
+          stdenvNoCC
+          buildPackages
+          cacert
+          config
+          ;
         curl = buildPackages.curlMinimal.override (old: rec {
           # break dependency cycles
           fetchurl = stdenv.fetchurlBoot;
@@ -416,7 +426,7 @@ with final; {
     propagatedBuildInputs = [ dieHook ];
   } ./build-support/setup-hooks/shorten-perl-shebang.sh;
 
-   copyPkgconfigItems = makeSetupHook {
+  copyPkgconfigItems = makeSetupHook {
     name = "copy-pkg-config-items-hook";
   } ./build-support/setup-hooks/copy-pkgconfig-items.sh;
   fixDarwinDylibNames = callPackage (
@@ -431,7 +441,7 @@ with final; {
       meta.platforms = lib.platforms.darwin;
     } ./build-support/setup-hooks/fix-darwin-dylib-names.sh
   ) { };
-    makePkgconfigItem = callPackage ./build-support/make-pkgconfigitem { };
+  makePkgconfigItem = callPackage ./build-support/make-pkgconfigitem { };
 
   # TODO(corepkgs): alias?
   mpi = openmpi; # this attribute should used to build MPI applications
@@ -479,7 +489,7 @@ with final; {
   libgbm = callPackage ./pkgs/mesa/gbm.nix { };
   mesa-gl-headers = callPackage ./pkgs/mesa/headers.nix { };
 
-   libunwind =
+  libunwind =
     # Use the system unwinder in the SDK but provide a compatibility package to:
     # 1. avoid evaluation errors with setting `unwind` to `null`; and
     # 2. provide a `.pc` for compatibility with packages that expect to find libunwind that way.
@@ -525,7 +535,7 @@ with final; {
     else
       gcc.cc;
 
-   inherit
+  inherit
     (rec {
       # NOTE: keep this with the "NG" label until we're ready to drop the monolithic GCC
       gccNGPackagesSet = lib.recurseIntoAttrs (callPackages ./pkgs/gcc/ng { });
@@ -850,7 +860,7 @@ with final; {
     pypy310
     pypy311
     ;
-    
+
   # Python package sets.
   python27Packages = python27.pkgs;
   python310Packages = python310.pkgs;
@@ -1037,7 +1047,7 @@ with final; {
     };
   } ./build-support/setup-hooks/auto-patchelf.sh;
 
-   stripJavaArchivesHook = makeSetupHook {
+  stripJavaArchivesHook = makeSetupHook {
     name = "strip-java-archives-hook";
     propagatedBuildInputs = [ strip-nondeterminism ];
   } ./build-support/setup-hooks/strip-java-archives.sh;
@@ -1074,8 +1084,14 @@ with final; {
 
   # TODO(corepkgs): use mkManyVariants
   texinfoPackages = callPackages ./pkgs/texinfo/packages.nix {
-    inherit freebsd gawk libintl ncurses procps;
-   };
+    inherit
+      freebsd
+      gawk
+      libintl
+      ncurses
+      procps
+      ;
+  };
   inherit (texinfoPackages)
     texinfo6
     texinfo7
@@ -1299,7 +1315,7 @@ with final; {
 
   curlMinimal = prev.curl;
   curl = curlMinimal.override (
-   {
+    {
       idnSupport = true;
       pslSupport = true;
       zstdSupport = true;
@@ -1428,11 +1444,9 @@ with final; {
     watch
     ;
 
-    sphinx = with python3.pkgs; toPythonApplication sphinx;
+  sphinx = with python3.pkgs; toPythonApplication sphinx;
 
-  nixDependencies = lib.recurseIntoAttrs (
-    callPackage ./pkgs/nix/dependencies-scope.nix { }
-  );
+  nixDependencies = lib.recurseIntoAttrs (callPackage ./pkgs/nix/dependencies-scope.nix { });
   nixVersions = lib.recurseIntoAttrs (
     callPackage ./pkgs/nix {
       storeDir = config.nix.storeDir or "/nix/store";
@@ -1494,7 +1508,7 @@ with final; {
   clangStdenv = if stdenv.cc.isClang then stdenv else lowPrio llvmPackages.stdenv;
   libcxxStdenv = if stdenv.hostPlatform.isDarwin then stdenv else lowPrio llvmPackages.libcxxStdenv;
 
-   lld = llvmPackages.lld;
+  lld = llvmPackages.lld;
 
   lldb = llvmPackages.lldb;
 

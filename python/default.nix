@@ -13,7 +13,16 @@
   let
 
     # Common passthru for all Python interpreters.
-    passthruFun = import ./passthrufun.nix { inherit lib config makeScopeWithSplicing' stdenv callPackage pythonPackagesExtensions; };
+    passthruFun = import ./passthrufun.nix {
+      inherit
+        lib
+        config
+        makeScopeWithSplicing'
+        stdenv
+        callPackage
+        pythonPackagesExtensions
+        ;
+    };
 
     sources = {
       python313 = {

@@ -48,7 +48,7 @@ runCommandCC testName
       insecure = throw "unused";
       license = throw "unused";
       maintainers = throw "unused";
-platforms = throw "unused";
+      platforms = throw "unused";
       unfree = throw "unused";
       unsupported = throw "unused";
     } package.meta;

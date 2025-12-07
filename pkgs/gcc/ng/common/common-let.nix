@@ -12,7 +12,7 @@
 rec {
   gcc_meta = {
     license = with lib.licenses; [ gpl3Plus ];
-};
+  };
 
   releaseInfo =
     if gitRelease != null then
