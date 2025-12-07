@@ -50,7 +50,7 @@ buildPythonPackage rec {
     "test_stdouterrin_setnull"
   ];
 
-  pytestFlagsArray = [ "-vvv" ];
+  pytestFlags = [ "-vvv" ];
 
   pythonImportsCheck = [ "execnet" ];
 

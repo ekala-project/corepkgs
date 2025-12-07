@@ -12,18 +12,30 @@
   systemdMinimal,
   libxcrypt,
 
+  # options
+  withModules ? !stdenv.hostPlatform.isStatic,
+  withSystemd ? lib.meta.availableOn stdenv.hostPlatform systemdMinimal,
+
   # passthru
   nixosTests,
 }:
 
 stdenv.mkDerivation rec {
   pname = "openldap";
-  version = "2.6.8";
+  version = "2.6.9";
 
   src = fetchurl {
     url = "https://www.openldap.org/software/download/OpenLDAP/openldap-release/${pname}-${version}.tgz";
-    hash = "sha256-SJaTI+lOO+OwPGoTKULcun741UXyrTVAFwkBn2lsPE4=";
+    hash = "sha256-LLfcc+nINA3/DZk1f7qleKvzDMZhnwUhlyxVVoHmsv8=";
   };
+
+  patches = [
+    (fetchurl {
+      name = "test069-sleep.patch";
+      url = "https://bugs.openldap.org/attachment.cgi?id=1051";
+      hash = "sha256-9LcFTswMQojrwHD+PRvlnSrwrISCFcboHypBwoDIZc0=";
+    })
+  ];
 
   # TODO: separate "out" and "bin"
   outputs = [
@@ -45,12 +57,16 @@ stdenv.mkDerivation rec {
     (cyrus_sasl.override {
       inherit openssl;
     })
-    libsodium
     libtool
     openssl
   ]
-  ++ lib.optionals (stdenv.isLinux) [
+  ++ lib.optionals (stdenv.hostPlatform.isLinux) [
     libxcrypt # causes linking issues on *-darwin
+  ]
+  ++ lib.optionals withModules [
+    libsodium
+  ]
+  ++ lib.optionals withSystemd [
     systemdMinimal
   ];
 
@@ -59,16 +75,16 @@ stdenv.mkDerivation rec {
   '';
 
   configureFlags = [
-    "--enable-argon2"
     "--enable-crypt"
-    "--enable-modules"
     "--enable-overlays"
+    (lib.enableFeature withModules "argon2")
+    (lib.enableFeature withModules "modules")
   ]
   ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
     "--with-yielding_select=yes"
     "ac_cv_func_memcmp_working=yes"
   ]
-  ++ lib.optional stdenv.isFreeBSD "--with-pic";
+  ++ lib.optional stdenv.hostPlatform.isFreeBSD "--with-pic";
 
   env.NIX_CFLAGS_COMPILE = toString [ "-DLDAPI_SOCK=\"/run/openldap/ldapi\"" ];
 
@@ -102,6 +118,9 @@ stdenv.mkDerivation rec {
       --replace "/bin/rm" "rm"
 
     # skip flaky tests
+    # https://bugs.openldap.org/show_bug.cgi?id=8623
+    rm -f tests/scripts/test022-ppolicy
+
     rm -f tests/scripts/test063-delta-multiprovider
 
     # https://bugs.openldap.org/show_bug.cgi?id=10009
@@ -124,7 +143,7 @@ stdenv.mkDerivation rec {
     "INSTALL=install"
   ];
 
-  postInstall = ''
+  postInstall = lib.optionalString withModules ''
     for module in $extraContribModules; do
       make $installFlags install -C contrib/slapd-modules/$module
     done
@@ -133,6 +152,7 @@ stdenv.mkDerivation rec {
 
   passthru.tests = {
     inherit (nixosTests) openldap;
+    kerberosWithLdap = nixosTests.kerberos.ldap;
   };
 
   meta = with lib; {

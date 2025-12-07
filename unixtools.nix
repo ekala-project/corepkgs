@@ -33,7 +33,7 @@ let
     let
       provider = providers.${stdenv.hostPlatform.parsed.kernel.name} or providers.linux;
       bin = "${getBin provider}/bin/${cmd}";
-      manpage = "${getOutput "man" provider}/share/man/man1/${cmd}.1.gz";
+      manDir = "${getOutput "man" provider}/share/man";
     in
     runCommand "${cmd}-${provider.name}"
       {
@@ -44,6 +44,7 @@ let
         };
         passthru = {
           inherit provider;
+          inherit (provider) version;
         }
         // lib.optionalAttrs (builtins.hasAttr "binlore" providers) {
           binlore.out = (binlore.synthesize (getBin bins.${cmd}) providers.binlore);
@@ -59,23 +60,33 @@ let
         mkdir -p $out/bin
         ln -s ${bin} $out/bin/${cmd}
 
-        if [ -f ${manpage} ]; then
-          mkdir -p $out/share/man/man1
-          ln -s ${manpage} $out/share/man/man1/${cmd}.1.gz
+        if [ -d ${manDir} ]; then
+          manpages=($(cd ${manDir} ; find . -name '${cmd}*'))
+          for manpage in "''${manpages[@]}"; do
+            mkdir -p $out/share/man/$(dirname $manpage)
+            ln -s ${manDir}/$manpage $out/share/man/$manpage
+          done
         fi
       '';
 
   # more is unavailable in darwin
   # so we just use less
-  more_compat = runCommand "more-${pkgs.less.name}" { } ''
-    mkdir -p $out/bin
-    ln -s ${pkgs.less}/bin/less $out/bin/more
-  '';
+  more_compat =
+    runCommand pkgs.less.name
+      {
+        passthru = {
+          inherit (pkgs.less) version;
+        };
+      }
+      ''
+        mkdir -p $out/bin
+        ln -s ${pkgs.less}/bin/less $out/bin/more
+      '';
 
   bins = mapAttrs singleBinary {
     # singular binaries
     arp = {
-      linux = pkgs.nettools;
+      linux = pkgs.net-tools;
       darwin = pkgs.darwin.network_cmds;
       freebsd = pkgs.freebsd.arp;
     };
@@ -91,7 +102,7 @@ let
       linux = pkgs.util-linux;
     };
     getconf = {
-      linux = if stdenv.hostPlatform.libc == "glibc" then pkgs.stdenv.cc.libc else pkgs.netbsd.getconf;
+      linux = if stdenv.hostPlatform.libc == "glibc" then pkgs.libc else pkgs.netbsd.getconf;
       darwin = pkgs.darwin.system_cmds;
       # I don't see any obvious arg exec in the doc/manpage
       binlore = ''
@@ -99,10 +110,10 @@ let
       '';
     };
     getent = {
-      linux =
-        if stdenv.hostPlatform.libc == "glibc" then pkgs.stdenv.cc.libc.getent else pkgs.netbsd.getent;
+      linux = if stdenv.hostPlatform.libc == "glibc" then pkgs.libc.getent else pkgs.netbsd.getent;
       darwin = pkgs.netbsd.getent;
       freebsd = pkgs.freebsd.getent;
+      openbsd = pkgs.openbsd.getent;
     };
     getopt = {
       linux = pkgs.util-linux;
@@ -118,18 +129,20 @@ let
       darwin = pkgs.darwin.diskdev_cmds;
     };
     hexdump = {
-      linux = pkgs.util-linux;
+      linux = pkgs.util-linuxMinimal;
       darwin = pkgs.darwin.shell_cmds;
     };
     hostname = {
-      linux = pkgs.nettools;
+      linux = pkgs.hostname-debian;
       darwin = pkgs.darwin.shell_cmds;
       freebsd = pkgs.freebsd.bin;
+      openbsd = pkgs.openbsd.hostname;
     };
     ifconfig = {
-      linux = pkgs.nettools;
+      linux = pkgs.net-tools;
       darwin = pkgs.darwin.network_cmds;
       freebsd = pkgs.freebsd.ifconfig;
+      openbsd = pkgs.openbsd.ifconfig;
     };
     killall = {
       linux = pkgs.psmisc;
@@ -156,6 +169,7 @@ let
       linux = pkgs.util-linux;
       darwin = pkgs.darwin.diskdev_cmds;
       freebsd = freebsd.mount;
+      openbsd = pkgs.openbsd.mount;
       # technically just targeting the darwin version; binlore already
       # ids the util-linux copy as 'cannot'
       # no obvious exec in manpage args; I think binlore flags 'can'
@@ -165,7 +179,7 @@ let
       '';
     };
     netstat = {
-      linux = pkgs.nettools;
+      linux = pkgs.net-tools;
       darwin = pkgs.darwin.network_cmds;
       freebsd = pkgs.freebsd.netstat;
     };
@@ -178,6 +192,7 @@ let
       linux = pkgs.procps;
       darwin = pkgs.darwin.ps;
       freebsd = pkgs.freebsd.bin;
+      openbsd = pkgs.openbsd.ps;
       # technically just targeting procps ps (which ids as can)
       # but I don't see obvious exec in args; have yet to look
       # for underlying cause in source
@@ -190,9 +205,10 @@ let
       darwin = pkgs.darwin.diskdev_cmds;
     };
     route = {
-      linux = pkgs.nettools;
+      linux = pkgs.net-tools;
       darwin = pkgs.darwin.network_cmds;
       freebsd = pkgs.freebsd.route;
+      openbsd = pkgs.openbsd.route;
     };
     script = {
       linux = pkgs.util-linux;
@@ -202,11 +218,13 @@ let
       linux = pkgs.procps;
       darwin = pkgs.darwin.system_cmds;
       freebsd = pkgs.freebsd.sysctl;
+      openbsd = pkgs.openbsd.sysctl;
     };
     top = {
       linux = pkgs.procps;
       darwin = pkgs.darwin.top;
       freebsd = pkgs.freebsd.top;
+      openbsd = pkgs.openbsd.top;
       # technically just targeting procps top; haven't needed this in
       # any scripts so far, but overriding it for consistency with ps
       # override above and in procps. (procps also overrides 'free',
@@ -233,15 +251,16 @@ let
       # Darwin/FreeBSD. Unfortunately no other implementations exist currently!
       darwin = pkgs.callPackage ../os-specific/linux/procps-ng { };
       freebsd = pkgs.callPackage ../os-specific/linux/procps-ng { };
+      openbsd = pkgs.callPackage ../os-specific/linux/procps-ng { };
     };
     write = {
       linux = pkgs.util-linux;
       darwin = pkgs.darwin.basic_cmds;
     };
     xxd = {
-      linux = pkgs.vim.xxd;
-      darwin = pkgs.vim.xxd;
-      freebsd = pkgs.vim.xxd;
+      linux = pkgs.tinyxxd;
+      darwin = pkgs.tinyxxd;
+      freebsd = pkgs.tinyxxd;
     };
   };
 
@@ -276,7 +295,7 @@ let
         col
         column
       ];
-      nettools = [
+      net-tools = [
         arp
         hostname
         ifconfig

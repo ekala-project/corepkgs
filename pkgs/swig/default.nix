@@ -6,28 +6,29 @@
   automake,
   libtool,
   bison,
-  pcre,
+  pcre2,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "swig";
-  version = "3.0.12";
+  version = "4.3.1";
 
   src = fetchFromGitHub {
     owner = "swig";
     repo = "swig";
-    rev = "rel-${version}";
-    sha256 = "1wyffskbkzj5zyhjnnpip80xzsjcr3p0q5486z3wdwabnysnhn8n";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-wEqbKDgXVU8kQxdh7uC+EZ0u5leeoYh2d/61qB4guOg=";
   };
 
-  PCRE_CONFIG = "${pcre.dev}/bin/pcre-config";
+  strictDeps = true;
   nativeBuildInputs = [
     autoconf
     automake
     libtool
     bison
+    pcre2
   ];
-  buildInputs = [ pcre ];
+  buildInputs = [ pcre2 ];
 
   configureFlags = [ "--without-tcl" ];
 
@@ -40,11 +41,16 @@ stdenv.mkDerivation rec {
     ./autogen.sh
   '';
 
-  meta = with lib; {
+  enableParallelBuilding = true;
+
+  meta = {
+    changelog = "https://github.com/swig/swig/blob/${finalAttrs.src.rev}/CHANGES.current";
     description = "Interface compiler that connects C/C++ code to higher-level languages";
     homepage = "https://swig.org/";
-    # Different types of licenses available: http://www.swig.org/Release/LICENSE .
-    license = licenses.gpl3Plus;
-    platforms = with platforms; linux ++ darwin;
+    # Different types of licenses available: https://www.swig.org/Release/LICENSE .
+    license = lib.licenses.gpl3Plus;
+    maintainers = [ ];
+    mainProgram = "swig";
+    platforms = with lib.platforms; linux ++ darwin;
   };
-}
+})

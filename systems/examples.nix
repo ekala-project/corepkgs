@@ -21,14 +21,23 @@ rec {
     config = "powerpc64le-unknown-linux-musl";
   };
 
-  ppc64 = {
+  ppc64-elfv1 = {
+    config = "powerpc64-unknown-linux-gnuabielfv1";
+  };
+  ppc64-elfv2 = {
     config = "powerpc64-unknown-linux-gnuabielfv2";
   };
+  ppc64 = ppc64-elfv2;
   ppc64-musl = {
     config = "powerpc64-unknown-linux-musl";
     gcc = {
       abi = "elfv2";
     };
+  };
+
+  ppc32 = {
+    config = "powerpc-unknown-linux-gnu";
+    rust.rustcTarget = "powerpc-unknown-linux-gnu";
   };
 
   sheevaplug = {
@@ -67,8 +76,8 @@ rec {
   armv7a-android-prebuilt = {
     config = "armv7a-unknown-linux-androideabi";
     rust.rustcTarget = "armv7-linux-androideabi";
-    androidSdkVersion = "33";
-    androidNdkVersion = "26";
+    androidSdkVersion = "35";
+    androidNdkVersion = "27";
     useAndroidPrebuilt = true;
   }
   // platforms.armv7a-android;
@@ -76,15 +85,15 @@ rec {
   aarch64-android-prebuilt = {
     config = "aarch64-unknown-linux-android";
     rust.rustcTarget = "aarch64-linux-android";
-    androidSdkVersion = "33";
-    androidNdkVersion = "26";
+    androidSdkVersion = "35";
+    androidNdkVersion = "27";
     useAndroidPrebuilt = true;
   };
 
   aarch64-android = {
     config = "aarch64-unknown-linux-android";
-    androidSdkVersion = "33";
-    androidNdkVersion = "26";
+    androidSdkVersion = "35";
+    androidNdkVersion = "27";
     libc = "bionic";
     useAndroidPrebuilt = false;
     useLLVM = true;
@@ -161,6 +170,10 @@ rec {
   riscv64 = riscv "64";
   riscv32 = riscv "32";
 
+  riscv64-musl = {
+    config = "riscv64-unknown-linux-musl";
+  };
+
   riscv64-embedded = {
     config = "riscv64-none-elf";
     libc = "newlib";
@@ -181,8 +194,16 @@ rec {
     libc = "newlib";
   };
 
-  loongarch64-linux = {
+  # https://github.com/loongson/la-softdev-convention/blob/master/la-softdev-convention.adoc#10-operating-system-package-build-requirements
+  loongarch64-linux = lib.recursiveUpdate platforms.loongarch64-multiplatform {
     config = "loongarch64-unknown-linux-gnu";
+  };
+  loongarch64-linux-embedded = lib.recursiveUpdate platforms.loongarch64-multiplatform {
+    config = "loongarch64-unknown-linux-gnu";
+    gcc = {
+      arch = "loongarch64";
+      strict-align = true;
+    };
   };
 
   mmix = {
@@ -229,6 +250,10 @@ rec {
   arm-embedded = {
     config = "arm-none-eabi";
     libc = "newlib";
+  };
+  arm-embedded-nano = {
+    config = "arm-none-eabi";
+    libc = "newlib-nano";
   };
   armhf-embedded = {
     config = "arm-none-eabihf";
@@ -278,31 +303,13 @@ rec {
   };
 
   #
-  # Redox
-  #
-
-  x86_64-unknown-redox = {
-    config = "x86_64-unknown-redox";
-    libc = "relibc";
-  };
-
-  #
   # Darwin
   #
 
   iphone64 = {
-    config = "aarch64-apple-ios";
+    config = "arm64-apple-ios";
     # config = "aarch64-apple-darwin14";
-    sdkVer = "14.3";
-    xcodeVer = "12.3";
-    xcodePlatform = "iPhoneOS";
-    useiOSPrebuilt = true;
-  };
-
-  iphone32 = {
-    config = "armv7a-apple-ios";
-    # config = "arm-apple-darwin10";
-    sdkVer = "14.3";
+    darwinSdkVersion = "14.3";
     xcodeVer = "12.3";
     xcodePlatform = "iPhoneOS";
     useiOSPrebuilt = true;
@@ -311,17 +318,7 @@ rec {
   iphone64-simulator = {
     config = "x86_64-apple-ios";
     # config = "x86_64-apple-darwin14";
-    sdkVer = "14.3";
-    xcodeVer = "12.3";
-    xcodePlatform = "iPhoneSimulator";
-    darwinPlatform = "ios-simulator";
-    useiOSPrebuilt = true;
-  };
-
-  iphone32-simulator = {
-    config = "i686-apple-ios";
-    # config = "i386-apple-darwin11";
-    sdkVer = "14.3";
+    darwinSdkVersion = "14.3";
     xcodeVer = "12.3";
     xcodePlatform = "iPhoneSimulator";
     darwinPlatform = "ios-simulator";
@@ -329,7 +326,7 @@ rec {
   };
 
   aarch64-darwin = {
-    config = "aarch64-apple-darwin";
+    config = "arm64-apple-darwin";
     xcodePlatform = "MacOSX";
     platform = { };
   };
@@ -362,7 +359,35 @@ rec {
     libc = "ucrt"; # This distinguishes the mingw (non posix) toolchain
   };
 
+  # LLVM-based mingw-w64 for ARM
+  ucrtAarch64 = {
+    config = "aarch64-w64-mingw32";
+    libc = "ucrt";
+    rust.rustcTarget = "aarch64-pc-windows-gnullvm";
+    useLLVM = true;
+  };
+
+  # Target the MSVC ABI
+  x86_64-windows = {
+    config = "x86_64-pc-windows-msvc";
+    useLLVM = true;
+  };
+
+  aarch64-windows = {
+    config = "aarch64-pc-windows-msvc";
+    useLLVM = true;
+  };
+
+  x86_64-cygwin = {
+    config = "x86_64-pc-cygwin";
+  };
+
   # BSDs
+
+  aarch64-freebsd = {
+    config = "aarch64-unknown-freebsd";
+    useLLVM = true;
+  };
 
   x86_64-freebsd = {
     config = "x86_64-unknown-freebsd";

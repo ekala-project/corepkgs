@@ -48,6 +48,11 @@ let
     pythonOnBuildForTarget = throw "${pname} does not support cross compilation";
     pythonOnHostForHost = throw "${pname} does not support cross compilation";
     pythonOnTargetForTarget = throw "${pname} does not support cross compilation";
+
+    pythonABITags = [
+      "none"
+      "pypy${lib.concatStrings (lib.take 2 (lib.splitString "." pythonVersion))}_pp${sourceVersion.major}${sourceVersion.minor}"
+    ];
   };
   pname = "${passthru.executable}_prebuilt";
   version = with sourceVersion; "${major}.${minor}.${patch}";
@@ -80,16 +85,16 @@ stdenv.mkDerivation {
     zlib
     stdenv.cc.cc.libgcc or null
   ]
-  ++ lib.optionals stdenv.isLinux [
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
     tcl-8_5
     tk-8_5
   ]
-  ++ lib.optionals stdenv.isDarwin [
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
     tcl-8_6
     tk-8_6
   ];
 
-  nativeBuildInputs = lib.optionals stdenv.isLinux [ autoPatchelfHook ];
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
 
   installPhase = ''
     runHook preInstall
@@ -98,8 +103,7 @@ stdenv.mkDerivation {
     echo "Moving files to $out"
     mv -t $out bin include lib-python lib_pypy site-packages
     mv $out/bin/libpypy*-c${stdenv.hostPlatform.extensions.sharedLibrary} $out/lib/
-    ${lib.optionalString stdenv.isLinux ''
-      mv lib/libffi.so.6* $out/lib/
+    ${lib.optionalString stdenv.hostPlatform.isLinux ''
       rm $out/bin/*.debug
     ''}
 
@@ -113,13 +117,13 @@ stdenv.mkDerivation {
   '';
 
   preFixup =
-    lib.optionalString (stdenv.isLinux) ''
+    lib.optionalString (stdenv.hostPlatform.isLinux) ''
       find $out/{lib,lib_pypy*} -name "*.so" \
         -exec patchelf \
           --replace-needed libtinfow.so.6 libncursesw.so.6 \
           --replace-needed libgdbm.so.4 libgdbm_compat.so.4 {} \;
     ''
-    + lib.optionalString (stdenv.isDarwin) ''
+    + lib.optionalString (stdenv.hostPlatform.isDarwin) ''
       install_name_tool \
         -change \
           @rpath/lib${executable}-c.dylib \
@@ -127,12 +131,12 @@ stdenv.mkDerivation {
           $out/bin/${executable}
       install_name_tool \
         -change \
-          /opt/homebrew${lib.optionalString stdenv.isx86_64 "_x86_64"}/opt/tcl-tk/lib/libtcl8.6.dylib \
+          /opt/homebrew${lib.optionalString stdenv.hostPlatform.isx86_64 "_x86_64"}/opt/tcl-tk/lib/libtcl8.6.dylib \
           ${tcl-8_6}/lib/libtcl8.6.dylib \
           $out/lib_pypy/_tkinter/*.so
       install_name_tool \
         -change \
-          /opt/homebrew${lib.optionalString stdenv.isx86_64 "_x86_64"}/opt/tcl-tk/lib/libtk8.6.dylib \
+          /opt/homebrew${lib.optionalString stdenv.hostPlatform.isx86_64 "_x86_64"}/opt/tcl-tk/lib/libtk8.6.dylib \
           ${tk-8_6}/lib/libtk8.6.dylib \
           $out/lib_pypy/_tkinter/*.so
     '';
@@ -171,7 +175,7 @@ stdenv.mkDerivation {
     homepage = "http://pypy.org/";
     description = "Fast, compliant alternative implementation of the Python language (${pythonVersion})";
     license = licenses.mit;
-    platforms = lib.mapAttrsToList (arch: _: arch) downloadUrls;
+    platforms = lib.attrNames downloadUrls;
   };
 
 }

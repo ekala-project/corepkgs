@@ -4,6 +4,7 @@
   fetchurl,
   gmp,
   mpfr,
+  updateAutotoolsGnuConfigScriptsHook,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -27,6 +28,10 @@ stdenv.mkDerivation rec {
     gmp
     mpfr
   ];
+  nativeBuildInputs = [
+    # needed until config scripts are updated to not use /usr/bin/uname on FreeBSD native
+    updateAutotoolsGnuConfigScriptsHook
+  ];
 
   doCheck = true; # not cross;
 
@@ -35,8 +40,8 @@ stdenv.mkDerivation rec {
 
     longDescription = ''
       GNU MPC is a C library for the arithmetic of complex numbers with
-              arbitrarily high precision and correct rounding of the result.  It is
-              built upon and follows the same principles as GNU MPFR.
+      arbitrarily high precision and correct rounding of the result.  It is
+      built upon and follows the same principles as GNU MPFR.
     '';
 
     homepage = "https://www.multiprecision.org/mpc/";

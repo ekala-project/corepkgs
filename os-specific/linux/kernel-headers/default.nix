@@ -5,15 +5,11 @@
   fetchurl,
   perl,
   elf-header,
-  # only on Android
   bison,
   flex,
   rsync ? null,
-
   writeTextFile,
 }:
-
-assert stdenvNoCC.hostPlatform.isAndroid -> rsync != null;
 
 let
 
@@ -94,6 +90,16 @@ let
         # `$(..)` expanded by make alone
         "HOSTCC:=$(CC_FOR_BUILD)"
         "HOSTCXX:=$(CXX_FOR_BUILD)"
+        # To properly detect LFS flags 32-bit build environments like
+        # pkgsi686Linux.linuxHeaders Kbuild uses this Makefile bit:
+        #     HOST_LFS_CFLAGS := $(shell getconf LFS_CFLAGS 2>/dev/null)
+        #
+        # `getconf` is not available in early bootstrap and thus the
+        # build fails on filesystems with 64-bit inodes as:
+        #     linux-headers> fixdep: error fstat'ing file: scripts/basic/.fixdep.d: Value too large for defined data type
+        #
+        # Let's hardcode subset of the output of `getconf` for this case.
+        "HOST_LFS_CFLAGS=-D_FILE_OFFSET_BITS=64"
       ];
 
       # Skip clean on darwin, case-sensitivity issues.
@@ -133,10 +139,10 @@ let
         echo "${version}-default" > $out/include/config/kernel.release
       '';
 
-      meta = with lib; {
+      meta = {
         description = "Header files and scripts for Linux kernel";
-        license = licenses.gpl2Only;
-        platforms = platforms.linux;
+        license = lib.licenses.gpl2Only;
+        platforms = lib.platforms.linux;
       };
     };
 in
@@ -145,13 +151,13 @@ in
 
   linuxHeaders =
     let
-      version = "6.9";
+      version = "6.16.7";
     in
     makeLinuxHeaders {
       inherit version;
       src = fetchurl {
         url = "mirror://kernel/linux/kernel/v${lib.versions.major version}.x/linux-${version}.tar.xz";
-        hash = "sha256-JPoB+5icej4oRT8Rd5kWhxN2bhGcU4HawwEV8Y8mgUk=";
+        hash = "sha256-W+PaoflCexvbNMSJTZwa36w4z/Z0N2/gYRowZXKaGoE=";
       };
       patches = [
         ./no-relocs.patch # for building x86 kernel headers on non-ELF platforms

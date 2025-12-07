@@ -2,12 +2,9 @@
   autoreconfHook,
   bash,
   coreutils,
-  docbook_xml_dtd_45,
   docbook_xsl,
-  docbook-xsl-ns,
   fetchgit,
   findutils,
-  flex,
   getopt,
   gnugrep,
   gnused,
@@ -17,7 +14,7 @@
   makeWrapper,
   stdenv,
   testers,
-  w3m,
+  w3m-batch,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -44,22 +41,18 @@ stdenv.mkDerivation (finalAttrs: {
 
     for f in format/docbook/* xmlto.in; do
       substituteInPlace $f \
-        --replace-fail "http://docbook.sourceforge.net/release/xsl/current" "${docbook-xsl-ns}/xml/xsl/docbook"
+        --replace-fail "http://docbook.sourceforge.net/release/xsl/current" "${docbook_xsl}/xml/xsl/docbook"
     done
   '';
+
+  strictDeps = true;
 
   # `libxml2' provides `xmllint', needed at build-time and run-time.
   # `libxslt' provides `xsltproc', used by `xmlto' at run-time.
   nativeBuildInputs = [
     autoreconfHook
     makeWrapper
-    flex
     getopt
-  ];
-
-  buildInputs = [
-    docbook_xml_dtd_45
-    docbook_xsl
     libxml2
     libxslt
   ];
@@ -72,7 +65,7 @@ stdenv.mkDerivation (finalAttrs: {
            libxslt
            libxml2
            getopt
-           w3m
+           w3m-batch
          ]
        }"
   '';

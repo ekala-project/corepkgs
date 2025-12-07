@@ -28,7 +28,7 @@
   lib,
   buildPackages,
   fetchurl,
-  linuxHeaders,
+  linuxHeaders ? null,
   gd ? null,
   libpng ? null,
   libidn2,
@@ -49,9 +49,9 @@
 }@args:
 
 let
-  version = "2.39";
-  patchSuffix = "-52";
-  sha256 = "sha256-93vUfPgXDFc2Wue/hmlsEYrbOxINMlnGTFAtPcHi2SY=";
+  version = "2.40";
+  patchSuffix = "-66";
+  sha256 = "sha256-GaiQF16SY9dI9ieZPeb0sa+c0h4D8IDkv7Oh+sECBaI=";
 in
 
 assert withLinuxHeaders -> linuxHeaders != null;
@@ -67,18 +67,18 @@ stdenv.mkDerivation (
     patches = [
       /*
         No tarballs for stable upstream branch, only https://sourceware.org/git/glibc.git and using git would complicate bootstrapping.
-         $ git fetch --all -p && git checkout origin/release/2.39/master && git describe
-         glibc-2.39-52-gf8e4623421
-         $ git show --minimal --reverse glibc-2.39.. ':!ADVISORIES' > 2.39-master.patch
+         $ git fetch --all -p && git checkout origin/release/2.40/master && git describe
+         glibc-2.40-142-g2eb180377b
+         $ git show --minimal --reverse glibc-2.40.. ':!ADVISORIES' > 2.40-master.patch
 
         To compare the archive contents zdiff can be used.
-         $ diff -u 2.39-master.patch ../nixpkgs/pkgs/development/libraries/glibc/2.39-master.patch
+         $ diff -u 2.40-master.patch ../nixpkgs/pkgs/development/libraries/glibc/2.40-master.patch
 
         Please note that each commit has changes to the file ADVISORIES excluded since
         that conflicts with the directory advisories/ making cross-builds from
         hosts with case-insensitive file-systems impossible.
       */
-      ./2.39-master.patch
+      ./2.40-master.patch
 
       # Allow NixOS and Nix to handle the locale-archive.
       ./nix-locale-archive.patch
@@ -111,6 +111,10 @@ stdenv.mkDerivation (
         & https://github.com/NixOS/nixpkgs/pull/188492#issuecomment-1233802991
       */
       ./reenable_DT_HASH.patch
+
+      # enable parallel & reproducible build of glibcLocales
+      ./0001-localedata-allow-reproducible-parallel-install-of-lo.patch
+      ./0002-Makeconfig-make-inst_complocaledir-overridable.patch
     ]
     /*
       NVCC does not support ARM intrinsics. Since <math.h> is pulled in by almost
@@ -123,10 +127,16 @@ stdenv.mkDerivation (
         isAarch64 = stdenv.buildPlatform.isAarch64 || stdenv.hostPlatform.isAarch64;
         isLinux = stdenv.buildPlatform.isLinux || stdenv.hostPlatform.isLinux;
       in
+      # Remove certain defines when __CUDACC__ is defined (i.e. we're building with a CUDA compiler)
       lib.optional (isAarch64 && isLinux) ./0001-aarch64-math-vector.h-add-NVCC-include-guard.patch
     )
+    # Modify certain defines to be compatible with musl
     ++ lib.optional stdenv.hostPlatform.isMusl ./fix-rpc-types-musl-conflicts.patch
+    # Enable cross-compilation of glibc on Darwin (build=Darwin, host=Linux)
     ++ lib.optional stdenv.buildPlatform.isDarwin ./darwin-cross-build.patch
+    # Reverts this patch: https://sourceware.org/git/?p=glibc.git;a=commit;h=55d63e731253de82e96ed4ddca2e294076cd0bc5
+    # This revert enables [CET] (Control-flow Enforcement Technology) by default
+    # [CET]: https://en.wikipedia.org/wiki/Control-flow_integrity#Intel_Control-flow_Enforcement_Technology
     ++ lib.optional enableCETRuntimeDefault ./2.39-revert-cet-default-disable.patch;
 
     postPatch = ''
@@ -154,6 +164,15 @@ stdenv.mkDerivation (
       -#define LIBIDN2_SONAME "libidn2.so.0"
       +#define LIBIDN2_SONAME "${lib.getLib libidn2}/lib/libidn2.so.0"
       EOF
+    ''
+    # For some reason, with gcc-15 build fails with the following error:
+    #
+    #     zic.c:3767:1: note: did you mean to specify it after ')' following function parameters?
+    #     zic.c:3781:1: error: standard 'reproducible' attribute can only be applied to function declarators or type specifiers with function type []
+    + ''
+      for path in timezone/zic.c timezone/zdump.c ; do
+        substituteInPlace $path  --replace-fail "ATTRIBUTE_REPRODUCIBLE" ""
+      done
     '';
 
     configureFlags = [
@@ -196,9 +215,13 @@ stdenv.mkDerivation (
     ]
     ++ lib.optional withGd "--with-gd";
 
-    makeFlags = (args.makeFlags or [ ]) ++ [
-      "OBJCOPY=${stdenv.cc.targetPrefix}objcopy"
-    ];
+    makeFlags =
+      (args.makeFlags or [ ])
+      ++ [ "OBJCOPY=${stdenv.cc.targetPrefix}objcopy" ]
+      ++ lib.optionals (stdenv.cc.libc != null) [
+        "BUILD_LDFLAGS=-Wl,-rpath,${stdenv.cc.libc}/lib"
+        "OBJDUMP=${stdenv.cc.bintools.bintools}/bin/objdump"
+      ];
 
     postInstall = (args.postInstall or "") + ''
       moveToOutput bin/getent $getent
@@ -237,7 +260,7 @@ stdenv.mkDerivation (
 
     env = {
       linuxHeaders = lib.optionalString withLinuxHeaders linuxHeaders;
-      inherit (stdenv) is64bit;
+      inherit (stdenv.hostPlatform) is64bit;
       # Needed to install share/zoneinfo/zone.tab.  Set to impure /bin/sh to
       # prevent a retained dependency on the bootstrap tools in the stdenv-linux
       # bootstrap.
@@ -253,6 +276,7 @@ stdenv.mkDerivation (
 
   // (removeAttrs args [
     "withLinuxHeaders"
+    "linuxHeaders"
     "withGd"
     "enableCET"
     "postInstall"
@@ -279,12 +303,6 @@ stdenv.mkDerivation (
         cd ../build
 
         configureScript="`pwd`/../$sourceRoot/configure"
-
-        ${lib.optionalString (stdenv.cc.libc != null)
-          ''makeFlags="$makeFlags BUILD_LDFLAGS=-Wl,-rpath,${stdenv.cc.libc}/lib OBJDUMP=${stdenv.cc.bintools.bintools}/bin/objdump"''
-        }
-
-
       ''
       + lib.optionalString (stdenv.hostPlatform != stdenv.buildPlatform) ''
         sed -i s/-lgcc_eh//g "../$sourceRoot/Makeconfig"
@@ -330,11 +348,11 @@ stdenv.mkDerivation (
 
           longDescription = ''
             Any Unix-like operating system needs a C library: the library which
-                    defines the "system calls" and other basic facilities such as
-                    open, malloc, printf, exit...
+            defines the "system calls" and other basic facilities such as
+            open, malloc, printf, exit...
 
-                    The GNU C library is used as the C library in the GNU system and
-                    most systems with the Linux kernel.
+            The GNU C library is used as the C library in the GNU system and
+            most systems with the Linux kernel.
           '';
 
           license = licenses.lgpl2Plus;

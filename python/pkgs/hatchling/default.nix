@@ -21,17 +21,16 @@
 
 buildPythonPackage rec {
   pname = "hatchling";
-  version = "1.25.0";
-  format = "pyproject";
-  disabled = pythonOlder "3.8";
+  version = "1.27.0";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-cGRjGlEmELUiUKTT/xvYFVHW0UMcTre3LnNN9sdPQmI=";
+    hash = "sha256-lxwpbZgZq7OBERL8UsepdRyNOBiY82Uzuxb5eR6UH9Y=";
   };
 
   # listed in backend/pyproject.toml
-  propagatedBuildInputs = [
+  dependencies = [
     editables
     packaging
     pathspec
@@ -56,7 +55,7 @@ buildPythonPackage rec {
   ];
 
   preCheck = ''
-    export HOME=$TMPDIR
+    export HOME=$(mktemp -d)
   '';
 
   checkPhase = ''
@@ -65,12 +64,12 @@ buildPythonPackage rec {
     runHook postCheck
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Modern, extensible Python build backend";
     mainProgram = "hatchling";
     homepage = "https://hatch.pypa.io/latest/";
     changelog = "https://github.com/pypa/hatch/releases/tag/hatchling-v${version}";
-    license = licenses.mit;
+    license = lib.licenses.mit;
     maintainers = [ ];
   };
 }

@@ -32,6 +32,8 @@
   libpng,
   liblqr1Support ? true,
   liblqr1,
+  libraqmSupport ? true,
+  libraqm,
   librawSupport ? true,
   libraw,
   librsvgSupport ? !stdenv.hostPlatform.isMinGW,
@@ -47,11 +49,11 @@
   libwebp,
   libheifSupport ? true,
   libheif,
+  fftwSupport ? true,
+  fftw,
   potrace,
   coreutils,
   curl,
-  ApplicationServices,
-  Foundation,
   testers,
   nixos-icons,
   perlPackages,
@@ -59,6 +61,7 @@
 }:
 
 assert libXtSupport -> libX11Support;
+assert libraqmSupport -> freetypeSupport;
 
 let
   arch =
@@ -82,13 +85,13 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "imagemagick";
-  version = "7.1.1-38";
+  version = "7.1.2-8";
 
   src = fetchFromGitHub {
     owner = "ImageMagick";
     repo = "ImageMagick";
-    rev = finalAttrs.version;
-    hash = "sha256-dyk9kCH1w76Jhy/yBhVFLthTKYaMgXLBn7QGWAFS0XU=";
+    tag = finalAttrs.version;
+    hash = "sha256-2jSQ59Wi6/1dbS/AgM1DfW6WlwoYuJlnTLoM8Mc6Ji8=";
   };
 
   outputs = [
@@ -113,6 +116,7 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.withFeature libjxlSupport "jxl")
     (lib.withFeatureAs ghostscriptSupport "gs-font-dir" "${ghostscript.fonts}/share/fonts")
     (lib.withFeature ghostscriptSupport "gslib")
+    (lib.withFeature fftwSupport "fftw")
   ]
   ++ lib.optionals stdenv.hostPlatform.isMinGW [
     # due to libxml2 being without DLLs ATM
@@ -133,6 +137,7 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optional ghostscriptSupport ghostscript
   ++ lib.optional liblqr1Support liblqr1
   ++ lib.optional libpngSupport libpng
+  ++ lib.optional libraqmSupport libraqm
   ++ lib.optional librawSupport libraw
   ++ lib.optional libtiffSupport libtiff
   ++ lib.optional libxml2Support libxml2
@@ -144,11 +149,7 @@ stdenv.mkDerivation (finalAttrs: {
     librsvg
     pango
   ]
-  ++ lib.optional openjpegSupport openjpeg
-  ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    ApplicationServices
-    Foundation
-  ];
+  ++ lib.optional openjpegSupport openjpeg;
 
   propagatedBuildInputs = [
     curl
@@ -159,12 +160,18 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optional lcms2Support lcms2
   ++ lib.optional libX11Support libX11
   ++ lib.optional libXtSupport libXt
-  ++ lib.optional libwebpSupport libwebp;
+  ++ lib.optional libwebpSupport libwebp
+  ++ lib.optional fftwSupport fftw;
 
   postInstall = ''
     (cd "$dev/include" && ln -s ImageMagick* ImageMagick)
+    # Q16HDRI = 16 bit quantum depth with HDRI support, and is the default ImageMagick configuration
+    # If the default is changed, or the derivation is modified to use a different configuration
+    # this will need to be changed below.
     moveToOutput "bin/*-config" "$dev"
     moveToOutput "lib/ImageMagick-*/config-Q16HDRI" "$dev" # includes configure params
+    configDestination=($out/share/ImageMagick-*)
+    grep -v '/nix/store' $dev/lib/ImageMagick-*/config-Q16HDRI/configure.xml > $configDestination/configure.xml
     for file in "$dev"/bin/*-config; do
       substituteInPlace "$file" --replace pkg-config \
         "PKG_CONFIG_PATH='$dev/lib/pkgconfig' '$(command -v $PKG_CONFIG)'"
@@ -195,7 +202,7 @@ stdenv.mkDerivation (finalAttrs: {
       "ImageMagick"
       "MagickWand"
     ];
-    platforms = platforms.linux ++ platforms.darwin;
+    platforms = platforms.unix;
     maintainers = [ ];
     license = licenses.asl20;
     mainProgram = "magick";

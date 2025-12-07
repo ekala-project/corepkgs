@@ -2,12 +2,10 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  bash,
-  gnugrep,
-
-  # Avoid cycles with cmake and libarchive
+  fetchpatch,
   cmakeMinimal,
-
+  bashNonInteractive,
+  gnugrep,
   fixDarwinDylibNames ? null,
   file,
   legacySupport ? false,
@@ -19,35 +17,46 @@
   nix-update-script,
 
   # for passthru.tests
-  libarchive,
+  libarchive ? null,
   rocksdb ? null,
-  arrow-cpp,
+  arrow-cpp ? null,
   libzip ? null,
   curl,
   python3Packages ? null,
   haskellPackages ? null,
+  testers,
 }:
 
-assert stdenv.isDarwin -> fixDarwinDylibNames != null;
-
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "zstd";
-  version = "1.5.6";
+  version = "1.5.7";
 
   src = fetchFromGitHub {
     owner = "facebook";
     repo = "zstd";
-    rev = "v${version}";
-    hash = "sha256-qcd92hQqVBjMT3hyntjcgk29o9wGQsg5Hg7HE5C0UNc=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-tNFWIT9ydfozB8dWcmTMuZLCQmQudTFJIkSr0aG7S44=";
   };
 
-  nativeBuildInputs = [ cmakeMinimal ] ++ lib.optional stdenv.isDarwin fixDarwinDylibNames;
-  buildInputs = lib.optional stdenv.hostPlatform.isUnix bash;
+  nativeBuildInputs = [
+    cmakeMinimal
+  ]
+  ++ lib.optional stdenv.hostPlatform.isDarwin fixDarwinDylibNames;
+  buildInputs = lib.optional stdenv.hostPlatform.isUnix bashNonInteractive;
 
   patches = [
     # This patches makes sure we do not attempt to use the MD5 implementation
     # of the host platform when running the tests
     ./playtests-darwin.patch
+
+    # Pull missing manpages update:
+    #   https://github.com/facebook/zstd/pull/4302
+    # TODO: remove with 1.5.8 release
+    (fetchpatch {
+      name = "man-fix.patch";
+      url = "https://github.com/facebook/zstd/commit/6af3842118ea5325480b403213b2a9fbed3d3d74.patch";
+      hash = "sha256-i+iv+owUXbKU3UtZBsjfj86kFB3TDlpcVDNsDX8dyZE=";
+    })
   ];
 
   postPatch = lib.optionalString (!static) ''
@@ -56,7 +65,7 @@ stdenv.mkDerivation rec {
     substituteInPlace build/cmake/tests/CMakeLists.txt \
       --replace 'libzstd_static' 'libzstd_shared'
     sed -i \
-      "1aexport ${lib.optionalString stdenv.isDarwin "DY"}LD_LIBRARY_PATH=$PWD/build_/lib" \
+      "1aexport ${lib.optionalString stdenv.hostPlatform.isDarwin "DY"}LD_LIBRARY_PATH=$PWD/build_/lib" \
       tests/playTests.sh
   '';
 
@@ -100,7 +109,7 @@ stdenv.mkDerivation rec {
     ''
       cp contrib/pzstd/pzstd $bin/bin/pzstd
     ''
-    + lib.optionalString stdenv.isDarwin ''
+    + lib.optionalString stdenv.hostPlatform.isDarwin ''
       install_name_tool -change @rpath/libzstd.1.dylib $out/lib/libzstd.1.dylib $bin/bin/pzstd
     ''
   );
@@ -115,12 +124,19 @@ stdenv.mkDerivation rec {
   passthru = {
     updateScript = nix-update-script { };
     tests = {
+
+      # Reverse dependencies
+
       inherit libarchive rocksdb arrow-cpp;
       libzip = libzip.override { withZstd = true; };
       curl = curl.override { zstdSupport = true; };
       python-zstd = python3Packages.zstd;
       haskell-zstd = haskellPackages.zstd;
       haskell-hs-zstd = haskellPackages.hs-zstd;
+
+      # Package tests (coherent with overrides)
+
+      pkg-config = testers.hasPkgConfigModules { package = finalAttrs.finalPackage; };
     };
   };
 
@@ -136,10 +152,11 @@ stdenv.mkDerivation rec {
       property shared by most LZ compression algorithms, such as zlib.
     '';
     homepage = "https://facebook.github.io/zstd/";
-    changelog = "https://github.com/facebook/zstd/blob/v${version}/CHANGELOG";
+    changelog = "https://github.com/facebook/zstd/blob/v${finalAttrs.version}/CHANGELOG";
     license = with licenses; [ bsd3 ]; # Or, at your opinion, GPL-2.0-only.
     mainProgram = "zstd";
     platforms = platforms.all;
     maintainers = [ ];
+    pkgConfigModules = [ "libzstd" ];
   };
-}
+})

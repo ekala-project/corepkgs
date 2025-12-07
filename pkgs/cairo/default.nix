@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchurl,
+  lzo,
   gtk-doc,
   meson,
   ninja,
@@ -13,18 +14,18 @@
   libpng,
   pixman,
   zlib,
-  x11Support ? !stdenv.isDarwin || true,
-  xorg,
+  x11Support ? !stdenv.hostPlatform.isDarwin || true,
+  libXext,
+  libXrender,
   gobjectSupport ? true,
   glib,
   xcbSupport ? x11Support,
-  darwin ? null,
+  libxcb,
   testers,
 }:
 
 let
   inherit (lib) optional optionals;
-  inherit (xorg) libXext libXrender libxcb;
 in
 stdenv.mkDerivation (
   finalAttrs:
@@ -33,13 +34,13 @@ stdenv.mkDerivation (
   in
   {
     pname = "cairo";
-    version = "1.18.0";
+    version = "1.18.4";
 
     src = fetchurl {
       url = "https://cairographics.org/${
         if lib.mod (builtins.fromJSON (lib.versions.minor version)) 2 == 0 then "releases" else "snapshots"
       }/${pname}-${version}.tar.xz";
-      hash = "sha256-JDoHNrl4oz3uKfnMp1IXM7eKZbVBggb+970cPUzxC2Q=";
+      hash = "sha256-RF7YIIpuSCPeEianTKMZ02AOg/Y2n5mxQmUAZZnDLMs=";
     };
 
     outputs = [
@@ -60,16 +61,8 @@ stdenv.mkDerivation (
 
     buildInputs = [
       docbook_xsl
-    ]
-    ++ optionals stdenv.isDarwin (
-      with darwin.apple_sdk.frameworks;
-      [
-        CoreGraphics
-        CoreText
-        ApplicationServices
-        Carbon
-      ]
-    );
+      lzo
+    ];
 
     propagatedBuildInputs = [
       fontconfig
@@ -107,8 +100,10 @@ stdenv.mkDerivation (
             linux = "true";
             freebsd = "true";
             netbsd = "false";
+            windows = "false";
           }
-          .${stdenv.hostPlatform.parsed.kernel.name} or (throw "Unknown value for ipc_rmid_deferred_release")
+          .${stdenv.hostPlatform.parsed.kernel.name}
+            or (throw "Unknown value for ipc_rmid_deferred_release on ${stdenv.hostPlatform.parsed.kernel.name}")
         }
       ''}"
     ];
@@ -126,8 +121,7 @@ stdenv.mkDerivation (
       # `-I' flags to be propagated.
       sed -i "$out/lib/pkgconfig/cairo.pc" \
           -es'|^Cflags:\(.*\)$|Cflags: \1 -I${freetype.dev}/include/freetype2 -I${freetype.dev}/include|g'
-    ''
-    + lib.optionalString stdenv.isDarwin glib.flattenInclude;
+    '';
 
     passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
 

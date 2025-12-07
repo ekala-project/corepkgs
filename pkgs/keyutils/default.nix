@@ -25,6 +25,8 @@ stdenv.mkDerivation rec {
     # nix-build -E 'with import ./. {}; pkgs.keyutils.override { stdenv = pkgs.clangStdenv; }'
     ./0001-Remove-unused-function-after_eq.patch
 
+    ./pkg-config-static.patch
+
     # Fix build for s390-linux, where size_t is different from ptrdiff_t.
     (fetchurl {
       url = "https://lore.kernel.org/keyrings/20230301134250.301819-1-hi@alyssa.is/raw";
@@ -50,6 +52,10 @@ stdenv.mkDerivation rec {
   '';
 
   enableParallelBuilding = true;
+
+  env = lib.optionalAttrs (stdenv.hostPlatform.useLLVM) {
+    NIX_LDFLAGS = "--undefined-version";
+  };
 
   installFlags = [
     "ETCDIR=$(out)/etc"

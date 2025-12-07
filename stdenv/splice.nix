@@ -14,10 +14,11 @@
 # For performance reasons, rather than uniformally splice in all cases, we only
 # do so when `pkgs` and `buildPackages` are distinct. The `actuallySplice`
 # parameter there the boolean value of that equality check.
+
+# TODO(corepkgs): sync with nixpkgs
 lib: pkgs: actuallySplice:
 
 let
-
   spliceReal =
     {
       pkgsBuildBuild,

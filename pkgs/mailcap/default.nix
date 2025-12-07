@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchurl,
+  nixosTests,
 
   # updater
   git,
@@ -52,6 +53,8 @@ stdenv.mkDerivation rec {
       head -n1)"
     exec nix-update --version "$VERSION" "$@"
   '';
+
+  passthru.tests.nginx-mime = nixosTests.nginx-mime;
 
   meta = with lib; {
     description = "Helper application and MIME type associations for file types";

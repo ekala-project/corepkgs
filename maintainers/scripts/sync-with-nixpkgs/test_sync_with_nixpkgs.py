@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -p "python3.withPackages (p: with p; [ pytest ])" -i python3
+#!nix-shell -p "python3.withPackages (p: with p; [ ])" -i python3
 """Tests for sync-with-nixpkgs.py"""
 
 import tempfile
@@ -58,7 +58,7 @@ def setup_dirs(tmpdir, corepkgs_structure=None, nixpkgs_structure=None):
     """Helper to set up corepkgs and nixpkgs directory structures."""
     corepkgs = Path(tmpdir) / "corepkgs"
     nixpkgs = Path(tmpdir) / "nixpkgs"
-
+    
     def create_structure(base, structure):
         if structure:
             if isinstance(structure, dict):
@@ -81,7 +81,7 @@ def setup_dirs(tmpdir, corepkgs_structure=None, nixpkgs_structure=None):
                 for path in structure:
                     full_path = base / path
                     full_path.mkdir(parents=True, exist_ok=True)
-
+    
     create_structure(corepkgs, corepkgs_structure)
     create_structure(nixpkgs, nixpkgs_structure)
     return corepkgs, nixpkgs
@@ -105,11 +105,11 @@ class TestShouldIgnore:
         assert sync_with_nixpkgs.should_ignore("patches/file.patch")
         assert sync_with_nixpkgs.should_ignore("maintainers/file.nix")
         assert sync_with_nixpkgs.should_ignore("docs")
-
+    
     def test_ignore_file(self):
         assert sync_with_nixpkgs.should_ignore("README.md")
         assert sync_with_nixpkgs.should_ignore("default.nix")
-
+    
     def test_dont_ignore_normal_file(self):
         assert not sync_with_nixpkgs.should_ignore("build-support/cc-wrapper/setup-hook.sh")
         assert not sync_with_nixpkgs.should_ignore("pkgs/llvm/package.nix")
@@ -118,15 +118,15 @@ class TestShouldIgnore:
 class TestShouldIgnoreNewFilesDir:
     def test_ignore_pattern_subdir_name(self):
         assert not sync_with_nixpkgs.should_ignore_new_files_dir("build-support", "some-subdir")
-
+    
     def test_ignore_pattern_exact_subdir_match(self):
         with config_context(CHECK_NEW_FILES_IGNORE_NEW_DIRS=["some-subdir"]):
             assert sync_with_nixpkgs.should_ignore_new_files_dir("build-support", "some-subdir")
-
+    
     def test_ignore_pattern_full_path(self):
         with config_context(CHECK_NEW_FILES_IGNORE_NEW_DIRS=["build-support/specific-subdir"]):
             assert sync_with_nixpkgs.should_ignore_new_files_dir("build-support", "specific-subdir")
-
+    
     def test_dont_ignore_normal_subdir(self):
         assert not sync_with_nixpkgs.should_ignore_new_files_dir("common-updater", "scripts")
 
@@ -138,7 +138,7 @@ class TestMapPath:
             nixpkgs.mkdir()
             (nixpkgs / "test.nix").write_text("test")
             assert sync_with_nixpkgs.map_path("test.nix", nixpkgs) == nixpkgs / "test.nix"
-
+    
     def test_path_mapping(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             nixpkgs = Path(tmpdir) / "nixpkgs"
@@ -147,7 +147,7 @@ class TestMapPath:
             test_file.write_text("test")
             with config_context(PATH_MAPPINGS={"build-support": "pkgs/build-support"}):
                 assert sync_with_nixpkgs.map_path("build-support/default.nix", nixpkgs) == test_file
-
+    
     def test_pkgs_by_name_mapping(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             corepkgs = Path(tmpdir) / "corepkgs"
@@ -156,7 +156,7 @@ class TestMapPath:
             by_name_file.parent.mkdir(parents=True)
             by_name_file.write_text("test")
             assert sync_with_nixpkgs.map_path("pkgs/llvm/default.nix", nixpkgs) == by_name_file
-
+    
     def test_not_found(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             nixpkgs = Path(tmpdir) / "nixpkgs"
@@ -171,7 +171,7 @@ class TestReverseMapPath:
             corepkgs.mkdir()
             (corepkgs / "test.nix").write_text("test")
             assert sync_with_nixpkgs.reverse_map_path("test.nix", corepkgs) == "test.nix"
-
+    
     def test_pkgs_by_name_reverse_mapping(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             corepkgs = Path(tmpdir) / "corepkgs"
@@ -179,7 +179,7 @@ class TestReverseMapPath:
             test_file.parent.mkdir(parents=True)
             test_file.write_text("test")
             assert sync_with_nixpkgs.reverse_map_path("pkgs/by-name/ll/llvm/package.nix", corepkgs) == "pkgs/llvm/default.nix"
-
+    
     def test_path_mapping_reverse(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             corepkgs = Path(tmpdir) / "corepkgs"
@@ -197,14 +197,14 @@ class TestFilesIdentical:
             file1.write_text("same content")
             file2.write_text("same content")
             assert sync_with_nixpkgs.files_identical(file1, file2)
-
+    
     def test_different_files(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             file1, file2 = Path(tmpdir) / "file1.txt", Path(tmpdir) / "file2.txt"
             file1.write_text("content 1")
             file2.write_text("content 2")
             assert not sync_with_nixpkgs.files_identical(file1, file2)
-
+    
     def test_nonexistent_file(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             file1 = Path(tmpdir) / "file1.txt"
@@ -216,10 +216,10 @@ class TestFilesIdentical:
 class TestGetDirectoryPath:
     def test_root_file(self):
         assert sync_with_nixpkgs.get_directory_path("file.nix") == "."
-
+    
     def test_nested_file(self):
         assert sync_with_nixpkgs.get_directory_path("build-support/cc-wrapper/default.nix") == "build-support/cc-wrapper"
-
+    
     def test_deeply_nested_file(self):
         assert sync_with_nixpkgs.get_directory_path("a/b/c/d/file.nix") == "a/b/c/d"
 
@@ -227,10 +227,10 @@ class TestGetDirectoryPath:
 class TestExtractRelativePath:
     def test_path_starts_with_base(self):
         assert sync_with_nixpkgs.extract_relative_path("/base/path/to/file", "/base/path") == "to/file"
-
+    
     def test_path_doesnt_start_with_base(self):
         assert sync_with_nixpkgs.extract_relative_path("/other/path/file", "/base/path") == "file"
-
+    
     def test_filename_only(self):
         assert sync_with_nixpkgs.extract_relative_path("file.nix", "/base") == "file.nix"
 
@@ -241,12 +241,12 @@ class TestReplaceDiffPath:
         result = sync_with_nixpkgs.replace_diff_path(line, "--- a", "/tmp/corepkgs/", "build-support/cc-wrapper")
         assert "--- a/build-support/cc-wrapper/default.nix" in result
         assert "\t2024-01-01 00:00:00" in result
-
+    
     def test_replace_without_timestamp(self):
         line = "+++ b/build-support/cc-wrapper/default.nix"
         result = sync_with_nixpkgs.replace_diff_path(line, "+++ b", "/tmp/nixpkgs/", "build-support/cc-wrapper")
         assert "+++ b/build-support/cc-wrapper/default.nix" in result
-
+    
     def test_root_directory(self):
         line = "--- a/file.nix"
         result = sync_with_nixpkgs.replace_diff_path(line, "--- a", "/tmp/corepkgs/", ".")
@@ -265,7 +265,7 @@ class TestDiffStats:
         assert stats.not_found_list == []
         assert stats.new_files_list == []
         assert stats.directories_with_diffs == {}
-
+    
     def test_increment_stats(self):
         stats = sync_with_nixpkgs.DiffStats()
         stats.processed += 1
@@ -283,14 +283,14 @@ class TestMapPathUsingMappings:
             (nixpkgs / "pkgs" / "build-support").mkdir(parents=True)
             with config_context(PATH_MAPPINGS={"build-support": "pkgs/build-support"}):
                 assert sync_with_nixpkgs.map_path_using_mappings("build-support", nixpkgs, check_file=False) == nixpkgs / "pkgs" / "build-support"
-
+    
     def test_prefix_match(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             nixpkgs = Path(tmpdir) / "nixpkgs"
             (nixpkgs / "pkgs" / "build-support" / "cc-wrapper").mkdir(parents=True)
             with config_context(PATH_MAPPINGS={"build-support": "pkgs/build-support"}):
                 assert sync_with_nixpkgs.map_path_using_mappings("build-support/cc-wrapper", nixpkgs, check_file=False) == nixpkgs / "pkgs" / "build-support" / "cc-wrapper"
-
+    
     def test_no_match(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             nixpkgs = Path(tmpdir) / "nixpkgs"
@@ -320,7 +320,7 @@ class TestCheckNewFiles:
             assert "build-support/some-new-directory/file.nix" not in stats.new_files_list
             assert "build-support/some-new-file.nix" not in stats.new_files_list
             assert "build-support/bintools-wrapper/new-file.nix" in stats.new_files_list
-
+    
     def test_recursive_check_in_existing_subdirectories(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             corepkgs, nixpkgs = setup_dirs(
@@ -334,7 +334,7 @@ class TestCheckNewFiles:
                 PATH_MAPPINGS={"build-support": "pkgs/build-support"}
             )
             assert "build-support/bintools-wrapper/nested/new-nested-file.nix" in stats.new_files_list
-
+    
     def test_check_new_files_when_not_ignored(self):
         """When NOT ignored: check new dirs, top-level files, and existing subdirs."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -359,7 +359,7 @@ class TestCheckNewFiles:
             assert "build-support/some-new-file.nix" in stats.new_files_list
             assert "build-support/bintools-wrapper/new-file.nix" in stats.new_files_list
             assert "build-support/bintools-wrapper/new-subdir/subdir-file.nix" in stats.new_files_list
-
+    
     def test_deeply_nested_new_directories(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             corepkgs, nixpkgs = setup_dirs(
@@ -379,7 +379,7 @@ class TestCheckNewFiles:
             assert "build-support/cc-wrapper/new-deep/level1/file1.nix" in stats.new_files_list
             assert "build-support/cc-wrapper/new-deep/level1/level2/file2.nix" in stats.new_files_list
             assert "build-support/cc-wrapper/new-deep/level1/level2/level3/deep-file.nix" in stats.new_files_list
-
+    
     def test_multiple_new_directories_at_same_level(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             nixpkgs_structure = {f"pkgs/build-support/new-dir{i}/file.nix": f"content-{i}" for i in range(1, 4)}
@@ -398,7 +398,7 @@ class TestCheckNewFiles:
             for i in range(1, 4):
                 assert f"build-support/new-dir{i}/file.nix" in stats.new_files_list
                 assert f"build-support/new-dir{i}/subdir/subfile.nix" in stats.new_files_list
-
+    
     def test_mixed_new_files_and_directories(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             corepkgs, nixpkgs = setup_dirs(
@@ -429,7 +429,7 @@ class TestCheckNewFiles:
             assert "build-support/dir1/new-subdir/file.nix" in stats.new_files_list
             assert "build-support/dir1/subdir1/new-file.nix" in stats.new_files_list
             assert "build-support/dir1/subdir1/new-nested/nested-file.nix" in stats.new_files_list
-
+    
     def test_ignore_pattern_with_nested_structure(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             corepkgs, nixpkgs = setup_dirs(
@@ -454,7 +454,7 @@ class TestCheckNewFiles:
             assert "build-support/ignored-subdir/new-dir/file.nix" not in stats.new_files_list
             assert "build-support/normal-subdir/new-file.nix" in stats.new_files_list
             assert "build-support/normal-subdir/new-dir/file.nix" in stats.new_files_list
-
+    
     def test_complex_path_mapping_scenario(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             corepkgs, nixpkgs = setup_dirs(
@@ -476,7 +476,7 @@ class TestCheckNewFiles:
             assert "build-support/wrapper/nested/new-sub/file.nix" in stats.new_files_list
             assert "build-support/wrapper/new-wrapper-dir/file.nix" in stats.new_files_list
             assert "build-support/wrapper/new-wrapper-file.nix" in stats.new_files_list
-
+    
     def test_recursive_with_multiple_existing_dirs(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             corepkgs, nixpkgs = setup_dirs(
@@ -509,7 +509,7 @@ class TestCheckNewFiles:
             assert "build-support/dir1/sub1/deep1/new-dir3/file.nix" in stats.new_files_list
             assert "build-support/dir2/new-file4.nix" in stats.new_files_list
             assert "build-support/dir2/sub2/new-file5.nix" in stats.new_files_list
-
+    
     def test_ignore_top_level_files_when_directory_ignored(self):
         """Top-level files skipped when directory ignored, but existing subdirs still checked."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -529,7 +529,7 @@ class TestCheckNewFiles:
             )
             assert "os-specific/top-level-file.nix" not in stats.new_files_list
             assert "os-specific/windows/mingw-w64/headers.nix" in stats.new_files_list
-
+    
     def test_check_new_files_only_if_in_path_mappings(self):
         """CHECK_NEW_FILES only works if directory is in PATH_MAPPINGS."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -545,7 +545,7 @@ class TestCheckNewFiles:
             )
             assert "some-dir/new-file.nix" not in stats.new_files_list
             assert stats.new_files == 0
-
+    
     def test_check_new_files_works_when_in_path_mappings(self):
         """CHECK_NEW_FILES works correctly when directory is in PATH_MAPPINGS."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -571,16 +571,16 @@ class TestGenerateDirectoryPatch:
             nixpkgs = Path(tmpdir) / "nixpkgs"
             patches_dir = Path(tmpdir) / "patches"
             patches_dir.mkdir()
-
+            
             # Create nixpkgs directory but not corepkgs directory
             nixpkgs_dir = nixpkgs / "pkgs" / "build-support" / "test-dir"
             nixpkgs_dir.mkdir(parents=True)
             (nixpkgs_dir / "file.nix").write_text("content")
-
+            
             files_in_dir = [
                 ("build-support/test-dir/file.nix", None, nixpkgs_dir / "file.nix")
             ]
-
+            
             with config_context(PATH_MAPPINGS={"build-support": "pkgs/build-support"}):
                 result = sync_with_nixpkgs.generate_directory_patch(
                     "build-support/test-dir",
@@ -590,7 +590,7 @@ class TestGenerateDirectoryPatch:
                     patches_dir
                 )
                 assert result is None
-
+    
     def test_skip_when_nixpkgs_dir_does_not_exist(self):
         """Skip patch generation when nixpkgs directory doesn't exist."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -598,16 +598,16 @@ class TestGenerateDirectoryPatch:
             nixpkgs = Path(tmpdir) / "nixpkgs"
             patches_dir = Path(tmpdir) / "patches"
             patches_dir.mkdir()
-
+            
             # Create corepkgs directory but not nixpkgs directory
             corepkgs_dir = corepkgs / "build-support" / "test-dir"
             corepkgs_dir.mkdir(parents=True)
             (corepkgs_dir / "file.nix").write_text("content")
-
+            
             files_in_dir = [
                 ("build-support/test-dir/file.nix", corepkgs_dir / "file.nix", None)
             ]
-
+            
             with config_context(PATH_MAPPINGS={"build-support": "pkgs/build-support"}):
                 result = sync_with_nixpkgs.generate_directory_patch(
                     "build-support/test-dir",
@@ -617,7 +617,7 @@ class TestGenerateDirectoryPatch:
                     patches_dir
                 )
                 assert result is None
-
+    
     def test_skip_when_corepkgs_path_is_file_not_directory(self):
         """Skip patch generation when corepkgs path exists but is a file, not a directory."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -625,20 +625,20 @@ class TestGenerateDirectoryPatch:
             nixpkgs = Path(tmpdir) / "nixpkgs"
             patches_dir = Path(tmpdir) / "patches"
             patches_dir.mkdir()
-
+            
             # Create corepkgs file (not directory) and nixpkgs directory
             corepkgs_file = corepkgs / "build-support" / "test-dir"
             corepkgs_file.parent.mkdir(parents=True)
             corepkgs_file.write_text("this is a file, not a directory")
-
+            
             nixpkgs_dir = nixpkgs / "pkgs" / "build-support" / "test-dir"
             nixpkgs_dir.mkdir(parents=True)
             (nixpkgs_dir / "file.nix").write_text("content")
-
+            
             files_in_dir = [
                 ("build-support/test-dir/file.nix", corepkgs_file, nixpkgs_dir / "file.nix")
             ]
-
+            
             with config_context(PATH_MAPPINGS={"build-support": "pkgs/build-support"}):
                 result = sync_with_nixpkgs.generate_directory_patch(
                     "build-support/test-dir",
@@ -648,7 +648,7 @@ class TestGenerateDirectoryPatch:
                     patches_dir
                 )
                 assert result is None
-
+    
     def test_skip_when_nixpkgs_path_is_file_not_directory(self):
         """Skip patch generation when nixpkgs path exists but is a file, not a directory."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -656,20 +656,20 @@ class TestGenerateDirectoryPatch:
             nixpkgs = Path(tmpdir) / "nixpkgs"
             patches_dir = Path(tmpdir) / "patches"
             patches_dir.mkdir()
-
+            
             # Create corepkgs directory and nixpkgs file (not directory)
             corepkgs_dir = corepkgs / "build-support" / "test-dir"
             corepkgs_dir.mkdir(parents=True)
             (corepkgs_dir / "file.nix").write_text("content")
-
+            
             nixpkgs_file = nixpkgs / "pkgs" / "build-support" / "test-dir"
             nixpkgs_file.parent.mkdir(parents=True)
             nixpkgs_file.write_text("this is a file, not a directory")
-
+            
             files_in_dir = [
                 ("build-support/test-dir/file.nix", corepkgs_dir / "file.nix", nixpkgs_file)
             ]
-
+            
             with config_context(PATH_MAPPINGS={"build-support": "pkgs/build-support"}):
                 result = sync_with_nixpkgs.generate_directory_patch(
                     "build-support/test-dir",
@@ -679,7 +679,7 @@ class TestGenerateDirectoryPatch:
                     patches_dir
                 )
                 assert result is None
-
+    
     def test_skip_root_level_patches(self):
         """Skip patch generation for root-level files (dir_path == '.')."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -689,15 +689,15 @@ class TestGenerateDirectoryPatch:
             corepkgs.mkdir()
             nixpkgs.mkdir()
             patches_dir.mkdir()
-
+            
             # Create root-level files that differ
             (corepkgs / "root-file.nix").write_text("corepkgs root content")
             (nixpkgs / "root-file.nix").write_text("nixpkgs root content")
-
+            
             files_in_dir = [
                 ("root-file.nix", corepkgs / "root-file.nix", nixpkgs / "root-file.nix")
             ]
-
+            
             result = sync_with_nixpkgs.generate_directory_patch(
                 ".",
                 files_in_dir,
@@ -708,7 +708,7 @@ class TestGenerateDirectoryPatch:
             assert result is None
             # Verify no root.patch file was created
             assert not (patches_dir / "root.patch").exists()
-
+    
     def test_generate_patch_when_both_directories_exist(self):
         """Generate patch successfully when both directories exist."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -716,20 +716,20 @@ class TestGenerateDirectoryPatch:
             nixpkgs = Path(tmpdir) / "nixpkgs"
             patches_dir = Path(tmpdir) / "patches"
             patches_dir.mkdir()
-
+            
             # Create both directories with different content
             corepkgs_dir = corepkgs / "build-support" / "test-dir"
             corepkgs_dir.mkdir(parents=True)
             (corepkgs_dir / "file.nix").write_text("corepkgs content")
-
+            
             nixpkgs_dir = nixpkgs / "pkgs" / "build-support" / "test-dir"
             nixpkgs_dir.mkdir(parents=True)
             (nixpkgs_dir / "file.nix").write_text("nixpkgs content")
-
+            
             files_in_dir = [
                 ("build-support/test-dir/file.nix", corepkgs_dir / "file.nix", nixpkgs_dir / "file.nix")
             ]
-
+            
             with config_context(PATH_MAPPINGS={"build-support": "pkgs/build-support"}):
                 result = sync_with_nixpkgs.generate_directory_patch(
                     "build-support/test-dir",
@@ -743,7 +743,7 @@ class TestGenerateDirectoryPatch:
                 # Verify patch file contains diff content
                 patch_content = result.read_text()
                 assert "diff -urN" in patch_content or "---" in patch_content
-
+    
     def test_skip_maintainer_only_changes(self):
         """Skip patch generation when diff only contains maintainer changes."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -751,7 +751,7 @@ class TestGenerateDirectoryPatch:
             nixpkgs = Path(tmpdir) / "nixpkgs"
             patches_dir = Path(tmpdir) / "patches"
             patches_dir.mkdir()
-
+            
             # Create directories with files that differ only in maintainers
             corepkgs_dir = corepkgs / "pkgs" / "test-pkg"
             corepkgs_dir.mkdir(parents=True)
@@ -759,18 +759,21 @@ class TestGenerateDirectoryPatch:
   description = "Test package";
   maintainers = [ ];
 }""")
-
+            
             nixpkgs_dir = nixpkgs / "pkgs" / "test-pkg"
             nixpkgs_dir.mkdir(parents=True)
             (nixpkgs_dir / "default.nix").write_text("""{
   description = "Test package";
-  maintainers = [ ];
+  maintainers = with maintainers; [
+    globin
+    basvandijk
+  ];
 }""")
-
+            
             files_in_dir = [
                 ("pkgs/test-pkg/default.nix", corepkgs_dir / "default.nix", nixpkgs_dir / "default.nix")
             ]
-
+            
             result = sync_with_nixpkgs.generate_directory_patch(
                 "pkgs/test-pkg",
                 files_in_dir,
@@ -781,7 +784,7 @@ class TestGenerateDirectoryPatch:
             assert result is None
             # Verify no patch file was created
             assert not (patches_dir / "pkgs_test-pkg.patch").exists()
-
+    
     def test_generate_patch_with_maintainer_and_other_changes(self):
         """Generate patch when diff contains maintainer changes AND other changes, but maintainer changes are filtered out."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -789,7 +792,7 @@ class TestGenerateDirectoryPatch:
             nixpkgs = Path(tmpdir) / "nixpkgs"
             patches_dir = Path(tmpdir) / "patches"
             patches_dir.mkdir()
-
+            
             # Create directories with files that differ in maintainers AND other fields
             corepkgs_dir = corepkgs / "pkgs" / "test-pkg"
             corepkgs_dir.mkdir(parents=True)
@@ -797,18 +800,20 @@ class TestGenerateDirectoryPatch:
   description = "Old description";
   maintainers = [ ];
 }""")
-
+            
             nixpkgs_dir = nixpkgs / "pkgs" / "test-pkg"
             nixpkgs_dir.mkdir(parents=True)
             (nixpkgs_dir / "default.nix").write_text("""{
   description = "New description";
-  maintainers = [ ];
+  maintainers = with maintainers; [
+    globin
+  ];
 }""")
-
+            
             files_in_dir = [
                 ("pkgs/test-pkg/default.nix", corepkgs_dir / "default.nix", nixpkgs_dir / "default.nix")
             ]
-
+            
             result = sync_with_nixpkgs.generate_directory_patch(
                 "pkgs/test-pkg",
                 files_in_dir,
@@ -826,7 +831,7 @@ class TestGenerateDirectoryPatch:
             # Verify maintainer changes are filtered out (should not appear in the patch)
             # The patch should only show description changes, not maintainer changes
             assert "Old description" in patch_content or "New description" in patch_content
-
+    
     def test_patch_format_valid_no_orphaned_hunks(self):
         """Verify that generated patches don't have orphaned hunk markers."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -834,7 +839,7 @@ class TestGenerateDirectoryPatch:
             nixpkgs = Path(tmpdir) / "nixpkgs"
             patches_dir = Path(tmpdir) / "patches"
             patches_dir.mkdir()
-
+            
             # Create a file with maintainer changes in the middle of other changes
             corepkgs_dir = corepkgs / "pkgs" / "test-pkg"
             corepkgs_dir.mkdir(parents=True)
@@ -843,19 +848,19 @@ class TestGenerateDirectoryPatch:
   maintainers = [ ];
   version = "1.0";
 }""")
-
+            
             nixpkgs_dir = nixpkgs / "pkgs" / "test-pkg"
             nixpkgs_dir.mkdir(parents=True)
             (nixpkgs_dir / "default.nix").write_text("""{
   description = "Test";
-  maintainers = [ ];
+  maintainers = with maintainers; [ globin ];
   version = "2.0";
 }""")
-
+            
             files_in_dir = [
                 ("pkgs/test-pkg/default.nix", corepkgs_dir / "default.nix", nixpkgs_dir / "default.nix")
             ]
-
+            
             result = sync_with_nixpkgs.generate_directory_patch(
                 "pkgs/test-pkg",
                 files_in_dir,
@@ -865,7 +870,7 @@ class TestGenerateDirectoryPatch:
             )
             assert result is not None
             patch_content = result.read_text()
-
+            
             # Verify no orphaned hunk markers (hunk marker followed immediately by another hunk marker)
             lines = patch_content.splitlines()
             for i, line in enumerate(lines):
@@ -876,17 +881,17 @@ class TestGenerateDirectoryPatch:
                         assert not next_line.startswith("@@"), f"Orphaned hunk marker at line {i+1}"
                         # Should have context or changes, not empty
                         assert next_line.strip() or i + 2 < len(lines), f"Empty hunk at line {i+1}"
-
+    
     def test_patch_no_hunk_marker_after_change_line(self):
         """Verify that generated patches are valid and can be applied."""
         import subprocess
-
+        
         with tempfile.TemporaryDirectory() as tmpdir:
             corepkgs = Path(tmpdir) / "corepkgs"
             nixpkgs = Path(tmpdir) / "nixpkgs"
             patches_dir = Path(tmpdir) / "patches"
             patches_dir.mkdir()
-
+            
             # Create a scenario where maintainer changes are between two hunks
             # This simulates the rust patch issue
             corepkgs_dir = corepkgs / "pkgs" / "rust"
@@ -900,23 +905,23 @@ class TestGenerateDirectoryPatch:
   ++ lib.optional (!stdenv.hostPlatform.isDarwin) zlib
   ++ lib.optional stdenv.hostPlatform.isDarwin Security;
 }""")
-
+            
             nixpkgs_dir = nixpkgs / "pkgs" / "development" / "compilers" / "rust"
             nixpkgs_dir.mkdir(parents=True)
             (nixpkgs_dir / "binary.nix").write_text("""{
   description = "Safe, concurrent, practical language";
   mainProgram = "rustc";
-  maintainers = [ ];
+  maintainers = with maintainers; [ globin ];
   buildInputs = [
     bash
   ]
   ++ lib.optional (!stdenv.hostPlatform.isDarwin) zlib;
 }""")
-
+            
             files_in_dir = [
                 ("pkgs/rust/binary.nix", corepkgs_dir / "binary.nix", nixpkgs_dir / "binary.nix")
             ]
-
+            
             with config_context(PATH_MAPPINGS={"pkgs/rust": "pkgs/development/compilers/rust"}):
                 result = sync_with_nixpkgs.generate_directory_patch(
                     "pkgs/rust",
@@ -927,7 +932,7 @@ class TestGenerateDirectoryPatch:
                 )
                 assert result is not None
                 patch_file = result
-
+                
                 # Test that the patch can actually be applied
                 # Create a test directory to apply the patch
                 test_dir = Path(tmpdir) / "test_apply"
@@ -936,14 +941,14 @@ class TestGenerateDirectoryPatch:
                 test_corepkgs_dir = test_corepkgs / "pkgs" / "rust"
                 test_corepkgs_dir.mkdir(parents=True)
                 (test_corepkgs_dir / "binary.nix").write_text((corepkgs_dir / "binary.nix").read_text())
-
+                
                 # Try to apply the patch
                 result = subprocess.run(
                     ["patch", "-p1", "-d", str(test_corepkgs), "-i", str(patch_file)],
                     capture_output=True,
                     text=True
                 )
-
+                
                 assert result.returncode == 0, \
                     f"Patch failed to apply: {result.stderr}\nPatch content:\n{patch_file.read_text()[:500]}"
 

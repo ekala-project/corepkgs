@@ -36,7 +36,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   patches = [
     # Upstream patch to fix 32-bit tests.
-    # Will be included in 5.46+ releases.
+    #
+    # It is included in 5.46+, but we are not updating to it or a later version until:
+    #
+    # https://bugs.astron.com/view.php?id=622
+    # https://bugs.astron.com/view.php?id=638
+    #
+    # are resolved. See also description of the 1st bug here:
+    #
+    # https://github.com/NixOS/nixpkgs/pull/402318#issuecomment-2881163359
     ./32-bit-time_t.patch
   ];
 
@@ -47,7 +55,7 @@ stdenv.mkDerivation (finalAttrs: {
     updateAutotoolsGnuConfigScriptsHook
   ]
   ++ lib.optional (stdenv.hostPlatform != stdenv.buildPlatform) file;
-  buildInputs = [ zlib ] ++ lib.optional stdenv.hostPlatform.isWindows libgnurx;
+  buildInputs = [ zlib ] ++ lib.optional stdenv.hostPlatform.isMinGW libgnurx;
 
   # https://bugs.astron.com/view.php?id=382
   doCheck = !stdenv.buildPlatform.isMusl;

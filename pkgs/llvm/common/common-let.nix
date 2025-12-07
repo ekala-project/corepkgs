@@ -10,9 +10,16 @@
 
 rec {
   llvm_meta = {
-    license = lib.licenses.ncsa;
-    maintainers = [ ];
-
+    license =
+      with lib.licenses;
+      [ ncsa ]
+      ++
+        # Contributions after June 1st, 2024 are only licensed under asl20 and
+        # llvm-exception: https://github.com/llvm/llvm-project/pull/92394
+        lib.optionals (lib.versionAtLeast release_version "19") [
+          asl20
+          llvm-exception
+        ];
     # See llvm/cmake/config-ix.cmake.
     platforms =
       lib.platforms.aarch64
@@ -22,8 +29,11 @@ rec {
       ++ lib.platforms.s390x
       ++ lib.platforms.wasi
       ++ lib.platforms.x86
-      ++ lib.optionals (lib.versionAtLeast release_version "7") lib.platforms.riscv
-      ++ lib.optionals (lib.versionAtLeast release_version "14") lib.platforms.m68k;
+      ++ lib.platforms.riscv
+      ++ lib.platforms.m68k
+      ++ lib.platforms.loongarch64;
+
+    identifiers.cpeParts.vendor = "llvm";
   };
 
   releaseInfo =
@@ -49,10 +59,11 @@ rec {
         sha256 = releaseInfo.original.sha256;
         rev = if gitRelease != null then gitRelease.rev else "llvmorg-${releaseInfo.version}";
       in
-      fetchFromGitHub {
+      fetchFromGitHub rec {
         owner = "llvm";
         repo = "llvm-project";
         inherit rev sha256;
+        passthru = { inherit owner repo rev; };
       };
 
 }

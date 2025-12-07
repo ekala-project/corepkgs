@@ -17,6 +17,7 @@
   gmp,
   autoreconfHook,
   buildPackages,
+  updateAutotoolsGnuConfigScriptsHook,
 }@args:
 
 stdenv.mkDerivation {
@@ -31,10 +32,15 @@ stdenv.mkDerivation {
   inherit patches;
 
   strictDeps = true;
-  depsBuildBuild = lib.optionals (packageAtLeast "0.24") [ buildPackages.stdenv.cc ];
-  nativeBuildInputs = lib.optionals (stdenv.hostPlatform.isRiscV && packageOlder "0.24") [
-    autoreconfHook
-  ];
+  depsBuildBuild = lib.optionals (packageAtLeast "0.23") [ buildPackages.stdenv.cc ];
+  nativeBuildInputs =
+    lib.optionals (stdenv.hostPlatform.isRiscV && packageOlder "0.23") [
+      autoreconfHook
+    ]
+    ++ [
+      # needed until config scripts are updated to not use /usr/bin/uname on FreeBSD native
+      updateAutotoolsGnuConfigScriptsHook
+    ];
   buildInputs = [ gmp ];
 
   inherit configureFlags;

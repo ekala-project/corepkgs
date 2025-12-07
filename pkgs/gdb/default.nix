@@ -22,8 +22,8 @@
   zstd,
   xz,
   dejagnu,
+  sourceHighlight,
   libiconv,
-  source-highlight,
 
   pythonSupport ? stdenv.hostPlatform == stdenv.buildPlatform && !stdenv.hostPlatform.isCygwin,
   python3 ? null,
@@ -37,7 +37,7 @@
     "$debugdir"
     "$datadir/auto-load"
     # targetPackages so we get the right libc when cross-compiling and using buildPackages.gdb
-    targetPackages.stdenv.cc.cc.lib
+    (lib.getLib targetPackages.stdenv.cc.cc)
   ],
   writeScript,
 }:
@@ -53,11 +53,11 @@ assert pythonSupport -> python3 != null;
 
 stdenv.mkDerivation rec {
   pname = targetPrefix + basename + lib.optionalString hostCpuOnly "-host-cpu-only";
-  version = "15.1";
+  version = "16.3";
 
   src = fetchurl {
     url = "mirror://gnu/gdb/${basename}-${version}.tar.xz";
-    hash = "sha256-OCVOrNRXITS8qcWlqk1MpWTLvTDDadiB9zP7a5AzVPI=";
+    hash = "sha256-vPzQlVKKmHkXrPn/8/FnIYFpSSbMGNYJyZ0AQsACJMU=";
   };
 
   postPatch =
@@ -97,7 +97,7 @@ stdenv.mkDerivation rec {
     zstd
     xz
     guile
-    source-highlight
+    sourceHighlight
   ]
   ++ lib.optional pythonSupport python3
   ++ lib.optional doCheck dejagnu
@@ -115,11 +115,14 @@ stdenv.mkDerivation rec {
 
   env.NIX_CFLAGS_COMPILE = "-Wno-format-nonliteral";
 
-  configurePlatforms = [
-    "build"
-    "host"
-    "target"
-  ];
+  # Workaround for Apple Silicon, configurePlatforms must be disabled
+  configurePlatforms =
+    lib.optionals (!(stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64))
+      [
+        "build"
+        "host"
+        "target"
+      ];
 
   preConfigure = ''
     # remove precompiled docs, required for man gdbinit to mention /etc/gdb/gdbinit
@@ -167,11 +170,15 @@ stdenv.mkDerivation rec {
   ++ lib.optional stdenv.hostPlatform.isMusl "--disable-nls"
   ++ lib.optional stdenv.hostPlatform.isStatic "--disable-inprocess-agent"
   ++ lib.optional enableDebuginfod "--with-debuginfod=yes"
-  ++ lib.optional (!enableSim) "--disable-sim";
+  ++ lib.optional (!enableSim) "--disable-sim"
+  # Workaround for Apple Silicon, "--target" must be "faked", see eg: https://github.com/Homebrew/homebrew-core/pull/209753
+  ++ lib.optional (
+    stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64
+  ) "--target=x86_64-apple-darwin";
 
   postInstall = ''
     # Remove Info files already provided by Binutils and other packages.
-          rm -v $out/share/info/bfd.info
+    rm -v $out/share/info/bfd.info
   '';
 
   # TODO: Investigate & fix the test failures.
@@ -207,9 +214,6 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3Plus;
 
     platforms = with lib.platforms; linux ++ cygwin ++ freebsd ++ darwin;
-    # upstream does not support targeting aarch64-darwin;
-    # see https://inbox.sourceware.org/gdb/3185c3b8-8a91-4beb-a5d5-9db6afb93713@Spark/
-    badPlatforms = lib.optionals (stdenv.targetPlatform.system == "aarch64-darwin") meta.platforms;
     maintainers = [ ];
   };
 }

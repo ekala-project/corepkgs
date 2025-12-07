@@ -3,13 +3,13 @@
   lib,
   stdenv,
   fetchurl,
-  fetchpatch,
   gettext,
   meson,
   ninja,
   pkg-config,
   perl,
   python3,
+  python3Packages,
   libiconv,
   zlib,
   libffi,
@@ -20,43 +20,31 @@
   bash,
   gnum4,
   libxslt,
+  docutils,
   gi-docgen,
   # use util-linuxMinimal to avoid circular dependency (util-linux, systemd, glib)
-  util-linuxMinimal,
+  util-linuxMinimal ? null,
   buildPackages,
 
   # this is just for tests (not in the closure of any regular package)
-  dbus ? null,
-  tzdata ? null,
-  desktop-file-utils ? null,
-  shared-mime-info ? null,
-  darwin ? { },
-  makeHardcodeGsettingsPatch ? null,
+  dbus,
+  tzdata,
+  desktop-file-utils,
+  shared-mime-info,
   testers,
-  gobject-introspection ? null,
-  mesonEmulatorHook ? null,
+  gobject-introspection,
+  libsystemtap,
+  libsysprof-capture,
+  mesonEmulatorHook,
   withIntrospection ?
     stdenv.hostPlatform.emulatorAvailable buildPackages
     && lib.meta.availableOn stdenv.hostPlatform gobject-introspection
     && stdenv.hostPlatform.isLittleEndian == stdenv.buildPlatform.isLittleEndian,
 }:
 
-assert stdenv.isLinux -> util-linuxMinimal != null;
+assert stdenv.hostPlatform.isLinux -> util-linuxMinimal != null;
 
 let
-  # Some packages don't get "Cflags" from pkg-config correctly
-  # and then fail to build when directly including like <glib/...>.
-  # This is intended to be run in postInstall of any package
-  # which has $out/include/ containing just some disjunct directories.
-  flattenInclude = ''
-    for dir in "''${!outputInclude}"/include/*; do
-      cp -r "$dir"/* "''${!outputInclude}/include/"
-      rm -r "$dir"
-      ln -s . "$dir"
-    done
-    ln -sr -t "''${!outputInclude}/include/" "''${!outputInclude}"/lib/*/include/* 2>/dev/null || true
-  '';
-
   gobject-introspection' = buildPackages.gobject-introspection.override {
     propagateFullGlib = false;
     # Avoid introducing cairo, which enables gobjectSupport by default.
@@ -74,25 +62,37 @@ let
       "2.0-0.dll"
     else
       "2.0-0.lib";
+
+  systemtap' = buildPackages.systemtap-sdt;
+
+  withDtrace =
+    lib.meta.availableOn stdenv.buildPlatform systemtap'
+    &&
+      # dtrace support requires sys/sdt.h header
+      lib.meta.availableOn stdenv.hostPlatform libsystemtap;
 in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "glib";
-  version = "2.80.4";
+  version = "2.86.1";
+
+  outputs = [
+    "bin"
+    "out"
+    "dev"
+    "devdoc"
+  ];
+
+  setupHook = ./setup-hook.sh;
 
   src = fetchurl {
     url = "mirror://gnome/sources/glib/${lib.versions.majorMinor finalAttrs.version}/glib-${finalAttrs.version}.tar.xz";
-    hash = "sha256-JOApxd/JtE5Fc2l63zMHipgnxIk4VVAEs7kJb6TqA08=";
+    hash = "sha256-EZ0XCMoCJVbW0pie6QrRuCvZwNFmfgZpRKbQAg4tXlc=";
   };
 
   patches =
-    lib.optionals stdenv.isDarwin [
+    lib.optionals stdenv.hostPlatform.isDarwin [
       ./darwin-compilation.patch
-      # FIXME: remove when https://gitlab.gnome.org/GNOME/glib/-/merge_requests/4088 is merged and is in the tagged release
-      (fetchpatch {
-        url = "https://gitlab.gnome.org/GNOME/glib/-/commit/9d0988ca62ee96e09aa76abbd65ff192cfce6858.patch";
-        hash = "sha256-JrR3Ba6L+3M0Nt8DgHmPG8uKtx7hOgUp7np08ATIzjA=";
-      })
     ]
     ++ lib.optionals stdenv.hostPlatform.isMusl [
       ./quark_init_on_demand.patch
@@ -119,9 +119,12 @@ stdenv.mkDerivation (finalAttrs: {
 
       # GLib contains many binaries used for different purposes;
       # we will install them to different outputs:
-      # 1. Tools for desktop environment ($bin)
+      # 1. Tools for desktop environment and introspection ($bin)
       #    * gapplication (non-darwin)
       #    * gdbus
+      #    * gi-compile-repository
+      #    * gi-decompile-typelib
+      #    * gi-inspect-typelib
       #    * gio
       #    * gio-launch-desktop (symlink to $out)
       #    * gsettings
@@ -146,22 +149,17 @@ stdenv.mkDerivation (finalAttrs: {
       # and by default meson installs in to $out/share/gdb/auto-load
       # which does not help
       ./gdb_script.patch
-
-      # glib assumes that `RTLD_LOCAL` is defined to `0`, which is true on Linux and FreeBSD but not on Darwin.
-      ./gmodule-rtld_local.patch
     ];
 
-  outputs = [
-    "bin"
-    "out"
-    "dev"
-    "devdoc"
-  ];
-
-  setupHook = ./setup-hook.sh;
+  strictDeps = true;
 
   buildInputs = [
     finalAttrs.setupHook
+  ]
+  ++ lib.optionals (!stdenv.hostPlatform.isFreeBSD) [
+    libsysprof-capture
+  ]
+  ++ [
     pcre2
   ]
   ++ lib.optionals (!stdenv.hostPlatform.isWindows) [
@@ -171,37 +169,27 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals (lib.meta.availableOn stdenv.hostPlatform elfutils) [
     elfutils
   ]
-  ++ lib.optionals stdenv.isLinux [
+  ++ lib.optionals withDtrace [
+    libsystemtap
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
     libselinux
     util-linuxMinimal # for libmount
-  ]
-  ++ lib.optionals stdenv.isDarwin (
-    with darwin.apple_sdk.frameworks;
-    [
-      AppKit
-      Carbon
-      Cocoa
-      CoreFoundation
-      CoreServices
-      Foundation
-    ]
-  );
-
-  strictDeps = true;
+  ];
 
   depsBuildBuild = [
     pkg-config # required to find native gi-docgen
   ];
 
   nativeBuildInputs = [
-    python3.pkgs.docutils # for rst2man, rst2html5
+    docutils # for rst2man, rst2html5
     meson
     ninja
     pkg-config
     perl
     python3
-    python3.pkgs.packaging # mostly used to make meson happy
-    python3.pkgs.wrapPython # for patchPythonScript
+    python3Packages.packaging # mostly used to make meson happy
+    python3Packages.wrapPython # for patchPythonScript
     gettext
     libxslt
   ]
@@ -211,6 +199,9 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals (withIntrospection && !stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
     mesonEmulatorHook
+  ]
+  ++ lib.optionals withDtrace [
+    systemtap' # for dtrace
   ];
 
   propagatedBuildInputs = [
@@ -220,8 +211,17 @@ stdenv.mkDerivation (finalAttrs: {
     libiconv
   ];
 
+  nativeCheckInputs = [
+    tzdata
+    desktop-file-utils
+    shared-mime-info
+  ];
+
   mesonFlags = [
+    "-Dglib_debug=disabled" # https://gitlab.gnome.org/GNOME/glib/-/issues/3421#note_2206315
     "-Ddocumentation=true" # gvariant specification can be built without gi-docgen
+    (lib.mesonEnable "dtrace" withDtrace)
+    (lib.mesonEnable "systemtap" withDtrace) # requires dtrace option to be enabled
     "-Dnls=enabled"
     "-Ddevbindir=${placeholder "dev"}/bin"
     (lib.mesonEnable "introspection" withIntrospection)
@@ -232,17 +232,19 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals (!lib.meta.availableOn stdenv.hostPlatform elfutils) [
     "-Dlibelf=disabled"
   ]
-  ++ lib.optionals stdenv.isFreeBSD [
-    "-Db_lundef=false"
+  ++ lib.optionals stdenv.hostPlatform.isFreeBSD [
     "-Dxattr=false"
+    "-Dsysprof=disabled" # sysprof-capture does not build on FreeBSD
   ];
 
-  env.NIX_CFLAGS_COMPILE = toString [
-    "-Wno-error=nonnull"
-    # Default for release buildtype but passed manually because
-    # we're using plain
-    "-DG_DISABLE_CAST_CHECKS"
-  ];
+  env = {
+    NIX_CFLAGS_COMPILE = toString [
+      "-Wno-error=nonnull"
+      # Default for release buildtype but passed manually because
+      # we're using plain
+      "-DG_DISABLE_CAST_CHECKS"
+    ];
+  };
 
   postPatch = ''
     patchShebangs glib/gen-unicode-tables.pl
@@ -290,7 +292,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   preFixup = lib.optionalString (!stdenv.hostPlatform.isStatic) ''
-    buildPythonPath ${python3.pkgs.packaging}
+    buildPythonPath ${python3Packages.packaging}
     patchPythonScript "$dev/share/glib-2.0/codegen/utils.py"
   '';
 
@@ -305,12 +307,6 @@ stdenv.mkDerivation (finalAttrs: {
     # Cannot be in postInstall, otherwise _multioutDocs hook in preFixup will move right back.
     moveToOutput "share/doc" "$devdoc"
   '';
-
-  nativeCheckInputs = [
-    tzdata
-    desktop-file-utils
-    shared-mime-info
-  ];
 
   # Conditional necessary to break infinite recursion with passthru.tests
   preCheck = lib.optionalString finalAttrs.finalPackage.doCheck or config.doCheckByDefault or false ''
@@ -343,7 +339,7 @@ stdenv.mkDerivation (finalAttrs: {
     rm $out/lib/libglib-${librarySuffix}
   '';
 
-  separateDebugInfo = stdenv.isLinux;
+  separateDebugInfo = stdenv.hostPlatform.isLinux;
 
   passthru = rec {
     gioModuleDir = "lib/gio/modules";
@@ -360,23 +356,10 @@ stdenv.mkDerivation (finalAttrs: {
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
     };
 
-    inherit flattenInclude;
     updateScript = gnome.updateScript {
       packageName = "glib";
       versionPolicy = "odd-unstable";
     };
-
-    mkHardcodeGsettingsPatch =
-      {
-        src,
-        glib-schema-to-var,
-      }:
-      builtins.trace
-        "glib.mkHardcodeGsettingsPatch is deprecated, please use makeHardcodeGsettingsPatch instead"
-        (makeHardcodeGsettingsPatch {
-          inherit src;
-          schemaIdToVariableMapping = glib-schema-to-var;
-        });
   };
 
   meta = with lib; {

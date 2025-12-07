@@ -9,37 +9,44 @@
   setuptools,
 
   # native dependencies
+  libxml2,
+  libxslt,
   zlib,
-  xcodebuild ? null,
-
-  # For native versions of libxml2 and libxslt
-  pkgs,
+  xcodebuild,
 }:
 
 buildPythonPackage rec {
   pname = "lxml";
-  version = "5.2.2";
+  version = "6.0.2";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "lxml";
     repo = "lxml";
-    rev = "refs/tags/lxml-${version}";
-    hash = "sha256-c9r2uqjXmQOXyPCsJTzi1OatkQ9rhJbKqpxaoFz2l18=";
+    tag = "lxml-${version}";
+    hash = "sha256-Ri5SzfQJFghRcMAKHS5QKD365OZlio895fSlumq83vs=";
   };
 
-  # setuptoolsBuildPhase needs dependencies to be passed through nativeBuildInputs
-  nativeBuildInputs = [
-    pkgs.libxml2
-    pkgs.libxslt
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace-fail 'Cython>=3.1.4' 'Cython'
+  '';
+
+  build-system = [
     cython
     setuptools
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [ xcodebuild ];
 
+  # required for build time dependency check
+  nativeBuildInputs = [
+    libxml2.dev
+    libxslt.dev
+  ];
+
   buildInputs = [
-    pkgs.libxml2
-    pkgs.libxslt
+    libxml2
+    libxslt
     zlib
   ];
 

@@ -3,6 +3,7 @@
   lib,
   buildPythonPackage,
   fetchPypi,
+  fetchpatch,
   pythonOlder,
   pytestCheckHook,
   aiohttp,
@@ -25,15 +26,33 @@
 
 buildPythonPackage rec {
   pname = "black";
-  version = "24.4.2";
+  version = "25.1.0";
   format = "pyproject";
 
   disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-yHK1MFfwAAhdpmoZxV1o9vjdysJkI5KtOjVYeEBvvU0=";
+    hash = "sha256-M0ltXNEiKtczkTUrSujaFSU8Xeibk6gLPiyNmhnsJmY=";
   };
+
+  patches = [
+    (fetchpatch {
+      name = "click-8.2-compat-1.patch";
+      url = "https://github.com/psf/black/commit/14e1de805a5d66744a08742cad32d1660bf7617a.patch";
+      hash = "sha256-fHRlMetE6+09MKkuFNQQr39nIKeNrqwQuBNqfIlP4hc=";
+    })
+    (fetchpatch {
+      name = "click-8.2-compat-2.patch";
+      url = "https://github.com/psf/black/commit/ed64d89faa7c738c4ba0006710f7e387174478af.patch";
+      hash = "sha256-df/J6wiRqtnHk3mAY3ETiRR2G4hWY1rmZMfm2rjP2ZQ=";
+    })
+    (fetchpatch {
+      name = "click-8.2-compat-3.patch";
+      url = "https://github.com/psf/black/commit/b0f36f5b4233ef4cf613daca0adc3896d5424159.patch";
+      hash = "sha256-SGLCxbgrWnAi79IjQOb2H8mD/JDbr2SGfnKyzQsJrOA=";
+    })
+  ];
 
   nativeBuildInputs = [
     hatch-fancy-pypi-readme
@@ -53,7 +72,7 @@ buildPythonPackage rec {
     typing-extensions
   ];
 
-  passthru.optional-dependencies = {
+  optional-dependencies = {
     colorama = [ colorama ];
     d = [ aiohttp ];
     uvloop = [ uvloop ];
@@ -71,11 +90,10 @@ buildPythonPackage rec {
     pytestCheckHook
     parameterized
   ]
-  ++ lib.flatten (lib.attrValues passthru.optional-dependencies);
+  ++ lib.concatAttrValues optional-dependencies;
 
-  pytestFlagsArray = [
-    "-W"
-    "ignore::DeprecationWarning"
+  pytestFlags = [
+    "-Wignore::DeprecationWarning"
   ];
 
   preCheck = ''
@@ -85,7 +103,7 @@ buildPythonPackage rec {
     # Make /build the project root for black tests to avoid excluding files.
     touch ../.git
   ''
-  + lib.optionalString stdenv.isDarwin ''
+  + lib.optionalString stdenv.hostPlatform.isDarwin ''
     # Work around https://github.com/psf/black/issues/2105
     export TMPDIR="/tmp"
   '';
@@ -93,8 +111,11 @@ buildPythonPackage rec {
   disabledTests = [
     # requires network access
     "test_gen_check_output"
+    # broken on Python 3.13.4
+    # FIXME: remove this when fixed upstream
+    "test_simple_format[pep_701]"
   ]
-  ++ lib.optionals stdenv.isDarwin [
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
     # fails on darwin
     "test_expression_diff"
     # Fail on Hydra, see https://github.com/NixOS/nixpkgs/pull/130785
@@ -102,7 +123,7 @@ buildPythonPackage rec {
     "test_skip_magic_trailing_comma"
   ];
   # multiple tests exceed max open files on hydra builders
-  doCheck = !(stdenv.isLinux && stdenv.isAarch64);
+  doCheck = !(stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isAarch64);
 
   meta = with lib; {
     description = "Uncompromising Python code formatter";

@@ -200,7 +200,7 @@ let
     and triggering the build of the host derivation.
   */
   mapTestOnCross = _mapTestOnHelper (addMetaAttrs {
-    maintainers = [ ];
+    maintainers = crossMaintainers;
   });
 
   /*

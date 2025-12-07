@@ -139,9 +139,6 @@ testers.runNixOSTest (
     };
     meta = {
       maintainers = [ ];
-        roberth
-        ShamrockLee
-      ];
     };
   }
 )

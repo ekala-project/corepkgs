@@ -1,4 +1,5 @@
 {
+  dri-pkgconfig-stub,
   egl-wayland,
   bash,
   libepoxy,
@@ -6,10 +7,11 @@
   fontutil,
   lib,
   libdecor,
+  libgbm,
   libei,
   libGL,
   libGLU,
-  libX11,
+  libx11,
   libXau,
   libXaw,
   libXdmcp,
@@ -23,13 +25,14 @@
   libXt,
   libdrm,
   libtirpc,
-  withLibunwind ? true,
+  # Disable withLibunwind as LLVM's libunwind will conflict and does not support the right symbols.
+  withLibunwind ? !(stdenv.hostPlatform.useLLVM or false),
   libunwind,
   libxcb,
   libxkbfile,
   libxshmfence,
   libxcvt,
-  mesa,
+  mesa-gl-headers,
   meson,
   ninja,
   openssl,
@@ -51,11 +54,11 @@
 
 stdenv.mkDerivation rec {
   pname = "xwayland";
-  version = "24.1.2";
+  version = "24.1.9";
 
   src = fetchurl {
     url = "mirror://xorg/individual/xserver/${pname}-${version}.tar.xz";
-    hash = "sha256-FB63bn5CKjZhwIeCxwvkCTEIR1UELARQbg2X3UY+99I=";
+    hash = "sha256-8pevJ6hFCNubgNHLvMacOAHaOOtkxy87W1D1gkWa/dA=";
   };
 
   postPatch = ''
@@ -73,14 +76,16 @@ stdenv.mkDerivation rec {
     wayland-scanner
   ];
   buildInputs = [
+    dri-pkgconfig-stub
     egl-wayland
     libdecor
+    libgbm
     libepoxy
     libei
     fontutil
     libGL
     libGLU
-    libX11
+    libx11
     libXau
     libXaw
     libXdmcp
@@ -98,7 +103,7 @@ stdenv.mkDerivation rec {
     libxkbfile
     libxshmfence
     libxcvt
-    mesa
+    mesa-gl-headers
     openssl
     pixman
     systemd

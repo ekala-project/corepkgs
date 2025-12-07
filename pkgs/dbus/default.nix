@@ -10,11 +10,11 @@
   libapparmor,
   dbus,
   docbook_xml_dtd_44,
-  docbook-xsl-nons,
+  docbook_xsl,
   xmlto,
   autoreconfHook,
   autoconf-archive,
-  x11Support ? (stdenv.isLinux || stdenv.isDarwin),
+  x11Support ? (stdenv.hostPlatform.isLinux || stdenv.hostPlatform.isDarwin),
   xorg,
 }:
 
@@ -27,7 +27,7 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-uh8h0r2dM52i1KqHgMCd8y/qh5mLc9ok9Jq53x42pQ8=";
   };
 
-  patches = lib.optional stdenv.isSunOS ./implement-getgrouplist.patch;
+  patches = lib.optional stdenv.hostPlatform.isSunOS ./implement-getgrouplist.patch;
 
   postPatch = ''
     substituteInPlace bus/Makefile.am \
@@ -60,7 +60,7 @@ stdenv.mkDerivation rec {
     autoconf-archive
     pkg-config
     docbook_xml_dtd_44
-    docbook-xsl-nons
+    docbook_xsl
     xmlto
   ];
 
@@ -72,13 +72,13 @@ stdenv.mkDerivation rec {
     lib.optionals x11Support (
       with xorg;
       [
-        libX11
+        libx11
         libICE
         libSM
       ]
     )
     ++ lib.optional enableSystemd systemdMinimal
-    ++ lib.optionals stdenv.isLinux [
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
       audit
       libapparmor
     ];
@@ -101,13 +101,13 @@ stdenv.mkDerivation rec {
     "--with-systemduserunitdir=${placeholder "out"}/etc/systemd/user"
   ]
   ++ lib.optional (!x11Support) "--without-x"
-  ++ lib.optionals stdenv.isLinux [
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
     "--enable-apparmor"
     "--enable-libaudit"
   ]
   ++ lib.optionals enableSystemd [ "SYSTEMCTL=${systemdMinimal}/bin/systemctl" ];
 
-  NIX_CFLAGS_LINK = lib.optionalString (!stdenv.isDarwin) "-Wl,--as-needed";
+  NIX_CFLAGS_LINK = lib.optionalString (!stdenv.hostPlatform.isDarwin) "-Wl,--as-needed";
 
   enableParallelBuilding = true;
 
@@ -138,7 +138,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.freedesktop.org/wiki/Software/dbus/";
     changelog = "https://gitlab.freedesktop.org/dbus/dbus/-/blob/dbus-${version}/NEWS";
     license = licenses.gpl2Plus; # most is also under AFL-2.1
-    maintainers = [ ];
     platforms = platforms.unix;
   };
 }

@@ -1,17 +1,20 @@
 {
   lib,
+  concatAttrValues,
   stdenv,
   buildPythonPackage,
   fetchFromGitHub,
+  fetchpatch,
   gitUpdater,
   pythonAtLeast,
   pythonOlder,
+  isPyPy,
 
   # build-system
+  pathspec,
   setuptools,
   types-psutil,
   types-setuptools,
-  wheel,
 
   # propagates
   mypy-extensions,
@@ -32,33 +35,44 @@
 
 buildPythonPackage rec {
   pname = "mypy";
-  version = "1.10.1";
+  version = "1.17.1";
   pyproject = true;
 
-  disabled = pythonOlder "3.8";
+  # relies on several CPython internals
+  disabled = isPyPy;
 
   src = fetchFromGitHub {
     owner = "python";
     repo = "mypy";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-joV+elRaAICNQHkYuYtTDjvOUkHPsRkG1OLRvdxeIHc=";
+    tag = "v${version}";
+    hash = "sha256-FfONUCCMU1bJXHx3GHH46Tu+wYU5FLPOqeCSCi1bRSs=";
   };
+
+  patches = [
+    # Fix the build on Darwin with a case‐sensitive store.
+    # Remove on next release.
+    (fetchpatch {
+      url = "https://github.com/python/mypy/commit/7534898319cb7f16738c11e4bc1bdcef0eb13c38.patch";
+      hash = "sha256-5jD0JBRnirmoMlUz9+n8G4AqHqCi8BaUX5rEl9NnLts=";
+    })
+  ];
+
   passthru.updateScript = gitUpdater {
     rev-prefix = "v";
   };
 
   build-system = [
     mypy-extensions
+    pathspec
     setuptools
     types-psutil
     types-setuptools
     typing-extensions
-    wheel
-  ]
-  ++ lib.optionals (pythonOlder "3.11") [ tomli ];
+  ];
 
   dependencies = [
     mypy-extensions
+    pathspec
     typing-extensions
   ]
   ++ lib.optionals (pythonOlder "3.11") [ tomli ];
@@ -97,7 +111,7 @@ buildPythonPackage rec {
     setuptools
     tomli
   ]
-  ++ lib.flatten (lib.attrValues optional-dependencies);
+  ++ concatAttrValues optional-dependencies;
 
   disabledTests = [
     # fails with typing-extensions>=4.10
@@ -128,10 +142,12 @@ buildPythonPackage rec {
     inherit (nixosTests) nixos-test-driver;
   };
 
-  meta = with lib; {
+  meta = {
     description = "Optional static typing for Python";
     homepage = "https://www.mypy-lang.org";
-    license = licenses.mit;
+    changelog = "https://github.com/python/mypy/blob/${src.rev}/CHANGELOG.md";
+    downloadPage = "https://github.com/python/mypy";
+    license = lib.licenses.mit;
     mainProgram = "mypy";
     maintainers = [ ];
   };

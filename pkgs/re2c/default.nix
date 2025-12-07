@@ -7,20 +7,20 @@
   python3,
 
   # for passthru.tests
-  ninja ? null,
+  ninja,
   php ? null,
   spamassassin ? null,
 }:
 
 stdenv.mkDerivation rec {
   pname = "re2c";
-  version = "3.1";
+  version = "4.3";
 
   src = fetchFromGitHub {
     owner = "skvadrik";
     repo = "re2c";
     rev = version;
-    sha256 = "sha256-7zZdLby7HdNoURgdkg+xnlp6VDCACcyGCTtjM43OLd4=";
+    hash = "sha256-zPOENMfXXgTwds1t+Lrmz9+GTHJf2yRpQsGT7nLRvcg=";
   };
 
   nativeBuildInputs = [

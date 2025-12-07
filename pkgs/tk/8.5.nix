@@ -17,7 +17,7 @@ callPackage ./generic.nix (
       sha256 = "1yhgcalldrjlc5q614rlzg1crgd3b52dhrk1pncdaxvl2vgg2yj0";
     };
 
-    patches = lib.optionals stdenv.isDarwin [
+    patches = lib.optionals stdenv.hostPlatform.isDarwin [
       # Define MODULE_SCOPE before including tkPort.h
       # https://core.tcl-lang.org/tk/info/dba9f5ce3b
       (fetchpatch {

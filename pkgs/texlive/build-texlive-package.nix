@@ -41,7 +41,7 @@
   version ? toString revision,
   extraRevision ? "",
   extraVersion ? "",
-  sha512,
+  sha512 ? { },
   mirrors,
   fixedHashes ? { },
   postUnpack ? "",
@@ -51,8 +51,10 @@
   hasHyphens ? false,
   hasInfo ? false,
   hasManpages ? false,
-  hasRunfiles ? false,
+  hasRunfiles ? (sha512 ? run),
   hasTlpkg ? false,
+  hasCatalogue ? true,
+  catalogue ? pname,
   extraNativeBuildInputs ? [ ],
   ...
 }@args:
@@ -69,9 +71,17 @@ let
     '';
     # discourage nix-env from matching this package
     priority = 10;
+    platforms = lib.platforms.all;
+    # These create a large number of jobs, which puts load on Hydra
+    # without any appreciable benefit (as the combined packages already
+    # cause them all to be built and cached anyway).
+    hydraPlatforms = [ ];
   }
   // lib.optionalAttrs (args ? shortdesc) {
     description = args.shortdesc;
+  }
+  // lib.optionalAttrs hasCatalogue {
+    homepage = "https://ctan.org/pkg/${catalogue}";
   };
 
   hasBinfiles = args ? binfiles && args.binfiles != [ ];

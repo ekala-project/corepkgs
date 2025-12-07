@@ -141,7 +141,10 @@ lib.makeOverridable (
             fetcher = ./nix-prefetch-git;
 
             nativeBuildInputs = [
-              pkgsBuildHost.git
+              # FIXME(corepkgs): using gitMinimal to avoid infinite recursion
+              # Avoid depending on full git (and its manual toolchain) to
+              # prevent evaluation cycles for consumers like git -> xmlto -> fetchgit.
+              pkgsBuildHost.gitMinimal
               pkgsBuildHost.cacert
             ]
             ++ lib.optionals fetchLFS [ pkgsBuildHost.git-lfs ]

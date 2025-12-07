@@ -1,4 +1,5 @@
 {
+  lib,
   pythonOnBuildForHost,
   runCommand,
   writeShellScript,
@@ -53,7 +54,7 @@ let
   # in order to test for a failing build, wrap it in a shell script
   expectFailure =
     build: errorMsg:
-    build.overrideDerivation (old: {
+    lib.overrideDerivation build (old: {
       builder = writeShellScript "test-for-failure" ''
         export PATH=${coreutils}/bin:${gnugrep}/bin:$PATH
         ${old.builder} "$@" > ./log 2>&1
@@ -97,7 +98,7 @@ in
   cyclic-dependencies = generatePythonPackage {
     pname = "cyclic-dependencies";
     preFixup = ''
-      propagatedBuildInputs+=("$out")
+      appendToVar propagatedBuildInputs "$out"
     '';
   };
 

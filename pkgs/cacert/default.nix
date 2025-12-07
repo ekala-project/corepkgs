@@ -23,7 +23,7 @@ let
     lib.concatStringsSep "\n\n" extraCertificateStrings
   );
 
-  srcVersion = "3.101.1";
+  srcVersion = "3.115";
   version = if nssOverride != null then nssOverride.version else srcVersion;
   meta = with lib; {
     homepage = "https://curl.haxx.se/docs/caextract.html";
@@ -44,7 +44,7 @@ let
           owner = "nss-dev";
           repo = "nss";
           rev = "NSS_${lib.replaceStrings [ "." ] [ "_" ] version}_RTM";
-          hash = "sha256-KcRiOUbdFnH618MFM6uxmRn+/Jn4QMHtv1BELXrCAX4=";
+          hash = "sha256-8PeFeaIOtjBZJLBx3ONwZlK5SaLnjKEFoZWvVsu/3tA=";
         };
 
     dontBuild = true;
@@ -61,7 +61,7 @@ let
     inherit meta;
   };
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "nss-cacert";
   inherit version;
 
@@ -71,12 +71,13 @@ stdenv.mkDerivation rec {
     "out"
     "unbundled"
     "p11kit"
+    "hashed"
   ];
 
   nativeBuildInputs = [ buildcatrust ];
 
   buildPhase = ''
-    mkdir unbundled
+    mkdir unbundled hashed
     buildcatrust \
       --certdata_input certdata.txt \
       --ca_bundle_input "${extraCertificatesBundle}" ${
@@ -86,6 +87,7 @@ stdenv.mkDerivation rec {
       --ca_bundle_output ca-bundle.crt \
       --ca_standard_bundle_output ca-no-trust-rules-bundle.crt \
       --ca_unpacked_output unbundled \
+      --ca_hashed_unpacked_output hashed \
       --p11kit_output ca-bundle.trust.p11-kit
   '';
 
@@ -100,6 +102,11 @@ stdenv.mkDerivation rec {
 
     # install individual certs in unbundled output
     install -D -t "$unbundled/etc/ssl/certs" unbundled/*.crt
+
+    # install hashed certs in hashed output
+    # use cp as install doesn't copy symlinks
+    mkdir -p $hashed/etc/ssl/certs/
+    cp -P hashed/* $hashed/etc/ssl/certs/
   '';
 
   setupHook = ./setup-hook.sh;

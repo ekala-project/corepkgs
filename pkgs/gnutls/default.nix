@@ -2,16 +2,14 @@
   lib,
   stdenv,
   fetchurl,
-  fetchpatch2,
   zlib,
-  lzo,
   libtasn1,
   nettle,
   pkg-config,
-  lzip,
   perl,
   gmp,
-  autoconf269,
+  # TODO(corepkgs): check if it shill builds
+  autoconf,
   automake,
   libidn2,
   libiconv,
@@ -24,27 +22,26 @@
   tpmSupport ? false,
   trousers,
   which,
-  nettools,
+  net-tools,
   libunistring,
   withP11-kit ? !stdenv.hostPlatform.isStatic,
   p11-kit,
-  Security ? null, # darwin Security.framework
   # certificate compression - only zlib now, more possible: zstd, brotli
 
   # for passthru.tests
-  curlWithGnuTls ? null,
-  emacs ? null,
-  ffmpeg ? null,
-  haskellPackages ? { },
-  knot-resolver ? null,
-  ngtcp2-gnutls ? null,
-  ocamlPackages ? null,
-  pkgsStatic ? null,
+  curlWithGnuTls,
+  emacs,
+  ffmpeg,
+  haskellPackages,
+  knot-resolver,
+  ngtcp2-gnutls,
+  ocamlPackages,
+  pkgsStatic,
   python3Packages,
-  qemu ? null,
-  rsyslog ? null,
-  openconnect ? null,
-  samba ? null,
+  qemu,
+  rsyslog,
+  openconnect,
+  samba,
 
   gitUpdater,
 }:
@@ -53,18 +50,21 @@ let
 
   # XXX: Gnulib's `test-select' fails on FreeBSD:
   # https://hydra.nixos.org/build/2962084/nixlog/1/raw .
-  doCheck = !stdenv.isFreeBSD && !stdenv.isDarwin && stdenv.buildPlatform == stdenv.hostPlatform;
+  doCheck =
+    !stdenv.hostPlatform.isFreeBSD
+    && !stdenv.hostPlatform.isDarwin
+    && stdenv.buildPlatform == stdenv.hostPlatform;
 
   inherit (stdenv.hostPlatform) isDarwin;
 in
 
 stdenv.mkDerivation rec {
   pname = "gnutls";
-  version = "3.8.6";
+  version = "3.8.10";
 
   src = fetchurl {
     url = "mirror://gnupg/gnutls/v${lib.versions.majorMinor version}/gnutls-${version}.tar.xz";
-    hash = "sha256-LhWIquU8sy1Dk38fTsoo/r2cDHqhc0/F3WGn6B4OvN0=";
+    hash = "sha256-23+rfM55Hncn677yM0MByCHXmlUOxVye8Ja2ELA+trc=";
   };
 
   outputs = [
@@ -83,15 +83,6 @@ stdenv.mkDerivation rec {
 
   patches = [
     ./nix-ssl-cert-file.patch
-    # Revert https://gitlab.com/gnutls/gnutls/-/merge_requests/1800
-    # dlopen isn't as easy in NixPkgs, as noticed in tests broken by this.
-    # Without getting the libs into RPATH they won't be found.
-    (fetchpatch2 {
-      name = "revert-dlopen-compression.patch";
-      url = "https://gitlab.com/gnutls/gnutls/-/commit/8584908d6b679cd4e7676de437117a793e18347c.diff";
-      revert = true;
-      hash = "sha256-r/+Gmwqy0Yc1LHL/PdPLXlErUBC5JxquLzCBAN3LuRM=";
-    })
   ];
 
   # Skip some tests:
@@ -99,6 +90,7 @@ stdenv.mkDerivation rec {
   #  - fastopen: no idea; it broke between 3.6.2 and 3.6.3 (3437fdde6 in particular)
   #  - trust-store: default trust store path (/etc/ssl/...) is missing in sandbox (3.5.11)
   #  - psk-file: no idea; it broke between 3.6.3 and 3.6.4
+  #  - ktls: requires tls module loaded into kernel and ktls-utils which depends on gnutls
   # Change p11-kit test to use pkg-config to find p11-kit
   postPatch = ''
     sed '2iexit 77' -i tests/{pkgconfig,fastopen}.sh
@@ -107,7 +99,17 @@ stdenv.mkDerivation rec {
   ''
   + lib.optionalString stdenv.hostPlatform.isMusl ''
     # See https://gitlab.com/gnutls/gnutls/-/issues/945
-       sed '2iecho "certtool tests skipped in musl build"\nexit 0' -i tests/cert-tests/certtool.sh
+    sed '2iecho "certtool tests skipped in musl build"\nexit 0' -i tests/cert-tests/certtool.sh
+  ''
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
+    sed '2iexit 77' -i tests/{ktls,ktls_keyupdate}.sh
+    sed '/-DUSE_KTLS/d' -i tests/Makefile.{am,in}
+    sed '/gnutls_ktls/d' -i tests/Makefile.am
+    sed '/ENABLE_KTLS_TRUE/d' -i tests/Makefile.in
+  ''
+  # https://gitlab.com/gnutls/gnutls/-/issues/1721
+  + ''
+    sed '2iexit 77' -i tests/system-override-compress-cert.sh
   '';
 
   preConfigure = "patchShebangs .";
@@ -123,8 +125,18 @@ stdenv.mkDerivation rec {
       (lib.withFeature withP11-kit "p11-kit")
       (lib.enableFeature cxxBindings "cxx")
     ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      "--enable-ktls"
+    ]
     ++ lib.optionals (stdenv.hostPlatform.isMinGW) [
       "--disable-doc"
+    ]
+    ++ lib.optionals (stdenv.hostPlatform.isLinux && tpmSupport) [
+      "--with-trousers-lib=${trousers}/lib/libtspi.so"
+    ]
+    ++ [
+      # do not dlopen in nixpkgs
+      "--with-zlib=link"
     ];
 
   enableParallelBuilding = true;
@@ -132,8 +144,6 @@ stdenv.mkDerivation rec {
   hardeningDisable = [ "trivialautovarinit" ];
 
   buildInputs = [
-    lzo
-    lzip
     libtasn1
     libidn2
     zlib
@@ -143,8 +153,8 @@ stdenv.mkDerivation rec {
     gettext
     libiconv
   ]
-  ++ lib.optional (withP11-kit) p11-kit
-  ++ lib.optional (tpmSupport && stdenv.isLinux) trousers;
+  ++ lib.optional withP11-kit p11-kit
+  ++ lib.optional (tpmSupport && stdenv.hostPlatform.isLinux) trousers;
 
   nativeBuildInputs = [
     perl
@@ -152,20 +162,16 @@ stdenv.mkDerivation rec {
     texinfo
   ]
   ++ [
-    autoconf269
+    autoconf
     automake
   ]
   ++ lib.optionals doCheck [
     which
-    nettools
+    net-tools
     util-linuxMinimal
   ];
 
-  propagatedBuildInputs = [
-    nettle
-  ]
-  # Builds dynamically linking against gnutls seem to need the framework now.
-  ++ lib.optional isDarwin Security;
+  propagatedBuildInputs = [ nettle ];
 
   inherit doCheck;
   # stdenv's `NIX_SSL_CERT_FILE=/no-cert-file.crt` breaks tests.
@@ -202,8 +208,8 @@ stdenv.mkDerivation rec {
       samba
       openconnect
       ;
-    inherit (ocamlPackages) ocamlnet;
-    haskell-gnutls = haskellPackages.gnutls;
+    #inherit (ocamlPackages) ocamlnet;
+    #haskell-gnutls = haskellPackages.gnutls;
     python3-gnutls = python3Packages.python3-gnutls;
     rsyslog = rsyslog.override { withGnutls = true; };
     static = pkgsStatic.gnutls;

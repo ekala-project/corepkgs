@@ -8,7 +8,7 @@
 
   # sensitive downstream packages
   curl,
-  grpc, # consumes cmake config
+  grpc ? null, # consumes cmake config
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -18,14 +18,12 @@
 
 stdenv.mkDerivation rec {
   pname = "c-ares";
-  version = "1.27.0";
+  version = "1.34.5";
 
   src = fetchurl {
     # Note: tag name varies in some versions, e.g. v1.30.0, c-ares-1_17_0.
-    url = "https://github.com/c-ares/${pname}/releases/download/cares-${
-      builtins.replaceStrings [ "." ] [ "_" ] version
-    }/${pname}-${version}.tar.gz";
-    hash = "sha256-CnK+ZpWZVcQ+KvL70DQY6Cor1UZGBOyaYhR+N6zrQgs=";
+    url = "https://github.com/c-ares/c-ares/releases/download/v${version}/c-ares-${version}.tar.gz";
+    hash = "sha256-fZNXkOmvCBwlxJX9E8LPzaR5KYNBjpY1jvbnMg7gY0Y=";
   };
 
   outputs = [
@@ -52,6 +50,10 @@ stdenv.mkDerivation rec {
     inherit grpc;
     curl = (curl.override { c-aresSupport = true; }).tests.withCheck;
   };
+
+  preFixup = lib.optionalString withCMake ''
+    substituteInPlace $out/lib/pkgconfig/libcares.pc --replace-fail \''${prefix}/ ""
+  '';
 
   meta = with lib; {
     description = "C library for asynchronous DNS requests";

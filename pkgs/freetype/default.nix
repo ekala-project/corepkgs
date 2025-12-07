@@ -20,25 +20,26 @@
   useEncumberedCode ? true,
 
   # for passthru.tests
-  cairo ? null,
-  fontforge ? null,
-  ghostscript ? null,
-  graphicsmagick ? null,
-  gtk3 ? null,
-  harfbuzz ? null,
-  imagemagick ? null,
-  pango ? null,
-  poppler ? null,
-  python3 ? null,
-  qt5 ? null,
-  texmacs ? null,
-  ttfautohint ? null,
+  cairo,
+  fontforge,
+  ghostscript,
+  graphicsmagick,
+  gtk3,
+  harfbuzz,
+  imagemagick,
+  pango,
+  poppler,
+  python3,
+  qt5,
+  texmacs,
+  ttfautohint,
   testers,
+  __flattenIncludeHackHook,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "freetype";
-  version = "2.13.2";
+  version = "2.13.3";
 
   src =
     let
@@ -46,7 +47,7 @@ stdenv.mkDerivation (finalAttrs: {
     in
     fetchurl {
       url = "mirror://savannah/${pname}/${pname}-${version}.tar.xz";
-      sha256 = "sha256-EpkcTlXFBt1/m3ZZM+Yv0r4uBtQhUF15UKEy5PG7SE0=";
+      sha256 = "sha256-BVA1BmbUJ8dNrrhdWse7NTrLpfdpVjlZlTEanG8GMok=";
     };
 
   propagatedBuildInputs = [
@@ -60,10 +61,11 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     pkg-config
     which
+    __flattenIncludeHackHook
   ]
   ++ lib.optional (!stdenv.hostPlatform.isWindows) makeWrapper
   # FreeType requires GNU Make, which is not part of stdenv on FreeBSD.
-  ++ lib.optional (!stdenv.isLinux) gnumake;
+  ++ lib.optional (!stdenv.hostPlatform.isLinux) gnumake;
 
   patches = [
     ./enable-table-validation.patch
@@ -85,26 +87,24 @@ stdenv.mkDerivation (finalAttrs: {
 
   # The asm for armel is written with the 'asm' keyword.
   CFLAGS =
-    lib.optionalString stdenv.isAarch32 "-std=gnu99"
+    lib.optionalString stdenv.hostPlatform.isAarch32 "-std=gnu99"
     + lib.optionalString stdenv.hostPlatform.is32bit " -D_FILE_OFFSET_BITS=64";
 
   enableParallelBuilding = true;
 
   doCheck = true;
 
-  postInstall =
-    glib.flattenInclude
-    # pkgsCross.mingwW64.pkg-config doesn't build
-    # makeWrapper doesn't cross-compile to windows #120726
-    + ''
-      substituteInPlace $dev/bin/freetype-config \
-        --replace ${buildPackages.pkg-config} ${pkgsHostHost.pkg-config}
-    ''
-    + lib.optionalString (!stdenv.hostPlatform.isMinGW) ''
+  # pkgsCross.mingwW64.pkg-config doesn't build
+  # makeWrapper doesn't cross-compile to windows #120726
+  postInstall = ''
+    substituteInPlace $dev/bin/freetype-config \
+      --replace ${buildPackages.pkg-config} ${pkgsHostHost.pkg-config}
+  ''
+  + lib.optionalString (!stdenv.hostPlatform.isMinGW) ''
 
-      wrapProgram "$dev/bin/freetype-config" \
-        --set PKG_CONFIG_PATH "$PKG_CONFIG_PATH:$dev/lib/pkgconfig"
-    '';
+    wrapProgram "$dev/bin/freetype-config" \
+      --set PKG_CONFIG_PATH "$PKG_CONFIG_PATH:$dev/lib/pkgconfig"
+  '';
 
   passthru.tests = {
     inherit

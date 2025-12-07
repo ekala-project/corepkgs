@@ -1,5 +1,6 @@
 {
   stdenv,
+  fetchpatch,
   lib,
   tlpdb,
   bin,
@@ -22,10 +23,9 @@
   python3,
   ruby,
   zip,
+  luajit,
 }:
-
 oldTlpdb:
-
 let
   tlpdbVersion = tlpdb."00texlive.config";
 
@@ -53,14 +53,11 @@ let
   );
 
   orig = removeFormatLinks (removeAttrs oldTlpdb [ "00texlive.config" ]);
-
 in
 lib.recursiveUpdate orig rec {
   #### overrides of texlive.tlpdb
 
   #### nonstandard script folders
-  context.scriptsFolder = "context/stubs-mkiv/unix";
-  context-legacy.scriptsFolder = "context/stubs/unix";
   cyrillic-bin.scriptsFolder = "texlive-extra";
   fontinst.scriptsFolder = "texlive-extra";
   mptopdf.scriptsFolder = "context/perl";
@@ -78,6 +75,13 @@ lib.recursiveUpdate orig rec {
   texlogsieve.extraBuildInputs = [ bin.luatex ];
 
   #### perl packages
+  bundledoc.extraBuildInputs = [
+    (perl.withPackages (
+      ps: with ps; [
+        StringShellQuote
+      ]
+    ))
+  ];
   crossrefware.extraBuildInputs = [
     (perl.withPackages (
       ps: with ps; [
@@ -117,10 +121,20 @@ lib.recursiveUpdate orig rec {
     ))
   ];
   pax.extraBuildInputs = [ (perl.withPackages (ps: with ps; [ FileWhich ])) ];
+  pdflatexpicscale.extraBuildInputs = [
+    (perl.withPackages (
+      ps: with ps; [
+        GD
+        ImageExifTool
+      ]
+    ))
+  ];
   ptex-fontmaps.extraBuildInputs = [ (perl.withPackages (ps: with ps; [ Tk ])) ];
   purifyeps.extraBuildInputs = [ (perl.withPackages (ps: with ps; [ FileWhich ])) ];
+  sqltex.extraBuildInputs = [ (perl.withPackages (ps: with ps; [ DBI ])) ];
   svn-multi.extraBuildInputs = [ (perl.withPackages (ps: with ps; [ TimeDate ])) ];
   texdoctk.extraBuildInputs = [ (perl.withPackages (ps: with ps; [ Tk ])) ];
+  typog.extraBuildInputs = [ (perl.withPackages (ps: with ps; [ IPCSystemSimple ])) ];
   ulqda.extraBuildInputs = [ (perl.withPackages (ps: with ps; [ DigestSHA1 ])) ];
 
   #### python packages
@@ -131,8 +145,6 @@ lib.recursiveUpdate orig rec {
   bibexport.extraBuildInputs = [ gnugrep ];
   checklistings.extraBuildInputs = [ coreutils ];
   cjk-gs-integrate.extraBuildInputs = [ ghostscript_headless ];
-  context.extraBuildInputs = [ coreutils ];
-  context-legacy.extraBuildInputs = [ ruby ];
   cyrillic-bin.extraBuildInputs = [
     coreutils
     gnused
@@ -236,6 +248,17 @@ lib.recursiveUpdate orig rec {
     "mtxrun.lua" = tl.context.tex + "/scripts/context/lua/mtxrun.lua";
   };
 
+  context-legacy.binlinks = {
+    texexec = tl.context-legacy.tex + "/scripts/context/ruby/texexec.rb";
+    texmfstart = tl.context-legacy.tex + "/scripts/context/ruby/texmfstart.rb";
+  };
+
+  dvipdfmx.binlinks = {
+    # even though 'ebb' was removed from the Makefile, this symlink is still
+    # part of the binary container of dvipdfmx
+    ebb = "xdvipdfmx";
+  };
+
   epstopdf.binlinks.repstopdf = "epstopdf";
   pdfcrop.binlinks.rpdfcrop = "pdfcrop";
 
@@ -278,14 +301,6 @@ lib.recursiveUpdate orig rec {
 
   cjk-gs-integrate.postFixup = ''
     sed -i '2i$ENV{PATH}='"'"'${lib.makeBinPath cjk-gs-integrate.extraBuildInputs}'"'"' . ($ENV{PATH} ? ":$ENV{PATH}" : '"'''"');' "$out"/bin/cjk-gs-integrate
-  '';
-
-  context.postFixup = ''
-    sed -i '2iPATH="${lib.makeBinPath context.extraBuildInputs}''${PATH:+:$PATH}"' "$out"/bin/{contextjit,mtxrunjit}
-  '';
-
-  context-legacy.postFixup = ''
-    sed -i '2iPATH="${lib.makeBinPath context-legacy.extraBuildInputs}''${PATH:+:$PATH}"' "$out"/bin/texexec
   '';
 
   cyrillic-bin.postFixup = ''
@@ -420,9 +435,40 @@ lib.recursiveUpdate orig rec {
     substituteInPlace "$out"/bin/epspdftk --replace-fail '[info script]' "\"$scriptsFolder/epspdftk.tcl\""
   '';
 
+  # use correct path to xdvipdfmx
+  extractbb.extraBuildInputs = [ bin.core.dvipdfmx ];
+  extractbb.postUnpack = ''
+    if [[ -f "$out"/scripts/extractbb/extractbb-wrapper.lua ]] ; then
+      sed -i 's!local target_path = interpreter_dir .. "/" .. TARGET_PATH_NAME .. target_ext!local target_path = os.getenv("NIX_TEXLIVE_XDVIPDFMX")!' "$out"/scripts/extractbb/extractbb-wrapper.lua
+    fi
+  '';
+  extractbb.postFixup = ''
+    sed -i "2ios.setenv('NIX_TEXLIVE_XDVIPDFMX','$(PATH="$HOST_PATH" command -v xdvipdfmx)')" "$out"/bin/extractbb
+  '';
+
   # find files in script directory, not in binary directory
   latexindent.postFixup = ''
     substituteInPlace "$out"/bin/latexindent --replace-fail 'use FindBin;' "BEGIN { \$0 = '$scriptsFolder' . '/latexindent.pl'; }; use FindBin;"
+  '';
+
+  # find files in script directory, not in binary directory
+  minted.postFixup = ''
+    substituteInPlace "$out"/bin/latexminted --replace-fail "__file__" "\"$scriptsFolder/latexminted.py\""
+  '';
+
+  # find files in source container, fix incompatibilities with snobol4
+  texaccents.postFixup = ''
+    sed -i '1s!$! -I${tl.texaccents.texsource}/source/support/texaccents!' "$out"/bin/*
+  '';
+  texaccents.postUnpack = ''
+    if [[ -f "$out"/source/support/texaccents/grepl.inc ]] ; then
+      sed -i 's!^-include "repl.inc"!-include "repl.sno"!' "$out"/source/support/texaccents/grepl.inc
+    elif [[ -f "$out"/scripts/texaccents/texaccents.sno ]] ; then
+      sed -i -e 's!^-include "host.inc"!-include "host.sno"!' \
+        -e 's/host(2,2)/host(2,host(3))/g' \
+        -e 's/host(2,3)/host(2,host(3) + 1)/g' \
+        "$out"/scripts/texaccents/texaccents.sno
+    fi
   '';
 
   # flag lua dependency
@@ -470,8 +516,17 @@ lib.recursiveUpdate orig rec {
   '';
 
   #### dependency changes
+
+  # Since 2025 OpTeX is based on luahbtex
+  optex.deps = (orig.optex.deps or [ ]) ++ [ "luahbtex" ];
+
+  # Since the packaging change for ConTeXt, context-legacy is missing the xetex dependency
+  context-legacy.deps = (orig.context-legacy.deps or [ ]) ++ [ "xetex" ];
+
   # it seems to need it to transform fonts
   xdvi.deps = (orig.xdvi.deps or [ ]) ++ [ "metafont" ];
+
+  mltex.deps = (orig.mltex.deps or [ ]) ++ [ "pdftex" ];
 
   # remove dependency-heavy packages from the basic collections
   collection-basic.deps = lib.subtractLists [ "metafont" "xdvi" ] orig.collection-basic.deps;
@@ -482,13 +537,16 @@ lib.recursiveUpdate orig rec {
 
   #### misc
 
-  # RISC-V: https://github.com/LuaJIT/LuaJIT/issues/628
-  luajittex.binfiles = lib.optionals (
-    !(stdenv.hostPlatform.isPower && stdenv.hostPlatform.is64bit) && !stdenv.hostPlatform.isRiscV
-  ) orig.luajittex.binfiles;
+  # FIXME: remove when https://github.com/borisveytsman/crossrefware/pull/17 is merged and included on CTAN
+  # Typo introduced in https://github.com/borisveytsman/crossrefware/commit/1e67e9773b3d3be983be156e2200478bc263dd93
+  crossrefware.postUnpack = ''
+    if [[ -f "$out"/scripts/crossrefware/ltx2crossrefxml.pl ]] ; then
+      sed -i 's/use IO::file;/use IO::File;/' "$out"/scripts/crossrefware/ltx2crossrefxml.pl
+    fi
+  '';
 
-  # tlpdb lists license as "unknown", but the README says lppl13: http://mirrors.ctan.org/language/arabic/arabi-add/README
-  arabi-add.license = [ "lppl13c" ];
+  # RISC-V: https://github.com/LuaJIT/LuaJIT/issues/628
+  luajittex.binfiles = lib.optionals (lib.meta.availableOn stdenv.hostPlatform luajit) orig.luajittex.binfiles;
 
   texdoc = {
     extraRevision = "-tlpdb${toString tlpdbVersion.revision}";
@@ -517,11 +575,6 @@ lib.recursiveUpdate orig rec {
     postFixup = ''
       TEXMFCNF="${tl.kpathsea.tex}"/web2c TEXMF="$scriptsFolder/../.." \
         texlua "$out"/bin/texdoc --print-completion zsh > "$TMPDIR"/_texdoc
-      substituteInPlace "$TMPDIR"/_texdoc \
-        --replace-fail 'compdef __texdoc texdoc' '#compdef texdoc' \
-        --replace-fail '$(kpsewhich -var-value TEXMFROOT)/tlpkg/texlive.tlpdb' '$(kpsewhich Data.tlpdb.lua)' \
-        --replace-fail '/^name[^.]*$/ {print $2}' '/^  \["[^"]*"\] = {$/ { print substr($1,3,length($1)-4) }'
-      echo '__texdoc' >> "$TMPDIR"/_texdoc
       installShellCompletion --zsh "$TMPDIR"/_texdoc
     '';
   };

@@ -2,19 +2,21 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
   bison,
   flex,
+  libxml2,
+  llvmPackages,
   meson,
   ninja,
   pkg-config,
   python3Packages,
-  Xplugin,
+  libx11,
   xorg,
   zlib,
 }:
 let
-  common = import ./common.nix { inherit lib fetchurl; };
+  common = import ./common.nix { inherit lib fetchFromGitLab; };
 in
 stdenv.mkDerivation {
   inherit (common)
@@ -38,13 +40,16 @@ stdenv.mkDerivation {
     python3Packages.packaging
     python3Packages.python
     python3Packages.mako
+    python3Packages.pyyaml
   ];
 
   buildInputs = [
-    Xplugin
-    xorg.libX11
+    libxml2 # should be propagated from libllvm
+    llvmPackages.libllvm
+    libx11
     xorg.libXext
     xorg.libXfixes
+    xorg.libxcb
     zlib
   ];
 
@@ -54,9 +59,14 @@ stdenv.mkDerivation {
     "--sysconfdir=/etc"
     "--datadir=${placeholder "out"}/share"
     (lib.mesonEnable "glvnd" false)
-    (lib.mesonEnable "shared-glapi" true)
+    (lib.mesonEnable "llvm" true)
   ];
 
-  # Don't need this on Darwin.
-  passthru.llvmpipeHook = null;
+  passthru = {
+    # needed to pass evaluation of bad platforms
+    driverLink = throw "driverLink not supported on darwin";
+    # Don't need this on Darwin.
+    llvmpipeHook = null;
+  };
+
 }

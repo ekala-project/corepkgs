@@ -23,9 +23,9 @@
   rebuildMan ? false,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "cryptsetup";
-  version = "2.7.3";
+  version = "2.8.1";
 
   outputs = [
     "bin"
@@ -36,8 +36,10 @@ stdenv.mkDerivation rec {
   separateDebugInfo = true;
 
   src = fetchurl {
-    url = "mirror://kernel/linux/utils/cryptsetup/v${lib.versions.majorMinor version}/${pname}-${version}.tar.xz";
-    hash = "sha256-t3KuT23wzucgCyjOqWDk2q/yogPS/VAr6rPBMXsHpFY=";
+    url =
+      "mirror://kernel/linux/utils/cryptsetup/v${lib.versions.majorMinor finalAttrs.version}/"
+      + "cryptsetup-${finalAttrs.version}.tar.xz";
+    hash = "sha256-LDN563ZZfcq1CRFEmwE+JpfEv/zHFtu/DZsOj7u0b7Q=";
   };
 
   patches = [
@@ -59,6 +61,7 @@ stdenv.mkDerivation rec {
   configureFlags = [
     "--with-crypto_backend=openssl"
     "--disable-ssh-token"
+    "--with-tmpfilesdir=${placeholder "out"}/lib/tmpfiles.d"
   ]
   ++ lib.optionals (!rebuildMan) [
     "--disable-asciidoc"
@@ -76,7 +79,7 @@ stdenv.mkDerivation rec {
   ++ (lib.mapAttrsToList (lib.flip lib.enableFeature)) programs;
 
   nativeBuildInputs = [ pkg-config ] ++ lib.optionals rebuildMan [ asciidoctor ];
-  buildInputs = [
+  propagatedBuildInputs = [
     lvm2
     json_c
     openssl
@@ -84,6 +87,8 @@ stdenv.mkDerivation rec {
     popt
   ]
   ++ lib.optional (!withInternalArgon2) libargon2;
+
+  enableParallelBuilding = true;
 
   # The test [7] header backup in compat-test fails with a mysterious
   # "out of memory" error, even though tons of memory is available.
@@ -103,10 +108,10 @@ stdenv.mkDerivation rec {
   meta = {
     homepage = "https://gitlab.com/cryptsetup/cryptsetup/";
     description = "LUKS for dm-crypt";
-    changelog = "https://gitlab.com/cryptsetup/cryptsetup/-/raw/v${version}/docs/v${version}-ReleaseNotes";
+    changelog = "https://gitlab.com/cryptsetup/cryptsetup/-/raw/v${finalAttrs.version}/docs/v${finalAttrs.version}-ReleaseNotes";
     license = lib.licenses.gpl2Plus;
     mainProgram = "cryptsetup";
     maintainers = [ ];
     platforms = with lib.platforms; linux;
   };
-}
+})

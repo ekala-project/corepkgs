@@ -8,6 +8,7 @@
   threadsCross,
   version,
 
+  apple-sdk,
   binutils,
   gmp,
   mpfr,
@@ -19,30 +20,26 @@
   enablePlugin,
   disableGdbPlugin ? !enablePlugin,
   enableShared,
+  enableDefaultPie,
+  targetPrefix,
 
   langC,
   langCC,
-  langD ? false,
   langFortran,
-  langJava ? false,
-  javaAwtGtk ? false,
-  javaAntlr ? null,
-  javaEcj ? null,
   langAda ? false,
   langGo,
   langObjC,
   langObjCpp,
   langJit,
   langRust ? false,
-  disableBootstrap ? stdenv.targetPlatform != stdenv.hostPlatform,
+  disableBootstrap ? (!lib.systems.equals stdenv.targetPlatform stdenv.hostPlatform),
 }:
 
 assert !enablePlugin -> disableGdbPlugin;
-assert langJava -> lib.versionOlder version "7";
 
 # Note [Windows Exception Handling]
 # sjlj (short jump long jump) exception handling makes no sense on x86_64,
-# it's forcably slowing programs down as it produces a constant overhead.
+# it's forcibly slowing programs down as it produces a constant overhead.
 # On x86_64 we have SEH (Structured Exception Handling) and we should use
 # that. On i686, we do not have SEH, and have to use sjlj with dwarf2.
 # Hence it's now conditional on x86_32 (i686 is 32bit).
@@ -59,12 +56,9 @@ let
   # See https://github.com/NixOS/nixpkgs/pull/209870#issuecomment-1500550903
   disableBootstrap' = disableBootstrap && !langFortran && !langGo;
 
-  crossMingw = targetPlatform != hostPlatform && targetPlatform.isMinGW;
-  crossDarwin = targetPlatform != hostPlatform && targetPlatform.libc == "libSystem";
-
-  targetPrefix = lib.optionalString (
-    stdenv.targetPlatform != stdenv.hostPlatform
-  ) "${stdenv.targetPlatform.config}-";
+  crossMingw = (!lib.systems.equals targetPlatform hostPlatform) && targetPlatform.isMinGW;
+  crossDarwin =
+    (!lib.systems.equals targetPlatform hostPlatform) && targetPlatform.libc == "libSystem";
 
   crossConfigureFlags =
     # Ensure that -print-prog-name is able to find the correct programs.
@@ -72,7 +66,6 @@ let
       "--with-as=${
         if targetPackages.stdenv.cc.bintools.isLLVM then binutils else targetPackages.stdenv.cc.bintools
       }/bin/${targetPlatform.config}-as"
-      "--with-ld=${targetPackages.stdenv.cc.bintools}/bin/${targetPlatform.config}-ld"
     ]
     ++ (
       if withoutTargetLibc then
@@ -87,6 +80,11 @@ let
           "--disable-libatomic" # requires libc
           "--disable-decimal-float" # requires libc
           "--disable-libmpx" # requires libc
+          "--disable-hosted-libstdcxx" # requires libc
+          "--disable-libstdcxx-backtrace"
+          "--disable-linux-futex"
+          "--disable-libvtv"
+          "--disable-libitm"
         ]
         ++ lib.optionals crossMingw [
           "--with-headers=${lib.getDev libcCross}/include"
@@ -149,7 +147,13 @@ let
     ++ lib.optionals (!withoutTargetLibc) [
       (
         if libcCross == null then
-          "--with-native-system-header-dir=${lib.getDev stdenv.cc.libc}/include"
+          (
+            # GCC will search for the headers relative to SDKROOT on Darwin, so it will find them in the store.
+            if targetPlatform.isDarwin then
+              "--with-native-system-header-dir=/usr/include"
+            else
+              "--with-native-system-header-dir=${lib.getDev stdenv.cc.libc}/include"
+          )
         else
           "--with-native-system-header-dir=${lib.getDev libcCross}${libcCross.incdir or "/include"}"
       )
@@ -171,7 +175,8 @@ let
       #
       # We pick "/" path to effectively avoid sysroot offset and make it work
       # as a native case.
-      "--with-build-sysroot=/"
+      # Darwin requires using the SDK as the sysroot for `SDKROOT` to work correctly.
+      "--with-build-sysroot=${if targetPlatform.isDarwin then apple-sdk.sdkroot else "/"}"
       # Same with the stdlibc++ headers embedded in the gcc output
       "--with-gxx-include-dir=${placeholder "out"}/include/c++/${version}/"
     ]
@@ -199,9 +204,7 @@ let
         lib.concatStringsSep "," (
           lib.optional langC "c"
           ++ lib.optional langCC "c++"
-          ++ lib.optional langD "d"
           ++ lib.optional langFortran "fortran"
-          ++ lib.optional langJava "java"
           ++ lib.optional langAda "ada"
           ++ lib.optional langGo "go"
           ++ lib.optional langObjC "objc"
@@ -242,33 +245,21 @@ let
 
     # Ada options, gcc can't build the runtime library for a cross compiler
     ++ lib.optional langAda (
-      if hostPlatform == targetPlatform then "--enable-libada" else "--disable-libada"
+      if lib.systems.equals hostPlatform targetPlatform then "--enable-libada" else "--disable-libada"
     )
-
-    # Java options
-    ++ lib.optionals langJava [
-      "--with-ecj-jar=${javaEcj}"
-
-      # Follow Sun's layout for the convenience of IcedTea/OpenJDK.  See
-      # <http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2010-April/008888.html>.
-      "--enable-java-home"
-      "--with-java-home=\${prefix}/lib/jvm/jre"
-    ]
-    ++ lib.optional javaAwtGtk "--enable-java-awt=gtk"
-    ++ lib.optional (langJava && javaAntlr != null) "--with-antlr-jar=${javaAntlr}"
 
     ++ import ../common/platform-flags.nix {
       inherit (stdenv) targetPlatform;
       inherit lib;
     }
-    ++ lib.optionals (targetPlatform != hostPlatform) crossConfigureFlags
+    ++ lib.optionals (!lib.systems.equals targetPlatform hostPlatform) crossConfigureFlags
     ++ lib.optional disableBootstrap' "--disable-bootstrap"
 
     # Platform-specific flags
     ++ lib.optional (
-      targetPlatform == hostPlatform && targetPlatform.isx86_32
+      lib.systems.equals targetPlatform hostPlatform && targetPlatform.isx86_32
     ) "--with-arch=${stdenv.hostPlatform.parsed.cpu.name}"
-    ++ lib.optional targetPlatform.isNetBSD "--disable-libssp" # Provided by libc.
+    ++ lib.optional (targetPlatform.isNetBSD || targetPlatform.isCygwin) "--disable-libssp" # Provided by libc.
     ++ lib.optionals hostPlatform.isSunOS [
       "--enable-long-long"
       "--enable-libssp"
@@ -283,30 +274,18 @@ let
       lib.optional (targetPlatform.libc == "musl")
         # musl at least, disable: https://git.buildroot.net/buildroot/commit/?id=873d4019f7fb00f6a80592224236b3ba7d657865
         "--disable-libmpx"
-    ++ lib.optionals (targetPlatform == hostPlatform && targetPlatform.libc == "musl") [
+    ++ lib.optionals (lib.systems.equals targetPlatform hostPlatform && targetPlatform.libc == "musl") [
       "--disable-libsanitizer"
       "--disable-symvers"
       "libat_cv_have_ifunc=no"
       "--disable-gnu-indirect-function"
     ]
+    ++ lib.optionals enableDefaultPie [
+      "--enable-default-pie"
+    ]
     ++ lib.optionals langJit [
       "--enable-host-shared"
     ]
-    ++ lib.optionals (langD) [
-      "--with-target-system-zlib=yes"
-    ]
-    # On mips64-unknown-linux-gnu libsanitizer defines collide with
-    # glibc's definitions and fail the build. It was fixed in gcc-13+.
-    ++
-      lib.optionals
-        (
-          targetPlatform.isMips
-          && targetPlatform.parsed.abi.name == "gnu"
-          && lib.versions.major version == "12"
-        )
-        [
-          "--disable-libsanitizer"
-        ]
     ++ lib.optionals targetPlatform.isAlpha [
       # Workaround build failures like:
       #   cc1: error: fp software completion requires '-mtrap-precision=i' [-Werror]

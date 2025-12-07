@@ -3,20 +3,22 @@
   stdenv,
   fetchurl,
   buildPackages,
+  # TODO(corepkgs): enable tests
+  postgresql ? null,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "tzdata";
-  version = "2024a";
+  version = "2025b";
 
   srcs = [
     (fetchurl {
       url = "https://data.iana.org/time-zones/releases/tzdata${finalAttrs.version}.tar.gz";
-      hash = "sha256-DQQ0RZrL0gWaeo2h8zBKhKhlkfbtacYkj/+lArbt/+M=";
+      hash = "sha256-EYEEEzRfx4BQF+J+qfpIhf10zWGykRcRrQOPXSjXFHQ=";
     })
     (fetchurl {
       url = "https://data.iana.org/time-zones/releases/tzcode${finalAttrs.version}.tar.gz";
-      hash = "sha256-gAcolK3/WkWPHRQ+FuTKHYsqEiycU5naSCy2jLpqH/g=";
+      hash = "sha256-Bfj+2zUl7nDUnIfT+ueKig265P6HqlZcZc2plIrhNew=";
     })
   ];
 
@@ -44,6 +46,7 @@ stdenv.mkDerivation (finalAttrs: {
     "LIBDIR=${placeholder "dev"}/lib"
     "MANDIR=${placeholder "man"}/share/man"
     "AWK=awk"
+    "CURL=:" # disable network access
     "CFLAGS=-DHAVE_LINK=0"
     "CFLAGS+=-DZIC_BLOAT_DEFAULT=\\\"fat\\\""
     "cc=${stdenv.cc.targetPrefix}cc"
@@ -54,13 +57,19 @@ stdenv.mkDerivation (finalAttrs: {
     "CFLAGS+=-DHAVE_SETENV=0"
     "CFLAGS+=-DHAVE_SYMLINK=0"
     "CFLAGS+=-DRESERVE_STD_EXT_IDS"
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isFreeBSD [
+    "CFLAGS+=-DNETBSD_INSPIRED=0"
+    "CFLAGS+=-DSTD_INSPIRED=0"
+    "CFLAGS+=-DUSE_TIMEX_T=1"
+    "CFLAGS+=-DMKTIME_FITS_IN\\(min,max\\)=0"
+    "CFLAGS+=-DEXTERN_TIMEOFF=1"
   ];
 
+  enableParallelBuilding = true;
+
   doCheck = true;
-  # everything except for:
-  # - check_web, because that needs curl and wants to talk to https://validator.w3.org
-  # - check_now, because that depends on the current time
-  checkTarget = "check_back check_character_set check_white_space check_links check_name_lengths check_slashed_abbrs check_sorted check_tables check_ziguard check_zishrink check_tzs";
+  checkTarget = "check";
 
   installFlags = lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
     "zic=${buildPackages.tzdata.bin}/bin/zic"
@@ -80,6 +89,11 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   setupHook = ./tzdata-setup-hook.sh;
+
+  # PostgreSQL is sensitive to tzdata updates, because the test-suite often breaks.
+  # Upstream provides patches very quickly, we just need to apply them until the next
+  # minor releases.
+  passthru.tests = postgresql;
 
   meta = with lib; {
     homepage = "http://www.iana.org/time-zones";

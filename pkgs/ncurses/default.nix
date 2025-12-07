@@ -11,18 +11,19 @@
   withCxx ? !stdenv.hostPlatform.useAndroidPrebuilt,
   mouseSupport ? false,
   gpm,
+  withTermlib ? false,
   unicodeSupport ? true,
   testers,
   binlore,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
-  version = "6.4.20221231";
+  version = "6.5";
   pname = "ncurses" + lib.optionalString (abiVersion == "5") "-abi5-compat";
 
   src = fetchurl {
-    url = "https://invisible-island.net/archives/ncurses/ncurses-${lib.versions.majorMinor finalAttrs.version}.tar.gz";
-    hash = "sha256-aTEoPZrIfFBz8wtikMTHXyFjK7T8NgOsgQCBK+0kgVk=";
+    url = "https://invisible-island.net/archives/ncurses/ncurses-${finalAttrs.version}.tar.gz";
+    hash = "sha256-E22RvCaamleF5fnpgLx2q1dCj2BM4+WlqQzrx2eXHMY=";
   };
 
   outputs = [
@@ -31,20 +32,45 @@ stdenv.mkDerivation (finalAttrs: {
     "man"
   ];
   setOutputFlags = false; # some aren't supported
+  separateDebugInfo = false;
+
+  patches = [
+    # linux-gnuabielfv{1,2} is not in ncurses' list of GNU-ish targets (or smth like that?).
+    # Causes some defines (_XOPEN_SOURCE=600, _DEFAULT_SOURCE) to not get set, so wcwidth is not exposed by system headers, which causes a FTBFS.
+    # Reported and fix submitted to upstream in https://lists.gnu.org/archive/html/bug-ncurses/2025-07/msg00040.html
+    # Backported to the 6.5 release (dropped some hunks for code that isn't in this release yet)
+    ./1001-ncurses-Support-gnuabielfv1-2.patch
+  ];
+
+  postPatch = ''
+    sed -i '1i #include <stdbool.h>' include/curses.h.in
+  '';
+
+  # see other isOpenBSD clause below
+  configurePlatforms =
+    if stdenv.hostPlatform.isOpenBSD then
+      [ "build" ]
+    else
+      [
+        "build"
+        "host"
+      ];
 
   configureFlags = [
     (lib.withFeature (!enableStatic) "shared")
-    "--without-debug"
     "--enable-pc-files"
     "--enable-symlinks"
     "--with-manpage-format=normal"
     "--disable-stripping"
     "--with-versioned-syms"
   ]
-  ++ lib.optional unicodeSupport "--enable-widec"
+  ++ lib.optional (!finalAttrs.separateDebugInfo) "--without-debug"
+  ++ lib.optional (unicodeSupport && abiVersion == "5") "--enable-widec"
+  ++ lib.optional (!unicodeSupport && abiVersion == "6") "--disable-widec"
   ++ lib.optional (!withCxx) "--without-cxx"
   ++ lib.optional (abiVersion == "5") "--with-abi-version=5"
   ++ lib.optional stdenv.hostPlatform.isNetBSD "--enable-rpath"
+  ++ lib.optional withTermlib "--with-termlib"
   ++ lib.optionals stdenv.hostPlatform.isWindows [
     "--enable-sp-funcs"
     "--enable-term-driver"
@@ -76,10 +102,32 @@ stdenv.mkDerivation (finalAttrs: {
       # For now we allow this with `--undefined-version`:
       "LDFLAGS=-Wl,--undefined-version"
     ]
-  );
+  )
+  ++ lib.optionals stdenv.hostPlatform.isOpenBSD [
+    # If you don't specify the version number in the host specification, a branch gets taken in configure
+    # which assumes that your openbsd is from the 90s, leading to a truly awful compiler/linker configuration.
+    # No, autoreconfHook doesn't work.
+    "--host=${stdenv.hostPlatform.config}${stdenv.cc.libc.version}"
+  ]
+  # Without this override, the upstream configure system results in
+  #
+  #     typedef unsigned char NCURSES_BOOL;
+  #     #define bool NCURSES_BOOL;
+  #
+  # Which breaks C++ bindings:
+  #
+  #      > /nix/store/[...]-gcc-15.1.0/include/c++/15.1.0/cstddef:81:21: error: redefinition of 'struct std::__byte_operand<unsigned char>'
+  #      >    81 |   template<> struct __byte_operand<unsigned char> { using __type = byte; };
+  #      >       |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  #      > /nix/store/[...]-gcc-15.1.0/include/c++/15.1.0/cstddef:78:21: note: previous definition of 'struct std::__byte_operand<unsigned char>'
+  #      >    78 |   template<> struct __byte_operand<bool> { using __type = byte; };
+  #
+  ++ [
+    "cf_cv_type_of_bool=bool"
+  ];
 
   # Only the C compiler, and explicitly not C++ compiler needs this flag on solaris:
-  CFLAGS = lib.optionalString stdenv.isSunOS "-D_XOPEN_SOURCE_EXTENDED";
+  CFLAGS = lib.optionalString stdenv.hostPlatform.isSunOS "-D_XOPEN_SOURCE_EXTENDED";
 
   strictDeps = true;
 
@@ -87,12 +135,12 @@ stdenv.mkDerivation (finalAttrs: {
     updateAutotoolsGnuConfigScriptsHook
     pkg-config
   ]
-  ++ lib.optionals (stdenv.isCross) [
+  ++ lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
     # for `tic`, build already depends on for build `cc` so it's weird the build doesn't just build `tic`.
-    #ncurses
+    ncurses
   ];
 
-  buildInputs = lib.optional (mouseSupport && stdenv.isLinux) gpm;
+  buildInputs = lib.optional (mouseSupport && stdenv.hostPlatform.isLinux) gpm;
 
   preConfigure = ''
     export PKG_CONFIG_LIBDIR="$dev/lib/pkgconfig"
@@ -105,7 +153,7 @@ stdenv.mkDerivation (finalAttrs: {
       "--with-pkg-config-libdir=$PKG_CONFIG_LIBDIR"
     )
   ''
-  + lib.optionalString stdenv.isSunOS ''
+  + lib.optionalString stdenv.hostPlatform.isSunOS ''
     sed -i -e '/-D__EXTENSIONS__/ s/-D_XOPEN_SOURCE=\$cf_XOPEN_SOURCE//' \
            -e '/CPPFLAGS="$CPPFLAGS/s/ -D_XOPEN_SOURCE_EXTENDED//' \
         configure
@@ -116,12 +164,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   doCheck = false;
 
-  postFixup =
+  postInstall =
     let
       abiVersion-extension =
-        if stdenv.isDarwin then "${abiVersion}.$dylibtype" else "$dylibtype.${abiVersion}";
+        if stdenv.hostPlatform.isDarwin then "${abiVersion}.$dylibtype" else "$dylibtype.${abiVersion}";
     in
+    lib.optionalString (!stdenv.hostPlatform.isCygwin && !enableStatic) ''
+      rm "$out"/lib/*.a
     ''
+    + ''
       # Determine what suffixes our libraries have
       suffix="$(awk -F': ' 'f{print $3; f=0} /default library suffix/{f=1}' config.log)"
     ''
@@ -194,10 +245,6 @@ stdenv.mkDerivation (finalAttrs: {
       moveToOutput "bin/infotocap" "$out"
       moveToOutput "bin/infocmp" "$out"
     '';
-
-  preFixup = lib.optionalString (!stdenv.hostPlatform.isCygwin && !enableStatic) ''
-    rm "$out"/lib/*.a
-  '';
 
   # I'm not very familiar with ncurses, but it looks like most of the
   # exec here will run hard-coded executables. There's one that is

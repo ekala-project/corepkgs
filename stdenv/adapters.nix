@@ -67,50 +67,6 @@ rec {
       extraBuildInputs = (prev.extraBuildInputs or [ ]) ++ pkgs;
     });
 
-  # Override the libc++ dynamic library used in the stdenv to use the one from the platform’s
-  # default stdenv. This allows building packages and linking dependencies with different
-  # compiler versions while still using the same libc++ implementation for compatibility.
-  #
-  # Note that this adapter still uses the headers from the new stdenv’s libc++. This is necessary
-  # because older compilers may not be able to parse the headers from the default stdenv’s libc++.
-  overrideLibcxx =
-    stdenv:
-    assert stdenv.cc.libcxx != null;
-    assert pkgs.stdenv.cc.libcxx != null;
-    # only unified libcxx / libcxxabi stdenv's are supported
-    assert lib.versionAtLeast pkgs.stdenv.cc.libcxx.version "12";
-    assert lib.versionAtLeast stdenv.cc.libcxx.version "12";
-    let
-      llvmLibcxxVersion = lib.getVersion llvmLibcxx;
-
-      stdenvLibcxx = pkgs.stdenv.cc.libcxx;
-      llvmLibcxx = stdenv.cc.libcxx;
-
-      libcxx =
-        pkgs.runCommand "${stdenvLibcxx.name}-${llvmLibcxxVersion}"
-          {
-            outputs = [
-              "out"
-              "dev"
-            ];
-            isLLVM = true;
-          }
-          ''
-            mkdir -p "$dev/nix-support"
-            ln -s '${stdenvLibcxx}' "$out"
-            echo '${stdenvLibcxx}' > "$dev/nix-support/propagated-build-inputs"
-            ln -s '${lib.getDev llvmLibcxx}/include' "$dev/include"
-          '';
-    in
-    overrideCC stdenv (
-      stdenv.cc.override {
-        inherit libcxx;
-        extraPackages = [
-          pkgs.buildPackages.targetPackages."llvmPackages_${lib.versions.major llvmLibcxxVersion}".compiler-rt
-        ];
-      }
-    );
-
   # Override the setup script of stdenv.  Useful for testing new
   # versions of the setup script without causing a rebuild of
   # everything.
@@ -135,22 +91,24 @@ rec {
           else
             (mkDerivationSuper args).overrideAttrs (
               args:
-              if args ? env.NIX_CFLAGS_LINK then
-                {
-                  env = args.env // {
-                    NIX_CFLAGS_LINK = toString args.env.NIX_CFLAGS_LINK + " -static";
-                  };
-                }
-              else
-                {
-                  NIX_CFLAGS_LINK = toString (args.NIX_CFLAGS_LINK or "") + " -static";
-                }
-                // lib.optionalAttrs (!(args.dontAddStaticConfigureFlags or false)) {
-                  configureFlags = (args.configureFlags or [ ]) ++ [
-                    "--disable-shared" # brrr...
-                  ];
-                  cmakeFlags = (args.cmakeFlags or [ ]) ++ [ "-DCMAKE_SKIP_INSTALL_RPATH=On" ];
-                }
+              (
+                if (args.__structuredAttrs or false) || (args ? env.NIX_CFLAGS_LINK) then
+                  {
+                    env = (args.env or { }) // {
+                      NIX_CFLAGS_LINK = toString (args.env.NIX_CFLAGS_LINK or "") + " -static";
+                    };
+                  }
+                else
+                  {
+                    NIX_CFLAGS_LINK = toString (args.NIX_CFLAGS_LINK or "") + " -static";
+                  }
+              )
+              // lib.optionalAttrs (!(args.dontAddStaticConfigureFlags or false)) {
+                configureFlags = (args.configureFlags or [ ]) ++ [
+                  "--disable-shared" # brrr...
+                ];
+                cmakeFlags = (args.cmakeFlags or [ ]) ++ [ "-DCMAKE_SKIP_INSTALL_RPATH=On" ];
+              }
             )
         );
       }
@@ -177,7 +135,10 @@ rec {
             "--disable-shared"
           ];
           cmakeFlags = (args.cmakeFlags or [ ]) ++ [ "-DBUILD_SHARED_LIBS:BOOL=OFF" ];
-          mesonFlags = (args.mesonFlags or [ ]) ++ [ "-Ddefault_library=static" ];
+          mesonFlags = (args.mesonFlags or [ ]) ++ [
+            "-Ddefault_library=static"
+            "-Ddefault_both_libraries=static"
+          ];
         }
       );
     });
@@ -187,26 +148,25 @@ rec {
   makeStaticDarwin =
     stdenv:
     stdenv.override (old: {
-      # extraBuildInputs are dropped in cross.nix, but darwin still needs them
-      extraBuildInputs = [ pkgs.buildPackages.darwin.CF ];
       mkDerivationFromStdenv = withOldMkDerivation old (
         stdenv: mkDerivationSuper: args:
-        (mkDerivationSuper args).overrideAttrs (prevAttrs: {
-          NIX_CFLAGS_LINK =
-            toString (prevAttrs.NIX_CFLAGS_LINK or "")
-            + lib.optionalString (stdenv.cc.isGNU or false) " -static-libgcc";
-          nativeBuildInputs =
-            (prevAttrs.nativeBuildInputs or [ ])
-            ++ lib.optionals stdenv.hasCC [
-              (pkgs.buildPackages.makeSetupHook {
-                name = "darwin-portable-libSystem-hook";
-                substitutions = {
-                  libsystem = "${stdenv.cc.libc}/lib/libSystem.B.dylib";
-                  targetPrefix = stdenv.cc.bintools.targetPrefix;
-                };
-              } ./darwin/portable-libsystem.sh)
-            ];
-        })
+        (mkDerivationSuper args).overrideAttrs (
+          prevAttrs:
+          if prevAttrs ? env.NIX_CFLAGS_LINK then
+            {
+              env = prevAttrs.env // {
+                NIX_CFLAGS_LINK =
+                  toString (args.env.NIX_CFLAGS_LINK or "")
+                  + lib.optionalString (stdenv.cc.isGNU or false) " -static-libgcc";
+              };
+            }
+          else
+            {
+              NIX_CFLAGS_LINK =
+                toString (prevAttrs.NIX_CFLAGS_LINK or "")
+                + lib.optionalString (stdenv.cc.isGNU or false) " -static-libgcc";
+            }
+        )
       );
     });
 
@@ -271,7 +231,7 @@ rec {
               drvPath = builtins.unsafeDiscardStringContext pkg.drvPath;
               license = pkg.meta.license or null;
             in
-            builtins.trace "@:drv:${toString drvPath}:${builtins.toString license}:@" val;
+            builtins.trace "@:drv:${toString drvPath}:${toString license}:@" val;
         in
         pkg
         // {
@@ -293,6 +253,7 @@ rec {
         dontStrip = true;
         env = (args.env or { }) // {
           NIX_CFLAGS_COMPILE = toString (args.env.NIX_CFLAGS_COMPILE or "") + " -ggdb -Og";
+          NIX_RUSTFLAGS = toString (args.env.NIX_RUSTFLAGS or "") + " -g -C opt-level=0 -C strip=none";
         };
       });
     });
@@ -343,32 +304,52 @@ rec {
 
   useMoldLinker =
     stdenv:
-    let
-      bintools = stdenv.cc.bintools.override {
-        extraBuildCommands = ''
-          wrap ${stdenv.cc.bintools.targetPrefix}ld.mold ${../build-support/bintools-wrapper/ld-wrapper.sh} ${pkgs.mold}/bin/ld.mold
-          wrap ${stdenv.cc.bintools.targetPrefix}ld ${../build-support/bintools-wrapper/ld-wrapper.sh} ${pkgs.mold}/bin/ld.mold
-        '';
-      };
-    in
-    stdenv.override (
-      old:
-      {
+    if stdenv.targetPlatform.isDarwin then
+      throw "Mold can't be used to emit Mach-O (Darwin) binaries"
+    else
+      let
+        bintools = stdenv.cc.bintools.override {
+          extraBuildCommands = ''
+            wrap ld.mold ${../build-support/bintools-wrapper/ld-wrapper.sh} ${pkgs.buildPackages.mold}/bin/ld.mold
+            wrap ${stdenv.cc.bintools.targetPrefix}ld.mold ${../build-support/bintools-wrapper/ld-wrapper.sh} ${pkgs.buildPackages.mold}/bin/ld.mold
+            wrap ${stdenv.cc.bintools.targetPrefix}ld ${../build-support/bintools-wrapper/ld-wrapper.sh} ${pkgs.buildPackages.mold}/bin/ld.mold
+          '';
+        };
+      in
+      stdenv.override (
+        old:
+        {
+          allowedRequisites = null;
+          cc = stdenv.cc.override { inherit bintools; };
+          # gcc >12.1.0 supports '-fuse-ld=mold'
+          # the wrap ld above in bintools supports gcc <12.1.0 and shouldn't harm >12.1.0
+          # https://github.com/rui314/mold#how-to-use
+        }
+        //
+          lib.optionalAttrs
+            (stdenv.cc.isClang || (stdenv.cc.isGNU && lib.versionAtLeast stdenv.cc.version "12"))
+            {
+              mkDerivationFromStdenv = extendMkDerivationArgs old (args: {
+                NIX_CFLAGS_LINK = toString (args.NIX_CFLAGS_LINK or "") + " -fuse-ld=mold";
+              });
+            }
+      );
+
+  useWildLinker =
+    stdenv:
+    if !stdenv.targetPlatform.isLinux then
+      throw "Wild only supports building Linux ELF files from Linux hosts."
+    else
+      stdenv.override (prev: {
         allowedRequisites = null;
-        cc = stdenv.cc.override { inherit bintools; };
-        # gcc >12.1.0 supports '-fuse-ld=mold'
-        # the wrap ld above in bintools supports gcc <12.1.0 and shouldn't harm >12.1.0
-        # https://github.com/rui314/mold#how-to-use
-      }
-      //
-        lib.optionalAttrs
-          (stdenv.cc.isClang || (stdenv.cc.isGNU && lib.versionAtLeast stdenv.cc.version "12"))
-          {
-            mkDerivationFromStdenv = extendMkDerivationArgs old (args: {
-              NIX_CFLAGS_LINK = toString (args.NIX_CFLAGS_LINK or "") + " -fuse-ld=mold";
-            });
-          }
-    );
+        cc = prev.cc.override {
+          bintools = prev.cc.bintools.override {
+            extraBuildCommands = ''
+              ln -fs ${pkgs.buildPackages.wild}/bin/* "$out/bin"
+            '';
+          };
+        };
+      });
 
   /*
     Modify a stdenv so that it builds binaries optimized specifically
@@ -414,26 +395,6 @@ rec {
         };
       });
     });
-
-  # Overriding the SDK changes the Darwin SDK used to build the package, which:
-  # * Ensures that the compiler and bintools have the correct Libsystem version; and
-  # * Replaces any SDK references with those in the SDK corresponding to the requested SDK version.
-  #
-  # `sdkVersion` can be any of the following:
-  # * A version string indicating the requested SDK version; or
-  # * An attrset consisting of either or both of the following fields: darwinSdkVersion and darwinMinVersion.
-  overrideSDK = import ./darwin/override-sdk.nix {
-    inherit lib extendMkDerivationArgs;
-    inherit (pkgs)
-      stdenvNoCC
-      pkgsBuildBuild
-      pkgsBuildHost
-      pkgsBuildTarget
-      pkgsHostHost
-      pkgsHostTarget
-      pkgsTargetTarget
-      ;
-  };
 
   withDefaultHardeningFlags =
     defaultHardeningFlags: stdenv:

@@ -62,13 +62,22 @@ assert enableNumpy -> enablePython;
 let
 
   src = fetchurl {
-    url =
-      "mirror://sourceforge/boost/boost_${builtins.replaceStrings [ "." ] [ "_" ] version}.tar.bz2";
+    url = "mirror://sourceforge/boost/boost_${builtins.replaceStrings [ "." ] [ "_" ] version}.tar.bz2";
     hash = src-hash;
   };
 
   boost-build = import ./boost-build.nix {
-    inherit lib stdenv bison fetchFromGitHub src version boostBuildPatches packageAtLeast packageOlder;
+    inherit
+      lib
+      stdenv
+      bison
+      fetchFromGitHub
+      src
+      version
+      boostBuildPatches
+      packageAtLeast
+      packageOlder
+      ;
   };
 
   variant = lib.concatStringsSep "," (
@@ -413,7 +422,6 @@ stdenv.mkDerivation {
     # will succeed, but packages depending on boost-context will fail with
     # a very cryptic error message.
     badPlatforms = [ lib.systems.inspect.patterns.isMips64n32 ];
-    broken =
-      enableNumpy && lib.versionAtLeast python.pkgs.numpy.version "2";
+    broken = enableNumpy && lib.versionAtLeast python.pkgs.numpy.version "2";
   };
 }

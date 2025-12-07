@@ -21,7 +21,7 @@ stdenv.mkDerivation (
     inherit version;
 
     src = fetchurl {
-      url = "https://download.oracle.com/berkeley-db/${pname}-${version}.tar.gz";
+      url = "https://download.oracle.com/berkeley-db/db-${version}.tar.gz";
       sha256 = sha256;
     };
 
@@ -80,7 +80,7 @@ stdenv.mkDerivation (
       (if compat185 then "--enable-compat185" else "--disable-compat185")
     ]
     ++ lib.optional dbmSupport "--enable-dbm"
-    ++ lib.optional stdenv.isFreeBSD "--with-pic";
+    ++ lib.optional stdenv.hostPlatform.isFreeBSD "--with-pic";
 
     preConfigure = ''
       cd build_unix

@@ -15,31 +15,27 @@
   pythonOlder,
   setuptools,
   tomli,
+  virtualenv,
   wheel,
 }:
 
 buildPythonPackage rec {
   pname = "build";
-  version = "1.2.1";
-  format = "pyproject";
-
-  disabled = pythonOlder "3.7";
+  version = "1.3.0";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "pypa";
     repo = "build";
-    rev = "refs/tags/${version}";
-    hash = "sha256-G0g+1v19sQMUuQlZKGELZOwwX07i7TIdEdaYzr8bKtI=";
+    tag = version;
+    hash = "sha256-w2YKQzni8e6rpnQJH2J0bHzRigjWOlWiI8Po5d3ZqS8=";
   };
 
-  postPatch = ''
-    # not strictly required, causes circular dependency cycle
-    sed -i '/importlib-metadata >= 4.6/d' pyproject.toml
-  '';
+  build-system = [ flit-core ];
 
-  nativeBuildInputs = [ flit-core ];
+  pythonRemoveDeps = [ "importlib-metadata" ];
 
-  propagatedBuildInputs = [
+  dependencies = [
     packaging
     pyproject-hooks
   ]
@@ -66,12 +62,12 @@ buildPythonPackage rec {
         pytest-xdist
         pytestCheckHook
         setuptools
+        virtualenv
         wheel
       ];
 
-      pytestFlagsArray = [
-        "-W"
-        "ignore::DeprecationWarning"
+      pytestFlags = [
+        "-Wignore::DeprecationWarning"
       ];
 
       __darwinAllowLocalNetworking = true;
@@ -85,8 +81,11 @@ buildPythonPackage rec {
         "test_init"
         "test_output"
         "test_wheel_metadata"
+        # Tests require network access to run pip install
+        "test_verbose_output"
+        "test_requirement_installation"
       ]
-      ++ lib.optionals stdenv.isDarwin [
+      ++ lib.optionals stdenv.hostPlatform.isDarwin [
         # Expects Apple's Python and its quirks
         "test_can_get_venv_paths_with_conflicting_default_scheme"
       ];
@@ -103,7 +102,8 @@ buildPythonPackage rec {
       is a simple build tool and does not perform any dependency management.
     '';
     homepage = "https://github.com/pypa/build";
-    changelog = "https://github.com/pypa/build/blob/${version}/CHANGELOG.rst";
+    changelog = "https://github.com/pypa/build/blob/${src.tag}/CHANGELOG.rst";
     license = licenses.mit;
+    maintainers = [ ];
   };
 }

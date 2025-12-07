@@ -1,27 +1,32 @@
 {
   buildPackages,
-  db,
+  gdbm,
   fetchurl,
   groff,
   gzip,
   lib,
   libiconv,
+  libiconvReal,
   libpipeline,
   makeWrapper,
   nixosTests,
   pkg-config,
   stdenv,
+  util-linuxMinimal,
   zstd,
-  autoreconfHook,
 }:
 
+let
+  libiconv' =
+    if stdenv.hostPlatform.isDarwin || stdenv.hostPlatform.isFreeBSD then libiconvReal else libiconv;
+in
 stdenv.mkDerivation rec {
   pname = "man-db";
-  version = "2.12.1";
+  version = "2.13.1";
 
   src = fetchurl {
     url = "mirror://savannah/man-db/man-db-${version}.tar.xz";
-    hash = "sha256-3e4kna63jPkrq3lMzQacyLV1mSJl6iDiOeiHFW6IAmU=";
+    hash = "sha256-iv67b362u4VCkpRYhB9cfm8kDjDIY1jB+8776gdsh9k=";
   };
 
   outputs = [
@@ -32,7 +37,6 @@ stdenv.mkDerivation rec {
 
   strictDeps = true;
   nativeBuildInputs = [
-    autoreconfHook
     groff
     makeWrapper
     pkg-config
@@ -40,12 +44,11 @@ stdenv.mkDerivation rec {
   ];
   buildInputs = [
     libpipeline
-    db
+    gdbm
     groff
+    libiconv'
   ]; # (Yes, 'groff' is both native and build input)
-  nativeCheckInputs = [
-    libiconv # for 'iconv' binary
-  ];
+  nativeCheckInputs = [ libiconv' ]; # for 'iconv' binary; make very sure it matches buildinput libiconv
 
   patches = [
     ./systemwide-man-db-conf.patch
@@ -72,10 +75,16 @@ stdenv.mkDerivation rec {
     "--with-systemdsystemunitdir=${placeholder "out"}/lib/systemd/system"
     "--with-pager=less"
   ]
+  ++ lib.optionals util-linuxMinimal.hasCol [
+    "--with-col=${util-linuxMinimal}/bin/col"
+  ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     "ac_cv_func__set_invalid_parameter_handler=no"
     "ac_cv_func_posix_fadvise=no"
     "ac_cv_func_mempcpy=no"
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isFreeBSD [
+    "--enable-mandirs="
   ];
 
   preConfigure = ''

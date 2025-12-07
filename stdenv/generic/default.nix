@@ -8,7 +8,7 @@ let
       initialPath,
 
       # If we don't have a C compiler, we might either have `cc = null` or `cc =
-      # throw ...`, but if we do have a C compiler we should definiely have `cc !=
+      # throw ...`, but if we do have a C compiler we should definitely have `cc !=
       # null`.
       #
       # TODO(@Ericson2314): Add assert without creating infinite recursion
@@ -60,7 +60,7 @@ let
       targetPlatform,
 
       # The implementation of `mkDerivation`, parameterized with the final stdenv so we can tie the knot.
-      # This is convient to have as a parameter so the stdenv "adapters" work better
+      # This is convenient to have as a parameter so the stdenv "adapters" work better
       mkDerivationFromStdenv ?
         stdenv: (import ./make-derivation.nix { inherit lib config; } stdenv).mkDerivation,
     }:
@@ -69,6 +69,7 @@ let
       defaultNativeBuildInputs =
         extraNativeBuildInputs
         ++ [
+          ../../build-support/setup-hooks/no-broken-symlinks.sh
           ../../build-support/setup-hooks/audit-tmpdir.sh
           ../../build-support/setup-hooks/compress-man-pages.sh
           ../../build-support/setup-hooks/make-symlinks-relative.sh
@@ -89,8 +90,8 @@ let
 
       stdenv = (stdenv-overridable argsStdenv);
 
-      # The stdenv that we are producing.
     in
+    # The stdenv that we are producing.
     derivation (
       lib.optionalAttrs (allowedRequisites != null) {
         allowedRequisites = allowedRequisites ++ defaultNativeBuildInputs ++ defaultBuildInputs;
@@ -133,9 +134,16 @@ let
           + lib.optionalString (hostPlatform.isDarwin && hostPlatform.isMacOS) ''
             export MACOSX_DEPLOYMENT_TARGET=${hostPlatform.darwinMinVersion}
           ''
-          + lib.optionalString targetPlatform.isDarwin ''
-            export NIX_DONT_SET_RPATH_FOR_TARGET=1
-          '';
+        # TODO this should be uncommented, but it causes stupid mass rebuilds due to
+        # `pkgsCross.*.buildPackages` not being the same, resulting in cross-compiling
+        # for a target rebuilding all of `nativeBuildInputs` for that target.
+        #
+        # I think the best solution would just be to fixup linux RPATHs so we don't
+        # need to set `-rpath` anywhere.
+        # + lib.optionalString targetPlatform.isDarwin ''
+        #   export NIX_DONT_SET_RPATH_FOR_TARGET=1
+        # ''
+        ;
 
         inherit
           initialPath

@@ -45,13 +45,17 @@ lib.fix (
     ### buildEnv with custom attributes
     buildEnv' =
       args:
-      (
-        buildEnv ({ inherit (args) name paths; })
+      (buildEnv (
+        {
+          inherit (args) name paths;
+        }
         // lib.optionalAttrs (args ? extraOutputsToInstall) { inherit (args) extraOutputsToInstall; }
-      ).overrideAttrs
+        // lib.optionalAttrs (args ? pathsToLink) { inherit (args) pathsToLink; }
+      )).overrideAttrs
         (
           removeAttrs args [
             "extraOutputsToInstall"
+            "pathsToLink"
             "name"
             "paths"
             "pkgs"
@@ -220,11 +224,14 @@ lib.fix (
       paths = builtins.catAttrs "outPath" pkgList.nonbin;
 
       # mktexlsr
-      nativeBuildInputs = [ tl."texlive.infra" ];
+      nativeBuildInputs = [
+        tl.texlive-scripts # for mktexlsr.pl with --sort support
+        perl
+      ];
 
       postBuild = # generate ls-R database
         ''
-          mktexlsr "$out"
+          perl ${tl.texlive-scripts.tex}/scripts/texlive/mktexlsr.pl --sort "$out"
         '';
     };
 
@@ -300,9 +307,11 @@ lib.fix (
       requiredTeXPackages = builtins.filter lib.isDerivation (
         pkgList.bin
         ++ pkgList.nonbin
-        ++ lib.optionals (!__fromCombineWrapper) (lib.concatMap (
-          n: (pkgList.otherOutputs.${n} or [ ] ++ pkgList.specifiedOutputs.${n} or [ ])
-        )) pkgList.nonEnvOutputs
+        ++ lib.optionals (!__fromCombineWrapper) (
+          lib.concatMap (
+            n: (pkgList.otherOutputs.${n} or [ ] ++ pkgList.specifiedOutputs.${n} or [ ])
+          ) pkgList.nonEnvOutputs
+        )
       );
       # useful for inclusion in the `fonts.packages` nixos option or for use in devshells
       fonts = "${texmfroot}/texmf-dist/fonts";
@@ -476,8 +485,8 @@ lib.fix (
         allowSubstitutes = true;
         preferLocalBuild = false;
       };
-    # outputsToInstall must be set *after* overrideAttrs (used in buildEnv') or it fails the checkMeta tests
   in
+  # outputsToInstall must be set *after* overrideAttrs (used in buildEnv') or it fails the checkMeta tests
   if __combine || __formatsOf != null then
     out
   else

@@ -30,7 +30,13 @@
   # Allow a configuration attribute set to be passed in as an argument.
   config ? { },
 
+  # Temporary hack to let Nixpkgs forbid internal use of `lib.fileset`
+  # until <https://github.com/NixOS/nix/issues/11503> is fixed.
+  # TODO(corepkgs): this was fixed, remove this https://github.com/NixOS/nixpkgs/commit/8725e466ef2bcc5be69106c16dbf69b9ef989273
+  __allowFileset ? true,
+
   # Allow for users to pass modules for the evaluation of pkgs.config
+  # TODO(corepkgs): document this
   modules ? [ ],
 
   # List of overlays layers used to extend Nixpkgs.
@@ -42,7 +48,7 @@
   # A function booting the final package set for a specific standard
   # environment. See below for the arguments given to that function, the type of
   # list it returns.
-  stdenvStages ? import ./stdenv.nix,
+  stdenvStages ? import ./.,
 
   # Ignore unexpected args.
   ...
@@ -54,22 +60,36 @@ let # Rename the function arguments
 
 in
 let
-  lib = import ../lib.nix;
+  pristineLib = import ../lib.nix;
+
+  lib =
+    if __allowFileset then
+      pristineLib
+    else
+      pristineLib.extend (
+        _: _: {
+          fileset = abort ''
+
+            The use of `lib.fileset` is currently forbidden in Nixpkgs due to the
+            upstream Nix bug <https://github.com/NixOS/nix/issues/11503>. This
+            causes difficult‐to‐debug errors when combined with chroot stores,
+            such as in the NixOS installer.
+
+            For packages that require source to be vendored inside Nixpkgs,
+            please use a subdirectory of the package instead.
+          '';
+        }
+      );
 
   inherit (lib) throwIfNot;
 
   checked =
-    throwIfNot (lib.isList overlays) "The overlays argument to nixpkgs must be a list." lib.foldr
-      (x: throwIfNot (lib.isFunction x) "All overlays passed to nixpkgs must be functions.")
-      (r: r)
-      overlays
-      throwIfNot
-      (lib.isList crossOverlays)
-      "The crossOverlays argument to nixpkgs must be a list."
-      lib.foldr
-      (x: throwIfNot (lib.isFunction x) "All crossOverlays passed to nixpkgs must be functions.")
-      (r: r)
-      crossOverlays;
+    (throwIfNot (lib.isList overlays) "The overlays argument to nixpkgs must be a list.")
+      (throwIfNot (lib.all lib.isFunction overlays) "All overlays passed to nixpkgs must be functions.")
+      (throwIfNot (lib.isList crossOverlays) "The crossOverlays argument to nixpkgs must be a list.")
+      (
+        throwIfNot (lib.all lib.isFunction crossOverlays) "All crossOverlays passed to nixpkgs must be functions."
+      );
 
   localSystem = lib.systems.elaborate args.localSystem;
 
@@ -141,7 +161,7 @@ let
   # experience here.)
   nixpkgsFun = newArgs: import ../. (args // newArgs);
 
-  # Partially apply some arguments for building bootstraping stage pkgs
+  # Partially apply some arguments for building bootstrapping stage pkgs
   # sets. Only apply arguments which no stdenv would want to override.
   allPackages =
     newArgs:

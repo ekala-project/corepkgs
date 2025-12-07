@@ -3,6 +3,7 @@
   stdenv,
   lib,
   fetchurl,
+  fetchpatch2,
   pkg-config,
   zlib,
   expat,
@@ -19,9 +20,14 @@
   ijs,
   lcms2,
   callPackage,
+  libice,
+  libx11,
+  libxext,
+  libxt,
   bash,
   buildPackages,
   openjpeg,
+  fixDarwinDylibNames,
   cupsSupport ? config.ghostscript.cups or (!stdenv.hostPlatform.isDarwin),
   cups,
   x11Support ? cupsSupport,
@@ -62,18 +68,31 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "ghostscript${lib.optionalString x11Support "-with-X"}";
-  version = "10.03.1";
+  version = "10.06.0";
 
   src = fetchurl {
     url = "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs${
       lib.replaceStrings [ "." ] [ "" ] version
     }/ghostscript-${version}.tar.xz";
-    hash = "sha256-FXIS7clrjMxAlHXc4uSYM/tEJ/FQxFUlje2WMsEGq+4=";
+    hash = "sha256-ZDUmSMLAgcip+xoS3Bll4B6tfFf1i3LRtU9u8c7zxWE=";
   };
 
   patches = [
     ./urw-font-files.patch
     ./doc-no-ref.diff
+
+    # Support SOURCE_DATE_EPOCH for reproducible builds
+    (fetchpatch2 {
+      url = "https://salsa.debian.org/debian/ghostscript/-/raw/01e895fea033cc35054d1b68010de9818fa4a8fc/debian/patches/2010_add_build_timestamp_setting.patch";
+      hash = "sha256-XTKkFKzMR2QpcS1YqoxzJnyuGk/l/Y2jdevsmbMtCXA=";
+    })
+  ]
+  ++ lib.optionals stdenv.hostPlatform.is32bit [
+    # 32 bit compat. conditional as to not cause rebuilds
+    (fetchpatch2 {
+      url = "https://github.com/ArtifexSoftware/ghostpdl/commit/3c0be6e4fcffa63e4a5a1b0aec057cebc4d2562f.patch?full_index=1";
+      hash = "sha256-NrL4lI19x+OHaSIwV93Op/I9k2MWXxSWgbkwSGU7R6A=";
+    })
   ];
 
   outputs = [
@@ -94,7 +113,8 @@ stdenv.mkDerivation rec {
     autoconf
     zlib
   ]
-  ++ lib.optional cupsSupport cups;
+  ++ lib.optional cupsSupport cups
+  ++ lib.optional stdenv.hostPlatform.isDarwin fixDarwinDylibNames;
 
   buildInputs = [
     zlib
@@ -114,10 +134,10 @@ stdenv.mkDerivation rec {
     openjpeg
   ]
   ++ lib.optionals x11Support [
-    xorg.libICE
-    xorg.libX11
-    xorg.libXext
-    xorg.libXt
+    libice
+    libx11
+    libxext
+    libxt
   ]
   ++ lib.optional cupsSupport cups;
 
@@ -131,7 +151,18 @@ stdenv.mkDerivation rec {
     sed "s@if ( test -f \$(INCLUDE)[^ ]* )@if ( true )@; s@INCLUDE=/usr/include@INCLUDE=/no-such-path@" -i base/unix-aux.mak
     sed "s@^ZLIBDIR=.*@ZLIBDIR=${zlib.dev}/include@" -i configure.ac
 
+    # Sidestep a bug in autoconf-2.69 that sets the compiler for all checks to
+    # $CXX after the part for the vendored copy of tesseract.
+    # `--without-tesseract` is already passed to the outer ./configure, here we
+    # make sure it is also passed to its recursive invocation for buildPlatform
+    # checks when cross-compiling.
+    substituteInPlace configure.ac \
+      --replace-fail "--without-x" "--without-x --without-tesseract"
+
     autoconf
+  ''
+  + lib.optionalString stdenv.hostPlatform.isDarwin ''
+    export DARWIN_LDFLAGS_SO_PREFIX=$out/lib/
   '';
 
   configureFlags = [
@@ -169,18 +200,6 @@ stdenv.mkDerivation rec {
     mkdir -p $fonts/share/fonts
     cp -rv ${fonts}/* "$fonts/share/fonts/"
     ln -s "$fonts/share/fonts" "$out/share/ghostscript/fonts"
-  ''
-  + lib.optionalString stdenv.hostPlatform.isDarwin ''
-    for file in $out/lib/*.dylib* ; do
-      install_name_tool -id "$file" $file
-    done
-  '';
-
-  # dynamic library name only contains maj.min, eg. '9.53'
-  dylib_version = lib.versions.majorMinor version;
-  preFixup = lib.optionalString stdenv.hostPlatform.isDarwin ''
-    install_name_tool -change libgs.dylib.$dylib_version $out/lib/libgs.dylib.$dylib_version $out/bin/gs
-    install_name_tool -change libgs.dylib.$dylib_version $out/lib/libgs.dylib.$dylib_version $out/bin/gsx
   '';
 
   # validate dynamic linkage

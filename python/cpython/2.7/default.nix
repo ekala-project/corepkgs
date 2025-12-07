@@ -14,12 +14,11 @@
   sqlite,
   tcl ? null,
   tk ? null,
-  tix ? null,
-  libX11 ? null,
+  tclPackages,
+  libx11 ? null,
   x11Support ? false,
   zlib,
   self,
-  configd,
   coreutils,
   autoreconfHook,
   python-setup-hook,
@@ -47,7 +46,7 @@
   pythonAttr ? "python${sourceVersion.major}${sourceVersion.minor}",
 }:
 
-assert x11Support -> tcl != null && tk != null && libX11 != null;
+assert x11Support -> tcl != null && tk != null && libx11 != null;
 
 assert lib.assertMsg (enableOptimizations -> (!stdenv.cc.isClang))
   "Optimizations with clang are not supported. configure: error: llvm-profdata is required for a --enable-optimizations build but could not be found.";
@@ -88,6 +87,10 @@ let
       pythonOnBuildForTarget = pkgsBuildTarget.${pythonAttr};
       pythonOnHostForHost = pkgsHostHost.${pythonAttr};
       pythonOnTargetForTarget = pkgsTargetTarget.${pythonAttr} or { };
+      pythonABITags = [
+        "none"
+        "cp${sourceVersion.major}${sourceVersion.minor}"
+      ];
     }
     // {
       inherit ucsEncoding;
@@ -152,16 +155,11 @@ let
       hash = "sha256-Lp5fGlcfJJ6p6vKmcLckJiAA2AZz4prjFE0aMEJxotw=";
     })
   ]
-  ++ lib.optionals (x11Support && stdenv.isDarwin) [
+  ++ lib.optionals (x11Support && stdenv.hostPlatform.isDarwin) [
     ./use-correct-tcl-tk-on-darwin.patch
 
   ]
-  ++ lib.optionals stdenv.isDarwin [
-    # Fix darwin build https://bugs.python.org/issue34027
-    ../3.7/darwin-libutil.patch
-
-  ]
-  ++ lib.optionals stdenv.isLinux [
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
 
     # Disable the use of ldconfig in ctypes.util.find_library (since
     # ldconfig doesn't work on NixOS), and don't use
@@ -210,7 +208,7 @@ let
       substituteInPlace $i --replace /usr/include/ ${stdenv.cc.libc}/include/
     done
   ''
-  + lib.optionalString stdenv.isDarwin ''
+  + lib.optionalString stdenv.hostPlatform.isDarwin ''
     substituteInPlace configure --replace '`/usr/bin/arch`' '"i386"'
     substituteInPlace Lib/multiprocessing/__init__.py \
       --replace 'os.popen(comm)' 'os.popen("${coreutils}/bin/nproc")'
@@ -232,11 +230,11 @@ let
     ++ lib.optionals stdenv.hostPlatform.isCygwin [
       "ac_cv_func_bind_textdomain_codeset=yes"
     ]
-    ++ lib.optionals stdenv.isDarwin [
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
       "--disable-toolbox-glue"
     ]
     ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
-      "PYTHON_FOR_BUILD=${lib.getBin buildPackages.python}/bin/python"
+      "PYTHON_FOR_BUILD=${lib.getBin buildPackages.python27}/bin/python"
       "ac_cv_buggy_getaddrinfo=no"
       # Assume little-endian IEEE 754 floating point when cross compiling
       "ac_cv_little_endian_double=yes"
@@ -281,15 +279,14 @@ let
     ++ lib.optionals x11Support [
       tcl
       tk
-      libX11
-    ]
-    ++ lib.optional (stdenv.isDarwin && configd != null) configd;
+      libx11
+    ];
   nativeBuildInputs = [
     autoreconfHook
   ]
   ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
     buildPackages.stdenv.cc
-    buildPackages.python
+    buildPackages.python27
   ];
 
   mkPaths = paths: {
@@ -321,18 +318,19 @@ stdenv.mkDerivation (
       configureFlags
       ;
 
-    LDFLAGS = lib.optionalString (!stdenv.isDarwin) "-lgcc_s";
+    LDFLAGS = lib.optionalString (!stdenv.hostPlatform.isDarwin) "-lgcc_s";
     inherit (mkPaths buildInputs) C_INCLUDE_PATH LIBRARY_PATH;
 
     env.NIX_CFLAGS_COMPILE =
       lib.optionalString (stdenv.targetPlatform.system == "x86_64-darwin") "-msse2"
-      + lib.optionalString stdenv.hostPlatform.isMusl " -DTHREAD_STACK_SIZE=0x100000";
+      + lib.optionalString stdenv.hostPlatform.isMusl " -DTHREAD_STACK_SIZE=0x100000"
+      + " -std=gnu17";
     DETERMINISTIC_BUILD = 1;
 
     setupHook = python-setup-hook sitePackages;
 
-    postPatch = lib.optionalString (x11Support && (tix != null)) ''
-      substituteInPlace "Lib/lib-tk/Tix.py" --replace "os.environ.get('TIX_LIBRARY')" "os.environ.get('TIX_LIBRARY') or '${tix}/lib'"
+    postPatch = lib.optionalString (x11Support && ((tclPackages.tix or null) != null)) ''
+      substituteInPlace "Lib/lib-tk/Tix.py" --replace "os.environ.get('TIX_LIBRARY')" "os.environ.get('TIX_LIBRARY') or '${tclPackages.tix}/lib'"
     '';
 
     postInstall = ''

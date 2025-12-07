@@ -19,10 +19,10 @@ let
   # we aim to support.
   environmentTests =
     let
-      envs =
+      environments =
         let
           inherit python;
-          pythonEnv = python.withPackages (ps: with ps; [ ]);
+          pythonEnv = python.withPackages (ps: [ ]);
           pythonVirtualEnv =
             if python.isPy3k then
               python.withPackages (ps: with ps; [ virtualenv ])
@@ -36,23 +36,23 @@ let
         {
           # Plain Python interpreter
           plain = rec {
-            env = python;
-            interpreter = env.interpreter;
+            environment = python;
+            interpreter = environment.interpreter;
             is_venv = "False";
             is_nixenv = "False";
             is_virtualenv = "False";
           };
         }
-        // lib.optionalAttrs (!python.isPyPy && !stdenv.isDarwin) {
+        // lib.optionalAttrs (!python.isPyPy && !stdenv.hostPlatform.isDarwin) {
           # Use virtualenv from a Nix env.
           # Fails on darwin with
           #   virtualenv: error: argument dest: the destination . is not write-able at /nix/store
           nixenv-virtualenv = rec {
-            env = runCommand "${python.name}-virtualenv" { } ''
+            environment = runCommand "${python.name}-virtualenv" { } ''
               ${pythonVirtualEnv.interpreter} -m virtualenv venv
               mv venv $out
             '';
-            interpreter = "${env}/bin/${python.executable}";
+            interpreter = "${environment}/bin/${python.executable}";
             is_venv = "False";
             is_nixenv = "True";
             is_virtualenv = "True";
@@ -61,8 +61,8 @@ let
         // lib.optionalAttrs (python.implementation != "graal") {
           # Python Nix environment (python.buildEnv)
           nixenv = rec {
-            env = pythonEnv;
-            interpreter = env.interpreter;
+            environment = pythonEnv;
+            interpreter = environment.interpreter;
             is_venv = "False";
             is_nixenv = "True";
             is_virtualenv = "False";
@@ -73,25 +73,25 @@ let
           # Python 2 does not support venv
           # TODO: PyPy executable name is incorrect, it should be pypy-c or pypy-3c instead of pypy and pypy3.
           plain-venv = rec {
-            env = runCommand "${python.name}-venv" { } ''
+            environment = runCommand "${python.name}-venv" { } ''
               ${python.interpreter} -m venv $out
             '';
-            interpreter = "${env}/bin/${python.executable}";
+            interpreter = "${environment}/bin/${python.executable}";
             is_venv = "True";
             is_nixenv = "False";
             is_virtualenv = "False";
           };
 
         }
-        // lib.optionalAttrs (python.pythonAtLeast "3.8") {
+        // {
           # Venv built using Python Nix environment (python.buildEnv)
           # TODO: Cannot create venv from a  nix env
           # Error: Command '['/nix/store/ddc8nqx73pda86ibvhzdmvdsqmwnbjf7-python3-3.7.6-venv/bin/python3.7', '-Im', 'ensurepip', '--upgrade', '--default-pip']' returned non-zero exit status 1.
           nixenv-venv = rec {
-            env = runCommand "${python.name}-venv" { } ''
+            environment = runCommand "${python.name}-venv" { } ''
               ${pythonEnv.interpreter} -m venv $out
             '';
-            interpreter = "${env}/bin/${pythonEnv.executable}";
+            interpreter = "${environment}/bin/${pythonEnv.executable}";
             is_venv = "True";
             is_nixenv = "True";
             is_virtualenv = "False";
@@ -117,28 +117,74 @@ let
           '';
 
     in
-    lib.mapAttrs testfun envs;
+    lib.mapAttrs testfun environments;
 
   # Integration tests involving the package set.
   # All PyPy package builds are broken at the moment
   integrationTests = lib.optionalAttrs (!python.isPyPy) (
-    lib.optionalAttrs (python.isPy3k && !stdenv.isDarwin) {
-      # darwin has no split-debug
-      cpython-gdb = callPackage ./tests/test_cpython_gdb {
-        interpreter = python;
-      };
-    }
-    // lib.optionalAttrs (python.pythonAtLeast "3.7") {
-      # Before the addition of NIX_PYTHONPREFIX mypy was broken with typed packages
-      nix-pythonprefix-mypy = callPackage ./tests/test_nix_pythonprefix {
-        interpreter = python;
-      };
+    {
       # Make sure tkinter is importable. See https://github.com/NixOS/nixpkgs/issues/238990
       tkinter = callPackage ./tests/test_tkinter {
         interpreter = python;
       };
     }
+    // lib.optionalAttrs (python.isPy3k && python.pythonOlder "3.13" && !stdenv.hostPlatform.isDarwin) {
+      # darwin has no split-debug
+      # fails on python3.13
+      cpython-gdb = callPackage ./tests/test_cpython_gdb {
+        interpreter = python;
+      };
+    }
+    // lib.optionalAttrs (python.isPy3k && python.pythonOlder "3.13") {
+      # Before the addition of NIX_PYTHONPREFIX mypy was broken with typed packages
+      # mypy does not yet support python3.13
+      # https://github.com/python/mypy/issues/17264
+      nix-pythonprefix-mypy = callPackage ./tests/test_nix_pythonprefix {
+        interpreter = python;
+      };
+    }
   );
+
+  # Test editable package support
+  editableTests =
+    let
+      testPython = python.override {
+        self = testPython;
+        packageOverrides = pyfinal: pyprev: {
+          # An editable package with a script that loads our mutable location
+          my-editable = pyfinal.mkPythonEditablePackage {
+            pname = "my-editable";
+            version = "0.1.0";
+            root = "$NIX_BUILD_TOP/src"; # Use environment variable expansion at runtime
+            # Inject a script
+            scripts = {
+              my-script = "my_editable.main:main";
+            };
+          };
+        };
+      };
+
+    in
+    {
+      editable-script =
+        runCommand "editable-test"
+          {
+            nativeBuildInputs = [ (testPython.withPackages (ps: [ ps.my-editable ])) ];
+          }
+          ''
+            mkdir -p src/my_editable
+
+            cat > src/my_editable/main.py << EOF
+            def main():
+              print("hello mutable")
+            EOF
+
+            test "$(my-script)" == "hello mutable"
+            test "$(python -c 'import sys; print(sys.path[1])')" == "$NIX_BUILD_TOP/src"
+
+            touch $out
+          '';
+    };
 
   # Tests to ensure overriding works as expected.
   overrideTests =
@@ -191,7 +237,8 @@ let
       }
     );
 
-  condaTests =
+  # depends on mypy, which depends on CPython internals
+  condaTests = lib.optionalAttrs (!python.isPyPy) (
     let
       requests = callPackage (
         {
@@ -227,13 +274,14 @@ let
       ) { };
       pythonWithRequests = requests.pythonModule.withPackages (ps: [ requests ]);
     in
-    lib.optionalAttrs (python.isPy3k && stdenv.isLinux) {
+    lib.optionalAttrs (python.isPy3k && stdenv.hostPlatform.isLinux) {
       condaExamplePackage = runCommand "import-requests" { } ''
         ${pythonWithRequests.interpreter} -c "import requests" > $out
       '';
-    };
+    }
+  );
 
 in
 lib.optionalAttrs (stdenv.hostPlatform == stdenv.buildPlatform) (
-  environmentTests // integrationTests // overrideTests // condaTests
+  environmentTests // integrationTests // overrideTests // condaTests // editableTests
 )

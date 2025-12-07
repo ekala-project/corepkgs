@@ -7,18 +7,17 @@
   libxml2,
   findXMLCatalogs,
   gettext,
-  python,
+  python3,
   ncurses,
-  libxcrypt,
-  libgcrypt,
+  libgcrypt ? null,
   cryptoSupport ? false,
   pythonSupport ? libxml2.pythonSupport,
-  gnome,
+  gnome ? null,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxslt";
-  version = "1.1.42";
+  version = "1.1.43";
 
   outputs = [
     "bin"
@@ -32,8 +31,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   src = fetchurl {
     url = "mirror://gnome/sources/libxslt/${lib.versions.majorMinor finalAttrs.version}/libxslt-${finalAttrs.version}.tar.xz";
-    hash = "sha256-hcpiysDUH8d9P2Az2p32/XPSDqL8GLCjYJ/7QRDhuus=";
+    hash = "sha256-Wj1rODylr8I1sXERjpD1/2qifp/qMwMGUjGm1APwGDo=";
   };
+
+  patches = [
+    # Fix use-after-free with key data stored cross-RVT
+    # https://gitlab.gnome.org/GNOME/libxslt/-/issues/144
+    # Source: https://gitlab.gnome.org/GNOME/libxslt/-/merge_requests/77
+    ./77-Use-a-dedicated-node-type-to-maintain-the-list-of-cached-rv-ts.patch
+  ];
 
   strictDeps = true;
 
@@ -44,14 +50,13 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [
     libxml2.dev
-    libxcrypt
   ]
-  ++ lib.optionals stdenv.isDarwin [
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
     gettext
   ]
   ++ lib.optionals pythonSupport [
     libxml2.py
-    python
+    python3
     ncurses
   ]
   ++ lib.optionals cryptoSupport [
@@ -63,14 +68,9 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   configureFlags = [
-    "--without-debug"
-    "--without-mem-debug"
-    "--without-debugger"
     (lib.withFeature pythonSupport "python")
-    (lib.optionalString pythonSupport "PYTHON=${python.pythonOnBuildForHost.interpreter}")
-  ]
-  ++ lib.optionals (!cryptoSupport) [
-    "--without-crypto"
+    (lib.optionalString pythonSupport "PYTHON=${python3.pythonOnBuildForHost.interpreter}")
+    (lib.withFeature cryptoSupport "crypto")
   ];
 
   enableParallelBuilding = true;
@@ -82,13 +82,12 @@ stdenv.mkDerivation (finalAttrs: {
   + lib.optionalString pythonSupport ''
     mkdir -p $py/nix-support
     echo ${libxml2.py} >> $py/nix-support/propagated-build-inputs
-    moveToOutput ${python.sitePackages} "$py"
+    moveToOutput ${python3.sitePackages} "$py"
   '';
 
   passthru = {
     inherit pythonSupport;
 
-    # TODO
     updateScript = gnome.updateScript {
       packageName = "libxslt";
       versionPolicy = "none";

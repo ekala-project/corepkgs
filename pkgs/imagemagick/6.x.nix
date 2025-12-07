@@ -45,8 +45,6 @@
   libde265Support ? true,
   libde265,
   fftw,
-  ApplicationServices,
-  Foundation,
   testers,
 }:
 
@@ -123,11 +121,7 @@ stdenv.mkDerivation (finalAttrs: {
     ++ lib.optional djvulibreSupport djvulibre
     ++ lib.optional openexrSupport openexr
     ++ lib.optional librsvgSupport librsvg
-    ++ lib.optional openjpegSupport openjpeg
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      ApplicationServices
-      Foundation
-    ];
+    ++ lib.optional openjpegSupport openjpeg;
 
   propagatedBuildInputs = [
     fftw

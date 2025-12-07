@@ -8,15 +8,16 @@
   expat,
   libxslt,
   gperf,
-  dejavu-fonts,
+  dejavu_fonts,
   autoreconfHook,
-  CoreFoundation ? null,
+  versionCheckHook,
   testers,
+  gitUpdater,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "fontconfig";
-  version = "2.15.0";
+  version = "2.17.1";
 
   outputs = [
     "bin"
@@ -25,11 +26,11 @@ stdenv.mkDerivation (finalAttrs: {
     "out"
   ]; # $out contains all the config
 
+  # GitLab repositrory does not include pre-generated man pages.
+  # ref: https://github.com/NixOS/nixpkgs/pull/401037#discussion_r2055430206
   src = fetchurl {
-    url =
-      with finalAttrs;
-      "https://www.freedesktop.org/software/fontconfig/release/${pname}-${version}.tar.xz";
-    hash = "sha256-Y6BljQ4G4PqIYQZFK1jvBPIfWCAuoCqUw53g0zNdfA4=";
+    url = "https://gitlab.freedesktop.org/api/v4/projects/890/packages/generic/fontconfig/${finalAttrs.version}/fontconfig-${finalAttrs.version}.tar.xz";
+    hash = "sha256-n1yuk/T//B+8Ba6ZzfxwjNYN/WYS/8BRKCcCXAJvpUE=";
   };
 
   nativeBuildInputs = [
@@ -42,8 +43,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [
     expat
-  ]
-  ++ lib.optional stdenv.isDarwin CoreFoundation;
+  ];
 
   propagatedBuildInputs = [
     freetype
@@ -52,6 +52,10 @@ stdenv.mkDerivation (finalAttrs: {
   postPatch = ''
     # Requires networking.
     sed -i '/check_PROGRAMS += test-crbug1004254/d' test/Makefile.am
+
+    # Test causes error without patch shebangs.
+    patchShebangs doc/check-whitespace-in-args.py \
+      doc/check-missing-doc.py
   '';
 
   configureFlags = [
@@ -59,7 +63,7 @@ stdenv.mkDerivation (finalAttrs: {
     "--with-arch=${stdenv.hostPlatform.parsed.cpu.name}"
     "--with-cache-dir=/var/cache/fontconfig" # otherwise the fallback is in $out/
     # just <1MB; this is what you get when loading config fails for some reason
-    "--with-default-fonts=${dejavu-fonts.minimal}"
+    "--with-default-fonts=${dejavu_fonts.minimal}"
   ]
   ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
     "--with-arch=${stdenv.hostPlatform.parsed.cpu.name}"
@@ -78,7 +82,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   postInstall = ''
     cd "$out/etc/fonts"
-    xsltproc --stringparam fontDirectories "${dejavu-fonts.minimal}" \
+    xsltproc --stringparam fontDirectories "${dejavu_fonts.minimal}" \
+      --stringparam includes /etc/fonts/conf.d \
       --path $out/share/xml/fontconfig \
       ${./make-fonts-conf.xsl} $out/etc/fonts/fonts.conf \
       > fonts.conf.tmp
@@ -88,9 +93,32 @@ stdenv.mkDerivation (finalAttrs: {
     rm -r $bin/share/man/man3
   '';
 
-  passthru.tests = {
-    pkg-config = testers.hasPkgConfigModules {
-      package = finalAttrs.finalPackage;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+  ];
+  doInstallCheck = true;
+  versionCheckProgram = "${placeholder "bin"}/bin/fc-list";
+  versionCheckProgramArg = "--version";
+
+  installCheckPhase = ''
+    runHook preInstallCheck
+
+    [ -d "$bin/share/man/man1" ]
+    [ -d "$bin/share/man/man5" ]
+    echo "man pages exist"
+
+    runHook postInstallCheck
+  '';
+
+  passthru = {
+    tests = {
+      pkg-config = testers.hasPkgConfigModules {
+        package = finalAttrs.finalPackage;
+      };
+    };
+
+    updateScript = gitUpdater {
+      url = "https://gitlab.freedesktop.org/fontconfig/fontconfig.git";
     };
   };
 
@@ -99,7 +127,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "http://fontconfig.org/";
     license = licenses.bsd2; # custom but very bsd-like
     platforms = platforms.all;
-    maintainers = [ ];
     pkgConfigModules = [ "fontconfig" ];
   };
 })

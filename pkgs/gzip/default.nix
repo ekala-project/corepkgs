@@ -2,9 +2,8 @@
   lib,
   stdenv,
   fetchurl,
-  makeWrapper,
+  makeShellWrapper,
   updateAutotoolsGnuConfigScriptsHook,
-  xz,
   runtimeShellPackage,
 }:
 
@@ -15,11 +14,11 @@
 
 stdenv.mkDerivation rec {
   pname = "gzip";
-  version = "1.13";
+  version = "1.14";
 
   src = fetchurl {
     url = "mirror://gnu/gzip/${pname}-${version}.tar.xz";
-    hash = "sha256-dFTraTXbF8ZlVXbC4bD6vv04tNCTbg+H9IzQYs6RoFc=";
+    hash = "sha256-Aae4gb0iC/32Ffl7hxj4C9/T9q3ThbmT3Pbv0U6MCsY=";
   };
 
   outputs = [
@@ -32,7 +31,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     updateAutotoolsGnuConfigScriptsHook
-    makeWrapper
+    makeShellWrapper
   ];
   buildInputs = [ runtimeShellPackage ];
 
@@ -67,14 +66,14 @@ stdenv.mkDerivation rec {
 
     longDescription = ''
       gzip (GNU zip) is a popular data compression program written by
-              Jean-loup Gailly for the GNU project.  Mark Adler wrote the
-              decompression part.
+      Jean-loup Gailly for the GNU project.  Mark Adler wrote the
+      decompression part.
 
-              We developed this program as a replacement for compress because of
-              the Unisys and IBM patents covering the LZW algorithm used by
-              compress.  These patents made it impossible for us to use compress,
-              and we needed a replacement.  The superior compression ratio of gzip
-              is just a bonus.
+      We developed this program as a replacement for compress because of
+      the Unisys and IBM patents covering the LZW algorithm used by
+      compress.  These patents made it impossible for us to use compress,
+      and we needed a replacement.  The superior compression ratio of gzip
+      is just a bonus.
     '';
 
     platforms = lib.platforms.all;

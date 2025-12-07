@@ -23,6 +23,7 @@
   pythonOnHostForHost,
   pythonOnTargetForTarget,
   pythonAttr ? null,
+  pythonABITags ? [ "none" ],
   self, # is pythonOnHostForTarget
 }:
 
@@ -94,7 +95,7 @@ let
                 overrides
               ]
             );
-            aliases = self: super: lib.optionalAttrs config.allowAliases (import ./aliases.nix lib self super);
+            aliases = self: super: lib.optionalAttrs config.allowAliases (import ./aliases.nix self super);
           in
           makeScopeWithSplicing' {
             inherit otherSplices keep;
@@ -119,6 +120,8 @@ rec {
   isPy310 = pythonVersion == "3.10";
   isPy311 = pythonVersion == "3.11";
   isPy312 = pythonVersion == "3.12";
+  isPy313 = pythonVersion == "3.13";
+  isPy314 = pythonVersion == "3.14";
   isPy2 = lib.strings.substring 0 1 pythonVersion == "2";
   isPy3 = lib.strings.substring 0 1 pythonVersion == "3";
   isPy3k = isPy3;
@@ -143,6 +146,7 @@ rec {
   pythonOlder = lib.versionOlder pythonVersion;
   inherit hasDistutilsCxxPatch;
   pythonOnBuildForHost = pythonOnBuildForHost_overridden;
+  inherit pythonABITags;
 
   tests = callPackage ./tests.nix {
     python = self;

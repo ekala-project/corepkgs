@@ -34,7 +34,8 @@ IGNORE_DIRS = [
     "maintainers",   # Maintainer information
     "pkgs-many",     # Many packages directory
     "patches",       # Generated patch files directory
-    "pkgs/rust",     # Synced 2025-05-12
+    "pkgs/rust",     # Synced 2025-12-05
+    "stdenv/generic",# Synced 2025-12-06
 ]
 
 IGNORE_FILES = [
@@ -46,6 +47,9 @@ IGNORE_FILES = [
     "lib.nix",
     "pins.nix",
     "top-level.nix",
+    "stdenv/aliases.nix",
+    "stdenv/config.nix",
+    "stdenv/generic/default.nix",
 ]
 
 PATCHES_DIR = "patches"
@@ -76,7 +80,7 @@ PATH_MAPPINGS = {
     "pkgs/xorg": "pkgs/servers/x11/xorg",
     "pkgs/javaPackages/openjdk": "pkgs/development/compilers/openjdk",
     "stdenv": "pkgs/stdenv",
-    "stdenv/stdenv.nix": "pkgs/stdenv/default.nix",
+    "stdenv/impure.nix": "pkgs/top-level/default.nix",
     "systems": "lib/systems",
     "test": "nixos/tests",
     "test/cc-wrapper": "pkgs/test/cc-wrapper",

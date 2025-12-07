@@ -6,7 +6,7 @@
 {
   lib,
   stdenvNoCC,
-  signingUtils,
+  signingUtils ? null,
   shell ? stdenvNoCC.shell,
 }:
 

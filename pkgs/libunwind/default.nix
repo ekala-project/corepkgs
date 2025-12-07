@@ -1,28 +1,23 @@
 {
   stdenv,
   lib,
-  fetchpatch,
   fetchFromGitHub,
   autoreconfHook,
-  xz,
   buildPackages,
+  xz,
+  testers,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libunwind";
-  version = "1.8.1";
+  version = "1.8.3";
 
   src = fetchFromGitHub {
     owner = "libunwind";
     repo = "libunwind";
-    rev = "v${version}";
-    hash = "sha256-rCFBHs6rCSnp5FEwbUR5veNNTqSQpFblAv8ebSPX0qE=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-ed+FUPApDxNHxznXMhiTeNr8yRxRDSCyJJdIhouGNho=";
   };
-
-  patches = lib.optional (stdenv.targetPlatform.useLLVM or false) (fetchpatch {
-    url = "https://github.com/libunwind/libunwind/pull/770/commits/a69d0f14c9e6c46e82ba6e02fcdedb2eb63b7f7f.patch";
-    hash = "sha256-9oBZimCXonNN++jJs3emp9w+q1aj3eNzvSKPgh92itA=";
-  });
 
   postPatch =
     if (stdenv.cc.isClang || stdenv.hostPlatform.isStatic) then
@@ -50,13 +45,11 @@ stdenv.mkDerivation rec {
     # Without latex2man, no man pages are installed despite being
     # prebuilt in the source tarball.
     "LATEX2MAN=${buildPackages.coreutils}/bin/true"
-  ]
-  # See https://github.com/libunwind/libunwind/issues/693
-  ++ lib.optionals (with stdenv.hostPlatform; isAarch64 && isMusl && !isStatic) [
-    "CFLAGS=-mno-outline-atomics"
   ];
 
   propagatedBuildInputs = [ xz ];
+
+  enableParallelBuilding = true;
 
   postInstall = ''
     find $out -name \*.la | while read file; do
@@ -66,10 +59,22 @@ stdenv.mkDerivation rec {
 
   doCheck = false; # fails
 
+  passthru.tests.pkg-config = testers.hasPkgConfigModules {
+    package = finalAttrs.finalPackage;
+    versionCheck = true;
+  };
+
   meta = with lib; {
     homepage = "https://www.nongnu.org/libunwind";
     description = "Portable and efficient API to determine the call-chain of a program";
     maintainers = [ ];
+    pkgConfigModules = [
+      "libunwind"
+      "libunwind-coredump"
+      "libunwind-generic"
+      "libunwind-ptrace"
+      "libunwind-setjmp"
+    ];
     # https://github.com/libunwind/libunwind#libunwind
     platforms = [
       "aarch64-linux"
@@ -82,6 +87,7 @@ stdenv.mkDerivation rec {
       "loongarch64-linux"
       "mips64el-linux"
       "mipsel-linux"
+      "powerpc-linux"
       "powerpc64-linux"
       "powerpc64le-linux"
       "riscv64-linux"
@@ -92,4 +98,4 @@ stdenv.mkDerivation rec {
     ];
     license = licenses.mit;
   };
-}
+})

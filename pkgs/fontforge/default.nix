@@ -2,11 +2,10 @@
   stdenv,
   fetchFromGitHub,
   lib,
-  fetchpatch,
+  replaceVars,
   cmake,
-  uthash,
   pkg-config,
-  python,
+  python3,
   freetype,
   zlib,
   glib,
@@ -21,40 +20,34 @@
   woff2,
   zeromq,
   withSpiro ? false,
-  libspiro ? null,
+  libspiro,
   withGTK ? false,
   gtk3,
+  gtkmm3,
   withGUI ? withGTK,
   withPython ? true,
   withExtras ? true,
-  # Darwin
-  Carbon ? null,
-  Cocoa ? null,
 }:
 
 assert withGTK -> withGUI;
-assert withSpiro -> libspiro != null;
 
-stdenv.mkDerivation rec {
+let
+  py = python3.withPackages (ps: with ps; [ setuptools ]);
+in
+stdenv.mkDerivation (finalAttrs: {
   pname = "fontforge";
-  version = "20230101";
+  version = "20251009";
 
   src = fetchFromGitHub {
-    owner = pname;
-    repo = pname;
-    rev = version;
-    sha256 = "sha256-/RYhvL+Z4n4hJ8dmm+jbA1Ful23ni2DbCRZC5A3+pP0=";
+    owner = "fontforge";
+    repo = "fontforge";
+    tag = finalAttrs.version;
+    hash = "sha256-tlpdd+x1mA+HeLXpy5LotNC6sabxI6U7S+m/qOn1jwc=";
   };
 
   patches = [
-    (fetchpatch {
-      name = "CVE-2024-25081.CVE-2024-25082.patch";
-      url = "https://github.com/fontforge/fontforge/commit/216eb14b558df344b206bf82e2bdaf03a1f2f429.patch";
-      hash = "sha256-aRnir09FSQMT50keoB7z6AyhWAVBxjSQsTRvBzeBuHU=";
-    })
-
-    # https://github.com/fontforge/fontforge/pull/5423
-    ./replace-distutils.patch
+    # Provide a Nix-controlled location for the initial `sys.path` entry.
+    (replaceVars ./set-python-sys-path.patch { python = "${py}/${py.sitePackages}"; })
   ];
 
   # use $SOURCE_DATE_EPOCH instead of non-deterministic timestamps
@@ -66,19 +59,19 @@ stdenv.mkDerivation rec {
     sed -r -i 's#sprintf\(.+ author \);#if (!getenv("SOURCE_DATE_EPOCH")) &#g'                        fontforgeexe/fontinfo.c
   '';
 
-  # do not use x87's 80-bit arithmetic, rouding errors result in very different font binaries
-  env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.isi686 "-msse2 -mfpmath=sse";
+  # do not use x87's 80-bit arithmetic, rounding errors result in very different font binaries
+  env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.hostPlatform.isi686 "-msse2 -mfpmath=sse";
 
   nativeBuildInputs = [
     pkg-config
     cmake
   ];
+
   buildInputs = [
     readline
-    uthash
     woff2
     zeromq
-    python
+    py
     freetype
     zlib
     glib
@@ -88,15 +81,13 @@ stdenv.mkDerivation rec {
     libtiff
     libxml2
   ]
+  ++ lib.optionals withPython [ py ]
   ++ lib.optionals withSpiro [ libspiro ]
   ++ lib.optionals withGUI [
     gtk3
+    gtkmm3
     cairo
     pango
-  ]
-  ++ lib.optionals stdenv.isDarwin [
-    Carbon
-    Cocoa
   ];
 
   cmakeFlags = [
@@ -105,24 +96,19 @@ stdenv.mkDerivation rec {
   ++ lib.optional (!withSpiro) "-DENABLE_LIBSPIRO=OFF"
   ++ lib.optional (!withGUI) "-DENABLE_GUI=OFF"
   ++ lib.optional (!withGTK) "-DENABLE_X11=ON"
+  ++ lib.optional (!withPython) "-DENABLE_PYTHON_SCRIPTING=OFF"
   ++ lib.optional withExtras "-DENABLE_FONTFORGE_EXTRAS=ON";
 
   preConfigure = ''
     # The way $version propagates to $version of .pe-scripts (https://github.com/dejavu-fonts/dejavu-fonts/blob/358190f/scripts/generate.pe#L19)
-    export SOURCE_DATE_EPOCH=$(date -d ${version} +%s)
+    export SOURCE_DATE_EPOCH=$(date -d ${finalAttrs.version} +%s)
   '';
 
-  postInstall =
-    # get rid of the runtime dependency on python
-    lib.optionalString (!withPython) ''
-      rm -r "$out/share/fontforge/python"
-    '';
-
-  meta = with lib; {
+  meta = {
     description = "Font editor";
     homepage = "https://fontforge.github.io";
-    platforms = platforms.all;
-    license = licenses.bsd3;
+    platforms = lib.platforms.all;
+    license = lib.licenses.bsd3;
     maintainers = [ ];
   };
-}
+})

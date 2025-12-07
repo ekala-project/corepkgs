@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  fetchFromGitHub,
+  fetchFromSourcehut,
   fetchpatch,
   ncurses,
   boehmgc,
@@ -12,11 +12,11 @@
   graphicsSupport ? !stdenv.hostPlatform.isDarwin,
   imlib2,
   x11Support ? graphicsSupport,
-  libX11,
+  libx11,
   mouseSupport ? !stdenv.hostPlatform.isDarwin,
-  gpm,
+  gpm-ncurses,
   perl,
-  man-db,
+  man,
   pkg-config,
   buildPackages,
   w3m,
@@ -38,23 +38,29 @@ let
     '';
   };
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "w3m";
-  version = "0.5.3+git20230121";
+  version = "0.5.5";
 
-  src = fetchFromGitHub {
-    owner = "tats";
-    repo = pname;
-    rev = "v${version}";
-    hash = "sha256-upb5lWqhC1jRegzTncIz5e21v4Pw912FyVn217HucFs=";
+  src = fetchFromSourcehut {
+    owner = "~rkta";
+    repo = "w3m";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-rz9tNkMg5xUqMpMdK2AQlKjCJlCjgLQOkj4A/eyPm0M=";
   };
 
-  NIX_LDFLAGS = lib.optionalString stdenv.hostPlatform.isSunOS "-lsocket -lnsl";
+  env = {
+    NIX_LDFLAGS = lib.optionalString stdenv.hostPlatform.isSunOS "-lsocket -lnsl";
 
-  # we must set these so that the generated files (e.g. w3mhelp.cgi) contain
-  # the correct paths.
-  PERL = "${perl}/bin/perl";
-  MAN = "${man-db}/bin/man";
+    # we must set these so that the generated files (e.g. w3mhelp.cgi) contain
+    # the correct paths.
+    PERL = "${perl}/bin/perl";
+    MAN = "${man}/bin/man";
+
+    # for w3mimgdisplay
+    # see: https://bbs.archlinux.org/viewtopic.php?id=196093
+    LIBS = lib.optionalString x11Support "-lX11";
+  };
 
   makeFlags = [ "AR=${stdenv.cc.bintools.targetPrefix}ar" ];
 
@@ -70,7 +76,7 @@ stdenv.mkDerivation rec {
   postPatch = lib.optionalString (stdenv.hostPlatform != stdenv.buildPlatform) ''
     ln -s ${mktable}/bin/mktable mktable
     # stop make from recompiling mktable
-    sed -ie 's!mktable.*:.*!mktable:!' Makefile.in
+    sed -i -e 's!mktable.*:.*!mktable:!' Makefile.in
   '';
 
   # updateAutotoolsGnuConfigScriptsHook necessary to build on FreeBSD native pending inclusion of
@@ -86,9 +92,9 @@ stdenv.mkDerivation rec {
     zlib
   ]
   ++ lib.optional sslSupport openssl
-  ++ lib.optional mouseSupport gpm
+  ++ lib.optional mouseSupport gpm-ncurses
   ++ lib.optional graphicsSupport imlib2
-  ++ lib.optional x11Support libX11;
+  ++ lib.optional x11Support libx11;
 
   postInstall = lib.optionalString graphicsSupport ''
     ln -s $out/libexec/w3m/w3mimgdisplay $out/bin
@@ -99,9 +105,12 @@ stdenv.mkDerivation rec {
   configureFlags = [
     "--with-ssl=${openssl.dev}"
     "--with-gc=${boehmgc.dev}"
+    # The code won't compile in c23 mode.
+    # https://gcc.gnu.org/gcc-15/porting_to.html#c23-fn-decls-without-parameters
+    "CFLAGS=-std=gnu17"
   ]
   ++ lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
-    "ac_cv_func_setpgrp_void=yes"
+    "ac_cv_func_setpgrp_void=${lib.boolToYesNo (!stdenv.hostPlatform.isBSD)}"
   ]
   ++ lib.optional graphicsSupport "--enable-image=${lib.optionalString x11Support "x11,"}fb"
   ++ lib.optional (graphicsSupport && !x11Support) "--without-x";
@@ -113,23 +122,19 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = false;
 
-  # for w3mimgdisplay
-  # see: https://bbs.archlinux.org/viewtopic.php?id=196093
-  LIBS = lib.optionalString x11Support "-lX11";
-
   passthru.tests.version = testers.testVersion {
-    inherit version;
+    inherit (finalAttrs) version;
     package = w3m;
     command = "w3m -version";
   };
 
-  meta = with lib; {
-    homepage = "https://w3m.sourceforge.net/";
-    changelog = "https://github.com/tats/w3m/blob/v${version}/ChangeLog";
+  meta = {
+    homepage = "https://git.sr.ht/~rkta/w3m";
+    changelog = "https://git.sr.ht/~rkta/w3m/tree/v${finalAttrs.version}/item/NEWS";
     description = "Text-mode web browser";
     maintainers = [ ];
-    platforms = platforms.unix;
-    license = licenses.mit;
+    platforms = lib.platforms.unix;
+    license = lib.licenses.mit;
     mainProgram = "w3m";
   };
-}
+})

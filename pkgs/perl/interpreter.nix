@@ -13,7 +13,7 @@
   pkgsHostHost,
   pkgsTargetTarget,
   zlib,
-  config ? { },
+  config,
   passthruFun,
   perlAttr ? "perl${lib.versions.major version}${lib.versions.minor version}",
   enableThreading ? true,
@@ -32,7 +32,7 @@
 assert (enableCrypt -> (libxcrypt != null));
 
 let
-  crossCompiling = stdenv.buildPlatform != stdenv.hostPlatform;
+  crossCompiling = !(stdenv.buildPlatform.canExecute stdenv.hostPlatform);
   libc = if stdenv.cc.libc or null != null then stdenv.cc.libc else "/usr";
   libcInc = lib.getDev libc;
   libcLib = lib.getLib libc;
@@ -67,24 +67,31 @@ stdenv.mkDerivation (
     # the libxcrypt port has been installed.
     #
     # Without libxcrypt, Perl will still find FreeBSD's crypt functions.
-    propagatedBuildInputs = lib.optional (enableCrypt && !stdenv.isFreeBSD) libxcrypt;
+    propagatedBuildInputs = lib.optional (enableCrypt && !stdenv.hostPlatform.isFreeBSD) libxcrypt;
 
     disallowedReferences = [ stdenv.cc ];
 
-    patches =
-      # Enable TLS/SSL verification in HTTP::Tiny by default
-      lib.optional (lib.versionOlder version "5.38.0") ./http-tiny-verify-ssl-by-default.patch
+    patches = [
+      ./CVE-2024-56406.patch
+      ./CVE-2025-40909.patch
+    ]
+    # Do not look in /usr etc. for dependencies.
+    ++ lib.optional ((lib.versions.majorMinor version) == "5.38") ./no-sys-dirs-5.38.0.patch
+    ++ lib.optional ((lib.versions.majorMinor version) == "5.40") ./no-sys-dirs-5.40.0.patch
 
-      # Do not look in /usr etc. for dependencies.
-      ++ lib.optional (lib.versionOlder version "5.38.0") ./no-sys-dirs-5.31.patch
-      ++ lib.optional (lib.versionAtLeast version "5.38.0") ./no-sys-dirs-5.38.0.patch
+    # Fix compilation on platforms with only a C locale: https://github.com/Perl/perl5/pull/22569
+    ++ lib.optional (version == "5.40.0") ./fix-build-with-only-C-locale-5.40.0.patch
 
-      ++ lib.optional stdenv.isSunOS ./ld-shared.patch
-      ++ lib.optionals stdenv.isDarwin [
-        ./cpp-precomp.patch
-        ./sw_vers.patch
-      ]
-      ++ lib.optional crossCompiling ./cross.patch;
+    ++ lib.optional stdenv.hostPlatform.isSunOS ./ld-shared.patch
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      ./cpp-precomp.patch
+      ./sw_vers.patch
+    ]
+    # fixes build failure due to missing d_fdopendir/HAS_FDOPENDIR configure option
+    # https://github.com/arsv/perl-cross/pull/159
+    ++ lib.optional (crossCompiling && (lib.versionAtLeast version "5.40.0")) ./cross-fdopendir.patch
+    ++ lib.optional (crossCompiling && (lib.versionAtLeast version "5.40.0")) ./cross540.patch
+    ++ lib.optional (crossCompiling && (lib.versionOlder version "5.40.0")) ./cross.patch;
 
     # This is not done for native builds because pwd may need to come from
     # bootstrap tools when building bootstrap perl.
@@ -121,36 +128,47 @@ stdenv.mkDerivation (
             "-Dlibpth=\"\""
             "-Dglibpth=\"\""
             "-Ddefault_inc_excludes_dot"
+            # https://github.com/arsv/perl-cross/issues/158
+            "-Dd_gnulibc=define"
           ]
         else
-          [
-            "-de"
-            "-Dcc=cc"
-          ]
+          (
+            [
+              "-de"
+              "-Dprefix=${placeholder "out"}"
+              "-Dman1dir=${placeholder "out"}/share/man/man1"
+              "-Dman3dir=${placeholder "out"}/share/man/man3"
+            ]
+            ++ (
+              if (stdenv.cc.targetPrefix != "") then
+                [
+                  "-Dcc=${stdenv.cc.targetPrefix}cc"
+                  "-Dnm=${stdenv.cc.targetPrefix}nm"
+                  "-Dar=${stdenv.cc.targetPrefix}ar"
+                ]
+              else
+                [
+                  "-Dcc=cc"
+                  "-Duseshrplib"
+                ]
+            )
+          )
       )
       ++ [
         "-Uinstallusrbinperl"
         "-Dinstallstyle=lib/perl5"
-      ]
-      ++ lib.optional (!crossCompiling) "-Duseshrplib"
-      ++ [
         "-Dlocincpth=${libcInc}/include"
         "-Dloclibpth=${libcLib}/lib"
       ]
+      ++ lib.optional stdenv.hostPlatform.isStatic "-Uusedl"
       ++ lib.optionals ((builtins.match ''5\.[0-9]*[13579]\..+'' version) != null) [
         "-Dusedevel"
         "-Uversiononly"
       ]
-      ++ lib.optional stdenv.isSunOS "-Dcc=gcc"
+      ++ lib.optional stdenv.hostPlatform.isSunOS "-Dcc=gcc"
       ++ lib.optional enableThreading "-Dusethreads"
       ++ lib.optional (!enableCrypt) "-A clear:d_crypt_r"
-      ++ lib.optional stdenv.hostPlatform.isStatic "--all-static"
-      ++ lib.optionals (!crossCompiling) [
-        "-Dprefix=${placeholder "out"}"
-        "-Dman1dir=${placeholder "out"}/share/man/man1"
-        "-Dman3dir=${placeholder "out"}/share/man/man3"
-      ]
-      ++ lib.optionals (stdenv.isFreeBSD && crossCompiling && enableCrypt) [
+      ++ lib.optionals (stdenv.hostPlatform.isFreeBSD && crossCompiling && enableCrypt) [
         # https://github.com/Perl/perl5/issues/22295
         # configure cannot figure out that we have crypt automatically, but we really do
         "-Dd_crypt"
@@ -158,11 +176,17 @@ stdenv.mkDerivation (
 
     configureScript = lib.optionalString (!crossCompiling) "${stdenv.shell} ./Configure";
 
+    # !canExecute cross uses miniperl which doesn't have this
+    postConfigure = lib.optionalString (!crossCompiling && stdenv.cc.targetPrefix != "") ''
+      substituteInPlace Makefile \
+        --replace-fail "AR = ar" "AR = ${stdenv.cc.targetPrefix}ar"
+    '';
+
     dontAddStaticConfigureFlags = true;
 
     dontAddPrefix = !crossCompiling;
 
-    enableParallelBuilding = !crossCompiling;
+    enableParallelBuilding = false;
 
     # perl includes the build date, the uname of the build system and the
     # username of the build user in some files.
@@ -192,9 +216,15 @@ stdenv.mkDerivation (
       OLD_ZLIB     = False
       GZIP_OS_CODE = AUTO_DETECT
       USE_ZLIB_NG  = False
+    ''
+    + lib.optionalString (lib.versionAtLeast version "5.40.0") ''
+      ZLIB_INCLUDE = ${zlib.dev}/include
+      ZLIB_LIB     = ${zlib.out}/lib
+    ''
+    + ''
       EOF
     ''
-    + lib.optionalString stdenv.isDarwin ''
+    + lib.optionalString stdenv.hostPlatform.isDarwin ''
       substituteInPlace hints/darwin.sh --replace "env MACOSX_DEPLOYMENT_TARGET=10.3" ""
     ''
     + lib.optionalString (!enableThreading) ''
@@ -247,6 +277,12 @@ stdenv.mkDerivation (
         --replace "${
           if stdenv.hasCC && stdenv.cc.cc != null then stdenv.cc.cc else "/no-such-path"
         }" /no-such-path \
+        --replace "${
+          if stdenv.hasCC && stdenv.cc.fallback_sdk or null != null then
+            stdenv.cc.fallback_sdk
+          else
+            "/no-such-path"
+        }" /no-such-path \
         --replace "$man" /no-such-path
     ''
     + lib.optionalString crossCompiling ''
@@ -272,26 +308,28 @@ stdenv.mkDerivation (
         "$mini/lib/perl5/cross_perl/${version}:$out/lib/perl5/${version}:$out/lib/perl5/${version}/$runtimeArch"
     ''; # */
 
-    meta = with lib; {
+    meta = {
       homepage = "https://www.perl.org/";
       description = "Standard implementation of the Perl 5 programming language";
-      license = licenses.artistic1;
+      license = lib.licenses.artistic1;
       maintainers = [ ];
-      platforms = platforms.all;
+      platforms = lib.platforms.all;
       priority = 6; # in `buildEnv' (including the one inside `perl.withPackages') the library files will have priority over files in `perl`
       mainProgram = "perl";
     };
   }
-  // lib.optionalAttrs (stdenv.buildPlatform != stdenv.hostPlatform) rec {
-    crossVersion = "84db4c71ae3d3b01fb2966cd15a060a7be334710"; # Nov 29, 2023
+  // lib.optionalAttrs crossCompiling rec {
+    crossVersion = "1.6.2";
 
     perl-cross-src = fetchFromGitHub {
       name = "perl-cross-${crossVersion}";
       owner = "arsv";
       repo = "perl-cross";
       rev = crossVersion;
-      sha256 = "sha256-1Zqw4sy/lD2nah0Z8rAE11tSpq1Ym9nBbatDczR+mxs=";
+      hash = "sha256-mG9ny+eXGBL4K/rXqEUPSbar+4Mq4IaQrGRFIHIyAAw=";
     };
+
+    # Patches are above!!!
 
     depsBuildBuild = [
       buildPackages.stdenv.cc

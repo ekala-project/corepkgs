@@ -36,9 +36,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Daemonless replacement for libudev";
     changelog = "https://github.com/illiliti/libudev-zero/releases/tag/${finalAttrs.version}";
     maintainers = [ ];
-      qyliss
-      shamilton
-    ];
     license = lib.licenses.isc;
     pkgConfigModules = [ "libudev" ];
     platforms = lib.platforms.linux;

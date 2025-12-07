@@ -1,5 +1,5 @@
 # The program `nuke-refs' created by this derivation replaces all
-# references to the Nix store in the specified files by a non-existant
+# references to the Nix store in the specified files by a non-existent
 # path (/nix/store/eeee...).  This is useful for getting rid of
 # dependencies that you know are not actually needed at runtime.
 
@@ -7,17 +7,10 @@
   lib,
   stdenvNoCC,
   perl,
+  # TODO(corepkgs): add
   signingUtils ? null,
   shell ? stdenvNoCC.shell,
 }:
-
-let
-  stdenv = stdenvNoCC;
-
-  darwinCodeSign = stdenv.targetPlatform.isDarwin && stdenv.targetPlatform.isAarch64;
-in
-
-assert stdenvNoCC.isDarwin -> signingUtils != null;
 
 stdenvNoCC.mkDerivation {
   name = "nuke-references";
@@ -34,17 +27,14 @@ stdenvNoCC.mkDerivation {
     chmod a+x $out/bin/nuke-refs
   '';
 
-  postFixup = lib.optionalString darwinCodeSign ''
-    mkdir -p $out/nix-support
-    substituteAll ${./darwin-sign-fixup.sh} $out/nix-support/setup-hooks.sh
-  '';
-
   # FIXME: get rid of perl dependency.
   env = {
     inherit perl;
     inherit (builtins) storeDir;
     shell = lib.getBin shell + (shell.shellPath or "");
-    signingUtils = lib.optionalString darwinCodeSign signingUtils;
+    signingUtils = lib.optionalString (
+      stdenvNoCC.targetPlatform.isDarwin && stdenvNoCC.targetPlatform.isAarch64
+    ) signingUtils;
   };
 
   meta.mainProgram = "nuke-refs";

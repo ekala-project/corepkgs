@@ -4,12 +4,14 @@
   fetchFromGitHub,
   autoconf,
   automake,
+  darwin,
   libtool,
   pkg-config,
   pkgsStatic,
 
   # for passthru.tests
-  bind,
+  # TODO(corepkgs): enable tests
+  bind ? null,
   cmake,
   knot-resolver ? null,
   sbclPackages ? null,
@@ -23,14 +25,14 @@
 }:
 
 stdenv.mkDerivation (finalAttrs: {
-  version = "1.48.0";
+  version = "1.51.0";
   pname = "libuv";
 
   src = fetchFromGitHub {
     owner = "libuv";
     repo = "libuv";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-U68BmIQNpmIy3prS7LkYl+wvDJQNikoeFiKh50yQFoA=";
+    hash = "sha256-ayTk3qkeeAjrGj5ab7wF7vpWI8XWS1EeKKUqzaD/LY0=";
   };
 
   outputs = [
@@ -50,6 +52,7 @@ stdenv.mkDerivation (finalAttrs: {
         "getaddrinfo_fail"
         "getaddrinfo_fail_sync"
         "tcp_connect6_link_local"
+        "thread_affinity" # else "test must be run with cpu 0 affinity" when affinity is set
         "threadpool_multiple_event_loops" # times out on slow machines
         "get_passwd" # passed on NixOS but failed on other Linuxes
         "tcp_writealot"
@@ -65,7 +68,7 @@ stdenv.mkDerivation (finalAttrs: {
         # https://github.com/libuv/libuv/pull/4075#issuecomment-1935572237
         "thread_priority"
       ]
-      ++ lib.optionals stdenv.isDarwin [
+      ++ lib.optionals stdenv.hostPlatform.isDarwin [
         # Sometimes: timeout (no output), failed uv_listen. Someone
         # should report these failures to libuv team. There tests should
         # be much more robust.
@@ -81,7 +84,6 @@ stdenv.mkDerivation (finalAttrs: {
         "tcp_ref3"
         "tcp_ref4"
         "tcp_bind6_error_inval"
-        "tcp_bind6_error_addrinuse"
         "tcp_read_stop"
         "tcp_unexpected_read"
         "tcp_write_to_half_open_connection"
@@ -96,7 +98,6 @@ stdenv.mkDerivation (finalAttrs: {
         "tcp_open"
         "tcp_write_queue_order"
         "tcp_try_write"
-        "tcp_writealot"
         "multiple_listen"
         "delayed_accept"
         "udp_recv_in_a_row"
@@ -107,7 +108,6 @@ stdenv.mkDerivation (finalAttrs: {
         "tty_pty"
         "condvar_5"
         "hrtime"
-        "udp_multicast_join"
         # Tests that fail when sandboxing is enabled.
         "fs_event_close_in_callback"
         "fs_event_watch_dir"
@@ -118,22 +118,34 @@ stdenv.mkDerivation (finalAttrs: {
         "fs_event_watch_file_exact_path"
         "process_priority"
         "udp_create_early_bad_bind"
+        "fs_event_watch_delete_dir"
       ]
-      ++ lib.optionals (stdenv.isDarwin && stdenv.isx86_64) [
-        # fail on macos < 10.15 (starting in libuv 1.47.0)
-        "fs_write_alotof_bufs_with_offset"
-        "fs_write_multiple_bufs"
-        "fs_read_bufs"
+      ++ lib.optionals (stdenv.hostPlatform.isDarwin && lib.versionOlder finalAttrs.version "1.49.3") [
+        # https://github.com/libuv/libuv/issues/4650
+        # can enable on upgrade from 1.49.2
+        "udp_mmsg"
       ]
-      ++ lib.optionals stdenv.isAarch32 [
+      ++ lib.optionals stdenv.hostPlatform.isAarch32 [
         # I observe this test failing with some regularity on ARMv7:
         # https://github.com/libuv/libuv/issues/1871
         "shutdown_close_pipe"
+      ]
+      ++ lib.optionals stdenv.hostPlatform.isFreeBSD [
+        # EOPNOTSUPP when performed in jailed build env
+        "tcp_reuseport"
+        "udp_reuseport"
+        # jailed build env does not have a hostname
+        "gethostname"
+        # Fails when built on non-nix FreeBSD
+        # https://github.com/libuv/libuv/issues/4606
+        "fs_event_watch_delete_dir"
       ];
       tdRegexp = lib.concatStringsSep "\\|" toDisable;
     in
     lib.optionalString (finalAttrs.finalPackage.doCheck) ''
       sed '/${tdRegexp}/d' -i test/test-list.h
+      # https://github.com/libuv/libuv/issues/4794
+      substituteInPlace Makefile.am --replace-fail -lutil "-lutil -lm"
     '';
 
   nativeBuildInputs = [
@@ -141,6 +153,12 @@ stdenv.mkDerivation (finalAttrs: {
     autoconf
     libtool
     pkg-config
+  ];
+
+  # This is part of the Darwin bootstrap, so we don’t always get
+  # `libutil.dylib` automatically propagated through the SDK.
+  buildInputs = lib.optionals stdenv.hostPlatform.isDarwin [
+    (lib.getLib darwin.libutil)
   ];
 
   preConfigure = ''

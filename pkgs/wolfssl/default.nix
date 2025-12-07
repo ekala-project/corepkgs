@@ -2,7 +2,6 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  Security ? null,
   autoreconfHook,
   util-linux,
   openssl,
@@ -11,23 +10,24 @@
   # requiring to build a special variant for that software. Example: 'haproxy'
   variant ? "all",
   extraConfigureFlags ? [ ],
+  enableARMCryptoExtensions ?
+    stdenv.hostPlatform.isAarch64
+    && ((builtins.match "^.*\\+crypto.*$" stdenv.hostPlatform.gcc.arch) != null),
   enableLto ? !(stdenv.hostPlatform.isStatic || stdenv.cc.isClang),
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "wolfssl-${variant}";
-  version = "5.7.2";
+  version = "5.8.2";
 
   src = fetchFromGitHub {
     owner = "wolfSSL";
     repo = "wolfssl";
-    rev = "refs/tags/v${finalAttrs.version}-stable";
-    hash = "sha256-VTMVgBSDL6pw1eEKnxGzTdyQYWVbMd3mAnOnpAOKVhk=";
+    tag = "v${finalAttrs.version}-stable";
+    hash = "sha256-rWBfpI6tdpKvQA/XdazBvU5hzyai5PtKRBpM4iplZDU=";
   };
 
   postPatch = ''
     patchShebangs ./scripts
-    # ocsp stapling tests require network access, so skip them
-    sed -i -e'2s/.*/exit 77/' scripts/ocsp-stapling.test
     # ensure test detects musl-based systems too
     substituteInPlace scripts/ocsp-stapling2.test \
       --replace '"linux-gnu"' '"linux-"'
@@ -61,19 +61,23 @@ stdenv.mkDerivation (finalAttrs: {
     "--enable-intelasm"
     "--enable-aesni"
   ]
-  ++ lib.optionals (stdenv.isAarch64 && stdenv.isDarwin) [
+  ++ lib.optionals (stdenv.hostPlatform.isAarch64) [
     # No runtime detection under ARM and no platform function checks like for X86.
-    # However, all ARM macOS systems have the supported extensions autodetected in the configure script.
-    "--enable-armasm=inline"
+    (if enableARMCryptoExtensions then "--enable-armasm=inline" else "--disable-armasm")
   ]
   ++ extraConfigureFlags;
 
   # Breaks tls13 tests on aarch64-darwin.
-  hardeningDisable = lib.optionals (stdenv.isDarwin && stdenv.isAarch64) [ "zerocallusedregs" ];
+  hardeningDisable = lib.optionals (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64) [
+    "zerocallusedregs"
+  ];
 
   # LTO should help with the C implementations.
   env.NIX_CFLAGS_COMPILE = lib.optionalString enableLto "-flto";
   env.NIX_LDFLAGS_COMPILE = lib.optionalString enableLto "-flto";
+
+  # Don't attempt connections to external services in the test suite.
+  env.WOLFSSL_EXTERNAL_TEST = "0";
 
   outputs = [
     "dev"
@@ -82,16 +86,14 @@ stdenv.mkDerivation (finalAttrs: {
     "out"
   ];
 
-  propagatedBuildInputs = lib.optionals stdenv.isDarwin [
-    Security
-  ];
-
   nativeBuildInputs = [
     autoreconfHook
     util-linux
   ];
 
-  doCheck = true;
+  # FAILURES:
+  #    497: test_wolfSSL_EVP_PBE_scrypt
+  doCheck = !stdenv.hostPlatform.isLoongArch64;
 
   nativeCheckInputs = [
     openssl

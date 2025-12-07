@@ -6,20 +6,20 @@
   # test suite depends on dejagnu which cannot be used during bootstrapping
   # dejagnu also requires tcl which can't be built statically at the moment
   doCheck ? !(stdenv.hostPlatform.isStatic),
-  dejagnu ? null,
+  dejagnu,
   nix-update-script,
   testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libffi";
-  version = "3.4.6";
+  version = "3.5.2";
 
   src = fetchurl {
     url =
       with finalAttrs;
       "https://github.com/libffi/libffi/releases/download/v${version}/${pname}-${version}.tar.gz";
-    hash = "sha256-sN6p3yPIY6elDoJUQPPr/6vWXfFJcQjl1Dd0eEOJWk4=";
+    hash = "sha256-86MIKiOzfCk6T80QUxR7Nx8v+R+n6hsqUuM1Z2usgtw=";
   };
 
   # Note: this package is used for bootstrapping fetchurl, and thus
@@ -27,6 +27,9 @@ stdenv.mkDerivation (finalAttrs: {
   # cgit) that are needed here should be included directly in Nixpkgs as
   # files.
   patches = [
+    # Threading tests need to be linked against pthread
+    # See: https://github.com/libffi/libffi/pull/944
+    ./freebsd-tsan-pthread.patch
   ];
 
   strictDeps = true;
@@ -57,7 +60,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   dontStrip = stdenv.hostPlatform != stdenv.buildPlatform; # Don't run the native `strip' when cross-compiling.
 
-  doCheck = doCheck && dejagnu != null;
+  inherit doCheck;
 
   nativeCheckInputs = [ dejagnu ];
 

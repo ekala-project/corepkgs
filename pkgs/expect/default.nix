@@ -7,7 +7,7 @@
   makeWrapper,
   autoreconfHook,
   fetchpatch,
-  substituteAll,
+  replaceVars,
 }:
 
 tcl.mkTclDerivation rec {
@@ -20,8 +20,7 @@ tcl.mkTclDerivation rec {
   };
 
   patches = [
-    (substituteAll {
-      src = ./fix-build-time-run-tcl.patch;
+    (replaceVars ./fix-build-time-run-tcl.patch {
       tcl = "${buildPackages.tcl}/bin/tclsh";
     })
     # The following patches fix compilation with clang 15+
@@ -51,6 +50,11 @@ tcl.mkTclDerivation rec {
   ];
 
   strictDeps = true;
+
+  env = lib.optionalAttrs stdenv.cc.isGNU {
+    NIX_CFLAGS_COMPILE = "-Wno-error=incompatible-pointer-types -std=gnu17";
+  };
+
   hardeningDisable = [ "format" ];
 
   postInstall = ''
@@ -63,11 +67,11 @@ tcl.mkTclDerivation rec {
     "dev"
   ];
 
-  meta = with lib; {
+  meta = {
     description = "Tool for automating interactive applications";
     homepage = "https://expect.sourceforge.net/";
-    license = licenses.publicDomain;
-    platforms = platforms.unix;
+    license = lib.licenses.publicDomain;
+    platforms = lib.platforms.unix;
     mainProgram = "expect";
     maintainers = [ ];
   };

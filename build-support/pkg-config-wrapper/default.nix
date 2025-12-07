@@ -5,9 +5,9 @@
   stdenvNoCC,
   lib,
   buildPackages,
-  pkg-config-unwrapped,
+  pkg-config,
   baseBinName ? "pkg-config",
-  propagateDoc ? pkg-config-unwrapped != null && pkg-config-unwrapped ? man,
+  propagateDoc ? pkg-config != null && pkg-config ? man,
   extraPackages ? [ ],
   extraBuildCommands ? "",
 }:
@@ -39,21 +39,18 @@ let
 in
 
 stdenv.mkDerivation {
-  pname = targetPrefix + pkg-config-unwrapped.pname + "-wrapper";
-  inherit (pkg-config-unwrapped) version;
+  pname = targetPrefix + pkg-config.pname + "-wrapper";
+  inherit (pkg-config) version;
 
   enableParallelBuilding = true;
 
   preferLocalBuild = true;
 
-  outputs = [
-    "out"
-  ]
-  ++ optionals propagateDoc ([ "man" ] ++ optional (pkg-config-unwrapped ? doc) "doc");
+  outputs = [ "out" ] ++ optionals propagateDoc ([ "man" ] ++ optional (pkg-config ? doc) "doc");
 
   passthru = {
     inherit targetPrefix suffixSalt;
-    pkg-config = pkg-config-unwrapped;
+    inherit pkg-config;
   };
 
   strictDeps = true;
@@ -62,7 +59,7 @@ stdenv.mkDerivation {
   dontUnpack = true;
 
   # Additional flags passed to pkg-config.
-  addFlags = optional stdenv.targetPlatform.isStatic "--static";
+  env.addFlags = optionalString stdenv.targetPlatform.isStatic "--static";
 
   installPhase = ''
     mkdir -p $out/bin $out/nix-support
@@ -77,16 +74,16 @@ stdenv.mkDerivation {
 
     echo $pkg-config > $out/nix-support/orig-pkg-config
 
-    wrap ${wrapperBinName} ${./pkg-config-wrapper.sh} "${getBin pkg-config-unwrapped}/bin/${baseBinName}"
+    wrap ${wrapperBinName} ${./pkg-config-wrapper.sh} "${getBin pkg-config}/bin/${baseBinName}"
   ''
   # symlink in share for autoconf to find macros
 
   # TODO(@Ericson2314): in the future just make the unwrapped pkg-config a
-  # propagated dep once we can rely on downstream deps comming first in
+  # propagated dep once we can rely on downstream deps coming first in
   # search paths. (https://github.com/NixOS/nixpkgs/pull/31414 took a crack
   # at this.)
   + ''
-    ln -s ${pkg-config-unwrapped}/share $out/share
+    ln -s ${pkg-config}/share $out/share
   '';
 
   setupHooks = [
@@ -102,7 +99,7 @@ stdenv.mkDerivation {
     # Propagate the underling unwrapped pkg-config so that if you
     # install the wrapper, you get anything else it might provide.
     ''
-      printWords ${pkg-config-unwrapped} > $out/nix-support/propagated-user-env-packages
+      printWords ${pkg-config} > $out/nix-support/propagated-user-env-packages
     ''
 
     ##
@@ -110,10 +107,10 @@ stdenv.mkDerivation {
     ##
     + optionalString propagateDoc (
       ''
-        ln -s ${pkg-config-unwrapped.man} $man
+        ln -s ${pkg-config.man} $man
       ''
-      + optionalString (pkg-config-unwrapped ? doc) ''
-        ln -s ${pkg-config-unwrapped.doc} $doc
+      + optionalString (pkg-config ? doc) ''
+        ln -s ${pkg-config.doc} $doc
       ''
     )
 
@@ -135,10 +132,10 @@ stdenv.mkDerivation {
 
   meta =
     let
-      pkg-config_ = optionalAttrs (pkg-config-unwrapped != null) pkg-config-unwrapped;
+      pkg-config_ = optionalAttrs (pkg-config != null) pkg-config;
     in
     (optionalAttrs (pkg-config_ ? meta) (
-      removeAttrs pkg-config-unwrapped.meta [
+      removeAttrs pkg-config.meta [
         "priority"
         "mainProgram"
       ]

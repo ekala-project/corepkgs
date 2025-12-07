@@ -5,15 +5,14 @@
   fetchurl,
   perl,
   libintl,
-  bash,
+  bashNonInteractive,
   updateAutotoolsGnuConfigScriptsHook,
-  gnulib,
   gawk,
   freebsd,
+  glibcLocales,
   libiconv,
-  xz,
 
-  # we are a dependency of gcc, this simplifies bootstraping
+  # we are a dependency of gcc, this simplifies bootstrapping
   interactive ? false,
   ncurses,
   procps,
@@ -56,19 +55,32 @@ stdenv.mkDerivation {
   patches = patches ++ optional crossBuildTools ./cross-tools-flags.patch;
 
   postPatch = ''
-    patchShebangs tp/maintain
-  ''
-  # This patch is needed for IEEE-standard long doubles on
-  # powerpc64; it does not apply cleanly to texinfo 5.x or
-  # earlier.  It is merged upstream in texinfo 6.8.
-  + optionalString (version == "6.7") ''
-    patch -p1 -d gnulib < ${gnulib.passthru.longdouble-redirect-patch}
+    patchShebangs tp/maintain/regenerate_commands_perl_info.pl
   '';
 
-  # ncurses is required to build `makedoc'
-  # this feature is introduced by the ./cross-tools-flags.patch
-  NATIVE_TOOLS_CFLAGS = if crossBuildTools then "-I${getDev buildPackages.ncurses}/include" else null;
-  NATIVE_TOOLS_LDFLAGS = if crossBuildTools then "-L${getLib buildPackages.ncurses}/lib" else null;
+  env = {
+    XFAIL_TESTS = toString (
+      optionals stdenv.hostPlatform.isMusl [
+        # musl does not support locales.
+        "different_languages_gen_master_menu.sh"
+        "test_scripts/formatting_documentlanguage_cmdline.sh"
+        "test_scripts/layout_formatting_fr_info.sh"
+        "test_scripts/layout_formatting_fr.sh"
+        "test_scripts/layout_formatting_fr_icons.sh"
+      ]
+      ++ optionals (!stdenv.hostPlatform.isMusl && versionOlder version "7") [
+        # Test is known to fail on various locales on texinfo-6.8:
+        #   https://lists.gnu.org/r/bug-texinfo/2021-07/msg00012.html
+        "test_scripts/layout_formatting_fr_icons.sh"
+      ]
+    );
+  }
+  // lib.optionalAttrs crossBuildTools {
+    # ncurses is required to build `makedoc'
+    # this feature is introduced by the ./cross-tools-flags.patch
+    NATIVE_TOOLS_CFLAGS = "-I${getDev buildPackages.ncurses}/include";
+    NATIVE_TOOLS_LDFLAGS = "-L${getLib buildPackages.ncurses}/lib";
+  };
 
   strictDeps = true;
   enableParallelBuilding = true;
@@ -81,10 +93,10 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ];
   buildInputs = [
-    bash
+    bashNonInteractive
     libintl
   ]
-  ++ optionals stdenv.isSunOS [
+  ++ optionals stdenv.hostPlatform.isSunOS [
     libiconv
     gawk
   ]
@@ -103,7 +115,7 @@ stdenv.mkDerivation {
   ++ optionals (crossBuildTools && lib.versionAtLeast version "7.1") [
     "texinfo_cv_sys_iconv_converts_euc_cn=yes"
   ]
-  ++ optional stdenv.isSunOS "AWK=${gawk}/bin/awk";
+  ++ optional stdenv.hostPlatform.isSunOS "AWK=${gawk}/bin/awk";
 
   installFlags = [ "TEXMF=$(out)/texmf-dist" ];
   installTargets = [
@@ -112,25 +124,18 @@ stdenv.mkDerivation {
   ];
 
   nativeCheckInputs = [ procps ] ++ optionals stdenv.buildPlatform.isFreeBSD [ freebsd.locale ];
+  checkInputs = optionals (lib.versionAtLeast version "7.2") [ glibcLocales ];
 
-  doCheck = interactive && !stdenv.isDarwin && !stdenv.isSunOS; # flaky
-
-  checkFlags = optionals (!stdenv.hostPlatform.isMusl && versionOlder version "7") [
-    # Test is known to fail on various locales on texinfo-6.8:
-    #   https://lists.gnu.org/r/bug-texinfo/2021-07/msg00012.html
-    "XFAIL_TESTS=test_scripts/layout_formatting_fr_icons.sh"
-  ];
+  doCheck = interactive && !stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isSunOS; # flaky
 
   postFixup = optionalString crossBuildTools ''
     for f in "$out"/bin/{pod2texi,texi2any}; do
       substituteInPlace "$f" \
-        --replace ${buildPackages.perl}/bin/perl ${perl}/bin/perl
+        --replace-fail ${buildPackages.perl}/bin/perl ${perl}/bin/perl
     done
   '';
 
   meta = meta // {
     branch = version;
-    # see comment above in patches section
-    broken = stdenv.hostPlatform.isPower64 && versionOlder version "6.0";
   };
 }

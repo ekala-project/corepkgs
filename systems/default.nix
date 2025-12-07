@@ -6,15 +6,15 @@ let
     filterAttrs
     foldl
     hasInfix
+    isAttrs
     isFunction
     isList
-    isString
     mapAttrs
     optional
     optionalAttrs
     optionalString
     removeSuffix
-    replaceStrings
+    replaceString
     toUpper
     ;
 
@@ -57,6 +57,11 @@ let
   */
   flakeExposed = import ./flake-systems.nix { };
 
+  # Turn localSystem or crossSystem, which could be system-string or attrset, into
+  # attrset.
+  systemToAttrs =
+    systemOrArgs: if isAttrs systemOrArgs then systemOrArgs else { system = systemOrArgs; };
+
   # Elaborate a `localSystem` or `crossSystem` so that it contains everything
   # necessary.
   #
@@ -64,25 +69,48 @@ let
   # clearly preferred, and to prevent cycles. A simpler fixed point where the RHS
   # always just used `final.*` would fail on both counts.
   elaborate =
-    args':
+    systemOrArgs:
     let
-      args = if isString args' then { system = args'; } else args';
+      allArgs = systemToAttrs systemOrArgs;
+
+      # Those two will always be derived from "config", if given, so they should NOT
+      # be overridden further down with "// args".
+      args = removeAttrs allArgs [
+        "parsed"
+        "system"
+      ];
 
       # TODO: deprecate args.rustc in favour of args.rust after 23.05 is EOL.
       rust = args.rust or args.rustc or { };
 
       final = {
         # Prefer to parse `config` as it is strictly more informative.
-        parsed = parse.mkSystemFromString (if args ? config then args.config else args.system);
-        # Either of these can be losslessly-extracted from `parsed` iff parsing succeeds.
+        parsed = parse.mkSystemFromString (args.config or allArgs.system);
+        # This can be losslessly-extracted from `parsed` iff parsing succeeds.
         system = parse.doubleFromSystem final.parsed;
+        # TODO: This currently can't be losslessly-extracted from `parsed`, for example
+        # because of -mingw32.
         config = parse.tripleFromSystem final.parsed;
         # Determine whether we can execute binaries built for the provided platform.
         canExecute =
           platform:
           final.isAndroid == platform.isAndroid
           && parse.isCompatible final.parsed.cpu platform.parsed.cpu
-          && final.parsed.kernel == platform.parsed.kernel;
+          && final.parsed.kernel == platform.parsed.kernel
+          && (
+            # Only perform this check when cpus have the same type;
+            # assume compatible cpu have all the instructions included
+            final.parsed.cpu == platform.parsed.cpu
+            ->
+              # if both have gcc.arch defined, check whether final can execute the given platform
+              (
+                (final ? gcc.arch && platform ? gcc.arch)
+                -> architectures.canExecute final.gcc.arch platform.gcc.arch
+              )
+              # if platform has gcc.arch defined but final doesn't, don't assume it can be executed
+              || (platform ? gcc.arch -> !(final ? gcc.arch))
+          );
+
         isCompatible =
           _:
           throw "2022-05-23: isCompatible has been removed in favor of canExecute, refer to the 22.11 changelog for details";
@@ -92,8 +120,12 @@ let
         libc =
           if final.isDarwin then
             "libSystem"
+          else if final.isMsvc then
+            "ucrt"
           else if final.isMinGW then
             "msvcrt"
+          else if final.isCygwin then
+            "cygwin"
           else if final.isWasi then
             "wasilibc"
           else if final.isWasm && !final.isWasi then
@@ -153,7 +185,7 @@ let
             sharedLibrary =
               if final.isDarwin then
                 ".dylib"
-              else if final.isWindows then
+              else if (final.isWindows || final.isCygwin) then
                 ".dll"
               else
                 ".so";
@@ -161,7 +193,7 @@ let
           // {
             staticLibrary = if final.isWindows then ".lib" else ".a";
             library = if final.isStatic then final.extensions.staticLibrary else final.extensions.sharedLibrary;
-            executable = if final.isWindows then ".exe" else "";
+            executable = if (final.isWindows || final.isCygwin) then ".exe" else "";
           };
         # Misc boolean options
         useAndroidPrebuilt = false;
@@ -174,6 +206,7 @@ let
             {
               linux = "Linux";
               windows = "Windows";
+              cygwin = "CYGWIN_NT";
               darwin = "Darwin";
               netbsd = "NetBSD";
               freebsd = "FreeBSD";
@@ -192,6 +225,8 @@ let
               "ppc${optionalString final.isLittleEndian "le"}"
             else if final.isMips64 then
               "mips64" # endianness is *not* included on mips64
+            else if final.isDarwin then
+              final.darwinArch
             else
               final.parsed.cpu.name;
 
@@ -286,6 +321,8 @@ let
         qemuArch =
           if final.isAarch32 then
             "arm"
+          else if final.isAarch64 then
+            "aarch64"
           else if final.isS390 && !final.isS390x then
             null
           else if final.isx86_64 then
@@ -312,12 +349,7 @@ let
           else
             final.parsed.cpu.name;
 
-        darwinArch =
-          {
-            armv7a = "armv7";
-            aarch64 = "arm64";
-          }
-          .${final.parsed.cpu.name} or final.parsed.cpu.name;
+        darwinArch = parse.darwinArch final.parsed.cpu;
 
         darwinPlatform =
           if final.isMacOS then
@@ -328,8 +360,8 @@ let
             null;
         # The canonical name for this attribute is darwinSdkVersion, but some
         # platforms define the old name "sdkVer".
-        darwinSdkVersion = final.sdkVer or (if final.isAarch64 then "11.0" else "10.12");
-        darwinMinVersion = final.darwinSdkVersion;
+        darwinSdkVersion = final.sdkVer or "14.4";
+        darwinMinVersion = "14.0";
         darwinMinVersionVariable =
           if final.isMacOS then
             "MACOSX_DEPLOYMENT_TARGET"
@@ -338,54 +370,26 @@ let
           else
             null;
 
-        # Remove before 25.05
-        androidSdkVersion =
-          if (args ? sdkVer && !args ? androidSdkVersion) then
-            throw "For android `sdkVer` has been renamed to `androidSdkVersion`"
-          else if (args ? androidSdkVersion) then
-            args.androidSdkVersion
-          else
-            null;
-        androidNdkVersion =
-          if (args ? ndkVer && !args ? androidNdkVersion) then
-            throw "For android `ndkVer` has been renamed to `androidNdkVersion`"
-          else if (args ? androidSdkVersion) then
-            args.androidNdkVersion
-          else
-            null;
+        # Handle Android SDK and NDK versions.
+        androidSdkVersion = args.androidSdkVersion or null;
+        androidNdkVersion = args.androidNdkVersion or null;
       }
       // (
         let
           selectEmulator =
             pkgs:
             let
-              qemu-user = pkgs.qemu.override {
-                smartcardSupport = false;
-                spiceSupport = false;
-                openGLSupport = false;
-                virglSupport = false;
-                vncSupport = false;
-                gtkSupport = false;
-                sdlSupport = false;
-                alsaSupport = false;
-                pulseSupport = false;
-                pipewireSupport = false;
-                jackSupport = false;
-                smbdSupport = false;
-                seccompSupport = false;
-                tpmSupport = false;
-                capstoneSupport = false;
-                enableDocs = false;
-                hostCpuTargets = [ "${final.qemuArch}-linux-user" ];
-              };
               wine = (pkgs.winePackagesFor "wine${toString final.parsed.cpu.bits}").minimal;
             in
+            # Note: we guarantee that the return value is either `null` or a path
+            # to an emulator program. That is, if an emulator requires additional
+            # arguments, a wrapper should be used.
             if pkgs.stdenv.hostPlatform.canExecute final then
-              "${pkgs.runtimeShell} -c '\"$@\"' --"
+              lib.getExe (pkgs.writeShellScriptBin "exec" ''exec "$@"'')
             else if final.isWindows then
               "${wine}/bin/wine${optionalString (final.parsed.cpu.bits == 64) "64"}"
             else if final.isLinux && pkgs.stdenv.hostPlatform.isLinux && final.qemuArch != null then
-              "${qemu-user}/bin/qemu-${final.qemuArch}"
+              "${pkgs.qemu-user}/bin/qemu-${final.qemuArch}"
             else if final.isWasi then
               "${pkgs.wasmtime}/bin/wasmtime"
             else if final.isMmix then
@@ -395,6 +399,10 @@ let
         in
         {
           emulatorAvailable = pkgs: (selectEmulator pkgs) != null;
+
+          # whether final.emulator pkgs.pkgsStatic works
+          staticEmulatorAvailable =
+            pkgs: final.emulatorAvailable pkgs && (final.isLinux || final.isWasi || final.isMmix);
 
           emulator =
             pkgs:
@@ -478,14 +486,30 @@ let
                   "armv7l" = "armv7";
                   "armv6l" = "arm";
                   "armv5tel" = "armv5te";
+                  "riscv32" = "riscv32gc";
                   "riscv64" = "riscv64gc";
                 }
                 .${cpu.name} or cpu.name;
               vendor_ = final.rust.platform.vendor;
-              # TODO: deprecate args.rustc in favour of args.rust after 23.05 is EOL.
+              abi_ =
+                # We're very explicit about the POWER ELF ABI w/ glibc in our parsing, while Rust is not.
+                # TODO: Somehow ensure that Rust actually *uses* the correct ABI, and not just a libc-based default.
+                if (lib.strings.hasPrefix "powerpc" cpu.name) && (lib.strings.hasPrefix "gnuabielfv" abi.name) then
+                  "gnu"
+                else
+                  abi.name;
             in
-            args.rust.rustcTarget or args.rustc.config
-              or "${cpu_}-${vendor_}-${kernel.name}${optionalString (abi.name != "unknown") "-${abi.name}"}";
+            # TODO: deprecate args.rustc in favour of args.rust after 23.05 is EOL.
+            args.rust.rustcTarget or args.rustc.config or (
+              # Rust uses `wasm32-wasip?` rather than `wasm32-unknown-wasi`.
+              # We cannot know which subversion does the user want, and
+              # currently use WASI 0.1 as default for compatibility. Custom
+              # users can set `rust.rustcTarget` to override it.
+              if final.isWasi then
+                "${cpu_}-wasip1"
+              else
+                "${cpu_}-${vendor_}-${kernel.name}${optionalString (abi.name != "unknown") "-${abi_}"}"
+            );
 
           # The name of the rust target if it is standard, or the json file
           # containing the custom target spec.
@@ -509,7 +533,7 @@ let
           #
           # https://github.com/rust-lang/cargo/pull/9169
           # https://github.com/rust-lang/cargo/issues/8285#issuecomment-634202431
-          cargoEnvVarTarget = replaceStrings [ "-" ] [ "_" ] (toUpper final.rust.cargoShortTarget);
+          cargoEnvVarTarget = replaceString "-" "_" (toUpper final.rust.cargoShortTarget);
 
           # True if the target is no_std
           # https://github.com/rust-lang/rust/blob/2e44c17c12cec45b6a682b1e53a04ac5b5fcc9d2/src/bootstrap/config.rs#L415-L421
@@ -519,6 +543,80 @@ let
             "switch"
             "-uefi"
           ];
+        };
+      }
+      // {
+        go = {
+          # See https://pkg.go.dev/internal/platform for a list of known platforms
+          GOARCH =
+            {
+              "aarch64" = "arm64";
+              "arm" = "arm";
+              "armv5tel" = "arm";
+              "armv6l" = "arm";
+              "armv7l" = "arm";
+              "i686" = "386";
+              "loongarch64" = "loong64";
+              "mips" = "mips";
+              "mips64el" = "mips64le";
+              "mipsel" = "mipsle";
+              "powerpc64" = "ppc64";
+              "powerpc64le" = "ppc64le";
+              "riscv64" = "riscv64";
+              "s390x" = "s390x";
+              "x86_64" = "amd64";
+              "wasm32" = "wasm";
+            }
+            .${final.parsed.cpu.name} or null;
+          GOOS = if final.isWasi then "wasip1" else final.parsed.kernel.name;
+
+          # See https://go.dev/wiki/GoArm
+          GOARM = toString (lib.intersectLists [ (final.parsed.cpu.version or "") ] [ "5" "6" "7" ]);
+        };
+
+        node = {
+          # See these locations for a list of known architectures/platforms:
+          # - https://nodejs.org/api/os.html#osarch
+          # - https://nodejs.org/api/os.html#osplatform
+          arch =
+            if final.isAarch then
+              "arm" + lib.optionalString final.is64bit "64"
+            else if final.isMips32 then
+              "mips" + lib.optionalString final.isLittleEndian "el"
+            else if final.isMips64 && final.isLittleEndian then
+              "mips64el"
+            else if final.isPower then
+              "ppc" + lib.optionalString final.is64bit "64"
+            else if final.isx86_64 then
+              "x64"
+            else if final.isx86_32 then
+              "ia32"
+            else if final.isS390x then
+              "s390x"
+            else if final.isRiscV64 then
+              "riscv64"
+            else if final.isLoongArch64 then
+              "loong64"
+            else
+              null;
+
+          platform =
+            if final.isAndroid then
+              "android"
+            else if final.isDarwin then
+              "darwin"
+            else if final.isFreeBSD then
+              "freebsd"
+            else if final.isLinux then
+              "linux"
+            else if final.isOpenBSD then
+              "openbsd"
+            else if final.isSunOS then
+              "sunos"
+            else if (final.isWindows || final.isCygwin) then
+              "win32"
+            else
+              null;
         };
       };
     in
@@ -542,5 +640,6 @@ in
     inspect
     parse
     platforms
+    systemToAttrs
     ;
 }

@@ -5,19 +5,18 @@
   perl,
   # Update the enabled crypt scheme ids in passthru when the enabled hashes change
   enableHashes ? "strong",
-  # Bootstrapped stdenv repo doesn't know of nixos
-  nixosTests ? { },
+  nixosTests,
   runCommand,
   python3,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxcrypt";
-  version = "4.4.36";
+  version = "4.5.2";
 
   src = fetchurl {
     url = "https://github.com/besser82/libxcrypt/releases/download/v${finalAttrs.version}/libxcrypt-${finalAttrs.version}.tar.xz";
-    hash = "sha256-5eH0yu4KAd4q7ibjE4gH1tPKK45nKHlm0f79ZeH9iUM=";
+    hash = "sha256-cVE6McAaQovM1TZ6Mv2V8RXW2sUPtbYMd51ceUKuwHE=";
   };
 
   # this could be accomplished by updateAutotoolsGnuConfigScriptsHook, but that causes infinite recursion
@@ -62,6 +61,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     tests = {
+      inherit (nixosTests) login shadow;
 
       passthruMatches = runCommand "libxcrypt-test-passthru-matches" { } ''
         ${python3.interpreter} "${./check_passthru_matches.py}" ${
@@ -76,14 +76,12 @@ stdenv.mkDerivation (finalAttrs: {
         }
         touch "$out"
       '';
-    }
-    // lib.optionalAttrs (nixosTests ? login) {
-      inherit (nixosTests) login shadow;
     };
     enabledCryptSchemeIds = [
-      # https://github.com/besser82/libxcrypt/blob/v4.4.35/lib/hashes.conf
+      # https://github.com/besser82/libxcrypt/blob/v4.5.0/lib/hashes.conf
       "y" # yescrypt
       "gy" # gost_yescrypt
+      "sm3y" # sm3_yescrypt
       "7" # scrypt
       "2b" # bcrypt
       "2y" # bcrypt_y

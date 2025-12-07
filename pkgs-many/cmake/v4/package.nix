@@ -178,7 +178,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   # make install attempts to use the just-built cmake
   preInstall = lib.optionalString (stdenv.hostPlatform != stdenv.buildPlatform) ''
-    sed -i 's|bin/cmake|${buildPackages.cmakeMinimal}/bin/cmake|g' Makefile
+    sed -i 's|bin/cmake|${buildPackages.cmake.minimal}/bin/cmake|g' Makefile
   '';
 
   dontUseCmakeConfigure = true;

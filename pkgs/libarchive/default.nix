@@ -6,12 +6,10 @@
   attr,
   autoreconfHook,
   bzip2,
-  e2fsprogs,
   glibcLocalesUtf8,
   lzo,
   openssl,
   pkg-config,
-  sharutils,
   xz,
   zlib,
   zstd,
@@ -23,7 +21,7 @@
 
   # for passthru.tests
   cmake,
-  nix ? null,
+  nix,
   samba ? null,
 
   # for passthru.lore
@@ -33,13 +31,13 @@
 assert xarSupport -> libxml2 != null;
 stdenv.mkDerivation (finalAttrs: {
   pname = "libarchive";
-  version = "3.7.4";
+  version = "3.8.2";
 
   src = fetchFromGitHub {
     owner = "libarchive";
     repo = "libarchive";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-czNKXHoEn1x4deNErnqp/NZfCglF1CxNoLtZ8tcl394=";
+    hash = "sha256-s7duwuNFyYq8obTS3qc6JewJ9f8LJhItlEx8wxnMgwk=";
   };
 
   outputs = [
@@ -58,11 +56,12 @@ stdenv.mkDerivation (finalAttrs: {
         # the filesystem does not necessarily have hardlink capabilities
         "libarchive/test/test_write_disk_hardlink.c"
         # access-time-related tests flakey on some systems
+        "libarchive/test/test_read_disk_directory_traversals.c"
         "cpio/test/test_option_a.c"
         "cpio/test/test_option_t.c"
-      ]
-      ++ lib.optionals (stdenv.isAarch64 && stdenv.isLinux) [
-        # only on some aarch64-linux systems?
+        # fails tests on filesystems with 64-bit inode values:
+        # FAIL: bsdcpio_test
+        #   bsdcpio: linkfile: large inode number truncated: Numerical result out of range
         "cpio/test/test_basic.c"
         "cpio/test/test_format_newc.c"
       ];
@@ -91,23 +90,23 @@ stdenv.mkDerivation (finalAttrs: {
     zlib
     zstd
   ]
-  ++ lib.optional stdenv.hostPlatform.isUnix sharutils
-  ++ lib.optionals stdenv.isLinux [
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
     acl
     attr
-    e2fsprogs
   ]
   ++ lib.optional xarSupport libxml2;
 
   # Without this, pkg-config-based dependencies are unhappy
-  propagatedBuildInputs = lib.optionals stdenv.isLinux [
+  propagatedBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     attr
     acl
   ];
 
+  hardeningDisable = [ "strictflexarrays3" ];
+
   configureFlags = lib.optional (!xarSupport) "--without-xml2";
 
-  preBuild = lib.optionalString stdenv.isCygwin ''
+  preBuild = lib.optionalString stdenv.hostPlatform.isCygwin ''
     echo "#include <windows.h>" >> config.h
   '';
 
@@ -140,6 +139,7 @@ stdenv.mkDerivation (finalAttrs: {
     license = licenses.bsd3;
     maintainers = [ ];
     platforms = platforms.all;
+    inherit (acl.meta) badPlatforms;
   };
 
   passthru.tests = {

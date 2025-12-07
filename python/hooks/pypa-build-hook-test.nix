@@ -12,9 +12,9 @@
       '';
       # the source of the example project
       projectSource = runCommand "my-project-source" { } ''
-        mkdir -p $out/src
+        mkdir -p $out/src/my_project
         cp ${pyprojectToml} $out/pyproject.toml
-        touch $out/src/__init__.py
+        touch $out/src/my_project/__init__.py
       '';
     in
     # this build must never triger conflicts
@@ -22,11 +22,13 @@
       pname = "dont-propagate-conflicting-deps";
       version = "0.0.0";
       src = projectSource;
-      format = "pyproject";
-      propagatedBuildInputs = [
+      pyproject = true;
+      dependencies = [
         # At least one dependency of `build` should be included here to
         # keep the test meaningful
         (mkConflict pythonOnBuildForHost.pkgs.tomli)
+      ];
+      build-system = [
         # setuptools is also needed to build the example project
         pythonOnBuildForHost.pkgs.setuptools
       ];

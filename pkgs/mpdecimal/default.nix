@@ -2,12 +2,12 @@
   lib,
   stdenv,
   fetchurl,
-  updateAutotoolsGnuConfigScriptsHook,
+  autoreconfHook,
 }:
 
 stdenv.mkDerivation rec {
   pname = "mpdecimal";
-  version = "4.0.0";
+  version = "4.0.1";
   outputs = [
     "out"
     "cxx"
@@ -17,12 +17,12 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-${version}.tar.gz";
-    hash = "sha256-lCRFwyRbInMP1Bpnp8XCMdEcsbmTa5wPdjNPt9C0Row=";
+    hash = "sha256-ltM6u0uwBwx74P7UJGzThBYYgyX4IEaCFEcZOFRbGsg=";
   };
 
-  nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ];
+  nativeBuildInputs = [ autoreconfHook ];
 
-  configureFlags = [ "LD=${stdenv.cc.targetPrefix}cc" ];
+  enableParallelBuilding = true;
 
   postInstall = ''
     mkdir -p $cxx/lib

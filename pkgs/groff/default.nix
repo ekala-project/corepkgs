@@ -6,10 +6,13 @@
   enableGhostscript ? false,
   ghostscript,
   gawk,
-  xorg, # for postscript and html output
+  libx11,
+  libxaw,
+  libxt,
+  libxmu, # for postscript and html output
   enableHtml ? false,
-  psutils,
-  netpbm, # for html output
+  psutils ? null,
+  netpbm ? null, # for html output
   enableIconv ? false,
   iconv,
   enableLibuchardet ? false,
@@ -19,17 +22,9 @@
   pkg-config,
   texinfo,
   bison,
-  bash,
+  bashNonInteractive,
 }:
 
-let
-  inherit (xorg)
-    libX11
-    libXaw
-    libXt
-    libXmu
-    ;
-in
 stdenv.mkDerivation rec {
   pname = "groff";
   version = "1.23.0";
@@ -81,15 +76,15 @@ stdenv.mkDerivation rec {
   ++ lib.optional (stdenv.cc.isClang && lib.versionAtLeast stdenv.cc.version "9") bison;
   buildInputs = [
     perl
-    bash
+    bashNonInteractive
   ]
   ++ lib.optionals enableGhostscript [
     ghostscript
     gawk
-    libX11
-    libXaw
-    libXt
-    libXmu
+    libx11
+    libxaw
+    libxt
+    libxmu
   ]
   ++ lib.optionals enableHtml [
     psutils

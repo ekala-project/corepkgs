@@ -64,6 +64,11 @@ rec {
         bits = 64;
       };
     };
+    isAbiElfv1 = {
+      abi = {
+        abi = "elfv1";
+      };
+    };
     # This ABI is the default in NixOS PowerPC64 BE, but not on mainline GCC,
     # so it sometimes causes issues in certain packages that makes the wrong
     # assumption on the used ABI.
@@ -332,12 +337,15 @@ rec {
       kernel = kernels.windows;
     };
     isCygwin = {
-      kernel = kernels.windows;
-      abi = abis.cygnus;
+      kernel = kernels.cygwin;
     };
     isMinGW = {
       kernel = kernels.windows;
       abi = abis.gnu;
+    };
+    isMsvc = {
+      kernel = kernels.windows;
+      abi = abis.msvc;
     };
     isWasi = {
       kernel = kernels.wasi;
@@ -416,6 +424,11 @@ rec {
           family = "x86";
         };
       }
+      {
+        cpu = {
+          family = "loongarch";
+        };
+      }
     ];
 
     isElf = {
@@ -423,6 +436,9 @@ rec {
     };
     isMacho = {
       kernel.execFormat = execFormats.macho;
+    };
+    isPE = {
+      kernel.execFormat = execFormats.pe;
     };
   };
 

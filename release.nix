@@ -3,11 +3,11 @@
   Everything defined here ends up in the Nixpkgs channel.  Individual
   jobs can be tested by running:
 
-  $ nix-build pkgs/top-level/release.nix -A <jobname>.<system>
+  $ nix-build release.nix -A <jobname>.<system>
 
   e.g.
 
-  $ nix-build pkgs/top-level/release.nix -A coreutils.x86_64-linux
+  $ nix-build release.nix -A coreutils.x86_64-linux
 */
 {
   pkgs ? {

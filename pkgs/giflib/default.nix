@@ -17,6 +17,7 @@ stdenv.mkDerivation rec {
 
   patches = [
     ./CVE-2021-40633.patch
+    ./CVE-2025-31344.patch
   ]
   ++ lib.optionals stdenv.hostPlatform.isMinGW [
     # Build dll libraries.
@@ -34,7 +35,7 @@ stdenv.mkDerivation rec {
   ];
 
   makeFlags = [
-    "PREFIX=${builtins.placeholder "out"}"
+    "PREFIX=${placeholder "out"}"
   ];
 
   postPatch = ''
