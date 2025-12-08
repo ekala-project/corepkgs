@@ -1,0 +1,7 @@
+{
+  "jobs": {
+    "core-pkgs": {
+      "file": "/maintainers/ci-jobs.nix"
+    }
+  }
+}
