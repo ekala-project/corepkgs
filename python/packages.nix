@@ -1,6 +1,4 @@
-self: super: with self; let
-  inherit (super) pkgs;
-in {
+self: super: with self; {
 
   bootstrap = lib.recurseIntoAttrs {
     flit-core = toPythonModule (callPackage ./bootstrap/flit-core { });
