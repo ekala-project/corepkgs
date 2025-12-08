@@ -1,4 +1,6 @@
-self: super: with self; {
+self: super: with self; let
+  inherit (super) pkgs;
+in {
 
   bootstrap = lib.recurseIntoAttrs {
     flit-core = toPythonModule (callPackage ./bootstrap/flit-core { });
@@ -14,4 +16,15 @@ self: super: with self; {
       }
     );
   };
+
+
+  libxml2 =
+    (toPythonModule (
+      pkgs.libxml2.override {
+        pythonSupport = true;
+        python3 = python;
+      }
+      )).py;
+
+
 }
