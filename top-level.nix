@@ -1443,6 +1443,8 @@ with final;
   docbook_xml_dtd_44 = callPackage ./pkgs/docbook-xml-dtd/4.4.nix { };
   docbook_xml_dtd_45 = callPackage ./pkgs/docbook-xml-dtd/4.5.nix { };
 
+  docutils = with python3Packages; toPythonApplication docutils;
+
   opensshPackages = lib.dontRecurseIntoAttrs (callPackage ./pkgs/openssh { });
   openssh = opensshPackages.openssh.override {
     etcDir = "/etc/ssh";
