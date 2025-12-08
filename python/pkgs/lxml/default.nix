@@ -9,10 +9,9 @@
   setuptools,
 
   # native dependencies
-  libxml2,
-  libxslt,
-  zlib,
   xcodebuild,
+  pkgsBuildHost,
+  pkgsHostTarget,
 }:
 
 buildPythonPackage rec {
@@ -40,14 +39,14 @@ buildPythonPackage rec {
 
   # required for build time dependency check
   nativeBuildInputs = [
-    libxml2.dev
-    libxslt.dev
+    pkgsBuildHost.libxml2.dev
+    pkgsBuildHost.libxslt.dev
   ];
 
   buildInputs = [
-    libxml2
-    libxslt
-    zlib
+    pkgsHostTarget.libxml2
+    pkgsHostTarget.libxslt
+    pkgsHostTarget.zlib
   ];
 
   env = lib.optionalAttrs stdenv.cc.isClang {
