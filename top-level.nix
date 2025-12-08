@@ -1368,6 +1368,14 @@ with final;
     }
   );
 
+  # TODO(corepkgs): use mkManyVariants
+  curlWithGnuTls = curl.override {
+    gnutlsSupport = true;
+    opensslSupport = false;
+    ngtcp2 = ngtcp2-gnutls;
+  };
+
+
   c-aresMinimal = callPackage ./pkgs/c-ares { withCMake = false; };
 
   libkrb5 = krb5; # TODO(de11n) Try to make krb5 reuse libkrb5 as a dependency
