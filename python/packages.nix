@@ -26,5 +26,13 @@ in {
       }
       )).py;
 
+  libxslt =
+    (toPythonModule (
+      pkgs.libxslt.override {
+        pythonSupport = true;
+        python3 = python;
+        inherit (self) libxml2;
+      }
+    )).py;
 
 }
