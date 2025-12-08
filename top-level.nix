@@ -533,6 +533,10 @@ with final;
   patchelf = callPackage ./pkgs/patchelf { };
   patchelfUnstable = lowPrio (callPackage ./pkgs/patchelf/unstable.nix { });
 
+  pruneLibtoolFiles = makeSetupHook {
+    name = "prune-libtool-files";
+  } ../build-support/setup-hooks/prune-libtool-files.sh;
+
   default-gcc-version = 14;
   gcc = pkgs.${"gcc${toString default-gcc-version}"};
   gccFun = callPackage ./pkgs/gcc { };
