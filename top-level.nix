@@ -1140,6 +1140,9 @@ with final;
   # On non-GNU systems we need GNU Gettext for libintl.
   libintl = if stdenv.hostPlatform.libc != "glibc" then gettext else null;
 
+  # TODO(corepkgs): use mkManyVariants
+  libpng12 = callPackage ../development/libraries/libpng/12.nix { };
+
   # TODO(corepkgs): cleanup and move into pkgs
   common-updater-scripts = callPackage ./common-updater/scripts.nix { };
   genericUpdater = callPackage ./common-updater/generic-updater.nix { };
