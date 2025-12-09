@@ -1771,4 +1771,13 @@ with final;
   };
   # TODO(corepkgs): alias
   man = man-db;
+
+  validatePkgConfig = makeSetupHook {
+    name = "validate-pkg-config";
+    propagatedBuildInputs = [
+      findutils
+      pkg-config
+    ];
+  } ./build-support/setup-hooks/validate-pkg-config.sh;
+
 }
