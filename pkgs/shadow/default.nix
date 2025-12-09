@@ -16,9 +16,9 @@
   glibc ? null,
   pam ? null,
   withLibbsd ? lib.meta.availableOn stdenv.hostPlatform libbsd,
-  libbsd,
+  libbsd ? null,
   withTcb ? lib.meta.availableOn stdenv.hostPlatform tcb,
-  tcb,
+  tcb ? null,
 }:
 let
   glibc' =
