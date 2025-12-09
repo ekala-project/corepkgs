@@ -425,6 +425,8 @@ with final;
   # TODO: proper freebsd port
   freebsd = { };
 
+  fts = if stdenv.hostPlatform.isMusl then musl-fts else null;
+
   shortenPerlShebang = makeSetupHook {
     name = "shorten-perl-shebang-hook";
     propagatedBuildInputs = [ dieHook ];
