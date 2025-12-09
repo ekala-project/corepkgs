@@ -8,13 +8,13 @@
 
 stdenvNoCC.mkDerivation rec {
   name = "lndir";
-  version = "0.1.0";
+  version = "0.1.1";
 
   src = fetchFromGitHub {
     owner = "jonringer";
     repo = "lndir-simple";
     rev = "v${version}";
-    hash = "sha256-dSi+bufyjgyVDAARb5V1BY7rbI26QXU/l36pWW6P6DM=";
+    hash = "sha256-G+k7MExzG/lfUL6dpGFl4xWU3rOCZHbt4vU+/TMLZLs=";
   };
 
   nativeBuildInputs = [
@@ -31,5 +31,6 @@ stdenvNoCC.mkDerivation rec {
   meta = {
     description = "Xorg's lndir utility, but in simple script form";
     licenses = [ lib.licenses.gpl3Plus ];
+    mainProgram = "lndir";
   };
 }
