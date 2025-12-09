@@ -34,6 +34,7 @@
   testers,
   gobject-introspection,
   libsystemtap ? null,
+  withSysprof ? libsysprof-capture != null && lib.meta.availableOn stdenv.hostPlatform libsysprof-capture,
   libsysprof-capture ? null,
   mesonEmulatorHook ? null,
   withIntrospection ?
@@ -151,7 +152,7 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs = [
     finalAttrs.setupHook
   ]
-  ++ lib.optionals (!stdenv.hostPlatform.isFreeBSD) [
+  ++ lib.optionals (!stdenv.hostPlatform.isFreeBSD && withSysprof) [
     libsysprof-capture
   ]
   ++ [
@@ -223,6 +224,8 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals stdenv.hostPlatform.isFreeBSD [
     "-Dxattr=false"
+  ]
+  ++ lib.optionals (!withSysprof) [
     "-Dsysprof=disabled" # sysprof-capture does not build on FreeBSD
   ];
 
