@@ -525,6 +525,9 @@ with final;
     };
   };
 
+  # TODO: Remove alias
+  libjpeg = libjpeg_turbo;
+
   # TODO(corepkgs): gross
   libtool = libtool2;
   libtool2 = callPackage ./pkgs/libtool/libtool2.nix { };
