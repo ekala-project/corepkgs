@@ -594,7 +594,8 @@ with final;
     go = buildPackages.go_1_24;
   };
 
-
+  # TODO(corepkgs): proper attrset of utilities
+  gnome = { };
 
   gnuStdenv =
     if stdenv.cc.isGNU then
