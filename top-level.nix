@@ -305,10 +305,6 @@ with final;
     in
     lib.recurseIntoAttrs xorgPackages;
 
-  inherit (xorg)
-    xorgproto
-    ;
-
   # TODO(corepkgs): use mkManyVariants
   autoconf = callPackage ./pkgs/autoconf { };
   autoconf269 = callPackage ./pkgs/autoconf/2.69.nix { };
