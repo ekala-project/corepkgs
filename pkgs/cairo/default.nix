@@ -53,6 +53,7 @@ stdenv.mkDerivation (
     nativeBuildInputs = [
       gtk-doc
       meson
+      meson.configurePhaseHook
       ninja
       pkg-config
       python3
