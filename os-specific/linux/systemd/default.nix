@@ -333,6 +333,7 @@ stdenv.mkDerivation (finalAttrs: {
     gperf
     ninja
     meson
+    meson.configurePhaseHook
     glibcLocales
     m4
     autoPatchelfHook
