@@ -534,6 +534,13 @@ with final;
   patchelf = callPackage ./pkgs/patchelf { };
   patchelfUnstable = lowPrio (callPackage ./pkgs/patchelf/unstable.nix { });
 
+  # TODO(corepkgs): This should be moved into unixtools
+  procps =
+    if stdenv.hostPlatform.isLinux then
+      procps-ng
+    else
+      unixtools.procps;
+
   pruneLibtoolFiles = makeSetupHook {
     name = "prune-libtool-files";
   } ../build-support/setup-hooks/prune-libtool-files.sh;
