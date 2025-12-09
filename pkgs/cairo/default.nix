@@ -15,8 +15,7 @@
   pixman,
   zlib,
   x11Support ? !stdenv.hostPlatform.isDarwin || true,
-  libXext,
-  libXrender,
+  xorg,
   gobjectSupport ? true,
   glib,
   xcbSupport ? x11Support,
@@ -71,10 +70,10 @@ stdenv.mkDerivation (
       libpng
       zlib
     ]
-    ++ optionals x11Support [
+    ++ optionals x11Support (with xorg; [
       libXext
       libXrender
-    ]
+    ])
     ++ optionals xcbSupport [ libxcb ]
     ++ optional gobjectSupport glib; # TODO: maybe liblzo but what would it be for here?
 
