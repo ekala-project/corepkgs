@@ -24,6 +24,7 @@ python3.pkgs.buildPythonApplication rec {
 
   nativeBuildInputs = [
     meson
+    meson.configurePhaseHook
     ninja
   ];
 
