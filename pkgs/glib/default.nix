@@ -27,15 +27,15 @@
   buildPackages,
 
   # this is just for tests (not in the closure of any regular package)
-  dbus,
-  tzdata,
-  desktop-file-utils,
-  shared-mime-info,
+  dbus ? null,
+  tzdata ? null,
+  desktop-file-utils ? null,
+  shared-mime-info ? null,
   testers,
   gobject-introspection,
-  libsystemtap,
-  libsysprof-capture,
-  mesonEmulatorHook,
+  libsystemtap ? null,
+  libsysprof-capture ? null,
+  mesonEmulatorHook ? null,
   withIntrospection ?
     stdenv.hostPlatform.emulatorAvailable buildPackages
     && lib.meta.availableOn stdenv.hostPlatform gobject-introspection
@@ -45,7 +45,7 @@
 assert stdenv.hostPlatform.isLinux -> util-linuxMinimal != null;
 
 let
-  gobject-introspection' = buildPackages.gobject-introspection.override {
+  gobject-introspection' = buildPackages.gobject-introspection-unwrapped.override {
     propagateFullGlib = false;
     # Avoid introducing cairo, which enables gobjectSupport by default.
     x11Support = false;
@@ -63,13 +63,8 @@ let
     else
       "2.0-0.lib";
 
-  systemtap' = buildPackages.systemtap-sdt;
-
-  withDtrace =
-    lib.meta.availableOn stdenv.buildPlatform systemtap'
-    &&
-      # dtrace support requires sys/sdt.h header
-      lib.meta.availableOn stdenv.hostPlatform libsystemtap;
+  # Not worth the dependency tree
+  withDtrace = false;
 in
 
 stdenv.mkDerivation (finalAttrs: {
@@ -169,9 +164,6 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals (lib.meta.availableOn stdenv.hostPlatform elfutils) [
     elfutils
   ]
-  ++ lib.optionals withDtrace [
-    libsystemtap
-  ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
     libselinux
     util-linuxMinimal # for libmount
@@ -199,9 +191,6 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals (withIntrospection && !stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
     mesonEmulatorHook
-  ]
-  ++ lib.optionals withDtrace [
-    systemtap' # for dtrace
   ];
 
   propagatedBuildInputs = [
