@@ -33,6 +33,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
     python3
     meson
+    meson.configurePhaseHook
     ninja
   ];
 

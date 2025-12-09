@@ -36,6 +36,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     meson
+    meson.configurePhaseHook
     ninja
     pkg-config
     libtasn1 # asn1Parser

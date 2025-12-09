@@ -177,6 +177,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     docutils # for rst2man, rst2html5
     meson
+    meson.configurePhaseHook
     ninja
     pkg-config
     perl

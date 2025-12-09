@@ -50,6 +50,7 @@ python3.pkgs.buildPythonApplication rec {
     pkg-config
     gettext
     meson
+    meson.configurePhaseHook
     ninja
     libxslt # for xsltproc
   ];
