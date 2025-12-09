@@ -628,6 +628,10 @@ with final;
   # profile-guided optimizations
   fastStdenv = overrideCC gccStdenv (wrapNonDeterministicGcc gccStdenv buildPackages.gcc_latest);
 
+  # TODO(corepkg): use mkManyVariants
+  inherit (fusePackages) fuse_2 fuse_3;
+  fuse = fuse_2;
+
   wrapCCMulti =
     cc:
     let
