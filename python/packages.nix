@@ -33,4 +33,11 @@ self: super: with self; {
       }
     )).py;
 
+  meson = toPythonModule (
+    (pkgs.meson.override { python3 = python; }).overridePythonAttrs (oldAttrs: {
+      # We do not want the setup hook in Python packages because the build is performed differently.
+      setupHook = null;
+    })
+  );
+
 }
