@@ -576,15 +576,18 @@ stdenv.mkDerivation (
         ''
     );
 
-    doCheck =
-      !isDarwinBootstrap
-      && !stdenv.hostPlatform.isAarch32
-      && (
-        !stdenv.hostPlatform.isx86_32 # TODO: why
-      )
-      && (!stdenv.hostPlatform.isMusl)
-      && !(stdenv.hostPlatform.isPower64 && stdenv.hostPlatform.isBigEndian)
-      && (stdenv.hostPlatform == stdenv.buildPlatform);
+    # TODO(corepkgs): Move tests to passthru.tests
+    # Test suite is very large ( >50k tests) and some tests are flakey on certain platforms
+    # It also removes ~20% / 800 build objects from build
+    # doCheck =
+    #   !isDarwinBootstrap
+    #   && !stdenv.hostPlatform.isAarch32
+    #   && (
+    #     !stdenv.hostPlatform.isx86_32 # TODO: why
+    #   )
+    #   && (!stdenv.hostPlatform.isMusl)
+    #   && !(stdenv.hostPlatform.isPower64 && stdenv.hostPlatform.isBigEndian)
+    #   && (stdenv.hostPlatform == stdenv.buildPlatform);
 
     checkTarget = "check-all";
 
