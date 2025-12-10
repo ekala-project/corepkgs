@@ -10,6 +10,21 @@ use cases.
 
 See [Major differences document](./docs/major-differences-nixpkgs.md).
 
+## Package criteria
+
+At a very high level, corepkgs is intended to include:
+- Stdenv
+- Compilers, interpreters, and toolchains
+  - Common language ecosystem tools (e.g. popular linters, package managers) are included as well
+- Logic around using overlays and most package scopes
+- Ecosystems necessary system creation (e.g. systemd)
+- And their dependencies
+
+The goal is to allow for corepkgs to be a viable platform for people wanting
+to do development and software deployments without the breadth of user tools
+and other nicities. This reduced scope should allow for updates to be applied
+more frequently and cause less rebuild churn than something the size of nixpkgs.
+
 ## Structure
 
 ```
