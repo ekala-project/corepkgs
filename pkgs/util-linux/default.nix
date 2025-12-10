@@ -23,7 +23,7 @@
   systemdLibs,
   sqlite,
   nlsSupport ? true,
-  translateManpages ? true,
+  translateManpages ? po4a != null,
   po4a ? null,
   installShellFiles,
   writeSupport ? stdenv.hostPlatform.isLinux,

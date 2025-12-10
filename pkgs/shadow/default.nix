@@ -7,7 +7,7 @@
   bison,
   flex,
   docbook_xml_dtd_45,
-  docbook_xsl,
+  docbook-xsl-nons,
   itstool,
   libxml2,
   libxslt,
@@ -16,9 +16,9 @@
   glibc ? null,
   pam ? null,
   withLibbsd ? lib.meta.availableOn stdenv.hostPlatform libbsd,
-  libbsd,
+  libbsd ? null,
   withTcb ? lib.meta.availableOn stdenv.hostPlatform tcb,
-  tcb,
+  tcb ? null,
 }:
 let
   glibc' =
@@ -53,7 +53,7 @@ stdenv.mkDerivation rec {
     bison
     flex
     docbook_xml_dtd_45
-    docbook_xsl
+    docbook-xsl-nons
     itstool
     libxml2
     libxslt

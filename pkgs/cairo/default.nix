@@ -8,15 +8,14 @@
   ninja,
   pkg-config,
   python3,
-  docbook_xsl,
+  docbook-xsl-nons,
   fontconfig,
   freetype,
   libpng,
   pixman,
   zlib,
   x11Support ? !stdenv.hostPlatform.isDarwin || true,
-  libXext,
-  libXrender,
+  xorg,
   gobjectSupport ? true,
   glib,
   xcbSupport ? x11Support,
@@ -54,13 +53,14 @@ stdenv.mkDerivation (
     nativeBuildInputs = [
       gtk-doc
       meson
+      meson.configurePhaseHook
       ninja
       pkg-config
       python3
     ];
 
     buildInputs = [
-      docbook_xsl
+      docbook-xsl-nons
       lzo
     ];
 
@@ -71,10 +71,10 @@ stdenv.mkDerivation (
       libpng
       zlib
     ]
-    ++ optionals x11Support [
+    ++ optionals x11Support (with xorg; [
       libXext
       libXrender
-    ]
+    ])
     ++ optionals xcbSupport [ libxcb ]
     ++ optional gobjectSupport glib; # TODO: maybe liblzo but what would it be for here?
 

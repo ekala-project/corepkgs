@@ -4,7 +4,6 @@
   fetchurl,
   lvm2,
   json_c,
-  asciidoctor,
   openssl,
   libuuid,
   pkg-config,
@@ -21,6 +20,7 @@
   # the bare NixOS build hash independent of changes to the ruby ecosystem,
   # saving mass-rebuilds.
   rebuildMan ? false,
+  asciidoctor ? null,
 }:
 
 stdenv.mkDerivation (finalAttrs: {

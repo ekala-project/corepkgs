@@ -23,7 +23,7 @@
   texinfo ? null,
   xmlto ? null,
   docbook2x ? null,
-  docbook_xsl ? null,
+  docbook-xsl-nons ? null,
   docbook_xml_dtd_45 ? null,
   libxslt,
   tcl,
@@ -149,7 +149,7 @@ stdenv.mkDerivation (finalAttrs: {
     texinfo
     xmlto
     docbook2x
-    docbook_xsl
+    docbook-xsl-nons
     docbook_xml_dtd_45
     libxslt
   ];

@@ -6,7 +6,7 @@
   pkg-config,
   python3,
   docbook_xml_dtd_43,
-  docbook_xsl,
+  docbook-xsl-nons,
   libxslt,
   gettext,
   gnome ? null,
@@ -50,13 +50,14 @@ python3.pkgs.buildPythonApplication rec {
     pkg-config
     gettext
     meson
+    meson.configurePhaseHook
     ninja
     libxslt # for xsltproc
   ];
 
   buildInputs = [
     docbook_xml_dtd_43
-    docbook_xsl
+    docbook-xsl-nons
     libxslt
   ]
   ++ lib.optionals withDblatex [

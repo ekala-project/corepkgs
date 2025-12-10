@@ -27,15 +27,16 @@
   buildPackages,
 
   # this is just for tests (not in the closure of any regular package)
-  dbus,
-  tzdata,
-  desktop-file-utils,
-  shared-mime-info,
+  dbus ? null,
+  tzdata ? null,
+  desktop-file-utils ? null,
+  shared-mime-info ? null,
   testers,
   gobject-introspection,
-  libsystemtap,
-  libsysprof-capture,
-  mesonEmulatorHook,
+  libsystemtap ? null,
+  withSysprof ? libsysprof-capture != null && lib.meta.availableOn stdenv.hostPlatform libsysprof-capture,
+  libsysprof-capture ? null,
+  mesonEmulatorHook ? null,
   withIntrospection ?
     stdenv.hostPlatform.emulatorAvailable buildPackages
     && lib.meta.availableOn stdenv.hostPlatform gobject-introspection
@@ -45,7 +46,7 @@
 assert stdenv.hostPlatform.isLinux -> util-linuxMinimal != null;
 
 let
-  gobject-introspection' = buildPackages.gobject-introspection.override {
+  gobject-introspection' = buildPackages.gobject-introspection-unwrapped.override {
     propagateFullGlib = false;
     # Avoid introducing cairo, which enables gobjectSupport by default.
     x11Support = false;
@@ -63,13 +64,8 @@ let
     else
       "2.0-0.lib";
 
-  systemtap' = buildPackages.systemtap-sdt;
-
-  withDtrace =
-    lib.meta.availableOn stdenv.buildPlatform systemtap'
-    &&
-      # dtrace support requires sys/sdt.h header
-      lib.meta.availableOn stdenv.hostPlatform libsystemtap;
+  # Not worth the dependency tree
+  withDtrace = false;
 in
 
 stdenv.mkDerivation (finalAttrs: {
@@ -156,7 +152,7 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs = [
     finalAttrs.setupHook
   ]
-  ++ lib.optionals (!stdenv.hostPlatform.isFreeBSD) [
+  ++ lib.optionals (!stdenv.hostPlatform.isFreeBSD && withSysprof) [
     libsysprof-capture
   ]
   ++ [
@@ -168,9 +164,6 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals (lib.meta.availableOn stdenv.hostPlatform elfutils) [
     elfutils
-  ]
-  ++ lib.optionals withDtrace [
-    libsystemtap
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
     libselinux
@@ -184,6 +177,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     docutils # for rst2man, rst2html5
     meson
+    meson.configurePhaseHook
     ninja
     pkg-config
     perl
@@ -199,9 +193,6 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals (withIntrospection && !stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
     mesonEmulatorHook
-  ]
-  ++ lib.optionals withDtrace [
-    systemtap' # for dtrace
   ];
 
   propagatedBuildInputs = [
@@ -234,6 +225,8 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals stdenv.hostPlatform.isFreeBSD [
     "-Dxattr=false"
+  ]
+  ++ lib.optionals (!withSysprof) [
     "-Dsysprof=disabled" # sysprof-capture does not build on FreeBSD
   ];
 

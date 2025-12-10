@@ -171,8 +171,8 @@ python3.pkgs.buildPythonApplication rec {
       --replace "python3 -c " "${python3.interpreter} -c "
   '';
 
-  setupHook = ./setup-hook.sh;
   env.hostPlatform = stdenv.targetPlatform.system;
+  passthru.configurePhaseHook = ./setup-hook.sh;
 
   meta = {
     homepage = "https://mesonbuild.com";

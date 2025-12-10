@@ -305,10 +305,6 @@ with final;
     in
     lib.recurseIntoAttrs xorgPackages;
 
-  inherit (xorg)
-    xorgproto
-    ;
-
   # TODO(corepkgs): use mkManyVariants
   autoconf = callPackage ./pkgs/autoconf { };
   autoconf269 = callPackage ./pkgs/autoconf/2.69.nix { };
@@ -421,6 +417,12 @@ with final;
           };
         });
       };
+
+  # TODO: proper freebsd port
+  freebsd = { };
+
+  fts = if stdenv.hostPlatform.isMusl then musl-fts else null;
+
   shortenPerlShebang = makeSetupHook {
     name = "shorten-perl-shebang-hook";
     propagatedBuildInputs = [ dieHook ];
@@ -441,6 +443,17 @@ with final;
       meta.platforms = lib.platforms.darwin;
     } ./build-support/setup-hooks/fix-darwin-dylib-names.sh
   ) { };
+
+  # TODO(corepkgs): Use mkManyVariants
+  inherit (callPackage ./pkgs/fmt { })
+    fmt_9
+    fmt_10
+    fmt_11
+    fmt_12
+    ;
+
+  fmt = fmt_12;
+
   makePkgconfigItem = callPackage ./build-support/make-pkgconfigitem { };
 
   # TODO(corepkgs): alias?
@@ -510,6 +523,9 @@ with final;
     };
   };
 
+  # TODO: Remove alias
+  libjpeg = libjpeg_turbo;
+
   # TODO(corepkgs): gross
   libtool = libtool2;
   libtool2 = callPackage ./pkgs/libtool/libtool2.nix { };
@@ -517,6 +533,17 @@ with final;
 
   patchelf = callPackage ./pkgs/patchelf { };
   patchelfUnstable = lowPrio (callPackage ./pkgs/patchelf/unstable.nix { });
+
+  # TODO(corepkgs): This should be moved into unixtools
+  procps =
+    if stdenv.hostPlatform.isLinux then
+      procps-ng
+    else
+      unixtools.procps;
+
+  pruneLibtoolFiles = makeSetupHook {
+    name = "prune-libtool-files";
+  } ./build-support/setup-hooks/prune-libtool-files.sh;
 
   default-gcc-version = 14;
   gcc = pkgs.${"gcc${toString default-gcc-version}"};
@@ -560,6 +587,23 @@ with final;
     else
       ccWrapper;
 
+  # TODO(corepkgs): mkManyVariant this
+  go_1_25 = callPackage ./pkgs/go/1.25.nix { };
+  go_1_24 = callPackage ./pkgs/go/1.24.nix { };
+  go = go_1_25;
+
+  gobject-introspection-unwrapped = callPackage ./pkgs/gobject-introspection/unwrapped.nix { };
+
+  buildGo125Module = callPackage ./build-support/go/module.nix {
+    go = buildPackages.go_1_25;
+  };
+  buildGo124Module = callPackage ./build-support/go/module.nix {
+    go = buildPackages.go_1_24;
+  };
+
+  # TODO(corepkgs): proper attrset of utilities
+  gnome = { };
+
   gnuStdenv =
     if stdenv.cc.isGNU then
       stdenv
@@ -591,6 +635,10 @@ with final;
   # profile-guided optimizations
   fastStdenv = overrideCC gccStdenv (wrapNonDeterministicGcc gccStdenv buildPackages.gcc_latest);
 
+  # TODO(corepkg): use mkManyVariants
+  inherit (fusePackages) fuse_2 fuse_3;
+  fuse = fuse_2;
+
   wrapCCMulti =
     cc:
     let
@@ -618,7 +666,7 @@ with final;
 
   wrapClangMulti =
     clang:
-    callPackage ../development/compilers/llvm/multi.nix {
+    callPackage ./development/compilers/llvm/multi.nix {
       inherit clang;
       gcc32 = pkgsi686Linux.gcc;
       gcc64 = pkgs.gcc;
@@ -898,6 +946,32 @@ with final;
   gmp = gmp6;
   gmpxx = gmp.override { cxx = true; };
 
+  # while building documentation meson may want to run binaries for host
+  # which needs an emulator
+  # example of an error which this fixes
+  # [Errno 8] Exec format error: './gdk3-scan'
+  mesonEmulatorHook =
+    makeSetupHook
+      {
+        name = "mesonEmulatorHook";
+        substitutions = {
+          crossFile = writeText "cross-file.conf" ''
+            [binaries]
+            exe_wrapper = '${lib.escape [ "'" "\\" ] (stdenv.targetPlatform.emulator pkgs)}'
+          '';
+        };
+      }
+      # The throw is moved into the `makeSetupHook` derivation, so that its
+      # outer level, but not its outPath can still be evaluated if the condition
+      # doesn't hold. This ensures that splicing still can work correctly.
+      (
+        if (!stdenv.hostPlatform.canExecute stdenv.targetPlatform) then
+          ./pkgs/meson/emulator-hook.sh
+        else
+          throw "mesonEmulatorHook may only be added to nativeBuildInputs when the target binaries can't be executed; however you are attempting to use it in a situation where ${stdenv.hostPlatform.config} can execute ${stdenv.targetPlatform.config}. Consider only adding mesonEmulatorHook according to a conditional based canExecute in your package expression."
+      );
+
+
   # TODO(corepkgs): alias?
   m4 = gnum4;
 
@@ -1047,6 +1121,15 @@ with final;
     };
   } ./build-support/setup-hooks/auto-patchelf.sh;
 
+  separateDebugInfo = makeSetupHook {
+    name = "separate-debug-info-hook";
+  } ./build-support/setup-hooks/separate-debug-info.sh;
+
+  setupDebugInfoDirs = makeSetupHook {
+    name = "setup-debug-info-dirs-hook";
+  } ./build-support/setup-hooks/setup-debug-info-dirs.sh;
+
+
   stripJavaArchivesHook = makeSetupHook {
     name = "strip-java-archives-hook";
     propagatedBuildInputs = [ strip-nondeterminism ];
@@ -1101,6 +1184,9 @@ with final;
 
   # On non-GNU systems we need GNU Gettext for libintl.
   libintl = if stdenv.hostPlatform.libc != "glibc" then gettext else null;
+
+  # TODO(corepkgs): use mkManyVariants
+  libpng12 = callPackage ../development/libraries/libpng/12.nix { };
 
   # TODO(corepkgs): cleanup and move into pkgs
   common-updater-scripts = callPackage ./common-updater/scripts.nix { };
@@ -1284,8 +1370,8 @@ with final;
   udev = if lib.meta.availableOn stdenv.hostPlatform systemdLibs then systemdLibs else libudev-zero;
 
   inherit (callPackages ./pkgs/docbook-xsl { })
-    docbook_xsl # was docbook-xsl-nons
-    docbook_xsl_ns # was docbook-xsl-ns
+    docbook-xsl-nons
+    docbook-xsl-ns # was docbook-xsl-ns
     ;
 
   inherit (callPackage ./pkgs/libxml2 { })
@@ -1326,6 +1412,14 @@ with final;
       brotliSupport = true;
     }
   );
+
+  # TODO(corepkgs): use mkManyVariants
+  curlWithGnuTls = curl.override {
+    gnutlsSupport = true;
+    opensslSupport = false;
+    ngtcp2 = ngtcp2-gnutls;
+  };
+
 
   c-aresMinimal = callPackage ./pkgs/c-ares { withCMake = false; };
 
@@ -1404,6 +1498,8 @@ with final;
   docbook_xml_dtd_43 = callPackage ./pkgs/docbook-xml-dtd/4.3.nix { };
   docbook_xml_dtd_44 = callPackage ./pkgs/docbook-xml-dtd/4.4.nix { };
   docbook_xml_dtd_45 = callPackage ./pkgs/docbook-xml-dtd/4.5.nix { };
+
+  docutils = with python3Packages; toPythonApplication docutils;
 
   opensshPackages = lib.dontRecurseIntoAttrs (callPackage ./pkgs/openssh { });
   openssh = opensshPackages.openssh.override {
@@ -1686,4 +1782,13 @@ with final;
   };
   # TODO(corepkgs): alias
   man = man-db;
+
+  validatePkgConfig = makeSetupHook {
+    name = "validate-pkg-config";
+    propagatedBuildInputs = [
+      findutils
+      pkg-config
+    ];
+  } ./build-support/setup-hooks/validate-pkg-config.sh;
+
 }
