@@ -543,7 +543,7 @@ with final;
 
   pruneLibtoolFiles = makeSetupHook {
     name = "prune-libtool-files";
-  } ../build-support/setup-hooks/prune-libtool-files.sh;
+  } ./build-support/setup-hooks/prune-libtool-files.sh;
 
   default-gcc-version = 14;
   gcc = pkgs.${"gcc${toString default-gcc-version}"};
@@ -594,10 +594,10 @@ with final;
 
   gobject-introspection-unwrapped = callPackage ./pkgs/gobject-introspection/unwrapped.nix { };
 
-  buildGo125Module = callPackage ../build-support/go/module.nix {
+  buildGo125Module = callPackage ./build-support/go/module.nix {
     go = buildPackages.go_1_25;
   };
-  buildGo124Module = callPackage ../build-support/go/module.nix {
+  buildGo124Module = callPackage ./build-support/go/module.nix {
     go = buildPackages.go_1_24;
   };
 
@@ -666,7 +666,7 @@ with final;
 
   wrapClangMulti =
     clang:
-    callPackage ../development/compilers/llvm/multi.nix {
+    callPackage ./development/compilers/llvm/multi.nix {
       inherit clang;
       gcc32 = pkgsi686Linux.gcc;
       gcc64 = pkgs.gcc;
