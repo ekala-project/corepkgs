@@ -93,6 +93,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     meson
+    meson.configurePhaseHook
     ninja
     flex
     pkg-config
