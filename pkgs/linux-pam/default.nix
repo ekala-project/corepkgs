@@ -65,6 +65,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     flex
     meson
+    meson.configurePhaseHook
     ninja
     pkg-config
     gettext
