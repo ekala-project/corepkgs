@@ -1029,7 +1029,6 @@ with final;
       lib.getBin libiconvReal;
 
   # TODO(corepkgs): use mkManyVariants
-  openssl = openssl_3_6;
   openssl_oqs = openssl.override {
     providers = [
       {
@@ -1046,13 +1045,8 @@ with final;
     };
   };
   openssl_legacy = openssl.override {
-    conf = ./pkgs/openssl/3.0/legacy.cnf;
+    conf = ./pkgs-many/openssl/3.0/legacy.cnf;
   };
-  inherit (callPackages ./pkgs/openssl { })
-    openssl_1_1
-    openssl_3
-    openssl_3_6
-    ;
 
   # TODO(corepkgs): move build-support hooks into pkgs
   makeWrapper = makeShellWrapper;
