@@ -71,10 +71,13 @@ stdenv.mkDerivation (
       libpng
       zlib
     ]
-    ++ optionals x11Support (with xorg; [
-      libXext
-      libXrender
-    ])
+    ++ optionals x11Support (
+      with xorg;
+      [
+        libXext
+        libXrender
+      ]
+    )
     ++ optionals xcbSupport [ libxcb ]
     ++ optional gobjectSupport glib; # TODO: maybe liblzo but what would it be for here?
 

@@ -8,4 +8,3 @@
     src-hash = "sha256-3zJPzQg0F12rB0gxM5Atl3SmBb+imAJfaYgyiP0gqMc=";
   };
 }
-

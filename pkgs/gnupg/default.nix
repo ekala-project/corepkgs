@@ -157,9 +157,9 @@ stdenv.mkDerivation rec {
     "--with-ksba-prefix=${libksba.dev}"
     "GPGRT_CONFIG=${lib.getDev libgpg-error}/bin/gpgrt-config"
   ]
-  ++ lib.optional (guiSupport && pinentry != null) "--with-pinentry-pgm=${pinentry}/${
-    pinentry.binaryPath or "bin/pinentry"
-  }"
+  ++
+    lib.optional (guiSupport && pinentry != null)
+      "--with-pinentry-pgm=${pinentry}/${pinentry.binaryPath or "bin/pinentry"}"
   ++ lib.optional withTpm2Tss "--with-tss=intel"
   ++ lib.optional stdenv.hostPlatform.isDarwin "--disable-ccid-driver";
 
