@@ -16,7 +16,7 @@
   autoconf-archive,
   x11Support ? (stdenv.hostPlatform.isLinux || stdenv.hostPlatform.isDarwin),
   xorg,
-  libx11
+  libx11,
 }:
 
 stdenv.mkDerivation rec {

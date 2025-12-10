@@ -34,7 +34,8 @@
   testers,
   gobject-introspection,
   libsystemtap ? null,
-  withSysprof ? libsysprof-capture != null && lib.meta.availableOn stdenv.hostPlatform libsysprof-capture,
+  withSysprof ?
+    libsysprof-capture != null && lib.meta.availableOn stdenv.hostPlatform libsysprof-capture,
   libsysprof-capture ? null,
   mesonEmulatorHook ? null,
   withIntrospection ?

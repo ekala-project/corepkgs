@@ -16,7 +16,7 @@
   lingua ? null,
 
   # tests
-  chameleon ? null ,
+  chameleon ? null,
   mock ? null,
   pytestCheckHook,
 }:

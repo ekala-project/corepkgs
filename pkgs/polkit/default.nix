@@ -111,7 +111,6 @@ stdenv.mkDerivation rec {
     glib # in .pc Requires
   ];
 
-
   # TODO: enable tests in passthru.tests
   # nativeCheckInputs = [
   #   dbus

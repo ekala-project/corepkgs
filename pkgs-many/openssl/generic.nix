@@ -384,11 +384,9 @@ stdenv.mkDerivation (finalAttrs: {
       rm -rf $dev/lib/cmake
     '';
 
-  passthru =
-    (mkVariantPassthru variantArgs args)
-    // {
-      tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
-    };
+  passthru = (mkVariantPassthru variantArgs args) // {
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  };
 
   meta = {
     homepage = "https://www.openssl.org/";

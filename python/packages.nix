@@ -15,14 +15,13 @@ self: super: with self; {
     );
   };
 
-
   libxml2 =
     (toPythonModule (
       pkgs.libxml2.override {
         pythonSupport = true;
         python3 = python;
       }
-      )).py;
+    )).py;
 
   libxslt =
     (toPythonModule (

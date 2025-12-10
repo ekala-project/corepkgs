@@ -525,11 +525,7 @@ with final;
   patchelfUnstable = lowPrio (callPackage ./pkgs/patchelf/unstable.nix { });
 
   # TODO(corepkgs): This should be moved into unixtools
-  procps =
-    if stdenv.hostPlatform.isLinux then
-      procps-ng
-    else
-      unixtools.procps;
+  procps = if stdenv.hostPlatform.isLinux then procps-ng else unixtools.procps;
 
   pruneLibtoolFiles = makeSetupHook {
     name = "prune-libtool-files";
@@ -961,7 +957,6 @@ with final;
           throw "mesonEmulatorHook may only be added to nativeBuildInputs when the target binaries can't be executed; however you are attempting to use it in a situation where ${stdenv.hostPlatform.config} can execute ${stdenv.targetPlatform.config}. Consider only adding mesonEmulatorHook according to a conditional based canExecute in your package expression."
       );
 
-
   # TODO(corepkgs): alias?
   m4 = gnum4;
 
@@ -1112,7 +1107,6 @@ with final;
   setupDebugInfoDirs = makeSetupHook {
     name = "setup-debug-info-dirs-hook";
   } ./build-support/setup-hooks/setup-debug-info-dirs.sh;
-
 
   stripJavaArchivesHook = makeSetupHook {
     name = "strip-java-archives-hook";
@@ -1403,7 +1397,6 @@ with final;
     opensslSupport = false;
     ngtcp2 = ngtcp2-gnutls;
   };
-
 
   c-aresMinimal = callPackage ./pkgs/c-ares { withCMake = false; };
 

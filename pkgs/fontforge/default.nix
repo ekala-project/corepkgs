@@ -21,7 +21,7 @@
   libspiro ? null,
   withGTK ? false,
   gtk3 ? null,
-  gtkmm3  ? null,
+  gtkmm3 ? null,
   withGUI ? withGTK,
   cairo ? null,
   pango ? null,

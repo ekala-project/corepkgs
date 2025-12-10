@@ -13,7 +13,7 @@
   pkg-config,
   libiconv,
   libintl,
-  fetchurl
+  fetchurl,
 }:
 
 stdenv.mkDerivation (finalAttrs: {

@@ -45,18 +45,16 @@ stdenv.mkDerivation {
 
   doCheck = true;
 
-  passthru =
-    (mkVariantPassthru variantArgs args)
-    // {
-      tests = {
-        inherit
-          mpd
-          openimageio
-          fcitx5
-          spdlog
-          ;
-      };
+  passthru = (mkVariantPassthru variantArgs args) // {
+    tests = {
+      inherit
+        mpd
+        openimageio
+        fcitx5
+        spdlog
+        ;
     };
+  };
 
   meta = with lib; {
     description = "Small, safe and fast formatting library";

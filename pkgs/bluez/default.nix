@@ -162,22 +162,22 @@ stdenv.mkDerivation (finalAttrs: {
       done
       install -Dm755 attrib/gatttool $out/bin/gatttool
     '';
-    # + lib.optionalString installTests ''
-    #   mkdir -p $test/{bin,test}
-    #   cp -a test $test
-    #   pushd $test/test
-    #   for t in \
-    #           list-devices \
-    #           monitor-bluetooth \
-    #           simple-agent \
-    #           test-adapter \
-    #           test-device \
-    #           ; do
-    #     ln -s ../test/$t $test/bin/bluez-$t
-    #   done
-    #   popd
-    #   wrapPythonProgramsIn $test/test "$test/test ${toString pythonPath}"
-    # '';
+  # + lib.optionalString installTests ''
+  #   mkdir -p $test/{bin,test}
+  #   cp -a test $test
+  #   pushd $test/test
+  #   for t in \
+  #           list-devices \
+  #           monitor-bluetooth \
+  #           simple-agent \
+  #           test-adapter \
+  #           test-device \
+  #           ; do
+  #     ln -s ../test/$t $test/bin/bluez-$t
+  #   done
+  #   popd
+  #   wrapPythonProgramsIn $test/test "$test/test ${toString pythonPath}"
+  # '';
 
   enableParallelBuilding = true;
 
