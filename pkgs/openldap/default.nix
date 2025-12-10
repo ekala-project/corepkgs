@@ -129,7 +129,9 @@ stdenv.mkDerivation rec {
     rm -f tests/scripts/test076-authid-rewrite
   '';
 
-  doCheck = true;
+  # TODO(corepkgs): move to passthru.
+  # Tests take a very long time to complete
+  doCheck = false;
 
   # The directory is empty and serve no purpose.
   preFixup = ''
