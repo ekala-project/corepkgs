@@ -136,6 +136,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Linux keyboard tools and keyboard maps";
     platforms = lib.platforms.linux;
     license = lib.licenses.gpl2Plus;
-    maintainers = with lib.maintainers; [ davidak ];
+    maintainers = [ ];
   };
 })

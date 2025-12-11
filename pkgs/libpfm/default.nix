@@ -47,10 +47,7 @@ stdenv.mkDerivation (finalAttrs: {
       (PMU) of modern processors.
     '';
     license = licenses.gpl2;
-    maintainers = with maintainers; [
-      pierron
-      t4ccer
-    ];
+    maintainers = [ ];
     platforms = platforms.linux ++ platforms.windows;
   };
 })

@@ -34,6 +34,6 @@ buildPythonPackage rec {
     mainProgram = "markdown_py";
     homepage = "https://github.com/Python-Markdown/markdown";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ dotlambda ];
+    maintainers = [ ];
   };
 }

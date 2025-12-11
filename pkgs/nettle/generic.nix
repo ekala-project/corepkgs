@@ -71,6 +71,6 @@ stdenv.mkDerivation {
     homepage = "https://www.lysator.liu.se/~nisse/nettle/";
 
     platforms = platforms.all;
-    maintainers = [ maintainers.vcunat ];
+    maintainers = [ ];
   };
 }

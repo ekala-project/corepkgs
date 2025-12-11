@@ -58,7 +58,7 @@ stdenv.mkDerivation rec {
     description = "Webfont compression reference code";
     homepage = "https://github.com/google/woff2";
     license = licenses.mit;
-    maintainers = [ maintainers.hrdinka ];
+    maintainers = [ ];
     platforms = platforms.unix;
   };
 }

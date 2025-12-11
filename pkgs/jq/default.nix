@@ -126,12 +126,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://jqlang.github.io/jq/";
     downloadPage = "https://jqlang.github.io/jq/download/";
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [
-      raskin
-      artturin
-      ncfavier
-      jk
-    ];
+    maintainers = [ ];
     platforms = lib.platforms.unix;
     mainProgram = "jq";
   };

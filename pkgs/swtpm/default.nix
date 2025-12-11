@@ -144,7 +144,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Libtpms-based TPM emulator";
     homepage = "https://github.com/stefanberger/swtpm";
     license = licenses.bsd3;
-    maintainers = [ maintainers.baloo ];
+    maintainers = [ ];
     mainProgram = "swtpm";
     platforms = platforms.all;
   };

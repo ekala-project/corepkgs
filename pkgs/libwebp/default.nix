@@ -100,7 +100,7 @@ stdenv.mkDerivation rec {
     homepage = "https://developers.google.com/speed/webp/";
     license = licenses.bsd3;
     platforms = platforms.all;
-    maintainers = with maintainers; [ ajs124 ];
+    maintainers = [ ];
     pkgConfigModules = [
       # configure_pkg_config() calls for these are unconditional
       "libwebp"
