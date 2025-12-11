@@ -16,21 +16,34 @@
       treefmt-nix,
     }:
     let
-      forAllSystems =
-        f: nixpkgs.lib.genAttrs (import systems) (system: f nixpkgs.legacyPackages.${system});
-      treefmt = forAllSystems (
+      forAllSystems = nixpkgs.lib.genAttrs (import systems);
+      mkTreefmt =
         pkgs:
-        treefmt-nix.lib.evalModule pkgs {
-          projectRootFile = "flake.nix";
-          programs.nixfmt.enable = true;
-          programs.keep-sorted = {
-            enable = true;
-            includes = [ "*.nix" ];
+        let
+          fmt = treefmt-nix.lib.evalModule pkgs {
+            projectRootFile = "flake.nix";
+            programs.nixfmt.enable = true;
+            programs.keep-sorted = {
+              enable = true;
+              includes = [ "*.nix" ];
+            };
           };
-        }
-      );
+        in
+        fmt.config.build.wrapper;
     in
     {
-      formatter = forAllSystems (pkgs: treefmt.${pkgs.stdenv.hostPlatform.system}.config.build.wrapper);
+      legacyPackages = forAllSystems (
+        system:
+        import ./. {
+          inherit system;
+        }
+      );
+      formatter = forAllSystems (system: mkTreefmt nixpkgs.legacyPackages.${system});
+      nixConfig = {
+        extra-substituters = [ "https://ekala-corepkgs.cachix.org" ];
+        extra-trusted-public-keys = [
+          "ekala-corepkgs.cachix.org-1:DcZV+vegWoEzacbSdXFXU4S7728C0eS9RfGpKeyHd6w="
+        ];
+      };
     };
 }
