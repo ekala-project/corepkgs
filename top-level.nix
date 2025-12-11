@@ -1174,6 +1174,16 @@ with final;
   texinfo = texinfo7;
   texinfoInteractive = texinfo.override { interactive = true; };
 
+  # TODO(corepkgs): remove hack
+  threads =
+    lib.optionalAttrs (stdenv.hostPlatform.isMinGW && !(stdenv.hostPlatform.useLLVM or false))
+      {
+        # other possible values: win32 or posix
+        model = "mcf";
+        # For win32 or posix set this to null
+        package = windows.mcfgthreads;
+      };
+
   # On non-GNU systems we need GNU Gettext for libintl.
   libintl = if stdenv.hostPlatform.libc != "glibc" then gettext else null;
 
