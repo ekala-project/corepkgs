@@ -524,6 +524,20 @@ with final;
   patchelf = callPackage ./pkgs/patchelf { };
   patchelfUnstable = lowPrio (callPackage ./pkgs/patchelf/unstable.nix { });
 
+  # These are used when building compiler-rt / libgcc, prior to building libc.
+  preLibcHeaders =
+    let
+      inherit (stdenv.hostPlatform) libc;
+    in
+    if stdenv.hostPlatform.isMinGW then
+      windows.mingw_w64_headers or fallback
+    else if libc == "nblibc" then
+      netbsd.headers
+    else if libc == "cygwin" then
+      cygwin.newlib-cygwin-headers
+    else
+      null;
+
   # TODO(corepkgs): This should be moved into unixtools
   procps = if stdenv.hostPlatform.isLinux then procps-ng else unixtools.procps;
 
