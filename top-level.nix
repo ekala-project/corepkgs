@@ -547,7 +547,7 @@ with final;
 
   default-gcc-version = 14;
   gcc = pkgs.${"gcc${toString default-gcc-version}"};
-  gccFun = callPackage ./pkgs/gcc { };
+  gccFun = callPackage ./pkgs/gcc;
   gcc-unwrapped = gcc.cc;
   libgcc = stdenv.cc.cc.libgcc or null;
 
