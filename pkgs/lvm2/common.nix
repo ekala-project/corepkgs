@@ -242,9 +242,6 @@ stdenv.mkDerivation rec {
       bsd2
       lgpl21
     ];
-    maintainers = with maintainers; [
-      raskin
-      ajs124
-    ];
+    maintainers = [ ];
   };
 }

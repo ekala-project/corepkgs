@@ -94,6 +94,6 @@ stdenv.mkDerivation rec {
       "sparc-linux"
       "sparc64-linux"
     ];
-    maintainers = with maintainers; [ thoughtpolice ];
+    maintainers = [ ];
   };
 }

@@ -40,7 +40,7 @@ buildPythonPackage rec {
     homepage = "https://github.com/leohemsted/smartypants.py";
     changelog = "https://github.com/leohemsted/smartypants.py/blob/v${version}/CHANGES.rst";
     license = lib.licenses.bsd3;
-    maintainers = with lib.maintainers; [ dotlambda ];
+    maintainers = [ ];
     mainProgram = "smartypants";
   };
 }

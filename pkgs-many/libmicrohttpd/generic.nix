@@ -64,7 +64,7 @@ stdenv.mkDerivation (finalAttrs: {
 
       homepage = "https://www.gnu.org/software/libmicrohttpd/";
 
-      maintainers = with maintainers; [ ];
+      maintainers = [ ];
       platforms = platforms.unix;
     }
     // meta;

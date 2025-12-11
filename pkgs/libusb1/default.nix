@@ -74,9 +74,6 @@ stdenv.mkDerivation rec {
     '';
     platforms = platforms.all;
     license = licenses.lgpl21Plus;
-    maintainers = with maintainers; [
-      prusnak
-      logger
-    ];
+    maintainers = [ ];
   };
 }

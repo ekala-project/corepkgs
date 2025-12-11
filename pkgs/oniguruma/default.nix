@@ -30,7 +30,7 @@ stdenv.mkDerivation rec {
     description = "Regular expressions library";
     mainProgram = "onig-config";
     license = licenses.bsd2;
-    maintainers = with maintainers; [ artturin ];
+    maintainers = [ ];
     platforms = platforms.unix;
   };
 }

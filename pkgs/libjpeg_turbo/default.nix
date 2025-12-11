@@ -117,10 +117,7 @@ stdenv.mkDerivation (finalAttrs: {
       "libjpeg"
       "libturbojpeg"
     ];
-    maintainers = with lib.maintainers; [
-      vcunat
-      kamadorueda
-    ];
+    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

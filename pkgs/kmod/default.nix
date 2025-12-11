@@ -126,6 +126,6 @@ stdenv.mkDerivation rec {
       gpl2Plus
     ]; # GPLv2+ for tools
     platforms = platforms.linux;
-    maintainers = with maintainers; [ artturin ];
+    maintainers = [ ];
   };
 }

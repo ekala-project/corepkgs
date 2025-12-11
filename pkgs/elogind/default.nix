@@ -157,6 +157,6 @@ stdenv.mkDerivation rec {
     description = "systemd project's 'logind', extracted to a standalone package";
     platforms = platforms.linux; # probably more
     license = licenses.lgpl21Plus;
-    maintainers = with maintainers; [ nh2 ];
+    maintainers = [ ];
   };
 }

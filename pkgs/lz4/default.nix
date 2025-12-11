@@ -75,6 +75,6 @@ stdenv.mkDerivation (finalAttrs: {
     ];
     platforms = platforms.all;
     mainProgram = "lz4";
-    maintainers = [ maintainers.tobim ];
+    maintainers = [ ];
   };
 })

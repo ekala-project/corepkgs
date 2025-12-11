@@ -78,7 +78,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/gabime/spdlog";
     changelog = "https://github.com/gabime/spdlog/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [ obadz ];
+    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

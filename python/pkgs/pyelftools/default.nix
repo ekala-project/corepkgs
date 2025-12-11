@@ -46,10 +46,7 @@ buildPythonPackage rec {
       # See elftools/construct/{LICENSE,README} in the source code.
       mit
     ];
-    maintainers = with lib.maintainers; [
-      igsha
-      pamplemousse
-    ];
+    maintainers = [ ];
     mainProgram = "readelf.py";
   };
 }

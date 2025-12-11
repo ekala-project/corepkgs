@@ -71,7 +71,7 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/catchorg/Catch2";
     changelog = "https://github.com/catchorg/Catch2/blob/${src.tag}/docs/release-notes.md";
     license = lib.licenses.boost;
-    maintainers = with lib.maintainers; [ dotlambda ];
+    maintainers = [ ];
     platforms = with lib.platforms; unix ++ windows;
   };
 }

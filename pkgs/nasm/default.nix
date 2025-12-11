@@ -40,9 +40,7 @@ stdenv.mkDerivation rec {
     homepage = "https://www.nasm.us/";
     description = "80x86 and x86-64 assembler designed for portability and modularity";
     platforms = platforms.unix;
-    maintainers = with maintainers; [
-      pSub
-    ];
+    maintainers = [ ];
     mainProgram = "nasm";
     license = licenses.bsd2;
   };

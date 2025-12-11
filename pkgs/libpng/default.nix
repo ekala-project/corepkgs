@@ -61,6 +61,6 @@ stdenv.mkDerivation (finalAttrs: {
       "libpng16"
     ];
     platforms = platforms.all;
-    maintainers = with maintainers; [ vcunat ];
+    maintainers = [ ];
   };
 })

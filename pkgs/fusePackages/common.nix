@@ -140,9 +140,7 @@ stdenv.mkDerivation rec {
       gpl2Only
       lgpl21Only
     ];
-    maintainers = with lib.maintainers; [
-      oxalica
-    ];
+    maintainers = [ ];
     outputsToInstall = [ "bin" ];
   };
 }

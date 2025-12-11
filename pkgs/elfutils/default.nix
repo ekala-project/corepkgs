@@ -152,6 +152,6 @@ stdenv.mkDerivation rec {
       lgpl3Plus
       gpl3Plus
     ];
-    maintainers = with maintainers; [ r-burns ];
+    maintainers = [ ];
   };
 }

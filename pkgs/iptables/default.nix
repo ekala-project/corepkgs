@@ -93,7 +93,7 @@ stdenv.mkDerivation rec {
     homepage = "https://www.netfilter.org/projects/iptables/index.html";
     platforms = platforms.linux;
     mainProgram = "iptables";
-    maintainers = with maintainers; [ fpletz ];
+    maintainers = [ ];
     license = licenses.gpl2Plus;
     downloadPage = "https://www.netfilter.org/projects/iptables/files/";
   };
