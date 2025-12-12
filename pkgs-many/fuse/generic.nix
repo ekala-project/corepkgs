@@ -1,11 +1,18 @@
-{ version, hash }:
+{
+  version,
+  src-hash,
+  packageAtLeast,
+  packageOlder,
+  mkVariantPassthru,
+  packageBetween,
+  ...
+}@variantArgs:
 
 {
   lib,
   stdenv,
   fetchFromGitHub,
   fetchpatch,
-  fusePackages,
   util-linux,
   gettext,
   shadow,
@@ -15,10 +22,10 @@
   autoreconfHook,
   runtimeShell,
   udevCheckHook,
-}:
+}@args:
 
 let
-  isFuse3 = lib.hasPrefix "3" version;
+  isFuse3 = packageBetween "3" "4";
 in
 stdenv.mkDerivation rec {
   pname = "fuse";
@@ -28,7 +35,7 @@ stdenv.mkDerivation rec {
     owner = "libfuse";
     repo = "libfuse";
     rev = "${pname}-${version}";
-    inherit hash;
+    hash = src-hash;
   };
 
   patches =
@@ -122,6 +129,8 @@ stdenv.mkDerivation rec {
 
   # Don't pull in SUID `fusermount{,3}` binaries into development environment.
   propagatedBuildOutputs = [ "out" ];
+
+  passthru = mkVariantPassthru variantArgs args;
 
   meta = {
     description = "Library that allows filesystems to be implemented in user space";

@@ -24,6 +24,12 @@
       ];
     in
     {
+      legacyPackages = forAllSystems (
+        system:
+        import ./. {
+          inherit system;
+        }
+      );
       formatter = forAllSystems (
         system:
         let
@@ -34,5 +40,12 @@
         in
         fmt.config.build.wrapper
       );
+      nixConfig = {
+        extra-substituters = [ "https://ekala-corepkgs.cachix.org" ];
+        extra-trusted-public-keys = [
+          "ekala-corepkgs.cachix.org-1:DcZV+vegWoEzacbSdXFXU4S7728C0eS9RfGpKeyHd6w="
+        ];
+      };
+
     };
 }
