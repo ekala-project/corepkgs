@@ -104,6 +104,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     cmake
+    cmake.configurePhaseHook
     darwin.xcodeProjectCheckHook
     meson
     ninja

@@ -77,6 +77,7 @@ stdenv.mkDerivation (
 
     nativeBuildInputs = [
       cmake
+      cmake.configurePhaseHook
       python3
       ninja
     ]

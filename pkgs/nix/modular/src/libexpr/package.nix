@@ -41,6 +41,7 @@ mkMesonLibrary (finalAttrs: {
     bison
     flex
     cmake
+    cmake.configurePhaseHook
   ];
 
   buildInputs = [

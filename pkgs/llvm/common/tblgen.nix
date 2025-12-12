@@ -82,6 +82,7 @@ let
 
     nativeBuildInputs = [
       cmake
+      cmake.configurePhaseHook
       ninja
       python3
 

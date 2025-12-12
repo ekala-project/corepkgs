@@ -29,6 +29,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     cmake
+    cmake.configurePhaseHook
   ];
 
   buildInputs = lib.optionals finalAttrs.finalPackage.doCheck [

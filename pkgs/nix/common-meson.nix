@@ -114,6 +114,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     bison
     cmake
+    cmake.configurePhaseHook
     flex
     jq
     meson

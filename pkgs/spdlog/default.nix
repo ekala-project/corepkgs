@@ -34,7 +34,10 @@ stdenv.mkDerivation (finalAttrs: {
     })
   ];
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    cmake.configurePhaseHook
+  ];
   # Required to build tests, even if they aren't executed
   buildInputs = [ catch2_3 ];
   propagatedBuildInputs = [ fmt ];
