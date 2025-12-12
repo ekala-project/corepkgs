@@ -18,7 +18,6 @@
   openssh,
   pcre2,
   bash,
-  # TODO(corepkgs): enable manual support
   asciidoc ? null,
   texinfo ? null,
   xmlto ? null,
@@ -40,7 +39,7 @@
   osxkeychainSupport ? stdenv.hostPlatform.isDarwin,
   guiSupport ? false,
   # TODO(corepkgs): build with manual by default
-  withManual ? true,
+  withManual ? false,
   pythonSupport ? true,
   withpcre2 ? true,
   withZlibNg ? true,
