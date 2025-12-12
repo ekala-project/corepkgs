@@ -190,8 +190,6 @@ stdenv.mkDerivation (finalAttrs: {
       ''}
     '';
 
-  dontUseCmakeConfigure = true;
-
   mesonFlags = [
     (lib.mesonBool "unit-tests" (stdenv.buildPlatform.canExecute stdenv.hostPlatform))
     (lib.mesonBool "bindings" false)
