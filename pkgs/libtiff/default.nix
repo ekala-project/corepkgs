@@ -76,6 +76,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     cmake
+    cmake.configurePhaseHook
     pkg-config
     sphinx
   ];

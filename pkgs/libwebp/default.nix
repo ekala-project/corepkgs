@@ -67,7 +67,10 @@ stdenv.mkDerivation rec {
     (lib.cmakeBool "WEBP_BUILD_LIBWEBPMUX" libwebpmuxSupport)
   ];
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    cmake.configurePhaseHook
+  ];
   buildInputs =
     [ ]
     ++ lib.optionals openglSupport [

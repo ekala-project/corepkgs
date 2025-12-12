@@ -23,6 +23,7 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [
     cmake
+    cmake.configurePhaseHook
     ninja
   ];
 

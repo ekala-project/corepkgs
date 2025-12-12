@@ -33,6 +33,7 @@ runCommandCC testName
     version = if versionCheck then version else null;
     nativeBuildInputs = [
       cmake
+      cmake.configurePhaseHook
     ]
     ++ nativeBuildInputs;
     buildInputs = [ package ] ++ buildInputs;

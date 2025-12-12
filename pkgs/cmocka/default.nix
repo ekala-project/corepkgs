@@ -18,7 +18,10 @@ stdenv.mkDerivation rec {
     ./uintptr_t.patch
   ];
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    cmake.configurePhaseHook
+  ];
 
   cmakeFlags =
     lib.optional doCheck "-DUNIT_TESTING=ON"
