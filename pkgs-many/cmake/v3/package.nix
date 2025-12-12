@@ -191,7 +191,6 @@ stdenv.mkDerivation (finalAttrs: {
     sed -i 's|bin/cmake|${buildPackages.cmake.minimal}/bin/cmake|g' Makefile
   '';
 
-  dontUseCmakeConfigure = true;
   enableParallelBuilding = true;
 
   doCheck = false; # fails
