@@ -197,6 +197,7 @@ stdenv.mkDerivation (finalAttrs: {
   doCheck = false; # fails
 
   passthru = (mkVariantPassthru variantArgs dependencies) // {
+    configurePhaseHook = ../configure-phase-hook.sh;
     updateScript = gitUpdater {
       url = "https://gitlab.kitware.com/cmake/cmake.git";
       rev-prefix = "v";
