@@ -222,6 +222,7 @@ stdenv.mkDerivation (
 
     nativeBuildInputs = [
       cmake
+      cmake.configurePhaseHook
       # while this is not an autotools build, it still includes a config.guess
       # this is needed until scripts are updated to not use /usr/bin/uname on FreeBSD native
       updateAutotoolsGnuConfigScriptsHook

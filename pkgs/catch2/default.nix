@@ -16,7 +16,10 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-XnT2ziES94Y4uzWmaxSw7nWegJFQjAqFUG8PkwK5nLU=";
   };
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    cmake.configurePhaseHook
+  ];
 
   cmakeFlags = [ "-H.." ];
 

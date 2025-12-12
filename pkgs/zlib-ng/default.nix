@@ -29,6 +29,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     cmake.minimal
+    cmake.configurePhaseHook
     pkg-config
   ];
 

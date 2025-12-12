@@ -29,7 +29,10 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   strictDeps = true;
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    cmake.configurePhaseHook
+  ];
 
   buildInputs = [
     cmocka # cmake expects cmocka module

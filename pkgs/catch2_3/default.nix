@@ -31,6 +31,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     cmake
+    cmake.configurePhaseHook
   ];
 
   hardeningDisable = [ "trivialautovarinit" ];

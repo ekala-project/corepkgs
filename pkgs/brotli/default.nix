@@ -31,7 +31,10 @@ stdenv.mkDerivation (finalAttrs: {
     })
   ];
 
-  nativeBuildInputs = [ cmake.minimal ];
+  nativeBuildInputs = [
+    cmake.minimal
+    cmake.configurePhaseHook
+  ];
 
   cmakeFlags = lib.optional staticOnly "-DBUILD_SHARED_LIBS=OFF";
 
