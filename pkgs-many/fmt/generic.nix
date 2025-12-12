@@ -39,7 +39,10 @@ stdenv.mkDerivation {
 
   patches = map (p: fetchpatch p) patches;
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    cmake.configurePhaseHook
+  ];
 
   cmakeFlags = [ (lib.cmakeBool "BUILD_SHARED_LIBS" enableShared) ];
 

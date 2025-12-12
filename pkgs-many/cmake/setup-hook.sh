@@ -140,11 +140,6 @@ cmakeConfigurePhase() {
     runHook postConfigure
 }
 
-if [ -z "${dontUseCmakeConfigure-}" -a -z "${configurePhase-}" ]; then
-    setOutputFlags=
-    configurePhase=cmakeConfigurePhase
-fi
-
 addEnvHooks "$targetOffset" addCMakeParams
 
 makeCmakeFindLibs(){

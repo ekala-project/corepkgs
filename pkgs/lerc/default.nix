@@ -48,6 +48,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     cmake
+    cmake.configurePhaseHook
   ];
 
   passthru.tests.pkg-config = testers.hasPkgConfigModules {

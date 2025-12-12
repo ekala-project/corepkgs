@@ -114,6 +114,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     bison
     cmake
+    cmake.configurePhaseHook
     flex
     jq
     meson
@@ -188,8 +189,6 @@ stdenv.mkDerivation (finalAttrs: {
         patchelf --set-rpath $out/lib:${lib.getLib stdenv.cc.cc}/lib $out/lib/libboost_thread.so.*
       ''}
     '';
-
-  dontUseCmakeConfigure = true;
 
   mesonFlags = [
     (lib.mesonBool "unit-tests" (stdenv.buildPlatform.canExecute stdenv.hostPlatform))

@@ -58,6 +58,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     cmake
+    cmake.configurePhaseHook
     nasm
   ]
   ++ lib.optionals enableJava [

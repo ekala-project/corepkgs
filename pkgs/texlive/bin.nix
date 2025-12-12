@@ -549,6 +549,7 @@ rec {
       enableParallelBuilding = true;
       nativeBuildInputs = [
         cmake
+        cmake.configurePhaseHook
         ninja
       ];
 

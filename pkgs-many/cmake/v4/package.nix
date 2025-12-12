@@ -181,12 +181,12 @@ stdenv.mkDerivation (finalAttrs: {
     sed -i 's|bin/cmake|${buildPackages.cmake.minimal}/bin/cmake|g' Makefile
   '';
 
-  dontUseCmakeConfigure = true;
   enableParallelBuilding = true;
 
   doCheck = false; # fails
 
   passthru = (mkVariantPassthru variantArgs dependencies) // {
+    configurePhaseHook = ../configure-phase-hook.sh;
     updateScript = gitUpdater {
       url = "https://gitlab.kitware.com/cmake/cmake.git";
       rev-prefix = "v";
