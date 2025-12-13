@@ -65,6 +65,7 @@ with final;
   ettercap = null;
   exiv2 = null;
   fcitx5 = null;
+  fd = null;
   feh = null;
   ffmpeg = null;
   firefox = null;
