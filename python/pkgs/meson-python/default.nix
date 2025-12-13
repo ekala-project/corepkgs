@@ -76,6 +76,5 @@ buildPythonPackage rec {
     homepage = "https://github.com/mesonbuild/meson-python";
     license = [ lib.licenses.mit ];
     maintainers = [ ];
-    teams = [ lib.teams.python ];
   };
 }

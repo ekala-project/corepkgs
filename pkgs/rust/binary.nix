@@ -34,7 +34,7 @@ rec {
       sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
       description = "Safe, concurrent, practical language";
       mainProgram = "rustc";
-      maintainers = with lib.maintainers; [ qknight ];
+      maintainers = [ ];
       license = [
         lib.licenses.mit
         lib.licenses.asl20
@@ -141,7 +141,7 @@ rec {
       homepage = "https://doc.rust-lang.org/cargo/";
       sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
       description = "Rust package manager";
-      maintainers = with lib.maintainers; [ qknight ];
+      maintainers = [ ];
       license = [
         lib.licenses.mit
         lib.licenses.asl20

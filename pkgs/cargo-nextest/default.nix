@@ -44,8 +44,6 @@ rustPlatform.buildRustPackage rec {
       mit
       asl20
     ];
-    maintainers = with lib.maintainers; [
-      matthiasbeyer
-    ];
+    maintainers = [ ];
   };
 }

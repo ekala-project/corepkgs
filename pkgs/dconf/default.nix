@@ -98,7 +98,6 @@ stdenv.mkDerivation (finalAttrs: {
       # Mandatory libdconfsettings shared library.
       lib.systems.inspect.platformPatterns.isStatic
     ];
-    teams = [ ];
     mainProgram = "dconf";
   };
 })

@@ -32,7 +32,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     description = "Script used to obtain source hashes for fetchsvn";
-    maintainers = with lib.maintainers; [ bennofs ];
+    maintainers = [ ];
     platforms = lib.platforms.unix;
     mainProgram = "nix-prefetch-svn";
   };

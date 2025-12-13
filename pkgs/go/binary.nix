@@ -33,7 +33,6 @@ stdenv.mkDerivation {
     description = "Go Programming language";
     homepage = "https://go.dev/";
     license = lib.licenses.bsd3;
-    teams = [ lib.teams.golang ];
     platforms = lib.platforms.darwin ++ lib.platforms.freebsd ++ lib.platforms.linux;
     badPlatforms = [
       # Support for big-endian POWER < 8 was dropped in 1.9, but POWER8 users have less of a reason to run in big-endian mode than pre-POWER8 ones

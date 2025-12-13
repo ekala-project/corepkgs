@@ -107,7 +107,6 @@ stdenv.mkDerivation rec {
     description = "Library providing (de)serialization support for the JavaScript Object Notation (JSON) format";
     homepage = "https://gitlab.gnome.org/GNOME/json-glib";
     license = licenses.lgpl21Plus;
-    teams = [ teams.gnome ];
     platforms = with platforms; unix;
   };
 }

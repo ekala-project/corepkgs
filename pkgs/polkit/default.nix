@@ -199,6 +199,5 @@ stdenv.mkDerivation rec {
       # mandatory libpolkit-gobject shared library
       lib.systems.inspect.platformPatterns.isStatic
     ];
-    teams = [ teams.freedesktop ];
   };
 }

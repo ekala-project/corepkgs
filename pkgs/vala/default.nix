@@ -116,7 +116,6 @@ let
         license = licenses.lgpl21Plus;
         platforms = platforms.unix;
         maintainers = [ ];
-        teams = [ teams.pantheon ];
       };
     }
   );

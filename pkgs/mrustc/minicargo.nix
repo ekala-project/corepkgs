@@ -36,10 +36,7 @@ stdenv.mkDerivation rec {
     '';
     inherit (src.meta) homepage;
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [
-      progval
-      r-burns
-    ];
+    maintainers = [ ];
     platforms = [ "x86_64-linux" ];
   };
 }
