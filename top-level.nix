@@ -1799,4 +1799,10 @@ with final;
     ];
   } ./build-support/setup-hooks/validate-pkg-config.sh;
 
+
+  writers = callPackage ./build-support/writers { };
+  # TODO(corepkgs): support writers fully
+  gixy = null;
+  mkNugetDeps = null;
+  mkNugetSource = null;
 }
