@@ -6,7 +6,7 @@
   python3,
   flex,
   bison,
-  qt6 ? null,
+  qt6,
   libiconv,
   spdlog,
   fmt,

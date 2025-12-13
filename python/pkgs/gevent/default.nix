@@ -17,9 +17,9 @@
   libuv,
 
   # for passthru.tests
-  dulwich ? null,
-  gunicorn ? null,
-  pika ? null,
+  dulwich,
+  gunicorn,
+  pika,
 }:
 
 buildPythonPackage rec {

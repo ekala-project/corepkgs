@@ -35,7 +35,7 @@
 
   # platform-specific dependencies
   bashNonInteractive,
-  windows ? null,
+  windows,
 
   # optional dependencies
   bluezSupport ? !withMinimalDeps && stdenv.hostPlatform.isLinux,

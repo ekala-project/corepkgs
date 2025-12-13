@@ -7,9 +7,9 @@
   ncurses,
   numpy,
   pkg-config,
-  pygame-ce ? null,
+  pygame-ce,
   python,
-  sage ? null, # Reverse dependency
+  sage, # Reverse dependency
   setuptools,
   stdenv,
 }:

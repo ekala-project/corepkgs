@@ -15,10 +15,10 @@
   enableShared ? !stdenv.hostPlatform.isStatic,
 
   # tests
-  mpd ? null,
-  openimageio ? null,
-  fcitx5 ? null,
-  spdlog ? null,
+  mpd,
+  openimageio,
+  fcitx5,
+  spdlog,
 }@args:
 
 stdenv.mkDerivation {

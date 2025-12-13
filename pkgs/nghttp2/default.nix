@@ -14,24 +14,24 @@
   enableGetAssets ? false,
   libxml2,
   enableHpack ? false,
-  jansson ? null,
+  jansson,
   enableHttp3 ? false,
   ngtcp2,
   nghttp3,
   enableJemalloc ? false,
-  jemalloc ? null,
+  jemalloc,
   enablePython ? false,
   python3,
   ncurses,
 
   # Unit tests ; we have to set TZDIR, which is a GNUism.
   enableTests ? stdenv.hostPlatform.isGnu,
-  cunit ? null,
+  cunit,
   tzdata,
 
   # downstream dependencies, for testing
   curl,
-  libsoup_3 ? null,
+  libsoup_3,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus cannot use fetchpatch!

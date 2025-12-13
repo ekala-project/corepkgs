@@ -151,7 +151,7 @@ in
       pytest,
       # For package tests
       testers,
-      objprint ? null,
+      objprint,
     }:
     makePythonHook {
       name = "pytest-check-hook";

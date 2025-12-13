@@ -12,12 +12,12 @@
   libwebp,
   libtiff,
   freetype,
+  fontconfig,
 
   # Avoid large dependencies
-  libavif ? null,
+  libavif,
   withXorg ? false,
-  libXpm ? null,
-  fontconfig,
+  libXpm,
 }:
 
 stdenv.mkDerivation rec {

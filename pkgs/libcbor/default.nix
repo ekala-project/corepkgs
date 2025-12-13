@@ -6,10 +6,10 @@
   cmocka,
 
   # for passthru.tests
-  libfido2 ? null,
-  mysql80 ? null,
-  openssh ? null,
-  systemd ? null,
+  libfido2,
+  mysql80,
+  openssh,
+  systemd,
 }:
 
 stdenv.mkDerivation (finalAttrs: {

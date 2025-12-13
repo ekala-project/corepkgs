@@ -10,16 +10,15 @@
   pkgsStatic,
 
   # for passthru.tests
-  # TODO(corepkgs): enable tests
-  bind ? null,
+  bind,
   cmake,
-  knot-resolver ? null,
-  sbclPackages ? null,
-  luajitPackages ? null,
-  mosquitto ? null,
-  neovim ? null,
-  nodejs ? null,
-  ocamlPackages ? null,
+  knot-resolver,
+  sbclPackages,
+  luajitPackages,
+  mosquitto,
+  neovim,
+  nodejs,
+  ocamlPackages,
   python3,
   testers,
 }:

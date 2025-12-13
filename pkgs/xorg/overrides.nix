@@ -19,7 +19,7 @@
   mesa,
   udev,
   bootstrap_cmds,
-  clangStdenv ? null,
+  clangStdenv,
   autoreconfHook,
   mcpp,
   libepoxy,

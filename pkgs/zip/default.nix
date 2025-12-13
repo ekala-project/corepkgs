@@ -3,7 +3,7 @@
   stdenv,
   fetchurl,
   enableNLS ? false,
-  libnatspec ? null,
+  libnatspec,
   libiconv,
   fetchpatch,
 }:

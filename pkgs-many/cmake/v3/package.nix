@@ -30,9 +30,9 @@
   texinfo,
   xz,
   zlib,
-  libsForQt5 ? null,
+  libsForQt5,
   gitUpdater,
-  darwin ? null,
+  darwin,
   ps,
 }@dependencies:
 

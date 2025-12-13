@@ -7,10 +7,10 @@
   lib,
 
   # for passthru.tests
-  knot-dns ? null,
+  knot-dns,
   nixosTests,
-  systemd ? null,
-  tracee ? null,
+  systemd,
+  tracee,
 }:
 
 stdenv.mkDerivation rec {

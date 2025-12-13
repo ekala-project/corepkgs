@@ -27,17 +27,17 @@
   buildPackages,
 
   # this is just for tests (not in the closure of any regular package)
-  dbus ? null,
-  tzdata ? null,
-  desktop-file-utils ? null,
-  shared-mime-info ? null,
+  dbus,
+  tzdata,
+  desktop-file-utils,
+  shared-mime-info,
   testers,
   gobject-introspection,
-  libsystemtap ? null,
+  libsystemtap,
   withSysprof ?
     libsysprof-capture != null && lib.meta.availableOn stdenv.hostPlatform libsysprof-capture,
-  libsysprof-capture ? null,
-  mesonEmulatorHook ? null,
+  libsysprof-capture,
+  mesonEmulatorHook,
   withIntrospection ?
     stdenv.hostPlatform.emulatorAvailable buildPackages
     && lib.meta.availableOn stdenv.hostPlatform gobject-introspection
@@ -47,7 +47,7 @@
 assert stdenv.hostPlatform.isLinux -> util-linuxMinimal != null;
 
 let
-  gobject-introspection' = buildPackages.gobject-introspection-unwrapped.override {
+  gobject-introspection' = buildPackages.gobject-introspection.override {
     propagateFullGlib = false;
     # Avoid introducing cairo, which enables gobjectSupport by default.
     x11Support = false;
@@ -64,6 +64,8 @@ let
       "2.0-0.dll"
     else
       "2.0-0.lib";
+
+  systemtap' = buildPackages.systemtap-sdt;
 
   # Not worth the dependency tree
   withDtrace = false;
@@ -166,6 +168,9 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals (lib.meta.availableOn stdenv.hostPlatform elfutils) [
     elfutils
   ]
+  ++ lib.optionals withDtrace [
+    libsystemtap
+  ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
     libselinux
     util-linuxMinimal # for libmount
@@ -194,6 +199,9 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals (withIntrospection && !stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
     mesonEmulatorHook
+  ]
+  ++ lib.optionals withDtrace [
+    systemtap' # for dtrace
   ];
 
   propagatedBuildInputs = [
@@ -356,17 +364,17 @@ stdenv.mkDerivation (finalAttrs: {
     };
   };
 
-  meta = with lib; {
+  meta = {
     description = "C library of programming buildings blocks";
     homepage = "https://gitlab.gnome.org/GNOME/glib";
-    license = licenses.lgpl21Plus;
+    license = lib.licenses.lgpl21Plus;
     maintainers = [ ];
     pkgConfigModules = [
       "gio-2.0"
       "gobject-2.0"
       "gthread-2.0"
     ];
-    platforms = platforms.unix ++ platforms.windows;
+    platforms = lib.platforms.unix ++ lib.platforms.windows;
 
     longDescription = ''
       GLib provides the core application building blocks for libraries

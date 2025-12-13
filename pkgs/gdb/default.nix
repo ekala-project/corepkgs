@@ -26,10 +26,10 @@
   libiconv,
 
   pythonSupport ? stdenv.hostPlatform == stdenv.buildPlatform && !stdenv.hostPlatform.isCygwin,
-  python3 ? null,
+  python3,
   enableDebuginfod ? lib.meta.availableOn stdenv.hostPlatform elfutils,
   elfutils,
-  guile ? null,
+  guile,
   hostCpuOnly ? false,
   enableSim ? false,
   safePaths ? [

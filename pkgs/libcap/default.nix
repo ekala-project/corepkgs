@@ -13,16 +13,16 @@
   withGo ? lib.meta.availableOn stdenv.buildPlatform go && stdenv.hostPlatform.go.GOARCH != null,
 
   # passthru.tests, don't force them to be available in corepkgs
-  bind ? null,
-  chrony ? null,
-  htop ? null,
-  libgcrypt ? null,
-  libvirt ? null,
-  ntp ? null,
-  qemu ? null,
-  squid ? null,
-  tor ? null,
-  uwsgi ? null,
+  bind,
+  chrony,
+  htop,
+  libgcrypt,
+  libvirt,
+  ntp,
+  qemu,
+  squid,
+  tor,
+  uwsgi,
 }:
 
 assert usePam -> pam != null;

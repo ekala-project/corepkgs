@@ -5,7 +5,7 @@
   fetchurl,
   updateAutotoolsGnuConfigScriptsHook,
   ncurses,
-  termcap ? null,
+  termcap,
   curses-library ? if stdenv.hostPlatform.isWindows then termcap else ncurses,
 }:
 

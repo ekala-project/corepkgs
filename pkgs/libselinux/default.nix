@@ -7,9 +7,9 @@
   pkg-config,
   libsepol,
   enablePython ? false,
-  swig ? null,
-  python3 ? null,
-  python3Packages ? null,
+  swig,
+  python3,
+  python3Packages,
   fts,
 }:
 

@@ -5,8 +5,8 @@
   flit-core,
 
   # reverse dependencies
-  mashumaro ? null,
-  pydantic ? null,
+  mashumaro,
+  pydantic,
 }:
 
 buildPythonPackage rec {

@@ -13,12 +13,12 @@
   libxslt,
   libxcrypt,
   pkg-config,
-  glibc ? null,
-  pam ? null,
+  glibc,
+  pam,
   withLibbsd ? lib.meta.availableOn stdenv.hostPlatform libbsd,
-  libbsd ? null,
+  libbsd,
   withTcb ? lib.meta.availableOn stdenv.hostPlatform tcb,
-  tcb ? null,
+  tcb,
 }:
 let
   glibc' =

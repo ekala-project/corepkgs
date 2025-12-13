@@ -12,7 +12,7 @@
   libxml2,
 
   # Optional dependencies.
-  e2fsprogs ? null,
+  e2fsprogs,
   bzip2,
   xz, # lzma
 
@@ -21,13 +21,12 @@
   musl-fts,
 
   # for tests
-  testers ? null,
-  python3 ? null,
-  libxslt ? null, # xsltproc
-  runCommand ? null,
-  runCommandCC ? null,
-  makeWrapper ? null,
-  xar,
+  testers,
+  python3,
+  libxslt, # xsltproc
+  runCommand,
+  runCommandCC,
+  makeWrapper,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "xar${lib.optionalString (e2fsprogs == null) "-minimal"}";

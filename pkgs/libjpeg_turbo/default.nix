@@ -4,7 +4,7 @@
   fetchFromGitHub,
   cmake,
   nasm,
-  openjdk ? null,
+  openjdk,
   enableJava ? false, # whether to build the java wrapper
   enableJpeg7 ? false, # whether to build libjpeg with v7 compatibility
   enableJpeg8 ? false, # whether to build libjpeg with v8 compatibility
@@ -12,18 +12,18 @@
   enableShared ? !stdenv.hostPlatform.isStatic,
 
   # for passthru.tests
-  dvgrab ? null,
-  epeg ? null,
-  gd ? null,
-  graphicsmagick ? null,
-  imagemagick ? null,
-  imlib2 ? null,
-  jhead ? null,
-  libjxl ? null,
-  mjpegtools ? null,
-  opencv ? null,
+  dvgrab,
+  epeg,
+  gd,
+  graphicsmagick,
+  imagemagick,
+  imlib2,
+  jhead,
+  libjxl,
+  mjpegtools,
+  opencv,
   python3,
-  vips ? null,
+  vips,
   testers,
   nix-update-script,
 }:

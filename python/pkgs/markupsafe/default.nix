@@ -12,9 +12,9 @@
 
   # reverse dependencies
   jinja2,
-  mkdocs ? null,
-  quart ? null,
-  werkzeug ? null,
+  mkdocs,
+  quart,
+  werkzeug,
 }:
 
 buildPythonPackage rec {

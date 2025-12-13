@@ -26,12 +26,12 @@
   withLerc ? !stdenv.hostPlatform.isStatic,
 
   # for passthru.tests
-  libgeotiff ? null,
-  python3Packages ? null,
-  imagemagick ? null,
-  graphicsmagick ? null,
-  gdal ? null,
-  openimageio ? null,
+  libgeotiff,
+  python3Packages,
+  imagemagick,
+  graphicsmagick,
+  gdal,
+  openimageio,
   testers,
 }:
 

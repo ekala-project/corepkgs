@@ -8,7 +8,7 @@
   setuptools,
 
   # tests
-  objgraph ? null,
+  objgraph,
   psutil,
   python,
   unittestCheckHook,

@@ -21,17 +21,17 @@
   libwebpmuxSupport ? true, # Build libwebpmux
 
   # for passthru.tests
-  gd ? null,
-  graphicsmagick ? null,
-  haskellPackages ? null,
-  imagemagick ? null,
-  imlib2 ? null,
-  libjxl ? null,
-  opencv ? null,
-  python3 ? null,
-  vips ? null,
+  gd,
+  graphicsmagick,
+  haskellPackages,
+  imagemagick,
+  imlib2,
+  libjxl,
+  opencv,
+  python3,
+  vips,
   testers,
-  libwebp ? null,
+  libwebp,
 }:
 
 stdenv.mkDerivation rec {

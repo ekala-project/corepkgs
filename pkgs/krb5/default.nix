@@ -12,13 +12,12 @@
   pkg-config,
 
   # for passthru.tests
-  # TODO(corepkgs): enable tests
-  bind ? null,
+  bind,
   curl,
   nixosTests,
-  openssh ? null,
-  postgresql ? null,
-  python3 ? null,
+  openssh,
+  postgresql,
+  python3,
 
   # Extra Arguments
   withLdap ? false,
@@ -26,7 +25,7 @@
   withLibedit ? true,
   libedit,
   withVerto ? false,
-  libverto ? null,
+  libverto,
 
   # This is called "staticOnly" because krb5 does not support
   # builting both static and shared, see below.

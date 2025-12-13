@@ -11,7 +11,7 @@
 
   # optional-dependencies
   psutil,
-  setproctitle ? null,
+  setproctitle,
 }:
 
 buildPythonPackage rec {

@@ -4,7 +4,7 @@
   fetchurl,
   bzip2,
   enableNLS ? false,
-  libnatspec ? null,
+  libnatspec,
 }:
 
 stdenv.mkDerivation rec {

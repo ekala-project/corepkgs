@@ -17,8 +17,8 @@
   # tests
   pytestCheckHook,
   pytest-timeout,
-  tornado ? null,
-  trustme ? null,
+  tornado,
+  trustme,
 }:
 
 let

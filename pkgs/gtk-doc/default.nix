@@ -9,9 +9,9 @@
   docbook-xsl-nons,
   libxslt,
   gettext,
-  gnome ? null,
+  gnome,
   withDblatex ? false,
-  dblatex ? null,
+  dblatex,
 }:
 
 python3.pkgs.buildPythonApplication rec {

@@ -24,7 +24,7 @@
   sqlite,
   nlsSupport ? true,
   translateManpages ? po4a != null,
-  po4a ? null,
+  po4a,
   installShellFiles,
   writeSupport ? stdenv.hostPlatform.isLinux,
   shadowSupport ? stdenv.hostPlatform.isLinux,
