@@ -47,7 +47,7 @@
 assert stdenv.hostPlatform.isLinux -> util-linuxMinimal != null;
 
 let
-  gobject-introspection' = buildPackages.gobject-introspection.override {
+  gobject-introspection' = buildPackages.gobject-introspection.unwrapped.override {
     propagateFullGlib = false;
     # Avoid introducing cairo, which enables gobjectSupport by default.
     x11Support = false;
