@@ -1799,6 +1799,68 @@ with final;
     ];
   } ./build-support/setup-hooks/validate-pkg-config.sh;
 
+  wrapRustcWith = { rustc-unwrapped, ... }@args: callPackage ./build-support/rust/rustc-wrapper args;
+  wrapRustc = rustc-unwrapped: wrapRustcWith { inherit rustc-unwrapped; };
+
+  rust_1_91 = callPackage ./pkgs/rust/1_91.nix { };
+  rust = rust_1_91;
+
+  mrustc-minicargo = callPackage ./pkgs/mrustc/minicargo.nix { };
+  mrustc-bootstrap = callPackage ./pkgs/mrustc/bootstrap.nix { };
+
+  rustPackages_1_91 = rust_1_91.packages.stable;
+  rustPackages = rustPackages_1_91;
+
+  inherit (rustPackages)
+    cargo
+    cargo-auditable
+    cargo-auditable-cargo-wrapper
+    clippy
+    rustc
+    rustc-unwrapped
+    rustPlatform
+    rustfmt
+    ;
+
+  makeRustPlatform = callPackage ./pkgs/rust/make-rust-platform.nix { };
+
+  buildRustCrate =
+    let
+      # Returns a true if the builder's rustc was built with support for the target.
+      targetAlreadyIncluded = lib.elem stdenv.hostPlatform.rust.rustcTarget (
+        lib.splitString "," (
+          lib.removePrefix "--target=" (
+            lib.elemAt (lib.filter (
+              f: lib.hasPrefix "--target=" f
+            ) pkgsBuildBuild.rustc.unwrapped.configureFlags) 0
+          )
+        )
+      );
+    in
+    callPackage ./build-support/rust/build-rust-crate (
+      { }
+      // lib.optionalAttrs (stdenv.hostPlatform.libc == null) {
+        stdenv = stdenvNoCC; # Some build targets without libc will fail to evaluate with a normal stdenv.
+      }
+      // lib.optionalAttrs targetAlreadyIncluded { inherit (pkgsBuildBuild) rustc cargo; } # Optimization.
+    );
+  buildRustCrateHelpers = callPackage ./build-support/rust/build-rust-crate/helpers.nix { };
+
+  defaultCrateOverrides = callPackage ./build-support/rust/default-crate-overrides.nix { };
+
+  inherit (callPackages ./pkgs/cargo-pgrx { })
+    cargo-pgrx_0_12_0_alpha_1
+    cargo-pgrx_0_12_6
+    cargo-pgrx_0_16_0
+    cargo-pgrx_0_16_1
+    cargo-pgrx
+    ;
+
+  buildPgrxExtension = callPackage ./pkgs/cargo-pgrx/buildPgrxExtension.nix { };
+
+  rust-bindgen-unwrapped = callPackage ./pkgs/rust-bindgen/unwrapped.nix { };
+  rustup-toolchain-install-master =
+    callPackage ./pkgs/rustup-toolchain-install-master { };
 
   writers = callPackage ./build-support/writers { };
   # TODO(corepkgs): support writers fully
