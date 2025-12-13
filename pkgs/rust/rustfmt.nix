@@ -59,9 +59,6 @@ rustPlatform.buildRustPackage {
       asl20
     ];
     mainProgram = "rustfmt";
-    maintainers = with lib.maintainers; [
-      globin
-      basvandijk
-    ];
+    maintainers = [ ];
   };
 }

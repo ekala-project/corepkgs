@@ -182,7 +182,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Easily extensible archive format";
     license = lib.licenses.bsd3;
     maintainers = lib.attrValues { inherit (lib.maintainers) tie; };
-    teams = [ lib.teams.darwin ];
     platforms = lib.platforms.unix;
     mainProgram = "xar";
   };

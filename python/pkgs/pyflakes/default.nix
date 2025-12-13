@@ -39,6 +39,6 @@ buildPythonPackage rec {
     description = "Simple program which checks Python source files for errors";
     mainProgram = "pyflakes";
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [ dotlambda ];
+    maintainers = [ ];
   };
 }

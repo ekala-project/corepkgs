@@ -158,9 +158,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
       asl20 # or
       mit
     ];
-    maintainers = with lib.maintainers; [
-      mic92
-    ];
+    maintainers = [ ];
     mainProgram = "rustup";
   };
 })

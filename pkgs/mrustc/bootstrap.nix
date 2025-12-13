@@ -144,10 +144,7 @@ stdenv.mkDerivation rec {
       This is useful for bootstrapping the main Rust compiler without
       an initial binary toolchain download.
     '';
-    maintainers = with lib.maintainers; [
-      progval
-      r-burns
-    ];
+    maintainers = [ ];
     license = with lib.licenses; [
       mit
       asl20
