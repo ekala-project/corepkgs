@@ -4,35 +4,29 @@
   inputs = {
     # For bootstrapping
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    systems.url = "github:nix-systems/default";
     treefmt-nix.url = "github:numtide/treefmt-nix";
   };
 
   outputs =
     {
       self,
+      systems,
       nixpkgs,
       treefmt-nix,
     }:
     let
-      # Helper function to generate outputs for each system
-      forAllSystems = nixpkgs.lib.genAttrs [
-        "aarch64-linux"
-        "aarch64-darwin"
-        "i686-linux"
-        "x86_64-darwin"
-        "x86_64-linux"
-      ];
+      forAllSystems =
+        f: nixpkgs.lib.genAttrs (import systems) (system: f nixpkgs.legacyPackages.${system});
+      treefmt = forAllSystems (
+        pkgs:
+        treefmt-nix.lib.evalModule pkgs {
+          projectRootFile = "flake.nix";
+          programs.nixfmt.enable = true;
+        }
+      );
     in
     {
-      formatter = forAllSystems (
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-          fmt = treefmt-nix.lib.evalModule pkgs {
-            programs.nixfmt.enable = true;
-          };
-        in
-        fmt.config.build.wrapper
-      );
+      formatter = forAllSystems (pkgs: treefmt.${pkgs.stdenv.hostPlatform.system}.config.build.wrapper);
     };
 }

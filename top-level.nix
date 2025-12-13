@@ -1859,8 +1859,7 @@ with final;
   buildPgrxExtension = callPackage ./pkgs/cargo-pgrx/buildPgrxExtension.nix { };
 
   rust-bindgen-unwrapped = callPackage ./pkgs/rust-bindgen/unwrapped.nix { };
-  rustup-toolchain-install-master =
-    callPackage ./pkgs/rustup-toolchain-install-master { };
+  rustup-toolchain-install-master = callPackage ./pkgs/rustup-toolchain-install-master { };
 
   writers = callPackage ./build-support/writers { };
   # TODO(corepkgs): support writers fully
