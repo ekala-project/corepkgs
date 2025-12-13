@@ -423,6 +423,13 @@ with final;
 
   fts = if stdenv.hostPlatform.isMusl then musl-fts else null;
 
+  inherit (callPackages ./build-support/setup-hooks/patch-rc-path-hooks { })
+    patchRcPathBash
+    patchRcPathCsh
+    patchRcPathFish
+    patchRcPathPosix
+    ;
+
   shortenPerlShebang = makeSetupHook {
     name = "shorten-perl-shebang-hook";
     propagatedBuildInputs = [ dieHook ];
