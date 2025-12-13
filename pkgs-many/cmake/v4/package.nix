@@ -32,7 +32,7 @@
   xz,
   zlib,
   darwin,
-  libsForQt5 ? null,
+  libsForQt5,
   gitUpdater,
 }@dependencies:
 

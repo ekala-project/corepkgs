@@ -15,7 +15,7 @@
   sphinx-issues,
 
   # Reverse dependency
-  sage ? null,
+  sage,
 }:
 
 buildPythonPackage rec {

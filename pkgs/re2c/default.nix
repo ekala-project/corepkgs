@@ -8,8 +8,8 @@
 
   # for passthru.tests
   ninja,
-  php ? null,
-  spamassassin ? null,
+  php,
+  spamassassin,
 }:
 
 stdenv.mkDerivation rec {

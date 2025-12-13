@@ -4,7 +4,7 @@
   fetchurl,
   autoreconfHook,
   guileSupport ? false,
-  guile ? null,
+  guile,
   # avoid guile depend on bootstrap to prevent dependency cycles
   inBootstrap ? false,
   pkg-config,

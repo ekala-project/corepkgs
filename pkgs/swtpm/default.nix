@@ -20,8 +20,8 @@
   makeWrapper,
 
   # Tests
-  python3 ? null,
-  which ? null,
+  python3,
+  which,
   nixosTests,
 }:
 

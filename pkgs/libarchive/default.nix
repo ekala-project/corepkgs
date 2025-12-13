@@ -22,7 +22,7 @@
   # for passthru.tests
   cmake,
   nix,
-  samba ? null,
+  samba,
 
   # for passthru.lore
   binlore,

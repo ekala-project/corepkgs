@@ -29,19 +29,17 @@
   # certificate compression - only zlib now, more possible: zstd, brotli
 
   # for passthru.tests
-  curlWithGnuTls ? null,
-  emacs ? null,
-  ffmpeg ? null,
-  haskellPackages ? null,
-  knot-resolver ? null,
-  ngtcp2-gnutls ? null,
-  ocamlPackages ? null,
-  pkgsStatic ? null,
-  python3Packages ? null,
-  qemu ? null,
-  rsyslog ? null,
-  openconnect ? null,
-  samba ? null,
+  curlWithGnuTls,
+  emacs,
+  ffmpeg,
+  knot-resolver,
+  ngtcp2-gnutls,
+  pkgsStatic,
+  python3Packages,
+  qemu,
+  rsyslog,
+  openconnect,
+  samba,
 
   gitUpdater,
 }:

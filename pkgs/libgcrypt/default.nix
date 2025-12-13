@@ -9,9 +9,9 @@
   buildPackages,
 
   # for passthru.tests. Don't force these to be available in corepkgs
-  gnupg ? null,
-  libotr ? null,
-  rsyslog ? null,
+  gnupg,
+  libotr,
+  rsyslog,
 }:
 
 assert enableCapabilities -> stdenv.hostPlatform.isLinux;

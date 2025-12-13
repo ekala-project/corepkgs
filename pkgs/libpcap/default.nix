@@ -14,14 +14,14 @@
   withRemote ? false,
 
   # for passthru.tests
-  ettercap ? null,
-  nmap ? null,
-  ostinato ? null,
-  tcpreplay ? null,
-  vde2 ? null,
-  wireshark ? null,
-  python3 ? null,
-  haskellPackages ? null,
+  ettercap,
+  nmap,
+  ostinato,
+  tcpreplay,
+  vde2,
+  wireshark,
+  python3,
+  haskellPackages,
 }:
 
 stdenv.mkDerivation rec {

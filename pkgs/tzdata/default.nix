@@ -3,8 +3,7 @@
   stdenv,
   fetchurl,
   buildPackages,
-  # TODO(corepkgs): enable tests
-  postgresql ? null,
+  postgresql,
 }:
 
 stdenv.mkDerivation (finalAttrs: {

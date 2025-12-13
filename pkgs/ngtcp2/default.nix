@@ -8,7 +8,7 @@
   nghttp3,
   openssl,
   withJemalloc ? false,
-  jemalloc ? null,
+  jemalloc,
   curl,
 }:
 

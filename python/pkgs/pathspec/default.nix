@@ -6,10 +6,10 @@
   unittestCheckHook,
 
   # for passthru.tests
-  awsebcli ? null,
+  awsebcli,
   black,
   hatchling,
-  yamllint ? null,
+  yamllint,
 }:
 
 buildPythonPackage rec {

@@ -21,14 +21,13 @@
   enableUtilLinux ? !stdenv.hostPlatform.isStatic,
   util-linux,
   enableVDO ? false,
-  vdo ? null,
+  vdo,
   enableMdadm ? false,
-  mdadm ? null,
+  mdadm,
   enableMultipath ? false,
-  multipath-tools ? null,
+  multipath-tools,
   nixosTests,
-  # TODO(corepkgs): add
-  buildFHSEnv ? null,
+  buildFHSEnv,
 }:
 
 # configure: error: --enable-dmeventd requires --enable-cmdlib to be used as well

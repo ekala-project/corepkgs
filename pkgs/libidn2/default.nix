@@ -4,7 +4,7 @@
   stdenv,
   libiconv,
   libunistring,
-  help2man ? null,
+  help2man,
   texinfo,
   buildPackages,
 }:

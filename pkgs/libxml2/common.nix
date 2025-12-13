@@ -5,7 +5,7 @@
   pkg-config,
   autoreconfHook,
   python3,
-  doxygen ? null,
+  doxygen,
   ncurses,
   findXMLCatalogs,
   libiconv,
@@ -16,7 +16,7 @@
   zlib,
   enableShared ? !stdenv.hostPlatform.isMinGW && !stdenv.hostPlatform.isStatic,
   enableStatic ? !enableShared,
-  gnome ? null,
+  gnome,
   testers,
   enableHttp ? false,
 

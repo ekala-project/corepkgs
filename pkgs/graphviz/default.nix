@@ -9,12 +9,12 @@
   flex,
   fontconfig,
   gd,
-  gts ? null,
+  gts,
   libjpeg,
   libpng,
   libtool,
   makeWrapper,
-  pango ? null,
+  pango,
   bash,
   bison,
   xorg,
@@ -22,9 +22,9 @@
   withXorg ? false,
 
   # for passthru.tests
-  exiv2 ? null,
-  fltk ? null,
-  graphicsmagick ? null,
+  exiv2,
+  fltk,
+  graphicsmagick,
 }:
 
 let

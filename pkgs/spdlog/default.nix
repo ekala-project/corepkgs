@@ -9,8 +9,8 @@
   staticBuild ? stdenv.hostPlatform.isStatic,
 
   # passthru
-  bear ? null,
-  tiledb ? null,
+  bear,
+  tiledb,
   nix-update-script,
 }:
 

@@ -4,15 +4,14 @@
   fetchurl,
   openssl,
   zlib,
-  windows ? null,
+  windows,
 
   # for passthru.tests
-  # TODO(corepkgs): enable tests
-  aria2 ? null,
+  aria2,
   curl,
-  libgit2 ? null,
-  mc ? null,
-  vlc ? null,
+  libgit2,
+  mc,
+  vlc,
 }:
 
 stdenv.mkDerivation rec {

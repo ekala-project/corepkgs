@@ -9,10 +9,10 @@
   gettext,
   python3,
   ncurses,
-  libgcrypt ? null,
+  libgcrypt,
   cryptoSupport ? false,
   pythonSupport ? libxml2.pythonSupport,
-  gnome ? null,
+  gnome,
 }:
 
 stdenv.mkDerivation (finalAttrs: {

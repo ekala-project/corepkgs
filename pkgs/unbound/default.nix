@@ -9,7 +9,7 @@
   libevent,
   libsodium,
   hiredis,
-  python ? null,
+  python,
   swig,
   dns-root-data,
   pkg-config,
@@ -27,13 +27,13 @@
   # For the daemon use-case, that needs to notify systemd, use `unbound-with-systemd`.
   #
   withSystemd ? false,
-  systemd ? null,
+  systemd,
   # optionally support DNS-over-HTTPS as a server
   withDoH ? false,
   withECS ? false,
   withDNSCrypt ? false,
   withDNSTAP ? false,
-  protobufc ? null,
+  protobufc,
   withTFO ? false,
   withRedis ? false,
   # Avoid .lib depending on lib.getLib openssl
@@ -46,7 +46,7 @@
   withDynlibModule ? false,
   withLto ? !stdenv.hostPlatform.isStatic && !stdenv.hostPlatform.isMinGW,
   withMakeWrapper ? !stdenv.hostPlatform.isMinGW,
-  libnghttp2 ? null,
+  libnghttp2,
 
   # for passthru.updateScript
   nix-update-script,

@@ -7,7 +7,7 @@
   elf-header,
   bison,
   flex,
-  rsync ? null,
+  rsync,
   writeTextFile,
 }:
 

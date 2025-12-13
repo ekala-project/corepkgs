@@ -6,7 +6,7 @@
   python,
 
   # tests
-  distutils ? null,
+  distutils,
 }:
 
 buildPythonPackage rec {

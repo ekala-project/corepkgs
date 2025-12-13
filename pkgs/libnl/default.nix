@@ -8,13 +8,13 @@
   flex,
   pkg-config,
   doxygen,
-  graphviz ? null,
-  mscgen ? null,
+  graphviz,
+  mscgen,
   asciidoc,
   sourceHighlight,
   pythonSupport ? false,
-  swig ? null,
-  python ? null,
+  swig,
+  python,
 }:
 
 stdenv.mkDerivation rec {

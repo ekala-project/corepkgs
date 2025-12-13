@@ -16,7 +16,7 @@
   profiledCompiler ? false,
   langJit ? false,
   langRust ? false,
-  cargo ? null,
+  cargo,
   staticCompiler ? false,
   enableShared ? stdenv.targetPlatform.hasSharedLibraries,
   enableDefaultPie ? stdenv.targetPlatform.hasSharedLibraries,

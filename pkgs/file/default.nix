@@ -4,11 +4,9 @@
   fetchurl,
   file,
   zlib,
+  libgnurx,
   updateAutotoolsGnuConfigScriptsHook,
   testers,
-
-  # Windows specific
-  libgnurx ? null,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus

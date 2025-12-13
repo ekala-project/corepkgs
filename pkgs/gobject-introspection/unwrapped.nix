@@ -25,7 +25,7 @@
   testers,
   propagateFullGlib ? true,
   # Check inputs
-  cctools ? null,
+  cctools,
 }:
 
 # now that gobject-introspection creates large .gir files (eg gtk3 case)

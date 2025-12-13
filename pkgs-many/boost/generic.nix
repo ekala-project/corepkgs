@@ -18,7 +18,7 @@
   bzip2,
   zstd,
   xz,
-  python ? null,
+  python,
   fixDarwinDylibNames,
   libiconv,
   libxcrypt,

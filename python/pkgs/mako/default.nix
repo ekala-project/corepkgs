@@ -12,12 +12,12 @@
   markupsafe,
 
   # optional-dependencies
-  babel ? null,
-  lingua ? null,
+  babel,
+  lingua,
 
   # tests
-  chameleon ? null,
-  mock ? null,
+  chameleon,
+  mock,
   pytestCheckHook,
 }:
 

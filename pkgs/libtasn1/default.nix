@@ -6,9 +6,9 @@
   texinfo,
 
   # for passthru.tests
-  gnutls ? null,
-  samba ? null,
-  qemu ? null,
+  gnutls,
+  samba,
+  qemu,
 }:
 
 stdenv.mkDerivation rec {

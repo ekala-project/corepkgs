@@ -9,13 +9,13 @@
   glib, # just passthru
 
   # for passthru.tests
-  cairo ? null,
-  qemu ? null,
-  scribus ? null,
-  tigervnc ? null,
-  wlroots_0_17 ? null,
-  wlroots_0_18 ? null,
-  xwayland ? null,
+  cairo,
+  qemu,
+  scribus,
+  tigervnc,
+  wlroots_0_17,
+  wlroots_0_18,
+  xwayland,
 
   gitUpdater,
   testers,

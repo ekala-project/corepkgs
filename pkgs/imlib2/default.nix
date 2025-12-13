@@ -25,17 +25,17 @@
   psSupport ? false,
 
   # for passthru.tests
-  libcaca ? null,
-  diffoscopeMinimal ? null,
-  feh ? null,
-  icewm ? null,
-  openbox ? null,
-  fluxbox ? null,
-  enlightenment ? null,
-  xorg ? null,
+  libcaca,
+  diffoscopeMinimal,
+  feh,
+  icewm,
+  openbox,
+  fluxbox,
+  enlightenment,
+  xorg,
   testers,
 
-  gitUpdater ? null,
+  gitUpdater,
 }:
 
 let

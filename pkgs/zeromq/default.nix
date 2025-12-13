@@ -10,11 +10,11 @@
   enableDrafts ? false,
   fetchpatch,
   # for passthru.tests
-  azmq ? null,
-  cppzmq ? null,
-  czmq ? null,
-  zmqpp ? null,
-  ffmpeg ? null,
+  azmq,
+  cppzmq,
+  czmq,
+  zmqpp,
+  ffmpeg,
   python3,
   testers,
 }:

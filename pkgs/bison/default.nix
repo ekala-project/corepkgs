@@ -4,7 +4,7 @@
   fetchurl,
   m4,
   perl,
-  help2man ? null,
+  help2man,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus

@@ -57,17 +57,16 @@
   zstd,
 
   # for passthru.tests
-  # TODO(corepkgs): enable tests
-  coeurl ? null,
-  curlpp ? null,
-  haskellPackages ? null,
-  ocamlPackages ? null,
-  phpExtensions ? null,
-  pkgsStatic ? null,
-  python3 ? null,
-  tests ? null,
-  testers ? null,
-  fetchpatch ? null,
+  coeurl,
+  curlpp,
+  haskellPackages,
+  ocamlPackages,
+  phpExtensions,
+  pkgsStatic,
+  python3,
+  tests,
+  testers,
+  fetchpatch,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
