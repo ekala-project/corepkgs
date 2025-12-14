@@ -39,8 +39,8 @@ let
 
   stagesCustom = import ./custom args;
 
-  # Select the appropriate stages for the platform `system'.
 in
+# Select the appropriate stages for the platform `system'.
 if crossSystem != localSystem || crossOverlays != [ ] then
   stagesCross
 else if config ? replaceStdenv then
