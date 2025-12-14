@@ -111,7 +111,7 @@ stdenv.mkDerivation rec {
     glib # in .pc Requires
   ];
 
-  # TODO: enable tests in passthru.tests
+  # TODO(corepkgs): enable tests in passthru.tests
   # nativeCheckInputs = [
   #   dbus
   #   util-linux # for mount

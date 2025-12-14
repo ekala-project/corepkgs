@@ -29,13 +29,11 @@ CHECK_NEW_FILES_IGNORE_NEW_DIRS = [
 ]
 
 IGNORE_DIRS = [
-    "apparmor",      # TODO: Structure diverged upstream
     "docs",          # Documentation files
     "maintainers",   # Maintainer information
     "pkgs-many",     # Many packages directory
     "patches",       # Generated patch files directory
-    "pkgs/rust",     # Synced 2025-12-05
-    "stdenv/generic",# Synced 2025-12-06
+    "stdenv",        # Synced 2025-12-06
 ]
 
 IGNORE_FILES = [
@@ -82,14 +80,14 @@ PATH_MAPPINGS = {
     "stdenv": "pkgs/stdenv",
     "stdenv/impure.nix": "pkgs/top-level/default.nix",
     "systems": "lib/systems",
-    "test": "nixos/tests",
-    "test/cc-wrapper": "pkgs/test/cc-wrapper",
-    "test/haskell": "pkgs/test/haskell",
-    "test/dotnet": "pkgs/test/dotnet",
-    "test/stdenv": "pkgs/test/stdenv",
-    "test/stdenv-inputs": "pkgs/test/stdenv-inputs",
-    "test/make-binary-wrapper": "pkgs/test/make-binary-wrapper",
-    "test/make-hardcode-gsettings-patch": "pkgs/test/make-hardcode-gsettings-patch",
+    # "test": "nixos/tests",
+    # "test/cc-wrapper": "pkgs/test/cc-wrapper",
+    # "test/haskell": "pkgs/test/haskell",
+    # "test/dotnet": "pkgs/test/dotnet",
+    # "test/stdenv": "pkgs/test/stdenv",
+    # "test/stdenv-inputs": "pkgs/test/stdenv-inputs",
+    # "test/make-binary-wrapper": "pkgs/test/make-binary-wrapper",
+    # "test/make-hardcode-gsettings-patch": "pkgs/test/make-hardcode-gsettings-patch",
     "release.nix": "pkgs/top-level/release.nix",
     "unixtools.nix": "pkgs/top-level/unixtools.nix",
 }

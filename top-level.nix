@@ -28,6 +28,7 @@ with final;
   qt6 = null;
   openjdk = null;
   haskellPackages = null;
+  luaPackages = null;
   ocamlPackages = null;
   phpExtensions = null;
 
@@ -165,7 +166,7 @@ with final;
   setproctitle = null;
   spamassassin = null;
   squid = null;
-  swig = null;
+  subversionClient = null;
   tcb = null;
   tcpreplay = null;
   termcap = null;
@@ -1653,12 +1654,11 @@ with final;
     pythonSupport = false;
     perlSupport = false;
     withpcre2 = false;
-    withZlibNg = false;
     # FIXME(corepkgs): these are hacks to break the infinite recursion
     # Prefer plain zlib and curl without HTTP/3 to keep bootstrap cycle small.
-    zlib-ng = zlib;
     # Avoid curl with HTTP/3 (nghttp3) to break the cmake→git→curl→nghttp3→cmake cycle.
     curl = curlMinimal;
+    withZlibNg = false;
   };
 
   deterministic-host-uname = deterministic-uname.override {

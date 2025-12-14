@@ -8,8 +8,7 @@
   ncurses,
 
   # for tests
-  # TODO(corepkgs): enable tests
-  python3Packages ? { },
+  python3Packages,
   sqldiff,
   sqlite-analyzer,
   sqlite-rsync,
