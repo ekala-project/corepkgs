@@ -31,14 +31,14 @@
   libiconv,
   libiconvReal,
   svnSupport ? false,
-  subversionClient ? null,
+  subversionClient,
   perlLibs,
   smtpPerlLibs,
   perlSupport ? stdenv.buildPlatform == stdenv.hostPlatform,
   nlsSupport ? true,
   osxkeychainSupport ? stdenv.hostPlatform.isDarwin,
   guiSupport ? false,
-  # TODO(corepkgs): build with manual by default
+  # TODO(corepkgs): build with manual by default?
   withManual ? false,
   pythonSupport ? true,
   withpcre2 ? true,

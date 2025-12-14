@@ -15,7 +15,7 @@
   libffi,
   python3,
   cairo,
-  gnome ? { },
+  gnome,
   replaceVars,
   replaceVarsWith,
   buildPackages,
