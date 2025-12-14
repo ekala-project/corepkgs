@@ -28,7 +28,7 @@ stdenv.mkDerivation rec {
   strictDeps = true;
 
   nativeBuildInputs = [
-    cmake
+    cmake.minimal
     pkg-config
   ];
 
