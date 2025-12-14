@@ -93,7 +93,7 @@ with final;
   jhead = null;
   jre = null;
   knot-dns = null;
-  knot-resolver = null;
+  knot-resolver_5 = null;
   libXpm = null;
   libavif = null;
   libcaca = null;

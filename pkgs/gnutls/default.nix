@@ -8,8 +8,7 @@
   pkg-config,
   perl,
   gmp,
-  # TODO(corepkgs): check if it shill builds
-  autoconf,
+  buildPackages,
   automake,
   libidn2,
   libiconv,
@@ -32,7 +31,7 @@
   curlWithGnuTls,
   emacs,
   ffmpeg,
-  knot-resolver,
+  knot-resolver_5,
   ngtcp2-gnutls,
   pkgsStatic,
   python3Packages,
@@ -45,6 +44,8 @@
 }:
 
 let
+  # break cyclic dependency
+  autoconf = buildPackages.autoconf269;
 
   # XXX: Gnulib's `test-select' fails on FreeBSD:
   # https://hydra.nixos.org/build/2962084/nixlog/1/raw .
@@ -202,18 +203,16 @@ stdenv.mkDerivation rec {
       ffmpeg
       emacs
       qemu
-      knot-resolver
+      knot-resolver_5
       samba
       openconnect
       ;
-    #inherit (ocamlPackages) ocamlnet;
-    #haskell-gnutls = haskellPackages.gnutls;
     python3-gnutls = python3Packages.python3-gnutls;
     rsyslog = rsyslog.override { withGnutls = true; };
     static = pkgsStatic.gnutls;
   };
 
-  meta = with lib; {
+  meta = {
     description = "GNU Transport Layer Security Library";
 
     longDescription = ''
@@ -231,8 +230,8 @@ stdenv.mkDerivation rec {
     '';
 
     homepage = "https://gnutls.org/";
-    license = licenses.lgpl21Plus;
+    license = lib.licenses.lgpl21Plus;
     maintainers = [ ];
-    platforms = platforms.all;
+    platforms = lib.platforms.all;
   };
 }
