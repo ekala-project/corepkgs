@@ -26,14 +26,21 @@ CHECK_NEW_FILES_IGNORE_NEW_DIRS = [
     "build-support",
     "os-specific",
     "os-specific/linux",
+    "perl/patches",
+    "stdenv",        # Synced 2025-12-06
+  
 ]
 
 IGNORE_DIRS = [
+    ".github",       # GitHub Actions
+    ".ekaci",        # CI
     "docs",          # Documentation files
     "maintainers",   # Maintainer information
     "pkgs-many",     # Many packages directory
     "patches",       # Generated patch files directory
-    "stdenv",        # Synced 2025-12-06
+    "stdenv/cygwin",
+    "stdenv/darwin",
+    "stdenv/freebsd",
 ]
 
 IGNORE_FILES = [
@@ -41,13 +48,13 @@ IGNORE_FILES = [
     "README.md",
     "LICENSE",
     ".gitignore",
+    "flake.nix",
+    "flake.lock",
     "default.nix",
     "lib.nix",
     "pins.nix",
     "top-level.nix",
     "stdenv/aliases.nix",
-    "stdenv/config.nix",
-    "stdenv/generic/default.nix",
 ]
 
 PATCHES_DIR = "patches"
@@ -58,6 +65,7 @@ PATH_MAPPINGS = {
     "os-specific": "pkgs/os-specific",
     "perl/buildperlpackage.nix": "pkgs/development/perl-modules/generic",
     "perl/perl-packages.nix": "pkgs/top-level/perl-packages.nix",
+    "perl/patches": "pkgs/development/perl-modules",
     "python": "pkgs/development/interpreters/python",
     "python/pkgs": "pkgs/development/python-modules",
     "pkgs": "pkgs/by-name",
@@ -78,7 +86,12 @@ PATH_MAPPINGS = {
     "pkgs/xorg": "pkgs/servers/x11/xorg",
     "pkgs/javaPackages/openjdk": "pkgs/development/compilers/openjdk",
     "stdenv": "pkgs/stdenv",
-    "stdenv/impure.nix": "pkgs/top-level/default.nix",
+    "stdenv/pure.nix": "pkgs/top-level/default.nix",
+    "stdenv/impure.nix": "pkgs/top-level/impure.nix",
+    "stdenv/config.nix": "pkgs/top-level/config.nix",
+    "stdenv/splice.nix": "pkgs/top-level/splice.nix",
+    "stdenv/stage.nix": "pkgs/top-level/stage.nix",
+    "stdenv/variants.nix": "pkgs/top-level/variants.nix",
     "systems": "lib/systems",
     # "test": "nixos/tests",
     # "test/cc-wrapper": "pkgs/test/cc-wrapper",
