@@ -25,6 +25,17 @@ to do development and software deployments without the breadth of user tools
 and other nicities. This reduced scope should allow for updates to be applied
 more frequently and cause less rebuild churn than something the size of nixpkgs.
 
+## Guiding design principles
+
+These are a set of guiding principles when making packaging or process decisions.
+Generally, this will cause divergence from Nixpkgs.
+
+- Explict over implict
+- Intuitive over pedantic
+- Good defaults over assumed configuration
+- Automation over manual
+- Fun over drudgery
+
 ## Structure
 
 ```
