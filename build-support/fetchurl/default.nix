@@ -240,7 +240,7 @@ lib.extendMkDerivation {
 
     derivationArgs
     // {
-      __structuredAttrs = true;
+      __structuredAttrs = false;
 
       name =
         if finalAttrs.pname or null != null && finalAttrs.version or null != null then
