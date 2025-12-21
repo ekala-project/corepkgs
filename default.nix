@@ -9,11 +9,11 @@ let
   inherit (pins) lib;
 
   filteredArgs = builtins.removeAttrs args [ "overlays" ];
+  pkgs = import ./stdenv/impure.nix (
+    {
+      inherit overlays;
+    }
+    // filteredArgs
+  );
 in
-
-import ./stdenv/impure.nix (
-  {
-    inherit overlays;
-  }
-  // filteredArgs
-)
+lib.recurseIntoAttrs pkgs
