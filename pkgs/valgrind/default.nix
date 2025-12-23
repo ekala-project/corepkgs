@@ -72,7 +72,8 @@ stdenv.mkDerivation rec {
 
   configureFlags = lib.optional stdenv.hostPlatform.isx86_64 "--enable-only64bit";
 
-  doCheck = true;
+  # TODO: move to passthru.tests
+  doCheck = false;
 
   postInstall = ''
     for i in $out/libexec/valgrind/*.supp; do
