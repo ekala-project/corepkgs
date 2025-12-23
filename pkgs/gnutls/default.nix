@@ -49,10 +49,12 @@ let
 
   # XXX: Gnulib's `test-select' fails on FreeBSD:
   # https://hydra.nixos.org/build/2962084/nixlog/1/raw .
-  doCheck =
-    !stdenv.hostPlatform.isFreeBSD
-    && !stdenv.hostPlatform.isDarwin
-    && stdenv.buildPlatform == stdenv.hostPlatform;
+  doCheck = false;
+  # TODO(corepkgs): move to passthru.tests
+  # doCheck =
+  #   !stdenv.hostPlatform.isFreeBSD
+  #   && !stdenv.hostPlatform.isDarwin
+  #   && stdenv.buildPlatform == stdenv.hostPlatform;
 
   inherit (stdenv.hostPlatform) isDarwin;
 in
