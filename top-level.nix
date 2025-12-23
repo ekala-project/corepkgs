@@ -20,6 +20,7 @@ with final;
   # TODO(corepkgs): Create ekapkg specific version
   nix-update-script = { };
   nix-update = null;
+  nixos = null;
 
   # These deps aren't needed for building, but only for passthru.tests
   # TODO(corepkgs): get rid of this asserts when packages become available
@@ -100,6 +101,7 @@ with final;
   libfido2 = null;
   libgeotiff = null;
   libgit2 = null;
+  libguestfs = null;
   libjxl = null;
   libnatspec = null;
   libnghttp2 = null;
@@ -136,6 +138,7 @@ with final;
   openconnect = null;
   opencv = null;
   openimageio = null;
+  opensbi = null; # RISC-V
   ostinato = null;
   pango = null;
   php = null;
@@ -154,7 +157,7 @@ with final;
   rich = null;
   ripgrep = null;
   rocksdb = null;
-  rsync = null;
+  rpm = null;
   rsyslog = null;
   ruby = null;
   sage = null;
@@ -188,7 +191,9 @@ with final;
   wlroots_0_17 = null;
   wlroots_0_18 = null;
   xwayland = null;
+  yallback = null;
   yamllint = null;
+  yara = null;
   zmqpp = null;
   # keep-sorted end
 
@@ -198,6 +203,7 @@ with final;
     bootstrap_cmds = null;
     signingUtils = null;
     configd = null;
+    binutilsDualAs-unwrapped = null;
   };
   bootstrap_cmds = null;
   apple-sdk = null;
@@ -2040,4 +2046,91 @@ with final;
   buildFHSEnv = buildFHSEnvBubblewrap;
   buildFHSEnvChroot = callPackage ./build-support/build-fhsenv-chroot { }; # Deprecated; use buildFHSEnv/buildFHSEnvBubblewrap
   buildFHSEnvBubblewrap = callPackage ./build-support/build-fhsenv-bubblewrap { };
+
+  # TODO(corepkgs): Refactor this into a `uboot` namespace. E.g. `uboot.tools`
+  # Upstream U-Boots:
+  inherit (callFromScope ./pkgs/uboot { })
+    buildUBoot
+    ubootTools
+    ubootPythonTools
+    ubootA20OlinuxinoLime
+    ubootA20OlinuxinoLime2EMMC
+    ubootBananaPi
+    ubootBananaPim2Zero
+    ubootBananaPim3
+    ubootBananaPim64
+    ubootAmx335xEVM
+    ubootClearfog
+    ubootCM3588NAS
+    ubootCubieboard2
+    ubootGuruplug
+    ubootJetsonTK1
+    ubootLibreTechCC
+    ubootNanoPCT4
+    ubootNanoPCT6
+    ubootNanoPiR5S
+    ubootNovena
+    ubootOdroidC2
+    ubootOdroidXU3
+    ubootOlimexA64Olinuxino
+    ubootOlimexA64Teres1
+    ubootOrangePi3
+    ubootOrangePi3B
+    ubootOrangePi5
+    ubootOrangePi5Max
+    ubootOrangePi5Plus
+    ubootOrangePiPc
+    ubootOrangePiZeroPlus2H5
+    ubootOrangePiZero
+    ubootOrangePiZero2
+    ubootOrangePiZero3
+    ubootPcduino3Nano
+    ubootPine64
+    ubootPine64LTS
+    ubootPinebook
+    ubootPinebookPro
+    ubootQemuAarch64
+    ubootQemuArm
+    ubootQemuRiscv64Smode
+    ubootQemuX86
+    ubootQemuX86_64
+    ubootQuartz64B
+    ubootRadxaZero3W
+    ubootRaspberryPi
+    ubootRaspberryPi2
+    ubootRaspberryPi3_32bit
+    ubootRaspberryPi3_64bit
+    ubootRaspberryPi4_32bit
+    ubootRaspberryPi4_64bit
+    ubootRaspberryPiZero
+    ubootRock4CPlus
+    ubootRock5ModelB
+    ubootRock64
+    ubootRock64v2
+    ubootRockPiE
+    ubootRockPi4
+    ubootRockPro64
+    ubootROCPCRK3399
+    ubootSheevaplug
+    ubootSopine
+    ubootTuringRK1
+    ubootUtilite
+    ubootVisionFive2
+    ubootWandboard
+    ;
+
+  # TODO(corepkgs): refactor arm-trusted into passthru attrs
+  inherit (arm-trusted-firmware)
+    buildArmTrustedFirmware
+    armTrustedFirmwareTools
+    armTrustedFirmwareAllwinner
+    armTrustedFirmwareAllwinnerH616
+    armTrustedFirmwareAllwinnerH6
+    armTrustedFirmwareQemu
+    armTrustedFirmwareRK3328
+    armTrustedFirmwareRK3399
+    armTrustedFirmwareRK3568
+    armTrustedFirmwareRK3588
+    armTrustedFirmwareS905
+    ;
 }
