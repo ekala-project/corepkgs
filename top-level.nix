@@ -802,6 +802,13 @@ with final;
         };
       };
 
+  # TODO(corepkgs): move to mkManyVariant
+  guile_1_8 = callPackage ./pkgs/guile/1.8.nix { };
+  guile_2_0 = callPackage ./pkgs/guile/2.0.nix { };
+  guile_2_2 = callPackage ./pkgs/guile/2.2.nix { };
+  guile_3_0 = callPackage ./pkgs/guile/3.0.nix { };
+  guile = guile_3_0;
+
   gccStdenv =
     if stdenv.cc.isGNU then
       stdenv
