@@ -3,11 +3,11 @@
   pkgsBuildBuild,
   callPackage,
   perl,
-  bison ? null,
-  flex ? null,
-  gmp ? null,
-  libmpc ? null,
-  mpfr ? null,
+  bison,
+  flex,
+  gmp,
+  libmpc,
+  mpfr,
   pahole,
   lib,
   stdenv,
@@ -261,34 +261,33 @@ let
         enableParallelBuilding = true;
 
         passthru = rec {
-          # TODO(corepkgs): migrate kernel config modules
-          # module = import ../../../../nixos/modules/system/boot/kernel_config.nix;
+          module = import ./kernel-config.nix;
 
           # used also in apache
           # { modules = [ { options = res.options; config = svc.config or svc; } ];
           #   check = false;
           # The result is a set of two attributes
-          # moduleStructuredConfig =
-          #   (lib.evalModules {
-          #     modules = [
-          #       module
-          #     ]
-          #     ++ lib.optionals enableCommonConfig [
-          #       {
-          #         settings = commonStructuredConfig;
-          #         _file = "pkgs/os-specific/linux/kernel/common-config.nix";
-          #       }
-          #     ]
-          #     ++ [
-          #       {
-          #         settings = structuredExtraConfig;
-          #         _file = "structuredExtraConfig";
-          #       }
-          #     ]
-          #     ++ structuredConfigFromPatches;
-          #   }).config;
+          moduleStructuredConfig =
+            (lib.evalModules {
+              modules = [
+                module
+              ]
+              ++ lib.optionals enableCommonConfig [
+                {
+                  settings = commonStructuredConfig;
+                  _file = "pkgs/linux/kernel/common-config.nix";
+                }
+              ]
+              ++ [
+                {
+                  settings = structuredExtraConfig;
+                  _file = "structuredExtraConfig";
+                }
+              ]
+              ++ structuredConfigFromPatches;
+            }).config;
 
-          # structuredConfig = moduleStructuredConfig.settings;
+          structuredConfig = moduleStructuredConfig.settings;
         };
       }; # end of configfile derivation
 
