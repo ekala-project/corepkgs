@@ -302,7 +302,7 @@ lib.makeOverridable (
       #
       # We use `--eval` here to undefine the inherited environment
       # variable before any Makefiles are read, ensuring that the
-      # kernel’s definition creates a new, unexported variable.
+      # kernel's definition creates a new, unexported variable.
       "--eval=undefine modules"
     ]
     ++ commonMakeFlags;
@@ -328,7 +328,7 @@ lib.makeOverridable (
         fi
       done
 
-      patchShebangs scripts
+      patchShebangs scripts lib/tests/module/*.sh
 
       # also patch arch-specific install scripts
       for i in $(find arch -name install.sh); do
