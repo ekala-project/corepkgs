@@ -190,6 +190,7 @@ with final;
   wireshark = null;
   wlroots_0_17 = null;
   wlroots_0_18 = null;
+  xattr = null;
   xwayland = null;
   yallback = null;
   yamllint = null;
@@ -940,6 +941,31 @@ with final;
     langJit = true;
     enableLTO = false;
   };
+
+  # Utility to extract just the source from a derivation
+  srcOnly =
+    args:
+    (callPackage (
+      {
+        runCommand,
+        lib,
+        stdenvNoCC,
+      }:
+      drv:
+      runCommand "${drv.name}-src"
+        {
+          outputs = [ "out" ];
+          preferLocalBuild = true;
+        }
+        ''
+          mkdir -p $out
+          ${lib.concatMapStringsSep "\n" (output: ''
+            if [ -d "${drv.${output}}" ]; then
+              cp -r "${drv.${output}}"/* $out/
+            fi
+          '') (drv.outputs or [ "out" ])}
+        ''
+    ) { } args);
 
   wrapCCWith =
     {
