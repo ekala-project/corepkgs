@@ -1,4 +1,4 @@
-{ mkManyVariants }:
+{ mkManyVariants, callPackage }:
 
 mkManyVariants {
   variants = ./variants.nix;
@@ -7,4 +7,5 @@ mkManyVariants {
   # to build hadrian and its dependencies
   defaultSelector = (p: p.v9_8_4_binary);
   genericBuilder = ./generic.nix;
+  inherit callPackage;
 }
