@@ -19,6 +19,9 @@
   # Nix expression which takes variant and package args, and returns an attrset to pass to mkDerivation
   # Type: AttrSet -> AttrSet -> AttrSet
   genericBuilder,
+
+  # This allows for each variant to be called with different inputs
+  callPackage,
 }:
 
 # Some assertions as poor man's type checking
@@ -46,6 +49,13 @@ let
 
   defaultVariant = defaultSelector variants';
 
+  mkVariantPassthru =
+    variantArgs:
+    let
+      variants = builtins.mapAttrs (_: v: mkPackage (variantArgs // v)) variants';
+    in
+    variants // { inherit variants; };
+
   # This also allows for additional attrs to be passed through besides variant and src
   mkVariantArgs =
     { version, ... }@args:
@@ -55,18 +65,31 @@ let
       packageOlder = lib.versionOlder version;
       packageAtLeast = lib.versionAtLeast version;
       packageBetween = lower: higher: packageAtLeast lower && packageOlder higher;
-      mkVariantPassthru =
-        variantArgs: packageArgs:
-        let
-          variants = builtins.mapAttrs (_: v: mkPackage (variantArgs // v) packageArgs) variants';
-        in
-        variants // { inherit variants; };
+      # For variants to compose, the package expressions must do `passthru = mkVariantPassthru variantArgs`
+      # This allows for built variant args to be remembered, trying to do this construction
+      # before getting callPackage'd leads to infinite recursion as it's not lazy
+      inherit mkVariantPassthru;
     };
 
   # Re-call the generic builder with new variant args, re-wrap with makeOverridable
   # to give it the same appearance as being called by callPackage
-  mkPackage = variant: lib.makeOverridable (genericExpr (mkVariantArgs (defaultVariant // variant)));
+  mkPackage =
+    variant:
+    let
+      variantArgs = mkVariantArgs (defaultVariant // variant);
+      pkg = callPackage (genericExpr variantArgs) { };
+    in
+    pkg.overrideAttrs (o: {
+      passthru =
+        o.passthru or { }
+        // mkVariantPassthru variantArgs
+        // {
+          inherit variantArgs;
+        };
+    });
+
+  defaultPackage = defaultSelector (mkVariantPassthru variants');
 in
-# The partially applied function doesn't need to be called with makeOverridable
-# As callPackage will be wrapping this in makeOverridable as well
-genericExpr (mkVariantArgs defaultVariant)
+# The calling scope will apply `callPackage`, so we need to return the partially
+# applied function
+defaultPackage.override
