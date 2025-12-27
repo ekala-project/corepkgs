@@ -1,9 +1,4 @@
 {
-  mkVariantPassthru,
-  ...
-}@variantArgs:
-
-{
   lib,
   stdenv,
   fetchurl,
@@ -24,7 +19,7 @@
   # This is "useful" for staying within hydra's output limits for at least the
   # aarch64-linux architecture.
   minimal ? false,
-}@packageArgs:
+}:
 
 # Prebuilt only does native
 assert stdenv.targetPlatform == stdenv.hostPlatform;
@@ -493,27 +488,25 @@ stdenv.mkDerivation {
     [ $(./main) == "yes" ]
   '';
 
-  passthru =
-    mkVariantPassthru variantArgs packageArgs
-    // {
-      targetPrefix = "";
-      enableShared = true;
+  passthru = {
+    targetPrefix = "";
+    enableShared = true;
 
-      inherit llvmPackages;
+    inherit llvmPackages;
 
-      # Our Cabal compiler name
-      haskellCompilerName = "ghc-${version}";
-    }
-    # We duplicate binDistUsed here since we have a sensible default even if no bindist is available,
-    # this makes sure that getting the `meta` attribute doesn't throw even on unsupported platforms.
-    // lib.optionalAttrs (ghcBinDists.${distSetName}.${stdenv.hostPlatform.system}.isHadrian or false) {
-      # Normal GHC derivations expose the hadrian derivation used to build them
-      # here. In the case of bindists we just make sure that the attribute exists,
-      # as it is used for checking if a GHC derivation has been built with hadrian.
-      # The isHadrian mechanism will become obsolete with GHCs that use hadrian
-      # exclusively, i.e. 9.6 (and 9.4?).
-      hadrian = null;
-    };
+    # Our Cabal compiler name
+    haskellCompilerName = "ghc-${version}";
+  }
+  # We duplicate binDistUsed here since we have a sensible default even if no bindist is available,
+  # this makes sure that getting the `meta` attribute doesn't throw even on unsupported platforms.
+  // lib.optionalAttrs (ghcBinDists.${distSetName}.${stdenv.hostPlatform.system}.isHadrian or false) {
+    # Normal GHC derivations expose the hadrian derivation used to build them
+    # here. In the case of bindists we just make sure that the attribute exists,
+    # as it is used for checking if a GHC derivation has been built with hadrian.
+    # The isHadrian mechanism will become obsolete with GHCs that use hadrian
+    # exclusively, i.e. 9.6 (and 9.4?).
+    hadrian = null;
+  };
 
   meta = {
     homepage = "http://haskell.org/ghc";

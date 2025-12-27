@@ -12,7 +12,7 @@
 
 # For binary versions, we import the complete binary package file directly
 if isBinary then
-  import ./${version}.nix variantArgs
+  import ./${version}.nix
 
 # For GHC 9.4.x and older, use the Make-based build system
 else if useMake then

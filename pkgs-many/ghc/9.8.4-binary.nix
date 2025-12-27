@@ -1,14 +1,8 @@
 {
-  mkVariantPassthru,
-  ...
-}@variantArgs:
-
-{
   lib,
   stdenv,
   fetchurl,
   perl,
-  ncurses5,
   ncurses6,
   gmp,
   libiconv,
@@ -16,16 +10,13 @@
   libffi,
   coreutils,
   targetPackages,
-  llvmPackages,
-  replaceVarsWith,
 
   # minimal = true; will remove files that aren't strictly necessary for
   # regular builds and GHC bootstrapping.
   # This is "useful" for staying within hydra's output limits for at least the
   # aarch64-linux architecture.
-  minimal ? false,
   ...
-}@packageArgs:
+}:
 
 # Prebuilt only does native
 assert stdenv.targetPlatform == stdenv.hostPlatform;
@@ -451,7 +442,7 @@ stdenv.mkDerivation {
     [ $(./main) == "yes" ]
   '';
 
-  passthru = mkVariantPassthru variantArgs packageArgs // {
+  passthru = {
     targetPrefix = "";
     enableShared = true;
 
