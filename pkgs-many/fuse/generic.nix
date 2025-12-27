@@ -1,12 +1,9 @@
 {
   version,
   src-hash,
-  packageAtLeast,
-  packageOlder,
-  mkVariantPassthru,
   packageBetween,
   ...
-}@variantArgs:
+}:
 
 {
   lib,
@@ -22,7 +19,7 @@
   autoreconfHook,
   runtimeShell,
   udevCheckHook,
-}@args:
+}:
 
 let
   isFuse3 = packageBetween "3" "4";
@@ -129,8 +126,6 @@ stdenv.mkDerivation rec {
 
   # Don't pull in SUID `fusermount{,3}` binaries into development environment.
   propagatedBuildOutputs = [ "out" ];
-
-  passthru = mkVariantPassthru variantArgs args;
 
   meta = {
     description = "Library that allows filesystems to be implemented in user space";

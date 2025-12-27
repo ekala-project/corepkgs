@@ -31,10 +31,9 @@
   texinfo,
   xz,
   zlib,
-  darwin,
   libsForQt5,
   gitUpdater,
-}@dependencies:
+}:
 
 let
   inherit (libsForQt5) qtbase wrapQtAppsHook;
@@ -185,7 +184,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   doCheck = false; # fails
 
-  passthru = (mkVariantPassthru variantArgs dependencies) // {
+  passthru = mkVariantPassthru variantArgs // {
     configurePhaseHook = ../configure-phase-hook.sh;
     updateScript = gitUpdater {
       url = "https://gitlab.kitware.com/cmake/cmake.git";

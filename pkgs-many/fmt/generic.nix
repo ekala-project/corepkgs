@@ -19,7 +19,7 @@
   openimageio,
   fcitx5,
   spdlog,
-}@args:
+}:
 
 stdenv.mkDerivation {
   pname = "fmt";
@@ -48,7 +48,7 @@ stdenv.mkDerivation {
 
   doCheck = true;
 
-  passthru = (mkVariantPassthru variantArgs args) // {
+  passthru = mkVariantPassthru variantArgs // {
     tests = {
       inherit
         mpd

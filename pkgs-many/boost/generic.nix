@@ -52,7 +52,7 @@
   useMpi ? false,
   mpi,
   extraB2Args ? [ ],
-}@packageArgs:
+}:
 
 # We must build at least one type of libraries
 assert enableShared || enableStatic;
@@ -266,7 +266,7 @@ stdenv.mkDerivation {
       })
     ];
 
-  passthru = mkVariantPassthru variantArgs packageArgs // {
+  passthru = mkVariantPassthru variantArgs // {
     inherit boostBuildPatches;
   };
 

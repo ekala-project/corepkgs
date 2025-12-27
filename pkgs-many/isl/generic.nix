@@ -6,7 +6,6 @@
   patches ? [ ],
   packageAtLeast,
   packageOlder,
-  mkVariantPassthru,
   ...
 }@variantArgs:
 
@@ -46,7 +45,6 @@ stdenv.mkDerivation {
   inherit configureFlags;
 
   enableParallelBuilding = true;
-  passthru = mkVariantPassthru variantArgs args;
 
   meta = {
     homepage = "https://libisl.sourceforge.io/";
