@@ -110,6 +110,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/jazzband/pip-tools/";
     changelog = "https://github.com/jazzband/pip-tools/releases/tag/${version}";
     license = lib.licenses.bsd3;
-    maintainers = with lib.maintainers; [ zimbatm ];
+    maintainers = [ ];
   };
 }
