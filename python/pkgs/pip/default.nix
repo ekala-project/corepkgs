@@ -14,16 +14,16 @@
   sphinx-issues,
 
   # checks
-  freezegun,
-  git,
-  mock,
-  scripttest,
-  virtualenv,
-  pretend,
-  proxy-py,
-  pytestCheckHook,
-  tomli-w,
-  werkzeug,
+  freezegun ? null,
+  git ? null,
+  mock ? null,
+  scripttest ? null,
+  virtualenv ? null,
+  pretend ? null,
+  proxy-py ? null,
+  pytestCheckHook ? null,
+  tomli-w ? null,
+  werkzeug ? null,
 
   # coupled downstream dependencies
   pip-tools,
