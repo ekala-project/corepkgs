@@ -1,0 +1,27 @@
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+}:
+
+stdenv.mkDerivation (finalAttrs: {
+  pname = "hwdata";
+  version = "0.401";
+
+  src = fetchFromGitHub {
+    owner = "vcrhonek";
+    repo = "hwdata";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-2NZwylrUfnzA0aE+xlVZ7QCpCzfW9DwGzRVHirt0TRU=";
+  };
+
+  doCheck = false; # this does build machine-specific checks (e.g. enumerates PCI bus)
+
+  meta = {
+    homepage = "https://github.com/vcrhonek/hwdata";
+    description = "Hardware Database, including Monitors, pci.ids, usb.ids, and video cards";
+    license = lib.licenses.gpl2Plus;
+    maintainers = [ ];
+    platforms = lib.platforms.all;
+  };
+})
