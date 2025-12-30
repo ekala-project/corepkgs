@@ -15,6 +15,7 @@
   pixman,
   zlib,
   x11Support ? !stdenv.hostPlatform.isDarwin || true,
+  libx11,
   xorg,
   gobjectSupport ? true,
   glib,
@@ -76,6 +77,7 @@ stdenv.mkDerivation (
       [
         libXext
         libXrender
+        libx11
       ]
     )
     ++ optionals xcbSupport [ libxcb ]
