@@ -710,6 +710,11 @@ with final;
   libtool2 = callPackage ./pkgs/libtool/libtool2.nix { };
   libtool_1_5 = callPackage ./pkgs/libtool { };
 
+  # Less secure variant of lowdown for use inside Nix builds.
+  lowdown-unsandboxed = lowdown.override {
+    enableDarwinSandbox = false;
+  };
+
   patchelf = callPackage ./pkgs/patchelf { };
   patchelfUnstable = lowPrio (callPackage ./pkgs/patchelf/unstable.nix { });
 
