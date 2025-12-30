@@ -2075,6 +2075,14 @@ with final;
   rust-bindgen-unwrapped = callPackage ./pkgs/rust-bindgen/unwrapped.nix { };
   rustup-toolchain-install-master = callPackage ./pkgs/rustup-toolchain-install-master { };
 
+  writableTmpDirAsHomeHook = callPackage (
+    { makeSetupHook }:
+    makeSetupHook {
+      name = "writable-tmpdir-as-home-hook";
+    } ./build-support/setup-hooks/writable-tmpdir-as-home.sh
+  ) { };
+
+
   writers = callPackage ./build-support/writers { };
   # TODO(corepkgs): support writers fully
   gixy = null;
