@@ -133,7 +133,6 @@ lib.makeExtensible (
 
       nixComponents_2_29 = nixDependencies.callPackage ./modular/packages.nix rec {
         version = "2.29.2";
-        inherit maintainers teams;
         otherSplices = generateSplicesForNixComponents "nixComponents_2_29";
         src = fetchFromGitHub {
           owner = "NixOS";
@@ -147,7 +146,6 @@ lib.makeExtensible (
 
       nixComponents_2_30 = nixDependencies.callPackage ./modular/packages.nix rec {
         version = "2.30.3";
-        inherit maintainers teams;
         otherSplices = generateSplicesForNixComponents "nixComponents_2_30";
         src = fetchFromGitHub {
           owner = "NixOS";
@@ -161,7 +159,6 @@ lib.makeExtensible (
 
       nixComponents_2_31 = nixDependencies.callPackage ./modular/packages.nix rec {
         version = "2.31.2";
-        inherit (self.nix_2_30.meta) maintainers teams;
         otherSplices = generateSplicesForNixComponents "nixComponents_2_31";
         src = fetchFromGitHub {
           owner = "NixOS";
@@ -175,7 +172,6 @@ lib.makeExtensible (
 
       nixComponents_2_32 = nixDependencies.callPackage ./modular/packages.nix rec {
         version = "2.32.4";
-        inherit (self.nix_2_31.meta) maintainers teams;
         otherSplices = generateSplicesForNixComponents "nixComponents_2_32";
         src = fetchFromGitHub {
           owner = "NixOS";
@@ -189,7 +185,6 @@ lib.makeExtensible (
 
       nixComponents_git = nixDependencies.callPackage ./modular/packages.nix rec {
         version = "2.33pre20251107_${lib.substring 0 8 src.rev}";
-        inherit maintainers teams;
         otherSplices = generateSplicesForNixComponents "nixComponents_git";
         src = fetchFromGitHub {
           owner = "NixOS";

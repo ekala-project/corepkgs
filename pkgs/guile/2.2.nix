@@ -144,7 +144,7 @@ builder rec {
       foreign function call interface, and powerful string processing.
     '';
     license = lib.licenses.lgpl3Plus;
-    maintainers = with lib.maintainers; [ ludo ];
+    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 }
