@@ -63,6 +63,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/pycompression/python-zlib-ng";
     changelog = "https://github.com/pycompression/python-zlib-ng/blob/${src.rev}/CHANGELOG.rst";
     license = lib.licenses.psfl;
-    maintainers = with lib.maintainers; [ hexa ];
+    maintainers = [ ];
   };
 }
