@@ -1,0 +1,78 @@
+{
+  abseil-cpp,
+  cmake,
+  fetchFromGitHub,
+  gbenchmark,
+  gtest,
+  haskellPackages,
+  icu,
+  lib,
+  ninja,
+  python3Packages,
+  stdenv,
+
+  chromium ? null,
+  grpc ? null,
+  mercurial ? null,
+}:
+
+stdenv.mkDerivation (finalAttrs: {
+  pname = "re2";
+  version = "2025-08-12";
+
+  src = fetchFromGitHub {
+    owner = "google";
+    repo = "re2";
+    rev = finalAttrs.version;
+    hash = "sha256-3cWbw8Wlnl1OMPIcbNlc3HnCsuL4VT7psuHWtldsWoQ=";
+  };
+
+  outputs = [
+    "out"
+    "dev"
+  ];
+
+  nativeBuildInputs = [
+    cmake
+    cmake.configurePhaseHook
+    ninja
+  ];
+
+  buildInputs = [
+    gbenchmark
+    gtest
+  ];
+
+  propagatedBuildInputs = [ abseil-cpp ] ++ lib.optionals (!stdenv.hostPlatform.isStatic) [ icu ];
+
+  cmakeFlags = [
+    (lib.cmakeBool "RE2_BUILD_TESTING" true)
+    (lib.cmakeFeature "CMAKE_CTEST_ARGUMENTS" "--timeout;999999")
+  ]
+  ++ lib.optionals (!stdenv.hostPlatform.isStatic) [
+    (lib.cmakeBool "RE2_USE_ICU" true)
+    (lib.cmakeBool "BUILD_SHARED_LIBS" true)
+  ];
+
+  # There's a few very long tests
+  doCheck = false;
+
+  passthru.tests = {
+    inherit chromium grpc mercurial;
+    inherit (python3Packages) google-re2;
+    haskell-re2 = haskellPackages.re2 or null;
+  };
+
+  meta = {
+    description = "Regular expression library";
+    longDescription = ''
+      RE2 is a fast, safe, thread-friendly alternative to backtracking regular
+      expression engines like those used in PCRE, Perl, and Python. It is a C++
+      library.
+    '';
+    license = lib.licenses.bsd3;
+    homepage = "https://github.com/google/re2";
+    maintainers = [ ];
+    platforms = lib.platforms.all;
+  };
+})
