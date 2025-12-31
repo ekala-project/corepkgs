@@ -23,7 +23,7 @@
   lapack,
 
   # Reverse dependency
-  sage,
+  sage ? null,
 
   # tests
   hypothesis,
@@ -118,6 +118,8 @@ buildPythonPackage rec {
 
   enableParallelBuilding = true;
 
+  # Avoid circular dependencies
+  doCheck = false;
   nativeCheckInputs = [
     hypothesis
     pytestCheckHook
