@@ -633,6 +633,8 @@ with final;
     } ./build-support/setup-hooks/fix-darwin-dylib-names.sh
   ) { };
 
+  json-schema-for-humans = with python3Packages; toPythonApplication json-schema-for-humans;
+
   makePkgconfigItem = callPackage ./build-support/make-pkgconfigitem { };
 
   # TODO(corepkgs): alias?
