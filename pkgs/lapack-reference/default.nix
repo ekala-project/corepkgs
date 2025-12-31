@@ -89,7 +89,7 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description = "Linear Algebra PACKage";
     homepage = "http://www.netlib.org/lapack/";
-    maintainers = with lib.maintainers; [ markuskowa ];
+    maintainers = [ ];
     license = lib.licenses.bsd3;
     pkgConfigModules = [ "lapack" ];
     platforms = lib.platforms.all;
