@@ -7,7 +7,8 @@
   pythonOlder,
 
   # build-system, dependencies
-  pkgsBuildHost,
+  meson,
+  ninja,
   pyproject-metadata,
   tomli,
 
@@ -38,13 +39,15 @@ buildPythonPackage rec {
   ];
 
   build-system = [
-    pkgsBuildHost.meson
-    pkgsBuildHost.ninja
+    meson
+    ninja
     pyproject-metadata
   ]
   ++ lib.optionals (pythonOlder "3.11") [ tomli ];
 
   dependencies = [
+    meson
+    ninja
     pyproject-metadata
   ]
   ++ lib.optionals (pythonOlder "3.11") [ tomli ];
@@ -68,6 +71,8 @@ buildPythonPackage rec {
     else
       null;
 
+  # TODO(corepkgs): move to passthru tests
+  doCheck = false;
   setupHooks = [ ./add-build-flags.sh ];
 
   meta = {
@@ -76,5 +81,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/mesonbuild/meson-python";
     license = [ lib.licenses.mit ];
     maintainers = [ ];
+    teams = [ lib.teams.python ];
   };
 }
