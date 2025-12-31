@@ -90,7 +90,6 @@ with final;
   imagemagick = null;
   imlib2 = null;
   jansson = null;
-  jemalloc = null;
   jhead = null;
   jre = null;
   knot-dns = null;
@@ -780,6 +779,16 @@ with final;
       })
     else
       ccWrapper;
+
+  gfortran = wrapCC (
+    gcc.cc.override {
+      name = "gfortran";
+      langFortran = true;
+      langCC = false;
+      langC = false;
+      profiledCompiler = false;
+    }
+  );
 
   # TODO(corepkgs): mkManyVariant this
   go_1_25 = callPackage ./pkgs/go/1.25.nix { };
@@ -2081,7 +2090,6 @@ with final;
       name = "writable-tmpdir-as-home-hook";
     } ./build-support/setup-hooks/writable-tmpdir-as-home.sh
   ) { };
-
 
   writers = callPackage ./build-support/writers { };
   # TODO(corepkgs): support writers fully
