@@ -39,4 +39,7 @@ self: super: with self; {
     })
   );
 
+  numpy_2 = callPackage ./pkgs/numpy/2.nix { };
+  numpy_1 = callPackage ./pkgs/numpy/1.nix { };
+  numpy = self.numpy_2;
 }
