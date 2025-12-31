@@ -208,6 +208,7 @@ with final;
   bootstrap_cmds = null;
   apple-sdk = null;
   xcodebuild = null;
+  xcbuild = null;
   cctools = null;
 
   # TODO(corepkgs): support windows
