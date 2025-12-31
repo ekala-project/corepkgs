@@ -339,25 +339,25 @@ lib.makeScope pkgs.newScope (
           inherit (pkgs) oci-seccomp-bpf-hook; # added 2022-11
           inherit (pkgs) dpdk; # added 2024-03
 
-          acer-wmi-battery = callPackage ./acer-wmi-battery { };
+          acer-wmi-battery = callPackage ./pkgs/acer-wmi-battery { };
 
-          acpi_call = callPackage ./acpi-call { };
+          acpi_call = callPackage ./pkgs/acpi-call { };
 
-          ajantv2 = callPackage ./ajantv2 { };
+          ajantv2 = callPackage ./pkgs/ajantv2 { };
 
-          akvcam = callPackage ./akvcam { };
+          akvcam = callPackage ./pkgs/akvcam { };
 
-          amdgpu-i2c = callPackage ./amdgpu-i2c { };
+          amdgpu-i2c = callPackage ./pkgs/amdgpu-i2c { };
 
-          amneziawg = callPackage ./amneziawg { };
+          amneziawg = callPackage ./pkgs/amneziawg { };
 
-          apfs = callPackage ./apfs { };
+          apfs = callPackage ./pkgs/apfs { };
 
-          ax99100 = callPackage ./ax99100 { };
+          ax99100 = callPackage ./pkgs/ax99100 { };
 
-          batman_adv = callPackage ./batman-adv { };
+          batman_adv = callPackage ./pkgs/batman-adv { };
 
-          bbswitch = callPackage ./bbswitch { };
+          bbswitch = callPackage ./pkgs/bbswitch { };
 
           # NOTE: The bcachefs module is called this way to facilitate
           # easy overriding, as it is expected many users will want to
@@ -365,94 +365,95 @@ lib.makeScope pkgs.newScope (
           # unreleased changes to the module build process.
           bcachefs = callPackage pkgs.bcachefs-tools.kernelModule { };
 
-          ch9344 = callPackage ./ch9344 { };
+          ch9344 = callPackage ./pkgs/ch9344 { };
 
-          chipsec = callPackage ../tools/security/chipsec {
+          chipsec = callPackage ../pkgs/tools/security/chipsec {
             inherit kernel;
             withDriver = true;
           };
 
-          cryptodev = callPackage ./cryptodev { };
+          cryptodev = callPackage ./pkgs/cryptodev { };
 
-          cpupower = callPackage ./cpupower { };
+          cpupower = callPackage ./pkgs/cpupower { };
 
-          ddcci-driver = callPackage ./ddcci { };
+          ddcci-driver = callPackage ./pkgs/ddcci { };
 
-          dddvb = callPackage ./dddvb { };
+          dddvb = callPackage ./pkgs/dddvb { };
 
-          decklink = callPackage ./decklink { };
+          decklink = callPackage ./pkgs/decklink { };
 
-          digimend = callPackage ./digimend { };
+          digimend = callPackage ./pkgs/digimend { };
 
-          dpdk-kmods = callPackage ./dpdk-kmods { };
+          dpdk-kmods = callPackage ./pkgs/dpdk-kmods { };
 
-          ecapture = callPackage ../by-name/ec/ecapture/package.nix {
+          ecapture = callPackage ../pkgs/by-name/ec/ecapture/package.nix {
             withNonBTF = true;
             inherit kernel;
           };
 
-          evdi = callPackage ./evdi { };
+          evdi = callPackage ./pkgs/evdi { };
 
-          fanout = callPackage ./fanout { };
+          fanout = callPackage ./pkgs/fanout { };
 
-          framework-laptop-kmod = callPackage ./framework-laptop-kmod { };
+          framework-laptop-kmod = callPackage ./pkgs/framework-laptop-kmod { };
 
-          fwts-efi-runtime = callPackage ./fwts/module.nix { };
+          fwts-efi-runtime = callPackage ./pkgs/fwts/module.nix { };
 
-          gasket = callPackage ./gasket { };
+          gasket = callPackage ./pkgs/gasket { };
 
-          gcadapter-oc-kmod = callPackage ./gcadapter-oc-kmod { };
+          gcadapter-oc-kmod = callPackage ./pkgs/gcadapter-oc-kmod { };
 
-          hyperv-daemons = callPackage ./hyperv-daemons { };
+          hyperv-daemons = callPackage ./pkgs/hyperv-daemons { };
 
-          e1000e = if lib.versionOlder kernel.version "4.10" then callPackage ./e1000e { } else null;
+          e1000e = if lib.versionOlder kernel.version "4.10" then callPackage ./pkgs/e1000e { } else null;
 
-          iio-utils = if lib.versionAtLeast kernel.version "4.1" then callPackage ./iio-utils { } else null;
+          iio-utils =
+            if lib.versionAtLeast kernel.version "4.1" then callPackage ./pkgs/iio-utils { } else null;
 
           intel-speed-select =
-            if lib.versionAtLeast kernel.version "5.3" then callPackage ./intel-speed-select { } else null;
+            if lib.versionAtLeast kernel.version "5.3" then callPackage ./pkgs/intel-speed-select { } else null;
 
-          ipu6-drivers = callPackage ./ipu6-drivers { };
+          ipu6-drivers = callPackage ./pkgs/ipu6-drivers { };
 
-          ivsc-driver = callPackage ./ivsc-driver { };
+          ivsc-driver = callPackage ./pkgs/ivsc-driver { };
 
-          ixgbevf = callPackage ./ixgbevf { };
+          ixgbevf = callPackage ./pkgs/ixgbevf { };
 
-          it87 = callPackage ./it87 { };
+          it87 = callPackage ./pkgs/it87 { };
 
-          asus-ec-sensors = callPackage ./asus-ec-sensors { };
+          asus-ec-sensors = callPackage ./pkgs/asus-ec-sensors { };
 
-          ena = callPackage ./ena { };
+          ena = callPackage ./pkgs/ena { };
 
-          lenovo-legion-module = callPackage ./lenovo-legion { };
+          lenovo-legion-module = callPackage ./pkgs/lenovo-legion { };
 
-          linux-gpib = callPackage ../applications/science/electronics/linux-gpib/kernel.nix { };
+          linux-gpib = callPackage ../pkgs/applications/science/electronics/linux-gpib/kernel.nix { };
 
-          liquidtux = callPackage ./liquidtux { };
+          liquidtux = callPackage ./pkgs/liquidtux { };
 
-          lkrg = callPackage ./lkrg { };
+          lkrg = callPackage ./pkgs/lkrg { };
 
-          v4l2loopback = callPackage ./v4l2loopback { };
+          v4l2loopback = callPackage ./pkgs/v4l2loopback { };
 
-          lttng-modules = callPackage ./lttng-modules { };
+          lttng-modules = callPackage ./pkgs/lttng-modules { };
 
-          mstflint_access = callPackage ./mstflint_access { };
+          mstflint_access = callPackage ./pkgs/mstflint_access { };
 
-          broadcom_sta = callPackage ./broadcom-sta { };
+          broadcom_sta = callPackage ./pkgs/broadcom-sta { };
 
-          tbs = callPackage ./tbs { };
+          tbs = callPackage ./pkgs/tbs { };
 
-          mbp2018-bridge-drv = callPackage ./mbp-modules/mbp2018-bridge-drv { };
+          mbp2018-bridge-drv = callPackage ./pkgs/mbp-modules/mbp2018-bridge-drv { };
 
-          nct6687d = callPackage ./nct6687d { };
+          nct6687d = callPackage ./pkgs/nct6687d { };
 
-          new-lg4ff = callPackage ./new-lg4ff { };
+          new-lg4ff = callPackage ./pkgs/new-lg4ff { };
 
-          zenergy = callPackage ./zenergy { };
+          zenergy = callPackage ./pkgs/zenergy { };
 
-          nvidiabl = callPackage ./nvidiabl { };
+          nvidiabl = callPackage ./pkgs/nvidiabl { };
 
-          nvidiaPackages = dontRecurseIntoAttrs (lib.makeExtensible (_: callPackage ./nvidia-x11 { }));
+          nvidiaPackages = dontRecurseIntoAttrs (lib.makeExtensible (_: callPackage ./pkgs/nvidia-x11 { }));
 
           nvidia_x11 = nvidiaPackages.stable;
           nvidia_x11_beta = nvidiaPackages.beta;
@@ -475,190 +476,194 @@ lib.makeScope pkgs.newScope (
           nvidia_x11_stable_open = nvidiaPackages.stable.open;
           nvidia_x11_vulkan_beta_open = nvidiaPackages.vulkan_beta.open;
 
-          nxp-pn5xx = callPackage ./nxp-pn5xx { };
+          nxp-pn5xx = callPackage ./pkgs/nxp-pn5xx { };
 
-          openrazer = callPackage ./openrazer/driver.nix { };
+          openrazer = callPackage ./pkgs/openrazer/driver.nix { };
 
-          ply = callPackage ./ply { };
+          ply = callPackage ./pkgs/ply { };
 
-          r8125 = callPackage ./r8125 { };
+          r8125 = callPackage ./pkgs/r8125 { };
 
-          r8168 = callPackage ./r8168 { };
+          r8168 = callPackage ./pkgs/r8168 { };
 
-          rtl8188eus-aircrack = callPackage ./rtl8188eus-aircrack { };
+          rtl8188eus-aircrack = callPackage ./pkgs/rtl8188eus-aircrack { };
 
-          rtl8192eu = callPackage ./rtl8192eu { };
+          rtl8192eu = callPackage ./pkgs/rtl8192eu { };
 
-          rtl8189es = callPackage ./rtl8189es { };
+          rtl8189es = callPackage ./pkgs/rtl8189es { };
 
-          rtl8189fs = callPackage ./rtl8189fs { };
+          rtl8189fs = callPackage ./pkgs/rtl8189fs { };
 
-          rtl8723ds = callPackage ./rtl8723ds { };
+          rtl8723ds = callPackage ./pkgs/rtl8723ds { };
 
-          rtl8812au = callPackage ./rtl8812au { };
+          rtl8812au = callPackage ./pkgs/rtl8812au { };
 
-          rtl8814au = callPackage ./rtl8814au { };
+          rtl8814au = callPackage ./pkgs/rtl8814au { };
 
-          rtl8852au = callPackage ./rtl8852au { };
+          rtl8852au = callPackage ./pkgs/rtl8852au { };
 
-          rtl8852bu = callPackage ./rtl8852bu { };
+          rtl8852bu = callPackage ./pkgs/rtl8852bu { };
 
-          rtl88xxau-aircrack = callPackage ./rtl88xxau-aircrack { };
+          rtl88xxau-aircrack = callPackage ./pkgs/rtl88xxau-aircrack { };
 
-          rtl8821au = callPackage ./rtl8821au { };
+          rtl8821au = callPackage ./pkgs/rtl8821au { };
 
-          rtl8821ce = callPackage ./rtl8821ce { };
+          rtl8821ce = callPackage ./pkgs/rtl8821ce { };
 
-          rtl88x2bu = callPackage ./rtl88x2bu { };
+          rtl88x2bu = callPackage ./pkgs/rtl88x2bu { };
 
-          rtl8821cu = callPackage ./rtl8821cu { };
+          rtl8821cu = callPackage ./pkgs/rtl8821cu { };
 
-          rtw88 = callPackage ./rtw88 { };
+          rtw88 = callPackage ./pkgs/rtw88 { };
 
-          rtw89 = if lib.versionOlder kernel.version "5.16" then callPackage ./rtw89 { } else null;
+          rtw89 = if lib.versionOlder kernel.version "5.16" then callPackage ./pkgs/rtw89 { } else null;
 
-          openafs_1_8 = callPackage ../servers/openafs/1.8/module.nix { };
+          openafs_1_8 = callPackage ../pkgs/servers/openafs/1.8/module.nix { };
           # Current stable release; don't backport release updates!
           openafs = openafs_1_8;
 
           opensnitch-ebpf =
-            if lib.versionAtLeast kernel.version "5.10" then callPackage ./opensnitch-ebpf { } else null;
+            if lib.versionAtLeast kernel.version "5.10" then callPackage ./pkgs/opensnitch-ebpf { } else null;
 
-          facetimehd = callPackage ./facetimehd { };
+          facetimehd = callPackage ./pkgs/facetimehd { };
 
           rust-out-of-tree-module =
-            if lib.versionAtLeast kernel.version "6.7" then callPackage ./rust-out-of-tree-module { } else null;
+            if lib.versionAtLeast kernel.version "6.7" then
+              callPackage ./pkgs/rust-out-of-tree-module { }
+            else
+              null;
 
           tuxedo-drivers =
-            if lib.versionAtLeast kernel.version "4.14" then callPackage ./tuxedo-drivers { } else null;
+            if lib.versionAtLeast kernel.version "4.14" then callPackage ./pkgs/tuxedo-drivers { } else null;
 
-          jool = callPackage ./jool { };
+          jool = callPackage ./pkgs/jool { };
 
-          kvmfr = callPackage ./kvmfr { };
+          kvmfr = callPackage ./pkgs/kvmfr { };
 
-          mba6x_bl = callPackage ./mba6x_bl { };
+          mba6x_bl = callPackage ./pkgs/mba6x_bl { };
 
-          mdio-netlink = callPackage ./mdio-netlink { };
+          mdio-netlink = callPackage ./pkgs/mdio-netlink { };
 
-          mwprocapture = callPackage ./mwprocapture { };
+          mwprocapture = callPackage ./pkgs/mwprocapture { };
 
-          mxu11x0 = callPackage ./mxu11x0 { };
+          mxu11x0 = callPackage ./pkgs/mxu11x0 { };
 
-          morse-driver = callPackage ./morse-driver { };
+          morse-driver = callPackage ./pkgs/morse-driver { };
 
           # compiles but has to be integrated into the kernel somehow
           # Let's have it uncommented and finish it..
-          ndiswrapper = callPackage ./ndiswrapper { };
+          ndiswrapper = callPackage ./pkgs/ndiswrapper { };
 
-          netatop = callPackage ./netatop { };
+          netatop = callPackage ./pkgs/netatop { };
 
-          isgx = callPackage ./isgx { };
+          isgx = callPackage ./pkgs/isgx { };
 
-          rr-zen_workaround = callPackage ../development/tools/analysis/rr/zen_workaround.nix { };
+          rr-zen_workaround = callPackage ../pkgs/development/tools/analysis/rr/zen_workaround.nix { };
 
-          sheep-net = callPackage ./sheep-net { };
+          sheep-net = callPackage ./pkgs/sheep-net { };
 
-          shufflecake = callPackage ./shufflecake { };
+          shufflecake = callPackage ./pkgs/shufflecake { };
 
-          sysdig = callPackage ./sysdig { };
+          sysdig = callPackage ./pkgs/sysdig { };
 
-          systemtap = callPackage ../development/tools/profiling/systemtap { };
+          systemtap = callPackage ../pkgs/development/tools/profiling/systemtap { };
 
-          system76 = callPackage ./system76 { };
+          system76 = callPackage ./pkgs/system76 { };
 
-          system76-acpi = callPackage ./system76-acpi { };
+          system76-acpi = callPackage ./pkgs/system76-acpi { };
 
-          system76-io = callPackage ./system76-io { };
+          system76-io = callPackage ./pkgs/system76-io { };
 
-          tmon = callPackage ./tmon { };
+          tmon = callPackage ./pkgs/tmon { };
 
-          tp_smapi = callPackage ./tp_smapi { };
+          tp_smapi = callPackage ./pkgs/tp_smapi { };
 
-          tt-kmd = callPackage ./tt-kmd { };
+          tt-kmd = callPackage ./pkgs/tt-kmd { };
 
-          turbostat = callPackage ./turbostat { };
+          turbostat = callPackage ./pkgs/turbostat { };
 
-          corefreq = callPackage ./corefreq { };
+          corefreq = callPackage ./pkgs/corefreq { };
 
-          trelay = callPackage ./trelay { };
+          trelay = callPackage ./pkgs/trelay { };
 
-          universal-pidff = callPackage ./universal-pidff { };
+          universal-pidff = callPackage ./pkgs/universal-pidff { };
 
-          usbip = callPackage ./usbip { };
+          usbip = callPackage ./pkgs/usbip { };
 
-          v86d = callPackage ./v86d { };
+          v86d = callPackage ./pkgs/v86d { };
 
-          veikk-linux-driver = callPackage ./veikk-linux-driver { };
-          vendor-reset = callPackage ./vendor-reset { };
+          veikk-linux-driver = callPackage ./pkgs/veikk-linux-driver { };
+          vendor-reset = callPackage ./pkgs/vendor-reset { };
 
-          vhba = callPackage ../applications/emulators/cdemu/vhba.nix { };
+          vhba = callPackage ../pkgs/applications/emulators/cdemu/vhba.nix { };
 
-          virtio_vmmci = callPackage ./virtio_vmmci { };
+          virtio_vmmci = callPackage ./pkgs/virtio_vmmci { };
 
-          virtualbox = callPackage ./virtualbox {
+          virtualbox = callPackage ./pkgs/virtualbox {
             virtualbox = pkgs.virtualboxHardened;
           };
 
           virtualboxGuestAdditions =
-            callPackage ../applications/virtualization/virtualbox/guest-additions
+            callPackage ../pkgs/applications/virtualization/virtualbox/guest-additions
               { };
 
-          mm-tools = callPackage ./mm-tools { };
+          mm-tools = callPackage ./pkgs/mm-tools { };
 
-          vmm_clock = callPackage ./vmm_clock { };
+          vmm_clock = callPackage ./pkgs/vmm_clock { };
 
-          vmware = callPackage ./vmware { };
+          vmware = callPackage ./pkgs/vmware { };
 
-          wireguard = if lib.versionOlder kernel.version "5.6" then callPackage ./wireguard { } else null;
+          wireguard =
+            if lib.versionOlder kernel.version "5.6" then callPackage ./pkgs/wireguard { } else null;
 
-          x86_energy_perf_policy = callPackage ./x86_energy_perf_policy { };
+          x86_energy_perf_policy = callPackage ./pkgs/x86_energy_perf_policy { };
 
-          xone = if lib.versionAtLeast kernel.version "5.4" then callPackage ./xone { } else null;
+          xone = if lib.versionAtLeast kernel.version "5.4" then callPackage ./pkgs/xone { } else null;
 
-          xpadneo = callPackage ./xpadneo { };
+          xpadneo = callPackage ./pkgs/xpadneo { };
 
-          yt6801 = callPackage ./yt6801 { };
+          yt6801 = callPackage ./pkgs/yt6801 { };
 
-          ithc = callPackage ./ithc { };
+          ithc = callPackage ./pkgs/ithc { };
 
-          ryzen-smu = callPackage ./ryzen-smu { };
+          ryzen-smu = callPackage ./pkgs/ryzen-smu { };
 
-          zenpower = callPackage ./zenpower { };
+          zenpower = callPackage ./pkgs/zenpower { };
 
-          zfs_2_3 = callPackage ./zfs/2_3.nix {
+          zfs_2_3 = callPackage ./pkgs/zfs/2_3.nix {
             configFile = "kernel";
             inherit pkgs kernel;
           };
-          zfs_2_4 = callPackage ./zfs/2_4.nix {
+          zfs_2_4 = callPackage ./pkgs/zfs/2_4.nix {
             configFile = "kernel";
             inherit pkgs kernel;
           };
-          zfs_unstable = callPackage ./zfs/unstable.nix {
+          zfs_unstable = callPackage ./pkgs/zfs/unstable.nix {
             configFile = "kernel";
             inherit pkgs kernel;
           };
 
-          can-isotp = callPackage ./can-isotp { };
+          can-isotp = callPackage ./pkgs/can-isotp { };
 
-          qc71_laptop = callPackage ./qc71_laptop { };
+          qc71_laptop = callPackage ./pkgs/qc71_laptop { };
 
-          hid-ite8291r3 = callPackage ./hid-ite8291r3 { };
+          hid-ite8291r3 = callPackage ./pkgs/hid-ite8291r3 { };
 
-          hid-t150 = callPackage ./hid-t150 { };
+          hid-t150 = callPackage ./pkgs/hid-t150 { };
 
-          hid-tmff2 = callPackage ./hid-tmff2 { };
+          hid-tmff2 = callPackage ./pkgs/hid-tmff2 { };
 
-          hpuefi-mod = callPackage ./hpuefi-mod { };
+          hpuefi-mod = callPackage ./pkgs/hpuefi-mod { };
 
-          drbd = callPackage ./drbd/driver.nix { };
+          drbd = callPackage ./pkgs/drbd/driver.nix { };
 
-          nullfs = callPackage ./nullfs { };
+          nullfs = callPackage ./pkgs/nullfs { };
 
-          msi-ec = callPackage ./msi-ec { };
+          msi-ec = callPackage ./pkgs/msi-ec { };
 
-          tsme-test = callPackage ./tsme-test { };
+          tsme-test = callPackage ./pkgs/tsme-test { };
 
-          xpad-noone = callPackage ./xpad-noone { };
+          xpad-noone = callPackage ./pkgs/xpad-noone { };
 
         }
         // lib.optionalAttrs config.allowAliases {
