@@ -1062,6 +1062,7 @@ with final;
   replaceVars = callPackage ./build-support/replace-vars/replace-vars.nix { };
   replaceDirectDependencies = callPackage ./build-support/replace-direct-dependencies.nix { };
 
+  runUnitTests = pkg: pkg.overrideAttrs { doCheck = true; };
   runtimeShell = "${runtimeShellPackage}${runtimeShellPackage.shellPath}";
   runtimeShellPackage = bashNonInteractive;
   bash = callPackage ./pkgs/bash/5.nix { };
