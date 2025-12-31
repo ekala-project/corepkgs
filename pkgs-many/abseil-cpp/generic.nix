@@ -1,22 +1,30 @@
 {
+  version,
+  src-hash,
+  packageOlder,
+  ...
+}:
+
+{
   lib,
   stdenv,
   fetchFromGitHub,
   cmake,
   gtest,
+  fetchpatch,
   static ? stdenv.hostPlatform.isStatic,
   cxxStandard ? null,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "abseil-cpp";
-  version = "20250814.1";
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "abseil";
     repo = "abseil-cpp";
     tag = finalAttrs.version;
-    hash = "sha256-SCQDORhmJmTb0CYm15zjEa7dkwc+lpW2s1d4DsMRovI=";
+    hash = src-hash;
   };
 
   cmakeFlags = [
@@ -28,6 +36,23 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeFeature "CMAKE_CXX_STANDARD" cxxStandard)
   ];
 
+  patches = lib.optionals (packageOlder "20220000") [
+    # Use CMAKE_INSTALL_FULL_{LIBDIR,INCLUDEDIR}
+    # https://github.com/abseil/abseil-cpp/pull/963
+    (fetchpatch {
+      url = "https://github.com/abseil/abseil-cpp/commit/5bfa70c75e621c5d5ec095c8c4c0c050dcb2957e.patch";
+      sha256 = "0nhjxqfxpi2pkfinnqvd5m4npf9l1kg39mjx9l3087ajhadaywl5";
+    })
+
+    # Bacport gcc-13 fix:
+    #   https://github.com/abseil/abseil-cpp/pull/1187
+    (fetchpatch {
+      name = "gcc-13.patch";
+      url = "https://github.com/abseil/abseil-cpp/commit/36a4b073f1e7e02ed7d1ac140767e36f82f09b7c.patch";
+      hash = "sha256-aA7mwGEtv/cQINcawjkukmCvfNuqwUeDFssSiNKPdgg=";
+    })
+
+  ];
   strictDeps = true;
 
   nativeBuildInputs = [
