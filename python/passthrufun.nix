@@ -87,8 +87,8 @@ let
             extensions = lib.composeManyExtensions (
               [
                 hooks
-                pythonExtension
                 autoCalledOverlay
+                pythonExtension
               ]
               ++ pythonPackagesExtensions
               ++ [
