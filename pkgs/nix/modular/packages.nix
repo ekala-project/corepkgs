@@ -3,8 +3,6 @@
   splicePackages,
   nixDependencies,
   pkgs,
-  maintainers,
-  teams,
   otherSplices,
   version,
   src,
@@ -27,8 +25,6 @@ let
         f = import ./packaging/components.nix {
           inherit
             lib
-            maintainers
-            teams
             officialRelease
             pkgs
             src

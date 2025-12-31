@@ -4,9 +4,6 @@
   lndir,
   buildEnv,
 
-  maintainers,
-  teams,
-
   version,
 
   nix-util,
@@ -227,7 +224,6 @@ stdenv.mkDerivation (finalAttrs: {
     longDescription = nix-cli.meta.longDescription;
     homepage = nix-cli.meta.homepage;
     license = nix-cli.meta.license;
-    maintainers = maintainers;
     platforms = nix-cli.meta.platforms;
     outputsToInstall = [
       "out"
