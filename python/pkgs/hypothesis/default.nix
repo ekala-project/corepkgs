@@ -16,9 +16,9 @@
   pythonAtLeast,
   pythonOlder,
   sphinxHook,
-  sphinx-rtd-theme,
-  sphinx-hoverxref,
-  sphinx-codeautolink,
+  sphinx-rtd-theme ? null,
+  sphinx-hoverxref ? null,
+  sphinx-codeautolink ? null,
   tzdata,
 }:
 
