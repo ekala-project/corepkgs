@@ -9,9 +9,10 @@
   gperf,
   nix-update-script,
   python3Packages,
+  runUnitTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: rec {
   pname = "libseccomp";
   version = "2.6.0";
 
@@ -58,8 +59,7 @@ stdenv.mkDerivation rec {
     which
   ];
 
-  # Test suite is quite long
-  # TODO(corepkgs): move unittests to passthru
+  # Test suite is quite long, run as passthru
   doCheck = false;
 
   # Hack to ensure that patchelf --shrink-rpath get rids of a $TMPDIR reference.
@@ -76,6 +76,7 @@ stdenv.mkDerivation rec {
     updateScript = nix-update-script { };
     tests = {
       inherit (python3Packages) seccomp;
+      unittests = runUnitTests finalAttrs.finalPackage;
     };
   };
 
@@ -96,4 +97,4 @@ stdenv.mkDerivation rec {
     ];
     maintainers = [ ];
   };
-}
+})
