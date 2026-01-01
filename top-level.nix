@@ -798,6 +798,8 @@ with final;
 
   gobject-introspection-unwrapped = callPackage ./pkgs/gobject-introspection/unwrapped.nix { };
 
+  buildGoModule = buildGo125Module;
+
   buildGo125Module = callPackage ./build-support/go/module.nix {
     go = buildPackages.go_1_25;
   };
