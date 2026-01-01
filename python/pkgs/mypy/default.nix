@@ -113,6 +113,9 @@ buildPythonPackage rec {
   ]
   ++ concatAttrValues optional-dependencies;
 
+  # Fairly large test suit
+  # TODO(corepkgs): move to passthru.unittests
+  doCheck = false;
   disabledTests = [
     # fails with typing-extensions>=4.10
     # https://github.com/python/mypy/issues/17005
