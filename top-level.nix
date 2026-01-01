@@ -487,10 +487,8 @@ with final;
     in
     lib.recurseIntoAttrs xorgPackages;
 
-  # TODO(corepkgs): use mkManyVariants
-  autoconf = callPackage ./pkgs/autoconf { };
-  autoconf269 = callPackage ./pkgs/autoconf/2.69.nix { };
-  autoconf271 = callPackage ./pkgs/autoconf/2.71.nix { };
+  autoconf269 = autoconf.variants.v2_69;
+  autoconf271 = autoconf.variants.v2_71;
 
   # TODO(corepkgs): use mkManyVariants
   automake = automake118x;
