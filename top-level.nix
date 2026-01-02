@@ -10,8 +10,6 @@ in
 with final;
 {
 
-  # FIXME(corepkgs): update lib and use function from it
-  concatAttrValues = set: lib.concatLists (lib.attrValues set);
   # TODO(corepkgs): support NixOS tests
   testers = { };
   nixosTests = { };
