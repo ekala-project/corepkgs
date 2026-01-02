@@ -1,6 +1,5 @@
 {
   lib,
-  concatAttrValues,
   stdenv,
   buildPythonPackage,
   fetchFromGitHub,
@@ -111,7 +110,7 @@ buildPythonPackage rec {
     setuptools
     tomli
   ]
-  ++ concatAttrValues optional-dependencies;
+  ++ lib.concatAttrValues optional-dependencies;
 
   # Fairly large test suit
   # TODO(corepkgs): move to passthru.unittests
