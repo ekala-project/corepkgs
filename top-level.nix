@@ -63,6 +63,7 @@ with final;
   emacs = null;
   enlightenment = null;
   epeg = null;
+  epoll-shim = null; # for non-linux compat
   epubcheck = null;
   ettercap = null;
   exiv2 = null;
@@ -1605,7 +1606,7 @@ with final;
   udev = if lib.meta.availableOn stdenv.hostPlatform systemdLibs then systemdLibs else libudev-zero;
 
   inherit (callPackages ./pkgs/docbook-xsl { })
-    docbook-xsl-nons
+    docbook-xsl-nons # was docbook_xsl
     docbook-xsl-ns # was docbook-xsl-ns
     ;
 
