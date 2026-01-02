@@ -158,7 +158,6 @@ with final;
   rocksdb = null;
   rpm = null;
   rsyslog = null;
-  ruby = null;
   sage = null;
   samba = null;
   sbclPackages = null;
