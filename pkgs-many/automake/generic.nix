@@ -1,4 +1,12 @@
 {
+  version,
+  src-hash,
+  packageAtLeast,
+  packageOlder,
+  ...
+}:
+
+{
   lib,
   stdenv,
   fetchurl,
@@ -7,16 +15,17 @@
   updateAutotoolsGnuConfigScriptsHook,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "automake";
-  version = "1.16.5";
+  inherit version;
 
   src = fetchurl {
     url = "mirror://gnu/automake/automake-${version}.tar.xz";
-    sha256 = "0sdl32qxdy7m06iggmkkvf7j520rmmgbsjzbm7fgnxwxdp6mh7gh";
+    hash = src-hash;
   };
 
   strictDeps = true;
+
   nativeBuildInputs = [
     updateAutotoolsGnuConfigScriptsHook
     autoconf
@@ -26,26 +35,29 @@ stdenv.mkDerivation rec {
 
   setupHook = ./setup-hook.sh;
 
-  doCheck = false; # takes _a lot_ of time, fails 3 out of 2698 tests, all seem to be related to paths
+  # Disable indented log output from Make, otherwise "make.test" will
+  # fail.
+  preCheck = "unset NIX_INDENT_MAKE";
+  doCheck = false; # takes _a lot_ of time, fails 3 out of 2698 tests
+
   doInstallCheck = false; # runs the same thing, fails the same tests
 
-  # The test suite can run in parallel.
   enableParallelBuilding = true;
 
-  # Don't fixup "#! /bin/sh" in Libtool, otherwise it will use the
-  # "fixed" path in generated files!
+  # Don't fixup '#! /bin/sh' in Libtool, otherwise it will use the
+  # 'fixed' path in generated files!
   dontPatchShebangs = true;
 
   meta = with lib; {
-    branch = "1.16";
+    branch = lib.versions.majorMinorVersion branch;
     homepage = "https://www.gnu.org/software/automake/";
     description = "GNU standard-compliant makefile generator";
     license = licenses.gpl2Plus;
     longDescription = ''
       GNU Automake is a tool for automatically generating
-      `Makefile.in' files compliant with the GNU Coding
+      `Makefile.in` files compliant with the GNU Coding
       Standards.  Automake requires the use of Autoconf.
     '';
     platforms = platforms.all;
   };
-}
+})
