@@ -487,10 +487,8 @@ with final;
   autoconf269 = autoconf.variants.v2_69;
   autoconf271 = autoconf.variants.v2_71;
 
-  # TODO(corepkgs): use mkManyVariants
-  automake = automake118x;
-  automake116x = callPackage ./pkgs/automake/automake-1.16.x.nix { };
-  automake118x = callPackage ./pkgs/automake/automake-1.18.x.nix { };
+  automake116x = automake.variants.v1_16;
+  automake118x = automake.variants.v1_18;
 
   # TODO(corepkgs): use mkManyVariants
   autoreconfHook269 = autoreconfHook.override { autoconf = autoconf269; };
