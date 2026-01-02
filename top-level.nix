@@ -38,7 +38,6 @@ with final;
   actdiag = null;
   aria2 = null;
   arrow-cpp = null;
-  asciidoctor = null;
   awsebcli = null;
   azmq = null;
   babel = null;
