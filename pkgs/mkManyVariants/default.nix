@@ -1,4 +1,10 @@
-{ lib, config }:
+{
+  lib,
+  config,
+
+  # Allow for alias and variant exprs to reference things from pkgs
+  callFromScope,
+}:
 
 {
   # Intended to be an attrset of { "<exposed variant>" = { variant = "<full variant>"; src = <path>; } }
@@ -28,9 +34,13 @@
 assert builtins.isFunction defaultSelector;
 
 let
-  variantsRaw = if builtins.isPath variants then import variants else variants;
-  aliasesExpr = if builtins.isPath aliases then import aliases else aliases;
-  genericExpr = if builtins.isPath genericBuilder then import genericBuilder else genericBuilder;
+  importIfPath = x: if builtins.isPath x then import x else x;
+  callIfFunction = x: if builtins.isFunction x then callFromScope x { } else x;
+
+  variantsRaw = callIfFunction (importIfPath variants);
+  aliasesExpr = importIfPath aliases;
+  # Do not use callFromScope as the genericExpr should get called from package scope later
+  genericExpr = importIfPath genericBuilder;
 
   aliases' =
     if builtins.isFunction aliasesExpr then
