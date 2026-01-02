@@ -786,10 +786,8 @@ with final;
     }
   );
 
-  # TODO(corepkgs): mkManyVariant this
-  go_1_25 = callPackage ./pkgs/go/1.25.nix { };
-  go_1_24 = callPackage ./pkgs/go/1.24.nix { };
-  go = go_1_25;
+  go_1_24 = go.variants.v1_24;
+  go_1_25 = go.variants.v1_25;
 
   gobject-introspection-unwrapped = callPackage ./pkgs/gobject-introspection/unwrapped.nix { };
 
