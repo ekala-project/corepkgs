@@ -11,6 +11,7 @@
   lib,
   stdenv,
   callPackage,
+  callFromScope,
   makeSetupHook,
   runCommand,
   tzdata,
