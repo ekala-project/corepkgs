@@ -313,14 +313,19 @@ let
       depsBuildBuild ? [ ], # -1 -> -1
       depsBuildBuildPropagated ? [ ], # -1 -> -1
       nativeBuildInputs ? [ ], # -1 ->  0  N.B. Legacy name
+      commands ? { },
       propagatedNativeBuildInputs ? [ ], # -1 ->  0  N.B. Legacy name
+      propagatedCommands ? { },
+
       depsBuildTarget ? [ ], # -1 ->  1
       depsBuildTargetPropagated ? [ ], # -1 ->  1
 
       depsHostHost ? [ ], # 0 ->  0
       depsHostHostPropagated ? [ ], # 0 ->  0
       buildInputs ? [ ], # 0 ->  1  N.B. Legacy name
+      libraries ? { },
       propagatedBuildInputs ? [ ], # 0 ->  1  N.B. Legacy name
+      propagatedLibraries ? { },
 
       depsTargetTarget ? [ ], # 1 ->  1
       depsTargetTargetPropagated ? [ ], # 1 ->  1
@@ -475,14 +480,24 @@ let
         doCheck = doCheck';
         doInstallCheck = doInstallCheck';
         buildInputs' =
-          buildInputs ++ optionals doCheck checkInputs ++ optionals doInstallCheck installCheckInputs;
+          buildInputs
+          ++ (builtins.attrValues libraries)
+          ++ optionals doCheck checkInputs
+          ++ optionals doInstallCheck installCheckInputs;
         nativeBuildInputs' =
           nativeBuildInputs
+          ++ (builtins.attrValues commands)
           ++ optional separateDebugInfo' ../../build-support/setup-hooks/separate-debug-info.sh
           ++ optional isWindows ../../build-support/setup-hooks/win-dll-link.sh
           ++ optional isCygwin ../../build-support/setup-hooks/cygwin-dll-link.sh
           ++ optionals doCheck nativeCheckInputs
           ++ optionals doInstallCheck nativeInstallCheckInputs;
+        propagatedNativeBuildInputs' =
+          propagatedNativeBuildInputs
+          ++ (builtins.attrValues propagatedCommands);
+        propagatedBuildInputs' =
+          propagatedBuildInputs
+          ++ (builtins.attrValues propagatedLibraries);
 
         outputs = outputs';
 
@@ -514,7 +529,7 @@ let
               checkDependencyList "depsBuildBuildPropagated" depsBuildBuildPropagated
             ))
             (map (drv: getDev drv.__spliced.buildHost or drv) (
-              checkDependencyList "propagatedNativeBuildInputs" propagatedNativeBuildInputs
+              checkDependencyList "propagatedNativeBuildInputs" propagatedNativeBuildInputs'
             ))
             (map (drv: getDev drv.__spliced.buildTarget or drv) (
               checkDependencyList "depsBuildTargetPropagated" depsBuildTargetPropagated
@@ -525,7 +540,7 @@ let
               checkDependencyList "depsHostHostPropagated" depsHostHostPropagated
             ))
             (map (drv: getDev drv.__spliced.hostTarget or drv) (
-              checkDependencyList "propagatedBuildInputs" propagatedBuildInputs
+              checkDependencyList "propagatedBuildInputs" propagatedBuildInputs'
             ))
           ]
           [
