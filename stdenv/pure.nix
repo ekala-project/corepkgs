@@ -118,7 +118,9 @@ let
 
   configEval = lib.evalModules {
     modules = [
-      ./config.nix
+      ../config/build-options.nix
+      ../config/package-options.nix
+      ../config/overlays.nix
       (
         { options, ... }:
         {
