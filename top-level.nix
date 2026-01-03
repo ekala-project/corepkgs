@@ -1499,10 +1499,9 @@ with final;
   patch = gnupatch;
 
   # TODO(corepkgs): use mkManyVariants
-  tcl = tcl-8_6;
-  tcl-8_5 = callPackage ./pkgs/tcl/8.5.nix { };
-  tcl-8_6 = callPackage ./pkgs/tcl/8.6.nix { };
-  tcl-9_0 = callPackage ./pkgs/tcl/9.0.nix { };
+  tcl-8_5 = tcl.v8_5;
+  tcl-8_6 = tcl.v8_6;
+  tcl-9_0 = tcl.v9_0;
   # We don't need versioned package sets thanks to the tcl stubs mechanism
   tclPackages = lib.recurseIntoAttrs (callPackage ./pkgs/tcl/packages.nix { });
 
