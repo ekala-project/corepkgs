@@ -91,6 +91,7 @@ let
                 pythonExtension
               ]
               ++ pythonPackagesExtensions
+              ++ config.overlays.python
               ++ [
                 overrides
               ]
