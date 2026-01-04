@@ -1377,12 +1377,11 @@ with final;
     withLastlog = false;
   };
 
-  # TODO(corepkgs): use mkManyVariants, move to perl
-  perlInterpreters = callPackage ./pkgs/perl { inherit config; };
-  inherit (perlInterpreters) perl538 perl540;
+  # TODO(corepkgs): move to nixpkgs alias file
+  perl538 = perl.v5_38;
+  perl540 = perl.v5_40;
   perl538Packages = lib.recurseIntoAttrs perl538.pkgs;
   perl540Packages = lib.recurseIntoAttrs perl540.pkgs;
-  perl = perl540;
   perlPackages = perl540Packages;
 
   # TODO(corepkgs): use mkManyVariants
