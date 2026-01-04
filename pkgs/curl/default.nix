@@ -124,17 +124,18 @@ stdenv.mkDerivation (finalAttrs: {
     NIX_LDFLAGS = "-liconv";
   };
 
-  nativeBuildInputs = [
-    pkg-config
-    perl
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isOpenBSD [ autoreconfHook ];
+  commands = {
+    inherit pkg-config perl;
+  };
+
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isOpenBSD [ autoreconfHook ];
 
   nativeCheckInputs = [
     # See https://github.com/curl/curl/pull/16928
     openssl
   ];
 
+  __structuredAttrs = true;
   # Zlib and OpenSSL must be propagated because `libcurl.la' contains
   # "-lz -lssl", which aren't necessary direct build inputs of
   # applications that use Curl.
