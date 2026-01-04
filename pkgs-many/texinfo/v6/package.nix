@@ -1,4 +1,12 @@
 {
+  version,
+  hash,
+  isInteractive ? false,
+  mkVariantPassthru,
+  ...
+}@variantArgs:
+
+{
   lib,
   stdenv,
   buildPackages,
@@ -11,18 +19,8 @@
   freebsd,
   glibcLocales,
   libiconv,
-
-  # we are a dependency of gcc, this simplifies bootstrapping
-  interactive ? false,
   ncurses,
   procps,
-  meta,
-}:
-
-{
-  version,
-  hash,
-  patches ? [ ],
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -44,7 +42,7 @@ let
 in
 
 stdenv.mkDerivation {
-  pname = "texinfo${optionalString interactive "-interactive"}";
+  pname = "texinfo${optionalString isInteractive "-interactive"}";
   inherit version;
 
   src = fetchurl {
@@ -52,7 +50,10 @@ stdenv.mkDerivation {
     inherit hash;
   };
 
-  patches = patches ++ optional crossBuildTools ./cross-tools-flags.patch;
+  patches = [
+    ./fix-glibc-2.34.patch
+  ]
+  ++ optional crossBuildTools ./cross-tools-flags.patch;
 
   postPatch = ''
     patchShebangs tp/maintain/regenerate_commands_perl_info.pl
@@ -100,7 +101,7 @@ stdenv.mkDerivation {
     libiconv
     gawk
   ]
-  ++ optional interactive ncurses;
+  ++ optional isInteractive ncurses;
 
   configureFlags = [
     "PERL=${buildPackages.perl}/bin/perl"
@@ -126,7 +127,7 @@ stdenv.mkDerivation {
   nativeCheckInputs = [ procps ] ++ optionals stdenv.buildPlatform.isFreeBSD [ freebsd.locale ];
   checkInputs = optionals (lib.versionAtLeast version "7.2") [ glibcLocales ];
 
-  doCheck = interactive && !stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isSunOS; # flaky
+  doCheck = isInteractive && !stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isSunOS; # flaky
 
   postFixup = optionalString crossBuildTools ''
     for f in "$out"/bin/{pod2texi,texi2any}; do
@@ -135,7 +136,32 @@ stdenv.mkDerivation {
     done
   '';
 
-  meta = meta // {
+  passthru = mkVariantPassthru variantArgs;
+
+  meta = {
+    homepage = "https://www.gnu.org/software/texinfo/";
+    description = "GNU documentation system";
+    changelog = "https://git.savannah.gnu.org/cgit/texinfo.git/plain/NEWS";
+    license = lib.licenses.gpl3Plus;
+    platforms = lib.platforms.all;
+    maintainers = [ ];
     branch = version;
+
+    longDescription = ''
+      Texinfo is the official documentation format of the GNU project.
+      It was invented by Richard Stallman and Bob Chassell many years
+      ago, loosely based on Brian Reid's Scribe and other formatting
+      languages of the time.  It is used by many non-GNU projects as
+      well.
+
+      Texinfo uses a single source file to produce output in a number
+      of formats, both online and printed (dvi, html, info, pdf, xml,
+      etc.).  This means that instead of writing different documents
+      for online information and another for a printed manual, you
+      need write only one document.  And when the work is revised, you
+      need revise only that one document.  The Texinfo system is
+      well-integrated with GNU Emacs.
+    '';
+    mainProgram = "texi2any";
   };
 }

@@ -1372,22 +1372,9 @@ with final;
   perl540Packages = lib.recurseIntoAttrs perl.v5_40.pkgs;
   perlPackages = perl540Packages;
 
-  # TODO(corepkgs): use mkManyVariants
-  texinfoPackages = callPackages ./pkgs/texinfo/packages.nix {
-    inherit
-      freebsd
-      gawk
-      libintl
-      ncurses
-      procps
-      ;
-  };
-  inherit (texinfoPackages)
-    texinfo6
-    texinfo7
-    ;
-  texinfo = texinfo7;
-  texinfoInteractive = texinfo.override { interactive = true; };
+  texinfo6 = texinfo.v6;
+  texinfo7 = texinfo.v7;
+  texinfoInteractive = texinfo.interactive;
 
   # TODO(corepkgs): remove hack
   threads =
