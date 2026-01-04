@@ -484,12 +484,6 @@ with final;
     in
     lib.recurseIntoAttrs xorgPackages;
 
-  autoconf269 = autoconf.v2_69;
-  autoconf271 = autoconf.v2_71;
-
-  automake116x = automake.v1_16;
-  automake118x = automake.v1_18;
-
   # TODO(corepkgs): use mkManyVariants
   autoreconfHook269 = autoreconfHook.override { autoconf = autoconf269; };
   autoreconfHook271 = autoreconfHook.override { autoconf = autoconf271; };
@@ -785,9 +779,6 @@ with final;
       profiledCompiler = false;
     }
   );
-
-  go_1_24 = go.v1_24;
-  go_1_25 = go.v1_25;
 
   gobject-introspection-unwrapped = callPackage ./pkgs/gobject-introspection/unwrapped.nix { };
 
@@ -1377,11 +1368,8 @@ with final;
     withLastlog = false;
   };
 
-  # TODO(corepkgs): move to nixpkgs alias file
-  perl538 = perl.v5_38;
-  perl540 = perl.v5_40;
-  perl538Packages = lib.recurseIntoAttrs perl538.pkgs;
-  perl540Packages = lib.recurseIntoAttrs perl540.pkgs;
+  perl538Packages = lib.recurseIntoAttrs perl.v5_38.pkgs;
+  perl540Packages = lib.recurseIntoAttrs perl.v5_40.pkgs;
   perlPackages = perl540Packages;
 
   # TODO(corepkgs): use mkManyVariants
@@ -1498,10 +1486,6 @@ with final;
   # TODO(corepkgs): alias?
   patch = gnupatch;
 
-  # TODO(corepkgs): use mkManyVariants
-  tcl-8_5 = tcl.v8_5;
-  tcl-8_6 = tcl.v8_6;
-  tcl-9_0 = tcl.v9_0;
   # We don't need versioned package sets thanks to the tcl stubs mechanism
   tclPackages = lib.recurseIntoAttrs (callPackage ./pkgs/tcl/packages.nix { });
 
