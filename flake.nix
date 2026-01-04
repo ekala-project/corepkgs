@@ -25,7 +25,10 @@
             programs.nixfmt.enable = true;
             programs.keep-sorted = {
               enable = true;
-              includes = [ "*.nix" ];
+              includes = [
+                "*.nix"
+                "maintainers/scripts/sync-with-nixpkgs/script.py"
+              ];
             };
           };
         in
