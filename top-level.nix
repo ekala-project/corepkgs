@@ -484,11 +484,11 @@ with final;
     in
     lib.recurseIntoAttrs xorgPackages;
 
-  autoconf269 = autoconf.variants.v2_69;
-  autoconf271 = autoconf.variants.v2_71;
+  autoconf269 = autoconf.v2_69;
+  autoconf271 = autoconf.v2_71;
 
-  automake116x = automake.variants.v1_16;
-  automake118x = automake.variants.v1_18;
+  automake116x = automake.v1_16;
+  automake118x = automake.v1_18;
 
   # TODO(corepkgs): use mkManyVariants
   autoreconfHook269 = autoreconfHook.override { autoconf = autoconf269; };
@@ -786,8 +786,8 @@ with final;
     }
   );
 
-  go_1_24 = go.variants.v1_24;
-  go_1_25 = go.variants.v1_25;
+  go_1_24 = go.v1_24;
+  go_1_25 = go.v1_25;
 
   gobject-introspection-unwrapped = callPackage ./pkgs/gobject-introspection/unwrapped.nix { };
 
