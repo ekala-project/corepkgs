@@ -62,6 +62,7 @@ stdenv.mkDerivation rec {
     if isFuse3 then
       [
         meson
+        meson.configurePhaseHook
         ninja
         pkg-config
       ]
