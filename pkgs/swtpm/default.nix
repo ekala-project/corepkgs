@@ -68,7 +68,7 @@ stdenv.mkDerivation (finalAttrs: {
     gnutls
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
-    fuse
+    fuse.v2
     libseccomp
   ];
 
