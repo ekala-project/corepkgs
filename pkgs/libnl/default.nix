@@ -66,11 +66,11 @@ stdenv.mkDerivation rec {
     inherit pythonSupport;
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "http://www.infradead.org/~tgr/libnl/";
     description = "Linux Netlink interface library suite";
-    license = licenses.lgpl21;
+    license = lib.licenses.lgpl21;
     maintainers = [ ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
   };
 }

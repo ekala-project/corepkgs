@@ -94,12 +94,12 @@ stdenv.mkDerivation rec {
     haskell-pcap = haskellPackages.pcap;
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://www.tcpdump.org";
     description = "Packet Capture Library";
     mainProgram = "pcap-config";
-    platforms = platforms.unix;
+    platforms = lib.platforms.unix;
     maintainers = [ ];
-    license = licenses.bsd3;
+    license = lib.licenses.bsd3;
   };
 }

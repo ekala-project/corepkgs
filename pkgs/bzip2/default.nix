@@ -71,13 +71,13 @@ stdenv.mkDerivation (
 
     passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
 
-    meta = with lib; {
+    meta = {
       description = "High-quality data compression program";
       homepage = "https://www.sourceware.org/bzip2";
       changelog = "https://sourceware.org/git/?p=bzip2.git;a=blob;f=CHANGES;hb=HEAD";
-      license = licenses.bsdOriginal;
+      license = lib.licenses.bsdOriginal;
       pkgConfigModules = [ "bzip2" ];
-      platforms = platforms.all;
+      platforms = lib.platforms.all;
       maintainers = [ ];
     };
   }

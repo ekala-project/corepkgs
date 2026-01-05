@@ -53,10 +53,10 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Attempt to guess a canonical system name";
     homepage = "https://savannah.gnu.org/projects/config";
-    license = licenses.gpl3;
+    license = lib.licenses.gpl3;
     # In addition to GPLv3:
     #   As a special exception to the GNU General Public License, if you
     #   distribute this file as part of a program that contains a
@@ -64,6 +64,6 @@ stdenv.mkDerivation {
     #   the same distribution terms that you use for the rest of that
     #   program.
     maintainers = [ ];
-    platforms = platforms.all;
+    platforms = lib.platforms.all;
   };
 }

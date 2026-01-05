@@ -79,11 +79,11 @@ let
 
     pythonImportsCheck = [ "urllib3" ];
 
-    meta = with lib; {
+    meta = {
       description = "Powerful, user-friendly HTTP client for Python";
       homepage = "https://github.com/urllib3/urllib3";
       changelog = "https://github.com/urllib3/urllib3/blob/${version}/CHANGES.rst";
-      license = licenses.mit;
+      license = lib.licenses.mit;
       maintainers = [ ];
     };
   };

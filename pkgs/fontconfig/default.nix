@@ -122,11 +122,11 @@ stdenv.mkDerivation (finalAttrs: {
     };
   };
 
-  meta = with lib; {
+  meta = {
     description = "Library for font customization and configuration";
     homepage = "http://fontconfig.org/";
-    license = licenses.bsd2; # custom but very bsd-like
-    platforms = platforms.all;
+    license = lib.licenses.bsd2; # custom but very bsd-like
+    platforms = lib.platforms.all;
     pkgConfigModules = [ "fontconfig" ];
   };
 })

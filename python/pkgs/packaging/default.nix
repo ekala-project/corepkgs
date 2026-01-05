@@ -48,12 +48,12 @@ let
       doCheck = true;
     });
 
-    meta = with lib; {
+    meta = {
       changelog = "https://github.com/pypa/packaging/blob/${version}/CHANGELOG.rst";
       description = "Core utilities for Python packages";
       downloadPage = "https://github.com/pypa/packaging";
       homepage = "https://packaging.pypa.io/";
-      license = with licenses; [
+      license = with lib.licenses; [
         bsd2
         asl20
       ];

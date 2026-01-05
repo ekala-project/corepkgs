@@ -23,10 +23,10 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "setuptools-stubs" ];
 
-  meta = with lib; {
+  meta = {
     description = "Typing stubs for setuptools";
     homepage = "https://github.com/python/typeshed";
-    license = licenses.asl20;
+    license = lib.licenses.asl20;
     maintainers = [ ];
   };
 }

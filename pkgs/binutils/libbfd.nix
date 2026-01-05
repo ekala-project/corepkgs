@@ -20,7 +20,7 @@ stdenv.mkDerivation {
     inherit (binutils-unwrapped-all-targets) src dev plugin-api-header;
   };
 
-  meta = with lib; {
+  meta = {
     description = "Library for manipulating containers of machine code";
     longDescription = ''
       BFD is a library which provides a single interface to read and write
@@ -29,8 +29,8 @@ stdenv.mkDerivation {
       it.
     '';
     homepage = "https://www.gnu.org/software/binutils/";
-    license = licenses.gpl3Plus;
+    license = lib.licenses.gpl3Plus;
     maintainers = [ ];
-    platforms = platforms.unix;
+    platforms = lib.platforms.unix;
   };
 }

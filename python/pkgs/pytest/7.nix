@@ -102,12 +102,12 @@ let
 
     pythonImportsCheck = [ "pytest" ];
 
-    meta = with lib; {
+    meta = {
       description = "Framework for writing tests";
       homepage = "https://docs.pytest.org";
       changelog = "https://github.com/pytest-dev/pytest/releases/tag/${version}";
       maintainers = [ ];
-      license = licenses.mit;
+      license = lib.licenses.mit;
     };
   };
 in

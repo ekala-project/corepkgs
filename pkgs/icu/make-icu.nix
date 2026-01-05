@@ -81,7 +81,7 @@ let
 
     enableParallelBuilding = true;
 
-    meta = with lib; {
+    meta = {
       description = "Unicode and globalization support library";
       homepage = "https://icu.unicode.org/";
       maintainers = [ ];
@@ -90,7 +90,7 @@ let
         "icu-io"
         "icu-uc"
       ];
-      platforms = platforms.all;
+      platforms = lib.platforms.all;
     };
   };
 

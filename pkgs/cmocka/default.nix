@@ -29,7 +29,7 @@ stdenv.mkDerivation rec {
 
   doCheck = true;
 
-  meta = with lib; {
+  meta = {
     description = "Lightweight library to simplify and generalize unit tests for C";
     longDescription = ''
       There are a variety of C unit testing frameworks available however
@@ -57,8 +57,8 @@ stdenv.mkDerivation rec {
       This is the successor of Google's Cmockery.
     '';
     homepage = "https://cmocka.org/";
-    license = licenses.asl20;
-    platforms = platforms.all;
+    license = lib.licenses.asl20;
+    platforms = lib.platforms.all;
     maintainers = [ ];
   };
 }

@@ -80,15 +80,15 @@ stdenv.mkDerivation rec {
   # them in parallel by make will eventually break one or more tests.
   enableParallelChecking = false;
 
-  meta = with lib; {
+  meta = {
     description = "Source code renderer with syntax highlighting";
     longDescription = ''
       GNU Source-highlight, given a source file, produces a document
       with syntax highlighting.
     '';
     homepage = "https://www.gnu.org/software/src-highlite/";
-    license = licenses.gpl3Plus;
-    platforms = platforms.unix;
+    license = lib.licenses.gpl3Plus;
+    platforms = lib.platforms.unix;
     maintainers = [ ];
   };
 }

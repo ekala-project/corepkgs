@@ -49,11 +49,11 @@ stdenv.mkDerivation rec {
     "-Dupdate-mimedb=true"
   ];
 
-  meta = with lib; {
+  meta = {
     description = "Database of common MIME types";
     homepage = "http://freedesktop.org/wiki/Software/shared-mime-info";
-    license = licenses.gpl2Plus;
-    platforms = platforms.unix;
+    license = lib.licenses.gpl2Plus;
+    platforms = lib.platforms.unix;
     maintainers = [ ];
     mainProgram = "update-mime-database";
   };

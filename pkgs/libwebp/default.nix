@@ -98,11 +98,11 @@ stdenv.mkDerivation rec {
     pkg-config = testers.hasPkgConfigModules { package = libwebp; };
   };
 
-  meta = with lib; {
+  meta = {
     description = "Tools and library for the WebP image format";
     homepage = "https://developers.google.com/speed/webp/";
-    license = licenses.bsd3;
-    platforms = platforms.all;
+    license = lib.licenses.bsd3;
+    platforms = lib.platforms.all;
     maintainers = [ ];
     pkgConfigModules = [
       # configure_pkg_config() calls for these are unconditional

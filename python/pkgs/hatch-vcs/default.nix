@@ -41,11 +41,11 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "hatch_vcs" ];
 
-  meta = with lib; {
+  meta = {
     changelog = "https://github.com/ofek/hatch-vcs/releases/tag/v${version}";
     description = "Plugin for Hatch that uses your preferred version control system (like Git) to determine project versions";
     homepage = "https://github.com/ofek/hatch-vcs";
-    license = licenses.mit;
+    license = lib.licenses.mit;
     maintainers = [ ];
   };
 }

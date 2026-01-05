@@ -59,14 +59,14 @@ stdenv.mkDerivation rec {
 
   # outputs = [ "out" "dev" ];
 
-  meta = with lib; {
+  meta = {
     description = "Library for loading eBPF programs and reading and manipulating eBPF objects from user-space";
     homepage = "https://github.com/libbpf/libbpf";
-    license = with licenses; [
+    license = with lib.licenses; [
       lgpl21 # or
       bsd2
     ];
     maintainers = [ ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
   };
 }

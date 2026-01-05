@@ -90,10 +90,10 @@ stdenv.mkDerivation (finalAttrs: {
     tests = { inherit (nixosTests) dconf; };
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://gitlab.gnome.org/GNOME/dconf";
-    license = licenses.lgpl21Plus;
-    platforms = platforms.unix;
+    license = lib.licenses.lgpl21Plus;
+    platforms = lib.platforms.unix;
     badPlatforms = [
       # Mandatory libdconfsettings shared library.
       lib.systems.inspect.platformPatterns.isStatic

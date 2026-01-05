@@ -61,7 +61,7 @@ stdenv.mkDerivation (finalAttrs: {
     python = python3Packages.brotli;
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/google/brotli";
     description = "General-purpose lossless compression library with CLI";
     longDescription = ''
@@ -76,13 +76,13 @@ stdenv.mkDerivation (finalAttrs: {
       in the following Internet-Draft:
       https://datatracker.ietf.org/doc/html/rfc7932
     '';
-    license = licenses.mit;
+    license = lib.licenses.mit;
     maintainers = [ ];
     pkgConfigModules = [
       "libbrotlidec"
       "libbrotlienc"
     ];
-    platforms = platforms.all;
+    platforms = lib.platforms.all;
     mainProgram = "brotli";
   };
 })

@@ -28,11 +28,11 @@ python3.pkgs.buildPythonApplication rec {
 
   doCheck = false;
 
-  meta = with lib; {
+  meta = {
     description = "Source code formatter for cmake listfiles";
     homepage = "https://github.com/cheshirekow/cmake_format";
-    license = licenses.gpl3;
+    license = lib.licenses.gpl3;
     mainProgram = "cmake-format";
-    platforms = platforms.all;
+    platforms = lib.platforms.all;
   };
 }
