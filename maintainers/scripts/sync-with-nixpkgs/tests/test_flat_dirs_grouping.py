@@ -31,11 +31,6 @@ class TestGetFlatDirSubfolder:
         result = script_module.get_flat_dir_subfolder("common-updater/scripts/update.sh")
         assert result == ("common-updater", "scripts")
 
-    def test_os_specific_linux_subfolder(self, script_module):
-        """Test os-specific/linux subfolder extraction."""
-        result = script_module.get_flat_dir_subfolder("os-specific/linux/kernel-headers/default.nix")
-        assert result == ("os-specific/linux", "kernel-headers")
-
     def test_systems_file(self, script_module):
         """Test systems with direct file."""
         result = script_module.get_flat_dir_subfolder("systems/default.nix")
@@ -76,11 +71,6 @@ class TestGetPatchOutputPath:
         """Test patch path for build-support."""
         result = script_module.get_patch_output_path("build-support/fetchgit/default.nix")
         assert result == "patches/build-support/fetchgit.patch"
-
-    def test_os_specific_linux_patch_path(self, script_module):
-        """Test patch path for os-specific/linux."""
-        result = script_module.get_patch_output_path("os-specific/linux/kernel-headers/default.nix")
-        assert result == "patches/os-specific/linux/kernel-headers.patch"
 
     def test_systems_patch_path(self, script_module):
         """Test patch path for systems."""

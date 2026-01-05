@@ -162,11 +162,6 @@ class TestIsFlatDir:
         """Test that common-updater is a flat dir."""
         assert script_module.is_flat_dir("common-updater") is True
 
-    def test_flat_dir_os_specific_linux(self, script_module):
-        """Test that os-specific/linux is a flat dir."""
-        assert script_module.is_flat_dir("os-specific/linux") is True
-        assert script_module.is_flat_dir("os-specific/linux/kernel-headers") is True
-
     def test_not_flat_dir_python(self, script_module):
         """Test that python is NOT a flat dir."""
         assert script_module.is_flat_dir("python") is False
