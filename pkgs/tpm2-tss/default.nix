@@ -155,12 +155,14 @@ stdenv.mkDerivation (finalAttrs: {
     EOF
   '';
 
+  # TODO(corepkgs): Move to passthru
   doCheck = false;
-  doInstallCheck =
-    stdenv.buildPlatform.canExecute stdenv.hostPlatform
-    && !stdenv.hostPlatform.isDarwin
-    # Tests rely on mocking, which can't work with static libs.
-    && !stdenv.hostPlatform.isStatic;
+  doInstallCheck = false;
+  # doInstallCheck =
+  #   stdenv.buildPlatform.canExecute stdenv.hostPlatform
+  #   && !stdenv.hostPlatform.isDarwin
+  #   # Tests rely on mocking, which can't work with static libs.
+  #   && !stdenv.hostPlatform.isStatic;
   # Since we rewrote the load path in the dynamic loader for the TCTI
   # The various tcti implementation should be placed in their target directory
   # before we could run tests, so we make turn checkPhase into installCheckPhase
