@@ -1495,7 +1495,7 @@ with final;
   # TODO(corepkgs): alias?
   su = shadow;
 
-  systemd = callPackage ./os-specific/linux/systemd {
+  systemd = callPackage ./pkgs/linux/pkgs/systemd {
     # break some cyclic dependencies
     util-linux = util-linuxMinimal;
     # provide a super minimal gnupg used for systemd-machined
