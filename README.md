@@ -40,8 +40,8 @@ Generally, this will cause divergence from Nixpkgs.
 
 ```
 build-support # Fetchers, shell hooks, and nix utilities
-os-specific   # For packages which are platform-specific
 pkgs/         # Subdirectories are automatically imported to pkgs
+  linux/      # Linux related packaging
 python/       # Python related packaging
   pkgs/       # Directory for python package set, automatically imported
 perl/         # Perl related packaging (interpreter) and packages

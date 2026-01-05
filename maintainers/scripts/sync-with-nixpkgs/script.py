@@ -78,7 +78,6 @@ IGNORE_DELETION_PATTERNS = [
 CHECK_NEW_FILES = [
     "build-support",
     "common-updater",
-    "os-specific/linux",
     "pkgs",
     "python",
     "stdenv",
@@ -132,7 +131,6 @@ PATH_MAPPINGS = {
     # keep-sorted start
     "build-support": "pkgs/build-support",
     "common-updater": "pkgs/common-updater",
-    "os-specific": "pkgs/os-specific",
     "perl/buildperlpackage.nix": "pkgs/development/perl-modules/generic",
     "perl/patches": "pkgs/development/perl-modules",
     "perl/perl-packages.nix": "pkgs/top-level/perl-packages.nix",

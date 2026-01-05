@@ -143,7 +143,6 @@ let
         description = "Header files and scripts for Linux kernel";
         license = lib.licenses.gpl2Only;
         platforms = lib.platforms.linux;
-        teams = [ lib.teams.linux-kernel ];
       };
     };
 in

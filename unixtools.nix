@@ -249,9 +249,9 @@ let
 
       # watch is the only command from procps that builds currently on
       # Darwin/FreeBSD. Unfortunately no other implementations exist currently!
-      darwin = pkgs.callPackage ../os-specific/linux/procps-ng { };
-      freebsd = pkgs.callPackage ../os-specific/linux/procps-ng { };
-      openbsd = pkgs.callPackage ../os-specific/linux/procps-ng { };
+      darwin = pkgs.procps-ng { };
+      freebsd = pkgs.procps-ng { };
+      openbsd = pkgs.procps-ng { };
     };
     write = {
       linux = pkgs.util-linux;
