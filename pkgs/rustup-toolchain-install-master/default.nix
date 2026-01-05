@@ -46,6 +46,5 @@ rustPlatform.buildRustPackage (finalAttrs: {
     mainProgram = "rustup-toolchain-install-master";
     homepage = "https://github.com/kennytm/rustup-toolchain-install-master";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 })

@@ -39,7 +39,6 @@ stdenv.mkDerivation {
       (8811au, 8812au, 8814au and 8821au chipsets) with monitor mode and injection support.'';
     homepage = "https://github.com/aircrack-ng/rtl8812au";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = [
       "x86_64-linux"
       "i686-linux"

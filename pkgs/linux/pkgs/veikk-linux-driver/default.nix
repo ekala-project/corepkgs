@@ -41,7 +41,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/jlam55555/veikk-linux-driver/";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
     broken = kernel.kernelOlder "4.19";
   };
 })

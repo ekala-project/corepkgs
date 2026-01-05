@@ -79,7 +79,6 @@ stdenv.mkDerivation {
     homepage = "https://www.tbsdtv.com/";
     description = "Linux driver for TBSDTV cards";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     priority = -1;
     broken = kernel.kernelOlder "4.19" || kernel.kernelAtLeast "6.15";
   };

@@ -61,7 +61,6 @@ stdenv.mkDerivation rec {
     '';
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
     broken = lib.versionAtLeast kernel.modDirVersion "6.13";
   };
 }

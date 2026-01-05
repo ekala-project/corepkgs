@@ -58,7 +58,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = with lib.licenses; [
       # The copyright notices are split between each protocol, so to be able to validate this,
       # I listed all the components that have the license for each license:
-
       # applewm, composite, dmx, evie, fixes, input, video, windowswm, x11, xext, xf86dri
       mit
       # bigreqs, fonts, input, lg3d, pm, x11, xmisc, xext, xinerama
@@ -79,7 +78,6 @@ stdenv.mkDerivation (finalAttrs: {
       x11
       # x11
       hpndDifferentDisclaimer
-
       # fontsproto and x11proto both contain a license that is almost the X11 license, but with one
       # important difference: the sentence "Permission is hereby granted [...] to use, copy,
       # modify, merge, publish, distribute ..." is replaced with "All rights reserved."
@@ -90,7 +88,6 @@ stdenv.mkDerivation (finalAttrs: {
       # upstream issue: https://gitlab.freedesktop.org/xorg/proto/xorgproto/-/issues/53
       #unfree
     ];
-    maintainers = [ ];
     pkgConfigModules = [
       "applewmproto"
       "bigreqsproto"

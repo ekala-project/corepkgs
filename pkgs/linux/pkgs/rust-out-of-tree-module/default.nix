@@ -32,7 +32,6 @@ kernel.stdenv.mkDerivation {
     description = "Basic template for an out-of-tree Linux kernel module written in Rust";
     homepage = "https://github.com/Rust-for-Linux/rust-out-of-tree-module";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = [ "x86_64-linux" ] ++ lib.optional (kernel.kernelAtLeast "6.9") "aarch64-linux";
   };
 

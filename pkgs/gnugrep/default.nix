@@ -99,16 +99,12 @@ stdenv.mkDerivation {
   meta = {
     homepage = "https://www.gnu.org/software/grep/";
     description = "GNU implementation of the Unix grep command";
-
     longDescription = ''
       The grep command searches one or more input files for lines
       containing a match to a specified pattern.  By default, grep
       prints the matching lines.
     '';
-
     license = lib.licenses.gpl3Plus;
-
-    maintainers = [ ];
     platforms = lib.platforms.all;
     mainProgram = "grep";
   };

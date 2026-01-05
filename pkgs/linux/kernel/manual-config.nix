@@ -103,8 +103,6 @@ lib.makeOverridable (
       optionals
       optionalString
       optionalAttrs
-      maintainers
-      teams
       platforms
       ;
 
@@ -517,7 +515,6 @@ lib.makeOverridable (
         meta = {
           # https://github.com/NixOS/nixpkgs/pull/345534#issuecomment-2391238381
           broken = withRust && lib.versionOlder version "6.12";
-
           description =
             "The Linux kernel"
             + (
@@ -528,8 +525,6 @@ lib.makeOverridable (
             );
           license = lib.licenses.gpl2Only;
           homepage = "https://www.kernel.org/";
-          maintainers = [ ];
-          teams = [ teams.linux-kernel ];
           platforms = platforms.linux;
           badPlatforms =
             lib.optionals (lib.versionOlder version "4.15") [

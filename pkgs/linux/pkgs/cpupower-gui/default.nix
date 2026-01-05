@@ -104,6 +104,5 @@ buildPythonApplication rec {
     mainProgram = "cpupower-gui";
     homepage = "https://github.com/vagnum08/cpupower-gui/";
     license = lib.licenses.gpl3Plus;
-    maintainers = [ ];
   };
 }

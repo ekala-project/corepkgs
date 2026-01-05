@@ -38,7 +38,6 @@ stdenv.mkDerivation {
     description = "Linux kernel module for Thrustmaster T300RS, T248 and TX(experimental)";
     homepage = "https://github.com/Kimplul/hid-tmff2";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 }

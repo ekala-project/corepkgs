@@ -102,6 +102,5 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://libgit2.org/";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 })

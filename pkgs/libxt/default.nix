@@ -75,7 +75,6 @@ stdenv.mkDerivation (finalAttrs: {
       mitOpenGroup
       x11
     ];
-    maintainers = [ ];
     pkgConfigModules = [ "xt" ];
     platforms = lib.platforms.unix;
   };

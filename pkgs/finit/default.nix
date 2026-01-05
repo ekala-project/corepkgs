@@ -67,7 +67,6 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "initctl";
     homepage = "https://troglobit.com/projects/finit/";
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

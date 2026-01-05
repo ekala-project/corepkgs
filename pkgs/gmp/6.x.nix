@@ -85,7 +85,6 @@ let
         lgpl3Only
         gpl2Only
       ];
-
       longDescription = ''
         GMP is a free library for arbitrary precision arithmetic, operating
         on signed integers, rational numbers, and floating point numbers.
@@ -107,9 +106,7 @@ let
         increases with the operand sizes for many operations, since GMP uses
         asymptotically faster algorithms.
       '';
-
       platforms = lib.platforms.all;
-      maintainers = [ ];
     };
   };
 in

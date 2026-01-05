@@ -47,7 +47,6 @@ stdenv.mkDerivation rec {
   meta = {
     homepage = "https://www.gnu.org/software/libidn/#libidn2";
     description = "Free software implementation of IDNA2008 and TR46";
-
     longDescription = ''
       Libidn2 is believed to be a complete IDNA2008 and TR46 implementation,
       but has yet to be as extensively used as the IDNA2003 Libidn library.
@@ -56,7 +55,6 @@ stdenv.mkDerivation rec {
       while the rest of the package is GPLv3+.  See the file COPYING for
       detailed information.
     '';
-
     mainProgram = "idn2";
     license = with lib.licenses; [
       lgpl3Plus
@@ -64,6 +62,5 @@ stdenv.mkDerivation rec {
       gpl3Plus
     ];
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 }

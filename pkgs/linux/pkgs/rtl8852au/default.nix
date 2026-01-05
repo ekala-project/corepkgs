@@ -72,6 +72,5 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = [ "x86_64-linux" ];
     # FIX: error: invalid initializer
     broken = (kernel.kernelOlder "6" && kernel.isHardened) || kernel.kernelAtLeast "6.17";
-    maintainers = [ ];
   };
 })

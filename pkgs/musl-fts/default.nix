@@ -29,6 +29,5 @@ stdenv.mkDerivation rec {
     description = "Implementation of fts(3) for musl-libc";
     platforms = lib.platforms.linux;
     license = lib.licenses.bsd3;
-    maintainers = [ ];
   };
 }

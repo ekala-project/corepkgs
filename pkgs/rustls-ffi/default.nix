@@ -76,6 +76,5 @@ stdenv.mkDerivation (finalAttrs: {
       asl20
       isc
     ];
-    maintainers = [ ];
   };
 })

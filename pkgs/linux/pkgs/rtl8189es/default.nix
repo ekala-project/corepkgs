@@ -58,6 +58,5 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/jwrdegoede/rtl8189ES_linux";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

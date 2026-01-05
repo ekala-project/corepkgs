@@ -54,7 +54,6 @@ stdenv.mkDerivation rec {
     description = "C99 library implementation for communicating with the S3 service";
     homepage = "https://github.com/awslabs/aws-c-s3";
     license = lib.licenses.asl20;
-    maintainers = [ ];
     mainProgram = "s3";
     platforms = lib.platforms.unix;
   };

@@ -30,7 +30,6 @@ stdenv.mkDerivation {
   meta = {
     homepage = "https://www.iana.org/domains/root/files";
     description = "DNS root data including root hints and DNSSEC root trust anchor + key";
-    maintainers = [ ];
     license = lib.licenses.gpl3Plus;
   };
 }

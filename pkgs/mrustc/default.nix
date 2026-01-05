@@ -51,7 +51,6 @@ stdenv.mkDerivation rec {
     '';
     inherit (src.meta) homepage;
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = [ "x86_64-linux" ];
   };
 }

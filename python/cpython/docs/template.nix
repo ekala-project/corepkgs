@@ -15,6 +15,6 @@ stdenv.mkDerivation {
     cp -R ./ $out/share/doc/pythonMAJORMINOR/TYPE
   '';
   meta = {
-    maintainers = [ ];
+
   };
 }

@@ -39,7 +39,6 @@ stdenv.mkDerivation rec {
       "x86_64-linux"
       "i686-linux"
     ];
-    maintainers = [ ];
     broken = kernel.kernelAtLeast "5.18";
   };
 }

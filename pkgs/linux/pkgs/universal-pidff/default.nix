@@ -38,9 +38,7 @@ stdenv.mkDerivation rec {
     description = "PIDFF driver with useful patches for initialization of FFB devices";
     homepage = "https://github.com/JacKeTUs/universal-pidff";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
-
     # Broken due to missing linux/minmax.h
     broken = kernel.kernelOlder "5.10";
   };

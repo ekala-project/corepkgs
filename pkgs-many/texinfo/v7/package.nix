@@ -141,7 +141,7 @@ stdenv.mkDerivation {
     changelog = "https://git.savannah.gnu.org/cgit/texinfo.git/plain/NEWS";
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.all;
-    maintainers = [ ];
+
     branch = version;
 
     longDescription = ''

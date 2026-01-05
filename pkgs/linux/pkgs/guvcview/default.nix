@@ -72,7 +72,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Simple interface for devices supported by the linux UVC driver";
     mainProgram = "guvcview";
     homepage = "https://guvcview.sourceforge.net";
-    maintainers = [ ];
     license = lib.licenses.gpl3;
     platforms = lib.platforms.linux;
   };

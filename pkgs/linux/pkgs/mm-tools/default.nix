@@ -14,6 +14,5 @@ stdenv.mkDerivation {
   meta = {
     inherit (linux.meta) license platforms;
     description = "Set of virtual memory tools";
-    maintainers = [ ];
   };
 }

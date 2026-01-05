@@ -35,10 +35,8 @@ stdenv.mkDerivation rec {
       compression levels achieving a quite competitive compression ratio
       while still decompressing at this very high speed.
     '';
-
     homepage = "http://www.oberhumer.com/opensource/lzo";
     license = lib.licenses.gpl2Plus;
-
     platforms = lib.platforms.all;
   };
 }

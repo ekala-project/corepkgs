@@ -49,7 +49,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Plausible deniability (hidden storage) layer for Linux";
     homepage = "https://shufflecake.net";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     outputsToInstall = [ "bin" ];
     platforms = lib.platforms.linux;
     broken = kernel.kernelOlder "6.1" || kernel.meta.name == "linux-lqx-6.12.1";

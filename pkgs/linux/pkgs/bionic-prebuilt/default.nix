@@ -156,6 +156,5 @@ stdenvNoCC.mkDerivation rec {
     homepage = "https://android.googlesource.com/platform/bionic/";
     license = lib.licenses.mit;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

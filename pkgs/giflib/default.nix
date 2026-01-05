@@ -61,7 +61,6 @@ stdenv.mkDerivation rec {
     homepage = "https://giflib.sourceforge.net/";
     platforms = lib.platforms.unix ++ lib.platforms.windows;
     license = lib.licenses.mit;
-    maintainers = [ ];
     branch = "5.2";
   };
 }

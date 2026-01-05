@@ -36,7 +36,6 @@ stdenv.mkDerivation rec {
     description = "Very minimal Linux init implementation from suckless.org";
     mainProgram = "sinit";
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     homepage = "https://tools.suckless.org/sinit";
     downloadPage = "https://git.suckless.org/sinit";

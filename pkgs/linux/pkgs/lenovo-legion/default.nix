@@ -35,7 +35,6 @@ stdenv.mkDerivation {
     homepage = "https://github.com/johnfanv2/LenovoLegionLinux";
     license = lib.licenses.gpl2Only;
     platforms = [ "x86_64-linux" ];
-    maintainers = [ ];
     broken = kernel.kernelOlder "5.15";
   };
 }

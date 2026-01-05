@@ -128,12 +128,10 @@ stdenv.mkDerivation rec {
       We have Python bindings of this library, but we do not have full code coverage yet.
       An experimental high level C++ library is also available.
     '';
-
     homepage = "https://nghttp2.org/";
     changelog = "https://github.com/nghttp2/nghttp2/releases/tag/v${version}";
     # News articles with changes summary can be found here: https://nghttp2.org/blog/archives/
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 }

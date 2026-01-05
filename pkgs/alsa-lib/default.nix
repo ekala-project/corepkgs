@@ -48,18 +48,15 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "http://www.alsa-project.org/";
     description = "ALSA, the Advanced Linux Sound Architecture libraries";
     mainProgram = "aserver";
-
     longDescription = ''
       The Advanced Linux Sound Architecture (ALSA) provides audio and
       MIDI functionality to the Linux-based operating system.
     '';
-
     license = lib.licenses.lgpl21Plus;
     pkgConfigModules = [
       "alsa"
       "alsa-topology"
     ];
     platforms = with lib.platforms; linux ++ freebsd;
-    maintainers = [ ];
   };
 })

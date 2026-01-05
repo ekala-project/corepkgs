@@ -61,6 +61,6 @@ buildPythonPackage rec {
     homepage = "https://execnet.readthedocs.io/";
     changelog = "https://github.com/pytest-dev/execnet/blob/v${version}/CHANGELOG.rst";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

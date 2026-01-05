@@ -538,7 +538,6 @@ let
   meta = {
     description = "TeX Live environment";
     platforms = lib.platforms.all;
-    maintainers = [ ];
     license = licenses.scheme-infraonly;
   };
 

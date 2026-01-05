@@ -29,7 +29,7 @@ in
       ./ssh-keysign-8.5.patch
     ];
     extraMeta = {
-      maintainers = [ ];
+
     };
   };
 
@@ -72,7 +72,7 @@ in
 
     extraConfigureFlags = [ "--with-hpn" ];
     extraMeta = {
-      maintainers = [ ];
+
     };
   };
 

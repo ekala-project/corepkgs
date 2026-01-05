@@ -20,6 +20,5 @@ makeSetupHook {
   };
   meta = {
     description = "Check validity of udev rules in outputs";
-    maintainers = [ ];
   };
 } ./hook.sh

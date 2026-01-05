@@ -41,7 +41,6 @@ stdenv.mkDerivation rec {
     description = "Snowball Stemming Algorithms";
     homepage = "https://snowballstem.org/";
     license = lib.licenses.bsd3;
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 }

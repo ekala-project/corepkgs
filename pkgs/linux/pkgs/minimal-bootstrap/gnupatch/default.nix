@@ -79,7 +79,6 @@ kaem.runCommand "${pname}-${version}"
       description = "GNU Patch, a program to apply differences to files";
       homepage = "https://www.gnu.org/software/patch";
       license = lib.licenses.gpl3Plus;
-      teams = [ lib.teams.minimal-bootstrap ];
       mainProgram = "patch";
       platforms = lib.platforms.unix;
     };

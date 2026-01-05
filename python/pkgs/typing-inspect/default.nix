@@ -36,6 +36,5 @@ buildPythonPackage rec {
     description = "Runtime inspection utilities for Python typing module";
     homepage = "https://github.com/ilevkivskyi/typing_inspect";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 }

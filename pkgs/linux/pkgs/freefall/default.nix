@@ -21,7 +21,6 @@ stdenv.mkDerivation {
 
   meta = {
     inherit (kernel.meta) homepage license;
-
     description = "Free-fall protection for spinning HP/Dell laptop hard drives";
     mainProgram = "freefall";
     longDescription = ''
@@ -32,7 +31,6 @@ stdenv.mkDerivation {
       feature, which should cause the drive to switch to idle mode and unload the
       disk heads, and an accelerometer device. It has no effect on SSD devices!
     '';
-
     platforms = lib.platforms.linux;
   };
 }

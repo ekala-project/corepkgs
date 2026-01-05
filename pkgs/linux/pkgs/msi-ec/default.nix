@@ -42,7 +42,6 @@ stdenv.mkDerivation {
     description = "Kernel modules for MSI Embedded controller";
     homepage = "https://github.com/BeardOverflow/msi-ec";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     broken = kernel.kernelOlder "6.5";
   };

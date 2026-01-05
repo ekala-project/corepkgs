@@ -95,6 +95,5 @@ stdenv.mkDerivation (finalAttrs: rec {
       "sparc-linux"
       "sparc64-linux"
     ];
-    maintainers = [ ];
   };
 })

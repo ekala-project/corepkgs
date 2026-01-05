@@ -555,14 +555,11 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Distributed version control system";
     license = lib.licenses.gpl2;
     changelog = "https://github.com/git/git/blob/v${version}/Documentation/RelNotes/${version}.txt";
-
     longDescription = ''
       Git, a popular distributed version control system designed to
       handle very large projects with speed and efficiency.
     '';
-
     platforms = lib.platforms.all;
-    maintainers = [ ];
     mainProgram = "git";
   };
 })

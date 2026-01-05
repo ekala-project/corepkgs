@@ -43,6 +43,5 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Realtek r8125 2.5G Ethernet driver";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 })

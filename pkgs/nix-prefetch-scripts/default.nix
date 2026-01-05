@@ -24,7 +24,6 @@ buildEnv {
 
   meta = {
     description = "Collection of all the nix-prefetch-* scripts which may be used to obtain source hashes";
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 }

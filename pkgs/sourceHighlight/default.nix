@@ -89,7 +89,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.gnu.org/software/src-highlite/";
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 }
 // lib.optionalAttrs (stdenv.targetPlatform.useLLVM or false) {

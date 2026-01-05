@@ -30,6 +30,5 @@ rec {
     changelog = "https://docs.mesa3d.org/relnotes/${version}.html";
     license = with lib.licenses; [ mit ]; # X11 variant, in most files
     platforms = lib.platforms.unix;
-    maintainers = [ ]; # Help is welcome :)
   };
 }

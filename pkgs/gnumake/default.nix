@@ -70,9 +70,7 @@ stdenv.mkDerivation rec {
       to build and install the program.
     '';
     homepage = "https://www.gnu.org/software/make/";
-
     license = lib.licenses.gpl3Plus;
-    maintainers = [ ];
     mainProgram = "make";
     platforms = lib.platforms.all;
   };

@@ -43,6 +43,5 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Implementation of HTTP/3 mapping over QUIC and QPACK in C";
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 })

@@ -35,7 +35,6 @@ stdenv.mkDerivation (finalAttrs: {
     # gitlab says x11-distribute-modifications but it's not
     # maybe due to https://github.com/spdx/spdx-online-tools/issues/540
     license = lib.licenses.x11;
-    maintainers = [ ];
     pkgConfigModules = [ "pthread-stubs" ];
     platforms = lib.platforms.unix;
   };

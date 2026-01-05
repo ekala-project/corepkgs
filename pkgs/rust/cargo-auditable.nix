@@ -38,7 +38,6 @@ let
         mit # or
         asl20
       ];
-      maintainers = [ ];
       broken = stdenv.hostPlatform != stdenv.buildPlatform;
     };
   };

@@ -44,6 +44,5 @@ buildPythonPackage rec {
     description = "Python library for parsing TOML, fully compatible with TOML v1.0.0";
     homepage = "https://github.com/hukkin/tomli";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 }

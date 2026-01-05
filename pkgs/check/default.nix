@@ -23,7 +23,6 @@ stdenv.mkDerivation rec {
 
   meta = {
     description = "Unit testing framework for C";
-
     longDescription = ''
       Check is a unit testing framework for C.  It features a simple
       interface for defining unit tests, putting little in the way of the
@@ -32,9 +31,7 @@ stdenv.mkDerivation rec {
       segmentation faults or other signals.  The output from unit tests
       can be used within source code editors and IDEs.
     '';
-
     homepage = "https://libcheck.github.io/check/";
-
     license = lib.licenses.lgpl2Plus;
     mainProgram = "checkmk";
     platforms = lib.platforms.all;

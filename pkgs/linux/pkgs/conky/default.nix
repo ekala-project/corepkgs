@@ -193,7 +193,6 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/brndnmtthws/conky/releases/tag/${finalAttrs.src.tag}";
     description = "Advanced, highly configurable system monitor based on torsmo";
     mainProgram = "conky";
-    maintainers = [ ];
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.linux;
   };

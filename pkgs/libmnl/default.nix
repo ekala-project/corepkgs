@@ -25,6 +25,5 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://netfilter.org/projects/libmnl/index.html";
     license = lib.licenses.lgpl21Plus;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 })

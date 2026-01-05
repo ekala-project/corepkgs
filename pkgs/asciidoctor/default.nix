@@ -21,7 +21,6 @@ bundlerApp {
     description = "Faster Asciidoc processor written in Ruby";
     homepage = "https://asciidoctor.org/";
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 }

@@ -53,6 +53,5 @@ stdenv.mkDerivation {
     description = "Fairly compliant SIIT and Stateful NAT64 for Linux - CLI tools";
     platforms = lib.platforms.linux;
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
   };
 }

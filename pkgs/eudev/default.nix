@@ -85,7 +85,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     changelog = "https://github.com/eudev-project/eudev/releases/tag/${finalAttrs.src.rev}";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     pkgConfigModules = [
       "libudev"
       "udev"

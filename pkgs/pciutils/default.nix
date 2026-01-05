@@ -70,7 +70,6 @@ stdenv.mkDerivation rec {
     description = "Collection of programs for inspecting and manipulating configuration of PCI devices";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix;
-    maintainers = [ ]; # not really, but someone should watch it
     mainProgram = "lspci";
   };
 }

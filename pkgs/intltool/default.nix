@@ -50,7 +50,6 @@ stdenv.mkDerivation rec {
     description = "Translation helper tool";
     homepage = "https://launchpad.net/intltool/";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 }

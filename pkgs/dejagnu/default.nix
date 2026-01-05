@@ -55,7 +55,6 @@ stdenv.mkDerivation rec {
 
   meta = {
     description = "Framework for testing other programs";
-
     longDescription = ''
       DejaGnu is a framework for testing other programs.  Its purpose
       is to provide a single front end for all tests.  Think of it as a
@@ -66,11 +65,8 @@ stdenv.mkDerivation rec {
       harness.  DejaGnu is written in Expect, which in turn uses Tcl --
       Tool command language.
     '';
-
     homepage = "https://www.gnu.org/software/dejagnu/";
     license = lib.licenses.gpl2Plus;
-
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 }

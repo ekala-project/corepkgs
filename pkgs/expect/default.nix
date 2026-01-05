@@ -73,6 +73,5 @@ tcl.mkTclDerivation rec {
     license = lib.licenses.publicDomain;
     platforms = lib.platforms.unix;
     mainProgram = "expect";
-    maintainers = [ ];
   };
 }

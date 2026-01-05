@@ -113,9 +113,7 @@ let
   hasUnfreeLicense = attrs: hasLicense attrs && isUnfree attrs.meta.license;
 
   hasMaintainersOrTeams =
-    attrs:
-    (attrs.meta.maintainers or [ ] != [ ])
-    || (attrs.meta.teams or [ ] != [ ]);
+    attrs: (attrs.meta.maintainers or [ ] != [ ]) || (attrs.meta.teams or [ ] != [ ]);
 
   isMarkedBroken = attrs: attrs.meta.broken or false;
 

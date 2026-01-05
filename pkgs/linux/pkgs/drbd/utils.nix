@@ -121,7 +121,6 @@ stdenv.mkDerivation rec {
     description = "Distributed Replicated Block Device, a distributed storage system for Linux (userspace utilities)";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
     longDescription = ''
       DRBD is a software-based, shared-nothing, replicated storage solution
       mirroring the content of block devices (hard disks, partitions, logical volumes etc.) between hosts.

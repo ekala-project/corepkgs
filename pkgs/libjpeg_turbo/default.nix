@@ -118,7 +118,6 @@ stdenv.mkDerivation (finalAttrs: {
       "libjpeg"
       "libturbojpeg"
     ];
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

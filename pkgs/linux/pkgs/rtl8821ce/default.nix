@@ -44,7 +44,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/tomaspinho/rtl8821ce";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
     broken =
       stdenv.hostPlatform.isAarch64
       || ((lib.versions.majorMinor kernel.version) == "5.4" && kernel.isHardened);

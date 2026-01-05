@@ -30,7 +30,6 @@ derivationWithMeta {
     description = "Collection of tools written for use in bootstrapping";
     homepage = "https://github.com/oriansj/mescc-tools-extra";
     license = lib.licenses.gpl3Plus;
-    teams = [ lib.teams.minimal-bootstrap ];
     inherit platforms;
   };
 }

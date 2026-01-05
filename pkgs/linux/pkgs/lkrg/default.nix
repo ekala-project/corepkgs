@@ -48,7 +48,6 @@ stdenv.mkDerivation (finalAttrs: {
     longDescription = "LKRG performs runtime integrity checking of the Linux kernel and detection of security vulnerability exploits against the kernel.";
     homepage = "https://lkrg.org/";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     broken = kernel.kernelOlder "5.10" || isKernelRT;
   };

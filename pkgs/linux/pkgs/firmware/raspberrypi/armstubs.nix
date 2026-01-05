@@ -62,6 +62,5 @@ stdenv.mkDerivation {
       "armv7l-linux"
       "aarch64-linux"
     ];
-    maintainers = [ ];
   };
 }

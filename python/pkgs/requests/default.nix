@@ -87,6 +87,6 @@ buildPythonPackage rec {
     homepage = "http://docs.python-requests.org/";
     changelog = "https://github.com/psf/requests/blob/v${version}/HISTORY.md";
     license = lib.licenses.asl20;
-    maintainers = [ ];
+
   };
 }

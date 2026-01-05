@@ -50,7 +50,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://troglobit.com/projects/editline/";
     description = "Readline() replacement for UNIX without termcap (ncurses)";
     license = lib.licenses.bsdOriginal;
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

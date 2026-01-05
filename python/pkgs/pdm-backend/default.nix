@@ -33,6 +33,6 @@ buildPythonPackage rec {
     changelog = "https://github.com/pdm-project/pdm-backend/releases/tag/${version}";
     description = "Yet another PEP 517 backend";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

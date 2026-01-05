@@ -33,6 +33,5 @@ stdenv.mkDerivation rec {
     description = "Extraction of the obstack functions and macros from GNU libiberty for use with musl-libc";
     platforms = lib.platforms.unix;
     license = lib.licenses.lgpl21Plus;
-    maintainers = [ ];
   };
 }

@@ -38,7 +38,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     description = "Script used to obtain source hashes for fetchgit";
-    maintainers = [ ];
     platforms = lib.platforms.unix;
     mainProgram = "nix-prefetch-git";
   };

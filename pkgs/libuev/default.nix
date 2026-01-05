@@ -27,6 +27,5 @@ stdenv.mkDerivation rec {
     homepage = "https://codedocs.xyz/troglobit/libuev/";
     license = lib.licenses.mit;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

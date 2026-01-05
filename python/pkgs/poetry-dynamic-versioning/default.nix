@@ -60,6 +60,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/mtkennerly/poetry-dynamic-versioning";
     changelog = "https://github.com/mtkennerly/poetry-dynamic-versioning/blob/${src.tag}/CHANGELOG.md";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

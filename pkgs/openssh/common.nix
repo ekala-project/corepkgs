@@ -270,7 +270,6 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://www.openssh.com/releasenotes.html";
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix ++ lib.platforms.windows;
-    maintainers = extraMeta.maintainers or [ ];
     mainProgram = "ssh";
   }
   // extraMeta;

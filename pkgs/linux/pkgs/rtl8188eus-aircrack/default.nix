@@ -38,7 +38,6 @@ stdenv.mkDerivation {
     description = "RealTek RTL8188eus WiFi driver with monitor mode & frame injection support";
     homepage = "https://github.com/aircrack-ng/rtl8188eus";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     broken =
       ((lib.versions.majorMinor kernel.version) == "5.4" && kernel.isHardened)
       || kernel.kernelAtLeast "6.17";

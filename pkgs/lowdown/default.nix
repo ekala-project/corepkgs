@@ -103,7 +103,6 @@ stdenv.mkDerivation rec {
     homepage = "https://kristaps.bsd.lv/lowdown/";
     description = "Simple markdown translator";
     license = lib.licenses.isc;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 }

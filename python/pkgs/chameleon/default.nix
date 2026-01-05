@@ -34,6 +34,6 @@ buildPythonPackage rec {
     downloadPage = "https://github.com/malthe/chameleon";
     homepage = "https://chameleon.readthedocs.io";
     license = lib.licenses.bsd0;
-    maintainers = [ ];
+
   };
 }

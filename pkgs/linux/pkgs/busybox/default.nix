@@ -223,7 +223,6 @@ stdenv.mkDerivation rec {
     homepage = "https://busybox.net/";
     license = lib.licenses.gpl2Only;
     mainProgram = "busybox";
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     priority = 15; # below systemd (halt, init, poweroff, reboot) and coreutils
   };

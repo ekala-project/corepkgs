@@ -74,6 +74,5 @@ stdenv.mkDerivation (finalAttrs: {
     priority = 11; # less than coreutils, which also provides "kill" and "uptime"
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 })

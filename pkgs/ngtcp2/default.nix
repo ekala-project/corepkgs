@@ -60,6 +60,5 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Implementation of the QUIC protocol (RFC9000)";
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 })

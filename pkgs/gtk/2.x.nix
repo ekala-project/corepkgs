@@ -163,7 +163,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     changelog = "https://gitlab.gnome.org/GNOME/gtk/-/raw/${finalAttrs.version}/NEWS";
     license = lib.licenses.lgpl2Plus;
-    maintainers = [ ];
     platforms = lib.platforms.all;
     pkgConfigModules = [
       "gdk-2.0"

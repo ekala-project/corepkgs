@@ -38,7 +38,6 @@ stdenv.mkDerivation {
   '';
 
   meta = {
-    maintainers = [ ];
     license = [ lib.licenses.gpl2Plus ];
     platforms = [
       "i686-linux"

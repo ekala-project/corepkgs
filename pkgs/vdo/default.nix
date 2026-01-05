@@ -69,6 +69,5 @@ stdenv.mkDerivation rec {
       "powerpc64le-linux"
     ];
     license = with lib.licenses; [ gpl2Plus ];
-    maintainers = [ ];
   };
 }

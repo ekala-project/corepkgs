@@ -43,7 +43,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Official reference implementation for the PNG file format";
     homepage = "http://www.libpng.org/pub/png/libpng.html";
     license = lib.licenses.libpng;
-    maintainers = [ ];
     branch = "1.2";
     pkgConfigModules = [
       "libpng"

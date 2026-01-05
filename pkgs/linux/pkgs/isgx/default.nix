@@ -47,7 +47,6 @@ stdenv.mkDerivation rec {
       bsd3 # OR
       gpl2Only
     ];
-    maintainers = [ ];
     platforms = [ "x86_64-linux" ];
     # This kernel module is now in mainline so newer kernels should
     # use that rather than this out-of-tree version (officially

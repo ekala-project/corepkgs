@@ -41,7 +41,6 @@ stdenv.mkDerivation rec {
     description = "CMS and X.509 access library";
     mainProgram = "ksba-config";
     platforms = lib.platforms.all;
-    maintainers = [ ];
     license = lib.licenses.lgpl3;
   };
 }

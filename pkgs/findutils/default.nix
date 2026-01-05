@@ -78,7 +78,6 @@ stdenv.mkDerivation rec {
   meta = {
     homepage = "https://www.gnu.org/software/findutils/";
     description = "GNU Find Utilities, the basic directory searching utilities of the GNU operating system";
-
     longDescription = ''
       The GNU Find Utilities are the basic directory searching
       utilities of the GNU operating system.  These programs are
@@ -96,11 +95,8 @@ stdenv.mkDerivation rec {
           * locate - list files in databases that match a pattern;
           * updatedb - update a file name database;
     '';
-
     platforms = lib.platforms.all;
-
     license = lib.licenses.gpl3Plus;
-
     mainProgram = "find";
   };
 }

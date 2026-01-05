@@ -45,6 +45,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/ionrock/cachecontrol";
     changelog = "https://github.com/psf/cachecontrol/releases/tag/${src.tag}";
     license = lib.licenses.asl20;
-    maintainers = [ ];
+
   };
 }

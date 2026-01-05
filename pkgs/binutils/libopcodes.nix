@@ -24,7 +24,6 @@ stdenv.mkDerivation {
     description = "Library from binutils for manipulating machine code";
     homepage = "https://www.gnu.org/software/binutils/";
     license = lib.licenses.gpl3Plus;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 }

@@ -354,7 +354,6 @@ rec {
       description = "Basic binaries for TeX Live";
       homepage = "http://www.tug.org/texlive";
       license = lib.licenses.gpl2Plus;
-      maintainers = [ ];
       platforms = lib.platforms.all;
     };
   };
@@ -557,7 +556,6 @@ rec {
         description = "LUAMETATEX engine is a follow up on LUATEX and is again part of CONTEXT development";
         homepage = "https://www.pragma-ade.nl/luametatex-1.htm";
         license = lib.licenses.gpl2Plus;
-        maintainers = [ ];
       };
     };
 
@@ -673,7 +671,6 @@ rec {
         prettify source code.
       '';
       license = lib.licenses.lppl13c;
-      maintainers = [ ];
     };
   };
 

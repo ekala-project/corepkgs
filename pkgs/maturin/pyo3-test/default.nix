@@ -41,6 +41,5 @@ buildPythonPackage rec {
     description = "PyO3 word count example";
     homepage = "https://github.com/PyO3/pyo3";
     license = lib.licenses.asl20;
-    maintainers = [ ];
   };
 }

@@ -24,6 +24,6 @@ buildPythonPackage rec {
     description = "McCabe checker, plugin for flake8";
     homepage = "https://github.com/flintwork/mccabe";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

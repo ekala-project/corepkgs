@@ -32,7 +32,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     description = "Script used to obtain source hashes for fetchbzr";
-    maintainers = [ ];
     platforms = lib.platforms.unix;
     mainProgram = "nix-prefetch-bzr";
   };

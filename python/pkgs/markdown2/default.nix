@@ -41,6 +41,6 @@ buildPythonPackage rec {
     mainProgram = "markdown2";
     homepage = "https://github.com/trentm/python-markdown2";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

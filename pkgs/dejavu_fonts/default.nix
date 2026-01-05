@@ -20,13 +20,11 @@ let
       the TeX Gyre DejaVu Math font.
     '';
     homepage = "https://dejavu-fonts.github.io/";
-
     # Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved.
     # Copyright (c) 2006 by Tavmjong Bah. All Rights Reserved.
     # DejaVu changes are in public domain
     # See http://dejavu-fonts.org/wiki/License for details
     license = lib.licenses.free;
-
     platforms = lib.platforms.all;
   };
 

@@ -43,7 +43,6 @@ let
     description = "Small, fast, and embeddable C compiler and interpreter";
     homepage = "https://repo.or.cz/w/tinycc.git";
     license = lib.licenses.lgpl21Only;
-    teams = [ lib.teams.minimal-bootstrap ];
     platforms = [
       "i686-linux"
       "x86_64-linux"

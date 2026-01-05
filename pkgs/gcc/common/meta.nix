@@ -7,9 +7,7 @@
 let
   inherit (lib)
     licenses
-    maintainers
     platforms
-    teams
     versionOlder
     ;
 in

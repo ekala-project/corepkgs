@@ -43,6 +43,5 @@ stdenv.mkDerivation {
     license = with lib.licenses; [ gpl2Only ];
     homepage = "https://github.com/Fred78290/nct6687d/";
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

@@ -123,7 +123,6 @@ let
       downloadPage = "https://www.mercurial-scm.org/release/";
       changelog = "https://wiki.mercurial-scm.org/Release${lib.versions.majorMinor version}";
       license = lib.licenses.gpl2Plus;
-      maintainers = [ ];
       platforms = lib.platforms.unix;
       mainProgram = "hg";
     };

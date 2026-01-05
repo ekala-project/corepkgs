@@ -31,6 +31,6 @@ buildPythonPackage rec {
     homepage = "https://platformdirs.readthedocs.io/";
     changelog = "https://github.com/tox-dev/platformdirs/releases/tag/${src.tag}";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

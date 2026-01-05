@@ -47,7 +47,6 @@ kaem.runCommand "${pname}-${version}"
       description = "Mes C Library";
       homepage = "https://www.gnu.org/software/mes";
       license = lib.licenses.gpl3Plus;
-      teams = [ lib.teams.minimal-bootstrap ];
       platforms = [
         "i686-linux"
         "x86_64-linux"

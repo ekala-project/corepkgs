@@ -35,7 +35,6 @@ kaem.runCommand "${pname}-${version}"
       '';
       homepage = "https://savannah.nongnu.org/projects/nyacc";
       license = lib.licenses.lgpl3Plus;
-      teams = [ lib.teams.minimal-bootstrap ];
       platforms = lib.platforms.all;
     };
   }

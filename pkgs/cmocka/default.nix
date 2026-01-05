@@ -59,6 +59,5 @@ stdenv.mkDerivation rec {
     homepage = "https://cmocka.org/";
     license = lib.licenses.asl20;
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 }

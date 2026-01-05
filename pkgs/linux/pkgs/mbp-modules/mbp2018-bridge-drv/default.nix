@@ -38,7 +38,6 @@ stdenv.mkDerivation {
     homepage = "https://github.com/MCMrARM/mbp2018-bridge-drv";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
     broken = kernel.kernelOlder "5.4";
   };
 }

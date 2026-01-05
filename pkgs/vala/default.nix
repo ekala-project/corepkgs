@@ -115,7 +115,6 @@ let
         homepage = "https://vala.dev";
         license = lib.licenses.lgpl21Plus;
         platforms = lib.platforms.unix;
-        maintainers = [ ];
       };
     }
   );

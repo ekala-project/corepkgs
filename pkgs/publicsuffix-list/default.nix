@@ -33,6 +33,5 @@ stdenvNoCC.mkDerivation {
     description = "Cross-vendor public domain suffix database";
     platforms = lib.platforms.all;
     license = lib.licenses.mpl20;
-    maintainers = [ ];
   };
 }

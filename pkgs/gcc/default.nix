@@ -60,7 +60,6 @@ let
     callPackageWith
     filter
     getBin
-    maintainers
     makeLibraryPath
     makeSearchPathOutput
     mapAttrs

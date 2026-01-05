@@ -41,6 +41,5 @@ stdenv.mkDerivation {
     homepage = "https://github.com/morrownr/8821cu-20210916";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

@@ -44,6 +44,5 @@ rustPlatform.buildRustPackage rec {
       mit
       asl20
     ];
-    maintainers = [ ];
   };
 }

@@ -34,7 +34,6 @@ stdenv.mkDerivation rec {
     mainProgram = "tcsd";
     homepage = "https://trousers.sourceforge.net/";
     license = lib.licenses.bsd3;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 }

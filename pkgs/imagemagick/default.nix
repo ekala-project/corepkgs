@@ -203,7 +203,6 @@ stdenv.mkDerivation (finalAttrs: {
       "MagickWand"
     ];
     platforms = lib.platforms.unix;
-    maintainers = [ ];
     license = lib.licenses.asl20;
     mainProgram = "magick";
   };

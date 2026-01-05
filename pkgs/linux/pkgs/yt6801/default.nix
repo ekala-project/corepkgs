@@ -57,7 +57,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.motor-comm.com/product/ethernet-control-chip";
     description = "YT6801 Gigabit PCIe Ethernet controller chip";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
   };

@@ -35,6 +35,5 @@ stdenv.mkDerivation {
     broken = kernel.kernelOlder "6.1.0" || kernel.isLibre;
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

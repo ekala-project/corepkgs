@@ -51,7 +51,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/intel/ipu6-drivers";
     description = "IPU6 kernel driver";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = [ "x86_64-linux" ];
     # requires 6.10
     broken = kernel.kernelOlder "6.10";

@@ -66,7 +66,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxcb";
     # gitlab wrongly says X11 Distribute Modifications
     license = lib.licenses.x11;
-    maintainers = [ ];
     pkgConfigModules = [
       "xcb"
       "xcb-composite"

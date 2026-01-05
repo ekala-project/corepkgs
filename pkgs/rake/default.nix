@@ -15,7 +15,6 @@ bundlerApp {
     description = "Software task management and build automation tool";
     homepage = "https://github.com/ruby/rake";
     license = with lib.licenses; mit;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
     mainProgram = "rake";
   };

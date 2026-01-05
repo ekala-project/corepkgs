@@ -49,6 +49,6 @@ buildPythonPackage rec {
     changelog = "https://github.com/python-poetry/cleo/blob/${src.rev}/CHANGELOG.md";
     description = "Allows you to create beautiful and testable command-line interfaces";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

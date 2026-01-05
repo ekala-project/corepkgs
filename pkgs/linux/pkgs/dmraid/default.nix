@@ -62,7 +62,6 @@ stdenv.mkDerivation rec {
       its volumes. May be needed for rescuing an older system or nuking
       the metadata when reformatting.
     '';
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     license = lib.licenses.gpl2Plus;
   };

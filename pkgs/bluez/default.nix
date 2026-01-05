@@ -192,7 +192,6 @@ stdenv.mkDerivation (finalAttrs: {
       description
       homepage
       license
-      maintainers
       platforms
       ;
   };

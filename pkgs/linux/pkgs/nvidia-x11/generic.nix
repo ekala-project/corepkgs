@@ -338,7 +338,6 @@ stdenv.mkDerivation (finalAttrs: {
     ]
     ++ lib.optionals (sha256_32bit != null) [ "i686-linux" ]
     ++ lib.optionals (sha256_aarch64 != null) [ "aarch64-linux" ];
-    maintainers = [ ];
     priority = 4; # resolves collision with xorg-server's "lib/xorg/modules/extensions/libglx.so"
     inherit broken;
   };

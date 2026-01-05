@@ -64,7 +64,6 @@ stdenv.mkDerivation (finalAttrs: {
       asl20
       cc0
     ];
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

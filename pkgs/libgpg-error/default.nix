@@ -79,17 +79,14 @@ stdenv.mkDerivation (
       changelog = "https://git.gnupg.org/cgi-bin/gitweb.cgi?p=libgpg-error.git;a=blob;f=NEWS;hb=refs/tags/libgpg-error-${version}";
       description = "Small library that defines common error values for all GnuPG components";
       mainProgram = "gen-posix-lock-obj";
-
       longDescription = ''
         Libgpg-error is a small library that defines common error values
         for all GnuPG components.  Among these are GPG, GPGSM, GPGME,
         GPG-Agent, libgcrypt, Libksba, DirMngr, Pinentry, SmartCard
         Daemon and possibly more in the future.
       '';
-
       license = lib.licenses.lgpl2Plus;
       platforms = lib.platforms.all;
-      maintainers = [ ];
     };
   }
   // genPosixLockObjOnlyAttrs

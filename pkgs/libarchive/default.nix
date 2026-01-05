@@ -137,7 +137,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     changelog = "https://github.com/libarchive/libarchive/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.bsd3;
-    maintainers = [ ];
     platforms = lib.platforms.all;
     inherit (acl.meta) badPlatforms;
   };

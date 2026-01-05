@@ -87,7 +87,6 @@ stdenv.mkDerivation (finalAttrs: {
       necessary post-processing.
     '';
     mainProgram = "xmlto";
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

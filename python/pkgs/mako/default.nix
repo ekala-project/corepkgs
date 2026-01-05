@@ -68,6 +68,6 @@ buildPythonPackage rec {
     changelog = "https://docs.makotemplates.org/en/latest/changelog.html";
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
+
   };
 }

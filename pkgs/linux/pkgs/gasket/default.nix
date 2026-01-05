@@ -59,7 +59,6 @@ stdenv.mkDerivation {
     description = "Coral Gasket Driver allows usage of the Coral EdgeTPU on Linux systems";
     homepage = "https://github.com/google/gasket-driver";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     broken = lib.versionOlder kernel.version "5.15";
   };

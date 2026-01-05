@@ -29,6 +29,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/davidism/sphinxcontrib-log-cabinet";
     description = "Sphinx extension to organize changelogs";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

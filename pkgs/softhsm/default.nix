@@ -52,7 +52,6 @@ stdenv.mkDerivation rec {
       course especially useful in environments where a dedicated hardware
       implementation of such a device - for instance a Hardware
       Security Module (HSM) or smartcard - is not available.
-
       SoftHSM follows the OASIS PKCS#11 standard, meaning it should be
       able to work with many cryptographic products. SoftHSM is a
       programme of The Commons Conservancy.

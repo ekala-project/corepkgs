@@ -35,6 +35,6 @@ buildPythonPackage rec {
     description = "Brain-dead simple parsing of ini files";
     homepage = "https://github.com/pytest-dev/iniconfig";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

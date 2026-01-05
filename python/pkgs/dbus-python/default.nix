@@ -95,7 +95,7 @@ lib.fix (
       homepage = "https://gitlab.freedesktop.org/dbus/dbus-python";
       license = lib.licenses.mit;
       platforms = pkgsHostTarget.dbus.meta.platforms;
-      maintainers = [ ];
+
     };
   }
 )

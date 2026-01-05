@@ -31,7 +31,6 @@ lib.makeOverridable (
 
     meta = {
       description = "Wrapper around testers.testBuildFailure to simplify common use cases";
-      maintainers = [ ];
     };
   })
 )

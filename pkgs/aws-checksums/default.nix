@@ -38,6 +38,5 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/awslabs/aws-checksums";
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 }

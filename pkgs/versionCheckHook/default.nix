@@ -10,6 +10,5 @@ makeSetupHook {
   };
   meta = {
     description = "Lookup for $version in the output of --help and --version";
-    maintainers = [ ];
   };
 } ./hook.sh

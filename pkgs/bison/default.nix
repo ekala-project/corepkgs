@@ -52,7 +52,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.gnu.org/software/bison/";
     description = "Yacc-compatible parser generator";
     license = lib.licenses.gpl3Plus;
-
     longDescription = ''
       Bison is a general-purpose parser generator that converts an
       annotated context-free grammar into an LALR(1) or GLR parser for
@@ -66,7 +65,6 @@ stdenv.mkDerivation rec {
       trouble.  You need to be fluent in C or C++ programming in order
       to use Bison.
     '';
-
     platforms = lib.platforms.unix;
   };
 }

@@ -522,7 +522,6 @@ stdenv.mkDerivation {
     # long as the evaluator runs on a platform that supports
     # `pkgsMusl`.
     platforms = builtins.attrNames ghcBinDists.${distSetName};
-    teams = [ lib.teams.haskell ];
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
   };
 }

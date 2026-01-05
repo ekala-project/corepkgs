@@ -41,7 +41,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Functions for handling Xauthority files and entries.";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxau";
     license = lib.licenses.mitOpenGroup;
-    maintainers = [ ];
     pkgConfigModules = [ "xau" ];
     platforms = lib.platforms.unix;
   };

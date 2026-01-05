@@ -137,7 +137,6 @@ stdenv.mkDerivation rec {
     homepage = "https://wayland.freedesktop.org/xserver.html";
     license = lib.licenses.mit;
     mainProgram = "Xwayland";
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 }

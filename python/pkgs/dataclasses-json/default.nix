@@ -60,6 +60,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/lidatong/dataclasses-json";
     changelog = "https://github.com/lidatong/dataclasses-json/releases/tag/v${version}";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

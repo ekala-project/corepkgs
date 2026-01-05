@@ -22,6 +22,5 @@ rtl8189es.overrideAttrs (drv: rec {
     homepage = "https://github.com/jwrdegoede/rtl8189ES_linux/tree/rtl8189fs";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 })

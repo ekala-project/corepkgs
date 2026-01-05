@@ -54,7 +54,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     license = lib.licenses.gpl3Plus;
     mainProgram = "ed";
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

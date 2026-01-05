@@ -73,7 +73,6 @@ stdenv.mkDerivation (finalAttrs: {
       cronyx
       hyphenBulgarian
     ];
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

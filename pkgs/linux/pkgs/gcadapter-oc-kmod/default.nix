@@ -36,7 +36,6 @@ stdenv.mkDerivation rec {
     description = "Kernel module for overclocking the Nintendo Wii U/Mayflash GameCube adapter";
     homepage = "https://github.com/HannesMann/gcadapter-oc-kmod";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 }

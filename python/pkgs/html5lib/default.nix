@@ -52,6 +52,6 @@ buildPythonPackage rec {
       major web browsers.
     '';
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

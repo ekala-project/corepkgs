@@ -41,6 +41,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/spulec/freezegun";
     changelog = "https://github.com/spulec/freezegun/blob/${version}/CHANGELOG";
     license = lib.licenses.asl20;
-    maintainers = [ ];
+
   };
 }

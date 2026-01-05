@@ -33,6 +33,5 @@ buildPythonPackage rec {
     homepage = "https://github.com/hukkin/tomli-w";
     changelog = "https://github.com/hukkin/tomli-w/blob/${src.rev}/CHANGELOG.md";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 }

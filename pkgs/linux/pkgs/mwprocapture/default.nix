@@ -69,7 +69,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.magewell.com/";
     description = "Linux driver for the Magewell Pro Capture family";
     license = lib.licenses.unfreeRedistributable;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     broken = lib.versionAtLeast kernel.version "6.15";
   };

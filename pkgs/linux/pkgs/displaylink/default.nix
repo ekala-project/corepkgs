@@ -95,7 +95,6 @@ stdenv.mkDerivation (finalAttrs: {
     hydraPlatforms = [ ];
     license = lib.licenses.unfree;
     mainProgram = "DisplayLinkManager";
-    maintainers = [ ];
     platforms = [
       "x86_64-linux"
       "i686-linux"

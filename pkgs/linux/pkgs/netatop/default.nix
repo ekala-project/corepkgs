@@ -61,6 +61,5 @@ stdenv.mkDerivation {
     homepage = "https://www.atoptool.nl/downloadnetatop.php";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

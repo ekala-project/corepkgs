@@ -35,7 +35,6 @@ buildPythonPackage rec {
     description = "Automate interactive console applications such as ssh, ftp, etc";
     downloadPage = "https://github.com/pexpect/pexpect";
     license = lib.licenses.mit;
-    maintainers = [ ];
 
     longDescription = ''
       Pexpect is similar to the Don Libes "Expect" system, but Pexpect

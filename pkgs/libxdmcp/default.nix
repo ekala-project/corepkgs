@@ -43,7 +43,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "X Display Manager Control Protocol library";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxdmcp";
     license = lib.licenses.mitOpenGroup;
-    maintainers = [ ];
     pkgConfigModules = [ "xdmcp" ];
     platforms = lib.platforms.unix;
   };

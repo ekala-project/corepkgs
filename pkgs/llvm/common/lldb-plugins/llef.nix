@@ -38,7 +38,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/foundryzero/llef";
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
-    maintainers = [ ];
     mainProgram = "llef";
   };
 })

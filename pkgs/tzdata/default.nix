@@ -103,6 +103,5 @@ stdenv.mkDerivation (finalAttrs: {
       publicDomain # tzdata
     ];
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 })

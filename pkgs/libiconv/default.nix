@@ -82,7 +82,6 @@ stdenv.mkDerivation rec {
 
   meta = {
     description = "Iconv(3) implementation";
-
     longDescription = ''
       Some programs, like mailers and web browsers, must be able to convert
       between a given text encoding and the user's encoding.  Other programs
@@ -92,13 +91,9 @@ stdenv.mkDerivation rec {
       are doing I/O.  GNU libiconv is a conversion library for both kinds of
       applications.
     '';
-
     homepage = "https://www.gnu.org/software/libiconv/";
     license = lib.licenses.lgpl2Plus;
-
-    maintainers = [ ];
     mainProgram = "iconv";
-
     # This library is not needed on GNU platforms.
     hydraPlatforms = with lib.platforms; cygwin ++ darwin ++ freebsd;
   };

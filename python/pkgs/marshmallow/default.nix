@@ -33,6 +33,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/marshmallow-code/marshmallow";
     changelog = "https://github.com/marshmallow-code/marshmallow/blob/${version}/CHANGELOG.rst";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

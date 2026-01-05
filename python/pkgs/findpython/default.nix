@@ -37,6 +37,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/frostming/findpython";
     changelog = "https://github.com/frostming/findpython/releases/tag/${version}";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

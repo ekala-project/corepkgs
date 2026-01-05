@@ -57,7 +57,7 @@ let
         bsd2
         asl20
       ];
-      maintainers = [ ];
+
     };
   };
 in

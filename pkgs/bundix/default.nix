@@ -47,7 +47,6 @@ buildRubyGem rec {
     '';
     homepage = "https://github.com/nix-community/bundix";
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 }

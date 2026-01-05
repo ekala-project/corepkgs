@@ -59,6 +59,5 @@ rustPlatform.buildRustPackage {
       asl20
     ];
     mainProgram = "rustfmt";
-    maintainers = [ ];
   };
 }

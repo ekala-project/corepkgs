@@ -42,7 +42,6 @@ stdenv.mkDerivation {
 
   meta = {
     description = "Cryptographic library";
-
     longDescription = ''
       Nettle is a cryptographic library that is designed to fit
       easily in more or less any context: In crypto toolkits for
@@ -65,12 +64,8 @@ stdenv.mkDerivation {
       selection.  It doesn't do memory allocation. It doesn't do any
       I/O.
     '';
-
     license = lib.licenses.gpl2Plus;
-
     homepage = "https://www.lysator.liu.se/~nisse/nettle/";
-
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 }

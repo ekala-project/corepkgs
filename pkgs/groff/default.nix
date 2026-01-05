@@ -159,8 +159,6 @@ stdenv.mkDerivation rec {
     description = "GNU Troff, a typesetting package that reads plain text and produces formatted output";
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.all;
-    maintainers = [ ];
-
     longDescription = ''
       groff is the GNU implementation of troff, a document formatting
       system.  Included in this release are implementations of troff,
@@ -172,7 +170,6 @@ stdenv.mkDerivation rec {
       version gxditview of the X11 xditview previewer, and an
       implementation of the -mm macros.
     '';
-
     outputsToInstall = [
       "out"
       "perl"

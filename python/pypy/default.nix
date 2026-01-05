@@ -403,6 +403,5 @@ stdenv.mkDerivation rec {
       "x86_64-darwin"
     ];
     broken = optimizationLevel == "0"; # generates invalid code
-    maintainers = [ ];
   };
 }

@@ -102,7 +102,6 @@ stdenv.mkDerivation rec {
       # or
       gpl2Plus
     ];
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 }
