@@ -51,7 +51,7 @@ let
   # messages and make problems easier to spot.
   inHydra = config.inHydra or false;
   # Allow the user to opt-into additional warnings, e.g.
-  # import <nixpkgs> { config = { showDerivationWarnings = [ "maintainerless" ]; }; }
+  # import <corepkgs> { config = { showDerivationWarnings = [ "has-maintainers" ]; }; }
   showWarnings = config.showDerivationWarnings;
 
   getNameWithVersion =
@@ -112,20 +112,10 @@ let
 
   hasUnfreeLicense = attrs: hasLicense attrs && isUnfree attrs.meta.license;
 
-  hasNoMaintainers =
-    # To get usable output, we want to avoid flagging "internal" derivations.
-    # Because we do not have a way to reliably decide between internal or
-    # external derivation, some heuristics are required to decide.
-    #
-    # If `outputHash` is defined, the derivation is a FOD, such as the output of a fetcher.
-    # If `description` is not defined, the derivation is probably not a package.
-    # Simply checking whether `meta` is defined is insufficient,
-    # as some fetchers and trivial builders do define meta.
+  hasMaintainersOrTeams =
     attrs:
-    (!attrs ? outputHash)
-    && (attrs ? meta.description)
-    && (attrs.meta.maintainers or [ ] == [ ])
-    && (attrs.meta.teams or [ ] == [ ]);
+    (attrs.meta.maintainers or [ ] != [ ])
+    || (attrs.meta.teams or [ ] != [ ]);
 
   isMarkedBroken = attrs: attrs.meta.broken or false;
 
@@ -206,7 +196,7 @@ let
     insecure = remediate_insecure;
     broken-outputs = remediateOutputsToInstall;
     unknown-meta = x: "";
-    maintainerless = x: "";
+    has-maintainers = x: "";
   };
   remediation_env_var =
     allow_attr:
@@ -566,12 +556,12 @@ let
       }
 
     # --- warnings ---
-    # Please also update the type in /pkgs/top-level/config.nix alongside this.
-    else if hasNoMaintainers attrs then
+    # Please also update the type in /config/package-options.nix alongside this.
+    else if hasMaintainersOrTeams attrs then
       {
         valid = "warn";
-        reason = "maintainerless";
-        errormsg = "has no maintainers or teams";
+        reason = "has-maintainers";
+        errormsg = "has maintainers or teams defined in meta";
       }
     # -----
     else
