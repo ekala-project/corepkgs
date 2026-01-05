@@ -3,7 +3,6 @@
   stdenv,
   fetchurl,
 
-  doCheck ? true, # test suite depends on dejagnu which cannot be used during bootstrapping
   dejagnu,
 }:
 
@@ -46,7 +45,8 @@ stdenv.mkDerivation rec {
 
   dontStrip = stdenv.hostPlatform != stdenv.buildPlatform; # Don't run the native `strip' when cross-compiling.
 
-  inherit doCheck;
+  # TODO(corepkgs): Move to passthru
+  doCheck = false;
 
   nativeCheckInputs = [ dejagnu ];
 

@@ -3,8 +3,6 @@
   stdenv,
   fetchurl,
 
-  # test suite depends on dejagnu which cannot be used during bootstrapping
-  # dejagnu also requires tcl which can't be built statically at the moment
   doCheck ? !(stdenv.hostPlatform.isStatic),
   dejagnu,
   nix-update-script,
@@ -60,7 +58,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   dontStrip = stdenv.hostPlatform != stdenv.buildPlatform; # Don't run the native `strip' when cross-compiling.
 
-  inherit doCheck;
+  # test suite depends on dejagnu which cannot be used during bootstrapping
+  # dejagnu also requires tcl which can't be built statically at the moment
+  # TODO(corepkgs): Move to passthru
+  doCheck = false;
 
   nativeCheckInputs = [ dejagnu ];
 
