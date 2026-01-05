@@ -44,11 +44,11 @@ stdenv.mkDerivation rec {
       -exec sed -i '{}' -e 's|/bin/echo|echo|g' \;
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Tools to manipulate patch files";
     homepage = "http://cyberelk.net/tim/software/patchutils";
-    license = licenses.gpl2Plus;
-    platforms = platforms.all;
+    license = lib.licenses.gpl2Plus;
+    platforms = lib.platforms.all;
     maintainers = [ ];
   };
 }

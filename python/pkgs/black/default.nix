@@ -125,11 +125,11 @@ buildPythonPackage rec {
   # multiple tests exceed max open files on hydra builders
   doCheck = !(stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isAarch64);
 
-  meta = with lib; {
+  meta = {
     description = "Uncompromising Python code formatter";
     homepage = "https://github.com/psf/black";
     changelog = "https://github.com/psf/black/blob/${version}/CHANGES.md";
-    license = licenses.mit;
+    license = lib.licenses.mit;
     mainProgram = "black";
     maintainers = [ ];
   };

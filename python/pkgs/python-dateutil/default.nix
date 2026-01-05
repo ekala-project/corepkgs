@@ -38,11 +38,11 @@ buildPythonPackage rec {
     "dateutil.zoneinfo"
   ];
 
-  meta = with lib; {
+  meta = {
     changelog = "https://github.com/dateutil/dateutil/blob/${version}/NEWS";
     description = "Powerful extensions to the standard datetime module";
     homepage = "https://github.com/dateutil/dateutil/";
-    license = with licenses; [
+    license = with lib.licenses; [
       asl20
       bsd3
     ];

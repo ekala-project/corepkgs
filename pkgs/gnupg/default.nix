@@ -194,11 +194,11 @@ stdenv.mkDerivation rec {
 
   passthru.tests = nixosTests.gnupg;
 
-  meta = with lib; {
+  meta = {
     homepage = "https://gnupg.org";
     changelog = "https://git.gnupg.org/cgi-bin/gitweb.cgi?p=${pname}.git;a=blob;f=NEWS;hb=refs/tags/${pname}-${version}";
     description = "Modern release of the GNU Privacy Guard, a GPL OpenPGP implementation";
-    license = licenses.gpl3Plus;
+    license = lib.licenses.gpl3Plus;
     longDescription = ''
       The GNU Privacy Guard is the GNU project's complete and free
       implementation of the OpenPGP standard as defined by RFC4880.  GnuPG
@@ -211,7 +211,7 @@ stdenv.mkDerivation rec {
       also provides support for S/MIME.
     '';
     maintainers = [ ];
-    platforms = platforms.all;
+    platforms = lib.platforms.all;
     mainProgram = "gpg";
   };
 }

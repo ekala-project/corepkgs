@@ -108,13 +108,13 @@ stdenv.mkDerivation (finalAttrs: {
     mkdir -p "$out"
   '';
 
-  meta = with lib; {
+  meta = {
     description = "Small, fast, portable implementation of TLS/SSL for embedded devices";
     mainProgram = "wolfssl-config";
     homepage = "https://www.wolfssl.com/";
     changelog = "https://github.com/wolfSSL/wolfssl/releases/tag/v${finalAttrs.version}-stable";
-    platforms = platforms.all;
-    license = licenses.gpl2Plus;
+    platforms = lib.platforms.all;
+    license = lib.licenses.gpl2Plus;
     maintainers = [ ];
   };
 })

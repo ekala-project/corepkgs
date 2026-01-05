@@ -48,11 +48,11 @@ stdenv.mkDerivation rec {
     curl = (curl.override { scpSupport = true; }).tests.withCheck;
   };
 
-  meta = with lib; {
+  meta = {
     description = "Client-side C library implementing the SSH2 protocol";
     homepage = "https://www.libssh2.org";
-    platforms = platforms.all;
-    license = with licenses; [ bsd3 ];
+    platforms = lib.platforms.all;
+    license = with lib.licenses; [ bsd3 ];
     maintainers = [ ];
   };
 }

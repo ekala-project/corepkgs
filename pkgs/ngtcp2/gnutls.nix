@@ -43,11 +43,11 @@ stdenv.mkDerivation rec {
     inherit curlWithGnuTls;
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/ngtcp2/ngtcp2";
     description = "Effort to implement RFC9000 QUIC protocol";
-    license = licenses.mit;
-    platforms = platforms.unix;
+    license = lib.licenses.mit;
+    platforms = lib.platforms.unix;
     maintainers = [ ];
   };
 }

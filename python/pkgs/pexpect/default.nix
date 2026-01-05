@@ -30,11 +30,11 @@ buildPythonPackage rec {
     inherit sage;
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "http://www.noah.org/wiki/Pexpect";
     description = "Automate interactive console applications such as ssh, ftp, etc";
     downloadPage = "https://github.com/pexpect/pexpect";
-    license = licenses.mit;
+    license = lib.licenses.mit;
     maintainers = [ ];
 
     longDescription = ''

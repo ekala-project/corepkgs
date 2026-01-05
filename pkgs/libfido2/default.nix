@@ -66,13 +66,13 @@ stdenv.mkDerivation rec {
   # causes possible redefinition of _FORTIFY_SOURCE?
   hardeningDisable = [ "fortify3" ];
 
-  meta = with lib; {
+  meta = {
     description = ''
       Provides library functionality for FIDO 2.0, including communication with a device over USB.
     '';
     homepage = "https://github.com/Yubico/libfido2";
-    license = licenses.bsd2;
+    license = lib.licenses.bsd2;
     maintainers = [ ];
-    platforms = platforms.unix;
+    platforms = lib.platforms.unix;
   };
 }
