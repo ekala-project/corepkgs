@@ -24,26 +24,22 @@ in
 
   # Fallback: The contents of the configuration file found at $NIXPKGS_CONFIG or
   # $HOME/.config/nixpkgs/config.nix.
-  config ? { },
-  # TODO(corepkgs): document removal of this
-  # config ?
-  #   let
-  #     configFile = builtins.getEnv "NIXPKGS_CONFIG";
-  #     configFile2 = homeDir + "/.config/nixpkgs/config.nix";
-  #   in
-  #   if configFile != "" && builtins.pathExists configFile then
-  #     import configFile
-  #   else if homeDir != "" && builtins.pathExists configFile2 then
-  #     import configFile2
-  #   else
-  #     { },
+  config ?
+    # let
+    #   configFile = builtins.getEnv "NIXPKGS_CONFIG";
+    #   configFile2 = homeDir + "/.config/nixpkgs/config.nix";
+    # in
+    # if configFile != "" && builtins.pathExists configFile then
+    #   import configFile
+    # else if homeDir != "" && builtins.pathExists configFile2 then
+    #   import configFile2
+    # else
+      { },
 
   # Overlays are used to extend Nixpkgs collection with additional
   # collections of packages.  These collection of packages are part of the
   # fix-point made by Nixpkgs.
   overlays ? [ ],
-  # TODO(corepkgs): document removal of this
-  # overlays ? import ./impure-overlays.nix,
 
   crossOverlays ? [ ],
 
@@ -55,7 +51,7 @@ in
 assert args ? localSystem -> !(args ? system);
 assert args ? system -> !(args ? localSystem);
 
-import ./pure.nix (
+import ./. (
   removeAttrs args [ "system" ]
   // {
     inherit config overlays localSystem;

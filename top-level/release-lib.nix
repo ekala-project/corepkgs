@@ -1,14 +1,15 @@
 {
   supportedSystems,
   system ? builtins.currentSystem,
-  packageSet ? (import ../.),
+  packageSet ? (import ../top-level/impure.nix),
   scrubJobs ? true,
   # Attributes passed to nixpkgs. Don't build packages marked as unfree.
-  pkgsArgs ? {
+   pkgsArgs ? {
     config = {
       allowUnfree = false;
       inHydra = true;
     };
+    __allowFileset = false;
   },
 }:
 
@@ -43,7 +44,7 @@ let
     recursiveUpdate {
       inherit system;
       config.allowUnsupportedSystem = true;
-    } pkgsArgs
+    }  pkgsArgs
   );
 
   hydraJob' = if scrubJobs then hydraJob else id;
@@ -56,7 +57,7 @@ let
   mkPkgsFor =
     crossSystem:
     let
-      packageSet' = args: packageSet (args // { inherit crossSystem; } // pkgsArgs);
+      packageSet' = args: packageSet (args // { inherit crossSystem; } //  pkgsArgs);
 
       pkgs_x86_64_linux = packageSet' { system = "x86_64-linux"; };
       pkgs_i686_linux = packageSet' { system = "i686-linux"; };
@@ -195,20 +196,30 @@ let
     maintainers = [ ];
   });
 
+  # Recursive for packages and apply a function to them
+  recursiveMapPackages =
+    f:
+    mapAttrs (
+      name: value:
+      if isDerivation value then
+        f value
+      else if value.recurseForDerivations or false || value.recurseForRelease or false then
+        recursiveMapPackages f value
+      else
+        [ ]
+    );
+
+  # Gets the list of Hydra platforms for a derivation
+  getPlatforms =
+    drv:
+    drv.meta.hydraPlatforms
+      or (subtractLists (drv.meta.badPlatforms or [ ]) (drv.meta.platforms or supportedSystems));
+
   /*
     Recursively map a (nested) set of derivations to an isomorphic
     set of meta.platforms values.
   */
-  packagePlatforms = mapAttrs (
-    name: value:
-    if isDerivation value then
-      value.meta.hydraPlatforms
-        or (subtractLists (value.meta.badPlatforms or [ ]) (value.meta.platforms or [ "x86_64-linux" ]))
-    else if value.recurseForDerivations or false || value.recurseForRelease or false then
-      packagePlatforms value
-    else
-      [ ]
-  );
+  packagePlatforms = recursiveMapPackages getPlatforms;
 
 in
 {
@@ -229,6 +240,8 @@ in
     lib
     mapTestOn
     mapTestOnCross
+    recursiveMapPackages
+    getPlatforms
     packagePlatforms
     pkgs
     pkgsFor

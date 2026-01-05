@@ -40,6 +40,7 @@ PATTERN_ALIASES = [
     (r"\blibX11\b", "libx11"),
     (r"\bdocbook_xsl\b", "docbook-xsl-nons"),
     (r"\bdocbook_xsl_ns\b", "docbook-xsl-ns"),
+    (r"\bnixpkgsArgs\b", "pkgsArgs"),
 ]
 
 # Regex patterns for lines that should be filtered out from diffs.
@@ -80,7 +81,6 @@ CHECK_NEW_FILES = [
     "common-updater",
     "pkgs",
     "python",
-    "stdenv",
     "systems",
 ]
 
@@ -149,6 +149,7 @@ PATH_MAPPINGS = {
     "pkgs/linux/kernel/kernel-config.nix": "nixos/modules/system/boot/kernel_config.nix",
     "pkgs/linux/pkgs": "pkgs/os-specific/linux",
     "pkgs/llvm": "pkgs/development/compilers/llvm",
+    "stdenv/release/lib.nix": "pkgs/top-level/release-lib.nix",
     "pkgs/nix": "pkgs/tools/package-management/nix",
     "pkgs/openssh": "pkgs/tools/networking/openssh",
     "pkgs/perl": "pkgs/development/interpreters/perl",

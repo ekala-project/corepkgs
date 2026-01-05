@@ -32,12 +32,7 @@
 
   # Temporary hack to let Nixpkgs forbid internal use of `lib.fileset`
   # until <https://github.com/NixOS/nix/issues/11503> is fixed.
-  # TODO(corepkgs): this was fixed, remove this https://github.com/NixOS/nixpkgs/commit/8725e466ef2bcc5be69106c16dbf69b9ef989273
   __allowFileset ? true,
-
-  # Allow for users to pass modules for the evaluation of pkgs.config
-  # TODO(corepkgs): document this
-  modules ? [ ],
 
   # List of overlays layers used to extend Nixpkgs.
   overlays ? [ ],
@@ -48,7 +43,7 @@
   # A function booting the final package set for a specific standard
   # environment. See below for the arguments given to that function, the type of
   # list it returns.
-  stdenvStages ? import ./.,
+  stdenvStages ? import ../stdenv,
 
   # Ignore unexpected args.
   ...
@@ -128,8 +123,7 @@ let
           config = config1;
         }
       )
-    ]
-    ++ modules;
+    ];
     class = "nixpkgsConfig";
   };
 
@@ -161,7 +155,7 @@ let
   # via `evalModules` is not idempotent. In other words, if you add `config` to
   # `newArgs`, expect strange very hard to debug errors! (Yes, I'm speaking from
   # experience here.)
-  nixpkgsFun = newArgs: import ../. (args // newArgs);
+  nixpkgsFun = newArgs: import ./. (args // newArgs);
 
   # Partially apply some arguments for building bootstrapping stage pkgs
   # sets. Only apply arguments which no stdenv would want to override.
@@ -174,7 +168,7 @@ let
       // newArgs
     );
 
-  boot = import ./booter.nix { inherit lib allPackages; };
+  boot = import ../stdenv/booter.nix { inherit lib allPackages; };
 
   stages = stdenvStages {
     inherit
