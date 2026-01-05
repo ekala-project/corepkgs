@@ -50,7 +50,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/jahnf/Projecteur";
     license = lib.licenses.mit;
     mainProgram = "projecteur";
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 })

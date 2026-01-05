@@ -47,6 +47,5 @@ stdenv.mkDerivation {
     license = lib.licenses.gpl2Only;
     platforms = [ "x86_64-linux" ];
     broken = (kernel.kernelOlder "5.5" && kernel.isHardened);
-    maintainers = [ ];
   };
 }

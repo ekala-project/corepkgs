@@ -115,6 +115,5 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/wolfSSL/wolfssl/releases/tag/v${finalAttrs.version}-stable";
     platforms = lib.platforms.all;
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
   };
 })

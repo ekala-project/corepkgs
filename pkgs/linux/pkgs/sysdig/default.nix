@@ -185,7 +185,6 @@ stdenv.mkDerivation {
       gpl2Only
       mit
     ];
-    maintainers = [ ];
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
     broken =
       kernel != null && ((lib.versionOlder kernel.version "4.14") || kernel.isHardened || kernel.isZen);

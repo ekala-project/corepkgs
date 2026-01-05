@@ -43,6 +43,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/msgpack/msgpack-python";
     changelog = "https://github.com/msgpack/msgpack-python/blob/${src.tag}/ChangeLog.rst";
     license = lib.licenses.asl20;
-    maintainers = [ ];
+
   };
 }

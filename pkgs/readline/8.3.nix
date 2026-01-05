@@ -94,7 +94,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     description = "Library for interactive line editing";
-
     longDescription = ''
       The GNU Readline library provides a set of functions for use by
       applications that allow users to edit command lines as they are
@@ -109,13 +108,8 @@ stdenv.mkDerivation (finalAttrs: {
       library may be used without Readline in applications which
       desire its capabilities.
     '';
-
     homepage = "https://savannah.gnu.org/projects/readline/";
-
     license = lib.licenses.gpl3Plus;
-
-    maintainers = [ ];
-
     platforms = lib.platforms.unix ++ lib.platforms.windows;
     branch = "8.3";
   };

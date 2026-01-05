@@ -36,7 +36,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/DigitalDevices/dddvb";
     description = "Device driver for all Digital Devices DVB demodulator and modulator cards";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     broken = lib.versionAtLeast kernel.version "6.15";
   };

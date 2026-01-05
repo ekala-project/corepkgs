@@ -84,7 +84,6 @@ let
       homepage = "https://github.com/urllib3/urllib3";
       changelog = "https://github.com/urllib3/urllib3/blob/${version}/CHANGES.rst";
       license = lib.licenses.mit;
-      maintainers = [ ];
     };
   };
 in

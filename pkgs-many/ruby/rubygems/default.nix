@@ -41,6 +41,6 @@ stdenv.mkDerivation rec {
       ruby
     ];
     mainProgram = "gem";
-    maintainers = [ ];
+
   };
 }

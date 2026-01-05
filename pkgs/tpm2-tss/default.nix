@@ -171,6 +171,5 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/tpm2-software/tpm2-tss";
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 })

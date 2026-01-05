@@ -34,7 +34,6 @@ stdenv.mkDerivation rec {
 
   meta = {
     description = "Library for arbitrary precision decimal floating point arithmetic";
-
     longDescription = ''
       libmpdec is a fast C/C++ library for correctly-rounded arbitrary
       precision decimal floating point arithmetic.  It is a complete
@@ -51,17 +50,10 @@ stdenv.mkDerivation rec {
       Specification.  libmpdec++ is mostly a header library around libmpdec's C
       functions.
     '';
-
     homepage = "https://www.bytereef.org/mpdecimal/index.html";
-
     downloadPage = "https://www.bytereef.org/mpdecimal/download.html";
-
     changelog = "https://www.bytereef.org/mpdecimal/changelog.html";
-
     license = lib.licenses.bsd2;
-
-    maintainers = [ ];
-
     platforms = lib.platforms.unix ++ lib.platforms.windows;
   };
 }

@@ -40,7 +40,6 @@ stdenv.mkDerivation {
     description = "Based on AMD_ENERGY driver, but with some jiffies added so non-root users can read it safely";
     homepage = "https://github.com/BoukeHaarsma23/zenergy";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = [ "x86_64-linux" ];
   };
 }

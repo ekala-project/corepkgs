@@ -108,7 +108,6 @@ bash.runCommand "${pname}-${version}"
         lpl-102
         info-zip
       ];
-      teams = [ lib.teams.minimal-bootstrap ];
       platforms = lib.platforms.unix;
     };
   }

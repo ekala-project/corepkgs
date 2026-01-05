@@ -110,6 +110,5 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://fontforge.github.io";
     platforms = lib.platforms.all;
     license = lib.licenses.bsd3;
-    maintainers = [ ];
   };
 })

@@ -66,7 +66,6 @@ stdenv.mkDerivation (finalAttrs: {
       - It provides some extensions not present in the TOML language standard.
     '';
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.unix ++ lib.platforms.windows;
   };
 })

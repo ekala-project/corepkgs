@@ -25,7 +25,5 @@ callPackage ./generic.nix args {
     inherit (nixosTests.zfs) installer;
   };
 
-  maintainers = [ ];
-
   hash = "sha256-v78Tn1Im9h8Sjd4XACYesPOD+hlUR3Cmg8XjcJXOuwM=";
 }

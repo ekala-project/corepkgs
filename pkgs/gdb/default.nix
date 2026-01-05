@@ -200,20 +200,14 @@ stdenv.mkDerivation rec {
 
   meta = {
     mainProgram = "gdb";
-
     description = "GNU Project debugger";
-
     longDescription = ''
       GDB, the GNU Project debugger, allows you to see what is going
       on `inside' another program while it executes -- or what another
       program was doing at the moment it crashed.
     '';
-
     homepage = "https://www.gnu.org/software/gdb/";
-
     license = lib.licenses.gpl3Plus;
-
     platforms = with lib.platforms; linux ++ cygwin ++ freebsd ++ darwin;
-    maintainers = [ ];
   };
 }

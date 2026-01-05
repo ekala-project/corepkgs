@@ -100,7 +100,6 @@ tcl.mkTclDerivation {
     homepage = "https://www.tcl.tk/";
     license = lib.licenses.tcltk;
     platforms = lib.platforms.all;
-    maintainers = [ ];
     broken = stdenv.hostPlatform.isDarwin && lib.elem (lib.versions.majorMinor tcl.version) [ "8.5" ];
   };
 }

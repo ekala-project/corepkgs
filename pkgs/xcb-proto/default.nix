@@ -39,7 +39,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "XML-XCB protocol descriptions used by libxcb for the X11 protocol & extensions";
     homepage = "https://gitlab.freedesktop.org/xorg/proto/xcbproto";
     license = lib.licenses.x11;
-    maintainers = [ ];
     pkgConfigModules = [ "xcb-proto" ];
     platforms = lib.platforms.unix;
   };

@@ -152,7 +152,7 @@ buildPythonPackage rec {
       processing and graphics capabilities.
     '';
     license = lib.licenses.mit-cmu;
-    maintainers = [ ];
+
   };
 
 }

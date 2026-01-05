@@ -119,7 +119,6 @@ let
       nixComponentsAttributeName
     ];
 
-  maintainers = [ ];
 in
 lib.makeExtensible (
   self:

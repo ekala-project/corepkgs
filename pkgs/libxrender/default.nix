@@ -57,7 +57,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Xlib library for the Render Extension to the X11 protocol";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxrender";
     license = lib.licenses.hpndSellVariant;
-    maintainers = [ ];
     pkgConfigModules = [ "xrender" ];
     platforms = lib.platforms.unix;
   };

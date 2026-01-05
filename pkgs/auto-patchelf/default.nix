@@ -38,6 +38,5 @@ stdenv.mkDerivation {
     mainProgram = "auto-patchelf";
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 }

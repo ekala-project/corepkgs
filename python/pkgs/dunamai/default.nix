@@ -60,6 +60,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/mtkennerly/dunamai";
     changelog = "https://github.com/mtkennerly/dunamai/blob/${src.tag}/CHANGELOG.md";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

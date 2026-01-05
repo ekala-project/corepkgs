@@ -47,7 +47,6 @@ stdenv.mkDerivation {
       bsd3
       gpl2Only
     ];
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     broken = kernel.kernelOlder "4.20";
     priority = -1;

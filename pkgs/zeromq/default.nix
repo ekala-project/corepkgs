@@ -118,7 +118,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Intelligent Transport Layer";
     license = lib.licenses.mpl20;
     platforms = lib.platforms.all;
-    maintainers = [ ];
     pkgConfigModules = [ "libzmq" ];
   };
 })

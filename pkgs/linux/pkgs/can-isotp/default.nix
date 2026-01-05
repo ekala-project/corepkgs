@@ -35,6 +35,5 @@ stdenv.mkDerivation {
     homepage = "https://github.com/hartkopp/can-isotp";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

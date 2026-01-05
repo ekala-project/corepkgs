@@ -34,7 +34,6 @@ stdenv.mkDerivation rec {
     description = "Linux driver for Intel Touch Host Controller";
     homepage = "https://github.com/quo/ithc-linux";
     license = lib.licenses.publicDomain;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     broken = kernel.kernelOlder "5.9" || kernel.kernelAtLeast "6.10";
   };

@@ -82,13 +82,9 @@ stdenv.mkDerivation rec {
       archives).
     '';
     homepage = "https://www.gnu.org/software/tar/";
-
     license = lib.licenses.gpl3Plus;
-
-    maintainers = [ ];
     mainProgram = "tar";
     platforms = lib.platforms.all;
-
     priority = 10;
   };
 }

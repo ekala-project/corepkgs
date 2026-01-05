@@ -357,7 +357,6 @@ stdenv.mkDerivation (
 
           license = lib.licenses.lgpl2Plus;
 
-          maintainers = [ ];
           platforms = lib.platforms.linux;
         }
         // (args.meta or { });

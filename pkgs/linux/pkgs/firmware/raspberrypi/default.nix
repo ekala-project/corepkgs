@@ -29,7 +29,6 @@ stdenvNoCC.mkDerivation rec {
     description = "Firmware for the Raspberry Pi board";
     homepage = "https://github.com/raspberrypi/firmware";
     license = lib.licenses.unfreeRedistributableFirmware; # See https://github.com/raspberrypi/firmware/blob/master/boot/LICENCE.broadcom
-    maintainers = [ ];
     # Hash mismatch on source, mystery.
     # Maybe due to https://github.com/NixOS/nix/issues/847
     broken = stdenvNoCC.hostPlatform.isDarwin;

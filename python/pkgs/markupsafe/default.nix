@@ -53,6 +53,6 @@ buildPythonPackage rec {
     description = "Implements a XML/HTML/XHTML Markup safe string";
     homepage = "https://palletsprojects.com/p/markupsafe/";
     license = lib.licenses.bsd3;
-    maintainers = [ ];
+
   };
 }

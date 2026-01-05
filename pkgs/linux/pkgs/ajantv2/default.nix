@@ -37,7 +37,7 @@ stdenv.mkDerivation {
   '';
 
   meta = {
-    inherit (libajantv2.meta) license homepage maintainers;
+    inherit (libajantv2.meta) license homepage;
     platforms = [
       "x86_64-linux"
       "aarch64-linux"

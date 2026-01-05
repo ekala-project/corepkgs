@@ -917,7 +917,6 @@ rec {
     name = "buildRustCrate-tests";
     meta = {
       description = "Test cases for buildRustCrate";
-      maintainers = [ ];
     };
     constituents = builtins.attrValues (lib.filterAttrs (_: v: lib.isDerivation v) tests);
   };

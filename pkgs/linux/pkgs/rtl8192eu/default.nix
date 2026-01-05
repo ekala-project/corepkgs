@@ -48,6 +48,5 @@ stdenv.mkDerivation {
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
     broken = stdenv.hostPlatform.isAarch64 || kernel.kernelAtLeast "6.17";
-    maintainers = [ ];
   };
 }

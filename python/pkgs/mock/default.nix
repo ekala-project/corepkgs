@@ -27,6 +27,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/testing-cabal/mock";
     changelog = "https://github.com/testing-cabal/mock/blob/${version}/CHANGELOG.rst";
     license = lib.licenses.bsd2;
-    maintainers = [ ];
+
   };
 }

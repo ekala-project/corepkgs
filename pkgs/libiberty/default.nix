@@ -38,7 +38,6 @@ stdenv.mkDerivation {
     homepage = "https://gcc.gnu.org/";
     license = lib.licenses.lgpl2;
     description = "Collection of subroutines used by various GNU programs";
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 }

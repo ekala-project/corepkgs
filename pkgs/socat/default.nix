@@ -55,7 +55,6 @@ stdenv.mkDerivation rec {
     homepage = "http://www.dest-unreach.org/socat/";
     platforms = lib.platforms.unix;
     license = with lib.licenses; [ gpl2Only ];
-    maintainers = [ ];
     mainProgram = "socat";
   };
 }

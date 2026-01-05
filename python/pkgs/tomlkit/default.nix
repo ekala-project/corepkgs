@@ -35,6 +35,5 @@ buildPythonPackage rec {
     changelog = "https://github.com/sdispater/tomlkit/blob/${version}/CHANGELOG.md";
     description = "Style-preserving TOML library for Python";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 }

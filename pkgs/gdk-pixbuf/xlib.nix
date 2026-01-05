@@ -51,7 +51,6 @@ stdenv.mkDerivation rec {
   meta = {
     description = "Deprecated API for integrating GdkPixbuf with Xlib data types";
     homepage = "https://gitlab.gnome.org/Archive/gdk-pixbuf-xlib";
-    maintainers = [ ];
     license = lib.licenses.lgpl21Plus;
     platforms = lib.platforms.unix;
   };

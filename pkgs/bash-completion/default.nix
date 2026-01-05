@@ -77,6 +77,5 @@ stdenv.mkDerivation rec {
     description = "Programmable completion for the bash shell";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 }

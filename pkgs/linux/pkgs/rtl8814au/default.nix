@@ -41,7 +41,6 @@ stdenv.mkDerivation {
     description = "Realtek 8814AU USB WiFi driver";
     homepage = "https://github.com/morrownr/8814au";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     broken = kernel.kernelOlder "5.2" || kernel.kernelAtLeast "6.15";
   };
 }

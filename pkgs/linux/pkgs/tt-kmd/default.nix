@@ -39,7 +39,6 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description = "Tenstorrent Kernel Module";
     homepage = "https://github.com/tenstorrent/tt-kmd";
-    maintainers = [ ];
     license = with lib.licenses; [ gpl2Only ];
     platforms = lib.platforms.linux;
   };

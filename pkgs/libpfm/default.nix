@@ -47,7 +47,6 @@ stdenv.mkDerivation (finalAttrs: {
       (PMU) of modern processors.
     '';
     license = lib.licenses.gpl2;
-    maintainers = [ ];
     platforms = lib.platforms.linux ++ lib.platforms.windows;
   };
 })

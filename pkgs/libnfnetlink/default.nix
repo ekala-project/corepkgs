@@ -26,7 +26,6 @@ stdenv.mkDerivation rec {
     '';
     homepage = "https://www.netfilter.org/projects/libnfnetlink/index.html";
     license = lib.licenses.gpl2;
-
     platforms = lib.platforms.linux;
   };
 }

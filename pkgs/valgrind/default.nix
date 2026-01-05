@@ -102,7 +102,6 @@ stdenv.mkDerivation rec {
   meta = {
     homepage = "https://valgrind.org/";
     description = "Debugging and profiling tool suite";
-
     longDescription = ''
       Valgrind is an award-winning instrumentation framework for
       building dynamic analysis tools.  There are Valgrind tools that
@@ -110,10 +109,7 @@ stdenv.mkDerivation rec {
       bugs, and profile your programs in detail.  You can also use
       Valgrind to build new tools.
     '';
-
     license = lib.licenses.gpl3Plus;
-
-    maintainers = [ ];
     platforms =
       with lib.platforms;
       lib.intersectLists (x86 ++ power ++ s390x ++ armv7 ++ aarch64 ++ mips ++ riscv64) (

@@ -32,7 +32,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     description = "Script used to obtain source hashes for fetchhg";
-    maintainers = [ ];
     platforms = lib.platforms.unix;
     mainProgram = "nix-prefetch-hg";
   };

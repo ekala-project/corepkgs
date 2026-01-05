@@ -34,7 +34,6 @@ stdenvNoCC.mkDerivation {
     description = "Rockchip proprietary bootloader blobs";
     homepage = "https://github.com/rockchip-linux/rkbin";
     license = lib.licenses.unfreeRedistributableFirmware;
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 }

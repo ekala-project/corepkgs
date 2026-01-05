@@ -63,7 +63,6 @@ stdenv.mkDerivation rec {
   meta = {
     homepage = "https://www.gnu.org/software/gzip/";
     description = "GNU zip compression program";
-
     longDescription = ''
       gzip (GNU zip) is a popular data compression program written by
       Jean-loup Gailly for the GNU project.  Mark Adler wrote the
@@ -75,11 +74,8 @@ stdenv.mkDerivation rec {
       and we needed a replacement.  The superior compression ratio of gzip
       is just a bonus.
     '';
-
     platforms = lib.platforms.all;
-
     license = lib.licenses.gpl3Plus;
-
     mainProgram = "gzip";
   };
 }

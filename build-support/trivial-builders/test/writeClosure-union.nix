@@ -11,7 +11,6 @@ runCommandLocal "test-trivial-builders-writeClosure-union"
     closures = lib.mapAttrs (n: v: writeClosure [ v ]) samples;
     collectiveClosure = writeClosure (lib.attrValues samples);
     inherit samples;
-    meta.maintainers = [ ];
   }
   ''
     set -eu -o pipefail

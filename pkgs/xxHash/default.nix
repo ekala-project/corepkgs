@@ -39,7 +39,6 @@ stdenv.mkDerivation rec {
       gpl2
     ];
     mainProgram = "xxhsum";
-    maintainers = [ ];
     platforms = lib.platforms.all;
     pkgConfigModules = [
       "libxxhash"

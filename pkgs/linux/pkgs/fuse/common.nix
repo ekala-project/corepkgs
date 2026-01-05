@@ -140,7 +140,6 @@ stdenv.mkDerivation rec {
       gpl2Only
       lgpl21Only
     ];
-    maintainers = [ ];
     outputsToInstall = [ "bin" ];
   };
 }

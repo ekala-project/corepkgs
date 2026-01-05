@@ -61,7 +61,6 @@ stdenv.mkDerivation {
     description = "Linux kernel driver that exposes access to the SMU (System Management Unit) for certain AMD Ryzen Processors";
     homepage = "https://github.com/amkillam/ryzen_smu";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     platforms = [ "x86_64-linux" ];
     mainProgram = "monitor_cpu";
   };

@@ -50,6 +50,6 @@ buildPythonPackage rec {
     description = "Read metadata from Python packages";
     homepage = "https://importlib-metadata.readthedocs.io/";
     license = lib.licenses.asl20;
-    maintainers = [ ];
+
   };
 }

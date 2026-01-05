@@ -51,7 +51,6 @@ let
       kernelMinSupportedMajorMinor,
       kernelMaxSupportedMajorMinor,
       enableUnsupportedExperimentalKernel ? false, # allows building against unsupported Kernel versions
-      maintainers ? (with lib.maintainers; [ amarshall ]),
       tests,
     }@innerArgs:
 
@@ -342,7 +341,6 @@ let
         homepage = "https://github.com/openzfs/zfs";
         changelog = "https://github.com/openzfs/zfs/releases/tag/zfs-${version}";
         license = lib.licenses.cddl;
-
         # The case-block for TARGET_CPU has branches for only some CPU families,
         # which prevents ZFS from building on any other platform.  Since the NixOS
         # `boot.zfs.enabled` property is `readOnly`, excluding platforms where ZFS
@@ -361,8 +359,6 @@ let
             isRiscV64
             isLoongArch64
           ];
-
-        inherit maintainers;
         mainProgram = "zfs";
         broken = buildKernel && !((kernelIsCompatible kernel) || enableUnsupportedExperimentalKernel);
       };

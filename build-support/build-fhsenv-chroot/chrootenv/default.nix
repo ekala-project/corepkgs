@@ -21,7 +21,6 @@ stdenv.mkDerivation {
   meta = {
     description = "Setup mount/user namespace for FHS emulation";
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 }

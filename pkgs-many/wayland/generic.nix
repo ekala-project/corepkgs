@@ -135,7 +135,7 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = lib.platforms.unix;
     # requires more work: https://gitlab.freedesktop.org/wayland/wayland/-/merge_requests/481
     badPlatforms = lib.platforms.darwin;
-    maintainers = [ ];
+
     pkgConfigModules = [
       "wayland-client"
       "wayland-cursor"

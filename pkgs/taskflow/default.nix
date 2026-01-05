@@ -56,6 +56,5 @@ stdenv.mkDerivation (finalAttrs: {
       "https://taskflow.github.io/taskflow/release-${release}.html";
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 })

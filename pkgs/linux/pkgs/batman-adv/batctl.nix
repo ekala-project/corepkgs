@@ -31,7 +31,6 @@ stdenv.mkDerivation rec {
     description = "B.A.T.M.A.N. routing protocol in a linux kernel module for layer 2, control tool";
     mainProgram = "batctl";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = with lib.platforms; linux;
   };
 }

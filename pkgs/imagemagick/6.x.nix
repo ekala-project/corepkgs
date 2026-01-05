@@ -164,7 +164,6 @@ stdenv.mkDerivation (finalAttrs: {
       "MagickWand"
     ];
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
-    maintainers = [ ];
     license = lib.licenses.asl20;
     knownVulnerabilities = [
       "CVE-2019-13136"

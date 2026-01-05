@@ -49,6 +49,5 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/awslabs/aws-c-http";
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 }

@@ -53,6 +53,5 @@ stdenv.mkDerivation {
     homepage = "https://www.kernel.org/doc/htmldocs/";
     platforms = lib.platforms.linux;
     inherit (linux_latest.meta) license;
-    maintainers = [ ];
   };
 }

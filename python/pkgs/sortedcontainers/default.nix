@@ -34,7 +34,7 @@ let
       description = "Python Sorted Container Types: SortedList, SortedDict, and SortedSet";
       homepage = "https://grantjenks.com/docs/sortedcontainers/";
       license = lib.licenses.asl20;
-      maintainers = [ ];
+
     };
   };
 in

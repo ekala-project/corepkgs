@@ -25,7 +25,6 @@ stdenv.mkDerivation rec {
 
   meta = {
     description = "Generic library support script";
-
     longDescription = ''
       GNU libtool is a generic library support script.  Libtool hides
       the complexity of using shared libraries behind a consistent,
@@ -35,12 +34,9 @@ stdenv.mkDerivation rec {
       your Makefile, Makefile.in, or Makefile.am.  See the
       documentation for details.
     '';
-
     homepage = "https://www.gnu.org/software/libtool/";
-
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix;
-
     mainProgram = "libtool";
   };
 }

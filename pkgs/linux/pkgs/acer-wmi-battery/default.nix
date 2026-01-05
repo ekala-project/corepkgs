@@ -44,6 +44,5 @@ stdenv.mkDerivation {
     homepage = "https://github.com/frederik-h/acer-wmi-battery";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

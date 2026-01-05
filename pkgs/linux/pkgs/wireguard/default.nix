@@ -50,7 +50,7 @@ stdenv.mkDerivation rec {
   };
 
   meta = {
-    inherit (wireguard-tools.meta) homepage license maintainers;
+    inherit (wireguard-tools.meta) homepage license;
     description = "Kernel module for the WireGuard secure network tunnel";
     longDescription = ''
       Backport of WireGuard for kernels 3.10 to 5.5, as an out of tree module.

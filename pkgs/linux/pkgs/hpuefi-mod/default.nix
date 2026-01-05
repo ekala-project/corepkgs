@@ -39,6 +39,5 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Kernel module for managing BIOS settings and updating BIOS firmware on supported HP computers";
     license = lib.licenses.gpl2Only; # See "License" section in ./non-rpms/hpuefi-mod-*.tgz/README
     platforms = [ "x86_64-linux" ];
-    maintainers = [ ];
   };
 })

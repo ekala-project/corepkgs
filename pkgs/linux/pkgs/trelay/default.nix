@@ -49,7 +49,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     homepage = "https://github.com/openwrt/openwrt/tree/main/package/kernel/trelay";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     broken = lib.versionOlder kernel.version "5.10";
   };

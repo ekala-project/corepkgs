@@ -238,7 +238,6 @@ stdenv.mkDerivation (finalAttrs: {
       bsdOriginalUC
       publicDomain
     ];
-    maintainers = [ ];
     platforms = lib.platforms.unix;
     pkgConfigModules = [
       "blkid"

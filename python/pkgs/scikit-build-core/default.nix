@@ -84,6 +84,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/scikit-build/scikit-build-core";
     changelog = "https://github.com/scikit-build/scikit-build-core/blob/${src.tag}/docs/about/changelog.md";
     license = with lib.licenses; [ asl20 ];
-    maintainers = [ ];
+
   };
 }

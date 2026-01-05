@@ -49,7 +49,6 @@ bash.runCommand "${pname}-${version}"
         gpl2Plus
         lgpl21Plus
       ];
-      teams = [ lib.teams.minimal-bootstrap ];
       platforms = lib.platforms.unix;
     };
   }

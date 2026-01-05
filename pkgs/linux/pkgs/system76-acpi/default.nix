@@ -39,7 +39,6 @@ stdenv.mkDerivation (finalAttrs: {
   env.NIX_CFLAGS_COMPILE = "-Wno-error=incompatible-pointer-types";
 
   meta = {
-    maintainers = [ ];
     license = [ lib.licenses.gpl2Only ];
     platforms = [
       "i686-linux"

@@ -171,7 +171,6 @@ stdenv.mkDerivation (finalAttrs: {
       classpathException20 # **/*cmnos_printf.c, only three files
       mit # **/xtos, **/xtensa
     ];
-
     # release 1.4.0 vendors a GMP which uses an ancient version of
     # autotools that does not work on aarch64 or powerpc.
     # However, enableUnstable (unreleased upstream) works.
@@ -184,7 +183,6 @@ stdenv.mkDerivation (finalAttrs: {
           isPower64
         ];
     */
-
     sourceProvenance = [ lib.sourceTypes.fromSource ];
     homepage = "http://lists.infradead.org/mailman/listinfo/ath9k_htc_fw";
     downloadPage = "https://github.com/qca/open-ath9k-htc-firmware";

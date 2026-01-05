@@ -44,7 +44,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "IBM ThinkPad hardware functions driver";
     homepage = "https://github.com/linux-thinkpad/tp_smapi";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     # driver is only meant for linux thinkpads, bellow platforms should cover it.
     platforms = [
       "x86_64-linux"

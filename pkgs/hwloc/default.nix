@@ -97,7 +97,6 @@ stdenv.mkDerivation (finalAttrs: {
     # https://www.open-mpi.org/projects/hwloc/license.php
     license = lib.licenses.bsd3;
     homepage = "https://www.open-mpi.org/projects/hwloc/";
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

@@ -12,7 +12,6 @@ in
     name = "patch-rc-path-bash";
     meta = {
       description = "Setup-hook to inject source-time PATH prefix to a Bash/Ksh/Zsh script";
-      maintainers = [ ];
     };
     passthru.tests = {
       inherit (tests) test-bash;
@@ -25,7 +24,6 @@ in
     };
     meta = {
       description = "Setup-hook to inject source-time PATH prefix to a Csh script";
-      maintainers = [ ];
     };
     passthru.tests = {
       inherit (tests) test-csh;
@@ -35,7 +33,6 @@ in
     name = "patch-rc-path-fish";
     meta = {
       description = "Setup-hook to inject source-time PATH prefix to a Fish script";
-      maintainers = [ ];
     };
     passthru.tests = {
       inherit (tests) test-fish;
@@ -48,7 +45,6 @@ in
     };
     meta = {
       description = "Setup-hook to inject source-time PATH prefix to a POSIX shell script";
-      maintainers = [ ];
     };
     passthru.tests = {
       inherit (tests) test-posix;

@@ -48,7 +48,6 @@ stdenv.mkDerivation rec {
     description = "Effort to implement RFC9000 QUIC protocol";
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 }
 

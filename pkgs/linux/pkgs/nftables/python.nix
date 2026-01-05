@@ -26,7 +26,6 @@ buildPythonPackage {
       homepage
       license
       platforms
-      maintainers
       ;
   };
 }

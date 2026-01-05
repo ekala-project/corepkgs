@@ -68,7 +68,6 @@ stdenv.mkDerivation rec {
     '';
     homepage = "http://sourceware.org/libffi/";
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.all;
     # never built on aarch64-darwin since first introduction in nixpkgs
     broken = stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64;

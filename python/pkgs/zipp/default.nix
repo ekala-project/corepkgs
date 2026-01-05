@@ -51,7 +51,6 @@ let
       description = "Pathlib-compatible object wrapper for zip files";
       homepage = "https://github.com/jaraco/zipp";
       license = lib.licenses.mit;
-      maintainers = [ ];
     };
   };
 in

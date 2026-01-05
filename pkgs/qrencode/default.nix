@@ -69,7 +69,6 @@ stdenv.mkDerivation (finalAttrs: {
       QR Code images in various formats.
     '';
     license = lib.licenses.lgpl21Plus;
-    maintainers = [ ];
     platforms = lib.platforms.all;
     mainProgram = "qrencode";
   };

@@ -158,6 +158,5 @@ stdenv.mkDerivation rec {
     ];
     homepage = "https://www.gnu.org/software/autogen/";
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 }

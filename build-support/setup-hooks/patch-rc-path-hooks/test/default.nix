@@ -23,7 +23,6 @@
         ];
         meta = {
           description = "Package test of patchActivateBash";
-          inherit (patchRcPathBash.meta) maintainers;
         };
       }
       ''
@@ -149,7 +148,6 @@
         ];
         meta = {
           description = "Package test of patchActivateCsh";
-          inherit (patchRcPathCsh.meta) maintainers;
         };
       }
       ''
@@ -227,7 +225,6 @@
         ];
         meta = {
           description = "Package test of patchActivateFish";
-          inherit (patchRcPathFish.meta) maintainers;
         };
       }
       ''
@@ -314,7 +311,6 @@
         ];
         meta = {
           description = "Package test of patchActivatePosix";
-          inherit (patchRcPathPosix.meta) maintainers;
         };
       }
       ''

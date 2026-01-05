@@ -26,6 +26,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/sdispater/crashtest";
     description = "Manage Python errors with ease";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

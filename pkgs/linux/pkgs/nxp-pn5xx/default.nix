@@ -37,7 +37,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "NXP's NFC Open Source Kernel mode driver with ACPI configuration support";
     homepage = "https://github.com/jr64/nxp-pn5xx";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 })

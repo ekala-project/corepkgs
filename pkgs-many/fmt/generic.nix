@@ -68,7 +68,7 @@ stdenv.mkDerivation {
     homepage = "https://fmt.dev/";
     changelog = "https://github.com/fmtlib/fmt/blob/${version}/ChangeLog.rst";
     downloadPage = "https://github.com/fmtlib/fmt/";
-    maintainers = [ ];
+
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
   };

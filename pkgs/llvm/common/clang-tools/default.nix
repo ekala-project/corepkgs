@@ -54,6 +54,6 @@ stdenv.mkDerivation {
 
   meta = llvm_meta // {
     description = "Standalone command line tools for C++ development";
-    maintainers = [ ];
+
   };
 }

@@ -40,7 +40,6 @@ let
         inherit description homepage mainProgram;
         downloadPage = "http://sqlite.org/download.html";
         license = lib.licenses.publicDomain;
-        maintainers = [ ];
         platforms = lib.platforms.unix;
       };
     };

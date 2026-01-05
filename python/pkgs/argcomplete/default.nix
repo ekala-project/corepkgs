@@ -37,6 +37,6 @@ buildPythonPackage rec {
     changelog = "https://github.com/kislyuk/argcomplete/blob/${src.tag}/Changes.rst";
     downloadPage = "https://github.com/kislyuk/argcomplete";
     license = lib.licenses.asl20;
-    maintainers = [ ];
+
   };
 }

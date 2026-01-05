@@ -59,6 +59,5 @@ stdenv.mkDerivation rec {
     mainProgram = "itstool";
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 }

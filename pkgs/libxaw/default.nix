@@ -72,7 +72,6 @@ stdenv.mkDerivation (finalAttrs: {
       hpndSellVariant
       hpnd
     ];
-    maintainers = [ ];
     pkgConfigModules = [
       "xaw6"
       "xaw7"

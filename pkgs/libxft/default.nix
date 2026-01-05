@@ -69,7 +69,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxft";
     license = lib.licenses.hpndSellVariant;
-    maintainers = [ ];
     pkgConfigModules = [ "xft" ];
     platforms = lib.platforms.unix;
   };

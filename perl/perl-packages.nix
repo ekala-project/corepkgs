@@ -28,10 +28,6 @@ self:
 
 # cpan2nix assumes that perl-packages.nix will be used only with perl 5.30.3 or above
 assert lib.versionAtLeast perl.version "5.30.3";
-let
-  inherit (lib) maintainers teams;
-
-in
 with self;
 {
 
@@ -139,7 +135,6 @@ with self;
       description = "Grep-like tool tailored to working with large trees of source code";
       homepage = "https://beyondgrep.com";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
     };
   };
 
@@ -289,7 +284,6 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
     };
   };
 
@@ -420,7 +414,6 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
     };
   };
 
@@ -697,7 +690,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -1269,7 +1262,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
       mainProgram = "cpm";
     };
   };
@@ -1285,7 +1278,7 @@ with self;
       description = "Write object oriented scripts with ease";
       homepage = "https://github.com/jhthorsen/applify";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -1366,7 +1359,7 @@ with self;
       homepage = "https://spwhitton.name/tech/code/papersway/";
       license = lib.licenses.gpl3Plus;
       mainProgram = "papersway";
-      maintainers = [ ];
+
     };
   };
 
@@ -1492,7 +1485,7 @@ with self;
       description = "Simple Statistics";
       homepage = "https://github.com/nferraz/st";
       license = with lib.licenses; [ mit ];
-      maintainers = [ ];
+
       mainProgram = "st";
     };
   };
@@ -1549,7 +1542,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -1577,7 +1570,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -1605,7 +1598,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -2036,7 +2029,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -2120,7 +2113,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -2147,7 +2140,7 @@ with self;
       description = "Salted Challenge Response Authentication Mechanism (RFC 5802)";
       homepage = "https://github.com/dagolden/Authen-SCRAM";
       license = with lib.licenses; [ asl20 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -2899,7 +2892,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -2916,7 +2909,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -3117,7 +3110,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -4409,7 +4402,7 @@ with self;
     meta = {
       description = "Get the CDDB info for an audio cd";
       license = with lib.licenses; [ artistic1 ];
-      maintainers = [ ];
+
       mainProgram = "cddb.pl";
     };
   };
@@ -4742,7 +4735,7 @@ with self;
       description = "Communicate with a smart card using PC/SC";
       homepage = "https://pcsc-perl.apdu.fr/";
       license = with lib.licenses; [ gpl2Plus ];
-      maintainers = [ ];
+
     };
   };
 
@@ -4773,7 +4766,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -5717,7 +5710,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -6288,7 +6281,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -6322,7 +6315,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -6646,7 +6639,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
       mainProgram = "minicpan";
     };
   };
@@ -6685,7 +6678,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -6907,7 +6900,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -6976,7 +6969,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -7038,7 +7031,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -7092,7 +7085,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -7126,7 +7119,7 @@ with self;
       description = "Secure memorable password generator";
       homepage = "http://www.bartb.ie/hsxkpasswd";
       license = with lib.licenses; [ bsd2 ];
-      maintainers = [ ];
+
       mainProgram = "hsxkpasswd";
     };
     # Two tests fail as a result of https://github.com/bbusschots/hsxkpasswd/issues/42
@@ -7276,7 +7269,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -7396,7 +7389,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -7459,7 +7452,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -7478,7 +7471,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -7511,7 +7504,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -7544,7 +7537,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -7586,7 +7579,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
       mainProgram = "pgplet";
     };
   };
@@ -7709,7 +7702,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -7736,7 +7729,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -7777,7 +7770,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -7795,7 +7788,7 @@ with self;
     meta = {
       description = "Minimal Ed25519 bindings";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -8219,7 +8212,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
       mainProgram = "hexdump";
     };
   };
@@ -8331,7 +8324,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -8666,7 +8659,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -9688,7 +9681,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -9712,7 +9705,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -9828,7 +9821,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -10060,7 +10053,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -10170,7 +10163,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -10249,7 +10242,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -10431,7 +10424,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -10799,7 +10792,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -10882,7 +10875,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
       mainProgram = "sha3sum";
     };
   };
@@ -11866,7 +11859,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
       mainProgram = "msgconvert";
     };
   };
@@ -11949,7 +11942,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -12023,7 +12016,7 @@ with self;
       description = "High speed Base32 encoding using GMP with BigInt and MD5 support";
       homepage = "https://metacpan.org/release/Encode-Base32-GMP";
       license = with lib.licenses; [ mit ];
-      maintainers = [ ];
+
     };
   };
 
@@ -12321,7 +12314,7 @@ with self;
       description = "Simplified safe evaluation of Perl code";
       homepage = "https://github.com/mkende/perl-eval-safe";
       license = lib.licenses.mit;
-      maintainers = [ ];
+
     };
   };
 
@@ -12754,7 +12747,7 @@ with self;
       description = "Simplistic interface to pkg-config";
       homepage = "https://gitlab.gnome.org/GNOME/perl-extutils-pkgconfig";
       license = with lib.licenses; [ lgpl21Plus ];
-      maintainers = [ ];
+
     };
   };
 
@@ -12943,7 +12936,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -13008,7 +13001,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -13034,7 +13027,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -13060,7 +13053,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -13083,7 +13076,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -13484,7 +13477,7 @@ with self;
     meta = {
       description = "File locking with fcntl(2)";
       license = with lib.licenses; [ artistic1 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -13521,7 +13514,7 @@ with self;
       description = "FileHandle which supports multi-byte unget";
       homepage = "https://github.com/coppit/filehandle-unget";
       license = with lib.licenses; [ gpl2Only ];
-      maintainers = [ ];
+
     };
   };
 
@@ -13924,7 +13917,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -14145,7 +14138,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -14268,7 +14261,7 @@ with self;
       changelog = "https://github.com/finance-quote/finance-quote/releases/tag/v${version}";
       description = "Get stock and mutual fund quotes from various exchanges";
       license = with lib.licenses; [ gpl2Plus ];
-      maintainers = [ ];
+
     };
   };
 
@@ -14472,7 +14465,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -14495,7 +14488,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -14705,7 +14698,7 @@ with self;
     meta = {
       description = "Interpolates script options from files into @ARGV or another array";
       license = with lib.licenses; [ artistic1 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -14796,7 +14789,7 @@ with self;
     meta = {
       description = "Create fixup commits for topic branches";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
       mainProgram = "git-autofixup";
     };
   };
@@ -15268,7 +15261,7 @@ with self;
       description = "Search mailboxes for mail matching a regular expression";
       homepage = "https://github.com/coppit/grepmail";
       license = with lib.licenses; [ gpl2Only ];
-      maintainers = [ ];
+
     };
   };
 
@@ -15525,7 +15518,7 @@ with self;
     propagatedBuildInputs = [ DateCalc ];
     meta = {
       description = "Finnish APRS Parser (Fabulous APRS Parser)";
-      maintainers = [ ];
+
       license = with lib.licenses; [
         artistic1
         gpl1Plus
@@ -16974,7 +16967,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -17085,7 +17078,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -17373,7 +17366,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -17996,7 +17989,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -18304,7 +18297,7 @@ with self;
       description = "Validate data against a JSON schema";
       homepage = "https://github.com/mojolicious/json-validator";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -18476,7 +18469,7 @@ with self;
       description = "Transforms TeX and LaTeX into XML/HTML/MathML";
       homepage = "https://dlmf.nist.gov/LaTeXML/";
       license = with lib.licenses; [ publicDomain ];
-      maintainers = [ ];
+
       mainProgram = "latexmlc";
     };
   };
@@ -18965,7 +18958,7 @@ with self;
       description = "Embed / expand oEmbed resources and other URL / links";
       homepage = "https://github.com/jhthorsen/linkembedder";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -19656,7 +19649,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -19674,7 +19667,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -20334,7 +20327,7 @@ with self;
       description = "Fast and simple mbox folder reader";
       homepage = "https://github.com/coppit/mail-mbox-messageparser";
       license = with lib.licenses; [ gpl2Only ];
-      maintainers = [ ];
+
     };
   };
 
@@ -20605,7 +20598,7 @@ with self;
       homepage = "https://github.com/Grinnz/Math-Calc-Parser";
       broken = true;
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -20771,7 +20764,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -20898,7 +20891,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -20919,7 +20912,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -20944,7 +20937,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -21299,7 +21292,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -21359,7 +21352,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -21473,7 +21466,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -21565,7 +21558,7 @@ with self;
       description = "High performance job queue for Perl";
       homepage = "https://github.com/mojolicious/minion";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -21587,7 +21580,7 @@ with self;
       homepage = "https://github.com/Difegue/Minion-Backend-Redis";
       description = "Redis backend for Minion job queue";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -21607,7 +21600,7 @@ with self;
       description = "SQLite backend for Minion job queue";
       homepage = "https://github.com/Grinnz/Minion-Backend-SQLite";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -21630,7 +21623,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -21745,7 +21738,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22172,7 +22165,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22197,7 +22190,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22220,7 +22213,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22238,7 +22231,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22521,7 +22514,7 @@ with self;
       description = "Real-time web framework";
       homepage = "https://mojolicious.org";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
       mainProgram = "mojo";
     };
   };
@@ -22542,7 +22535,7 @@ with self;
       description = "Compress and convert css, less, sass, javascript and coffeescript files";
       homepage = "https://github.com/jhthorsen/mojolicious-plugin-assetpack";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22560,7 +22553,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22601,7 +22594,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22620,7 +22613,7 @@ with self;
       description = "OpenAPI / Swagger plugin for Mojolicious";
       homepage = "https://github.com/jhthorsen/mojolicious-plugin-openapi";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22639,7 +22632,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22661,7 +22654,7 @@ with self;
       description = "Mojolicious server status";
       homepage = "https://mojolicious.org";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22677,7 +22670,7 @@ with self;
       description = "Plugin for enabling a Mojolicious app to log to syslog";
       homepage = "https://github.com/jhthorsen/mojolicious-plugin-syslog";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22698,7 +22691,7 @@ with self;
       homepage = "https://github.com/Grinnz/Mojolicious-Plugin-TemplateToolkit";
       description = "Template Toolkit renderer plugin for Mojolicious";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22714,7 +22707,7 @@ with self;
       description = "Render exceptions as text in command line user agents";
       homepage = "https://github.com/marcusramberg/mojolicious-plugin-textexceptions";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22733,7 +22726,7 @@ with self;
       description = "Mojolicious <3 Webpack";
       homepage = "https://github.com/jhthorsen/mojolicious-plugin-webpack";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22752,7 +22745,7 @@ with self;
       description = "Redis driver based on Mojo::IOLoop";
       homepage = "https://github.com/jhthorsen/mojo-redis";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22777,7 +22770,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22800,7 +22793,7 @@ with self;
       description = "Tiny Mojolicious wrapper for SQLite";
       homepage = "https://github.com/Grinnz/Mojo-SQLite";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22821,7 +22814,7 @@ with self;
       description = "Mojolicious and Async MySQL/MariaDB";
       homepage = "https://github.com/jhthorsen/mojo-mysql";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22838,7 +22831,7 @@ with self;
       description = "(DISCOURAGED) Promises/A+ and flow-control helpers";
       homepage = "https://github.com/jberger/Mojo-IOLoop-Delay";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22866,7 +22859,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22886,7 +22879,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22907,7 +22900,7 @@ with self;
       description = "Mojolicious ♥ PostgreSQL";
       homepage = "https://mojolicious.org";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -22936,7 +22929,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -23083,7 +23076,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
       mainProgram = "moose-outdated";
     };
   };
@@ -23545,7 +23538,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -24761,7 +24754,7 @@ with self;
         gpl1Plus # or
         artistic1
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -24840,7 +24833,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
       mainProgram = "mysqldiff";
     };
   };
@@ -24918,7 +24911,7 @@ with self;
         gpl1Plus # or
         artistic1
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -24935,7 +24928,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -25138,7 +25131,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -25165,7 +25158,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -25219,7 +25212,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -25259,7 +25252,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -25276,7 +25269,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -25619,7 +25612,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -26500,7 +26493,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -26579,7 +26572,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -26660,7 +26653,7 @@ with self;
       description = "Client for talking to an Open API powered server";
       homepage = "https://github.com/jhthorsen/openapi-client";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -26721,7 +26714,7 @@ with self;
     meta = {
       description = "Perl Open OpenDocument Connector";
       license = with lib.licenses; [ lgpl21Only ];
-      maintainers = [ ];
+
     };
   };
 
@@ -26811,7 +26804,7 @@ with self;
       description = "Perl extension for Apache ZooKeeper";
       homepage = "https://github.com/mark-5/p5-net-zookeeper";
       license = with lib.licenses; [ asl20 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -26847,7 +26840,7 @@ with self;
         mit0
         bsd0
       ];
-      maintainers = [ ];
+
       mainProgram = "nsdiff";
     };
   };
@@ -27038,7 +27031,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -27057,7 +27050,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -27328,7 +27321,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -27578,7 +27571,7 @@ with self;
       description = "Minimalist PBKDF2 (RFC 2898) with HMAC-SHA1 or HMAC-SHA2";
       homepage = "https://github.com/dagolden/PBKDF2-Tiny";
       license = with lib.licenses; [ asl20 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -28481,7 +28474,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
       mainProgram = "pls";
     };
   };
@@ -28696,7 +28689,7 @@ with self;
     meta = {
       description = "Pattern-based Perl Recognizer";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -28915,7 +28908,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -28931,7 +28924,7 @@ with self;
       description = "Optimized pure-perl Redis protocol parser/encoder";
       homepage = "https://github.com/Grinnz/Protocol-Redis-Faster";
       license = with lib.licenses; [ artistic2 ];
-      maintainers = [ ];
+
     };
   };
 
@@ -29896,7 +29889,7 @@ with self;
         mit
         bsd3
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -30454,7 +30447,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -30479,7 +30472,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -30505,7 +30498,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -30571,7 +30564,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -30651,7 +30644,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -31543,7 +31536,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -32242,7 +32235,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -32333,7 +32326,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -32346,7 +32339,7 @@ with self;
     };
     meta = {
       description = "Use mmap to map in a file as a Perl variable";
-      maintainers = [ ];
+
       license = with lib.licenses; [ gpl2Plus ];
     };
   };
@@ -32361,7 +32354,7 @@ with self;
     meta = {
       description = "Memory information";
       license = with lib.licenses; [ gpl2Plus ];
-      maintainers = [ ];
+
     };
   };
 
@@ -32408,7 +32401,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -32793,7 +32786,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -33413,7 +33406,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -33436,7 +33429,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -34647,7 +34640,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -35874,7 +35867,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -35895,7 +35888,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -36001,7 +35994,7 @@ with self;
       description = "Test environment setup for development with IDE";
       homepage = "https://github.com/wchristian/Test-InDistDir";
       license = with lib.licenses; [ wtfpl ];
-      maintainers = [ ];
+
     };
   };
 
@@ -36076,7 +36069,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
       mainProgram = "lorem";
     };
   };
@@ -36591,7 +36584,7 @@ with self;
     meta = {
       description = "Extract collocations and Ngrams from text";
       license = with lib.licenses; [ gpl2Plus ];
-      maintainers = [ ];
+
     };
   };
 
@@ -36775,7 +36768,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -37072,7 +37065,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -37090,7 +37083,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -37463,7 +37456,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -37482,7 +37475,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -37840,7 +37833,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
       mainProgram = "vidir";
     };
   };
@@ -38355,7 +38348,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -39075,7 +39068,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -39094,7 +39087,7 @@ with self;
         artistic1
         gpl1Plus
       ];
-      maintainers = [ ];
+
     };
   };
 
@@ -39384,7 +39377,7 @@ with self;
     meta = {
       description = "Run Zonemaster tests from the command line";
       license = with lib.licenses; [ bsd3 ];
-      maintainers = [ ];
+
     };
   };
 

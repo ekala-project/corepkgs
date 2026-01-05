@@ -169,7 +169,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.netfilter.org/projects/iptables/index.html";
     platforms = lib.platforms.linux;
     mainProgram = "iptables";
-    maintainers = [ ];
     license = lib.licenses.gpl2Plus;
     downloadPage = "https://www.netfilter.org/projects/iptables/files/";
   };

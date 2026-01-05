@@ -11,12 +11,6 @@
     inherit hash;
   },
   patches ? [ ],
-  maintainers ? [
-    lib.maintainers.artturin
-    lib.maintainers.philiptaron
-    lib.maintainers.lovesegfault
-  ],
-  teams ? [ lib.teams.nix ],
   self_attribute_name,
 }@args:
 assert (hash == null) -> (src != null);
@@ -271,7 +265,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     homepage = "https://nixos.org/";
     license = lib.licenses.lgpl21Plus;
-    inherit maintainers teams;
     platforms = lib.platforms.unix;
     # Gets stuck in functional-tests in cross-trunk jobset and doesn't timeout
     # https://hydra.nixos.org/build/298175022

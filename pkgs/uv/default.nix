@@ -83,9 +83,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
       asl20
       mit
     ];
-    maintainers = [ ];
     mainProgram = "uv";
-
     # Builds on 32-bit platforms fails with "out of memory" since at least 0.8.6.
     # We don't place this in `badPlatforms` because cross-compilation on 64-bit
     # machine may work, e.g. `pkgsCross.gnu32.uv`.

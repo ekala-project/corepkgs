@@ -121,7 +121,7 @@ stdenv.mkDerivation (finalAttrs: rec {
     homepage = "https://www.tcl.tk/";
     license = lib.licenses.tcltk;
     platforms = lib.platforms.all;
-    maintainers = [ ];
+
   };
 
   passthru = rec {

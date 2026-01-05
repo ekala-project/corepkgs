@@ -74,6 +74,5 @@ stdenv.mkDerivation rec {
     '';
     platforms = lib.platforms.all;
     license = lib.licenses.lgpl21Plus;
-    maintainers = [ ];
   };
 }

@@ -55,7 +55,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/pypa/installer";
     changelog = "https://github.com/pypa/installer/blob/${src.rev}/docs/changelog.md";
     license = lib.licenses.mit;
-    maintainers = [ ];
 
   };
 }

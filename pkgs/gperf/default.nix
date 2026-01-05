@@ -17,7 +17,6 @@ stdenv.mkDerivation rec {
 
   meta = {
     description = "Perfect hash function generator";
-
     longDescription = ''
       GNU gperf is a perfect hash function generator.  For a given
       list of strings, it produces a hash function and hash table, in
@@ -31,9 +30,7 @@ stdenv.mkDerivation rec {
       nested ifs instead of a hash table, and for tuning the algorithm
       employed by gperf.
     '';
-
     license = lib.licenses.gpl3Plus;
-
     homepage = "https://www.gnu.org/software/gperf/";
     platforms = lib.platforms.unix;
     mainProgram = "gperf";

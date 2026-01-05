@@ -205,6 +205,5 @@ stdenv.mkDerivation rec {
       # On 64-bit POWER, musl is ELFv2-only
       (lib.recursiveUpdate lib.systems.inspect.patterns.isPower64 lib.systems.inspect.patterns.isAbiElfv1)
     ];
-    maintainers = [ ];
   };
 }

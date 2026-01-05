@@ -177,7 +177,6 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description = "Middleware layer between C libraries and language bindings";
     homepage = "https://gi.readthedocs.io/";
-    maintainers = [ ];
     pkgConfigModules = [ "gobject-introspection-1.0" ];
     platforms = lib.platforms.unix;
     badPlatforms = [ lib.systems.inspect.platformPatterns.isStatic ];
@@ -185,7 +184,6 @@ stdenv.mkDerivation (finalAttrs: {
       gpl2
       lgpl2
     ];
-
     longDescription = ''
       GObject introspection is a middleware layer between C libraries (using
       GObject) and language bindings. The C library can be scanned at compile

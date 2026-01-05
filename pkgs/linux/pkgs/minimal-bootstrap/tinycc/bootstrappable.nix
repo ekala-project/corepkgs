@@ -89,7 +89,6 @@ let
     description = "Tiny C Compiler's bootstrappable fork";
     homepage = "https://gitlab.com/janneke/tinycc";
     license = lib.licenses.lgpl21Only;
-    teams = [ lib.teams.minimal-bootstrap ];
     platforms = [
       "i686-linux"
       "x86_64-linux"

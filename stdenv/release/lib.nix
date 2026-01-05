@@ -27,7 +27,6 @@ let
     id
     isDerivation
     lists
-    maintainers
     mapAttrs
     mapAttrs'
     mapAttrsRecursive
@@ -149,13 +148,6 @@ let
     else
       pkgs.runCommand "evaluated-to-false" { } "false";
 
-  /*
-    The working or failing mails for cross builds will be sent only to
-    the following maintainers, as most package maintainers will not be
-    interested in the result of cross building a package.
-  */
-  crossMaintainers = [ ];
-
   # Generate attributes for all supported systems.
   forAllSystems = genAttrs supportedSystems;
 
@@ -200,7 +192,7 @@ let
     and triggering the build of the host derivation.
   */
   mapTestOnCross = _mapTestOnHelper (addMetaAttrs {
-    maintainers = crossMaintainers;
+    maintainers = [ ];
   });
 
   /*

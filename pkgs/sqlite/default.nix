@@ -151,7 +151,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.sqlite.org/";
     license = lib.licenses.publicDomain;
     mainProgram = "sqlite3";
-    maintainers = [ ];
     platforms = lib.platforms.unix ++ lib.platforms.windows;
     pkgConfigModules = [ "sqlite3" ];
   };

@@ -70,7 +70,6 @@ stdenv.mkDerivation rec {
     homepage = "http://www.infradead.org/~tgr/libnl/";
     description = "Linux Netlink interface library suite";
     license = lib.licenses.lgpl21;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 }

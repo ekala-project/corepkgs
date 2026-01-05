@@ -216,7 +216,6 @@ stdenv.mkDerivation rec {
 
   meta = {
     description = "GNU Transport Layer Security Library";
-
     longDescription = ''
       GnuTLS is a project that aims to develop a library which
       provides a secure layer, over a reliable transport
@@ -230,10 +229,8 @@ stdenv.mkDerivation rec {
       communicate in a way that is designed to prevent eavesdropping,
       tampering, or message forgery."
     '';
-
     homepage = "https://gnutls.org/";
     license = lib.licenses.lgpl21Plus;
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 }

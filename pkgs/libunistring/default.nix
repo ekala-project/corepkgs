@@ -62,9 +62,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     homepage = "https://www.gnu.org/software/libunistring/";
-
     description = "Unicode string library";
-
     longDescription = ''
       This library provides functions for manipulating Unicode strings
       and for manipulating C strings according to the Unicode
@@ -85,10 +83,7 @@ stdenv.mkDerivation (finalAttrs: {
       libunistring is also for you if your application uses Unicode
       strings as internal in-memory representation.
     '';
-
     license = lib.licenses.lgpl3Plus;
-
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

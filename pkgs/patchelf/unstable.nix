@@ -41,7 +41,6 @@ stdenv.mkDerivation {
     license = lib.licenses.gpl3;
     description = "Small utility to modify the dynamic linker and RPATH of ELF executables";
     mainProgram = "patchelf";
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 }

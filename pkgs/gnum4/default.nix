@@ -63,7 +63,6 @@ stdenv.mkDerivation (finalAttrs: {
       compiler or as a macro processor in its own right.
     '';
     homepage = "https://www.gnu.org/software/m4/";
-
     license = lib.licenses.gpl3Plus;
     mainProgram = "m4";
     platforms = lib.platforms.unix ++ lib.platforms.windows;

@@ -47,6 +47,5 @@ stdenv.mkDerivation {
     description = "Fairly compliant SIIT and Stateful NAT64 for Linux - kernel modules";
     platforms = lib.platforms.linux;
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
   };
 }

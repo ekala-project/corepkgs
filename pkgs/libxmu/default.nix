@@ -65,7 +65,6 @@ stdenv.mkDerivation (finalAttrs: {
       x11
       isc
     ];
-    maintainers = [ ];
     pkgConfigModules = [
       "xmu"
       "xmuu"

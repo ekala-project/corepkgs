@@ -111,7 +111,6 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://gitlab.com/cryptsetup/cryptsetup/-/raw/v${finalAttrs.version}/docs/v${finalAttrs.version}-ReleaseNotes";
     license = lib.licenses.gpl2Plus;
     mainProgram = "cryptsetup";
-    maintainers = [ ];
     platforms = with lib.platforms; linux;
   };
 })

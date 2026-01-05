@@ -34,6 +34,5 @@ buildPythonPackage rec {
     changelog = "https://github.com/python/typing_extensions/blob/${version}/CHANGELOG.md";
     homepage = "https://github.com/python/typing";
     license = lib.licenses.psfl;
-    maintainers = [ ];
   };
 }

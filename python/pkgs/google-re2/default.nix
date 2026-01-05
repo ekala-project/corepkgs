@@ -35,6 +35,6 @@ buildPythonPackage rec {
     description = "RE2 Python bindings";
     homepage = "https://github.com/google/re2";
     license = lib.licenses.bsd3;
-    maintainers = [ ];
+
   };
 }

@@ -325,7 +325,6 @@ python3.pkgs.buildPythonApplication rec {
       articles, books, ebooks, slideshows, web pages, man pages and blogs.
       AsciiDoc files can be translated to many formats including HTML, PDF,
       EPUB, man page.
-
       AsciiDoc is highly configurable: both the AsciiDoc source file syntax and
       the backend output markups (which can be almost any type of SGML/XML
       markup) can be customized and extended by the user.
@@ -338,6 +337,5 @@ python3.pkgs.buildPythonApplication rec {
     changelog = "https://github.com/asciidoc-py/asciidoc-py/blob/${version}/CHANGELOG.adoc";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 }

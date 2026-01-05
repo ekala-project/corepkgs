@@ -32,6 +32,5 @@ stdenv.mkDerivation {
     homepage = "https://github.com/patjak/mba6x_bl";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

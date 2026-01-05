@@ -34,7 +34,6 @@ stdenv.mkDerivation {
   '';
 
   meta = {
-    maintainers = [ ];
     homepage = "https://github.com/nix-community/acpi_call";
     platforms = lib.platforms.linux;
     description = "Module allowing arbitrary ACPI calls; use case: hybrid video";

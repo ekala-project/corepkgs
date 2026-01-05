@@ -44,7 +44,6 @@ stdenv.mkDerivation {
     description = "Kernel-based publish-subscribe system";
     homepage = "https://github.com/bob-linuxtoys/fanout";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 }

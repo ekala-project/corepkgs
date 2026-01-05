@@ -36,6 +36,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/pallets/pallets-sphinx-themes";
     description = "Sphinx theme for Pallets projects";
     license = lib.licenses.bsd3;
-    maintainers = [ ];
+
   };
 }

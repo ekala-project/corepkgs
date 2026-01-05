@@ -41,6 +41,5 @@ buildPythonPackage rec {
       and as such there is no stable, public API.
     '';
     license = with lib.licenses; [ mit ];
-    maintainers = [ ];
   };
 }

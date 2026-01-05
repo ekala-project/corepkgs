@@ -32,7 +32,6 @@ stdenv.mkDerivation rec {
   meta = {
     homepage = "https://www.gnu.org/software/sed/";
     description = "GNU sed, a batch stream editor";
-
     longDescription = ''
       Sed (stream editor) isn't really a true text editor or text
       processor.  Instead, it is used to filter text, i.e., it takes
@@ -41,11 +40,8 @@ stdenv.mkDerivation rec {
       extracting part of a file using pattern matching or substituting
       multiple occurrences of a string within a file.
     '';
-
     license = lib.licenses.gpl3Plus;
-
     platforms = lib.platforms.unix;
-    maintainers = [ ];
     mainProgram = "sed";
   };
 }

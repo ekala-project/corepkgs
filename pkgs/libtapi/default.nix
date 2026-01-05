@@ -163,7 +163,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/apple-oss-distributions/tapi/";
     license = lib.licenses.ncsa;
     mainProgram = "tapi";
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

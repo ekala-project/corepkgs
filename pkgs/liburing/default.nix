@@ -56,6 +56,5 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/axboe/liburing";
     license = lib.licenses.lgpl21;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

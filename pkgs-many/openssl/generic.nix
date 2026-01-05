@@ -393,7 +393,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Cryptographic library that implements the SSL and TLS protocols";
     license = lib.licenses.openssl;
     mainProgram = "openssl";
-    maintainers = [ ];
+
     pkgConfigModules = [
       "libcrypto"
       "libssl"

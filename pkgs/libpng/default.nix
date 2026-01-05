@@ -61,6 +61,5 @@ stdenv.mkDerivation (finalAttrs: {
       "libpng16"
     ];
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 })

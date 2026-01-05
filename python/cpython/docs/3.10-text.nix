@@ -19,6 +19,6 @@ stdenv.mkDerivation {
     cp -R ./ $out/share/doc/python310/text
   '';
   meta = {
-    maintainers = [ ];
+
   };
 }

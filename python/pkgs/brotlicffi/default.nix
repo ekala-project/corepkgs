@@ -52,6 +52,6 @@ buildPythonPackage rec {
     description = "Python CFFI bindings to the Brotli library";
     homepage = "https://github.com/python-hyper/brotlicffi";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

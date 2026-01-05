@@ -289,7 +289,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     homepage = "https://www.gtk.org/";
     license = lib.licenses.lgpl2Plus;
-    maintainers = [ ];
     pkgConfigModules = [
       "gdk-3.0"
       "gtk+-3.0"

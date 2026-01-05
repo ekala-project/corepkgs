@@ -92,7 +92,6 @@ let
         '';
         license = lib.licenses.gpl3Plus;
         platforms = lib.platforms.unix;
-        maintainers = [ ];
       }
       // lib.optionalAttrs (broken != null) { inherit broken; };
     }

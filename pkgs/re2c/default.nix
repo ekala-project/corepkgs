@@ -53,6 +53,5 @@ stdenv.mkDerivation rec {
     homepage = "https://re2c.org";
     license = lib.licenses.publicDomain;
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 }

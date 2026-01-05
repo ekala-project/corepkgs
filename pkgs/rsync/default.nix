@@ -89,7 +89,6 @@ stdenv.mkDerivation rec {
     homepage = "https://rsync.samba.org/";
     license = lib.licenses.gpl3Plus;
     mainProgram = "rsync";
-    maintainers = [ ];
     platforms = lib.platforms.unix;
     identifiers.cpeParts = {
       vendor = "samba";

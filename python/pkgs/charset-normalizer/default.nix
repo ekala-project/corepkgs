@@ -45,6 +45,6 @@ buildPythonPackage rec {
     homepage = "https://charset-normalizer.readthedocs.io/";
     changelog = "https://github.com/jawah/charset_normalizer/blob/${src.tag}/CHANGELOG.md";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

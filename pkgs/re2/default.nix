@@ -72,7 +72,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     license = lib.licenses.bsd3;
     homepage = "https://github.com/google/re2";
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

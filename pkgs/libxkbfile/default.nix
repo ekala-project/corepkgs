@@ -53,7 +53,6 @@ stdenv.mkDerivation (finalAttrs: {
       hpnd
       mitOpenGroup
     ];
-    maintainers = [ ];
     pkgConfigModules = [ "xkbfile" ];
     platforms = lib.platforms.unix;
   };

@@ -99,7 +99,6 @@ stdenv.mkDerivation rec {
     description = "Packet Capture Library";
     mainProgram = "pcap-config";
     platforms = lib.platforms.unix;
-    maintainers = [ ];
     license = lib.licenses.bsd3;
   };
 }

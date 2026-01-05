@@ -42,6 +42,6 @@ stdenvNoCC.mkDerivation {
       Format), is usually defined in a header like this.
     '';
     platforms = lib.platforms.all;
-    maintainers = [ ];
+
   };
 }

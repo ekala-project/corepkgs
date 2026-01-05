@@ -52,7 +52,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "LINBIT DRBD kernel module";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
     longDescription = ''
       DRBD is a software-based, shared-nothing, replicated storage solution
       mirroring the content of block devices (hard disks, partitions, logical volumes, and so on) between hosts.

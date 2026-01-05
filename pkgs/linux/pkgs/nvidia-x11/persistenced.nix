@@ -56,7 +56,6 @@ stdenv.mkDerivation {
     description = "NVIDIA driver persistence daemon";
     license = lib.licenses.mit;
     platforms = nvidia_x11.meta.platforms;
-    maintainers = [ ];
     mainProgram = "nvidia-persistenced";
   };
 }

@@ -51,6 +51,5 @@ stdenv.mkDerivation {
     homepage = "https://github.com/linux-apfs/linux-apfs-rw";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

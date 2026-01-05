@@ -65,7 +65,6 @@ stdenv.mkDerivation (finalAttrs: {
 
       Can be used with the "hardware.tuxedo-drivers" NixOS module.
     '';
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 })

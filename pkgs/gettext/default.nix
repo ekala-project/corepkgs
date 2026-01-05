@@ -109,7 +109,6 @@ stdenv.mkDerivation rec {
 
   meta = {
     description = "Well integrated set of translation tools and documentation";
-
     longDescription = ''
       Usually, programs are written and documented in English, and use
       English at execution time for interacting with users.  Using a common
@@ -128,10 +127,7 @@ stdenv.mkDerivation rec {
       utilities are a set of tools that provides a framework to help other
       GNU packages produce multi-lingual messages.
     '';
-
     homepage = "https://www.gnu.org/software/gettext/";
-
-    maintainers = [ ];
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.all;
   };

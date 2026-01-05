@@ -51,7 +51,6 @@ stdenv.mkDerivation (finalAttr: {
     license = with lib.licenses; [
       gpl2Only
     ];
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     broken = kernel.kernelOlder "5.15";
   };

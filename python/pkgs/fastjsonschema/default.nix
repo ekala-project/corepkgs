@@ -49,6 +49,6 @@ buildPythonPackage rec {
     downloadPage = "https://github.com/horejsek/python-fastjsonschema";
     homepage = "https://horejsek.github.io/python-fastjsonschema/";
     license = lib.licenses.bsd3;
-    maintainers = [ ];
+
   };
 }

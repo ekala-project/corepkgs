@@ -64,6 +64,5 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Firmware Test Suite";
     platforms = lib.platforms.linux;
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
   };
 })

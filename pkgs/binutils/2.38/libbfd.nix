@@ -76,7 +76,6 @@ stdenv.mkDerivation {
     '';
     homepage = "https://www.gnu.org/software/binutils/";
     license = lib.licenses.gpl3Plus;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 }

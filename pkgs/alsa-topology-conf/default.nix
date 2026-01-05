@@ -27,14 +27,11 @@ stdenv.mkDerivation rec {
   meta = {
     homepage = "https://www.alsa-project.org/";
     description = "ALSA topology configuration files";
-
     longDescription = ''
       The Advanced Linux Sound Architecture (ALSA) provides audio and
       MIDI functionality to the Linux-based operating system.
     '';
-
     license = lib.licenses.bsd3;
-    maintainers = [ ];
     platforms = lib.platforms.linux ++ lib.platforms.freebsd;
   };
 }

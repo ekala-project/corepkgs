@@ -85,12 +85,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
       It is recommended to use the latest kernel for the best compatibility.
       :::
     '';
-
     homepage = "https://github.com/sched-ext/scx/tree/main/scheds/rust";
     changelog = "https://github.com/sched-ext/scx/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
     badPlatforms = [ "aarch64-linux" ];
-    maintainers = [ ];
   };
 })

@@ -23,7 +23,6 @@ stdenv.mkDerivation {
     description = "Netlink support for MDIO devices";
     homepage = "https://github.com/wkz/mdio-tools";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 }

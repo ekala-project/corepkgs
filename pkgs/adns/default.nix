@@ -55,7 +55,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Asynchronous DNS resolver library";
     license = [
       lib.licenses.gpl3Plus
-
       # `adns.h` only
       lib.licenses.lgpl2Plus
     ];

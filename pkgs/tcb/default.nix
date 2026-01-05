@@ -62,6 +62,5 @@ stdenv.mkDerivation {
     homepage = "https://www.openwall.com/tcb/";
     license = lib.licenses.bsd3;
     platforms = lib.systems.inspect.patterns.isGnu;
-    maintainers = [ ];
   };
 }

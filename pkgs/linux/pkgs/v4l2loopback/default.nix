@@ -58,7 +58,6 @@ stdenv.mkDerivation rec {
     mainProgram = "v4l2loopback-ctl";
     homepage = "https://github.com/umlaeute/v4l2loopback";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     outputsToInstall = [ "out" ];
   };

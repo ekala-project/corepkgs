@@ -38,7 +38,6 @@ bash.runCommand "${pname}-${version}"
       description = "GNU zip compression program";
       homepage = "https://www.gnu.org/software/gzip";
       license = lib.licenses.gpl3Plus;
-      teams = [ lib.teams.minimal-bootstrap ];
       platforms = lib.platforms.unix;
     };
   }

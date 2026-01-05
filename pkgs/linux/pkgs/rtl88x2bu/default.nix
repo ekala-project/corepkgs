@@ -41,7 +41,6 @@ stdenv.mkDerivation {
     homepage = "https://github.com/RinCat/RTL88x2BU-Linux-Driver";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
     broken = kernel.kernelOlder "5.11";
   };
 }

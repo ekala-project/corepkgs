@@ -40,7 +40,6 @@ stdenv.mkDerivation rec {
     '';
     homepage = "https://github.com/troglobit/libite";
     platforms = with lib.platforms; linux ++ netbsd;
-    maintainers = [ ];
     license = with lib.licenses; [
       mit
       isc

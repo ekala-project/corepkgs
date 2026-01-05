@@ -43,6 +43,5 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/abbbi/nullfsvfs";
     license = lib.licenses.gpl3;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

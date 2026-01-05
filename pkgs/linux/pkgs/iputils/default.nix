@@ -95,6 +95,5 @@ stdenv.mkDerivation rec {
       bsd3
     ];
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

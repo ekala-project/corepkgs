@@ -37,7 +37,6 @@ buildRubyGem rec {
     homepage = "https://bundler.io";
     changelog = "https://github.com/rubygems/rubygems/blob/bundler-v${version}/bundler/CHANGELOG.md";
     license = lib.licenses.mit;
-    maintainers = [ ];
     mainProgram = "bundler";
   };
 }

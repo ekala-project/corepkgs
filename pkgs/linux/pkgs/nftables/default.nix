@@ -92,7 +92,6 @@ stdenv.mkDerivation rec {
     homepage = "https://netfilter.org/projects/nftables/";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
     mainProgram = "nft";
   };
 }

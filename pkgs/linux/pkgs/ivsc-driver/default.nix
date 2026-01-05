@@ -38,7 +38,6 @@ stdenv.mkDerivation {
     homepage = "https://github.com/intel/ivsc-driver";
     description = "Intel Vision Sensing Controller kernel driver";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = [ "x86_64-linux" ];
     # This module is in mainline now and upstream suggests using that
     # with recent kernels rather than the out-of-tree module.

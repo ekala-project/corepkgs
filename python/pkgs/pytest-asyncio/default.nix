@@ -51,6 +51,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/pytest-dev/pytest-asyncio";
     changelog = "https://github.com/pytest-dev/pytest-asyncio/blob/${src.tag}/docs/reference/changelog.rst";
     license = lib.licenses.asl20;
-    maintainers = [ ];
+
   };
 }

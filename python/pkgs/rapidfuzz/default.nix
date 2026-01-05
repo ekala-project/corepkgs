@@ -61,6 +61,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/maxbachmann/RapidFuzz";
     changelog = "https://github.com/maxbachmann/RapidFuzz/blob/${src.tag}/CHANGELOG.rst";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

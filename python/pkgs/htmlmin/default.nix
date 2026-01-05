@@ -32,6 +32,6 @@ buildPythonPackage rec {
     mainProgram = "htmlmin";
     homepage = "https://github.com/mankyd/htmlmin";
     license = lib.licenses.bsd3;
-    maintainers = [ ];
+
   };
 }

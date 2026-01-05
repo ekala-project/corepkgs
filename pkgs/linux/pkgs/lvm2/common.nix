@@ -241,6 +241,5 @@ stdenv.mkDerivation rec {
       bsd2
       lgpl21
     ];
-    maintainers = [ ];
   };
 }

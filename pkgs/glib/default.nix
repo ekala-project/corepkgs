@@ -368,14 +368,12 @@ stdenv.mkDerivation (finalAttrs: {
     description = "C library of programming buildings blocks";
     homepage = "https://gitlab.gnome.org/GNOME/glib";
     license = lib.licenses.lgpl21Plus;
-    maintainers = [ ];
     pkgConfigModules = [
       "gio-2.0"
       "gobject-2.0"
       "gthread-2.0"
     ];
     platforms = lib.platforms.unix ++ lib.platforms.windows;
-
     longDescription = ''
       GLib provides the core application building blocks for libraries
       and applications written in C.  It provides the core object

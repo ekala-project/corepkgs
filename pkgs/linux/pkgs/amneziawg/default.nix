@@ -46,7 +46,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Kernel module for the AmneziaWG";
     homepage = "https://amnezia.org";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 })

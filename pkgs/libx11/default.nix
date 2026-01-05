@@ -85,7 +85,6 @@ stdenv.mkDerivation (finalAttrs: {
       # upstream issue: https://gitlab.freedesktop.org/xorg/lib/libx11/-/issues/217
       # unfree
     ];
-    maintainers = [ ];
     pkgConfigModules = [
       "x11"
       "x11-xcb"

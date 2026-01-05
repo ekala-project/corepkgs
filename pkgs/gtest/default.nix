@@ -62,6 +62,5 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/google/googletest";
     license = lib.licenses.bsd3;
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 }

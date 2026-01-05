@@ -35,7 +35,6 @@ stdenv.mkDerivation {
     '';
     homepage = "https://github.com/gnif/LookingGlass";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     platforms = [ "x86_64-linux" ];
     broken = kernel.kernelOlder "5.3";
   };

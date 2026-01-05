@@ -19,6 +19,6 @@ stdenv.mkDerivation {
     cp ./python.info $out/share/info
   '';
   meta = {
-    maintainers = [ ];
+
   };
 }

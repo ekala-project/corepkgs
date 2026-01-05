@@ -104,6 +104,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/pypa/build";
     changelog = "https://github.com/pypa/build/blob/${src.tag}/CHANGELOG.rst";
     license = lib.licenses.mit;
-    maintainers = [ ];
+
   };
 }

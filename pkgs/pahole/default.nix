@@ -50,8 +50,6 @@ stdenv.mkDerivation rec {
     homepage = "https://git.kernel.org/pub/scm/devel/pahole/pahole.git/";
     description = "Shows, manipulates, and pretty-prints debugging information in DWARF, CTF, and BTF formats";
     license = lib.licenses.gpl2Only;
-
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 }

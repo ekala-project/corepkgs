@@ -51,7 +51,6 @@ stdenv.mkDerivation rec {
     mainProgram = "ply";
     homepage = "https://wkz.github.io/ply/";
     license = [ lib.licenses.gpl2Only ];
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 }

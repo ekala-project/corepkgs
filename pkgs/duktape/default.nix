@@ -47,7 +47,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://duktape.org/";
     downloadPage = "https://duktape.org/download.html";
     license = lib.licenses.mit;
-    maintainers = [ ];
     mainProgram = "duk";
     platforms = lib.platforms.all;
   };

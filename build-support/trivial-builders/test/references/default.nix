@@ -137,8 +137,5 @@ testers.runNixOSTest (
         ;
       inherit guestTestScriptBin;
     };
-    meta = {
-      maintainers = [ ];
-    };
   }
 )

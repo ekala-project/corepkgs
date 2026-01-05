@@ -130,7 +130,6 @@ stdenv.mkDerivation {
       we use that name here.
     '';
     homepage = "https://kernel.org";
-    maintainers = [ ];
     platforms = kernel.meta.platforms;
   };
 }
