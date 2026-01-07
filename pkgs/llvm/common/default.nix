@@ -22,7 +22,6 @@
   version ? null,
   patchesFn ? lib.id,
   cmake,
-  cmakeMinimal,
   python3,
   python3Minimal,
   # Allows passthrough to packages via newScope. This makes it possible to
@@ -491,7 +490,7 @@ makeScopeWithSplicing' {
         # Issue: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=77882
         stdenv = overrideCC stdenv buildLlvmPackages.clangNoLibcNoRt;
         # FIXME: This should almost certainly be `stdenv.hostPlatform`.
-        cmake = if stdenv.targetPlatform.libc == "llvm" then cmakeMinimal else cmake;
+        cmake = if stdenv.targetPlatform.libc == "llvm" then cmake.minimal else cmake;
         python3 = if stdenv.targetPlatform.libc == "llvm" then python3Minimal else python3;
       };
 
