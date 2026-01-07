@@ -1,6 +1,6 @@
 /*
   This file defines the composition for CPAN (Perl) packages.  It has
-  been factored out of all-packages.nix because there are so many of
+  been factored out of top-level.nix because there are so many of
   them.  Also, because most Nix expressions for CPAN packages are
   trivial, most are actually defined here.  I.e. there's no function
   for each package in a separate file: the call to the function would

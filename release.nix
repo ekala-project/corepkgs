@@ -40,7 +40,7 @@
   # Attributes passed to nixpkgs. Don't build packages marked as unfree.
   pkgsArgs ? {
     config = {
-      allowAliases = false; # TODO(corepkgs): false
+      allowAliases = true; # TODO(corepkgs): false
       allowUnfree = false;
       inHydra = true;
     };
