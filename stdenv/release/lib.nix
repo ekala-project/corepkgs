@@ -1,19 +1,21 @@
 {
   supportedSystems,
   system ? builtins.currentSystem,
-  packageSet ? (import ../.),
+  packageSet ? (import ../..),
   scrubJobs ? true,
-  # Attributes passed to nixpkgs. Don't build packages marked as unfree.
+  # Attributes passed to corepkgs. Don't build packages marked as unfree.
   pkgsArgs ? {
     config = {
+      allowAliases = true; # TODO(corepkgs): false
       allowUnfree = false;
       inHydra = true;
     };
+    __allowFileset = false;
   },
 }:
 
 let
-  lib = import ../lib.nix;
+  lib = import ../../lib.nix;
 
   inherit (lib)
     addMetaAttrs
@@ -195,20 +197,30 @@ let
     maintainers = [ ];
   });
 
+  # Recursive for packages and apply a function to them
+  recursiveMapPackages =
+    f:
+    mapAttrs (
+      name: value:
+      if isDerivation value then
+        f value
+      else if value.recurseForDerivations or false || value.recurseForRelease or false then
+        recursiveMapPackages f value
+      else
+        [ ]
+    );
+
+  # Gets the list of Hydra platforms for a derivation
+  getPlatforms =
+    drv:
+    drv.meta.hydraPlatforms
+      or (subtractLists (drv.meta.badPlatforms or [ ]) (drv.meta.platforms or supportedSystems));
+
   /*
     Recursively map a (nested) set of derivations to an isomorphic
     set of meta.platforms values.
   */
-  packagePlatforms = mapAttrs (
-    name: value:
-    if isDerivation value then
-      value.meta.hydraPlatforms
-        or (subtractLists (value.meta.badPlatforms or [ ]) (value.meta.platforms or [ "x86_64-linux" ]))
-    else if value.recurseForDerivations or false || value.recurseForRelease or false then
-      packagePlatforms value
-    else
-      [ ]
-  );
+  packagePlatforms = recursiveMapPackages getPlatforms;
 
 in
 {
@@ -229,6 +241,8 @@ in
     lib
     mapTestOn
     mapTestOnCross
+    recursiveMapPackages
+    getPlatforms
     packagePlatforms
     pkgs
     pkgsFor

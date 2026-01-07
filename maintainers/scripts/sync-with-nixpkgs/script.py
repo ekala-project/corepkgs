@@ -40,6 +40,7 @@ PATTERN_ALIASES = [
     (r"\blibX11\b", "libx11"),
     (r"\bdocbook_xsl\b", "docbook-xsl-nons"),
     (r"\bdocbook_xsl_ns\b", "docbook-xsl-ns"),
+    (r"\bnixpkgsArgs\b", "pkgsArgs"),
 ]
 
 # Regex patterns for lines that should be filtered out from diffs.
@@ -80,7 +81,6 @@ CHECK_NEW_FILES = [
     "common-updater",
     "pkgs",
     "python",
-    "stdenv",
     "systems",
 ]
 
@@ -102,6 +102,8 @@ IGNORE_DIRS = [
     "stdenv/cygwin",
     "stdenv/darwin",
     "stdenv/freebsd",
+    # "stdenv/linux/bootstrap-files", # lets wait for minimal-bootstrap
+
 ]
 
 # Should not be checked for patches at all
@@ -115,7 +117,7 @@ IGNORE_FILES = [
     "lib.nix",
     "pins.nix",
     "top-level.nix",
-    "stdenv/aliases.nix",
+    "stdenv/aliases.nix", # we have our own aliases
 ]
 
 # Patches for these directories should be grouped by folders
@@ -163,6 +165,7 @@ PATH_MAPPINGS = {
     "stdenv/config.nix": "pkgs/top-level/config.nix",
     "stdenv/impure.nix": "pkgs/top-level/impure.nix",
     "stdenv/pure.nix": "pkgs/top-level/default.nix",
+    "stdenv/release/lib.nix": "pkgs/top-level/release-lib.nix",
     "stdenv/splice.nix": "pkgs/top-level/splice.nix",
     "stdenv/stage.nix": "pkgs/top-level/stage.nix",
     "stdenv/variants.nix": "pkgs/top-level/variants.nix",

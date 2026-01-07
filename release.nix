@@ -40,9 +40,12 @@
   # Attributes passed to nixpkgs. Don't build packages marked as unfree.
   pkgsArgs ? {
     config = {
+      allowAliases = false; # TODO(corepkgs): false
       allowUnfree = false;
       inHydra = true;
     };
+
+    __allowFileset = false;
   },
 
   # This flag, if set to true, will inhibit the use of `mapTestOn`
@@ -60,30 +63,19 @@
 }:
 
 let
-  pins = import ./pins.nix;
-  stdenv = import pins.stdenvRepo pkgsArgs;
-
-  release-lib = stdenv.mkReleaseLib {
+  release-lib = import ./stdenv/release/lib.nix {
     inherit
       supportedSystems
       scrubJobs
       pkgsArgs
       system
       ;
-    packageSet = import ./.;
   };
 
   inherit (release-lib) mapTestOn pkgs;
 
   inherit (release-lib.lib)
-    collect
-    elem
-    genAttrs
-    hasInfix
-    hasSuffix
     id
-    isDerivation
-    optionals
     ;
 
   inherit (release-lib.lib.attrsets) unionOfDisjoint;
