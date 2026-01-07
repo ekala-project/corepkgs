@@ -4,7 +4,7 @@ in
 
 {
   stdenv,
-  autoconf269,
+  autoconf,
   automake,
   libtool,
   bison,
@@ -153,7 +153,7 @@ stdenv.mkDerivation (finalAttrs: {
     perl
   ]
   ++ lib.optionals buildPlatform.isDarwin [
-    autoconf269
+    autoconf.v2_69
     automake
     gettext
     libtool
