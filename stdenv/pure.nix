@@ -32,7 +32,6 @@
 
   # Temporary hack to let Nixpkgs forbid internal use of `lib.fileset`
   # until <https://github.com/NixOS/nix/issues/11503> is fixed.
-  # TODO(corepkgs): this was fixed, remove this https://github.com/NixOS/nixpkgs/commit/8725e466ef2bcc5be69106c16dbf69b9ef989273
   __allowFileset ? true,
 
   # Allow for users to pass modules for the evaluation of pkgs.config
@@ -138,10 +137,10 @@ let
 
   # A few packages make a new package set to draw their dependencies from.
   # (Currently to get a cross tool chain, or forced-i686 package.) Rather than
-  # give `all-packages.nix` all the arguments to this function, even ones that
+  # give `top-level.nix` all the arguments to this function, even ones that
   # don't concern it, we give it this function to "re-call" nixpkgs, inheriting
   # whatever arguments it doesn't explicitly provide. This way,
-  # `all-packages.nix` doesn't know more than it needs too.
+  # `top-level.nix` doesn't know more than it needs too.
   #
   # It's OK that `args` doesn't include default arguments from this file:
   # they'll be deterministically inferred. In fact we must *not* include them,

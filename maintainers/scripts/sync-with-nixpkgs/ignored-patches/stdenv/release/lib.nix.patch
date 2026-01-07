@@ -1,0 +1,45 @@
+--- a/stdenv/release/lib.nix
++++ b/stdenv/release/lib.nix
+@@ -3,10 +3,10 @@
+   system ? builtins.currentSystem,
+   packageSet ? (import ../..),
+   scrubJobs ? true,
+-  # Attributes passed to corepkgs. Don't build packages marked as unfree.
++  # Attributes passed to nixpkgs. Don't build packages marked as unfree.
+   pkgsArgs ? {
+     config = {
+-      allowAliases = true; # TODO(corepkgs): false
++      allowAliases = false;
+       allowUnfree = false;
+       inHydra = true;
+     };
+@@ -15,7 +15,7 @@
+ }:
+
+ let
+-  lib = import ../../lib.nix;
++  lib = import ../../lib;
+
+   inherit (lib)
+     addMetaAttrs
+@@ -29,6 +29,7 @@
+     id
+     isDerivation
+     lists
++    maintainers
+     mapAttrs
+     mapAttrs'
+     mapAttrsRecursive
+@@ -150,6 +151,13 @@
+     else
+       pkgs.runCommand "evaluated-to-false" { } "false";
+
++  /*
++    The working or failing mails for cross builds will be sent only to
++    the following maintainers, as most package maintainers will not be
++    interested in the result of cross building a package.
++  */
++  crossMaintainers = [ ];
++
+   # Generate attributes for all supported systems.
+   forAllSystems = genAttrs supportedSystems;

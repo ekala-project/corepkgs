@@ -96,7 +96,7 @@ let
                 overrides
               ]
             );
-            aliases = self: super: lib.optionalAttrs config.allowAliases (import ./aliases.nix self super);
+            aliases = self: super: lib.optionalAttrs config.allowAliases (import ./aliases.nix lib self super);
           in
           makeScopeWithSplicing' {
             inherit otherSplices keep;

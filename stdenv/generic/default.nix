@@ -23,7 +23,7 @@ let
       disallowedRequisites ? [ ],
 
       # The `fetchurl' to use for downloading curl and its dependencies
-      # (see all-packages.nix).
+      # (see top-level.nix).
       fetchurlBoot,
 
       setupScript ? ./setup.sh,
@@ -223,7 +223,7 @@ let
 
     # Propagate any extra attributes.  For instance, we use this to
     # "lift" packages like curl from the final stdenv for Linux to
-    # all-packages.nix for that platform (meaning that it has a line
+    # top-level.nix for that platform (meaning that it has a line
     # like curl = if stdenv ? curl then stdenv.curl else ...).
     // extraAttrs
   );

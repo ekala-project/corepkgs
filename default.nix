@@ -8,7 +8,7 @@ let
 
   inherit (pins) lib;
 
-  filteredArgs = builtins.removeAttrs args [ "overlays" ];
+  filteredArgs = removeAttrs args [ "overlays" ];
   pkgs = import ./stdenv/impure.nix (
     {
       inherit overlays;

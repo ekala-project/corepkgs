@@ -1,0 +1,9 @@
+--- a/stdenv/splice.nix
++++ b/stdenv/splice.nix
+@@ -137,7 +137,6 @@
+   callPackage = pkgs.newScope { };
+
+   callPackages = lib.callPackagesWith pkgsForCall;
+-  callFromScope = lib.callFromScopeWith splicedPackages;
+
+   newScope = extra: lib.callPackageWith (pkgsForCall // extra);

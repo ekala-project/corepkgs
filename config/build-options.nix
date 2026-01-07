@@ -9,7 +9,7 @@ let
   mkMassRebuild =
     args:
     mkOption (
-      builtins.removeAttrs args [ "feature" ]
+      lib.removeAttrs args [ "feature" ]
       // {
         type = args.type or (types.uniq types.bool);
         default = args.default or false;
@@ -39,6 +39,12 @@ in
     warnings = mkOption {
       type = types.listOf types.str;
       default = [ ];
+      internal = true;
+    };
+
+    inHydra = mkOption {
+      type = types.bool;
+      default = false;
       internal = true;
     };
 

@@ -483,8 +483,8 @@ with final;
     lib.recurseIntoAttrs xorgPackages;
 
   # TODO(corepkgs): use mkManyVariants
-  autoreconfHook269 = autoreconfHook.override { autoconf = autoconf269; };
-  autoreconfHook271 = autoreconfHook.override { autoconf = autoconf271; };
+  autoreconfHook269 = autoreconfHook.override { autoconf = autoconf.v2_69; };
+  autoreconfHook271 = autoreconfHook.override { autoconf = autoconf.v2_71; };
 
   dbus = callPackage ./pkgs/dbus { };
   makeDBusConf = callPackage ./pkgs/dbus/make-dbus-conf.nix { };
@@ -1678,8 +1678,6 @@ with final;
 
   makeFontsConf = callPackage ./build-support/make-fonts-conf { };
   makeFontsCache = callPackage ./build-support/make-fonts-cache { };
-
-  cmakeMinimal = prev.cmake.minimal;
 
   gtk3 = callPackage ./pkgs/gtk/3.x.nix { };
   gtk4 = callPackage ./pkgs/gtk/4.x.nix { };

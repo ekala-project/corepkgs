@@ -1,0 +1,9 @@
+--- a/stdenv/linux/make-bootstrap-tools.nix
++++ b/stdenv/linux/make-bootstrap-tools.nix
+@@ -1,5 +1,5 @@
+ {
+-  pkgs ? import ../.. { },
++  pkgs ? import ../../.. { },
+ }:
+
+ let

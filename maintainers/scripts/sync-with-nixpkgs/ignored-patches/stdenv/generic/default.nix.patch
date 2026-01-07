@@ -1,0 +1,36 @@
+--- a/stdenv/generic/default.nix
++++ b/stdenv/generic/default.nix
+@@ -1,5 +1,5 @@
+ let
+-  lib = import ../../lib.nix;
++  lib = import ../../../lib;
+   stdenv-overridable = lib.makeOverridable (
+
+     argsStdenv@{
+@@ -23,7 +23,7 @@
+       disallowedRequisites ? [ ],
+
+       # The `fetchurl' to use for downloading curl and its dependencies
+-      # (see top-level.nix).
++      # (see all-packages.nix).
+       fetchurlBoot,
+
+       setupScript ? ./setup.sh,
+@@ -202,8 +202,6 @@
+
+       mkDerivation = mkDerivationFromStdenv stdenv;
+
+-      isCross = hostPlatform != buildPlatform;
+-
+       inherit fetchurlBoot;
+
+       inherit overrides;
+@@ -223,7 +221,7 @@
+
+     # Propagate any extra attributes.  For instance, we use this to
+     # "lift" packages like curl from the final stdenv for Linux to
+-    # top-level.nix for that platform (meaning that it has a line
++    # all-packages.nix for that platform (meaning that it has a line
+     # like curl = if stdenv ? curl then stdenv.curl else ...).
+     // extraAttrs
+   );

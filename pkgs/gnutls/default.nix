@@ -45,7 +45,7 @@
 
 let
   # break cyclic dependency
-  autoconf = buildPackages.autoconf269;
+  autoconf = buildPackages.autoconf.v2_69;
 
   # XXX: Gnulib's `test-select' fails on FreeBSD:
   # https://hydra.nixos.org/build/2962084/nixlog/1/raw .

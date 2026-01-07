@@ -1,0 +1,88 @@
+--- a/stdenv/pure.nix
++++ b/stdenv/pure.nix
+@@ -34,10 +34,6 @@
+   # until <https://github.com/NixOS/nix/issues/11503> is fixed.
+   __allowFileset ? true,
+
+-  # Allow for users to pass modules for the evaluation of pkgs.config
+-  # TODO(corepkgs): document this
+-  modules ? [ ],
+-
+   # List of overlays layers used to extend Nixpkgs.
+   overlays ? [ ],
+
+@@ -47,7 +43,7 @@
+   # A function booting the final package set for a specific standard
+   # environment. See below for the arguments given to that function, the type of
+   # list it returns.
+-  stdenvStages ? import ./.,
++  stdenvStages ? import ../stdenv,
+
+   # Ignore unexpected args.
+   ...
+@@ -59,7 +55,7 @@
+
+ in
+ let
+-  pristineLib = import ../lib.nix;
++  pristineLib = import ../../lib;
+
+   lib =
+     if __allowFileset then
+@@ -113,13 +109,11 @@
+   # Allow both:
+   # { /* the config */ } and
+   # { pkgs, ... } : { /* the config */ }
+-  config1 = if lib.isFunction config0 then config0 { inherit pkgs; } else config0;
++  config1 = if lib.isFunction config0 then config0 { inherit lib pkgs; } else config0;
+
+   configEval = lib.evalModules {
+     modules = [
+-      ../config/build-options.nix
+-      ../config/package-options.nix
+-      ../config/overlays.nix
++      ./config.nix
+       (
+         { options, ... }:
+         {
+@@ -127,8 +121,7 @@
+           config = config1;
+         }
+       )
+-    ]
+-    ++ modules;
++    ];
+     class = "nixpkgsConfig";
+   };
+
+@@ -137,10 +130,10 @@
+
+   # A few packages make a new package set to draw their dependencies from.
+   # (Currently to get a cross tool chain, or forced-i686 package.) Rather than
+-  # give `top-level.nix` all the arguments to this function, even ones that
++  # give `all-packages.nix` all the arguments to this function, even ones that
+   # don't concern it, we give it this function to "re-call" nixpkgs, inheriting
+   # whatever arguments it doesn't explicitly provide. This way,
+-  # `top-level.nix` doesn't know more than it needs too.
++  # `all-packages.nix` doesn't know more than it needs too.
+   #
+   # It's OK that `args` doesn't include default arguments from this file:
+   # they'll be deterministically inferred. In fact we must *not* include them,
+@@ -160,7 +153,7 @@
+   # via `evalModules` is not idempotent. In other words, if you add `config` to
+   # `newArgs`, expect strange very hard to debug errors! (Yes, I'm speaking from
+   # experience here.)
+-  nixpkgsFun = newArgs: import ../. (args // newArgs);
++  nixpkgsFun = newArgs: import ./. (args // newArgs);
+
+   # Partially apply some arguments for building bootstrapping stage pkgs
+   # sets. Only apply arguments which no stdenv would want to override.
+@@ -173,7 +166,7 @@
+       // newArgs
+     );
+
+-  boot = import ./booter.nix { inherit lib allPackages; };
++  boot = import ../stdenv/booter.nix { inherit lib allPackages; };
+
+   stages = stdenvStages {
+     inherit
