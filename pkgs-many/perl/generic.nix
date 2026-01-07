@@ -26,6 +26,7 @@
   makeWrapper,
   enableCrypt ? true,
   libxcrypt ? null,
+  self ? null,
   overrides ? config.perlPackageOverrides or (p: { }), # TODO: (self: super: {}) like in python
 }@inputs:
 

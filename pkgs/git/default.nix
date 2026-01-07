@@ -38,8 +38,7 @@
   nlsSupport ? true,
   osxkeychainSupport ? stdenv.hostPlatform.isDarwin,
   guiSupport ? false,
-  # TODO(corepkgs): build with manual by default?
-  withManual ? false,
+  withManual ? true,
   pythonSupport ? true,
   withpcre2 ? true,
   withZlibNg ? true,
