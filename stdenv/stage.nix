@@ -167,7 +167,7 @@ let
 
   splice = self: super: import ./splice.nix lib self (adjacentPackages != null);
 
-  aliases = self: super: lib.optionalAttrs config.allowAliases (import ./aliases.nix self super);
+  aliases = self: super: lib.optionalAttrs config.allowAliases (import ./aliases.nix lib self super);
 
   variants =
     self: super:
