@@ -1,0 +1,91 @@
+--- a/stdenv/stage.nix
++++ b/stdenv/stage.nix
+@@ -9,6 +9,14 @@
+   arguments. Normal users should not import this directly but instead
+   import `pkgs/default.nix` or `default.nix`.
+ */
++
++let
++  # An overlay to auto-call packages in ../by-name.
++  # By defining it at the top of the file,
++  # this value gets reused even if this file is imported multiple times,
++  # thanks to Nix's import-value cache.
++  autoCalledPackages = import ./by-name-overlay.nix ../by-name;
++in
+
+ {
+   ## Misc parameters kept the same for all stages
+@@ -110,7 +118,7 @@
+   stdenvAdapters =
+     self: super:
+     let
+-      res = import ./adapters.nix {
++      res = import ../stdenv/adapters.nix {
+         inherit lib config;
+         pkgs = self;
+       };
+@@ -118,7 +126,6 @@
+     res
+     // {
+       stdenvAdapters = res;
+-      inherit config;
+     };
+
+   trivialBuilders =
+@@ -127,7 +134,8 @@
+       inherit lib;
+       inherit (self) config;
+       inherit (self) runtimeShell stdenv stdenvNoCC;
+-      inherit (self.pkgsBuildHost) jq shellcheck-minimal lndir;
++      inherit (self.pkgsBuildHost) jq shellcheck-minimal;
++      inherit (self.pkgsBuildHost.xorg) lndir;
+     };
+
+   stdenvBootstappingAndPlatforms =
+@@ -166,6 +174,20 @@
+     };
+
+   splice = self: super: import ./splice.nix lib self (adjacentPackages != null);
++
++  allPackages =
++    self: super:
++    let
++      res = import ./all-packages.nix {
++        inherit
++          lib
++          noSysDirs
++          config
++          overlays
++          ;
++      } res self super;
++    in
++    res;
+
+   aliases = self: super: lib.optionalAttrs config.allowAliases (import ./aliases.nix lib self super);
+
+@@ -309,22 +331,17 @@
+     };
+   };
+
+-  pkgsOverlay = lib.packageSets.mkAutoCalledPackageDir ../pkgs;
+-  pkgsManyVariantOverlay = lib.packageSets.mkAutoCalledManyVariantsDir ../pkgs-many;
+-  toplevelOverrides = import ../top-level.nix;
+-
+   # The complete chain of package set builders, applied from top to bottom.
+   # stdenvOverlays must be last as it brings package forward from the
+   # previous bootstrapping phases which have already been overlaid.
+-  toFix = lib.foldl' (lib.flip lib.extends) (self: { inherit lib; }) (
++  toFix = lib.foldl' (lib.flip lib.extends) (self: { }) (
+     [
+       stdenvBootstappingAndPlatforms
+       stdenvAdapters
+       trivialBuilders
+       splice
+-      pkgsOverlay
+-      pkgsManyVariantOverlay
+-      toplevelOverrides
++      autoCalledPackages
++      allPackages
+       otherPackageSets
+       aliases
+       variants

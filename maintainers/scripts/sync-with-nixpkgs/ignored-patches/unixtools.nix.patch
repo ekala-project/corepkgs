@@ -1,0 +1,15 @@
+--- a/unixtools.nix
++++ b/unixtools.nix
+@@ -249,9 +249,9 @@
+
+       # watch is the only command from procps that builds currently on
+       # Darwin/FreeBSD. Unfortunately no other implementations exist currently!
+-      darwin = pkgs.procps-ng { };
+-      freebsd = pkgs.procps-ng { };
+-      openbsd = pkgs.procps-ng { };
++      darwin = pkgs.callPackage ./procps-ng { };
++      freebsd = pkgs.callPackage ./procps-ng { };
++      openbsd = pkgs.callPackage ./procps-ng { };
+     };
+     write = {
+       linux = pkgs.util-linux;

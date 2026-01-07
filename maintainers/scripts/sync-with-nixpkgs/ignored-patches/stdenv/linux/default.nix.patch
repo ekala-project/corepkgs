@@ -1,0 +1,39 @@
+--- a/stdenv/linux/default.nix
++++ b/stdenv/linux/default.nix
+@@ -193,6 +193,7 @@
+
+         fetchurlBoot = import ../../build-support/fetchurl/boot.nix {
+           inherit system;
++          inherit (config) rewriteURL;
+         };
+
+         cc =
+@@ -606,7 +607,7 @@
+     assert isBuiltByNixpkgsCompiler prevStage.patchelf;
+     assert lib.all isBuiltByNixpkgsCompiler [
+       prevStage.gmp
+-      prevStage.isl
++      prevStage.isl_0_20
+       prevStage.libmpc
+       prevStage.mpfr
+     ];
+@@ -909,7 +910,7 @@
+             ${localSystem.libc} = prevStage.${localSystem.libc};
+
+             # Hack: avoid libidn2.{bin,dev} referencing bootstrap tools.  There's a logical cycle.
+-            libidn2 = import ../../pkgs/libidn2/no-bootstrap-reference.nix {
++            libidn2 = import ../../development/libraries/libidn2/no-bootstrap-reference.nix {
+               inherit lib;
+               inherit (prevStage) libidn2;
+               inherit (self)
+@@ -944,9 +945,7 @@
+     assert isBuiltByNixpkgsCompiler prevStage.gnugrep;
+     assert isBuiltByNixpkgsCompiler prevStage.patchelf;
+     {
+-      inherit (prevStage) config stdenv;
+-      # TODO(corepkgs): is this a bug in nixpkgs?
+-      inherit overlays;
++      inherit (prevStage) config overlays stdenv;
+     }
+   )
+ ]
