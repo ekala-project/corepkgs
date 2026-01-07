@@ -32,7 +32,6 @@
 
   # Temporary hack to let Nixpkgs forbid internal use of `lib.fileset`
   # until <https://github.com/NixOS/nix/issues/11503> is fixed.
-  # TODO(corepkgs): this was fixed, remove this https://github.com/NixOS/nixpkgs/commit/8725e466ef2bcc5be69106c16dbf69b9ef989273
   __allowFileset ? true,
 
   # Allow for users to pass modules for the evaluation of pkgs.config
