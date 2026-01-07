@@ -3,7 +3,7 @@
   stdenv,
   fetchFromGitHub,
   fetchpatch,
-  cmakeMinimal,
+  cmake,
   bashNonInteractive,
   gnugrep,
   fixDarwinDylibNames,
@@ -39,8 +39,8 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   nativeBuildInputs = [
-    cmakeMinimal
-    cmakeMinimal.configurePhaseHook
+    cmake.minimal
+    cmake.configurePhaseHook
   ]
   ++ lib.optional stdenv.hostPlatform.isDarwin fixDarwinDylibNames;
   buildInputs = lib.optional stdenv.hostPlatform.isUnix bashNonInteractive;
