@@ -18,6 +18,7 @@ let
     aliases: lib.mapAttrs (n: alias: removeRecurseForDerivations (checkInPkgs n alias)) aliases;
 in
 with pkgs;
+# These largely reflect Nixpkgs aliases
 mapAliases {
   # keep-sorted start
   autoconf269 = autoconf.v2_69;
@@ -27,6 +28,10 @@ mapAliases {
   cmakeMinimal = cmake.minimal;
   go_1_24 = go.v1_24;
   go_1_25 = go.v1_25;
+  guile_1_8 = guile.v1_8;
+  guile_2_0 = guile.v2_0;
+  guile_2_2 = guile.v2_2;
+  guile_3_0 = guile.v3_0;
   perl538 = perl.v5_38;
   perl540 = perl.v5_40;
   tcl-8_5 = tcl.v8_5;
