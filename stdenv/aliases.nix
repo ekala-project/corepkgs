@@ -30,6 +30,8 @@ mapAliases {
   cmakeMinimal = cmake.minimal;
   go_1_24 = go.v1_24;
   go_1_25 = go.v1_25;
+  gmp6 = gmp.variants.v6_3;
+  gmpxx = gmp.variants.cxx;
   guile_1_8 = guile.v1_8;
   guile_2_0 = guile.v2_0;
   guile_2_2 = guile.v2_2;
