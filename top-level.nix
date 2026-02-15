@@ -404,17 +404,17 @@ with final;
 
   # Held back 2.38 release. Remove once all dependencies are ported to 2.39.
   binutils-unwrapped_2_38 = callPackage ./pkgs/binutils/2.38 {
-    autoreconfHook = autoreconfHook269;
+    autoreconfHook = autoconf.v2_69.autoreconfHook;
     # FHS sys dirs presumably only have stuff for the build platform
     noSysDirs = (stdenv.targetPlatform != stdenv.hostPlatform) || noSysDirs;
   };
 
   libbfd_2_38 = callPackage ./pkgs/binutils/2.38/libbfd.nix {
-    autoreconfHook = buildPackages.autoreconfHook269;
+    autoreconfHook = buildPackages.autoconf.v2_69.autoreconfHook;
   };
 
   libopcodes_2_38 = callPackage ./pkgs/binutils/2.38/libopcodes.nix {
-    autoreconfHook = buildPackages.autoreconfHook269;
+    autoreconfHook = buildPackages.autoconf.v2_69.autoreconfHook;
   };
 
   # Here we select the default bintools implementations to be used.  Note when
@@ -484,9 +484,6 @@ with final;
     in
     lib.recurseIntoAttrs xorgPackages;
 
-  # TODO(corepkgs): use mkManyVariants
-  autoreconfHook269 = autoreconfHook.override { autoconf = autoconf.v2_69; };
-  autoreconfHook271 = autoreconfHook.override { autoconf = autoconf.v2_71; };
 
   dbus = callPackage ./pkgs/dbus { };
   makeDBusConf = callPackage ./pkgs/dbus/make-dbus-conf.nix { };

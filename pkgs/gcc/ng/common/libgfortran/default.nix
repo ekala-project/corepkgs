@@ -7,7 +7,7 @@
   version,
   getVersionFile,
   monorepoSrc ? null,
-  autoreconfHook269,
+  autoconf,
   libiberty,
   buildPackages,
   libgcc,
@@ -28,7 +28,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   depsBuildBuild = [ buildPackages.stdenv.cc ];
   nativeBuildInputs = [
-    autoreconfHook269
+    autoconf.v2_69.autoreconfHook
     libiberty
     gfortran
   ];

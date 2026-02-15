@@ -4,8 +4,9 @@
   patches ? [ ],
   packageAtLeast,
   packageOlder,
+  mkVariantPassthru,
   ...
-}:
+}@variantArgs:
 
 {
   lib,
@@ -14,6 +15,7 @@
   m4,
   perl,
   texinfo,
+  callPackage,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -21,7 +23,7 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation {
+stdenv.mkDerivation (finalAttrs: {
   pname = "autoconf";
   inherit version;
 
@@ -98,4 +100,10 @@ stdenv.mkDerivation {
 
     platforms = lib.platforms.all;
   };
-}
+
+  passthru = mkVariantPassthru variantArgs // {
+    autoreconfHook = callPackage ../../pkgs/autoreconfHook {
+      autoconf = finalAttrs.finalPackage;
+    };
+  };
+})
