@@ -25,6 +25,8 @@ mapAliases {
   autoconf271 = autoconf.v2_71;
   automake116x = automake.v1_16;
   automake118x = automake.v1_18;
+  autoreconfHook269 = autoconf.v2_69.autoreconfHook;
+  autoreconfHook271 = autoconf.v2_71.autoreconfHook;
   cmakeMinimal = cmake.minimal;
   go_1_24 = go.v1_24;
   go_1_25 = go.v1_25;
