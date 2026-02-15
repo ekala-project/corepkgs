@@ -7,7 +7,7 @@
   getVersionFile,
   monorepoSrc ? null,
   fetchpatch,
-  autoreconfHook269,
+  autoconf,
   buildGccPackages,
   buildPackages,
   which,
@@ -32,7 +32,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   nativeBuildInputs = [
-    autoreconfHook269
+    autoconf.v2_69.autoreconfHook
     which
     python3
   ];

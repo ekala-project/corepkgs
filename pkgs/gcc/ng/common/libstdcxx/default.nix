@@ -7,7 +7,7 @@
   getVersionFile,
   monorepoSrc ? null,
   fetchpatch,
-  autoreconfHook269,
+  autoconf,
   runCommand,
   gettext,
 }:
@@ -77,7 +77,7 @@ stdenv.mkDerivation (finalAttrs: {
   enableParallelBuilding = true;
 
   nativeBuildInputs = [
-    autoreconfHook269
+    autoconf.v2_69.autoreconfHook
     gettext
   ];
 

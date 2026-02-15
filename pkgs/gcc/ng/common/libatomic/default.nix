@@ -7,7 +7,7 @@
   getVersionFile,
   monorepoSrc ? null,
   fetchpatch,
-  autoreconfHook269,
+  autoconf,
   runCommand,
 }:
 stdenv.mkDerivation (finalAttrs: {
@@ -63,7 +63,7 @@ stdenv.mkDerivation (finalAttrs: {
   enableParallelBuilding = true;
 
   nativeBuildInputs = [
-    autoreconfHook269
+    autoconf.v2_69.autoreconfHook
   ];
 
   configurePlatforms = [

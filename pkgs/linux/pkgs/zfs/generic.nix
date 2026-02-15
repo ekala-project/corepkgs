@@ -4,7 +4,7 @@ let
       lib,
       stdenv,
       fetchFromGitHub,
-      autoreconfHook269,
+      autoconf,
       util-linux,
       nukeReferences,
       coreutils,
@@ -176,7 +176,7 @@ let
         '';
 
       nativeBuildInputs = [
-        autoreconfHook269
+        autoconf.v2_69.autoreconfHook
         nukeReferences
       ]
       ++ optionals buildKernel (kernel.moduleBuildDependencies ++ [ perl ])
