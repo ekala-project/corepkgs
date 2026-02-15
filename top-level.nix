@@ -1055,9 +1055,8 @@ with final;
   };
   bashInteractiveFHS = bashFHS;
 
-  # TODO(corepkgs): use mkManyVariants
-  flex_2_5_35 = callPackage ./pkgs/flex/2.5.35.nix { };
-  flex = callPackage ./pkgs/flex { };
+  flex = callPackage ./pkgs-many/flex { };
+  flex_2_5_35 = flex.v2_5_35;
 
   # Python interpreters. All standard library modules are included except for tkinter, which is
   # available as `pythonPackages.tkinter` and can be used as any other Python package.
