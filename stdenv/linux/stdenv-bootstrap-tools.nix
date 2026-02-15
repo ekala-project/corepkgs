@@ -12,7 +12,7 @@
   diffutils,
   findutils,
   gawk,
-  gmpxx,
+  gmp,
   gnugrep,
   gnumake,
   gnused,
@@ -152,7 +152,7 @@ stdenv.mkDerivation (finalAttrs: {
     rm -rf $out/include/c++/*/ext/pb_ds
     rm -rf $out/include/c++/*/ext/parallel
 
-    cp -d ${gmpxx.out}/lib/libgmp*.so* $out/lib
+    cp -d ${gmp.withCxx.out}/lib/libgmp*.so* $out/lib
     cp -d ${mpfr.out}/lib/libmpfr*.so* $out/lib
     cp -d ${libmpc.out}/lib/libmpc*.so* $out/lib
     cp -d ${zlib.out}/lib/libz.so* $out/lib

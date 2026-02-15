@@ -399,7 +399,6 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
           patchelf
           ;
         ${localSystem.libc} = prevStage.${localSystem.libc};
-        gmp = super.gmp.override { cxx = false; };
         # This stage also rebuilds binutils which will of course be used only in the next stage.
         # We inherit this until stage3, in stage4 it will be rebuilt using the adjacent bash/runtimeShell pkg.
         # TODO(@sternenseemann): Can we already build the wrapper with the actual runtimeShell here?
@@ -633,7 +632,6 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
           # We build a special copy of libgmp which doesn't use libstdc++, because
           # xgcc++'s libstdc++ references the bootstrap-files (which is what
           # compiles xgcc++).
-          gmp = super.gmp.override { cxx = false; };
         }
         // {
           ${localSystem.libc} = prevStage.${localSystem.libc};

@@ -1149,11 +1149,6 @@ with final;
     makeLinuxHeaders
     ;
 
-  # TODO(corepkgs): use mkManyVariants
-  gmp6 = callPackage ./pkgs/gmp/6.x.nix { };
-  gmp = gmp6;
-  gmpxx = gmp.override { cxx = true; };
-
   # while building documentation meson may want to run binaries for host
   # which needs an emulator
   # example of an error which this fixes
