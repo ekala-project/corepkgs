@@ -8,6 +8,8 @@
   mingw-linking-patch ? null,
   withDocs ? false,
   extraMeta ? { },
+  needsOQSProvider ? false,
+  oqsExtraINIConfig ? null,
   packageAtLeast,
   packageOlder,
   ...
@@ -40,9 +42,20 @@
   conf ? null,
   removeReferencesTo,
   testers,
-  providers ? [ ], # Each provider in the format { name = "provider-name"; package = <drv>; }
-  autoloadProviders ? false,
-  extraINIConfig ? null, # Extra INI config in the format { section_name = { key = "value"}; }
+  oqs-provider ? null,
+  providers ? (
+    if needsOQSProvider && oqs-provider != null then
+      [ { name = "oqsprovider"; package = oqs-provider; } ]
+    else
+      [ ]
+  ),
+  autoloadProviders ? needsOQSProvider,
+  extraINIConfig ? (
+    if oqsExtraINIConfig != null then
+      oqsExtraINIConfig
+    else
+      null
+  ),
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
