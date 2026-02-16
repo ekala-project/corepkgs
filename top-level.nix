@@ -1394,14 +1394,11 @@ with final;
 
   libuuid = if stdenv.hostPlatform.isLinux then util-linuxMinimal else null;
 
-  # TODO(corepkgs): use mkManyVariants
-  ncurses5 = ncurses.override { abiVersion = "5"; };
-  ncurses6 = ncurses.override { abiVersion = "6"; };
   ncurses =
     if stdenv.hostPlatform.useiOSPrebuilt then
       null
     else
-      callPackage ./pkgs/ncurses {
+      prev.ncurses.override {
         # ncurses is included in the SDK. Avoid an infinite recursion by using a bootstrap stdenv.
         stdenv = if stdenv.hostPlatform.isDarwin then darwin.bootstrapStdenv else stdenv;
       };
