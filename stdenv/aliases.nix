@@ -28,6 +28,13 @@ mapAliases {
   autoreconfHook269 = autoconf.v2_69.autoreconfHook;
   autoreconfHook271 = autoconf.v2_71.autoreconfHook;
   cmakeMinimal = cmake.minimal;
+  db4 = db.v4_8;
+  db48 = db.v4_8;
+  db5 = db.v5_3;
+  db53 = db.v5_3;
+  db6 = db.v6_0;
+  db60 = db.v6_0;
+  db62 = db.v6_2;
   go_1_24 = go.v1_24;
   go_1_25 = go.v1_25;
   gmp6 = gmp.variants.v6_3;

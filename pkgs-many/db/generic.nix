@@ -1,3 +1,16 @@
+# First parameter: variant args with helpers
+{
+  version,
+  sha256,
+  extraPatches ? [ ],
+  license ? "sleepycat",
+  drvArgs ? { },
+  packageAtLeast,
+  packageOlder,
+  ...
+}@variantArgs:
+
+# Second parameter: package dependencies
 {
   lib,
   stdenv,
@@ -6,14 +19,7 @@
   cxxSupport ? true,
   compat185 ? true,
   dbmSupport ? false,
-
-  # Options from inherited versions
-  version,
-  sha256,
-  extraPatches ? [ ],
-  license ? lib.licenses.sleepycat,
-  drvArgs ? { },
-}:
+}@args:
 
 stdenv.mkDerivation (
   rec {
@@ -46,12 +52,12 @@ stdenv.mkDerivation (
 
     preAutoreconf = ''
       pushd dist
-      # Upstream’s `dist/s_config` cats everything into `aclocal.m4`, but that doesn’t work with
-      # autoreconfHook, so cat `config.m4` to another file. Otherwise, it won’t be found by `aclocal`.
+      # Upstream's `dist/s_config` cats everything into `aclocal.m4`, but that doesn't work with
+      # autoreconfHook, so cat `config.m4` to another file. Otherwise, it won't be found by `aclocal`.
       cat aclocal/config.m4 >> aclocal/options.m4
     '';
 
-    # This isn’t pretty. The version information is kept separate from the configure script.
+    # This isn't pretty. The version information is kept separate from the configure script.
     # After the configure script is regenerated, the version information has to be replaced with the
     # contents of `dist/RELEASE`.
     postAutoreconf = ''
@@ -102,7 +108,13 @@ stdenv.mkDerivation (
     meta = {
       homepage = "https://www.oracle.com/database/technologies/related/berkeleydb.html";
       description = "Berkeley DB";
-      license = license;
+      license =
+        if license == "sleepycat" then
+          lib.licenses.sleepycat
+        else if license == "agpl3Only" then
+          lib.licenses.agpl3Only
+        else
+          lib.licenses.${license};
       platforms = lib.platforms.unix;
     };
   }
