@@ -1,4 +1,9 @@
 {
+  abiVersion,
+  ...
+}@variantArgs:
+
+{
   lib,
   stdenv,
   fetchurl,
@@ -6,7 +11,6 @@
   updateAutotoolsGnuConfigScriptsHook,
   ncurses,
   pkg-config,
-  abiVersion ? "6",
   enableStatic ? stdenv.hostPlatform.isStatic,
   withCxx ? !stdenv.hostPlatform.useAndroidPrebuilt,
   mouseSupport ? false,

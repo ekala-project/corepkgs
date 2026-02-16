@@ -36,6 +36,8 @@ mapAliases {
   guile_2_0 = guile.v2_0;
   guile_2_2 = guile.v2_2;
   guile_3_0 = guile.v3_0;
+  ncurses5 = ncurses.v5;
+  ncurses6 = ncurses.v6;
   openssl_oqs = openssl.oqs;
   perl538 = perl.v5_38;
   perl540 = perl.v5_40;
