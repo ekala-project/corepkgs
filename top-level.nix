@@ -1422,13 +1422,6 @@ with final;
   );
 
   sqlite = lowPrio (callPackage ./pkgs/sqlite { });
-  inherit
-    (callPackage ./pkgs/sqlite/tools.nix {
-    })
-    sqlite-analyzer
-    sqldiff
-    sqlite-rsync
-    ;
   sqlar = callPackage ./pkgs/sqlite/sqlar.nix { };
   sqlite-interactive = (sqlite.override { interactive = true; }).bin;
 
