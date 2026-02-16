@@ -1369,19 +1369,7 @@ with final;
   httpTwoLevelsUpdater = callPackage ./common-updater/http-two-levels-updater.nix { };
   unstableGitUpdater = callPackage ./common-updater/unstable-updater.nix { };
 
-  # Make bdb5 the default as it is the last release under the custom
-  # bsd-like license
-  # TODO(corepkgs): use mkManyVariants
-  db = db5;
-  db4 = db48;
-  db48 = callPackage ./pkgs/db/db-4.8.nix { };
-  db5 = db53;
-  db53 = callPackage ./pkgs/db/db-5.3.nix { };
-  db6 = db60;
-  db60 = callPackage ./pkgs/db/db-6.0.nix { };
-  db62 = callPackage ./pkgs/db/db-6.2.nix { };
-
-  bzip2 = callPackage ./pkgs/bzip2 { };
+  bzip2 = callPackage ./pkgs-many/bzip2 { };
   bzip2_1_1 = callPackage ./pkgs/bzip2/1_1.nix { };
 
   # Use Apple’s fork of libffi by default, which provides APIs and trampoline functionality that is not yet
