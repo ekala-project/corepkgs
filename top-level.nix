@@ -484,7 +484,6 @@ with final;
     in
     lib.recurseIntoAttrs xorgPackages;
 
-
   dbus = callPackage ./pkgs/dbus { };
   makeDBusConf = callPackage ./pkgs/dbus/make-dbus-conf.nix { };
 

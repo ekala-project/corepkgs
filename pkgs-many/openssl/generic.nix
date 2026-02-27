@@ -45,17 +45,17 @@
   oqs-provider ? null,
   providers ? (
     if needsOQSProvider && oqs-provider != null then
-      [ { name = "oqsprovider"; package = oqs-provider; } ]
+      [
+        {
+          name = "oqsprovider";
+          package = oqs-provider;
+        }
+      ]
     else
       [ ]
   ),
   autoloadProviders ? needsOQSProvider,
-  extraINIConfig ? (
-    if oqsExtraINIConfig != null then
-      oqsExtraINIConfig
-    else
-      null
-  ),
+  extraINIConfig ? (if oqsExtraINIConfig != null then oqsExtraINIConfig else null),
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
