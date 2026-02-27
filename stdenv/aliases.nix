@@ -35,10 +35,10 @@ mapAliases {
   db6 = db.v6_0;
   db60 = db.v6_0;
   db62 = db.v6_2;
-  go_1_24 = go.v1_24;
-  go_1_25 = go.v1_25;
   gmp6 = gmp.variants.v6_3;
   gmpxx = gmp.variants.cxx;
+  go_1_24 = go.v1_24;
+  go_1_25 = go.v1_25;
   guile_1_8 = guile.v1_8;
   guile_2_0 = guile.v2_0;
   guile_2_2 = guile.v2_2;
