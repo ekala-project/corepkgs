@@ -31,9 +31,30 @@ let
     in
     serviceLib.mkSystemdUserServices services;
 
+  # Build launchd user agent plist files (for ~/Library/LaunchAgents)
+  buildLaunchdUserAgents =
+    servicesConfig:
+    let
+      services = evalServices servicesConfig;
+    in
+    serviceLib.mkLaunchdUserAgents services;
+
+  # Build launchd daemon plist files (for /Library/LaunchDaemons)
+  buildLaunchdDaemons =
+    servicesConfig:
+    let
+      services = evalServices servicesConfig;
+    in
+    serviceLib.mkLaunchdDaemons services;
+
 in
 {
-  inherit evalServices buildSystemdUserServices;
+  inherit
+    evalServices
+    buildSystemdUserServices
+    buildLaunchdUserAgents
+    buildLaunchdDaemons
+    ;
 
   # Export library functions
   lib = serviceLib;
