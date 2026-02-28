@@ -13,6 +13,8 @@ let
   commonOpts = import ./options.nix { inherit lib; };
   systemdOpts = import ./systemd-options.nix { inherit lib; };
   systemdTranslate = import ./systemd-translate.nix { inherit lib pkgs; };
+  launchdOpts = import ./launchd-options.nix { inherit lib; };
+  launchdTranslate = import ./launchd-translate.nix { inherit lib pkgs; };
 
   # Service option type
   serviceOpts =
@@ -33,7 +35,13 @@ let
           description = "Systemd-specific options";
         };
 
-        # TODO: Add launchd, runit, rcd options
+        launchd = mkOption {
+          type = types.submodule (launchdOpts.launchdOptions { inherit name config; });
+          default = { };
+          description = "Launchd-specific options (macOS)";
+        };
+
+        # TODO: Add runit, rcd options
       };
     };
 
@@ -64,5 +72,43 @@ in
       }
     ) enabledServices;
 
-  inherit systemdTranslate;
+  # Generate launchd user agent plist files from service definitions
+  mkLaunchdUserAgents =
+    services:
+    let
+      enabledServices = filterAttrs (_: cfg: cfg.enable) services;
+    in
+    mapAttrs (
+      name: config:
+      let
+        plistResult = launchdTranslate.toLaunchdPlist config;
+        plistContent = plistResult.plistContent;
+      in
+      pkgs.writeTextFile {
+        name = "${name}.plist";
+        text = plistContent;
+        destination = "/${name}.plist";
+      }
+    ) enabledServices;
+
+  # Generate launchd daemon plist files (system-wide) from service definitions
+  mkLaunchdDaemons =
+    services:
+    let
+      enabledServices = filterAttrs (_: cfg: cfg.enable) services;
+    in
+    mapAttrs (
+      name: config:
+      let
+        plistResult = launchdTranslate.toLaunchdPlist config;
+        plistContent = plistResult.plistContent;
+      in
+      pkgs.writeTextFile {
+        name = "${name}.plist";
+        text = plistContent;
+        destination = "/${name}.plist";
+      }
+    ) enabledServices;
+
+  inherit systemdTranslate launchdTranslate;
 }
