@@ -136,10 +136,19 @@ let
 
   # Generate [Install] section
   mkInstallSection =
+    { serviceType ? "user" }:
     config:
     let
       cfg = config.systemd or { };
-      wantedBy = concatMapStringsSep "\n" (t: "WantedBy=${t}") cfg.wantedBy;
+      # Auto-adjust wantedBy for system services:
+      # If it's still the default user target and we're building a system service,
+      # use multi-user.target instead
+      adjustedWantedBy =
+        if serviceType == "system" && cfg.wantedBy == [ "default.target" ] then
+          [ "multi-user.target" ]
+        else
+          cfg.wantedBy;
+      wantedBy = concatMapStringsSep "\n" (t: "WantedBy=${t}") adjustedWantedBy;
     in
     ''
       [Install]
@@ -149,11 +158,14 @@ let
 in
 {
   # Main translation function
-  toSystemdUnit = config: ''
-    ${mkUnitSection config}
+  # opts: { serviceType = "user" | "system" }
+  toSystemdUnit =
+    { serviceType ? "user" }:
+    config: ''
+      ${mkUnitSection config}
 
-    ${mkServiceSection config}
+      ${mkServiceSection config}
 
-    ${mkInstallSection config}
-  '';
+      ${mkInstallSection { inherit serviceType; } config}
+    '';
 }
