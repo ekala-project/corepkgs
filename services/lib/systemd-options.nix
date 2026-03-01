@@ -3,9 +3,17 @@
 
 let
   inherit (lib) types mkOption literalExpression;
-in
-{
-  systemdOptions = {
+
+  # Parameterized options function that accepts serviceType
+  # serviceType: "user" or "system" to control defaults
+  mkSystemdOptions = { serviceType ? "user" }:
+    let
+      defaultWantedBy = if serviceType == "user" then [ "default.target" ] else [ "multi-user.target" ];
+      defaultWantedByDescription = if serviceType == "user"
+        then "For user services, typically \"default.target\"."
+        else "For system services, typically \"multi-user.target\".";
+    in
+    {
     # Allow raw systemd options to be passed through
     serviceConfig = mkOption {
       type = types.attrs;
@@ -66,11 +74,18 @@ in
 
     wantedBy = mkOption {
       type = types.listOf types.str;
-      default = [ "default.target" ];
+      default = defaultWantedBy;
       description = ''
         Targets that should pull in this service.
-        For user services, typically "default.target".
+        ${defaultWantedByDescription}
       '';
     };
   };
+in
+{
+  # Expose the parameterized function
+  inherit mkSystemdOptions;
+
+  # Backward compatibility: export user service options as default
+  systemdOptions = mkSystemdOptions { serviceType = "user"; };
 }

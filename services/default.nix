@@ -31,6 +31,14 @@ let
     in
     serviceLib.mkSystemdUserServices services;
 
+  # Build systemd system service files (for /etc/systemd/system)
+  buildSystemdSystemServices =
+    servicesConfig:
+    let
+      services = evalServices servicesConfig;
+    in
+    serviceLib.mkSystemdSystemServices services;
+
   # Build launchd user agent plist files (for ~/Library/LaunchAgents)
   buildLaunchdUserAgents =
     servicesConfig:
@@ -52,6 +60,7 @@ in
   inherit
     evalServices
     buildSystemdUserServices
+    buildSystemdSystemServices
     buildLaunchdUserAgents
     buildLaunchdDaemons
     ;

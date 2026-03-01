@@ -4,15 +4,17 @@ This directory contains the implementation of a unified service management inter
 
 ## Status
 
-**Phase 2 Complete**: Launchd support added for macOS!
+**Phase 3 Complete**: Systemd system services added!
 
 ✅ Core module infrastructure
 ✅ Common service options (command, args, environment, user, lifecycle hooks, etc.)
 ✅ Systemd translation layer
 ✅ Systemd user service generation
+✅ **Systemd system service generation** (NEW!)
 ✅ **Launchd translation layer**
 ✅ **Launchd user agent & daemon generation**
 ✅ **Cross-platform examples (systemd + launchd)**
+✅ **Full user/system service parity across platforms**
 ✅ Working prototypes with SQLite service and HTTP server
 
 ## Architecture
@@ -22,19 +24,22 @@ services/
 ├── lib/
 │   ├── types.nix              # Custom types for service definitions
 │   ├── options.nix            # Common service options
-│   ├── systemd-options.nix    # Systemd-specific options
+│   ├── systemd-options.nix    # Systemd-specific options (user & system)
 │   ├── systemd-translate.nix  # Common → systemd translation
-│   ├── launchd-options.nix    # Launchd-specific options (NEW!)
-│   ├── launchd-translate.nix  # Common → launchd plist translation (NEW!)
+│   ├── launchd-options.nix    # Launchd-specific options
+│   ├── launchd-translate.nix  # Common → launchd plist translation
 │   └── service-module.nix     # Core module infrastructure
 ├── examples/
-│   ├── simple-test.nix            # Minimal test service
-│   ├── sqlite-simple.nix          # SQLite logger (systemd)
-│   ├── sqlite-simple-launchd.nix  # SQLite logger (cross-platform) (NEW!)
-│   ├── sqlite-server.nix          # SQLite HTTP server (systemd)
-│   └── http-server-launchd.nix    # HTTP server (cross-platform) (NEW!)
+│   ├── simple-test.nix                  # Minimal test service
+│   ├── sqlite-simple.nix                # SQLite logger (systemd user)
+│   ├── sqlite-simple-launchd.nix        # SQLite logger (cross-platform)
+│   ├── sqlite-server.nix                # SQLite HTTP server (systemd user)
+│   ├── http-server-launchd.nix          # HTTP server (cross-platform)
+│   ├── nginx-system.nix                 # Nginx daemon (system service) (NEW!)
+│   └── http-server-cross-platform.nix   # HTTP server (all 4 builders) (NEW!)
 ├── tests/
-│   └── launchd-test.nix       # Launchd test suite (NEW!)
+│   ├── launchd-test.nix       # Launchd test suite
+│   └── systemd-system-test.nix # Systemd system services tests (NEW!)
 ├── default.nix                # Main entry point
 └── README.md                  # This file
 ```
@@ -89,8 +94,9 @@ let
   };
 in
 {
-  # Build for different platforms
-  systemdService = services.buildSystemdUserServices serviceConfig;
+  # Build for different platforms and contexts
+  systemdUserService = services.buildSystemdUserServices serviceConfig;
+  systemdSystemService = services.buildSystemdSystemServices serviceConfig;
   launchdUserAgent = services.buildLaunchdUserAgents serviceConfig;
   launchdDaemon = services.buildLaunchdDaemons serviceConfig;
 }
@@ -98,11 +104,11 @@ in
 
 ### Building and Installing
 
-#### Linux (systemd)
+#### Linux (systemd) - User Service
 
 ```bash
-# Build the service file
-nix-build -A systemdService
+# Build the user service file
+nix-build -A systemdUserService
 
 # Install to user systemd directory
 cp result/my-service.service ~/.config/systemd/user/
@@ -113,7 +119,30 @@ systemctl --user start my-service
 systemctl --user status my-service
 ```
 
-#### macOS (launchd)
+#### Linux (systemd) - System Service
+
+```bash
+# Build the system service file
+nix-build -A systemdSystemService
+
+# Install to system directory (requires sudo)
+sudo cp result/my-service.service /etc/systemd/system/
+
+# Reload and start
+sudo systemctl daemon-reload
+sudo systemctl start my-service
+sudo systemctl status my-service
+
+# Enable at boot (optional)
+sudo systemctl enable my-service
+
+# View logs
+sudo journalctl -u my-service -f
+```
+
+**Note**: System services automatically use `multi-user.target` instead of `default.target`. If you don't specify `wantedBy`, it will default to the appropriate target based on whether you use `buildSystemdUserServices` or `buildSystemdSystemServices`.
+
+#### macOS (launchd) - User Agent
 
 ```bash
 # Build the user agent plist
@@ -133,18 +162,26 @@ launchctl list my-service
 log show --predicate 'process == "my-service"' --last 1h
 ```
 
-For system-wide daemons (requires sudo):
+#### macOS (launchd) - System Daemon
 
 ```bash
 # Build the daemon plist
 nix-build -A launchdDaemon
 
-# Install to system LaunchDaemons directory
+# Install to system LaunchDaemons directory (requires sudo)
 sudo cp result/my-service.plist /Library/LaunchDaemons/
 
 # Load and start
 sudo launchctl load /Library/LaunchDaemons/my-service.plist
+
+# Check status
+sudo launchctl list | grep my-service
+
+# Unload (to stop)
+sudo launchctl unload /Library/LaunchDaemons/my-service.plist
 ```
+
+**Note**: Launchd uses the same plist format for both user agents and system daemons. The installation location determines the context (user vs system).
 
 ## Example: SQLite Logger
 
@@ -303,10 +340,32 @@ These options work consistently on both systemd and launchd:
 - Mach services (XPC)
 - Network state awareness
 
+## User vs System Services Comparison
+
+| Aspect | User Service | System Service |
+|--------|--------------|----------------|
+| **Installation** | `~/.config/systemd/user/` | `/etc/systemd/system/` |
+| **Control Command** | `systemctl --user` | `systemctl` (requires sudo) |
+| **Default WantedBy** | `default.target` | `multi-user.target` |
+| **Permissions** | Runs as user | Runs as specified user (or root) |
+| **Builder Function** | `buildSystemdUserServices` | `buildSystemdSystemServices` |
+| **Auto-start** | At user login | At system boot |
+| **Dependencies** | Other user services | System targets (network.target, etc.) |
+
+**Launchd Comparison:**
+
+| Aspect | User Agent | System Daemon |
+|--------|------------|---------------|
+| **Installation** | `~/Library/LaunchAgents/` | `/Library/LaunchDaemons/` |
+| **Control Command** | `launchctl` | `sudo launchctl` |
+| **Plist Format** | Identical | Identical |
+| **Builder Function** | `buildLaunchdUserAgents` | `buildLaunchdDaemons` |
+| **Auto-start** | At user login | At system boot |
+
 ## Future Work
 
 - [x] ~~Launchd support (macOS)~~ **COMPLETE!**
-- [ ] Systemd system services (not just user services)
+- [x] ~~Systemd system services~~ **COMPLETE!**
 - [ ] Runit support
 - [ ] BSD rc.d support (FreeBSD, OpenBSD, NetBSD, DragonFly)
 - [ ] Validation and warnings for incompatible options
@@ -344,6 +403,34 @@ Restart=on-failure
 WantedBy=default.target
 ```
 
+### Systemd System Services Test Suite
+
+Run the comprehensive systemd system services test suite:
+
+```bash
+# Build all tests
+nix-build services/tests/systemd-system-test.nix -A all
+
+# View test results and verification
+cat result/test-results.txt
+
+# Inspect individual service files
+ls -l result/*.service
+
+# Compare user vs system service for same config
+diff result/compare-user.service result/compare-system.service
+```
+
+The test suite verifies:
+- Basic system service generation
+- Automatic `multi-user.target` default (vs `default.target` for user services)
+- Custom `wantedBy` override
+- Non-root user service with User/Group directives
+- PreStart and postStop hooks
+- Environment variables and PATH
+- Restart policies (always, on-failure)
+- Network dependencies (wants, requires, after)
+
 ### Launchd Test Suite
 
 Run the comprehensive launchd test suite:
@@ -373,13 +460,36 @@ The test suite includes:
 
 ### Cross-Platform Examples
 
-Test that the same service definition works on both platforms:
+Test that the same service definition works across all builders:
 
 ```bash
-# Build both systemd and launchd versions
-nix-build services/examples/sqlite-simple-launchd.nix
+# Build all four variants (user + system, systemd + launchd)
+nix-build services/examples/http-server-cross-platform.nix
 
 # Compare outputs
-cat result-systemdService/sqlite-logger.service
-cat result-launchdUserAgent/sqlite-logger.plist
+cat result-systemdUserService/http-server.service
+cat result-systemdSystemService/http-server.service
+cat result-launchdUserAgent/http-server.plist
+cat result-launchdDaemon/http-server.plist
+
+# See the automatic wantedBy adjustment
+diff result-systemdUserService/http-server.service \
+     result-systemdSystemService/http-server.service
+```
+
+### Example: Nginx System Daemon
+
+Build and inspect a real-world system service example:
+
+```bash
+# Build nginx as a system service
+nix-build services/examples/nginx-system.nix -A systemdSystemService
+
+# View the generated service file
+cat result/nginx.service
+
+# Compare with user service variant
+nix-build services/examples/nginx-system.nix -A systemdUserService
+diff result-systemdUserService/nginx.service \
+     result-systemdSystemService/nginx.service
 ```

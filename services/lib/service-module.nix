@@ -63,7 +63,25 @@ in
     mapAttrs (
       name: config:
       let
-        unitText = systemdTranslate.toSystemdUnit config;
+        unitText = systemdTranslate.toSystemdUnit { serviceType = "user"; } config;
+      in
+      pkgs.writeTextFile {
+        name = "${name}.service";
+        text = unitText;
+        destination = "/${name}.service";
+      }
+    ) enabledServices;
+
+  # Generate systemd system service files from service definitions
+  mkSystemdSystemServices =
+    services:
+    let
+      enabledServices = filterAttrs (_: cfg: cfg.enable) services;
+    in
+    mapAttrs (
+      name: config:
+      let
+        unitText = systemdTranslate.toSystemdUnit { serviceType = "system"; } config;
       in
       pkgs.writeTextFile {
         name = "${name}.service";
