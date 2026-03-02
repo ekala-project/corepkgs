@@ -239,6 +239,8 @@
 
   testMetaPkgConfig = callPackage ./testMetaPkgConfig/tester.nix { };
 
+  pkg-config = callPackage ./pkg-config { };
+
   shellcheck = callPackage ./shellcheck/tester.nix { };
 
   shfmt = callPackage ./shfmt { };
