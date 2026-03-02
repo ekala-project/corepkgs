@@ -71,7 +71,9 @@ stdenv.mkDerivation (
 
     passthru.tests = {
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
-      pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage {};
+      pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage {
+        example = ./test-example.c;
+      };
     };
 
     meta = {
