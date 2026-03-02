@@ -37,7 +37,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   doCheck = true;
 
-  passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  passthru.tests = {
+    pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
+  };
 
   meta = {
     description = "Modern and easy-to-use crypto library";
