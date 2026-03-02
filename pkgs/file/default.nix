@@ -60,7 +60,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   makeFlags = lib.optional stdenv.hostPlatform.isWindows "FILE_COMPILE=file";
 
-  passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  passthru.tests = {
+    pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
+  };
 
   meta = {
     homepage = "https://darwinsys.com/file";
