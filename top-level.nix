@@ -1384,11 +1384,13 @@ with final;
   ncurses =
     if stdenv.hostPlatform.useiOSPrebuilt then
       null
-    else
+    else if stdenv.hostPlatform.isDarwin then
       prev.ncurses.override {
         # ncurses is included in the SDK. Avoid an infinite recursion by using a bootstrap stdenv.
-        stdenv = if stdenv.hostPlatform.isDarwin then darwin.bootstrapStdenv else stdenv;
-      };
+        stdenv = darwin.bootstrapStdenv;
+      }
+    else
+      prev.ncurses;
 
   pkgconf = callPackage ./build-support/pkg-config-wrapper {
     pkg-config = pkgconf-unwrapped;
