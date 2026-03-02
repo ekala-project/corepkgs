@@ -106,6 +106,7 @@ stdenv.mkDerivation (finalAttrs: {
         ;
       inherit (python3.pkgs) pillow imread pyturbojpeg;
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
     };
   };
 
