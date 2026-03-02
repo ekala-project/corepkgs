@@ -172,7 +172,10 @@ let
       finalAttrs:
       attrs
       // {
-        passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+        passthru.tests = {
+          pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+          pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
+        };
         passthru.buildRootOnly = mkWithAttrs buildRootOnlyAttrs;
       }
     );
