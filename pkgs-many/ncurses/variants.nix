@@ -5,9 +5,11 @@
 
   v5 = {
     abiVersion = "5";
+    version = "6.5";
   };
 
   v6 = {
     abiVersion = "6";
+    version = "6.5";
   };
 }
