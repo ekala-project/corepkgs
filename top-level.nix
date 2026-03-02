@@ -11,7 +11,6 @@ with final;
 {
 
   # TODO(corepkgs): support NixOS tests
-  testers = { };
   nixosTests = { };
   tests = { };
 
@@ -1338,6 +1337,8 @@ with final;
   perl538Packages = lib.recurseIntoAttrs perl.v5_38.pkgs;
   perl540Packages = lib.recurseIntoAttrs perl.v5_40.pkgs;
   perlPackages = perl540Packages;
+
+  testers = callPackage ./build-support/testers { };
 
   texinfo6 = texinfo.v6;
   texinfo7 = texinfo.v7;
