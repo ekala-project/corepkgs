@@ -110,6 +110,7 @@ stdenv.mkDerivation (finalAttrs: {
     pyzmq = python3.pkgs.pyzmq;
     ffmpeg = ffmpeg.override { withZmq = true; };
     pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
   };
 
   meta = {
