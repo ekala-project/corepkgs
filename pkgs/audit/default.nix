@@ -154,6 +154,7 @@ stdenv.mkDerivation (finalAttrs: {
       musl = pkgsMusl.audit or null;
       static = pkgsStatic.audit or null;
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
       audit = nixosTests.audit;
       # Broken on a hardened kernel
       package = finalAttrs.finalPackage.overrideAttrs (previousAttrs: {
