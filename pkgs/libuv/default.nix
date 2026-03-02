@@ -194,6 +194,7 @@ stdenv.mkDerivation (finalAttrs: {
     python-uvloop = python3.pkgs.uvloop;
     static = pkgsStatic.libuv;
     pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
   };
 
   meta = {
