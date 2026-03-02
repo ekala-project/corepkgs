@@ -46,6 +46,7 @@ stdenv.mkDerivation (finalAttrs: {
     updateScript = nix-update-script { };
     tests = {
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
     };
   };
 
