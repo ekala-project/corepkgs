@@ -271,6 +271,7 @@ stdenv.mkDerivation (finalAttrs: {
         # nginx-http3 = useThisCurl nixosTests.nginx-http3;
         nginx-http3 = nixosTests.nginx-http3;
         pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+        pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
         static = pkgsStatic.curl;
       };
     };
