@@ -35,7 +35,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     updateScript = unstableGitUpdater { };
-    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    tests = {
+      pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
+    };
   };
 
   meta = {
