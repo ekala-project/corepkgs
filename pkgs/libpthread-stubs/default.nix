@@ -26,7 +26,10 @@ stdenv.mkDerivation (finalAttrs: {
 
       update-source-version ${finalAttrs.pname} "$version"
     '';
-    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    tests = {
+      pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
+    };
   };
 
   meta = {
