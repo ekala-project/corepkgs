@@ -6,8 +6,8 @@
   };
 
   v1_13 = rec {
-    version = "1.13.1";
-    src-hash = "sha256-GhAF5wUT19E02ZekW+ywsCMVGYrt56hES+MHCH4lNG4=";
+    version = "1.13.2";
+    src-hash = "sha256-D9HsIjv8EJ1qAdXFAKy260K77cCvopgQ2Fx6uXpt6VI=";
     buildDocs = false;
   };
 
