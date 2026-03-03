@@ -1,0 +1,10 @@
+- bzip2-unstable
+- rustls-ffi
+- cairo
+- hidapi
+- gsasl
+- pcsclite
+- libxt
+- xorgproto
+- libpng12
+- imlib2
