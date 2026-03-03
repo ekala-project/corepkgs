@@ -18,12 +18,12 @@
 
   v2_6_4 = rec {
     version = "2.6.4";
-    src-hash = "sha256-15g9bv236nzi665p9ggqjlfn4dwck5835vf0bbw2cz7h5c1swyp8=";
+    src-hash = "sha256-6HquAyvwfCb4WsDtMlCZjDdiHZX4vXSLMfFbM8Re6ZU=";
     src-url = "https://github.com/westes/flex/releases/download/v${version}/flex-${version}.tar.gz";
     # This version needs the glibc-2.26 patch (will be part of 2.6.5)
     # Using fetchurl directly to avoid 'fetchpatch' dependency for bootstrap
     glibcPatchUrl = "https://raw.githubusercontent.com/lede-project/source/0fb14a2b1ab2f82ce63f4437b062229d73d90516/tools/flex/patches/200-build-AC_USE_SYSTEM_EXTENSIONS-in-configure.ac.patch";
-    glibcPatchHash = "sha256-0mpp41zdg17gx30kcpj83jl8hssks3adbks0qzbhcz882b9c083r=";
+    glibcPatchHash = "sha256-eSDA0hIIfQbXx0DP1dTQU2uIqBxIXjbB6O+E134g91Y=";
     metaHomepage = "https://github.com/westes/flex";
   };
 }

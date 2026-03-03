@@ -45,7 +45,7 @@ stdenv.mkDerivation rec {
     (fetchurl {
       name = "glibc-2.26.patch";
       url = glibcPatchUrl;
-      sha256 = glibcPatchHash;
+      hash = glibcPatchHash;
     })
   ];
 
