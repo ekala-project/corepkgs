@@ -10,13 +10,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "lz4";
-  version = "1.10.0";
+  version = "131";
 
   src = fetchFromGitHub {
     repo = "lz4";
     owner = "lz4";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-/dG1n59SKBaEBg72pAWltAtVmJ2cXxlFFhP+klrkTos=";
+    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
 
   patches = [
