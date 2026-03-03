@@ -1053,7 +1053,6 @@ with final;
   };
   bashInteractiveFHS = bashFHS;
 
-  flex = callPackage ./pkgs-many/flex { };
   flex_2_5_35 = flex.v2_5_35;
 
   # Python interpreters. All standard library modules are included except for tkinter, which is
