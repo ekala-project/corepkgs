@@ -681,11 +681,6 @@ with final;
   # TODO: Remove alias
   libjpeg = libjpeg_turbo;
 
-  # TODO(corepkgs): gross
-  libtool = libtool2;
-  libtool2 = callPackage ./pkgs/libtool/libtool2.nix { };
-  libtool_1_5 = callPackage ./pkgs/libtool { };
-
   # Less secure variant of lowdown for use inside Nix builds.
   lowdown-unsandboxed = lowdown.override {
     enableDarwinSandbox = false;
