@@ -488,7 +488,7 @@ with final;
 
   # TODO(corepkgs): move these fetchers into pkgs
   fetchpatch =
-    callPackage ./build-support/fetchpatch {
+    callPackage ./pkgs/fetchpatch {
       # 0.3.4 would change hashes: https://github.com/NixOS/nixpkgs/issues/25154
       patchutils = __splicedPackages.patchutils_0_3_3;
     }
@@ -497,27 +497,19 @@ with final;
       version = 1;
     };
   fetchpatch2 =
-    callPackage ./build-support/fetchpatch {
+    callPackage ./pkgs/fetchpatch {
       patchutils = __splicedPackages.patchutils_0_4_2;
     }
     // {
       tests = pkgs.tests.fetchpatch2;
       version = 2;
     };
-  fetchDebianPatch = callPackage ./build-support/fetchdebianpatch { };
-  fetchgit = callFromScope ./build-support/fetchgit { };
-  fetchgitLocal = callPackage ./build-support/fetchgitlocal { };
-  fetchFromGitLab = callPackage ./build-support/fetchgitlab { };
-  fetchFromSourcehut = callPackage ./build-support/fetchsourcehut { };
-  fetchPypi = callPackage ./build-support/fetchpypi { };
-  fetchhg = callPackage ./build-support/fetchhg { };
   # TODO(corepkgs): uppercase them?
-  fetchzip = callPackage ./build-support/fetchzip { };
   fetchurl =
     if stdenv.buildPlatform != stdenv.hostPlatform then
       buildPackages.fetchurl # No need to do special overrides twice,
     else
-      lib.makeOverridable (import ./build-support/fetchurl) {
+      lib.makeOverridable (import ./pkgs/fetchurl) {
         inherit
           lib
           stdenvNoCC

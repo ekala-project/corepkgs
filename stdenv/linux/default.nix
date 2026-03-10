@@ -191,7 +191,7 @@ let
         shell = "${bootstrapTools}/bin/bash";
         initialPath = [ bootstrapTools ];
 
-        fetchurlBoot = import ../../build-support/fetchurl/boot.nix {
+        fetchurlBoot = import ../../pkgs/fetchurl/boot.nix {
           inherit system;
         };
 
