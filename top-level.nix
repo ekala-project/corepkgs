@@ -1031,8 +1031,6 @@ with final;
   };
   bashInteractiveFHS = bashFHS;
 
-  flex_2_5_35 = flex.v2_5_35;
-
   # Python interpreters. All standard library modules are included except for tkinter, which is
   # available as `pythonPackages.tkinter` and can be used as any other Python package.
   python = python3;

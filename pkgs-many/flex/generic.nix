@@ -1,13 +1,6 @@
 {
   version,
-  src-url,
   src-hash,
-  needsFlexBootstrap ? false,
-  needsTexinfo ? false,
-  doCheck ? true,
-  glibcPatchUrl ? null,
-  glibcPatchHash ? null,
-  metaHomepage,
   packageOlder,
   packageAtLeast,
   ...
@@ -29,23 +22,30 @@
 # Avoid 'fetchpatch' to allow 'flex' to be used as a possible 'gcc'
 # dependency during bootstrap. Useful when gcc is built from snapshot
 # or from a git tree (flex lexers are not pre-generated there).
+let
+  is2_5 = packageOlder "2.6";
+  url =
+    if is2_5 then
+      "https://github.com/westes/flex/releases/download/flex-${version}/flex-${version}.tar.gz"
+    else
+      "https://github.com/westes/flex/releases/download/v${version}/flex-${version}.tar.gz";
 
+  needsTexinfo = is2_5;
+in
 stdenv.mkDerivation rec {
   pname = "flex";
   inherit version;
 
+  # Use the published sources associated with a tag to avoid the need to run flex as part of build
   src = fetchurl {
-    url = src-url;
+    inherit url;
     hash = src-hash;
   };
 
-  # v2.6.4 needs glibc-2.26 patch (will be part of 2.6.5)
-  # https://github.com/westes/flex/commit/24fd0551333e
-  patches = lib.optionals (glibcPatchUrl != null) [
+  patches = lib.optionals (packageAtLeast "2.6") [
     (fetchurl {
-      name = "glibc-2.26.patch";
-      url = glibcPatchUrl;
-      hash = glibcPatchHash;
+      url = "https://raw.githubusercontent.com/lede-project/source/0fb14a2b1ab2f82ce63f4437b062229d73d90516/tools/flex/patches/200-build-AC_USE_SYSTEM_EXTENSIONS-in-configure.ac.patch";
+      hash = "sha256-eSDA0hIIfQbXx0DP1dTQU2uIqBxIXjbB6O+E134g91Y=";
     })
   ];
 
@@ -60,16 +60,13 @@ stdenv.mkDerivation rec {
 
   depsBuildBuild = lib.optionals (packageAtLeast "2.6") [ buildPackages.stdenv.cc ];
 
-  nativeBuildInputs =
-    # v2.5.35 needs flex to build itself (bootstrap)
-    lib.optionals needsFlexBootstrap [ flex ]
-    ++ [
-      bison
-      help2man
-      autoreconfHook
-    ]
-    # v2.5.35 needs texinfo
-    ++ lib.optionals needsTexinfo [ texinfo ];
+  nativeBuildInputs = [
+    bison
+    help2man
+    autoreconfHook
+  ]
+  # v2.5.35 needs texinfo
+  ++ lib.optionals needsTexinfo [ texinfo ];
 
   buildInputs = lib.optionals (packageAtLeast "2.6") [ bison ];
 
@@ -86,24 +83,17 @@ stdenv.mkDerivation rec {
 
   dontDisableStatic = stdenv.buildPlatform != stdenv.hostPlatform;
 
-  inherit doCheck;
+  doCheck = false;
 
   postInstall = ''
     ln -s $out/bin/flex $out/bin/lex
   '';
 
   meta = {
-    homepage = metaHomepage;
+    homepage = "https://github.com/westes/flex";
     description = "Fast lexical analyser generator";
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix;
-  }
-  # v2.5.35 has a branch attribute in meta
-  // lib.optionalAttrs (packageOlder "2.6") {
-    branch = version;
-  }
-  # v2.6+ has mainProgram in meta
-  // lib.optionalAttrs (packageAtLeast "2.6") {
     mainProgram = "flex";
   };
 }

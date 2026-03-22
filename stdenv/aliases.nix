@@ -37,6 +37,7 @@ mapAliases {
   db6 = db.v6_0;
   db60 = db.v6_0;
   db62 = db.v6_2;
+  flex_2_5_39 = flex.v2_5_39;
   gmp6 = gmp.variants.v6_3;
   gmpxx = gmp.variants.cxx;
   go_1_24 = go.v1_24;
