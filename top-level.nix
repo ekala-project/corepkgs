@@ -549,15 +549,6 @@ with final;
             fetchurl = stdenv.fetchurlBoot;
             inherit zlib openssl;
           };
-          # On darwin, libkrb5 needs bootstrap_cmds which would require
-          # converting many packages to fetchurl_boot to avoid evaluation cycles.
-          # So turn gssSupport off there, and on Windows.
-          # On other platforms, keep the previous value.
-          gssSupport =
-            if stdenv.hostPlatform.isDarwin || stdenv.hostPlatform.isWindows then
-              false
-            else
-              old.gssSupport or true; # `? true` is the default
           libkrb5 = buildPackages.krb5.override {
             fetchurl = stdenv.fetchurlBoot;
             inherit pkg-config perl openssl;
@@ -1529,27 +1520,6 @@ with final;
     mouseSupport = false;
     x11Support = false;
     imlib2 = imlib2-nox;
-  };
-
-  curlMinimal = prev.curl;
-  curl = curlMinimal.override (
-    {
-      idnSupport = true;
-      pslSupport = true;
-      zstdSupport = true;
-      http3Support = true;
-      c-aresSupport = true;
-    }
-    // lib.optionalAttrs (!stdenv.hostPlatform.isStatic) {
-      brotliSupport = true;
-    }
-  );
-
-  # TODO(corepkgs): use mkManyVariants
-  curlWithGnuTls = curl.override {
-    gnutlsSupport = true;
-    opensslSupport = false;
-    ngtcp2 = ngtcp2-gnutls;
   };
 
   c-aresMinimal = callPackage ./pkgs/c-ares { withCMake = false; };
