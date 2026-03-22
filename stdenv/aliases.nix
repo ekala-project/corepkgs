@@ -28,6 +28,8 @@ mapAliases {
   autoreconfHook269 = autoconf.v2_69.autoreconfHook;
   autoreconfHook271 = autoconf.v2_71.autoreconfHook;
   cmakeMinimal = cmake.minimal;
+  curlMinimal = curl.minimal;
+  curlWithGnuTls = curl.gnutls;
   db4 = db.v4_8;
   db48 = db.v4_8;
   db5 = db.v5_3;
