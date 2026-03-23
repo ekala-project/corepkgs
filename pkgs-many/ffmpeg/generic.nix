@@ -42,12 +42,12 @@
   # Feature flags
   withAlsa ? withHeadlessDeps && stdenv.hostPlatform.isLinux, # Alsa in/output supporT
   withAmf ? withHeadlessDeps && lib.meta.availableOn stdenv.hostPlatform amf, # AMD Media Framework video encoding
-  withAom ? withHeadlessDeps, # AV1 reference encoder
+  withAom ? withHeadlessDeps && libaom != null, # AV1 reference encoder
   withAribb24 ? withFullDeps, # ARIB text and caption decoding
   withAribcaption ? withFullDeps && packageAtLeast "6.1", # ARIB STD-B24 Caption Decoder/Renderer
-  withAss ? withHeadlessDeps && stdenv.hostPlatform == stdenv.buildPlatform, # (Advanced) SubStation Alpha subtitle rendering
+  withAss ? withHeadlessDeps && stdenv.hostPlatform == stdenv.buildPlatform && libass != null, # (Advanced) SubStation Alpha subtitle rendering
   withAvisynth ? withFullDeps, # AviSynth script files reading
-  withBluray ? withHeadlessDeps, # BluRay reading
+  withBluray ? withHeadlessDeps && libbluray != null, # BluRay reading
   withBs2b ? withFullDeps, # bs2b DSP library
   withBzlib ? withHeadlessDeps,
   withCaca ? withFullDeps, # Textual display (ASCII art)
@@ -59,7 +59,7 @@
   withCudaLLVM ? withHeadlessDeps,
   withCudaNVCC ? withFullDeps && withUnfree && config.cudaSupport,
   withCuvid ? withHeadlessDeps && withNvcodec,
-  withDav1d ? withHeadlessDeps, # AV1 decoder (focused on speed and correctness)
+  withDav1d ? withHeadlessDeps && dav1d != null, # AV1 decoder (focused on speed and correctness)
   withDavs2 ? withFullDeps && withGPL, # AVS2 decoder
   withDc1394 ? withFullDeps && !stdenv.hostPlatform.isDarwin, # IIDC-1394 grabbing (ieee 1394)
   withDrm ? withHeadlessDeps && (with stdenv; isLinux || isFreeBSD), # libdrm support
@@ -76,17 +76,17 @@
       && !hostPlatform.isRiscV
       && !(hostPlatform.isPower && hostPlatform.isBigEndian)
       && hostPlatform == buildPlatform
-    ), # dynamically linked Nvidia code
+    ) && (if (packageAtLeast "6") then nv-codec-headers-12 != null else nv-codec-headers != null), # dynamically linked Nvidia code
   withFlite ? withFullDeps, # Voice Synthesis
   withFontconfig ? withHeadlessDeps, # Needed for drawtext filter
   withFreetype ? withHeadlessDeps, # Needed for drawtext filter
   withFrei0r ? withFullDeps && withGPL, # frei0r video filtering
-  withFribidi ? withHeadlessDeps, # Needed for drawtext filter
+  withFribidi ? withHeadlessDeps && fribidi != null, # Needed for drawtext filter
   withGme ? withFullDeps, # Game Music Emulator
   withGmp ? withHeadlessDeps && withVersion3, # rtmp(t)e support
   withGnutls ? withHeadlessDeps,
   withGsm ? withFullDeps, # GSM de/encoder
-  withHarfbuzz ? withHeadlessDeps && packageAtLeast "6.1", # Needed for drawtext filter
+  withHarfbuzz ? withHeadlessDeps && packageAtLeast "6.1" && harfbuzz != null, # Needed for drawtext filter
   withIconv ? withHeadlessDeps,
   withIlbc ? withFullDeps, # iLBC de/encoding
   withJack ? withFullDeps && !stdenv.hostPlatform.isDarwin, # Jack audio
@@ -100,75 +100,75 @@
   withMetal ? false, # Unfree and requires manual downloading of files
   withMfx ? false, # Hardware acceleration via intel-media-sdk/libmfx
   withModplug ? withFullDeps && !stdenv.hostPlatform.isDarwin, # ModPlug support
-  withMp3lame ? withHeadlessDeps, # LAME MP3 encoder
+  withMp3lame ? withHeadlessDeps && lame != null, # LAME MP3 encoder
   withMysofa ? withFullDeps, # HRTF support via SOFAlizer
   withNpp ? withFullDeps && withUnfree && config.cudaSupport, # Nvidia Performance Primitives-based code
   withNvdec ? withHeadlessDeps && withNvcodec,
   withNvenc ? withHeadlessDeps && withNvcodec,
   withOpenal ? withFullDeps, # OpenAL 1.1 capture support
-  withOpenapv ? withHeadlessDeps && packageAtLeast "8.0", # APV encoding support
-  withOpencl ? withHeadlessDeps,
+  withOpenapv ? withHeadlessDeps && packageAtLeast "8.0" && openapv != null, # APV encoding support
+  withOpencl ? withHeadlessDeps && ocl-icd != null && opencl-headers != null,
   withOpencoreAmrnb ? withFullDeps && withVersion3, # AMR-NB de/encoder
   withOpencoreAmrwb ? withFullDeps && withVersion3, # AMR-WB decoder
   withOpengl ? withFullDeps && !stdenv.hostPlatform.isDarwin, # OpenGL rendering
   withOpenh264 ? withFullDeps, # H.264/AVC encoder
-  withOpenjpeg ? withHeadlessDeps, # JPEG 2000 de/encoder
-  withOpenmpt ? withHeadlessDeps, # Tracked music files decoder
-  withOpus ? withHeadlessDeps, # Opus de/encoder
+  withOpenjpeg ? withHeadlessDeps && openjpeg != null, # JPEG 2000 de/encoder
+  withOpenmpt ? withHeadlessDeps && libopenmpt != null, # Tracked music files decoder
+  withOpus ? withHeadlessDeps && libopus != null, # Opus de/encoder
   withPlacebo ? withFullDeps && !stdenv.hostPlatform.isDarwin, # libplacebo video processing library
-  withPulse ? withSmallDeps && stdenv.hostPlatform.isLinux, # Pulseaudio input support
+  withPulse ? withSmallDeps && stdenv.hostPlatform.isLinux && libpulseaudio != null, # Pulseaudio input support
   withQrencode ? withFullDeps && packageAtLeast "7", # QR encode generation
   withQuirc ? withFullDeps && packageAtLeast "7", # QR decoding
   withRav1e ? withFullDeps, # AV1 encoder (focused on speed and safety)
-  withRist ? withHeadlessDeps, # Reliable Internet Stream Transport (RIST) protocol
+  withRist ? withHeadlessDeps && librist != null, # Reliable Internet Stream Transport (RIST) protocol
   withRtmp ? false, # RTMP[E] support via librtmp
   withRubberband ? withFullDeps && withGPL && !stdenv.hostPlatform.isFreeBSD, # Rubberband filter
   withSamba ? withFullDeps && !stdenv.hostPlatform.isDarwin && withGPLv3, # Samba protocol
-  withSdl2 ? withSmallDeps,
+  withSdl2 ? withSmallDeps && SDL2 != null,
   withShaderc ? withFullDeps && !stdenv.hostPlatform.isDarwin && packageAtLeast "5.0",
   withShine ? withFullDeps, # Fixed-point MP3 encoding
   withSnappy ? withFullDeps, # Snappy compression, needed for hap encoding
-  withSoxr ? withHeadlessDeps, # Resampling via soxr
-  withSpeex ? withHeadlessDeps, # Speex de/encoder
-  withSrt ? withHeadlessDeps, # Secure Reliable Transport (SRT) protocol
+  withSoxr ? withHeadlessDeps && soxr != null, # Resampling via soxr
+  withSpeex ? withHeadlessDeps && speex != null, # Speex de/encoder
+  withSrt ? withHeadlessDeps && srt != null, # Secure Reliable Transport (SRT) protocol
   withSsh ? withHeadlessDeps, # SFTP protocol
   withSvg ? withFullDeps, # SVG protocol
-  withSvtav1 ? withHeadlessDeps && !stdenv.hostPlatform.isMinGW, # AV1 encoder/decoder (focused on speed and correctness)
+  withSvtav1 ? withHeadlessDeps && !stdenv.hostPlatform.isMinGW && svt-av1 != null, # AV1 encoder/decoder (focused on speed and correctness)
   withTensorflow ? false, # Tensorflow dnn backend support (Increases closure size by ~390 MiB)
-  withTheora ? withHeadlessDeps, # Theora encoder
+  withTheora ? withHeadlessDeps && libtheora != null, # Theora encoder
   withTwolame ? withFullDeps, # MP2 encoding
   withUavs3d ? withFullDeps, # AVS3 decoder
-  withV4l2 ? withHeadlessDeps && stdenv.hostPlatform.isLinux, # Video 4 Linux support
+  withV4l2 ? withHeadlessDeps && stdenv.hostPlatform.isLinux && libv4l != null, # Video 4 Linux support
   withV4l2M2m ? withV4l2,
   withVaapi ? withHeadlessDeps && (with stdenv; isLinux || isFreeBSD), # Vaapi hardware acceleration
   withVdpau ? withSmallDeps && !stdenv.hostPlatform.isMinGW, # Vdpau hardware acceleration
-  withVidStab ? withHeadlessDeps && withGPL, # Video stabilization
+  withVidStab ? withHeadlessDeps && withGPL && vid-stab != null, # Video stabilization
   withVmaf ? withFullDeps && packageAtLeast "5", # Netflix's VMAF (Video Multi-Method Assessment Fusion)
   withVoAmrwbenc ? withFullDeps && withVersion3, # AMR-WB encoder
-  withVorbis ? withHeadlessDeps, # Vorbis de/encoding, native encoder exists
+  withVorbis ? withHeadlessDeps && libvorbis != null, # Vorbis de/encoding, native encoder exists
   withVpl ? withFullDeps && stdenv.hostPlatform.isLinux, # Hardware acceleration via intel libvpl
-  withVpx ? withHeadlessDeps && stdenv.buildPlatform == stdenv.hostPlatform, # VP8 & VP9 de/encoding
+  withVpx ? withHeadlessDeps && stdenv.buildPlatform == stdenv.hostPlatform && libvpx != null, # VP8 & VP9 de/encoding
   withVulkan ? withHeadlessDeps && !stdenv.hostPlatform.isDarwin,
   withVvenc ? withFullDeps && packageAtLeast "7.1", # H.266/VVC encoding
   withWebp ? withHeadlessDeps, # WebP encoder
   withWhisper ? withFullDeps && packageAtLeast "8.0", # Whisper speech recognition
-  withX264 ? withHeadlessDeps && withGPL, # H.264/AVC encoder
-  withX265 ? withHeadlessDeps && withGPL, # H.265/HEVC encoder
+  withX264 ? withHeadlessDeps && withGPL && x264 != null, # H.264/AVC encoder
+  withX265 ? withHeadlessDeps && withGPL && x265 != null, # H.265/HEVC encoder
   withXavs ? withFullDeps && withGPL, # AVS encoder
   withXavs2 ? withFullDeps && withGPL, # AVS2 encoder
   withXcb ? withXcbShm || withXcbxfixes || withXcbShape, # X11 grabbing using XCB
   withXcbShape ? withFullDeps, # X11 grabbing shape rendering
   withXcbShm ? withFullDeps, # X11 grabbing shm communication
   withXcbxfixes ? withFullDeps, # X11 grabbing mouse rendering
-  withXevd ? withFullDeps && packageAtLeast "7.1" && !xevd.meta.broken, # MPEG-5 EVC decoding
-  withXeve ? withFullDeps && packageAtLeast "7.1" && !xeve.meta.broken, # MPEG-5 EVC encoding
+  withXevd ? withFullDeps && packageAtLeast "7.1" && xevd != null && !xevd.meta.broken, # MPEG-5 EVC decoding
+  withXeve ? withFullDeps && packageAtLeast "7.1" && xevd != null && !xeve.meta.broken, # MPEG-5 EVC encoding
   withXlib ? withFullDeps, # Xlib support
   withXml2 ? withHeadlessDeps, # libxml2 support, for IMF and DASH demuxers
-  withXvid ? withHeadlessDeps && withGPL, # Xvid encoder, native encoder exists
-  withZimg ? withHeadlessDeps,
+  withXvid ? withHeadlessDeps && withGPL && xvidcore != null, # Xvid encoder, native encoder exists
+  withZimg ? withHeadlessDeps && zimg != null,
   withZlib ? withHeadlessDeps,
   withZmq ? withFullDeps, # Message passing
-  withZvbi ? withHeadlessDeps, # Teletext support
+  withZvbi ? withHeadlessDeps && zvbi != null, # Teletext support
 
   # Licensing options (yes some are listed twice, filters and such are not listed)
   withGPL ? true,
@@ -193,7 +193,7 @@
 
   # Program options
   buildFfmpeg ? withHeadlessDeps, # Build ffmpeg executable
-  buildFfplay ? withSmallDeps, # Build ffplay executable
+  buildFfplay ? withSmallDeps && withSdl2, # Build ffplay executable
   buildFfprobe ? withHeadlessDeps, # Build ffprobe executable
   buildQtFaststart ? withFullDeps, # Build qt-faststart executable
   withBin ? buildFfmpeg || buildFfplay || buildFfprobe || buildQtFaststart,
