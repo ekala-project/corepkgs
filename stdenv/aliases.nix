@@ -53,6 +53,8 @@ mapAliases {
   docbook_xml_dtd_45 = docbook-xml-dtd.v4_5;
   elixir_1_17 = elixir.v1_17;
   elixir_1_18 = elixir;
+  ffmpeg-full = ffmpeg.full;
+  ffmpeg-headless = ffmpeg.headless;
   ffmpeg_4 = ffmpeg.v4;
   ffmpeg_4-full = ffmpeg.v4.full;
   ffmpeg_4-headless = ffmpeg.v4.headless;
@@ -65,8 +67,6 @@ mapAliases {
   ffmpeg_8 = ffmpeg.v4;
   ffmpeg_8-full = ffmpeg.v4.full;
   ffmpeg_8-headless = ffmpeg.v4.headless;
-  ffmpeg-full = ffmpeg.full;
-  ffmpeg-headless = ffmpeg.headless;
   flang_20 = llvm.v20.pkgs.flang;
   flang_21 = llvm.v21.pkgs.flang;
   flex_2_5_39 = flex.v2_5_39;
