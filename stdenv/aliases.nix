@@ -21,6 +21,7 @@ with pkgs;
 # These largely reflect Nixpkgs aliases
 mapAliases {
   # keep-sorted start
+
   autoconf269 = autoconf.v2_69;
   autoconf271 = autoconf.v2_71;
   automake116x = automake.v1_16;
@@ -46,6 +47,21 @@ mapAliases {
   guile_2_0 = guile.v2_0;
   guile_2_2 = guile.v2_2;
   guile_3_0 = guile.v3_0;
+  icu60 = icu.v60;
+  icu63 = icu.v63;
+  icu64 = icu.v64;
+  icu66 = icu.v66;
+  icu67 = icu.v67;
+  icu69 = icu.v69;
+  icu70 = icu.v70;
+  icu71 = icu.v71;
+  icu72 = icu.v72;
+  icu73 = icu.v73;
+  icu74 = icu.v74;
+  icu75 = icu.v75;
+  icu76 = icu.v76;
+  icu77 = icu.v77;
+  icu78 = icu.v78;
   libtool2 = libtool.v2_5;
   libtool_1_5 = libtool.v1_5;
   ncurses5 = ncurses.v5;

@@ -1,20 +1,25 @@
 {
-  stdenv,
+  version,
+  src-hash,
+  patches ? [ ],
+  patchFlags ? [ ],
+  packageOlder,
+  packageAtLeast,
+  mkVariantPassthru,
+  ...
+}@variantArgs:
+
+{
   lib,
+  stdenv,
   buildPackages,
   fetchurl,
+  fetchpatch,
   fixDarwinDylibNames,
   testers,
   updateAutotoolsGnuConfigScriptsHook,
-}:
-
-{
-  version,
-  hash,
-  patches ? [ ],
-  patchFlags ? [ ],
   withStatic ? stdenv.hostPlatform.isStatic,
-}:
+}@args:
 
 let
   # Cross-compiled icu4c requires a build-root of a native compile
@@ -28,6 +33,17 @@ let
   #  if lib.hasSuffix "rc" version then lib.replaceStrings [ "1" ] [ "" ] version else version
   #);
 
+  # Convert patch specifications from variants.nix to actual patches
+  processedPatches = map (
+    p:
+    if builtins.isAttrs p && p ? url then
+      fetchpatch {
+        inherit (p) url sha256;
+      }
+    else
+      p
+  ) patches;
+
   baseAttrs = {
     src = fetchurl {
       url =
@@ -37,7 +53,7 @@ let
           "https://github.com/unicode-org/icu/releases/download/release-${release}/icu4c-${
             lib.replaceStrings [ "." ] [ "_" ] version
           }-src.tgz";
-      inherit hash;
+      hash = src-hash;
     };
 
     postUnpack = ''
@@ -55,7 +71,8 @@ let
       else
         null; # won't find locale_t on darwin
 
-    inherit patchFlags patches;
+    inherit patchFlags;
+    patches = processedPatches;
 
     preConfigure = ''
       sed -i -e "s|/bin/sh|${stdenv.shell}|" configure
@@ -172,11 +189,13 @@ let
       finalAttrs:
       attrs
       // {
-        passthru.tests = {
-          pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
-          pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
+        passthru = mkVariantPassthru variantArgs // {
+          tests = {
+            pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+            pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
+          };
+          buildRootOnly = mkWithAttrs buildRootOnlyAttrs;
         };
-        passthru.buildRootOnly = mkWithAttrs buildRootOnlyAttrs;
       }
     );
 in

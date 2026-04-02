@@ -1648,26 +1648,6 @@ with final;
   nix = nixVersions.stable;
   nixStatic = pkgsStatic.nix;
 
-  icu-versions = callPackages ./pkgs/icu { };
-  inherit (icu-versions)
-    icu60
-    icu63
-    icu64
-    icu66
-    icu67
-    icu69
-    icu70
-    icu71
-    icu72
-    icu73
-    icu74
-    icu75
-    icu76
-    icu77
-    icu78
-    ;
-  icu = icu76;
-
   # TODO(corepkgs): move into build-support
   ensureNewerSourcesHook =
     { year }:
