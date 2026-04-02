@@ -1700,82 +1700,29 @@ with final;
   clangStdenv = if stdenv.cc.isClang then stdenv else lowPrio llvmPackages.stdenv;
   libcxxStdenv = if stdenv.hostPlatform.isDarwin then stdenv else lowPrio llvmPackages.libcxxStdenv;
 
+  # LLVM is auto-imported from pkgs-many/llvm via mkManyVariants
+  # llvm defaults to v21 (LLVM 21.1.2) as the LLVM library
+  # llvm.pkgs provides the full package scope (clang, lld, lldb, etc.)
+  # Individual versions accessible as: llvm.v18, llvm.v19, etc.
+  # Package scopes accessible as: llvm.v18.pkgs, llvm.v19.pkgs, etc.
+  # Old names like llvmPackages_18, clang_18, etc. are available via stdenv/aliases.nix
+
+  llvmPackages = llvm.pkgs;
+
+  # Individual LLVM version package scopes (needed for splicing to work correctly)
+  llvmPackages_18 = llvm.v18.pkgs;
+  llvmPackages_19 = llvm.v19.pkgs;
+  llvmPackages_20 = llvm.v20.pkgs;
+  llvmPackages_21 = llvm.v21.pkgs;
+  llvmPackages_git = llvm.git.pkgs;
+
+  # Common LLVM packages from the default version
   lld = llvmPackages.lld;
-
   lldb = llvmPackages.lldb;
-
-  llvm = llvmPackages.llvm;
-  flang = llvmPackages_20.flang;
-
+  flang = llvm.v20.pkgs.flang;
   libclc = llvmPackages.libclc;
   libllvm = llvmPackages.libllvm;
   llvm-manpages = llvmPackages.llvm-manpages;
-
-  llvmPackages = llvmPackages_21;
-
-  # TODO(corepkgs): use mkManyVariants
-  inherit
-    (rec {
-      llvmPackagesSet = lib.recurseIntoAttrs (callPackages ./pkgs/llvm { });
-
-      llvmPackages_18 = llvmPackagesSet."18";
-      clang_18 = llvmPackages_18.clang;
-      lld_18 = llvmPackages_18.lld;
-      lldb_18 = llvmPackages_18.lldb;
-      llvm_18 = llvmPackages_18.llvm;
-
-      llvmPackages_19 = llvmPackagesSet."19";
-      clang_19 = llvmPackages_19.clang;
-      lld_19 = llvmPackages_19.lld;
-      lldb_19 = llvmPackages_19.lldb;
-      llvm_19 = llvmPackages_19.llvm;
-      bolt_19 = llvmPackages_19.bolt;
-
-      llvmPackages_20 = llvmPackagesSet."20";
-      clang_20 = llvmPackages_20.clang;
-      lld_20 = llvmPackages_20.lld;
-      lldb_20 = llvmPackages_20.lldb;
-      llvm_20 = llvmPackages_20.llvm;
-      bolt_20 = llvmPackages_20.bolt;
-      flang_20 = llvmPackages_20.flang;
-
-      llvmPackages_21 = llvmPackagesSet."21";
-      clang_21 = llvmPackages_21.clang;
-      lld_21 = llvmPackages_21.lld;
-      lldb_21 = llvmPackages_21.lldb;
-      llvm_21 = llvmPackages_21.llvm;
-      bolt_21 = llvmPackages_21.bolt;
-      flang_21 = llvmPackages_21.flang;
-
-      mkLLVMPackages = llvmPackagesSet.mkPackage;
-    })
-    llvmPackages_18
-    clang_18
-    lld_18
-    lldb_18
-    llvm_18
-    llvmPackages_19
-    clang_19
-    lld_19
-    lldb_19
-    llvm_19
-    bolt_19
-    llvmPackages_20
-    clang_20
-    lld_20
-    lldb_20
-    llvm_20
-    bolt_20
-    flang_20
-    llvmPackages_21
-    clang_21
-    lld_21
-    lldb_21
-    llvm_21
-    bolt_21
-    flang_21
-    mkLLVMPackages
-    ;
 
   asciidoc = callPackage ./pkgs/asciidoc {
     inherit (python3.pkgs)
