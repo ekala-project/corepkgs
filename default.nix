@@ -16,4 +16,5 @@ let
     // filteredArgs
   );
 in
-lib.recurseIntoAttrs pkgs
+pkgs
+# lib.recurseIntoAttrs pkgs
