@@ -22,7 +22,8 @@ let
       }
     );
 in
-self: super: {
+self: super:
+builtins.mapAttrs (_: v: if builtins.isAttrs v then lib.dontRecurseIntoAttrs v else v) {
   pkgsLLVM = nixpkgsFun {
     overlays = [
       (self': super': {
