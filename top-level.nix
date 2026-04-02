@@ -27,7 +27,6 @@ with final;
   openjdk = null;
   openjdk11 = null;
   haskellPackages = null;
-  luaPackages = null;
   ocamlPackages = null;
   phpExtensions = null;
 
@@ -110,7 +109,6 @@ with final;
   libzip = null;
   lilypond = null;
   lingua = null;
-  luajitPackages = null;
   lynx = null;
   mashumaro = null;
   mathplotlib = null;
@@ -1703,6 +1701,16 @@ with final;
   libclc = llvmPackages.libclc;
   libllvm = llvmPackages.libllvm;
   llvm-manpages = llvmPackages.llvm-manpages;
+
+  # Lua is auto-imported from pkgs-many/lua via mkManyVariants
+  # lua defaults to v5_4 (Lua 5.4.7) as the Lua interpreter
+  # lua.pkgs provides the full Lua package scope (awesome-wm-widgets, etc.)
+  # Individual versions accessible as: lua.v5_1, lua.v5_2, lua.v5_3, lua.v5_4, lua.v5_5
+  # LuaJIT variants accessible as: lua.luajit_2_0, lua.luajit_2_1, lua.luajit_openresty
+  # Package scopes accessible as: lua.v5_3.pkgs, lua.luajit_2_0.pkgs, etc.
+
+  luaPackages = lua.pkgs;
+  luajitPackages = lua.jit_2_1.pkgs;
 
   asciidoc = callPackage ./pkgs/asciidoc {
     inherit (python3.pkgs)
