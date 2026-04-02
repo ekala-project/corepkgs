@@ -10,17 +10,17 @@
   pkgsStatic,
 
   # for passthru.tests
-  bind,
+  bind ? null,
   cmake,
-  knot-resolver_5,
-  sbclPackages,
-  luajitPackages,
-  mosquitto,
-  neovim,
+  knot-resolver_5 ? null,
+  sbclPackages ? null,
+  luajitPackages ? null,
+  mosquitto ? null,
+  neovim ? null,
   nodejs,
-  ocamlPackages,
+  ocamlPackages ? null,
   python3,
-  testers,
+  testers ? null,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
