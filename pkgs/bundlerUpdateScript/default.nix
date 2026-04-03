@@ -7,8 +7,8 @@
   coreutils,
   git,
   nix,
-# Nixfmt is not available in corepkgs
-# nixfmt,
+  # Nixfmt is not available in corepkgs
+  # nixfmt,
 }:
 
 attrPath:
