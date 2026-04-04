@@ -18,7 +18,6 @@
   glib,
   glibcLocalesUtf8,
   gmp,
-  # gnulib,
   gnum4,
   gobject-introspection,
   imagemagick,
@@ -27,17 +26,11 @@
   libc,
   libevent,
   libiconv,
-  # libmpack,
-  # libmysqlclient,
   libpsl,
-  # libpq,
   libuuid,
   libxcrypt,
   libyaml,
-  # lua-language-server,
-  # mariadb,
   mpfr,
-  # neovim-unwrapped,
   oniguruma,
   openldap,
   openssl,
@@ -47,16 +40,12 @@
   ripgrep,
   rustPlatform,
   sqlite,
-  # tree-sitter,
   unbound,
   unzip,
   util-linux,
   versionCheckHook,
-  # vimPlugins,
-  # yajl,
   zip,
   zlib,
-  # zziplib,
   writableTmpDirAsHomeHook,
   gitMinimal,
   getopt,
@@ -72,170 +61,6 @@ let
     ;
 in
 {
-  # keep-sorted start block=yes case=no newline_separated=yes
-  #     # Dependencies needed in special location
-  #     mkdir -p deps/{ripgrep,astgrep}
-  #     mkdir {temp_test_dir,temp_history_dir}
-  #     ln -s ${lib.getExe ripgrep} deps/ripgrep/rg
-  #     ln -s ${lib.getExe ast-grep} deps/astgrep/ast-grep
-  #     ln -s ${vimPlugins.mini-nvim} deps/mini.nvim
-
-  #     # TODO: Investigate if test infra issue or upstream issue
-  #     # Remove failing subprocess tests that require channel functionality
-  #     rm tests/unit/lib/subprocess_spec.lua
-
-  #     # Update dependency check to respect packaged version
-  #     substituteInPlace lua/grug-far/test/dependencies.lua \
-  #       --replace-fail "local RG_VERSION = '14.1.0'" "local RG_VERSION = '${lib.getVersion ripgrep}'" \
-  #       --replace-fail "local SG_VERSION = '0.35.0'" "local SG_VERSION = '${lib.getVersion ast-grep}'"
-
-  #     make test dir=base
-  #     runHook postCheck
-  #   '';
-
-  #     nvim --headless -i NONE \
-  #       --cmd "set rtp+=${vimPlugins.plenary-nvim}" \
-  #       -c "PlenaryBustedDirectory tests/ {sequential = true}"
-
-  #     runHook postCheck
-  #   '';
-  # });
-
-  #   # Patch in tree-sitter-orgmode dependency
-  #   postPatch = ''
-  #     substituteInPlace lua/orgmode/config/init.lua \
-  #       --replace-fail \
-  #       "require('orgmode.utils.treesitter.install').install()" \
-  #       "pcall(function() vim.treesitter.language.add('org', { path = '${final.tree-sitter-orgmode}/lib/lua/${final.tree-sitter-orgmode.lua.luaversion}/parser/org.so'}) end)" \
-  #       --replace-fail \
-  #       "require('orgmode.utils.treesitter.install').reinstall()" \
-  #       "pcall(function() vim.treesitter.language.add('org', { path = '${final.tree-sitter-orgmode}/lib/lua/${final.tree-sitter-orgmode.lua.luaversion}/parser/org.so'}) end)"
-  #   '';
-  # };
-
-  #   # feel free to disable the checks. They are mostly screenshot based
-  #   checkPhase = ''
-  #     runHook preCheck
-  #     # feel free to disable/adjust the tests
-  #     rm tests/base/test_apply.lua tests/base/test_vimscript_interpreter.lua
-
-  #   # should be fixed upstream
-  #   meta.broken = lua.luaversion != "5.1";
-  # });
-
-  #   checkPhase = ''
-  #     runHook preCheck
-  #     export LUA_PATH="./lua/?.lua;./lua/?/init.lua;$LUA_PATH"
-
-  #   luarocksConfig = lib.recursiveUpdate old.luarocksConfig {
-  #     variables = {
-  #       MYSQL_INCDIR = "${lib.getDev libmysqlclient}/include/";
-  #       MYSQL_LIBDIR = "${lib.getLib libmysqlclient}/lib//mysql/";
-  #     };
-  #   };
-  #   buildInputs = old.buildInputs ++ [
-  #     mariadb.client
-  #     libmysqlclient
-  #   ];
-  # });
-
-  # grug-far-nvim = prev.grug-far-nvim.overrideAttrs {
-  #   doCheck = lua.luaversion == "5.1" && !stdenv.hostPlatform.isDarwin;
-  #   nativeCheckInputs = [
-  #     final.busted
-  #     final.mini-test
-  #     final.nlua
-  #     ripgrep
-  #     neovim-unwrapped
-  #   ];
-
-  # llscheck = prev.llscheck.overrideAttrs (old: {
-  #   propagatedBuildInputs = old.propagatedBuildInputs ++ [ lua-language-server ];
-  # });
-
-  # lrexlib-gnu = prev.lrexlib-gnu.overrideAttrs (old: {
-  #   strictDeps = false;
-  #   buildInputs = old.buildInputs ++ [
-  #     gnulib
-  #   ];
-  #   meta.broken = isLuaJIT;
-  # });
-
-  # lua-yajl = prev.lua-yajl.overrideAttrs (old: {
-  #   buildInputs = old.buildInputs ++ [
-  #     yajl
-  #   ];
-  #   luarocksConfig = old.luarocksConfig // {
-  #     variables = {
-  #       # Since yajl's outputs are split, we need to help luarocks find the
-  #       # include directory.
-  #       YAJL_INCDIR = "${lib.getDev yajl}/include";
-  #     };
-  #   };
-  # });
-
-  # luadbi-mysql = prev.luadbi-mysql.overrideAttrs (old: {
-
-  # luadbi-postgresql = prev.luadbi-postgresql.overrideAttrs (old: {
-  #   buildInputs = old.buildInputs ++ [
-  #     (lib.getDev libpq)
-  #   ];
-  # });
-
-  # luazip = prev.luazip.overrideAttrs (old: {
-  #   buildInputs = old.buildInputs ++ [
-  #     zziplib
-  #   ];
-  # });
-
-  # mpack = prev.mpack.overrideAttrs (drv: {
-  #   buildInputs = (drv.buildInputs or [ ]) ++ [ libmpack ];
-  #   env = {
-  #     # the rockspec doesn't use the makefile so you may need to export more flags
-  #     USE_SYSTEM_LUA = "yes";
-  #     USE_SYSTEM_MPACK = "yes";
-  #   };
-  # });
-
-  # neotest = prev.neotest.overrideAttrs (old: {
-  #   doCheck = stdenv.hostPlatform.isLinux;
-  #   nativeCheckInputs = old.nativeCheckInputs ++ [
-  #     final.nlua
-  #     final.busted
-  #     neovim-unwrapped
-  #     writableTmpDirAsHomeHook
-  #   ];
-
-  # nlua = prev.nlua.overrideAttrs {
-  #   # patchShebang removes the nvim in nlua's shebang so we hardcode one
-  #   postFixup = ''
-  #     sed -i -e "1 s|.*|#\!${coreutils}/bin/env -S ${neovim-unwrapped}/bin/nvim -l|" "$out/bin/nlua"
-  #   '';
-  #   dontPatchShebangs = true;
-  # };
-
-  # orgmode = prev.orgmode.overrideAttrs {
-  #   doCheck = false;
-
-  # tree-sitter-http = prev.tree-sitter-http.overrideAttrs (old: {
-  #   nativeBuildInputs = old.nativeBuildInputs or [ ] ++ [
-  #     tree-sitter
-  #     writableTmpDirAsHomeHook
-  #   ];
-  # });
-
-  # tree-sitter-norg = prev.tree-sitter-norg.overrideAttrs (old: {
-  #   meta.broken = lua.luaversion != "5.1";
-  # });
-
-  # tree-sitter-orgmode = prev.tree-sitter-orgmode.overrideAttrs (old: {
-  #   nativeBuildInputs = old.nativeBuildInputs or [ ] ++ [
-  #     writableTmpDirAsHomeHook
-  #     tree-sitter
-  #   ];
-
-  # };
-
   argparse = prev.argparse.overrideAttrs {
     doCheck = true;
     nativeCheckInputs = [ final.bustedCheckHook ];
@@ -1078,6 +903,4 @@ in
   xml2lua = prev.xml2lua.overrideAttrs {
     meta.broken = luaAtLeast "5.5";
   };
-
-  # keep-sorted end
 }

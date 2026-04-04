@@ -92,9 +92,7 @@ toLuaModule (
       homepage = "https://lux.lumen-labs.org/";
       changelog = "https://github.com/lumen-oss/lux/blob/${src.tag}/CHANGELOG.md";
       license = lib.licenses.lgpl3Plus;
-      maintainers = with lib.maintainers; [
-        mrcjkb
-      ];
+      maintainers = [ ];
       platforms = lib.platforms.all;
     };
   }

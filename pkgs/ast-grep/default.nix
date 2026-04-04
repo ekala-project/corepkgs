@@ -60,11 +60,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     homepage = "https://ast-grep.github.io/";
     changelog = "https://github.com/ast-grep/ast-grep/blob/${finalAttrs.version}/CHANGELOG.md";
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [
-      xiaoxiangmoe
-      astratagem
-      lord-valen
-      cafkafk
-    ];
+    maintainers = [ ];
   };
 })

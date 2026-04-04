@@ -104,7 +104,7 @@ buildLuarocksPackage rec {
       project but should usable from nearly any lua project.
     '';
     license = lib.licenses.asl20;
-    maintainers = with lib.maintainers; [ stasjok ];
+    maintainers = [ ];
     platforms = lua.meta.platforms;
   };
 }
