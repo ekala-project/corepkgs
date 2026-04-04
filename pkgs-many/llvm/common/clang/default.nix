@@ -82,8 +82,8 @@ stdenv.mkDerivation (
       ninja
     ]
     ++ lib.optionals enableManpages [
-      python3.pkgs.myst-parser
-      python3.pkgs.sphinx
+      # python3.pkgs.myst-parser
+      # python3.pkgs.sphinx
     ]
     ++ lib.optional stdenv.hostPlatform.isDarwin fixDarwinDylibNames;
 

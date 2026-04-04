@@ -373,6 +373,8 @@ with final;
     else
       throw "Unknown libc ${libc}";
 
+  lit = with python3Packages; toPythonApplication lit;
+
   binutils-unwrapped = callPackage ./pkgs/binutils {
     # FHS sys dirs presumably only have stuff for the build platform
     noSysDirs = (stdenv.targetPlatform != stdenv.hostPlatform) || noSysDirs;

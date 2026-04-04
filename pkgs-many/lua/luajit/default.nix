@@ -175,12 +175,7 @@ stdenv.mkDerivation (finalAttrs: {
         "powerpc64le-linux" # `#error "No support for PPC64"`
       ];
       mainProgram = "lua";
-      maintainers = with lib.maintainers; [
-        thoughtpolice
-        smironov
-        vcunat
-        lblasc
-      ];
+      maintainers = [ ];
     }
     // extraMeta;
 })

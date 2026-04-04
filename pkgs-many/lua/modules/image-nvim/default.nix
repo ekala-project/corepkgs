@@ -29,7 +29,7 @@ buildLuarocksPackage rec {
   meta = {
     homepage = "https://github.com/3rd/image.nvim";
     description = "🖼️ Bringing images to Neovim.";
-    maintainers = with lib.maintainers; [ SuperSandro2000 ];
+    maintainers = [ ];
     license.fullName = "MIT";
   };
 }

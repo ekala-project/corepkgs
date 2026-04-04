@@ -40,7 +40,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/cheusov/lua-alt-getopt";
         description = "Process application arguments the same way as getopt_long";
-        maintainers = with lib.maintainers; [ arobyn ];
+        maintainers = [ ];
         license.fullName = "MIT/X11";
       };
     }
@@ -70,7 +70,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/kikito/ansicolors.lua";
         description = "Library for color Manipulation.";
-        maintainers = with lib.maintainers; [ Freed-Wu ];
+        maintainers = [ ];
         license.fullName = "MIT <http://opensource.org/licenses/MIT>";
       };
     }
@@ -160,7 +160,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/Tieske/binaryheap.lua";
         description = "Binary heap implementation in pure Lua";
-        maintainers = with lib.maintainers; [ vcunat ];
+        maintainers = [ ];
         license.fullName = "MIT/X11";
       };
     }
@@ -192,7 +192,7 @@ final: prev: {
       meta = {
         homepage = "http://www.lua.org/manual/5.2/manual.html#6.7";
         description = "Lua 5.2 bit manipulation library";
-        maintainers = with lib.maintainers; [ lblasc ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -272,7 +272,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/hishamhm/busted-htest";
         description = "A pretty output handler for Busted";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -307,7 +307,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/sile-typesetter/cassowary.lua";
         description = "The cassowary constraint solver";
-        maintainers = with lib.maintainers; [ alerque ];
+        maintainers = [ ];
         license.fullName = "Apache 2";
       };
     }
@@ -342,7 +342,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/alerque/cldr-lua";
         description = "Lua interface to Unicode CLDR data";
-        maintainers = with lib.maintainers; [ alerque ];
+        maintainers = [ ];
         license.fullName = "MIT/ICU";
       };
     }
@@ -373,7 +373,7 @@ final: prev: {
       meta = {
         homepage = "https://linrongbin16.github.io/commons.nvim/";
         description = "The commons lua library for Neovim plugin project.";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -405,7 +405,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/lunarmodules/lua-compat-5.3";
         description = "Compatibility module providing Lua-5.3-style APIs for Lua 5.2 and 5.1";
-        maintainers = with lib.maintainers; [ vcunat ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -496,7 +496,7 @@ final: prev: {
       meta = {
         homepage = "http://25thandclement.com/~william/projects/cqueues.html";
         description = "Continuation Queues: Embeddable asynchronous networking, threading, and notification framework for Lua on Unix.";
-        maintainers = with lib.maintainers; [ vcunat ];
+        maintainers = [ ];
         license.fullName = "MIT/X11";
       };
     }
@@ -669,7 +669,7 @@ final: prev: {
       meta = {
         homepage = "https://fennel-lang.org";
         description = "A lisp that compiles to Lua";
-        maintainers = with lib.maintainers; [ misterio77 ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -700,7 +700,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/j-hui/fidget.nvim";
         description = "Extensible UI for Neovim notifications and LSP progress messages.";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -768,7 +768,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/alerque/fluent-lua";
         description = "Lua implementation of Project Fluent";
-        maintainers = with lib.maintainers; [ alerque ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -799,7 +799,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/aikooo7/funnyfiles.nvim";
         description = "This plugin is a way of creating/deleting files/folders without needing to open a file explorer.";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -830,7 +830,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/ibhagwan/fzf-lua";
         description = "Improved fzf.vim written in lua";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "AGPL-3.0";
       };
     }
@@ -861,7 +861,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/swarn/fzy-lua";
         description = "A lua implementation of the fzy fuzzy matching algorithm";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -922,7 +922,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/MagicDuck/grug-far.nvim";
         description = "Find And Replace plugin for neovim";
-        maintainers = with lib.maintainers; [ teto ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -953,7 +953,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/mrcjkb/haskell-tools.nvim";
         description = "🦥 Supercharge your Haskell experience in neovim!";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "GPL-2.0";
       };
     }
@@ -1004,7 +1004,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/daurnimator/lua-http";
         description = "HTTP library for Lua";
-        maintainers = with lib.maintainers; [ vcunat ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -1221,7 +1221,7 @@ final: prev: {
       meta = {
         homepage = "http://www.myriabit.com/ljsyscall/";
         description = "LuaJIT Linux syscall FFI";
-        maintainers = with lib.maintainers; [ lblasc ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -1266,7 +1266,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/jeffzi/llscheck";
         description = "Human-friendly Lua code analysis powered by Lua Language Server";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -1290,7 +1290,7 @@ final: prev: {
       meta = {
         homepage = "http://www.tecgraf.puc-rio.br/~lhf/ftp/lua/#lmathx";
         description = "C99 extensions for the math library";
-        maintainers = with lib.maintainers; [ alexshpilkin ];
+        maintainers = [ ];
         license.fullName = "Public domain";
       };
     }
@@ -1321,7 +1321,7 @@ final: prev: {
       meta = {
         homepage = "http://www.circuitwizard.de/lmpfrlib/lmpfrlib.html";
         description = "Lua API for the GNU MPFR library";
-        maintainers = with lib.maintainers; [ alexshpilkin ];
+        maintainers = [ ];
         license.fullName = "LGPL";
       };
     }
@@ -1354,7 +1354,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/leafo/loadkit";
         description = "Loadkit allows you to load arbitrary files within the Lua package path";
-        maintainers = with lib.maintainers; [ alerque ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -1507,7 +1507,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/rrthomas/lrexlib";
         description = "Regular expression library binding (oniguruma flavour).";
-        maintainers = with lib.maintainers; [ junestepp ];
+        maintainers = [ ];
         license.fullName = "MIT/X11";
       };
     }
@@ -1602,7 +1602,7 @@ final: prev: {
       meta = {
         homepage = "https://linrongbin16.github.io/lsp-progress.nvim/";
         description = "A performant lsp progress status for Neovim.";
-        maintainers = with lib.maintainers; [ gepbird ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -1860,7 +1860,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/starwing/lua-protobuf";
         description = "protobuf data support for Lua";
-        maintainers = with lib.maintainers; [ lockejan ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -2064,7 +2064,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/lblasc/lua-rtoml";
         description = "Lua bindings for the Rust toml crate.";
-        maintainers = with lib.maintainers; [ lblasc ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -2092,7 +2092,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/xlq/lua-subprocess";
         description = "A Lua module written in C that allows you to create child processes and communicate with them.";
-        maintainers = with lib.maintainers; [ scoder12 ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -2178,7 +2178,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/nvim-neorg/lua-utils.nvim";
         description = "A set of utility functions for Neovim plugins.";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -2211,7 +2211,7 @@ final: prev: {
       meta = {
         homepage = "http://github.com/brimworks/lua-yajl";
         description = "Integrate the yajl JSON library with Lua.";
-        maintainers = with lib.maintainers; [ pstn ];
+        maintainers = [ ];
         license.fullName = "MIT/X11";
       };
     }
@@ -2244,7 +2244,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/brimworks/lua-zlib";
         description = "Simple streaming interface to zlib for Lua.";
-        maintainers = with lib.maintainers; [ koral ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -2611,10 +2611,7 @@ final: prev: {
       meta = {
         homepage = "https://lunarmodules.github.io/luaexpat";
         description = "XML Expat parsing";
-        maintainers = with lib.maintainers; [
-          arobyn
-          flosse
-        ];
+        maintainers = [ ];
         license.fullName = "MIT/X11";
       };
     }
@@ -2679,7 +2676,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/lunarmodules/luafilesystem";
         description = "File System Library for the Lua Programming Language";
-        maintainers = with lib.maintainers; [ flosse ];
+        maintainers = [ ];
         license.fullName = "MIT/X11";
       };
     }
@@ -2712,7 +2709,7 @@ final: prev: {
       meta = {
         homepage = "https://lualdap.github.io/lualdap/";
         description = "A Lua interface to the OpenLDAP library";
-        maintainers = with lib.maintainers; [ aanderse ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -2835,7 +2832,7 @@ final: prev: {
       meta = {
         homepage = "http://github.com/luaposix/luaposix/";
         description = "Lua bindings for POSIX";
-        maintainers = with lib.maintainers; [ lblasc ];
+        maintainers = [ ];
         license.fullName = "MIT/X11";
       };
     }
@@ -2870,7 +2867,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/dpapavas/luaprompt";
         description = "A Lua command prompt with pretty-printing and auto-completion";
-        maintainers = with lib.maintainers; [ Freed-Wu ];
+        maintainers = [ ];
         license.fullName = "MIT/X11";
       };
     }
@@ -2929,10 +2926,7 @@ final: prev: {
       meta = {
         homepage = "http://www.luarocks.org";
         description = "A package manager for Lua modules.";
-        maintainers = with lib.maintainers; [
-          mrcjkb
-          teto
-        ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -2962,7 +2956,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/mlua-rs/luarocks-build-rust-mlua";
         description = "A LuaRocks build backend for Lua modules written in Rust using mlua";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -2995,7 +2989,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/lumen-oss/luarocks-build-treesitter-parser";
         description = "A luarocks build backend for tree-sitter parsers.";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -3028,7 +3022,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/lumen-oss/luarocks-build-treesitter-parser-cpp";
         description = "A luarocks build backend for tree-sitter parsers written in C++.";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -3063,7 +3057,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/brunoos/luasec/wiki";
         description = "A binding for OpenSSL library to provide TLS/SSL communication over LuaSocket.";
-        maintainers = with lib.maintainers; [ flosse ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -3319,7 +3313,7 @@ final: prev: {
       meta = {
         homepage = "http://github.com/bluebird75/luaunit";
         description = "A unit testing framework for Lua";
-        maintainers = with lib.maintainers; [ lockejan ];
+        maintainers = [ ];
         license.fullName = "BSD";
       };
     }
@@ -3349,7 +3343,7 @@ final: prev: {
       meta = {
         homepage = "http://github.com/starwing/luautf8";
         description = "A UTF-8 support module for Lua";
-        maintainers = with lib.maintainers; [ pstn ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -3450,7 +3444,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/rktjmp/lush.nvim";
         description = "Define Neovim themes as a DSL in lua, with real-time feedback.";
-        maintainers = with lib.maintainers; [ teto ];
+        maintainers = [ ];
         license.fullName = "MIT/X11";
       };
     }
@@ -3512,7 +3506,7 @@ final: prev: {
       meta = {
         homepage = "http://github.com/gvvaughan/lyaml";
         description = "libYAML binding for Lua";
-        maintainers = with lib.maintainers; [ lblasc ];
+        maintainers = [ ];
         license.fullName = "MIT/X11";
       };
     }
@@ -3543,7 +3537,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/nvim-neorocks/lz.n";
         description = "🦥 A dead simple lazy-loading Lua library for Neovim plugins.";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "GPL-2+";
       };
     }
@@ -3574,7 +3568,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/BirdeeHub/lze";
         description = "A lazy-loading library for neovim, inspired by, but different from, nvim-neorocks/lz.n";
-        maintainers = with lib.maintainers; [ birdee ];
+        maintainers = [ ];
         license.fullName = "GPL-2+";
       };
     }
@@ -3605,7 +3599,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/BirdeeHub/lzextras";
         description = "A collection of utilities and handlers for BirdeeHub/lze";
-        maintainers = with lib.maintainers; [ birdee ];
+        maintainers = [ ];
         license.fullName = "GPL-2+";
       };
     }
@@ -3638,7 +3632,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/horriblename/lzn-auto-require";
         description = "Auto load optional plugins via lua modules with lz.n";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "GPL-2.0";
       };
     }
@@ -3671,7 +3665,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/leafo/magick.git";
         description = "Lua bindings to ImageMagick & GraphicsMagick for LuaJIT using FFI";
-        maintainers = with lib.maintainers; [ donovanglover ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -3860,7 +3854,7 @@ final: prev: {
       meta = {
         homepage = "http://moonscript.org";
         description = "A programmer friendly language that compiles to Lua";
-        maintainers = with lib.maintainers; [ arobyn ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -3926,7 +3920,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/nvim-neorg/neorg";
         description = "Modernity meets insane extensibility. The future of organizing your life in Neovim.";
-        maintainers = with lib.maintainers; [ GaetanLepage ];
+        maintainers = [ ];
         license.fullName = "GPL-3.0";
       };
     }
@@ -3995,7 +3989,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/nvim-neotest/neotest";
         description = "An extensible framework for interacting with tests within NeoVim.";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -4026,7 +4020,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/mfussenegger/nlua";
         description = "Neovim as Lua interpreter";
-        maintainers = with lib.maintainers; [ teto ];
+        maintainers = [ ];
         license.fullName = "GPL-3.0";
       };
     }
@@ -4056,7 +4050,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/MunifTanjim/nui.nvim";
         description = "UI Component Library for Neovim.";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -4115,7 +4109,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/nvim-neotest/nvim-nio";
         description = "A library for asynchronous IO in Neovim";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -4244,7 +4238,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/jghauser/papis.nvim";
         description = "Manage your bibliography from within your favourite editor";
-        maintainers = with lib.maintainers; [ GaetanLepage ];
+        maintainers = [ ];
         license.fullName = "GPL-3.0";
       };
     }
@@ -4309,7 +4303,7 @@ final: prev: {
       meta = {
         homepage = "https://lunarmodules.github.io/penlight";
         description = "Lua utility libraries loosely based on the Python standard libraries";
-        maintainers = with lib.maintainers; [ alerque ];
+        maintainers = [ ];
         license.fullName = "MIT/X11";
       };
     }
@@ -4443,7 +4437,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/rest-nvim/rest.nvim";
         description = "A very fast, powerful, extensible and asynchronous Neovim HTTP client written in Lua.";
-        maintainers = with lib.maintainers; [ teto ];
+        maintainers = [ ];
         license.fullName = "GPL-3.0";
       };
     }
@@ -4476,7 +4470,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/lumen-oss/rocks-config.nvim";
         description = "Allow rocks.nvim to help configure your plugins.";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "GPL-3.0";
       };
     }
@@ -4515,7 +4509,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/nvim-neorocks/rocks-dev.nvim";
         description = "A swiss-army knife for testing and developing rocks.nvim modules.";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "GPL-3.0";
       };
     }
@@ -4552,7 +4546,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/lumen-oss/rocks-git.nvim";
         description = "Use rocks.nvim to install plugins from git!";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "GPL-3.0";
       };
     }
@@ -4597,7 +4591,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/lumen-oss/rocks.nvim";
         description = "🌒 Neovim plugin management inspired by Cargo, powered by luarocks";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "GPL-3.0";
       };
     }
@@ -4628,7 +4622,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/nvim-neorocks/rtp.nvim";
         description = "Source plugin and ftdetect directories on the Neovim runtimepath.";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "GPL-3.0";
       };
     }
@@ -4659,7 +4653,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/mrcjkb/rustaceanvim/archive/refs/tags/v8.0.3.zip";
         description = "🦀 Supercharge your Rust experience in Neovim! A heavily modified fork of rust-tools.nvim";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "GPL-2.0-only";
       };
     }
@@ -4725,7 +4719,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/pkulchenko/serpent";
         description = "Lua serializer and pretty printer";
-        maintainers = with lib.maintainers; [ lockejan ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -4769,7 +4763,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/f4z3r/sofa";
         description = "A command execution engine powered by rofi.";
-        maintainers = with lib.maintainers; [ f4z3r ];
+        maintainers = [ ];
         license.fullName = "MIT <http://opensource.org/licenses/MIT>";
       };
     }
@@ -5044,7 +5038,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/gptlang/lua-tiktoken";
         description = "An experimental port of OpenAI's Tokenizer to lua";
-        maintainers = with lib.maintainers; [ natsukium ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -5081,7 +5075,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/teal-language/tl";
         description = "Teal, a typed dialect of Lua";
-        maintainers = with lib.maintainers; [ mephistophiles ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -5114,7 +5108,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/lumen-oss/toml-edit.lua";
         description = "TOML Parser + Formatting and Comment-Preserving Editor";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -5177,7 +5171,7 @@ final: prev: {
       meta = {
         homepage = "https://github.com/nvim-neorg/tree-sitter-norg";
         description = "The official tree-sitter parser for Norg documents.";
-        maintainers = with lib.maintainers; [ mrcjkb ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
@@ -5307,7 +5301,7 @@ final: prev: {
       meta = {
         homepage = "http://manoelcampos.github.io/xml2lua/";
         description = "An XML Parser written entirely in Lua that works for Lua 5.1+";
-        maintainers = with lib.maintainers; [ teto ];
+        maintainers = [ ];
         license.fullName = "MIT";
       };
     }
