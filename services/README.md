@@ -370,9 +370,17 @@ These options work consistently on both systemd and launchd:
 - [ ] BSD rc.d support (FreeBSD, OpenBSD, NetBSD, DragonFly)
 - [ ] Validation and warnings for incompatible options
 - [ ] Migration tooling from existing service definitions
-- [ ] Integration with home-manager and nix-darwin
 - [ ] Socket activation support (both systemd and launchd)
 - [ ] Enhanced timer/scheduling support
+- [ ] Home-manager style service DAG construction
+- [ ] Dev shell service support
+  - [ ] Shared resource suport (e.g. shared mariadb instance)
+  - [ ] Spin up / spin down service creation
+
+## Needs investigation
+
+- [ ] Integration with home-manager and nix-darwin
+- [ ] More native nixos-hardware support
 
 ## Related Documentation
 
