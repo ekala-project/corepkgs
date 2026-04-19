@@ -6,7 +6,7 @@ with lib;
 
 let
   # Generate bootspec (boot.json) for the system
-  bootspecJson = pkgs.writeText "bootspec.json" (builtins.toJSON {
+  bootspecJson = pkgs.writeText "bootspec.json" (builtins.toJSON ({
     "org.nixos.bootspec.v1" = {
       system = pkgs.stdenv.hostPlatform.system;
       kernel = "${config.boot.kernelPackages.kernel}/${config.system.boot.loader.kernelFile}";
@@ -23,7 +23,7 @@ let
     "org.nixos.systemd-boot" = {
       sortKey = config.boot.loader.systemd-boot.sortKey;
     };
-  });
+  }));
 
   # Build the system closure
   systemBuilder = ''
@@ -141,12 +141,6 @@ in
       default = [];
       description = "Packages to install in the system environment.";
       example = literalExpression "[ pkgs.vim pkgs.git ]";
-    };
-
-    systemd.package = mkOption {
-      type = types.package;
-      default = pkgs.systemd;
-      description = "The systemd package to use.";
     };
   };
 

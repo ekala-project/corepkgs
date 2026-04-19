@@ -6,7 +6,7 @@ with lib;
 
 let
   # Import the services library
-  servicesLib = import ../services/lib/service-module.nix { inherit lib pkgs; };
+  servicesLib = import ../../services/lib/service-module.nix { inherit lib pkgs; };
 
   # Generate systemd unit files from service definitions
   systemdUnits = servicesLib.mkSystemdSystemServices config.systemd.services;
@@ -26,7 +26,7 @@ in
 {
   options = {
     systemd.services = mkOption {
-      type = types.attrsOf (types.submodule (import ../services/lib/options.nix { inherit lib; }).commonOptions);
+      type = types.attrsOf (types.submodule (import ../../services/lib/options.nix { inherit lib; }).commonOptions);
       default = {};
       description = ''
         Systemd services to run on the system.

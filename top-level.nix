@@ -30,6 +30,13 @@ with final;
   ocamlPackages = null;
   phpExtensions = null;
 
+  # Linux kernel packages (for ekaos and other system builders)
+  # Use linux scope which is auto-called from pkgs/linux/default.nix
+  linuxPackages = linux.packagesFor linux.kernels.linux_6_12;
+  linuxPackages_latest = linux.packagesFor linux.kernels.linux_6_18;
+  linuxPackages_6_12 = linuxPackages;
+  linuxPackages_6_18 = linuxPackages_latest;
+
   # keep-sorted start
   aafigure = null;
   actdiag = null;

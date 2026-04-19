@@ -133,6 +133,12 @@ in
         '';
       };
     };
+
+    system.build.installBootLoader = mkOption {
+      type = types.package;
+      internal = true;
+      description = "Script to install the boot loader.";
+    };
   };
 
   config = mkIf cfg.enable {

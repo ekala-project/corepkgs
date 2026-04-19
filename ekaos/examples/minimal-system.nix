@@ -12,7 +12,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot";
 
-  # Use default kernel
+  # Kernel selection
   boot.kernelPackages = pkgs.linuxPackages;
 
   # Kernel parameters

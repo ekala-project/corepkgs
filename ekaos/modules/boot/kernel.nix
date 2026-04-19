@@ -7,7 +7,7 @@ with lib;
   options = {
     boot.kernelPackages = mkOption {
       type = types.unspecified;
-      default = pkgs.linuxPackages;
+      defaultText = "pkgs.linuxPackages (linux_6_12)";
       example = literalExpression "pkgs.linuxPackages_latest";
       description = ''
         Kernel package set to use for the system.
@@ -15,10 +15,11 @@ with lib;
         This determines which Linux kernel version will be used
         and provides access to kernel modules.
 
-        Common values:
-        - pkgs.linuxPackages - Default stable kernel
-        - pkgs.linuxPackages_latest - Latest kernel
-        - pkgs.linuxPackages_hardened - Hardened kernel
+        Available kernel packages:
+        - pkgs.linuxPackages - Default stable kernel (6.12)
+        - pkgs.linuxPackages_latest - Latest kernel (6.18)
+        - pkgs.linuxPackages_6_12 - Specific version 6.12
+        - pkgs.linuxPackages_6_18 - Specific version 6.18
       '';
     };
 
@@ -61,9 +62,6 @@ with lib;
   };
 
   config = {
-    # Add init parameter to kernel params
-    boot.kernelParams = mkBefore [
-      "init=${config.system.build.toplevel}/init"
-    ];
+    # Note: init parameter is added in toplevel.nix to avoid circular dependency
   };
 }
