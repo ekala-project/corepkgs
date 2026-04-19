@@ -55,7 +55,6 @@ with final;
   distutils = null;
   dulwich = null;
   dvgrab = null;
-  e2fsprogs = null;
   emacs = null;
   enlightenment = null;
   epeg = null;
