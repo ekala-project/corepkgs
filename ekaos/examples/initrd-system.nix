@@ -13,10 +13,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot";
 
-  # Kernel configuration
-  boot.kernelPackages = pkgs.linuxPackages;
-
-  # Kernel parameters
+  # Kernel parameters (using default linux_6_12 kernel)
   boot.kernelParams = [
     "console=ttyS0,115200"  # Serial console
     "console=tty1"           # VGA console

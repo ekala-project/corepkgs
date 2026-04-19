@@ -155,6 +155,18 @@ in
         '';
       };
     };
+
+    system.build.diskImage = mkOption {
+      type = types.package;
+      internal = true;
+      description = "QEMU disk image for the system.";
+    };
+
+    system.build.vm = mkOption {
+      type = types.package;
+      internal = true;
+      description = "Script to run the system in a VM.";
+    };
   };
 
   config = mkIf cfg.enable {

@@ -29,8 +29,10 @@ This directory contains the implementation of a unified service management inter
 ✅ **Initramfs/initrd support** (NEW!)
 ✅ **Two-stage boot (stage-1 + stage-2)** (NEW!)
 ✅ **LUKS encryption support** (NEW!)
+✅ **Linux kernel package integration with core-pkgs** (NEW!)
 ✅ Full user/system service parity across platforms
 ✅ Working prototypes with SQLite service and HTTP server
+🔄 **System build testing in progress**
 
 ## Architecture
 
@@ -801,6 +803,39 @@ nix-build ekaos -A system
 - **QEMU/VM Testing**: Complete testing infrastructure with automated boot tests
 - **Disk Image Builder**: Automated QCOW2 image generation for VMs
 
+### Kernel Package Integration
+
+ekaos uses Linux kernel packages from core-pkgs. The kernel packages are exposed at the top level:
+
+```nix
+# Available kernel packages:
+pkgs.linuxPackages           # Default stable kernel (linux_6_12)
+pkgs.linuxPackages_latest    # Latest kernel (linux_6_18)
+pkgs.linuxPackages_6_12      # Specific version 6.12
+pkgs.linuxPackages_6_18      # Specific version 6.18
+```
+
+**Important**: You must explicitly set `boot.kernelPackages` in your ekaos configuration:
+
+```nix
+{ config, pkgs, ... }:
+{
+  # Required: Select kernel package
+  boot.kernelPackages = pkgs.linuxPackages;
+
+  # Or use latest kernel:
+  # boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  boot.loader.systemd-boot.enable = true;
+  # ... rest of configuration
+}
+```
+
+The kernel packages include:
+- `kernel` - The Linux kernel itself
+- `modules` - Kernel modules for the selected version
+- All necessary tools for building initramfs and kernel modules
+
 ### Example: Bootable HTTP Server
 
 Create a complete bootable system with an HTTP server:
@@ -858,6 +893,29 @@ Or install to disk and boot on real hardware!
 - ✅ **Disk image creation** - Automated QCOW2 image generation for VMs
 - ✅ **Boot verification** - One-command testing with `./tests/quick-test.sh`
 - ✅ **Initramfs/initrd support** - Two-stage boot for encrypted root, LVM, custom modules
+- ✅ **Kernel package integration** - Linux kernel packages exposed at top-level in core-pkgs
+- 🔄 **System build testing** - Currently verifying complete build process
+
+### Recent Changes (Phase 9)
+
+**Initramfs/Initrd Implementation:**
+- Complete two-stage boot support with stage-1 init in initramfs
+- LUKS encryption support with cryptsetup integration
+- Kernel module loading for SATA, NVMe, USB, VirtIO devices
+- Filesystem support for ext4, btrfs, xfs, vfat
+- Busybox-based minimal environment for stage-1
+
+**Kernel Package Integration:**
+- Added `linuxPackages`, `linuxPackages_latest`, `linuxPackages_6_12`, `linuxPackages_6_18` to `top-level.nix`
+- Kernel packages built using `packagesFor` function from linux scope
+- Users must explicitly set `boot.kernelPackages` in configuration
+- All required kernel modules and tools available for initramfs building
+
+**Module System Improvements:**
+- Fixed circular dependency issues in kernel module
+- Proper integration with core-pkgs package set
+- Services library path corrections for ekaos integration
+- Bootspec JSON structure fixed for proper attribute merging
 
 ### Quick Test
 

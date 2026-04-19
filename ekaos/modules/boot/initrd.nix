@@ -210,17 +210,18 @@ in
       "virtio_blk" "virtio_pci" "virtio_scsi"
     ];
 
-    # Add filesystem-specific modules
+    # Add filesystem-specific modules and LUKS modules
     boot.initrd.kernelModules = mkMerge [
+      # Filesystem modules
       (mkIf (elem "ext4" cfg.supportedFilesystems) [ "ext4" ])
       (mkIf (elem "btrfs" cfg.supportedFilesystems) [ "btrfs" ])
       (mkIf (elem "xfs" cfg.supportedFilesystems) [ "xfs" ])
       (mkIf (elem "vfat" cfg.supportedFilesystems) [ "vfat" "nls_cp437" "nls_iso8859-1" ])
-    ];
 
-    # Add LUKS modules if any LUKS devices are configured
-    boot.initrd.kernelModules = mkIf (cfg.luks.devices != {}) [
-      "dm-crypt" "dm-mod" "aes" "sha256" "sha512"
+      # LUKS modules if any LUKS devices are configured
+      (mkIf (cfg.luks.devices != {}) [
+        "dm-crypt" "dm-mod" "aes" "sha256" "sha512"
+      ])
     ];
 
     # Build the initrd

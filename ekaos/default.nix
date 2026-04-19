@@ -6,8 +6,9 @@
 }:
 
 let
-  eval = import ./eval-config.nix {
+  eval = (import ./eval-config.nix {
     inherit lib pkgs;
+  }) {
     modules = [ configuration ];
   };
 
