@@ -63,6 +63,22 @@ let
     in
     serviceLib.mkRunitServices services;
 
+  # Build BSD rc.d service files (FreeBSD/NetBSD/DragonFly for /etc/rc.d or /usr/local/etc/rc.d)
+  buildRcdServices =
+    servicesConfig:
+    let
+      services = evalServices servicesConfig;
+    in
+    serviceLib.mkRcdServices services;
+
+  # Build BSD rc.d service files (OpenBSD variant for /etc/rc.d)
+  buildRcdServicesOpenBSD =
+    servicesConfig:
+    let
+      services = evalServices servicesConfig;
+    in
+    serviceLib.mkRcdServicesOpenBSD services;
+
 in
 {
   inherit
@@ -72,6 +88,8 @@ in
     buildLaunchdUserAgents
     buildLaunchdDaemons
     buildRunitServices
+    buildRcdServices
+    buildRcdServicesOpenBSD
     ;
 
   # Export library functions

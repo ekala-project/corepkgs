@@ -130,6 +130,13 @@ let
           ulimit -n 1024
         '';
       };
+
+      # BSD rc.d-specific options
+      rcd = {
+        rcRequire = [ "DAEMON" "NETWORKING" ];
+        rcKeywords = [ "shutdown" ];
+        pidfile = "/var/run/http-server.pid";
+      };
     };
   };
 in
@@ -148,6 +155,12 @@ in
 
   # Runit service directory (/etc/sv/)
   runitService = services.buildRunitServices serviceConfig;
+
+  # BSD rc.d (FreeBSD/NetBSD/DragonFly for /usr/local/etc/rc.d/)
+  rcdService = services.buildRcdServices serviceConfig;
+
+  # BSD rc.d (OpenBSD for /etc/rc.d/)
+  rcdServiceOpenBSD = services.buildRcdServicesOpenBSD serviceConfig;
 }
 
 # ============================================================================
@@ -158,12 +171,14 @@ in
 # -------------------
 # nix-build services/examples/http-server-cross-platform.nix
 #
-# This creates five outputs:
+# This creates seven outputs:
 # - result-systemdUserService/http-server.service
 # - result-systemdSystemService/http-server.service
 # - result-launchdUserAgent/http-server.plist
 # - result-launchdDaemon/http-server.plist
 # - result-runitService/http-server/ (service directory with run script)
+# - result-rcdService/etc/rc.d/http-server (FreeBSD/NetBSD/DragonFly)
+# - result-rcdServiceOpenBSD/etc/rc.d/http-server (OpenBSD)
 #
 #
 # LINUX - User Service:
@@ -283,6 +298,54 @@ in
 #    sudo rm /run/service/http-server  # Or /var/service/http-server
 #
 #
+# BSD RC.D - FreeBSD/NetBSD/DragonFly:
+# -------------------------------------
+# 1. Install:
+#    sudo cp result-rcdService/etc/rc.d/http-server /usr/local/etc/rc.d/
+#    sudo chmod +x /usr/local/etc/rc.d/http-server
+#
+# 2. Configure in /etc/rc.conf:
+#    echo 'http_server_enable="YES"' | sudo tee -a /etc/rc.conf
+#
+# 3. Start:
+#    sudo service http-server start
+#
+# 4. Check status:
+#    sudo service http-server status
+#
+# 5. Test:
+#    curl http://localhost:8000
+#
+# 6. Control commands:
+#    sudo service http-server stop      # Stop
+#    sudo service http-server restart   # Restart
+#    sudo service http-server reload    # Reload (SIGHUP)
+#
+#
+# BSD RC.D - OpenBSD:
+# -------------------
+# 1. Install:
+#    sudo cp result-rcdServiceOpenBSD/etc/rc.d/http-server /etc/rc.d/
+#    sudo chmod +x /etc/rc.d/http-server
+#
+# 2. Enable with rcctl:
+#    sudo rcctl enable http-server
+#
+# 3. Start:
+#    sudo rcctl start http-server
+#
+# 4. Check status:
+#    sudo rcctl check http-server
+#
+# 5. Test:
+#    curl http://localhost:8000
+#
+# 6. Control commands:
+#    sudo rcctl stop http-server        # Stop
+#    sudo rcctl restart http-server     # Restart
+#    sudo rcctl reload http-server      # Reload (SIGHUP)
+#
+#
 # COMPARISON:
 # -----------
 # Compare the generated files to see how the same service definition
@@ -293,9 +356,13 @@ in
 # cat result-launchdUserAgent/http-server.plist
 # cat result-launchdDaemon/http-server.plist
 # cat result-runitService/http-server/run
+# cat result-rcdService/etc/rc.d/http-server
+# cat result-rcdServiceOpenBSD/etc/rc.d/http-server
 #
 # Note the differences:
 # - systemd user vs system: WantedBy target (default.target vs multi-user.target)
 # - launchd user vs daemon: Same content (location determines context)
 # - systemd vs launchd: Different formats (INI vs plist), same behavior
 # - runit: Shell script format, simple and portable
+# - rc.d FreeBSD vs OpenBSD: Different variable names (command vs daemon), rcorder metadata
+# - All formats: Express the same service in their platform-native way

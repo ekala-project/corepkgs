@@ -4,7 +4,7 @@ This directory contains the implementation of a unified service management inter
 
 ## Status
 
-**Phase 4 Complete**: Runit support added!
+**Phase 5 Complete**: BSD rc.d support added!
 
 ✅ Core module infrastructure
 ✅ Common service options (command, args, environment, user, lifecycle hooks, etc.)
@@ -13,9 +13,11 @@ This directory contains the implementation of a unified service management inter
 ✅ Systemd system service generation
 ✅ Launchd translation layer
 ✅ Launchd user agent & daemon generation
-✅ **Runit translation layer** (NEW!)
-✅ **Runit service directory generation** (NEW!)
-✅ **Cross-platform examples (systemd + launchd + runit)** (UPDATED!)
+✅ Runit translation layer
+✅ Runit service directory generation
+✅ **BSD rc.d translation layer** (NEW!)
+✅ **BSD rc.d script generation (FreeBSD/OpenBSD/NetBSD/DragonFly)** (NEW!)
+✅ **Cross-platform examples (systemd + launchd + runit + rc.d)** (UPDATED!)
 ✅ Full user/system service parity across platforms
 ✅ Working prototypes with SQLite service and HTTP server
 
@@ -30,8 +32,10 @@ services/
 │   ├── systemd-translate.nix  # Common → systemd translation
 │   ├── launchd-options.nix    # Launchd-specific options
 │   ├── launchd-translate.nix  # Common → launchd plist translation
-│   ├── runit-options.nix      # Runit-specific options (NEW!)
-│   ├── runit-translate.nix    # Common → runit service directory (NEW!)
+│   ├── runit-options.nix      # Runit-specific options
+│   ├── runit-translate.nix    # Common → runit service directory
+│   ├── rcd-options.nix        # BSD rc.d-specific options (NEW!)
+│   ├── rcd-translate.nix      # Common → BSD rc.d script (NEW!)
 │   └── service-module.nix     # Core module infrastructure
 ├── examples/
 │   ├── simple-test.nix                  # Minimal test service
@@ -39,11 +43,13 @@ services/
 │   ├── sqlite-simple-launchd.nix        # SQLite logger (cross-platform)
 │   ├── sqlite-server.nix                # SQLite HTTP server (systemd user)
 │   ├── http-server-launchd.nix          # HTTP server (cross-platform)
+│   ├── http-server-rcd.nix              # HTTP server (BSD rc.d) (NEW!)
 │   ├── nginx-system.nix                 # Nginx daemon (system service)
-│   └── http-server-cross-platform.nix   # HTTP server (all 5 builders!) (UPDATED!)
+│   └── http-server-cross-platform.nix   # HTTP server (all 7 builders!) (UPDATED!)
 ├── tests/
 │   ├── launchd-test.nix       # Launchd test suite
-│   └── systemd-system-test.nix # Systemd system services tests
+│   ├── systemd-system-test.nix # Systemd system services tests
+│   └── rcd-test.nix           # BSD rc.d test suite (NEW!)
 ├── default.nix                # Main entry point
 └── README.md                  # This file
 ```
@@ -102,6 +108,14 @@ let
           exec svlogd -tt /var/log/my-service
         '';
       };
+
+      # BSD rc.d-specific options
+      rcd = {
+        variant = "freebsd"; # or "openbsd", "netbsd", "dragonfly"
+        rcRequire = [ "DAEMON" "NETWORKING" ];
+        rcKeywords = [ "shutdown" ];
+        pidfile = "/var/run/my-service.pid";
+      };
     };
   };
 in
@@ -112,6 +126,8 @@ in
   launchdUserAgent = services.buildLaunchdUserAgents serviceConfig;
   launchdDaemon = services.buildLaunchdDaemons serviceConfig;
   runitService = services.buildRunitServices serviceConfig;
+  rcdService = services.buildRcdServices serviceConfig;            # FreeBSD/NetBSD/DragonFly
+  rcdServiceOpenBSD = services.buildRcdServicesOpenBSD serviceConfig; # OpenBSD
 }
 ```
 
@@ -227,6 +243,74 @@ sudo rm /run/service/my-service  # Or /var/service/my-service
 ```
 
 **Note**: Runit service directories contain a `run` script (required) and optional `finish` script. The service is supervised by `runsv` and restarts automatically on exit unless disabled.
+
+#### BSD rc.d - FreeBSD/NetBSD/DragonFly
+
+```bash
+# Build the rc.d service files
+nix-build -A rcdService
+
+# Install to service directory
+sudo cp result/etc/rc.d/my-service /usr/local/etc/rc.d/
+sudo chmod +x /usr/local/etc/rc.d/my-service
+
+# View sample rc.conf configuration
+cat result/etc/rc.conf.d/my-service.sample
+
+# Add to /etc/rc.conf to enable
+echo 'my_service_enable="YES"' | sudo tee -a /etc/rc.conf
+
+# Start the service
+sudo service my-service start
+
+# Check status
+sudo service my-service status
+
+# Control commands
+sudo service my-service stop      # Stop
+sudo service my-service restart   # Restart
+sudo service my-service reload    # Reload (sends SIGHUP)
+
+# Service will start automatically at boot
+```
+
+**Note**: BSD rc.d services use rcorder (FreeBSD/NetBSD/DragonFly) for dependency-based ordering. The PROVIDE/REQUIRE metadata in the script controls boot sequence. Services do **not** auto-restart on failure.
+
+#### BSD rc.d - OpenBSD
+
+```bash
+# Build the OpenBSD rc.d service files
+nix-build -A rcdServiceOpenBSD
+
+# Install to service directory
+sudo cp result/etc/rc.d/my-service /etc/rc.d/
+sudo chmod +x /etc/rc.d/my-service
+
+# Enable using rcctl (recommended)
+sudo rcctl enable my-service
+
+# Or manually add to /etc/rc.conf.local
+echo 'pkg_scripts="${pkg_scripts} my-service"' | sudo tee -a /etc/rc.conf.local
+
+# Start the service
+sudo rcctl start my-service
+# Or: sudo /etc/rc.d/my-service start
+
+# Check status
+sudo rcctl check my-service
+
+# Control commands
+sudo rcctl stop my-service        # Stop
+sudo rcctl restart my-service     # Restart
+sudo rcctl reload my-service      # Reload (sends SIGHUP)
+
+# View service flags
+sudo rcctl get my-service
+
+# Service will start automatically at boot
+```
+
+**Note**: OpenBSD rc.d uses sequential ordering (no rcorder). Services are started in alphabetical order. The `rcctl` utility is the recommended way to manage services.
 
 ## Example: SQLite Logger
 
@@ -463,11 +547,11 @@ Runit doesn't distinguish between user and system services. All services are sys
 - [x] ~~Launchd support (macOS)~~ **COMPLETE!**
 - [x] ~~Systemd system services~~ **COMPLETE!**
 - [x] ~~Runit support~~ **COMPLETE!**
-- [ ] BSD rc.d support (FreeBSD, OpenBSD, NetBSD, DragonFly)
+- [x] ~~BSD rc.d support (FreeBSD, OpenBSD, NetBSD, DragonFly)~~ **COMPLETE!**
 - [ ] Validation and warnings for incompatible options
 - [ ] Migration tooling from existing service definitions
 - [ ] Integration with home-manager and nix-darwin
-- [ ] Socket activation support (systemd, launchd, and potentially runit)
+- [ ] Socket activation support (systemd, launchd, runit, and BSD rc.d)
 - [ ] Enhanced timer/scheduling support
 
 ## Related Documentation

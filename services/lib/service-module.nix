@@ -17,6 +17,8 @@ let
   launchdTranslate = import ./launchd-translate.nix { inherit lib pkgs; };
   runitOpts = import ./runit-options.nix { inherit lib; };
   runitTranslate = import ./runit-translate.nix { inherit lib pkgs; };
+  rcdOpts = import ./rcd-options.nix { inherit lib; };
+  rcdTranslate = import ./rcd-translate.nix { inherit lib pkgs; };
 
   # Service option type
   serviceOpts =
@@ -49,7 +51,11 @@ let
           description = "Runit-specific options";
         };
 
-        # TODO: Add rcd options
+        rcd = mkOption {
+          type = types.submodule (rcdOpts.rcdOptions { inherit name config; });
+          default = { };
+          description = "BSD rc.d-specific options";
+        };
       };
     };
 
@@ -147,5 +153,30 @@ in
       runitTranslate.toRunitService name config
     ) enabledServices;
 
-  inherit systemdTranslate launchdTranslate runitTranslate;
+  # Generate BSD rc.d service files (FreeBSD/NetBSD/DragonFly)
+  mkRcdServices =
+    services:
+    let
+      enabledServices = filterAttrs (_: cfg: cfg.enable) services;
+    in
+    mapAttrs (
+      name: config:
+      let
+        variant = config.rcd.variant or "freebsd";
+      in
+      rcdTranslate.toRcdService variant name config
+    ) enabledServices;
+
+  # Generate BSD rc.d service files (OpenBSD variant)
+  mkRcdServicesOpenBSD =
+    services:
+    let
+      enabledServices = filterAttrs (_: cfg: cfg.enable) services;
+    in
+    mapAttrs (
+      name: config:
+      rcdTranslate.toRcdService "openbsd" name config
+    ) enabledServices;
+
+  inherit systemdTranslate launchdTranslate runitTranslate rcdTranslate;
 }
