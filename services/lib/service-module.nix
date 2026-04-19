@@ -15,6 +15,8 @@ let
   systemdTranslate = import ./systemd-translate.nix { inherit lib pkgs; };
   launchdOpts = import ./launchd-options.nix { inherit lib; };
   launchdTranslate = import ./launchd-translate.nix { inherit lib pkgs; };
+  runitOpts = import ./runit-options.nix { inherit lib; };
+  runitTranslate = import ./runit-translate.nix { inherit lib pkgs; };
 
   # Service option type
   serviceOpts =
@@ -41,7 +43,13 @@ let
           description = "Launchd-specific options (macOS)";
         };
 
-        # TODO: Add runit, rcd options
+        runit = mkOption {
+          type = types.submodule (runitOpts.runitOptions { inherit name config; });
+          default = { };
+          description = "Runit-specific options";
+        };
+
+        # TODO: Add rcd options
       };
     };
 
@@ -128,5 +136,16 @@ in
       }
     ) enabledServices;
 
-  inherit systemdTranslate launchdTranslate;
+  # Generate runit service directories from service definitions
+  mkRunitServices =
+    services:
+    let
+      enabledServices = filterAttrs (_: cfg: cfg.enable) services;
+    in
+    mapAttrs (
+      name: config:
+      runitTranslate.toRunitService name config
+    ) enabledServices;
+
+  inherit systemdTranslate launchdTranslate runitTranslate;
 }

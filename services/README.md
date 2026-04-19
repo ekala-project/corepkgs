@@ -4,17 +4,19 @@ This directory contains the implementation of a unified service management inter
 
 ## Status
 
-**Phase 3 Complete**: Systemd system services added!
+**Phase 4 Complete**: Runit support added!
 
 ✅ Core module infrastructure
 ✅ Common service options (command, args, environment, user, lifecycle hooks, etc.)
 ✅ Systemd translation layer
 ✅ Systemd user service generation
-✅ **Systemd system service generation** (NEW!)
-✅ **Launchd translation layer**
-✅ **Launchd user agent & daemon generation**
-✅ **Cross-platform examples (systemd + launchd)**
-✅ **Full user/system service parity across platforms**
+✅ Systemd system service generation
+✅ Launchd translation layer
+✅ Launchd user agent & daemon generation
+✅ **Runit translation layer** (NEW!)
+✅ **Runit service directory generation** (NEW!)
+✅ **Cross-platform examples (systemd + launchd + runit)** (UPDATED!)
+✅ Full user/system service parity across platforms
 ✅ Working prototypes with SQLite service and HTTP server
 
 ## Architecture
@@ -28,6 +30,8 @@ services/
 │   ├── systemd-translate.nix  # Common → systemd translation
 │   ├── launchd-options.nix    # Launchd-specific options
 │   ├── launchd-translate.nix  # Common → launchd plist translation
+│   ├── runit-options.nix      # Runit-specific options (NEW!)
+│   ├── runit-translate.nix    # Common → runit service directory (NEW!)
 │   └── service-module.nix     # Core module infrastructure
 ├── examples/
 │   ├── simple-test.nix                  # Minimal test service
@@ -35,11 +39,11 @@ services/
 │   ├── sqlite-simple-launchd.nix        # SQLite logger (cross-platform)
 │   ├── sqlite-server.nix                # SQLite HTTP server (systemd user)
 │   ├── http-server-launchd.nix          # HTTP server (cross-platform)
-│   ├── nginx-system.nix                 # Nginx daemon (system service) (NEW!)
-│   └── http-server-cross-platform.nix   # HTTP server (all 4 builders) (NEW!)
+│   ├── nginx-system.nix                 # Nginx daemon (system service)
+│   └── http-server-cross-platform.nix   # HTTP server (all 5 builders!) (UPDATED!)
 ├── tests/
 │   ├── launchd-test.nix       # Launchd test suite
-│   └── systemd-system-test.nix # Systemd system services tests (NEW!)
+│   └── systemd-system-test.nix # Systemd system services tests
 ├── default.nix                # Main entry point
 └── README.md                  # This file
 ```
@@ -90,6 +94,14 @@ let
         keepAlive = true;
         processType = "Background";
       };
+
+      # Runit-specific options
+      runit = {
+        logScript = ''
+          #!/bin/sh
+          exec svlogd -tt /var/log/my-service
+        '';
+      };
     };
   };
 in
@@ -99,6 +111,7 @@ in
   systemdSystemService = services.buildSystemdSystemServices serviceConfig;
   launchdUserAgent = services.buildLaunchdUserAgents serviceConfig;
   launchdDaemon = services.buildLaunchdDaemons serviceConfig;
+  runitService = services.buildRunitServices serviceConfig;
 }
 ```
 
@@ -183,6 +196,38 @@ sudo launchctl unload /Library/LaunchDaemons/my-service.plist
 
 **Note**: Launchd uses the same plist format for both user agents and system daemons. The installation location determines the context (user vs system).
 
+#### Runit - Service
+
+```bash
+# Build the service directory
+nix-build -A runitService
+
+# Install to service directory
+sudo mkdir -p /etc/sv
+sudo cp -r result/my-service /etc/sv/
+
+# Enable and start (creates supervision)
+sudo ln -s /etc/sv/my-service /run/service/
+# Or on some systems: sudo ln -s /etc/sv/my-service /var/service/
+
+# Check status
+sudo sv status my-service
+
+# Control commands
+sudo sv up my-service      # Start
+sudo sv down my-service    # Stop
+sudo sv restart my-service # Restart
+sudo sv once my-service    # Run once without supervision
+
+# View logs (if logging configured)
+tail -f /var/log/my-service/current
+
+# Disable service
+sudo rm /run/service/my-service  # Or /var/service/my-service
+```
+
+**Note**: Runit service directories contain a `run` script (required) and optional `finish` script. The service is supervised by `runsv` and restarts automatically on exit unless disabled.
+
 ## Example: SQLite Logger
 
 ### Linux (systemd)
@@ -257,6 +302,30 @@ Under `systemd = { ... }`:
 - `after` / `before` - Ordering
 - `wantedBy` - Installation targets
 
+## Runit-Specific Options
+
+Under `runit = { ... }`:
+
+### Service Directory
+- `superviseDirectory` - Where service will be installed (default: `/etc/sv/<name>`)
+
+### Lifecycle & Logging
+- `logScript` - Optional logging run script (typically uses `svlogd`)
+- `timeoutFinish` - Max seconds to wait for finish script
+- `extraRunScript` - Additional shell code in run script (e.g., `ulimit` settings)
+- `extraFinishScript` - Additional shell code in finish script
+
+### Advanced Options
+- `extraConfig.checkScript` - Optional health check script content
+
+**Key Behaviors:**
+- Services restart automatically on exit (supervised by `runsv`)
+- `preStart` hook runs before exec in run script
+- `postStop` hook runs in optional finish script
+- User/group switching via `chpst -u user:group`
+- Environment variables exported in run script
+- Working directory changed via `cd` in run script
+
 ## Launchd-Specific Options (macOS)
 
 Under `launchd = { ... }`:
@@ -299,7 +368,7 @@ Under `launchd = { ... }`:
 
 ### Common Options Across All Platforms
 
-These options work consistently on both systemd and launchd:
+These options work consistently across systemd, launchd, and runit:
 - `enable`, `description`, `command`, `args`
 - `workingDirectory`, `user`, `group`
 - `environment`, `path`
@@ -310,19 +379,27 @@ These options work consistently on both systemd and launchd:
 **preStart hooks:**
 - **systemd**: Runs as separate ExecStartPre unit
 - **launchd**: Wrapped in shell script before main command
+- **runit**: Inline shell code before exec in run script
 
 **postStart/postStop:**
 - **systemd**: Full support via ExecStartPost/ExecStopPost
 - **launchd**: Limited support (warnings issued, needs wrapper scripts)
+- **runit**: postStop via optional finish script (receives exit code and signal)
 
 **Restart policies:**
-- `always` → systemd: `Restart=always`, launchd: `KeepAlive=true`
-- `on-failure` → systemd: `Restart=on-failure`, launchd: `KeepAlive={SuccessfulExit=false}`
-- `never` → systemd: `Restart=no`, launchd: `KeepAlive=false`
+- `always` → systemd: `Restart=always`, launchd: `KeepAlive=true`, runit: default behavior
+- `on-failure` → systemd: `Restart=on-failure`, launchd: `KeepAlive={SuccessfulExit=false}`, runit: default behavior
+- `never` → systemd: `Restart=no`, launchd: `KeepAlive=false`, runit: use `sv once` to run without supervision
 
 **Environment variables:**
 - **systemd**: Uses `Environment=` and `EnvironmentFile=`
 - **launchd**: Uses `EnvironmentVariables` dict in plist
+- **runit**: Shell `export` statements in run script
+
+**User/Group switching:**
+- **systemd**: `User=` and `Group=` directives
+- **launchd**: `UserName=` and `GroupName=` keys
+- **runit**: `chpst -u user:group` command wrapper
 
 ### Unique Platform Features
 
@@ -339,6 +416,13 @@ These options work consistently on both systemd and launchd:
 - Process type classification (Background, Interactive, etc.)
 - Mach services (XPC)
 - Network state awareness
+
+**Runit-only:**
+- Extremely simple shell script format (easy to debug)
+- Built-in process supervision (runsv monitors and restarts)
+- Optional logging via separate log/run script
+- Health checks via optional check script
+- Minimal dependencies (just shell and basic Unix tools)
 
 ## User vs System Services Comparison
 
@@ -362,16 +446,28 @@ These options work consistently on both systemd and launchd:
 | **Builder Function** | `buildLaunchdUserAgents` | `buildLaunchdDaemons` |
 | **Auto-start** | At user login | At system boot |
 
+**Runit:**
+
+Runit doesn't distinguish between user and system services. All services are system-level and controlled via `sv` commands. User-level services would require a separate runit supervision tree running as that user.
+
+| Aspect | Runit Service |
+|--------|---------------|
+| **Installation** | `/etc/sv/<name>/` (definition), `/run/service/<name>` or `/var/service/<name>` (activation) |
+| **Control Command** | `sudo sv` |
+| **Format** | Shell script directory (run, optional finish/check/log) |
+| **Builder Function** | `buildRunitServices` |
+| **Auto-start** | When symlinked to service directory |
+
 ## Future Work
 
 - [x] ~~Launchd support (macOS)~~ **COMPLETE!**
 - [x] ~~Systemd system services~~ **COMPLETE!**
-- [ ] Runit support
+- [x] ~~Runit support~~ **COMPLETE!**
 - [ ] BSD rc.d support (FreeBSD, OpenBSD, NetBSD, DragonFly)
 - [ ] Validation and warnings for incompatible options
 - [ ] Migration tooling from existing service definitions
 - [ ] Integration with home-manager and nix-darwin
-- [ ] Socket activation support (both systemd and launchd)
+- [ ] Socket activation support (systemd, launchd, and potentially runit)
 - [ ] Enhanced timer/scheduling support
 
 ## Related Documentation

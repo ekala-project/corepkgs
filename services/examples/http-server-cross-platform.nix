@@ -115,6 +115,21 @@ let
         # Scheduling (optional - demonstrate launchd features)
         # startInterval = 3600;  # Restart hourly if needed
       };
+
+      # runit-specific options
+      runit = {
+        # Optional logging setup
+        # logScript = ''
+        #   #!/bin/sh
+        #   exec svlogd -tt /var/log/http-server
+        # '';
+
+        # Optional extra configuration
+        extraRunScript = ''
+          # Set resource limits for runit
+          ulimit -n 1024
+        '';
+      };
     };
   };
 in
@@ -130,6 +145,9 @@ in
 
   # macOS: launchd daemon (/Library/LaunchDaemons/)
   launchdDaemon = services.buildLaunchdDaemons serviceConfig;
+
+  # Runit service directory (/etc/sv/)
+  runitService = services.buildRunitServices serviceConfig;
 }
 
 # ============================================================================
@@ -140,11 +158,12 @@ in
 # -------------------
 # nix-build services/examples/http-server-cross-platform.nix
 #
-# This creates four outputs:
+# This creates five outputs:
 # - result-systemdUserService/http-server.service
 # - result-systemdSystemService/http-server.service
 # - result-launchdUserAgent/http-server.plist
 # - result-launchdDaemon/http-server.plist
+# - result-runitService/http-server/ (service directory with run script)
 #
 #
 # LINUX - User Service:
@@ -235,6 +254,35 @@ in
 #    sudo launchctl unload /Library/LaunchDaemons/http-server.plist
 #
 #
+# RUNIT - Service:
+# ----------------
+# 1. Install:
+#    sudo mkdir -p /etc/sv
+#    sudo cp -r result-runitService/http-server /etc/sv/
+#
+# 2. Enable and start:
+#    sudo ln -s /etc/sv/http-server /run/service/
+#    # Or on some systems: sudo ln -s /etc/sv/http-server /var/service/
+#
+# 3. Check status:
+#    sudo sv status http-server
+#
+# 4. Test:
+#    curl http://localhost:8000
+#
+# 5. View logs (if svlogd is configured):
+#    tail -f /var/log/http-server/current
+#
+# 6. Control commands:
+#    sudo sv up http-server      # Start
+#    sudo sv down http-server    # Stop
+#    sudo sv restart http-server # Restart
+#    sudo sv once http-server    # Start once (don't restart)
+#
+# 7. Disable:
+#    sudo rm /run/service/http-server  # Or /var/service/http-server
+#
+#
 # COMPARISON:
 # -----------
 # Compare the generated files to see how the same service definition
@@ -244,8 +292,10 @@ in
 # cat result-systemdSystemService/http-server.service
 # cat result-launchdUserAgent/http-server.plist
 # cat result-launchdDaemon/http-server.plist
+# cat result-runitService/http-server/run
 #
 # Note the differences:
 # - systemd user vs system: WantedBy target (default.target vs multi-user.target)
 # - launchd user vs daemon: Same content (location determines context)
-# - systemd vs launchd: Different formats, same behavior
+# - systemd vs launchd: Different formats (INI vs plist), same behavior
+# - runit: Shell script format, simple and portable

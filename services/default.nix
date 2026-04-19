@@ -55,6 +55,14 @@ let
     in
     serviceLib.mkLaunchdDaemons services;
 
+  # Build runit service directories (for /etc/sv)
+  buildRunitServices =
+    servicesConfig:
+    let
+      services = evalServices servicesConfig;
+    in
+    serviceLib.mkRunitServices services;
+
 in
 {
   inherit
@@ -63,6 +71,7 @@ in
     buildSystemdSystemServices
     buildLaunchdUserAgents
     buildLaunchdDaemons
+    buildRunitServices
     ;
 
   # Export library functions
