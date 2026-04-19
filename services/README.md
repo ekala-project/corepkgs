@@ -4,7 +4,7 @@ This directory contains the implementation of a unified service management inter
 
 ## Status
 
-**Phase 5 Complete**: BSD rc.d support added!
+**Phase 9 Complete**: Initramfs/initrd support for advanced boot scenarios!
 
 ✅ Core module infrastructure
 ✅ Common service options (command, args, environment, user, lifecycle hooks, etc.)
@@ -15,9 +15,20 @@ This directory contains the implementation of a unified service management inter
 ✅ Launchd user agent & daemon generation
 ✅ Runit translation layer
 ✅ Runit service directory generation
-✅ **BSD rc.d translation layer** (NEW!)
-✅ **BSD rc.d script generation (FreeBSD/OpenBSD/NetBSD/DragonFly)** (NEW!)
-✅ **Cross-platform examples (systemd + launchd + runit + rc.d)** (UPDATED!)
+✅ BSD rc.d translation layer
+✅ BSD rc.d script generation (FreeBSD/OpenBSD/NetBSD/DragonFly)
+✅ Cross-platform examples (systemd + launchd + runit + rc.d)
+✅ Configuration validation system
+✅ Build-time error detection and warnings
+✅ Bootable ekaos system integration
+✅ systemd-boot UEFI bootloader support
+✅ Complete boot path: UEFI → systemd-boot → kernel → systemd
+✅ QEMU/VM testing infrastructure
+✅ Automated boot testing
+✅ Disk image generation (QCOW2)
+✅ **Initramfs/initrd support** (NEW!)
+✅ **Two-stage boot (stage-1 + stage-2)** (NEW!)
+✅ **LUKS encryption support** (NEW!)
 ✅ Full user/system service parity across platforms
 ✅ Working prototypes with SQLite service and HTTP server
 
@@ -34,8 +45,9 @@ services/
 │   ├── launchd-translate.nix  # Common → launchd plist translation
 │   ├── runit-options.nix      # Runit-specific options
 │   ├── runit-translate.nix    # Common → runit service directory
-│   ├── rcd-options.nix        # BSD rc.d-specific options (NEW!)
-│   ├── rcd-translate.nix      # Common → BSD rc.d script (NEW!)
+│   ├── rcd-options.nix        # BSD rc.d-specific options
+│   ├── rcd-translate.nix      # Common → BSD rc.d script
+│   ├── validate.nix           # Configuration validation (NEW!)
 │   └── service-module.nix     # Core module infrastructure
 ├── examples/
 │   ├── simple-test.nix                  # Minimal test service
@@ -49,7 +61,8 @@ services/
 ├── tests/
 │   ├── launchd-test.nix       # Launchd test suite
 │   ├── systemd-system-test.nix # Systemd system services tests
-│   └── rcd-test.nix           # BSD rc.d test suite (NEW!)
+│   ├── rcd-test.nix           # BSD rc.d test suite
+│   └── validation-test.nix    # Configuration validation tests (NEW!)
 ├── default.nix                # Main entry point
 └── README.md                  # This file
 ```
@@ -361,6 +374,118 @@ sqlite3 ~/.local/share/sqlite-logger/log.db \
 launchctl unload ~/Library/LaunchAgents/sqlite-logger.plist
 ```
 
+## Configuration Validation
+
+The service system includes **automatic build-time validation** to catch configuration errors early:
+
+### Error Detection (Build Fails)
+
+The validation system catches critical errors at build time:
+
+1. **Platform-specific options on wrong builder**
+   ```nix
+   services.buildLaunchdUserAgents {
+     bad-service = {
+       enable = true;
+       command = "${pkgs.coreutils}/bin/echo";
+       systemd = {  # ERROR: Using systemd.* in launchd build
+         serviceConfig.PrivateTmp = true;
+       };
+     };
+   }
+   # Error: Using systemd.* options in launchd build - these options will be ignored
+   ```
+
+2. **Missing required configuration**
+   ```nix
+   my-service = {
+     enable = true;
+     command = "";  # ERROR: Empty command
+   };
+   # Error: command is required but not specified
+   ```
+
+3. **Invalid configuration values**
+   ```nix
+   my-service = {
+     enable = true;
+     command = "${pkgs.coreutils}/bin/echo";
+     restartPolicy = "invalid-policy";  # ERROR: Invalid value
+   };
+   # Error: Invalid restartPolicy 'invalid-policy' - must be one of: always, on-failure, ...
+   ```
+
+### Warning Detection (Build Succeeds)
+
+The validation system issues warnings for non-critical issues:
+
+1. **Limited platform support**
+   ```nix
+   services.buildLaunchdUserAgents {
+     service = {
+       enable = true;
+       command = "${pkgs.coreutils}/bin/echo";
+       postStart = "echo done";  # WARNING: Limited launchd support
+     };
+   }
+   # Warning: postStart hook has limited support on launchd - may need wrapper script
+   ```
+
+2. **Platform limitations**
+   ```nix
+   services.buildRcdServices {
+     service = {
+       enable = true;
+       command = "${pkgs.coreutils}/bin/echo";
+       restartPolicy = "always";  # WARNING: Not supported on rc.d
+     };
+   }
+   # Warning: restartPolicy 'always' not supported on BSD rc.d
+   ```
+
+3. **Best practice violations**
+   ```nix
+   my-service = {
+     enable = true;
+     description = "";  # WARNING: Empty description
+     command = "${pkgs.coreutils}/bin/echo";
+   };
+   # Warning: description is empty - consider adding a human-readable description
+   ```
+
+### Validation Categories
+
+The validation system checks for:
+
+- **Platform-specific options on wrong builder** - Detects when you use systemd/launchd/runit/rcd-specific options with the wrong build function
+- **Unsupported common options** - Warns when common options have limited support on a platform (e.g., `postStart` on launchd, `restartPolicy` on rc.d)
+- **Missing required dependencies** - Ensures `command` and other required fields are set
+- **Configuration conflicts** - Catches invalid values for typed options like `restartPolicy`
+
+### Testing Validation
+
+Run the validation test suite to see all validation cases:
+
+```bash
+# Run all validation tests
+nix-build services/tests/validation-test.nix -A all
+
+# View test results
+cat result/test-results.txt
+
+# Test specific error cases
+nix-build services/tests/validation-test.nix -A test1_platformSpecificError  # Should fail
+nix-build services/tests/validation-test.nix -A test5_emptyCommandError      # Should fail
+
+# Test warning cases
+nix-build services/tests/validation-test.nix -A test3_postStartWarning        # Succeeds with warning
+nix-build services/tests/validation-test.nix -A test4_restartPolicyWarning    # Succeeds with warning
+```
+
+The test suite includes 12 comprehensive tests covering:
+- 4 error detection tests (build failures)
+- 8 warning detection tests (build succeeds with warnings)
+
 ## Common Service Options
 
 All service managers support these common options:
@@ -542,21 +667,236 @@ Runit doesn't distinguish between user and system services. All services are sys
 | **Builder Function** | `buildRunitServices` |
 | **Auto-start** | When symlinked to service directory |
 
+## Integration with ekaos Bootable System
+
+The service management infrastructure is now integrated into **ekaos**, a minimal bootable Linux system with systemd. This provides a complete boot-to-service path.
+
+### What is ekaos?
+
+ekaos (`../ekaos/`) is a bootable system builder that:
+- Creates complete Linux system closures
+- Supports systemd-boot UEFI bootloader
+- Uses the services/ infrastructure for system service management
+- Provides a NixOS-style module system for configuration
+- Generates RFC-0125 compliant bootspec (boot.json)
+
+### Boot Process
+
+**Without initramfs (direct boot):**
+```
+UEFI Firmware
+    ↓
+systemd-boot (reads /boot/loader/entries/)
+    ↓
+Linux Kernel (with init=/nix/store/.../init)
+    ↓
+Stage-2 Init
+    ├─ Mount filesystems (/proc, /sys, /dev, /run)
+    ├─ Mount /nix/store (read-only)
+    ├─ Run activation scripts
+    └─ exec systemd (PID 1)
+        ↓
+    Systemd Services (managed via services/ interface)
+        ↓
+    multi-user.target
+```
+
+**With initramfs (two-stage boot):**
+```
+UEFI Firmware
+    ↓
+systemd-boot (reads /boot/loader/entries/)
+    ↓
+Linux Kernel (with initrd, init=/init in initramfs)
+    ↓
+Stage-1 Init (initramfs)
+    ├─ Mount essential filesystems (/proc, /sys, /dev, /run)
+    ├─ Load kernel modules (SATA, NVMe, USB, etc.)
+    ├─ Unlock LUKS encrypted devices
+    ├─ Mount root filesystem
+    └─ switch_root to real root
+        ↓
+    Stage-2 Init
+        ├─ Mount /nix/store (read-only)
+        ├─ Run activation scripts
+        └─ exec systemd (PID 1)
+            ↓
+        Systemd Services (managed via services/ interface)
+            ↓
+        multi-user.target
+```
+
+### Using Services in ekaos
+
+Define system services in ekaos configuration using the same interface:
+
+```nix
+# ekaos system configuration
+{ config, lib, pkgs, ... }:
+
+{
+  system.ekaos.version = "24.11";
+
+  boot.loader.systemd-boot.enable = true;
+  boot.kernelPackages = pkgs.linuxPackages;
+
+  # Services use the same interface as services/
+  systemd.services = {
+    my-service = {
+      enable = true;
+      description = "My Service";
+      command = "${pkgs.python3}/bin/python3";
+      args = [ "-m" "http.server" "8080" ];
+      restartPolicy = "always";
+
+      environment = {
+        PORT = "8080";
+      };
+
+      # Systemd-specific options still work
+      systemd.serviceConfig = {
+        PrivateTmp = true;
+      };
+    };
+  };
+}
+```
+
+Build a bootable system:
+
+```bash
+cd /home/jon/projects/core-pkgs
+nix-build ekaos -A system
+
+# Result contains:
+./result/init                 # Stage-2 init script
+./result/boot.json           # Bootspec for bootloader
+./result/etc/                # System configuration
+./result/sw/                 # System packages
+./result/systemd/            # Systemd package
+./result/activate            # Activation script
+```
+
+### Benefits of Integration
+
+1. **Unified Service Interface**: Same service definitions work for:
+   - Standalone systemd services (user/system)
+   - Full bootable ekaos systems
+   - All other supported platforms (launchd, runit, rc.d)
+
+2. **Cross-Platform Development**: Develop services on any platform, deploy to ekaos
+
+3. **Validation**: Build-time validation catches errors before boot
+
+4. **Modular**: Services can be defined in modules and reused across systems
+
+### ekaos Features
+
+- **Module System**: NixOS-inspired configuration modules
+- **systemd-boot**: Modern UEFI bootloader with automatic generation management
+- **Bootspec Compliant**: RFC-0125 boot.json for reliable boot configuration
+- **Initramfs/initrd**: Two-stage boot with LUKS encryption, LVM, custom modules
+- **Activation Framework**: Topologically sorted system setup scripts
+- **/etc Management**: Declarative system configuration files
+- **QEMU/VM Testing**: Complete testing infrastructure with automated boot tests
+- **Disk Image Builder**: Automated QCOW2 image generation for VMs
+
+### Example: Bootable HTTP Server
+
+Create a complete bootable system with an HTTP server:
+
+```nix
+{ config, pkgs, ... }:
+
+{
+  system.ekaos.label = "http-server-system";
+
+  boot.loader.systemd-boot.enable = true;
+  boot.kernelPackages = pkgs.linuxPackages;
+
+  systemd.services.http-server = {
+    enable = true;
+    description = "HTTP Server";
+    command = "${pkgs.python3}/bin/python3";
+    args = [ "-m" "http.server" "8080" ];
+    restartPolicy = "always";
+
+    systemd = {
+      wantedBy = [ "multi-user.target" ];
+      after = [ "network.target" ];
+    };
+  };
+}
+```
+
+Build and test in a VM:
+
+```bash
+# Add VM support to configuration
+{ config, pkgs, ... }:
+{
+  # ... HTTP server configuration above ...
+
+  # Enable VM testing
+  virtualisation.enable = true;
+}
+
+# Build and run
+nix-build -A vm
+./result  # Boots VM with HTTP server running
+```
+
+Or install to disk and boot on real hardware!
+
+### Current Status
+
+- ✅ **Core boot infrastructure** - Stage-2 init, activation, /etc management
+- ✅ **systemd-boot integration** - UEFI bootloader with boot entry generation
+- ✅ **Service integration** - services/ infrastructure used for system services
+- ✅ **Bootspec generation** - RFC-0125 compliant boot.json
+- ✅ **QEMU/VM testing** - Complete testing infrastructure with automated tests
+- ✅ **Disk image creation** - Automated QCOW2 image generation for VMs
+- ✅ **Boot verification** - One-command testing with `./tests/quick-test.sh`
+- ✅ **Initramfs/initrd support** - Two-stage boot for encrypted root, LVM, custom modules
+
+### Quick Test
+
+Test ekaos boot in QEMU:
+
+```bash
+cd /home/jon/projects/core-pkgs/ekaos
+./tests/quick-test.sh
+```
+
+This builds a bootable VM, boots it, and verifies successful systemd startup in ~30 seconds.
+
+See `../ekaos/README.md` for complete ekaos documentation and testing options.
+
 ## Future Work
 
 - [x] ~~Launchd support (macOS)~~ **COMPLETE!**
 - [x] ~~Systemd system services~~ **COMPLETE!**
 - [x] ~~Runit support~~ **COMPLETE!**
 - [x] ~~BSD rc.d support (FreeBSD, OpenBSD, NetBSD, DragonFly)~~ **COMPLETE!**
-- [ ] Validation and warnings for incompatible options
+- [x] ~~Validation and warnings for incompatible options~~ **COMPLETE!**
+- [x] ~~Bootable system integration (ekaos with systemd-boot)~~ **COMPLETE!**
+- [x] ~~Boot testing in QEMU/VM~~ **COMPLETE!**
+- [x] ~~Initrd/initramfs support for ekaos~~ **COMPLETE!**
+- [ ] Real hardware boot testing
 - [ ] Migration tooling from existing service definitions
 - [ ] Integration with home-manager and nix-darwin
 - [ ] Socket activation support (systemd, launchd, runit, and BSD rc.d)
 - [ ] Enhanced timer/scheduling support
+- [ ] GRUB bootloader support for ekaos
+- [ ] Network configuration modules for ekaos
+- [ ] User management modules for ekaos
+- [ ] Network root filesystem (iSCSI/NFS) in initramfs
 
 ## Related Documentation
 
-See `../cross-service-plan.md` for the full design document.
+- `../cross-service-plan.md` - Full design document for cross-service interface
+- `../ekaos/README.md` - ekaos bootable system documentation
+- `../ekaos/missing-packages.md` - Package requirements for bootable systems
 
 ## Testing
 

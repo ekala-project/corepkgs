@@ -19,6 +19,7 @@ let
   runitTranslate = import ./runit-translate.nix { inherit lib pkgs; };
   rcdOpts = import ./rcd-options.nix { inherit lib; };
   rcdTranslate = import ./rcd-translate.nix { inherit lib pkgs; };
+  validate = import ./validate.nix { inherit lib pkgs; };
 
   # Service option type
   serviceOpts =
@@ -73,6 +74,7 @@ in
     services:
     let
       enabledServices = filterAttrs (_: cfg: cfg.enable) services;
+      validatedServices = validate.validateServices "systemd" enabledServices;
     in
     mapAttrs (
       name: config:
@@ -84,13 +86,14 @@ in
         text = unitText;
         destination = "/${name}.service";
       }
-    ) enabledServices;
+    ) validatedServices;
 
   # Generate systemd system service files from service definitions
   mkSystemdSystemServices =
     services:
     let
       enabledServices = filterAttrs (_: cfg: cfg.enable) services;
+      validatedServices = validate.validateServices "systemd" enabledServices;
     in
     mapAttrs (
       name: config:
@@ -102,13 +105,14 @@ in
         text = unitText;
         destination = "/${name}.service";
       }
-    ) enabledServices;
+    ) validatedServices;
 
   # Generate launchd user agent plist files from service definitions
   mkLaunchdUserAgents =
     services:
     let
       enabledServices = filterAttrs (_: cfg: cfg.enable) services;
+      validatedServices = validate.validateServices "launchd" enabledServices;
     in
     mapAttrs (
       name: config:
@@ -121,13 +125,14 @@ in
         text = plistContent;
         destination = "/${name}.plist";
       }
-    ) enabledServices;
+    ) validatedServices;
 
   # Generate launchd daemon plist files (system-wide) from service definitions
   mkLaunchdDaemons =
     services:
     let
       enabledServices = filterAttrs (_: cfg: cfg.enable) services;
+      validatedServices = validate.validateServices "launchd" enabledServices;
     in
     mapAttrs (
       name: config:
@@ -140,24 +145,26 @@ in
         text = plistContent;
         destination = "/${name}.plist";
       }
-    ) enabledServices;
+    ) validatedServices;
 
   # Generate runit service directories from service definitions
   mkRunitServices =
     services:
     let
       enabledServices = filterAttrs (_: cfg: cfg.enable) services;
+      validatedServices = validate.validateServices "runit" enabledServices;
     in
     mapAttrs (
       name: config:
       runitTranslate.toRunitService name config
-    ) enabledServices;
+    ) validatedServices;
 
   # Generate BSD rc.d service files (FreeBSD/NetBSD/DragonFly)
   mkRcdServices =
     services:
     let
       enabledServices = filterAttrs (_: cfg: cfg.enable) services;
+      validatedServices = validate.validateServices "rcd" enabledServices;
     in
     mapAttrs (
       name: config:
@@ -165,18 +172,19 @@ in
         variant = config.rcd.variant or "freebsd";
       in
       rcdTranslate.toRcdService variant name config
-    ) enabledServices;
+    ) validatedServices;
 
   # Generate BSD rc.d service files (OpenBSD variant)
   mkRcdServicesOpenBSD =
     services:
     let
       enabledServices = filterAttrs (_: cfg: cfg.enable) services;
+      validatedServices = validate.validateServices "rcd" enabledServices;
     in
     mapAttrs (
       name: config:
       rcdTranslate.toRcdService "openbsd" name config
-    ) enabledServices;
+    ) validatedServices;
 
   inherit systemdTranslate launchdTranslate runitTranslate rcdTranslate;
 }
