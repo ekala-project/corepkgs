@@ -5,10 +5,12 @@ ekaos is a minimal, bootable Linux system builder using Nix. It provides a clean
 ## Features
 
 - **Minimal boot path**: UEFI → systemd-boot → kernel → stage-2 init → systemd
+- **Two-stage boot**: Optional initramfs for LUKS encryption, LVM, custom modules
 - **Modular configuration**: NixOS-inspired module system
 - **Service management**: Integrates with the ekaos unified service interface (services/)
 - **systemd-boot**: Modern UEFI bootloader with automatic boot entry generation
 - **Bootspec compliant**: Uses RFC-0125 bootspec (boot.json) for boot configuration
+- **Testing framework**: ekaosTest - automated testing with Python test driver (see `lib/testing/README.md`)
 
 ## Quick Start
 
@@ -433,9 +435,65 @@ virtualisation = {
 };
 ```
 
-### Automated Testing
+### Automated Testing with ekaosTest
 
-Run the full boot test:
+ekaos includes **ekaosTest**, a comprehensive testing framework inspired by nixosTest. It provides Python test scripts with high-level primitives for testing boot, services, and system behavior.
+
+**Quick example tests:**
+
+```bash
+# Run a simple boot test
+nix-build ekaos/tests -A simple
+
+# Run a service management test
+nix-build ekaos/tests -A service
+
+# Run a boot process test
+nix-build ekaos/tests -A boot-process
+
+# Run all tests
+nix-build ekaos/tests -A all
+```
+
+**Write your own test:**
+
+```nix
+# my-test.nix
+{ pkgs, ... }:
+
+{
+  name = "my-service-test";
+
+  nodes.machine = { config, pkgs, ... }: {
+    boot.kernelPackages = pkgs.linuxPackages;
+    virtualisation.enable = true;
+
+    systemd.services.my-service = {
+      # Your service configuration
+    };
+  };
+
+  testScript = ''
+    machine.start()
+    machine.wait_for_unit("multi-user.target")
+    machine.wait_for_unit("my-service.service")
+    machine.succeed("systemctl status my-service")
+    machine.shutdown()
+  '';
+}
+```
+
+**Run it:**
+
+```bash
+nix-build -E '(import ./. {}).ekaosTest ./my-test.nix'
+```
+
+See **`lib/testing/README.md`** for complete ekaosTest documentation, API reference, and examples.
+
+#### Legacy Boot Test
+
+The original simple boot test is still available:
 
 ```bash
 # Build and run boot test

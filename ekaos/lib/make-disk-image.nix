@@ -41,7 +41,6 @@ let
       additionalSpace
       installBootLoader
       touchEFIVars
-      copyChannel
       label
       ;
 
