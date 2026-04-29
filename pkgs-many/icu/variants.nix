@@ -1,7 +1,7 @@
 {
   icu78 = {
-    version = "78.1";
-    src-hash = "sha256-Yhf1jKObIxJ2Bc/Gx+DTR1/ksNYxVwETg9cWy0FheIY=";
+    version = "78.3";
+    src-hash = "sha256-Oi56R2BLpwLzRYeDCOb+/sphLuiVz0pfIi55Vfq/4MA=";
   };
   icu77 = {
     version = "77.1";
