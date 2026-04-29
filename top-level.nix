@@ -37,6 +37,22 @@ with final;
   linuxPackages_6_12 = linuxPackages;
   linuxPackages_6_18 = linuxPackages_latest;
 
+  # ekaosTest - Testing framework for ekaos systems
+  ekaosTest = (callPackage ./ekaos/lib/testing {}).runTest;
+
+  # vmTools - VM building utilities for ekaosTest and disk image creation
+  vmTools = callPackage ./build-support/vm { };
+  makeInitrd = callPackage ./build-support/kernel/make-initrd.nix { };
+  makeModulesClosure = callPackage ./build-support/kernel/modules-closure.nix { };
+
+  # Temporarily reference nixpkgs for packages not yet in core-pkgs
+  # TODO: Implement these natively in core-pkgs
+  virtiofsd = (import <nixpkgs> {}).virtiofsd;
+  OVMF = (import <nixpkgs> {}).OVMF;
+  dpkg = (import <nixpkgs> {}).dpkg;  # Needed by vmTools for Debian image support
+  rpm = (import <nixpkgs> {}).rpm;    # Needed by vmTools for RPM image support
+  mtdutils = (import <nixpkgs> {}).mtdutils;  # Needed by vmTools for MTD filesystem support
+
   # keep-sorted start
   aafigure = null;
   actdiag = null;
@@ -151,12 +167,10 @@ with final;
   psutils = null;
   pydantic = null;
   pygame-ce = null;
-  qemu = null;
   quart = null;
   rich = null;
   ripgrep = null;
   rocksdb = null;
-  rpm = null;
   rsyslog = null;
   sage = null;
   samba = null;
