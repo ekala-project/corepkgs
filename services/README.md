@@ -30,6 +30,8 @@ This directory contains the implementation of a unified service management inter
 ✅ **Two-stage boot (stage-1 + stage-2)** (NEW!)
 ✅ **LUKS encryption support** (NEW!)
 ✅ **Linux kernel package integration with core-pkgs** (NEW!)
+✅ **ekaosTest framework (Phase 1 MVP)** (NEW!)
+✅ **Python test driver with test primitives** (NEW!)
 ✅ Full user/system service parity across platforms
 ✅ Working prototypes with SQLite service and HTTP server
 🔄 **System build testing in progress**
@@ -896,7 +898,17 @@ Or install to disk and boot on real hardware!
 - ✅ **Kernel package integration** - Linux kernel packages exposed at top-level in core-pkgs
 - 🔄 **System build testing** - Currently verifying complete build process
 
-### Recent Changes (Phase 9)
+### Recent Changes (Phase 9 + ekaosTest)
+
+**ekaosTest Framework (NEW!):**
+- Complete testing framework for ekaos systems (Phase 1 MVP complete)
+- Inspired by nixosTest from nixpkgs, adapted for ekaos
+- Python test driver with high-level test primitives for systemd, commands, and network testing
+- Single-VM testing support (multi-VM planned for Phase 2)
+- Public API exposed as `pkgs.ekaosTest`
+- Example tests: boot verification, service management, systemd targets
+- Comprehensive documentation at `ekaos/lib/testing/README.md`
+- **Note**: Currently depends on nixpkgs `make-disk-image.nix` (requires vmTools not yet in core-pkgs)
 
 **Initramfs/Initrd Implementation:**
 - Complete two-stage boot support with stage-1 init in initramfs
@@ -916,6 +928,7 @@ Or install to disk and boot on real hardware!
 - Proper integration with core-pkgs package set
 - Services library path corrections for ekaos integration
 - Bootspec JSON structure fixed for proper attribute merging
+- Fixed duplicate option declarations and module loading issues
 
 ### Quick Test
 
