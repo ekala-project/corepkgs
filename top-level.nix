@@ -952,6 +952,21 @@ final: prev: with final; {
     lib.recurseIntoAttrs arrayUtilitiesPackages;
   makeWrapper = makeShellWrapper;
 
+  # Driver-wrapper: lets nix-built executables that need hardware
+  # acceleration run on non-NixOS hosts by exposing host-provided
+  # GL/Vulkan/CUDA/etc. libraries at runtime.
+  #
+  # Use as:
+  #   nativeBuildInputs = [ wrapDriverProgramHook ];
+  #   # autoWrapDriverPrograms is registered into postFixup automatically;
+  #   # alternatively call wrapDriverProgram $out/bin/foo manually.
+  #
+  # Or, externally, transform an existing derivation:
+  #   wrapDriverProgram { drv = somepkg; }
+  wrapDriverProgramHook = callPackage ./build-support/wrap-driver-program { };
+  wrapDriverProgram = wrapDriverProgramHook.wrapDriverProgram;
+  autoWrapDriverPrograms = wrapDriverProgramHook;
+
   readline70 = callPackage ./pkgs/readline/7.0.nix { };
   readline = callPackage ./pkgs/readline/8.3.nix { };
 
