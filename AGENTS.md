@@ -190,14 +190,47 @@ nix fmt top-level.nix
 
 ## Common Patterns
 
+### Checking if Dependencies Exist
+
+Before porting a package, verify that all required dependencies are available in core-pkgs.
+
+**Use `nix-instantiate` to check if a dependency exists:**
+
+```bash
+nix-instantiate -A <dependency-name>
+```
+
+If the dependency exists, you'll see the derivation path. If it doesn't exist, you'll get an error.
+
+**Example - checking multiple dependencies:**
+```bash
+for dep in acl lzo cmocka libuuid util-linux zlib zstd; do
+  echo -n "$dep: "
+  nix-instantiate -A $dep >/dev/null 2>&1 && echo "✓ available" || echo "✗ missing"
+done
+```
+
+**Output:**
+```
+acl: ✓ available
+lzo: ✓ available
+cmocka: ✓ available
+libuuid: ✓ available
+util-linux: ✓ available
+zlib: ✓ available
+zstd: ✓ available
+```
+
+**Important:** Do NOT search `top-level.nix` with grep to check for dependencies. Packages in `pkgs/` and `pkgs-many/` are automatically registered and may not appear in `top-level.nix`. Always use `nix-instantiate` to verify availability.
+
 ### Porting from nixpkgs
 
 When porting a package from nixpkgs to core-pkgs:
 
-1. **Copy the package files** to the appropriate directory (`pkgs/` or `pkgs-many/`)
-2. **Remove/clear `meta.maintainers`** field
-3. **Remove update scripts** (e.g., `updateScript = gnome.updateScript { ... }`)
-4. **Check dependencies** - ensure all dependencies are available in core-pkgs
+1. **Check dependencies first** - use `nix-instantiate -A <dep>` to verify all dependencies exist
+2. **Copy the package files** to the appropriate directory (`pkgs/` or `pkgs-many/`)
+3. **Remove/clear `meta.maintainers`** field
+4. **Remove update scripts** (e.g., `updateScript = gnome.updateScript { ... }`)
 5. **Add TODO comments** for missing dependencies:
    ```nix
    # TODO(corepkgs): Port pexpect when needed for msVarsTemplate support
@@ -262,6 +295,7 @@ stdenv.mkDerivation (finalAttrs: {
 
 Before submitting changes, ensure:
 
+- [ ] All dependencies verified to exist using `nix-instantiate -A <dep>`
 - [ ] Package directory created in `pkgs/` or `pkgs-many/` as appropriate
 - [ ] Explicit `top-level.nix` entry only if inputs deviate from defaults
 - [ ] `meta.maintainers = [ ];` (empty list)
