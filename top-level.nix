@@ -54,8 +54,6 @@ with final;
 
   # Temporarily reference nixpkgs for packages not yet in core-pkgs
   # TODO: Port these natively to core-pkgs
-  # OVMF requires porting the entire edk2 UEFI development kit (complex, large task)
-  OVMF = (import <nixpkgs> {}).OVMF;
   dpkg = (import <nixpkgs> {}).dpkg;  # Needed by vmTools for Debian image support
   rpm = (import <nixpkgs> {}).rpm;    # Needed by vmTools for RPM image support
   mtdutils = (import <nixpkgs> {}).mtdutils;  # Needed by vmTools for MTD filesystem support
