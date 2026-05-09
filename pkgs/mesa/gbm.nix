@@ -56,6 +56,7 @@ stdenv.mkDerivation rec {
     bison
     flex
     meson
+    meson.configurePhaseHook
     pkg-config
     ninja
     python3Packages.packaging
