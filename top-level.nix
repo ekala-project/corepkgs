@@ -45,16 +45,12 @@ with final;
   };
 
   # ekaosTest - Testing framework for ekaos systems
-  ekaosTest = (callPackage ./ekaos/lib/testing {}).runTest;
+  ekaosTest = (callPackage ./ekaos/lib/testing { }).runTest;
 
   # vmTools - VM building utilities for ekaosTest and disk image creation
   vmTools = callPackage ./build-support/vm { };
   makeInitrd = callPackage ./build-support/kernel/make-initrd.nix { };
   makeModulesClosure = callPackage ./build-support/kernel/modules-closure.nix { };
-
-  # Temporarily reference nixpkgs for packages not yet in core-pkgs
-  # TODO: Port these natively to core-pkgs
-  mtdutils = (import <nixpkgs> {}).mtdutils;  # Needed by vmTools for MTD filesystem support
 
   # keep-sorted start
   aafigure = null;
