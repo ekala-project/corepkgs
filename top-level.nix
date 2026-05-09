@@ -37,6 +37,13 @@ with final;
   linuxPackages_6_12 = linuxPackages;
   linuxPackages_6_18 = linuxPackages_latest;
 
+  # qemu - disable docs to avoid sphinx dependencies for now
+  # disable smartcard support to avoid libcacard dependency
+  qemu = prev.qemu.override {
+    enableDocs = false;
+    smartcardSupport = false;
+  };
+
   # ekaosTest - Testing framework for ekaos systems
   ekaosTest = (callPackage ./ekaos/lib/testing {}).runTest;
 
