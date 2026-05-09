@@ -54,7 +54,6 @@ with final;
 
   # Temporarily reference nixpkgs for packages not yet in core-pkgs
   # TODO: Port these natively to core-pkgs
-  dpkg = (import <nixpkgs> {}).dpkg;  # Needed by vmTools for Debian image support
   rpm = (import <nixpkgs> {}).rpm;    # Needed by vmTools for RPM image support
   mtdutils = (import <nixpkgs> {}).mtdutils;  # Needed by vmTools for MTD filesystem support
 
