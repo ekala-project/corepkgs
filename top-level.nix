@@ -54,7 +54,6 @@ with final;
 
   # Temporarily reference nixpkgs for packages not yet in core-pkgs
   # TODO: Port these natively to core-pkgs
-  rpm = (import <nixpkgs> {}).rpm;    # Needed by vmTools for RPM image support
   mtdutils = (import <nixpkgs> {}).mtdutils;  # Needed by vmTools for MTD filesystem support
 
   # keep-sorted start
@@ -1517,6 +1516,9 @@ with final;
     docbook-xsl-nons # was docbook_xsl
     docbook-xsl-ns # was docbook-xsl-ns
     ;
+
+  # Alias for compatibility
+  docbook-xsl = docbook-xsl-nons;
 
   inherit (callPackage ./pkgs/libxml2 { })
     libxml2_13

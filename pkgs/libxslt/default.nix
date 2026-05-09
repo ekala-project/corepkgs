@@ -12,12 +12,11 @@
   libgcrypt,
   cryptoSupport ? false,
   pythonSupport ? libxml2.pythonSupport,
-  gnome,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxslt";
-  version = "1.1.43";
+  version = "1.1.45";
 
   outputs = [
     "bin"
@@ -31,7 +30,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   src = fetchurl {
     url = "mirror://gnome/sources/libxslt/${lib.versions.majorMinor finalAttrs.version}/libxslt-${finalAttrs.version}.tar.xz";
-    hash = "sha256-Wj1rODylr8I1sXERjpD1/2qifp/qMwMGUjGm1APwGDo=";
+    hash = "sha256-ms/mhBnE0GpFxVAyGzISdi2S9BRlBiyk6hnmMu5dIW4=";
   };
 
   patches = [
@@ -87,11 +86,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     inherit pythonSupport;
-
-    updateScript = gnome.updateScript {
-      packageName = "libxslt";
-      versionPolicy = "none";
-    };
   };
 
   meta = {
@@ -100,5 +94,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
     broken = pythonSupport && !libxml2.pythonSupport; # see #73102 for why this is not an assert
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "xmlsoft" finalAttrs.version;
   };
 })
