@@ -195,7 +195,6 @@ with final;
   ttfautohint = null;
   unixODBC = null;
   uwsgi = null;
-  vde2 = null;
   vips = null;
   vlc = null;
   werkzeug = null;
