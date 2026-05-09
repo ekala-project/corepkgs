@@ -438,7 +438,7 @@ stdenv.mkDerivation (finalAttrs: {
       homepage = "https://www.qemu.org/";
       description = "Generic and open source machine emulator and virtualizer";
       license = lib.licenses.gpl2Plus;
-      maintainers = with lib.maintainers; [ qyliss ];
+      maintainers = [ ];
       teams = lib.optionals xenSupport xen.meta.teams;
       platforms = lib.platforms.unix;
     }
