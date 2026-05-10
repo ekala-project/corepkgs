@@ -39,7 +39,8 @@
   seccompSupport ? stdenv.hostPlatform.isLinux && !minimal,
   libseccomp,
   alsaSupport ? lib.hasSuffix "linux" stdenv.hostPlatform.system && !nixosTestRunner && !minimal,
-  pulseSupport ? !stdenv.hostPlatform.isDarwin && !nixosTestRunner && !minimal && libpulseaudio != null,
+  pulseSupport ?
+    !stdenv.hostPlatform.isDarwin && !nixosTestRunner && !minimal && libpulseaudio != null,
   libpulseaudio ? null,
   pipewireSupport ? !stdenv.hostPlatform.isDarwin && !nixosTestRunner && !minimal && pipewire != null,
   pipewire ? null,
@@ -48,7 +49,8 @@
   SDL2_image ? null,
   jackSupport ? !stdenv.hostPlatform.isDarwin && !nixosTestRunner && !minimal && libjack2 != null,
   libjack2 ? null,
-  gtkSupport ? !stdenv.hostPlatform.isDarwin && !xenSupport && !nixosTestRunner && !minimal && vte != null,
+  gtkSupport ?
+    !stdenv.hostPlatform.isDarwin && !xenSupport && !nixosTestRunner && !minimal && vte != null,
   gtk3,
   gettext,
   vte ? null,
@@ -77,7 +79,10 @@
   libepoxy,
   libdrm ? null,
   rutabagaSupport ?
-    openGLSupport && !minimal && lib.meta.availableOn stdenv.hostPlatform rutabaga_gfx && rutabaga_gfx != null,
+    openGLSupport
+    && !minimal
+    && lib.meta.availableOn stdenv.hostPlatform rutabaga_gfx
+    && rutabaga_gfx != null,
   rutabaga_gfx ? null,
   virglSupport ? openGLSupport && virglrenderer != null,
   virglrenderer ? null,
