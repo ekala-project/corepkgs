@@ -52,8 +52,15 @@ with final;
 
   # vmTools - VM building utilities for ekaosTest and disk image creation
   vmTools = callPackage ./build-support/vm { };
-  makeInitrd = callPackage ./build-support/kernel/make-initrd.nix { };
-  makeModulesClosure = callPackage ./build-support/kernel/modules-closure.nix { };
+  makeInitrd = callPackage ./build-support/kernel/make-initrd.nix;
+  makeModulesClosure = callPackage ./build-support/kernel/modules-closure.nix;
+  closureInfo = callPackage ./build-support/closure-info.nix { };
+
+  # fuse3 alias for compatibility (fuse package provides version 3.x)
+  fuse3 = fuse;
+
+  # qemu-utils alias for compatibility (qemu package provides qemu-img and utilities)
+  qemu-utils = qemu;
 
   # keep-sorted start
   aafigure = null;
