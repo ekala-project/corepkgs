@@ -1,15 +1,22 @@
 # Test script configuration and processing
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
 let
   # Generate Python code to define machine objects
-  machinesPython = concatStringsSep "\n" (mapAttrsToList (name: node: ''
-    ${name} = Machine("${name}", "${node.vm}")
-    register_machine(${name})
-  '') config.builtNodes);
+  machinesPython = concatStringsSep "\n" (
+    mapAttrsToList (name: node: ''
+      ${name} = Machine("${name}", "${node.vm}")
+      register_machine(${name})
+    '') config.builtNodes
+  );
 
   # Full test script with machine definitions
   fullTestScript = ''
@@ -74,9 +81,7 @@ in
   config = {
     # Convert testScript to string if it's a function
     testScriptString =
-      if isFunction config.testScript
-      then config.testScript config.builtNodes
-      else config.testScript;
+      if isFunction config.testScript then config.testScript config.builtNodes else config.testScript;
 
     # Write test script to a file
     testScriptFile = pkgs.writeText "test-script.py" fullTestScript;

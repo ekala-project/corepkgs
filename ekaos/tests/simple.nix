@@ -11,13 +11,15 @@
   };
 
   nodes = {
-    machine = { config, pkgs, ... }: {
-      # Minimal system configuration
-      boot.kernelPackages = pkgs.linuxPackages;
+    machine =
+      { config, pkgs, ... }:
+      {
+        # Minimal system configuration
+        boot.kernelPackages = pkgs.linuxPackages;
 
-      # Enable QEMU guest for testing
-      virtualisation.enable = true;
-    };
+        # Enable QEMU guest for testing
+        virtualisation.enable = true;
+      };
   };
 
   testScript = ''

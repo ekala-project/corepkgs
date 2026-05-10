@@ -1,6 +1,11 @@
 # System activation script framework
 # Builds and manages activation scripts that configure the system
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -10,7 +15,7 @@ let
     options = {
       deps = mkOption {
         type = types.listOf types.str;
-        default = [];
+        default = [ ];
         description = "List of activation scripts this one depends on.";
       };
 
@@ -28,64 +33,73 @@ let
   };
 
   # Topologically sort activation scripts by dependencies
-  sortActivationScripts = scripts:
+  sortActivationScripts =
+    scripts:
     let
       # Create dependency graph
       scriptNames = attrNames scripts;
 
       # Simple topological sort (Kahn's algorithm)
-      sort = remaining: sorted:
-        if remaining == []
-        then sorted
+      sort =
+        remaining: sorted:
+        if remaining == [ ] then
+          sorted
         else
           let
             # Find scripts with no unsatisfied dependencies
-            ready = filter (name:
+            ready = filter (
+              name:
               let
-                deps = scripts.${name}.deps or [];
+                deps = scripts.${name}.deps or [ ];
                 unsatisfied = filter (d: elem d remaining) deps;
               in
-              unsatisfied == []
+              unsatisfied == [ ]
             ) remaining;
 
             # Remove ready scripts from remaining
             newRemaining = filter (name: !(elem name ready)) remaining;
           in
-          if ready == []
-          then throw "Circular dependency in activation scripts: ${toString remaining}"
-          else sort newRemaining (sorted ++ ready);
+          if ready == [ ] then
+            throw "Circular dependency in activation scripts: ${toString remaining}"
+          else
+            sort newRemaining (sorted ++ ready);
     in
-    sort scriptNames [];
+    sort scriptNames [ ];
 
   # Build the activation script
-  activationScript = let
-    sortedScripts = sortActivationScripts config.system.activationScripts;
+  activationScript =
+    let
+      sortedScripts = sortActivationScripts config.system.activationScripts;
 
-    scriptBodies = map (name:
-      let script = config.system.activationScripts.${name};
-      in ''
-        # Activation script: ${name}
-        ${script.text}
-      ''
-    ) sortedScripts;
+      scriptBodies = map (
+        name:
+        let
+          script = config.system.activationScripts.${name};
+        in
+        ''
+          # Activation script: ${name}
+          ${script.text}
+        ''
+      ) sortedScripts;
 
-  in pkgs.writeScript "activate" ''
-    #!${pkgs.runtimeShell}
-    set -e
+    in
+    pkgs.writeScript "activate" ''
+      #!${pkgs.runtimeShell}
+      set -e
 
-    # Parse arguments
-    action="''${1:-switch}"
+      # Parse arguments
+      action="''${1:-switch}"
 
-    echo "Running activation scripts (action: $action)..."
+      echo "Running activation scripts (action: $action)..."
 
-    # Set current system symlink
-    mkdir -p /run
-    ln -sfn @out@ /run/current-system
+      # Set current system symlink
+      mkdir -p /run
+      ln -sfn @out@ /run/current-system
 
-    ${concatStringsSep "\n" scriptBodies}
+      ${concatStringsSep "\n" scriptBodies}
 
-    echo "Activation complete."
-  '';
+      echo "Activation complete."
+    '';
 
 in
 
@@ -93,7 +107,7 @@ in
   options = {
     system.activationScripts = mkOption {
       type = types.attrsOf activationScriptType;
-      default = {};
+      default = { };
       description = ''
         Activation scripts that configure the system.
 
@@ -129,7 +143,7 @@ in
     system.activationScripts = {
       # Set up /etc
       etc = {
-        deps = [];
+        deps = [ ];
         text = ''
           echo "Setting up /etc..."
           # Link /etc to the system configuration

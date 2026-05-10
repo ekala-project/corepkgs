@@ -11,11 +11,13 @@
   };
 
   nodes = {
-    machine = { config, pkgs, ... }: {
-      boot.kernelPackages = pkgs.linuxPackages;
+    machine =
+      { config, pkgs, ... }:
+      {
+        boot.kernelPackages = pkgs.linuxPackages;
 
-      virtualisation.enable = true;
-    };
+        virtualisation.enable = true;
+      };
   };
 
   testScript = ''

@@ -1,29 +1,40 @@
 # Top-level system builder
 # Creates the system closure derivation
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
 let
   # Generate bootspec (boot.json) for the system
-  bootspecJson = pkgs.writeText "bootspec.json" (builtins.toJSON ({
-    "org.nixos.bootspec.v1" = {
-      system = pkgs.stdenv.hostPlatform.system;
-      kernel = "${config.boot.kernelPackages.kernel}/${config.system.boot.loader.kernelFile}";
-      kernelParams = config.boot.kernelParams;
-      init = "@init@";  # Will be substituted
-      toplevel = "@toplevel@";  # Will be substituted
-      label = config.system.ekaos.label;
-      inherit (config.system.ekaos) version;
-    } // optionalAttrs config.boot.initrd.enable {
-      # Include initrd in bootspec when enabled
-      initrd = "@initrd@";  # Will be substituted
-    };
-  } // optionalAttrs (config.boot.loader.systemd-boot.enable or false) {
-    "org.nixos.systemd-boot" = {
-      sortKey = config.boot.loader.systemd-boot.sortKey;
-    };
-  }));
+  bootspecJson = pkgs.writeText "bootspec.json" (
+    builtins.toJSON (
+      {
+        "org.nixos.bootspec.v1" = {
+          system = pkgs.stdenv.hostPlatform.system;
+          kernel = "${config.boot.kernelPackages.kernel}/${config.system.boot.loader.kernelFile}";
+          kernelParams = config.boot.kernelParams;
+          init = "@init@"; # Will be substituted
+          toplevel = "@toplevel@"; # Will be substituted
+          label = config.system.ekaos.label;
+          inherit (config.system.ekaos) version;
+        }
+        // optionalAttrs config.boot.initrd.enable {
+          # Include initrd in bootspec when enabled
+          initrd = "@initrd@"; # Will be substituted
+        };
+      }
+      // optionalAttrs (config.boot.loader.systemd-boot.enable or false) {
+        "org.nixos.systemd-boot" = {
+          sortKey = config.boot.loader.systemd-boot.sortKey;
+        };
+      }
+    )
+  );
 
   # Build the system closure
   systemBuilder = ''
@@ -62,23 +73,28 @@ let
     ''}
 
     # Generate bootspec (boot.json)
-    ${if config.boot.initrd.enable then ''
-      ${pkgs.jq}/bin/jq \
-        '."org.nixos.bootspec.v1".toplevel = $toplevel |
-         ."org.nixos.bootspec.v1".init = $init |
-         ."org.nixos.bootspec.v1".initrd = $initrd' \
-        --arg toplevel "$out" \
-        --arg init "$out/init" \
-        --arg initrd "$out/initrd" \
-        < ${bootspecJson} > $out/boot.json
-    '' else ''
-      ${pkgs.jq}/bin/jq \
-        '."org.nixos.bootspec.v1".toplevel = $toplevel |
-         ."org.nixos.bootspec.v1".init = $init' \
-        --arg toplevel "$out" \
-        --arg init "$out/init" \
-        < ${bootspecJson} > $out/boot.json
-    ''}
+    ${
+      if config.boot.initrd.enable then
+        ''
+          ${pkgs.jq}/bin/jq \
+            '."org.nixos.bootspec.v1".toplevel = $toplevel |
+             ."org.nixos.bootspec.v1".init = $init |
+             ."org.nixos.bootspec.v1".initrd = $initrd' \
+            --arg toplevel "$out" \
+            --arg init "$out/init" \
+            --arg initrd "$out/initrd" \
+            < ${bootspecJson} > $out/boot.json
+        ''
+      else
+        ''
+          ${pkgs.jq}/bin/jq \
+            '."org.nixos.bootspec.v1".toplevel = $toplevel |
+             ."org.nixos.bootspec.v1".init = $init' \
+            --arg toplevel "$out" \
+            --arg init "$out/init" \
+            < ${bootspecJson} > $out/boot.json
+        ''
+    }
 
     # Create extra dependencies file for GC roots
     mkdir -p $out/extra-dependencies
@@ -127,6 +143,18 @@ in
       '';
     };
 
+    system.build.nixos-install = mkOption {
+      type = types.package;
+      default = pkgs.nixos-install;
+      description = "The nixos-install tool for installing the system.";
+    };
+
+    system.build.nixos-enter = mkOption {
+      type = types.package;
+      default = pkgs.nixos-enter;
+      description = "The nixos-enter tool for entering a NixOS chroot.";
+    };
+
     system.path = mkOption {
       type = types.package;
       description = ''
@@ -138,7 +166,7 @@ in
 
     environment.systemPackages = mkOption {
       type = types.listOf types.package;
-      default = [];
+      default = [ ];
       description = "Packages to install in the system environment.";
       example = literalExpression "[ pkgs.vim pkgs.git ]";
     };
@@ -151,7 +179,13 @@ in
     system.path = pkgs.buildEnv {
       name = "system-path";
       paths = config.environment.systemPackages;
-      pathsToLink = [ "/bin" "/sbin" "/lib" "/share" "/etc" ];
+      pathsToLink = [
+        "/bin"
+        "/sbin"
+        "/lib"
+        "/share"
+        "/etc"
+      ];
     };
 
     # Essential system packages

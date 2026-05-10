@@ -18,11 +18,13 @@ let
 
   # Convert Nix attrset to XML plist format
   # This is a simplified plist generator - for production use, consider using pkgs.formats.plist
-  toPlist = value:
+  toPlist =
+    value:
     let
       indent = depth: concatStringsSep "" (lib.genList (_: "  ") depth);
 
-      valueToPlist = depth: val:
+      valueToPlist =
+        depth: val:
         if lib.isBool val then
           if val then "<true/>" else "<false/>"
         else if lib.isInt val then
@@ -37,9 +39,11 @@ let
         else if lib.isAttrs val then
           ''
             <dict>
-            ${concatStringsSep "\n" (mapAttrsToList (k: v: ''
-              ${indent (depth + 1)}<key>${k}</key>
-              ${indent (depth + 1)}${valueToPlist (depth + 1) v}'') val)}
+            ${concatStringsSep "\n" (
+              mapAttrsToList (k: v: ''
+                ${indent (depth + 1)}<key>${k}</key>
+                ${indent (depth + 1)}${valueToPlist (depth + 1) v}'') val
+            )}
             ${indent depth}</dict>''
         else
           throw "Unsupported type in plist: ${builtins.typeOf val}";
@@ -53,7 +57,13 @@ let
     '';
 
   # Generate ProgramArguments array from command and args
-  mkProgramArguments = { command, args, preStart ? "", ... }:
+  mkProgramArguments =
+    {
+      command,
+      args,
+      preStart ? "",
+      ...
+    }:
     let
       cmd = toString command;
       # If we have preStart commands, wrap everything in a shell script
@@ -69,55 +79,63 @@ let
         exec ${cmd} ${concatStringsSep " " (map escapeShellArg args)}
       '';
     in
-    if needsWrapper then
-      [ (toString wrapperScript) ]
-    else
-      [ cmd ] ++ args;
+    if needsWrapper then [ (toString wrapperScript) ] else [ cmd ] ++ args;
 
   # Generate EnvironmentVariables dict
-  mkEnvironmentVariables = env: path:
+  mkEnvironmentVariables =
+    env: path:
     let
       # Convert package list to PATH string
       pathString =
         let
           paths = map (pkg: "${pkg}/bin:${pkg}/sbin") path;
         in
-        if paths != [] then concatStringsSep ":" paths else "";
+        if paths != [ ] then concatStringsSep ":" paths else "";
 
       # Convert environment values to strings
-      envStrings = mapAttrs (name: value:
+      envStrings = mapAttrs (
+        name: value:
         let
-          val = if lib.isDerivation value then
-                  value
-                else if lib.isPath value then
-                  toString value
-                else
-                  value;
+          val =
+            if lib.isDerivation value then
+              value
+            else if lib.isPath value then
+              toString value
+            else
+              value;
         in
         toString val
       ) env;
 
       # Add PATH if we have packages
-      withPath = if pathString != "" then
-        envStrings // { PATH = pathString; }
-      else
-        envStrings;
+      withPath = if pathString != "" then envStrings // { PATH = pathString; } else envStrings;
     in
-    if withPath != {} then withPath else null;
+    if withPath != { } then withPath else null;
 
   # Convert restart policy to KeepAlive
-  mkKeepAlive = policy:
+  mkKeepAlive =
+    policy:
     {
       always = true;
-      on-failure = { SuccessfulExit = false; };
-      on-abnormal = { SuccessfulExit = false; };  # Similar to on-failure for launchd
-      on-abort = { SuccessfulExit = false; };      # Similar to on-failure for launchd
-      on-watchdog = { SuccessfulExit = false; };   # Similar to on-failure for launchd
+      on-failure = {
+        SuccessfulExit = false;
+      };
+      on-abnormal = {
+        SuccessfulExit = false;
+      }; # Similar to on-failure for launchd
+      on-abort = {
+        SuccessfulExit = false;
+      }; # Similar to on-failure for launchd
+      on-watchdog = {
+        SuccessfulExit = false;
+      }; # Similar to on-failure for launchd
       never = false;
-    }.${policy};
+    }
+    .${policy};
 
   # Convert launchd keepAlive option (might override restart policy)
-  mkKeepAliveFromConfig = launchdConfig: defaultKeepAlive:
+  mkKeepAliveFromConfig =
+    launchdConfig: defaultKeepAlive:
     if launchdConfig ? keepAlive then
       if lib.isBool launchdConfig.keepAlive then
         launchdConfig.keepAlive
@@ -131,23 +149,27 @@ let
             OtherJobEnabled = launchdConfig.keepAlive.otherJobEnabled or null;
           };
         in
-        if conditions != {} then conditions else true
+        if conditions != { } then conditions else true
     else
       defaultKeepAlive;
 
   # Convert StartCalendarInterval to plist format
-  mkStartCalendarInterval = interval:
+  mkStartCalendarInterval =
+    interval:
     if interval == null then
       null
     else if isList interval then
       # Multiple intervals
-      map (i: filterAttrs (n: v: v != null) {
-        Minute = i.minute or null;
-        Hour = i.hour or null;
-        Day = i.day or null;
-        Weekday = i.weekday or null;
-        Month = i.month or null;
-      }) interval
+      map (
+        i:
+        filterAttrs (n: v: v != null) {
+          Minute = i.minute or null;
+          Hour = i.hour or null;
+          Day = i.day or null;
+          Weekday = i.weekday or null;
+          Month = i.month or null;
+        }
+      ) interval
     else
       # Single interval
       filterAttrs (n: v: v != null) {
@@ -159,9 +181,10 @@ let
       };
 
   # Build the complete plist dict
-  buildPlistDict = config:
+  buildPlistDict =
+    config:
     let
-      launchdCfg = config.launchd or {};
+      launchdCfg = config.launchd or { };
 
       # Base KeepAlive from common restart policy
       baseKeepAlive = mkKeepAlive config.restartPolicy;
@@ -181,8 +204,8 @@ let
       calendarInterval = mkStartCalendarInterval (launchdCfg.startCalendarInterval or null);
 
       # Resource limits
-      softLimits = launchdCfg.softResourceLimits or {};
-      hardLimits = launchdCfg.hardResourceLimits or {};
+      softLimits = launchdCfg.softResourceLimits or { };
+      hardLimits = launchdCfg.hardResourceLimits or { };
 
       # Build the base plist
       basePlist = filterAttrs (n: v: v != null) {
@@ -192,12 +215,11 @@ let
 
         # Common options
         RunAtLoad = if launchdCfg ? runAtLoad then launchdCfg.runAtLoad else null;
-        KeepAlive = if keepAlive == false then null else keepAlive;  # Omit if false
+        KeepAlive = if keepAlive == false then null else keepAlive; # Omit if false
 
         # Working directory
-        WorkingDirectory = if config.workingDirectory != null
-          then toString config.workingDirectory
-          else null;
+        WorkingDirectory =
+          if config.workingDirectory != null then toString config.workingDirectory else null;
 
         # User context
         UserName = if config.user != "root" then config.user else null;
@@ -212,26 +234,25 @@ let
         StandardInPath = launchdCfg.standardInPath or null;
 
         # Event triggers
-        WatchPaths = if (launchdCfg.watchPaths or []) != []
-          then map toString launchdCfg.watchPaths
-          else null;
-        QueueDirectories = if (launchdCfg.queueDirectories or []) != []
-          then map toString launchdCfg.queueDirectories
-          else null;
+        WatchPaths =
+          if (launchdCfg.watchPaths or [ ]) != [ ] then map toString launchdCfg.watchPaths else null;
+        QueueDirectories =
+          if (launchdCfg.queueDirectories or [ ]) != [ ] then
+            map toString launchdCfg.queueDirectories
+          else
+            null;
 
         # Scheduling
         StartInterval = launchdCfg.startInterval or null;
         StartCalendarInterval = calendarInterval;
 
         # Process management
-        ProcessType = if launchdCfg.processType != "Standard"
-          then launchdCfg.processType
-          else null;
+        ProcessType = if launchdCfg.processType != "Standard" then launchdCfg.processType else null;
         Nice = launchdCfg.nice or null;
 
         # Resource limits
-        SoftResourceLimits = if softLimits != {} then softLimits else null;
-        HardResourceLimits = if hardLimits != {} then hardLimits else null;
+        SoftResourceLimits = if softLimits != { } then softLimits else null;
+        HardResourceLimits = if hardLimits != { } then hardLimits else null;
 
         # Timeout
         ExitTimeOut = launchdCfg.exitTimeout or null;
@@ -246,12 +267,13 @@ let
       };
 
       # Merge with extraConfig
-      extraCfg = launchdCfg.extraConfig or {};
+      extraCfg = launchdCfg.extraConfig or { };
     in
     basePlist // extraCfg;
 
   # Generate postStart script if needed
-  mkPostStartScript = config:
+  mkPostStartScript =
+    config:
     if config.postStart != "" then
       pkgs.writeScript "poststart" ''
         #!${pkgs.bash}/bin/bash
@@ -262,7 +284,8 @@ let
       null;
 
   # Generate postStop script if needed
-  mkPostStopScript = config:
+  mkPostStopScript =
+    config:
     if config.postStop != "" then
       pkgs.writeScript "poststop" ''
         #!${pkgs.bash}/bin/bash
@@ -273,7 +296,8 @@ let
       null;
 
   # Main translation function
-  toLaunchdPlist = config:
+  toLaunchdPlist =
+    config:
     let
       plistDict = buildPlistDict config;
       plistContent = toPlist plistDict;
@@ -286,12 +310,18 @@ let
       # Warning message if postStart/postStop are used
       warnings =
         lib.optional (config.postStart != "")
-          "WARNING: postStart is not natively supported by launchd for service '${config.description}'. Consider using a wrapper script." ++
-        lib.optional (config.postStop != "")
-          "WARNING: postStop is not natively supported by launchd for service '${config.description}'. Consider using a wrapper script.";
+          "WARNING: postStart is not natively supported by launchd for service '${config.description}'. Consider using a wrapper script."
+        ++
+          lib.optional (config.postStop != "")
+            "WARNING: postStop is not natively supported by launchd for service '${config.description}'. Consider using a wrapper script.";
     in
     {
-      inherit plistContent postStartScript postStopScript warnings;
+      inherit
+        plistContent
+        postStartScript
+        postStopScript
+        warnings
+        ;
     };
 
 in

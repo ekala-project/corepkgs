@@ -1,6 +1,11 @@
 # /etc file management
 # Builds the /etc directory for the system
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -8,71 +13,82 @@ let
   etc' = filter (f: f.enable) (attrValues config.environment.etc);
 
   # Build the /etc directory
-  etcDir = pkgs.runCommand "etc" {
-    preferLocalBuild = true;
-  } ''
-    mkdir -p $out/etc
+  etcDir =
+    pkgs.runCommand "etc"
+      {
+        preferLocalBuild = true;
+      }
+      ''
+        mkdir -p $out/etc
 
-    ${concatMapStringsSep "\n" (file: ''
-      mkdir -p $out/etc/$(dirname ${escapeShellArg file.target})
-      ${if file.source != null then ''
-        ln -s ${file.source} $out/etc/${escapeShellArg file.target}
-      '' else ''
-        cat > $out/etc/${escapeShellArg file.target} <<'EOF'
-        ${file.text}
-        EOF
-        ${optionalString (file.mode != null) "chmod ${file.mode} $out/etc/${escapeShellArg file.target}"}
-      ''}
-    '') etc'}
-  '';
+        ${concatMapStringsSep "\n" (file: ''
+          mkdir -p $out/etc/$(dirname ${escapeShellArg file.target})
+          ${
+            if file.source != null then
+              ''
+                ln -s ${file.source} $out/etc/${escapeShellArg file.target}
+              ''
+            else
+              ''
+                cat > $out/etc/${escapeShellArg file.target} <<'EOF'
+                ${file.text}
+                EOF
+                ${optionalString (file.mode != null) "chmod ${file.mode} $out/etc/${escapeShellArg file.target}"}
+              ''
+          }
+        '') etc'}
+      '';
 
 in
 
 {
   options = {
     environment.etc = mkOption {
-      type = types.attrsOf (types.submodule ({ name, config, ... }: {
-        options = {
-          enable = mkOption {
-            type = types.bool;
-            default = true;
-            description = "Whether this /etc file should be generated.";
-          };
+      type = types.attrsOf (
+        types.submodule (
+          { name, config, ... }:
+          {
+            options = {
+              enable = mkOption {
+                type = types.bool;
+                default = true;
+                description = "Whether this /etc file should be generated.";
+              };
 
-          target = mkOption {
-            type = types.str;
-            default = name;
-            description = "Name of the file in /etc (relative path).";
-          };
+              target = mkOption {
+                type = types.str;
+                default = name;
+                description = "Name of the file in /etc (relative path).";
+              };
 
-          text = mkOption {
-            type = types.nullOr types.lines;
-            default = null;
-            description = "Text content of the file.";
-          };
+              text = mkOption {
+                type = types.nullOr types.lines;
+                default = null;
+                description = "Text content of the file.";
+              };
 
-          source = mkOption {
-            type = types.nullOr types.path;
-            default = null;
-            description = "Source file to symlink.";
-          };
+              source = mkOption {
+                type = types.nullOr types.path;
+                default = null;
+                description = "Source file to symlink.";
+              };
 
-          mode = mkOption {
-            type = types.nullOr types.str;
-            default = null;
-            example = "0600";
-            description = "File mode (permissions).";
-          };
-        };
+              mode = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+                example = "0600";
+                description = "File mode (permissions).";
+              };
+            };
 
-        config = {
-          # Ensure either text or source is set
-          source = mkIf (config.text != null) (
-            mkDefault (pkgs.writeText name config.text)
-          );
-        };
-      }));
-      default = {};
+            config = {
+              # Ensure either text or source is set
+              source = mkIf (config.text != null) (mkDefault (pkgs.writeText name config.text));
+            };
+          }
+        )
+      );
+      default = { };
       description = ''
         Files to include in /etc.
 

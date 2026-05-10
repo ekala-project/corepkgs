@@ -1,7 +1,12 @@
 # Minimal boot test configuration
 # Optimized for quick boot testing in QEMU
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   # System identification
@@ -18,9 +23,9 @@
 
   # Kernel parameters for testing
   boot.kernelParams = [
-    "console=ttyS0,115200"  # Serial console (primary)
-    "console=tty1"           # VGA console (backup)
-    "quiet"                  # Reduce verbosity
+    "console=ttyS0,115200" # Serial console (primary)
+    "console=tty1" # VGA console (backup)
+    "quiet" # Reduce verbosity
   ];
 
   # Minimal system packages

@@ -1,7 +1,13 @@
 # Node/VM configuration for ekaosTest
 # Handles building test VMs from ekaos configurations
 
-{ config, options, lib, pkgs, ... }:
+{
+  config,
+  options,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -15,14 +21,17 @@ let
   ];
 
   # Build a single node configuration
-  buildNode = name: config:
+  buildNode =
+    name: config:
     let
       # Import ekaos eval-config to build the system
-      eval = (import ../../eval-config.nix {
-        inherit lib pkgs;
-      }) {
-        modules = testBaseModules ++ [ config ];
-      };
+      eval =
+        (import ../../eval-config.nix {
+          inherit lib pkgs;
+        })
+          {
+            modules = testBaseModules ++ [ config ];
+          };
     in
     {
       inherit name;
@@ -37,7 +46,7 @@ in
   options = {
     nodes = mkOption {
       type = types.attrsOf types.unspecified;
-      default = {};
+      default = { };
       description = ''
         Attribute set of test nodes/VMs.
 
@@ -67,7 +76,7 @@ in
 
     defaults = mkOption {
       type = types.unspecified;
-      default = {};
+      default = { };
       description = ''
         Configuration applied to all nodes.
 
@@ -88,11 +97,18 @@ in
 
   config = {
     # Build all nodes with defaults applied
-    builtNodes = mapAttrs (name: nodeConfig:
+    builtNodes = mapAttrs (
+      name: nodeConfig:
       buildNode name (
-        if isFunction config.defaults
-        then { imports = [ nodeConfig config.defaults ]; }
-        else nodeConfig
+        if isFunction config.defaults then
+          {
+            imports = [
+              nodeConfig
+              config.defaults
+            ];
+          }
+        else
+          nodeConfig
       )
     ) config.nodes;
   };

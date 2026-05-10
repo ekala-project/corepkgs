@@ -1,27 +1,28 @@
 # Disk image builder for ekaos
 # Wraps nixpkgs make-disk-image.nix for bootable ekaos systems
 
-{ config
-, lib
-, pkgs
-, nixpkgs ? /home/jon/projects/nixpkgs
-, # Disk image format: "qcow2", "raw", "vdi", "vpc"
-  format ? "qcow2"
-, # Partition table type: "efi" (GPT + ESP), "legacy" (MBR), "hybrid", "none"
-  partitionTableType ? "efi"
-, # Disk size in MB, or "auto" to calculate from closure size
-  diskSize ? "auto"
-, # Additional space beyond closure size (when diskSize = "auto")
-  additionalSpace ? "512M"
-, # Install bootloader (runs installBootLoader script)
-  installBootLoader ? true
-, # Touch EFI variables file (creates efi-vars.fd)
-  touchEFIVars ? true
-, # Copy nixpkgs channel (usually not needed for ekaos)
-  copyChannel ? false
-, # Filesystem label
-  label ? "ekaos"
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  nixpkgs ? /home/jon/projects/nixpkgs,
+  # Disk image format: "qcow2", "raw", "vdi", "vpc"
+  format ? "qcow2",
+  # Partition table type: "efi" (GPT + ESP), "legacy" (MBR), "hybrid", "none"
+  partitionTableType ? "efi",
+  # Disk size in MB, or "auto" to calculate from closure size
+  diskSize ? "auto",
+  # Additional space beyond closure size (when diskSize = "auto")
+  additionalSpace ? "512M",
+  # Install bootloader (runs installBootLoader script)
+  installBootLoader ? true,
+  # Touch EFI variables file (creates efi-vars.fd)
+  touchEFIVars ? true,
+  # Copy nixpkgs channel (usually not needed for ekaos)
+  copyChannel ? false,
+  # Filesystem label
+  label ? "ekaos",
+  ...
 }@args:
 
 let

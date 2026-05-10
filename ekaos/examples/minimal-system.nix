@@ -1,6 +1,11 @@
 # Minimal bootable ekaos system configuration
 # This is the simplest possible configuration that should boot
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   # System identification
@@ -17,8 +22,8 @@
 
   # Kernel parameters
   boot.kernelParams = [
-    "console=ttyS0,115200"  # Serial console for VM testing
-    "console=tty1"           # VGA console
+    "console=ttyS0,115200" # Serial console for VM testing
+    "console=tty1" # VGA console
   ];
 
   # Essential system packages

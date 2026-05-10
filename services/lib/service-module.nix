@@ -154,10 +154,7 @@ in
       enabledServices = filterAttrs (_: cfg: cfg.enable) services;
       validatedServices = validate.validateServices "runit" enabledServices;
     in
-    mapAttrs (
-      name: config:
-      runitTranslate.toRunitService name config
-    ) validatedServices;
+    mapAttrs (name: config: runitTranslate.toRunitService name config) validatedServices;
 
   # Generate BSD rc.d service files (FreeBSD/NetBSD/DragonFly)
   mkRcdServices =
@@ -181,10 +178,12 @@ in
       enabledServices = filterAttrs (_: cfg: cfg.enable) services;
       validatedServices = validate.validateServices "rcd" enabledServices;
     in
-    mapAttrs (
-      name: config:
-      rcdTranslate.toRcdService "openbsd" name config
-    ) validatedServices;
+    mapAttrs (name: config: rcdTranslate.toRcdService "openbsd" name config) validatedServices;
 
-  inherit systemdTranslate launchdTranslate runitTranslate rcdTranslate;
+  inherit
+    systemdTranslate
+    launchdTranslate
+    runitTranslate
+    rcdTranslate
+    ;
 }

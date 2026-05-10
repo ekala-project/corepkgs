@@ -1,7 +1,12 @@
 # Example ekaos system configuration with initrd/initramfs support
 # Demonstrates two-stage boot process
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   # System identification
@@ -15,8 +20,8 @@
 
   # Kernel parameters (using default linux_6_12 kernel)
   boot.kernelParams = [
-    "console=ttyS0,115200"  # Serial console
-    "console=tty1"           # VGA console
+    "console=ttyS0,115200" # Serial console
+    "console=tty1" # VGA console
     "quiet"
   ];
 
@@ -27,26 +32,33 @@
     # Kernel modules to load in stage-1
     availableKernelModules = [
       # SATA controllers
-      "ahci" "ata_piix"
+      "ahci"
+      "ata_piix"
 
       # NVMe
       "nvme"
 
       # USB
-      "xhci_pci" "ehci_pci"
-      "usb_storage" "sd_mod"
+      "xhci_pci"
+      "ehci_pci"
+      "usb_storage"
+      "sd_mod"
 
       # VirtIO (for VMs)
-      "virtio_blk" "virtio_pci"
+      "virtio_blk"
+      "virtio_pci"
     ];
 
     # Additional modules
     kernelModules = [
-      "ext4"  # Root filesystem
+      "ext4" # Root filesystem
     ];
 
     # Supported filesystems
-    supportedFilesystems = [ "ext4" "vfat" ];
+    supportedFilesystems = [
+      "ext4"
+      "vfat"
+    ];
 
     # Compression (options: gzip, xz, zstd, lz4)
     compressor = "gzip";

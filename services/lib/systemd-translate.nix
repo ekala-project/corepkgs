@@ -136,7 +136,9 @@ let
 
   # Generate [Install] section
   mkInstallSection =
-    { serviceType ? "user" }:
+    {
+      serviceType ? "user",
+    }:
     config:
     let
       cfg = config.systemd or { };
@@ -160,7 +162,9 @@ in
   # Main translation function
   # opts: { serviceType = "user" | "system" }
   toSystemdUnit =
-    { serviceType ? "user" }:
+    {
+      serviceType ? "user",
+    }:
     config: ''
       ${mkUnitSection config}
 
