@@ -56,9 +56,6 @@ with final;
   makeModulesClosure = callPackage ./build-support/kernel/modules-closure.nix;
   closureInfo = callPackage ./build-support/closure-info.nix { };
 
-  # fuse3 alias for compatibility (fuse package provides version 3.x)
-  fuse3 = fuse;
-
   # qemu-utils alias for compatibility (qemu package provides qemu-img and utilities)
   qemu-utils = qemu;
 
