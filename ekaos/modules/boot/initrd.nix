@@ -1,7 +1,12 @@
 # Initramfs (initrd) configuration for ekaos
 # Provides stage-1 boot support for advanced scenarios
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -34,8 +39,14 @@ in
 
       availableKernelModules = mkOption {
         type = types.listOf types.str;
-        default = [];
-        example = [ "ahci" "xhci_pci" "nvme" "usb_storage" "sd_mod" ];
+        default = [ ];
+        example = [
+          "ahci"
+          "xhci_pci"
+          "nvme"
+          "usb_storage"
+          "sd_mod"
+        ];
         description = ''
           Kernel modules to include in the initramfs.
 
@@ -54,8 +65,11 @@ in
 
       kernelModules = mkOption {
         type = types.listOf types.str;
-        default = [];
-        example = [ "dm-crypt" "dm-mod" ];
+        default = [ ];
+        example = [
+          "dm-crypt"
+          "dm-mod"
+        ];
         description = ''
           Additional kernel modules to load in initramfs.
 
@@ -64,35 +78,37 @@ in
       };
 
       luks.devices = mkOption {
-        type = types.attrsOf (types.submodule {
-          options = {
-            device = mkOption {
-              type = types.str;
-              example = "/dev/sda2";
-              description = "Path to the encrypted device.";
-            };
+        type = types.attrsOf (
+          types.submodule {
+            options = {
+              device = mkOption {
+                type = types.str;
+                example = "/dev/sda2";
+                description = "Path to the encrypted device.";
+              };
 
-            name = mkOption {
-              type = types.str;
-              default = "";
-              description = "Name of the decrypted device mapper entry.";
-            };
+              name = mkOption {
+                type = types.str;
+                default = "";
+                description = "Name of the decrypted device mapper entry.";
+              };
 
-            keyFile = mkOption {
-              type = types.nullOr types.str;
-              default = null;
-              example = "/root/luks-key";
-              description = "Path to key file for automatic unlocking.";
-            };
+              keyFile = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+                example = "/root/luks-key";
+                description = "Path to key file for automatic unlocking.";
+              };
 
-            allowDiscards = mkOption {
-              type = types.bool;
-              default = false;
-              description = "Enable TRIM/discard support for SSDs.";
+              allowDiscards = mkOption {
+                type = types.bool;
+                default = false;
+                description = "Enable TRIM/discard support for SSDs.";
+              };
             };
-          };
-        });
-        default = {};
+          }
+        );
+        default = { };
         description = ''
           LUKS encrypted devices to unlock during stage-1.
 
@@ -112,8 +128,16 @@ in
 
       supportedFilesystems = mkOption {
         type = types.listOf types.str;
-        default = [ "ext4" "vfat" ];
-        example = [ "ext4" "btrfs" "xfs" "vfat" ];
+        default = [
+          "ext4"
+          "vfat"
+        ];
+        example = [
+          "ext4"
+          "btrfs"
+          "xfs"
+          "vfat"
+        ];
         description = ''
           Filesystem types to support in initramfs.
 
@@ -197,17 +221,25 @@ in
     # Default kernel modules for common hardware
     boot.initrd.availableKernelModules = mkIf cfg.includeDefaultModules [
       # SATA/PATA
-      "ahci" "ata_piix" "sata_nv" "sata_via"
+      "ahci"
+      "ata_piix"
+      "sata_nv"
+      "sata_via"
 
       # NVMe
       "nvme"
 
       # USB
-      "xhci_pci" "ehci_pci" "uhci_hcd"
-      "usb_storage" "sd_mod"
+      "xhci_pci"
+      "ehci_pci"
+      "uhci_hcd"
+      "usb_storage"
+      "sd_mod"
 
       # VirtIO (for VMs)
-      "virtio_blk" "virtio_pci" "virtio_scsi"
+      "virtio_blk"
+      "virtio_pci"
+      "virtio_scsi"
     ];
 
     # Add filesystem-specific modules and LUKS modules
@@ -216,11 +248,19 @@ in
       (mkIf (elem "ext4" cfg.supportedFilesystems) [ "ext4" ])
       (mkIf (elem "btrfs" cfg.supportedFilesystems) [ "btrfs" ])
       (mkIf (elem "xfs" cfg.supportedFilesystems) [ "xfs" ])
-      (mkIf (elem "vfat" cfg.supportedFilesystems) [ "vfat" "nls_cp437" "nls_iso8859-1" ])
+      (mkIf (elem "vfat" cfg.supportedFilesystems) [
+        "vfat"
+        "nls_cp437"
+        "nls_iso8859-1"
+      ])
 
       # LUKS modules if any LUKS devices are configured
-      (mkIf (cfg.luks.devices != {}) [
-        "dm-crypt" "dm-mod" "aes" "sha256" "sha512"
+      (mkIf (cfg.luks.devices != { }) [
+        "dm-crypt"
+        "dm-mod"
+        "aes"
+        "sha256"
+        "sha512"
       ])
     ];
 

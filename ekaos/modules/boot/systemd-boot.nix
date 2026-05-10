@@ -1,5 +1,10 @@
 # systemd-boot UEFI boot loader configuration
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -34,6 +39,19 @@ in
 
 {
   options = {
+    # Compatibility options for nixpkgs make-disk-image.nix
+    boot.loader.grub.enable = mkOption {
+      type = types.bool;
+      default = false;
+      description = "GRUB is not supported in ekaos. Use systemd-boot instead.";
+    };
+
+    boot.loader.limine.enable = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Limine is not supported in ekaos. Use systemd-boot instead.";
+    };
+
     boot.loader.systemd-boot = {
       enable = mkOption {
         type = types.bool;
@@ -84,7 +102,11 @@ in
       };
 
       consoleMode = mkOption {
-        type = types.enum [ "auto" "max" "keep" ];
+        type = types.enum [
+          "auto"
+          "max"
+          "keep"
+        ];
         default = "keep";
         description = ''
           Console mode for the boot loader.

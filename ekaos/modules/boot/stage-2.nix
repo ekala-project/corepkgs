@@ -1,6 +1,11 @@
 # Stage-2 boot initialization
 # This init script mounts filesystems, runs activation, and starts systemd
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 

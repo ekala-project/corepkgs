@@ -14,7 +14,7 @@ with lib;
 
     meta = mkOption {
       type = types.attrs;
-      default = {};
+      default = { };
       description = ''
         Meta attributes for the test derivation.
 
@@ -33,7 +33,7 @@ with lib;
 
     passthru = mkOption {
       type = types.attrs;
-      default = {};
+      default = { };
       description = ''
         Attributes to pass through to the test derivation.
 

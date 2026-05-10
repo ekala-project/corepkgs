@@ -22,7 +22,8 @@ let
 
   # Evaluate a test without building it
   # Returns the evaluated module system with test configuration
-  evalTest = module:
+  evalTest =
+    module:
     let
       eval = lib.evalModules {
         class = "ekaosTest";
@@ -37,7 +38,8 @@ let
 
   # Run a test (evaluate and build)
   # Returns a derivation that runs the test
-  runTest = module:
+  runTest =
+    module:
     let
       eval = evalTest module;
     in

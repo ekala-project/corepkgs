@@ -69,10 +69,7 @@ let
       '';
 
       # Environment setup
-      envExports = if config.environment != { } then
-        mkEnvironmentExports config.environment
-      else
-        "";
+      envExports = if config.environment != { } then mkEnvironmentExports config.environment else "";
 
       # PATH setup
       pathExport = mkPathExport config.path;
@@ -133,10 +130,7 @@ let
       cfg = config.runit or { };
       checkScriptContent = cfg.extraConfig.checkScript or null;
     in
-    if checkScriptContent != null then
-      pkgs.writeScript "${name}-check" checkScriptContent
-    else
-      null;
+    if checkScriptContent != null then pkgs.writeScript "${name}-check" checkScriptContent else null;
 
   # Generate optional log/run script
   mkLogScript =
@@ -144,10 +138,7 @@ let
     let
       cfg = config.runit or { };
     in
-    if cfg.logScript != null then
-      pkgs.writeScript "${name}-log-run" cfg.logScript
-    else
-      null;
+    if cfg.logScript != null then pkgs.writeScript "${name}-log-run" cfg.logScript else null;
 
   # Build the complete service directory
   mkServiceDirectory =
@@ -188,6 +179,5 @@ let
 in
 {
   # Main translation function
-  toRunitService = name: config:
-    mkServiceDirectory name config;
+  toRunitService = name: config: mkServiceDirectory name config;
 }

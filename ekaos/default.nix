@@ -1,16 +1,19 @@
 # ekaos system builder
 # Main entry point for building ekaos systems
-{ pkgs ? import ../. {}
-, lib ? pkgs.lib
-, configuration ? ./examples/minimal-system.nix
+{
+  pkgs ? import ../. { },
+  lib ? pkgs.lib,
+  configuration ? ./examples/minimal-system.nix,
 }:
 
 let
-  eval = (import ./eval-config.nix {
-    inherit lib pkgs;
-  }) {
-    modules = [ configuration ];
-  };
+  eval =
+    (import ./eval-config.nix {
+      inherit lib pkgs;
+    })
+      {
+        modules = [ configuration ];
+      };
 
 in
 

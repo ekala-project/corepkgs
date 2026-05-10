@@ -1,6 +1,11 @@
 # Systemd integration for ekaos
 # Leverages the existing services/ infrastructure
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -12,7 +17,7 @@ let
   systemdUnits = servicesLib.mkSystemdSystemServices config.systemd.services;
 
   # Combine all unit files into /etc/systemd/system
-  systemdEtcDir = pkgs.runCommand "systemd-etc" {} ''
+  systemdEtcDir = pkgs.runCommand "systemd-etc" { } ''
     mkdir -p $out/systemd/system
 
     # Copy all generated unit files
@@ -26,8 +31,10 @@ in
 {
   options = {
     systemd.services = mkOption {
-      type = types.attrsOf (types.submodule (import ../../services/lib/options.nix { inherit lib; }).commonOptions);
-      default = {};
+      type = types.attrsOf (
+        types.submodule (import ../../services/lib/options.nix { inherit lib; }).commonOptions
+      );
+      default = { };
       description = ''
         Systemd services to run on the system.
 
@@ -63,10 +70,14 @@ in
     # Add systemd units to /etc
     environment.etc = mkMerge [
       # Copy systemd unit files
-      (listToAttrs (map (name: nameValuePair
-        "systemd/system/${name}.service"
-        { source = "${systemdUnits.${name}}/${name}.service"; }
-      ) (attrNames systemdUnits)))
+      (listToAttrs (
+        map (
+          name:
+          nameValuePair "systemd/system/${name}.service" {
+            source = "${systemdUnits.${name}}/${name}.service";
+          }
+        ) (attrNames systemdUnits)
+      ))
 
       # Default systemd configuration
       {

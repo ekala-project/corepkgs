@@ -1,5 +1,10 @@
 # Kernel package configuration for ekaos
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -25,8 +30,11 @@ with lib;
 
     boot.kernelParams = mkOption {
       type = types.listOf types.str;
-      default = [];
-      example = [ "quiet" "splash" ];
+      default = [ ];
+      example = [
+        "quiet"
+        "splash"
+      ];
       description = ''
         Kernel command line parameters.
 
@@ -41,8 +49,11 @@ with lib;
 
     boot.kernelModules = mkOption {
       type = types.listOf types.str;
-      default = [];
-      example = [ "kvm-intel" "virtio_net" ];
+      default = [ ];
+      example = [
+        "kvm-intel"
+        "virtio_net"
+      ];
       description = ''
         List of kernel modules to load at boot.
 

@@ -133,7 +133,10 @@ let
 
       # BSD rc.d-specific options
       rcd = {
-        rcRequire = [ "DAEMON" "NETWORKING" ];
+        rcRequire = [
+          "DAEMON"
+          "NETWORKING"
+        ];
         rcKeywords = [ "shutdown" ];
         pidfile = "/var/run/http-server.pid";
       };

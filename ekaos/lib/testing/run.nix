@@ -1,6 +1,11 @@
 # Build the test derivation that runs the test
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -14,31 +19,37 @@ with lib;
   };
 
   config = {
-    test = pkgs.runCommand "vm-test-run-${config.name}" {
-      inherit (config) meta passthru;
+    test =
+      pkgs.runCommand "vm-test-run-${config.name}"
+        {
+          inherit (config) meta passthru;
 
-      requiredSystemFeatures = [ "kvm" "nixos-test" ];
+          requiredSystemFeatures = [
+            "kvm"
+            "nixos-test"
+          ];
 
-      preferLocalBuild = true;
-      allowSubstitutes = false;
+          preferLocalBuild = true;
+          allowSubstitutes = false;
 
-    } ''
-      mkdir -p $out
+        }
+        ''
+          mkdir -p $out
 
-      # Run the test
-      echo "Running ekaosTest: ${config.name}"
-      echo "======================================"
+          # Run the test
+          echo "Running ekaosTest: ${config.name}"
+          echo "======================================"
 
-      if ${config.driver}/bin/ekaos-test-driver 2>&1 | tee $out/test-output.log; then
-        echo "======================================"
-        echo "Test PASSED: ${config.name}"
-        touch $out/success
-      else
-        echo "======================================"
-        echo "Test FAILED: ${config.name}"
-        touch $out/failure
-        exit 1
-      fi
-    '';
+          if ${config.driver}/bin/ekaos-test-driver 2>&1 | tee $out/test-output.log; then
+            echo "======================================"
+            echo "Test PASSED: ${config.name}"
+            touch $out/success
+          else
+            echo "======================================"
+            echo "Test FAILED: ${config.name}"
+            touch $out/failure
+            exit 1
+          fi
+        '';
   };
 }

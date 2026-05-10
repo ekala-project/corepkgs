@@ -18,8 +18,7 @@ let
       cfg = config.rcd or { };
       provide = concatStringsSep " " cfg.rcProvide;
       require = concatStringsSep " " cfg.rcRequire;
-      before = optionalString (cfg.rcBefore != [ ])
-        "# BEFORE: ${concatStringsSep " " cfg.rcBefore}";
+      before = optionalString (cfg.rcBefore != [ ]) "# BEFORE: ${concatStringsSep " " cfg.rcBefore}";
       keywords = concatStringsSep " " cfg.rcKeywords;
     in
     ''
@@ -66,19 +65,22 @@ let
       pidfileVal = if cfg.pidfile or null != null then cfg.pidfile else "/var/run/${name}.pid";
       procName = cfg.processName or null;
     in
-    if variant == "openbsd" then ''
-      daemon=${escapeShellArg cmd}
-      ${optionalString (args != "") "daemon_flags=${escapeShellArg args}"}
-      ${optionalString (config.user != "root") "daemon_user=${escapeShellArg config.user}"}
-      ${optionalString (procName != null) "pexp=${escapeShellArg procName}"}
-    '' else ''
-      name="${name}"
-      rcvar="${name}_enable"
-      command=${escapeShellArg cmd}
-      ${optionalString (args != "") "command_args=${escapeShellArg args}"}
-      pidfile="${pidfileVal}"
-      ${optionalString (procName != null) "procname=${escapeShellArg procName}"}
-    '';
+    if variant == "openbsd" then
+      ''
+        daemon=${escapeShellArg cmd}
+        ${optionalString (args != "") "daemon_flags=${escapeShellArg args}"}
+        ${optionalString (config.user != "root") "daemon_user=${escapeShellArg config.user}"}
+        ${optionalString (procName != null) "pexp=${escapeShellArg procName}"}
+      ''
+    else
+      ''
+        name="${name}"
+        rcvar="${name}_enable"
+        command=${escapeShellArg cmd}
+        ${optionalString (args != "") "command_args=${escapeShellArg args}"}
+        pidfile="${pidfileVal}"
+        ${optionalString (procName != null) "procname=${escapeShellArg procName}"}
+      '';
 
   # Generate preStart hook (variant-aware)
   mkPreStartHook =
@@ -99,18 +101,22 @@ let
         ${optionalString hasPreStart config.preStart}
       '';
     in
-    if !needsHook then "" else
-    if variant == "openbsd" then ''
-      rc_start() {
-          ${precmdContent}
-          ''${rcexec} "''${daemon} ''${daemon_flags}"
-      }
-    '' else ''
-      start_precmd="${name}_precmd"
-      ${name}_precmd() {
-          ${precmdContent}
-      }
-    '';
+    if !needsHook then
+      ""
+    else if variant == "openbsd" then
+      ''
+        rc_start() {
+            ${precmdContent}
+            ''${rcexec} "''${daemon} ''${daemon_flags}"
+        }
+      ''
+    else
+      ''
+        start_precmd="${name}_precmd"
+        ${name}_precmd() {
+            ${precmdContent}
+        }
+      '';
 
   # Generate postStop hook (variant-aware)
   mkPostStopHook =
@@ -118,18 +124,22 @@ let
     let
       hasPostStop = config.postStop != "";
     in
-    if !hasPostStop then "" else
-    if variant == "openbsd" then ''
-      rc_stop() {
-          ''${rcexec} "''${daemon_stop:-kill -TERM $(cat $pidfile)}"
-          ${config.postStop}
-      }
-    '' else ''
-      stop_postcmd="${name}_postcmd"
-      ${name}_postcmd() {
-          ${config.postStop}
-      }
-    '';
+    if !hasPostStop then
+      ""
+    else if variant == "openbsd" then
+      ''
+        rc_stop() {
+            ''${rcexec} "''${daemon_stop:-kill -TERM $(cat $pidfile)}"
+            ${config.postStop}
+        }
+      ''
+    else
+      ''
+        stop_postcmd="${name}_postcmd"
+        ${name}_postcmd() {
+            ${config.postStop}
+        }
+      '';
 
   # Generate user switching for non-OpenBSD systems
   # OpenBSD has daemon_user built-in
@@ -138,11 +148,14 @@ let
     let
       needsUserSwitch = config.user != "root" && variant != "openbsd";
     in
-    if !needsUserSwitch then "" else ''
-      # User switching via command wrapper
-      # Consider setting ${config.name}_user="${config.user}" in rc.conf
-      # and using daemon(8) or defining custom start_cmd with su(1)
-    '';
+    if !needsUserSwitch then
+      ""
+    else
+      ''
+        # User switching via command wrapper
+        # Consider setting ${config.name}_user="${config.user}" in rc.conf
+        # and using daemon(8) or defining custom start_cmd with su(1)
+      '';
 
   # Generate additional rc.d variables from extraConfig
   mkExtraVariables =
@@ -197,17 +210,25 @@ let
       enableVar = if isOpenBSD then "pkg_scripts" else "${name}_enable";
       enableVal = if isOpenBSD then ''"''${pkg_scripts} ${name}"'' else ''"YES"'';
 
-      envVars = if config.environment != { } then
-        optionalString (!isOpenBSD) ''
-          # Environment variables
-          ${name}_env="${concatStringsSep " " (mapAttrsToList (k: v: "${k}=${toString v}") config.environment)}"
-        ''
-      else "";
+      envVars =
+        if config.environment != { } then
+          optionalString (!isOpenBSD) ''
+            # Environment variables
+            ${name}_env="${
+              concatStringsSep " " (mapAttrsToList (k: v: "${k}=${toString v}") config.environment)
+            }"
+          ''
+        else
+          "";
 
-      userVar = if config.user != "root" && !isOpenBSD then ''
-        # Run as user (requires wrapper or custom start_cmd)
-        ${name}_user="${config.user}"
-      '' else "";
+      userVar =
+        if config.user != "root" && !isOpenBSD then
+          ''
+            # Run as user (requires wrapper or custom start_cmd)
+            ${name}_user="${config.user}"
+          ''
+        else
+          "";
     in
     ''
       # Enable ${name}
@@ -239,6 +260,7 @@ let
 in
 {
   # Main translation function
-  toRcdService = variant: name: config:
+  toRcdService =
+    variant: name: config:
     mkRcdService variant name config;
 }

@@ -1,8 +1,9 @@
 # QEMU boot test for ekaos
 # Tests that the system can boot successfully
 
-{ pkgs ? import ../../. {}
-, configuration ? ../examples/minimal-system.nix
+{
+  pkgs ? import ../../. { },
+  configuration ? ../examples/minimal-system.nix,
 }:
 
 let

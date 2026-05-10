@@ -1,105 +1,116 @@
 # Initramfs (initrd) builder for ekaos
 # Creates a minimal initial ramdisk for stage-1 boot
 
-{ pkgs
-, lib
-, kernelPackages
-, availableKernelModules ? []
-, kernelModules ? []
-, compressor ? "gzip"
-, extraUtilsCommands ? ""
-, preLVMCommands ? ""
-, postDeviceCommands ? ""
-, postMountCommands ? ""
-, luks ? { devices = {}; }
-, supportedFilesystems ? [ "ext4" "vfat" ]
+{
+  pkgs,
+  lib,
+  kernelPackages,
+  availableKernelModules ? [ ],
+  kernelModules ? [ ],
+  compressor ? "gzip",
+  extraUtilsCommands ? "",
+  preLVMCommands ? "",
+  postDeviceCommands ? "",
+  postMountCommands ? "",
+  luks ? {
+    devices = { };
+  },
+  supportedFilesystems ? [
+    "ext4"
+    "vfat"
+  ],
 }:
 
 let
   inherit (lib) concatStringsSep optionalString;
 
   # Compression commands
-  compressorExe = {
-    gzip = "${pkgs.gzip}/bin/gzip";
-    bzip2 = "${pkgs.bzip2}/bin/bzip2";
-    xz = "${pkgs.xz}/bin/xz";
-    zstd = "${pkgs.zstd}/bin/zstd";
-    lz4 = "${pkgs.lz4}/bin/lz4";
-    lzop = "${pkgs.lzop}/bin/lzop";
-  }.${compressor} or "${pkgs.gzip}/bin/gzip";
+  compressorExe =
+    {
+      gzip = "${pkgs.gzip}/bin/gzip";
+      bzip2 = "${pkgs.bzip2}/bin/bzip2";
+      xz = "${pkgs.xz}/bin/xz";
+      zstd = "${pkgs.zstd}/bin/zstd";
+      lz4 = "${pkgs.lz4}/bin/lz4";
+      lzop = "${pkgs.lzop}/bin/lzop";
+    }
+    .${compressor} or "${pkgs.gzip}/bin/gzip";
 
   # All kernel modules to include
   allModules = availableKernelModules ++ kernelModules;
 
   # Build minimal utilities for initramfs
-  extraUtils = pkgs.runCommand "initrd-utils" {
-    nativeBuildInputs = [ pkgs.buildPackages.nukeReferences ];
-    allowedReferences = [ "out" ];
-  } ''
-    set +o pipefail
+  extraUtils =
+    pkgs.runCommand "initrd-utils"
+      {
+        nativeBuildInputs = [ pkgs.buildPackages.nukeReferences ];
+        allowedReferences = [ "out" ];
+      }
+      ''
+        set +o pipefail
 
-    mkdir -p $out/bin $out/lib
+        mkdir -p $out/bin $out/lib
 
-    # Copy busybox (provides most basic utilities)
-    cp ${pkgs.busybox}/bin/busybox $out/bin/
+        # Copy busybox (provides most basic utilities)
+        cp ${pkgs.busybox}/bin/busybox $out/bin/
 
-    # Create busybox symlinks
-    for cmd in sh ash mount umount mkdir mknod switch_root cat cp mv rm ln chmod chown \
-               sleep echo test true false kill pidof ps grep sed awk cut sort uniq wc \
-               find xargs basename dirname readlink realpath pwd which env; do
-      ln -sf busybox $out/bin/$cmd
-    done
+        # Create busybox symlinks
+        for cmd in sh ash mount umount mkdir mknod switch_root cat cp mv rm ln chmod chown \
+                   sleep echo test true false kill pidof ps grep sed awk cut sort uniq wc \
+                   find xargs basename dirname readlink realpath pwd which env; do
+          ln -sf busybox $out/bin/$cmd
+        done
 
-    # Copy modprobe for kernel module loading
-    copy_bin_and_libs() {
-      local BIN="$1"
-      cp "$BIN" $out/bin/
+        # Copy modprobe for kernel module loading
+        copy_bin_and_libs() {
+          local BIN="$1"
+          cp "$BIN" $out/bin/
 
-      # Copy shared libraries
-      local LIBS=$(${pkgs.buildPackages.patchelf}/bin/patchelf --print-needed "$BIN" 2>/dev/null || true)
-      for lib in $LIBS; do
-        local libPath=$(${pkgs.buildPackages.patchelf}/bin/patchelf --print-rpath "$BIN" 2>/dev/null | tr ':' '\n' | \
-          xargs -I{} find {} -name "$lib" 2>/dev/null | head -1)
-        if [ -n "$libPath" ] && [ -f "$libPath" ]; then
-          cp "$libPath" $out/lib/ 2>/dev/null || true
-        fi
-      done
-    }
+          # Copy shared libraries
+          local LIBS=$(${pkgs.buildPackages.patchelf}/bin/patchelf --print-needed "$BIN" 2>/dev/null || true)
+          for lib in $LIBS; do
+            local libPath=$(${pkgs.buildPackages.patchelf}/bin/patchelf --print-rpath "$BIN" 2>/dev/null | tr ':' '\n' | \
+              xargs -I{} find {} -name "$lib" 2>/dev/null | head -1)
+            if [ -n "$libPath" ] && [ -f "$libPath" ]; then
+              cp "$libPath" $out/lib/ 2>/dev/null || true
+            fi
+          done
+        }
 
-    copy_bin_and_libs ${pkgs.kmod}/bin/modprobe
-    ln -sf modprobe $out/bin/insmod
-    ln -sf modprobe $out/bin/lsmod
-    ln -sf modprobe $out/bin/rmmod
+        copy_bin_and_libs ${pkgs.kmod}/bin/modprobe
+        ln -sf modprobe $out/bin/insmod
+        ln -sf modprobe $out/bin/lsmod
+        ln -sf modprobe $out/bin/rmmod
 
-    # Copy mount utilities
-    copy_bin_and_libs ${pkgs.util-linux}/bin/mount
-    copy_bin_and_libs ${pkgs.util-linux}/bin/umount
+        # Copy mount utilities
+        copy_bin_and_libs ${pkgs.util-linux}/bin/mount
+        copy_bin_and_libs ${pkgs.util-linux}/bin/umount
 
-    # Copy filesystem tools
-    ${optionalString (lib.elem "ext4" supportedFilesystems) ''
-      copy_bin_and_libs ${pkgs.e2fsprogs}/bin/e2fsck
-      ln -sf e2fsck $out/bin/fsck.ext4
-    ''}
+        # Copy filesystem tools
+        ${optionalString (lib.elem "ext4" supportedFilesystems) ''
+          copy_bin_and_libs ${pkgs.e2fsprogs}/bin/e2fsck
+          ln -sf e2fsck $out/bin/fsck.ext4
+        ''}
 
-    ${optionalString (lib.elem "vfat" supportedFilesystems) ''
-      copy_bin_and_libs ${pkgs.dosfstools}/bin/fsck.vfat
-    ''}
+        ${optionalString (lib.elem "vfat" supportedFilesystems) ''
+          copy_bin_and_libs ${pkgs.dosfstools}/bin/fsck.vfat
+        ''}
 
-    # Copy LUKS utilities if needed
-    ${optionalString (luks.devices != {}) ''
-      copy_bin_and_libs ${pkgs.cryptsetup}/bin/cryptsetup
-    ''}
+        # Copy LUKS utilities if needed
+        ${optionalString (luks.devices != { }) ''
+          copy_bin_and_libs ${pkgs.cryptsetup}/bin/cryptsetup
+        ''}
 
-    # Extra utilities from configuration
-    ${extraUtilsCommands}
+        # Extra utilities from configuration
+        ${extraUtilsCommands}
 
-    # Strip binaries and nuke references
-    find $out/bin -type f -exec ${pkgs.buildPackages.patchelf}/bin/patchelf --set-rpath $out/lib {} \; || true
-    find $out/bin -type f -exec strip -s {} \; 2>/dev/null || true
-    find $out/lib -type f -exec strip -s {} \; 2>/dev/null || true
+        # Strip binaries and nuke references
+        find $out/bin -type f -exec ${pkgs.buildPackages.patchelf}/bin/patchelf --set-rpath $out/lib {} \; || true
+        find $out/bin -type f -exec strip -s {} \; 2>/dev/null || true
+        find $out/lib -type f -exec strip -s {} \; 2>/dev/null || true
 
-    nuke-refs $out/bin/* $out/lib/* || true
-  '';
+        nuke-refs $out/bin/* $out/lib/* || true
+      '';
 
   # Stage-1 init script
   bootStage1 = pkgs.writeScript "init" ''
@@ -133,14 +144,21 @@ let
     ${preLVMCommands}
 
     # Unlock LUKS devices
-    ${concatStringsSep "\n" (lib.mapAttrsToList (name: dev: ''
-      echo "Unlocking LUKS device ${dev.device}..."
-      ${if dev.keyFile != null then
-        "cryptsetup luksOpen ${dev.device} ${if dev.name != "" then dev.name else name} --key-file=${dev.keyFile} ${optionalString dev.allowDiscards "--allow-discards"}"
-      else
-        "cryptsetup luksOpen ${dev.device} ${if dev.name != "" then dev.name else name} ${optionalString dev.allowDiscards "--allow-discards"}"
-      }
-    '') luks.devices)}
+    ${concatStringsSep "\n" (
+      lib.mapAttrsToList (name: dev: ''
+        echo "Unlocking LUKS device ${dev.device}..."
+        ${
+          if dev.keyFile != null then
+            "cryptsetup luksOpen ${dev.device} ${
+              if dev.name != "" then dev.name else name
+            } --key-file=${dev.keyFile} ${optionalString dev.allowDiscards "--allow-discards"}"
+          else
+            "cryptsetup luksOpen ${dev.device} ${
+              if dev.name != "" then dev.name else name
+            } ${optionalString dev.allowDiscards "--allow-discards"}"
+        }
+      '') luks.devices
+    )}
 
     ${postDeviceCommands}
 

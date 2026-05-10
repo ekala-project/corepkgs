@@ -27,14 +27,20 @@ let
       enable = true;
       description = "Environment Test Service";
       command = "${pkgs.bash}/bin/bash";
-      args = [ "-c" "echo $TEST_VAR" ];
+      args = [
+        "-c"
+        "echo $TEST_VAR"
+      ];
 
       environment = {
         TEST_VAR = "test-value";
         ANOTHER_VAR = "another-value";
       };
 
-      path = with pkgs; [ coreutils gnugrep ];
+      path = with pkgs; [
+        coreutils
+        gnugrep
+      ];
 
       restartPolicy = "always";
 
@@ -78,8 +84,14 @@ let
       launchd = {
         # Run at 9 AM and 5 PM every day
         startCalendarInterval = [
-          { hour = 9; minute = 0; }
-          { hour = 17; minute = 0; }
+          {
+            hour = 9;
+            minute = 0;
+          }
+          {
+            hour = 17;
+            minute = 0;
+          }
         ];
       };
     };
@@ -113,14 +125,20 @@ let
       enable = true;
       description = "Resource Limited Test Service";
       command = "${pkgs.python3}/bin/python3";
-      args = [ "-m" "http.server" "8080" ];
+      args = [
+        "-m"
+        "http.server"
+        "8080"
+      ];
       user = "nobody";
       group = "nobody";
       restartPolicy = "on-failure";
 
       launchd = {
         label = "org.nixos.limited-test";
-        keepAlive = { successfulExit = false; };
+        keepAlive = {
+          successfulExit = false;
+        };
         processType = "Background";
         nice = 10;
 
@@ -194,8 +212,7 @@ let
   keepAliveConditionsService = services.buildLaunchdUserAgents keepAliveConditionsConfig;
 
   # Helper to extract plist content for inspection
-  getPlist = svc: name:
-    builtins.readFile "${svc.${name}}/${name}.plist";
+  getPlist = svc: name: builtins.readFile "${svc.${name}}/${name}.plist";
 
 in
 {
@@ -227,13 +244,37 @@ in
 
   # Convenience attribute for building all tests at once
   all = pkgs.linkFarm "launchd-tests" [
-    { name = "basic-test.plist"; path = "${basicService.basic-test}/basic-test.plist"; }
-    { name = "env-test.plist"; path = "${envService.env-test}/env-test.plist"; }
-    { name = "scheduled-test.plist"; path = "${scheduledService.scheduled-test}/scheduled-test.plist"; }
-    { name = "multi-schedule-test.plist"; path = "${multiScheduleService.multi-schedule-test}/multi-schedule-test.plist"; }
-    { name = "watch-test.plist"; path = "${watchService.watch-test}/watch-test.plist"; }
-    { name = "limited-test.plist"; path = "${limitedService.limited-test}/limited-test.plist"; }
-    { name = "workdir-test.plist"; path = "${workdirService.workdir-test}/workdir-test.plist"; }
-    { name = "keepalive-conditions-test.plist"; path = "${keepAliveConditionsService.keepalive-conditions-test}/keepalive-conditions-test.plist"; }
+    {
+      name = "basic-test.plist";
+      path = "${basicService.basic-test}/basic-test.plist";
+    }
+    {
+      name = "env-test.plist";
+      path = "${envService.env-test}/env-test.plist";
+    }
+    {
+      name = "scheduled-test.plist";
+      path = "${scheduledService.scheduled-test}/scheduled-test.plist";
+    }
+    {
+      name = "multi-schedule-test.plist";
+      path = "${multiScheduleService.multi-schedule-test}/multi-schedule-test.plist";
+    }
+    {
+      name = "watch-test.plist";
+      path = "${watchService.watch-test}/watch-test.plist";
+    }
+    {
+      name = "limited-test.plist";
+      path = "${limitedService.limited-test}/limited-test.plist";
+    }
+    {
+      name = "workdir-test.plist";
+      path = "${workdirService.workdir-test}/workdir-test.plist";
+    }
+    {
+      name = "keepalive-conditions-test.plist";
+      path = "${keepAliveConditionsService.keepalive-conditions-test}/keepalive-conditions-test.plist";
+    }
   ];
 }

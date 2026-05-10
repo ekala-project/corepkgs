@@ -1,17 +1,20 @@
 # Build the test driver package
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
 let
   # Import the Python test driver package
-  testDriverPkg = pkgs.callPackage ../test-driver {};
+  testDriverPkg = pkgs.callPackage ../test-driver { };
 
   # List of VM start scripts
-  vmStartScripts = mapAttrsToList (name: node:
-    "${node.vm}"
-  ) config.builtNodes;
+  vmStartScripts = mapAttrsToList (name: node: "${node.vm}") config.builtNodes;
 
   # Build the driver executable
   driverScript = pkgs.writeScript "ekaos-test-driver" ''
@@ -55,18 +58,23 @@ in
   };
 
   config = {
-    driver = pkgs.runCommand "ekaos-test-driver-${config.name}" {
-      preferLocalBuild = true;
-    } ''
-      mkdir -p $out/bin
-      ln -s ${driverScript} $out/bin/ekaos-test-driver
-      chmod +x $out/bin/ekaos-test-driver
+    driver =
+      pkgs.runCommand "ekaos-test-driver-${config.name}"
+        {
+          preferLocalBuild = true;
+        }
+        ''
+          mkdir -p $out/bin
+          ln -s ${driverScript} $out/bin/ekaos-test-driver
+          chmod +x $out/bin/ekaos-test-driver
 
-      # Store VM scripts for reference
-      mkdir -p $out/vm-scripts
-      ${concatStringsSep "\n" (mapAttrsToList (name: node: ''
-        ln -s ${node.vm} $out/vm-scripts/${name}
-      '') config.builtNodes)}
-    '';
+          # Store VM scripts for reference
+          mkdir -p $out/vm-scripts
+          ${concatStringsSep "\n" (
+            mapAttrsToList (name: node: ''
+              ln -s ${node.vm} $out/vm-scripts/${name}
+            '') config.builtNodes
+          )}
+        '';
   };
 }

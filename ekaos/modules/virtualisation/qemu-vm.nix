@@ -1,7 +1,12 @@
 # QEMU VM configuration for ekaos
 # Simplified VM module for testing bootable systems
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -10,8 +15,7 @@ let
 
   # Build the disk image
   diskImage = import ../../lib/make-disk-image.nix {
-    inherit (config) config;
-    inherit lib pkgs;
+    inherit config lib pkgs;
 
     format = "qcow2";
     partitionTableType = "efi";

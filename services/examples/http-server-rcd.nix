@@ -82,7 +82,10 @@ let
 
         # Dependencies (FreeBSD/NetBSD/DragonFly - ignored on OpenBSD)
         rcProvide = [ "http_server" ];
-        rcRequire = [ "DAEMON" "NETWORKING" ];
+        rcRequire = [
+          "DAEMON"
+          "NETWORKING"
+        ];
         rcBefore = [ ];
         rcKeywords = [ "shutdown" ];
 

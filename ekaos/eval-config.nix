@@ -2,14 +2,18 @@
 # Entry point for building ekaos systems
 { lib, pkgs }:
 
-{ modules ? []
-, baseModules ? import ./modules/module-list.nix
-, ...
+{
+  modules ? [ ],
+  baseModules ? import ./modules/module-list.nix,
+  ...
 }@args:
 
 let
   # Remove our special arguments from args
-  extraArgs = builtins.removeAttrs args [ "modules" "baseModules" ];
+  extraArgs = builtins.removeAttrs args [
+    "modules"
+    "baseModules"
+  ];
 
   # Evaluate the module system
   eval = lib.evalModules {
@@ -17,7 +21,8 @@ let
     specialArgs = {
       inherit lib pkgs;
       modulesPath = ./modules;
-    } // extraArgs;
+    }
+    // extraArgs;
   };
 
 in

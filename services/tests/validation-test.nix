@@ -8,11 +8,11 @@ let
   services = import ../. { inherit pkgs; };
 
   # Helper to catch expected errors
-  expectError = name: config:
-    builtins.tryEval (services.buildSystemdUserServices config);
+  expectError = name: config: builtins.tryEval (services.buildSystemdUserServices config);
 
   # Helper to build and check if it succeeds (for warnings)
-  expectWarning = name: builder: config:
+  expectWarning =
+    name: builder: config:
     builder config;
 
   # Test 1: Platform-specific option on wrong builder (ERROR)
