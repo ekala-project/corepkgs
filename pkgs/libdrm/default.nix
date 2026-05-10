@@ -30,7 +30,7 @@ stdenv.mkDerivation (finalAttrs: {
     meson
     meson.configurePhaseHook
     ninja
-    python3Packages.docutils  # Provides rst2man for documentation
+    python3Packages.docutils # Provides rst2man for documentation
   ];
 
   buildInputs = [
@@ -43,7 +43,7 @@ stdenv.mkDerivation (finalAttrs: {
     "-Dcairo-tests=disabled"
     (lib.mesonEnable "intel" true)
     (lib.mesonEnable "omap" stdenv.hostPlatform.isLinux)
-    (lib.mesonEnable "valgrind" false)  # Disable valgrind support for simplicity
+    (lib.mesonEnable "valgrind" false) # Disable valgrind support for simplicity
   ]
   ++ lib.optionals stdenv.hostPlatform.isAarch [
     "-Dtegra=enabled"
