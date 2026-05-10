@@ -47,6 +47,9 @@ with final;
   # ekaosTest - Testing framework for ekaos systems
   ekaosTest = (callPackage ./ekaos/lib/testing { }).runTest;
 
+  # ekaosTests - Test suite for ekaos systems (individual tests can be built)
+  ekaosTests = callPackage ./ekaos/tests { };
+
   # vmTools - VM building utilities for ekaosTest and disk image creation
   vmTools = callPackage ./build-support/vm { };
   makeInitrd = callPackage ./build-support/kernel/make-initrd.nix { };
