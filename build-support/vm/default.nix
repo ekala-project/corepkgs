@@ -12,7 +12,7 @@
   fetchurl,
   glibc,
   kmod,
-  linux,
+  linuxPackages,
   makeInitrd,
   makeModulesClosure,
   mtdutils,
@@ -30,7 +30,7 @@
   # Note that `img` is a real package, but is set to this default in `all-packages.nix`.
   # ----------------------------
   customQemu ? null,
-  kernel ? linux,
+  kernel ? linuxPackages.kernel,
   img ? stdenv.hostPlatform.linux-kernel.target,
   storeDir ? builtins.storeDir,
   rootModules ? [
@@ -46,9 +46,9 @@
 }:
 
 let
-  qemu-common = import ../../../nixos/lib/qemu-common.nix { inherit lib stdenv; };
+  qemu-common = import ../../ekaos/lib/qemu-common.nix { inherit lib stdenv; };
 
-  qemu = buildPackages.qemu_kvm;
+  qemu = buildPackages.qemu;
 
   modulesClosure = makeModulesClosure {
     kernel = lib.getOutput "modules" kernel;
