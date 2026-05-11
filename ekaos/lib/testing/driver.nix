@@ -66,7 +66,6 @@ in
         ''
           mkdir -p $out/bin
           ln -s ${driverScript} $out/bin/ekaos-test-driver
-          chmod +x $out/bin/ekaos-test-driver
 
           # Store VM scripts for reference
           mkdir -p $out/vm-scripts

@@ -87,6 +87,26 @@ in
           DefaultTimeoutStopSec=90s
         '';
       }
+
+      # Create symlinks for essential systemd targets
+      {
+        "systemd/system/multi-user.target".source =
+          "${config.systemd.package}/lib/systemd/system/multi-user.target";
+        "systemd/system/sysinit.target".source =
+          "${config.systemd.package}/lib/systemd/system/sysinit.target";
+        "systemd/system/basic.target".source = "${config.systemd.package}/lib/systemd/system/basic.target";
+        "systemd/system/sockets.target".source =
+          "${config.systemd.package}/lib/systemd/system/sockets.target";
+        "systemd/system/timers.target".source =
+          "${config.systemd.package}/lib/systemd/system/timers.target";
+        "systemd/system/paths.target".source = "${config.systemd.package}/lib/systemd/system/paths.target";
+        "systemd/system/local-fs.target".source =
+          "${config.systemd.package}/lib/systemd/system/local-fs.target";
+        "systemd/system/remote-fs.target".source =
+          "${config.systemd.package}/lib/systemd/system/remote-fs.target";
+        "systemd/system/default.target".source =
+          "${config.systemd.package}/lib/systemd/system/${config.systemd.defaultTarget}";
+      }
     ];
 
     # Essential systemd targets and services

@@ -32,10 +32,17 @@ with final;
 
   # Linux kernel packages (for ekaos and other system builders)
   # Use linux scope which is auto-called from pkgs/linux/default.nix
-  linuxPackages = linux.packagesFor linux.kernels.linux_6_12;
-  linuxPackages_latest = linux.packagesFor linux.kernels.linux_6_18;
-  linuxPackages_6_12 = linuxPackages;
-  linuxPackages_6_18 = linuxPackages_latest;
+  # Note: 6.18 is required for vmTools (6.12 has issues with direct kernel boot)
+  # Override kernel with preferBuiltin=true to ensure DRM and framebuffer drivers
+  # are built-in rather than modules (required for vmTools direct kernel boot)
+  linuxPackages = linux.packagesFor (
+    linux.kernels.linux_6_18.override {
+      preferBuiltin = true;
+    }
+  );
+  linuxPackages_latest = linuxPackages;
+  linuxPackages_6_12 = linux.packagesFor linux.kernels.linux_6_12;
+  linuxPackages_6_18 = linuxPackages;
 
   # qemu - disable docs to avoid sphinx dependencies for now
   # disable smartcard support to avoid libcacard dependency
@@ -43,6 +50,10 @@ with final;
     enableDocs = false;
     smartcardSupport = false;
   };
+
+  # qemu_kvm - QEMU with only host CPU support (for vmTools)
+  # This is required for vmTools to work correctly with direct kernel boot
+  qemu_kvm = lowPrio (qemu.override { hostCpuOnly = true; });
 
   # ekaosTest - Testing framework for ekaos systems
   ekaosTest = (callPackage ./ekaos/lib/testing { }).runTest;

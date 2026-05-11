@@ -22,7 +22,7 @@ let
     diskSize = toString cfg.diskSize;
     additionalSpace = "512M";
     installBootLoader = true;
-    touchEFIVars = true;
+    touchEFIVars = false; # LKL doesn't support EFI, vars created at runtime
     label = config.system.ekaos.label;
   };
 
@@ -33,7 +33,7 @@ let
 
     # Paths
     DISK_IMAGE="${diskImage}/nixos.qcow2"
-    EFI_VARS="${diskImage}/efi-vars.fd"
+    EFI_VARS_TEMPLATE="${diskImage}/efi-vars.fd"
     OVMF_CODE="${pkgs.OVMF.firmware}"
 
     # Check if disk image exists
@@ -41,6 +41,24 @@ let
       echo "Error: Disk image not found at $DISK_IMAGE"
       exit 1
     fi
+
+    # Create a writable copy of EFI vars in /tmp
+    # (EFI vars must be writable, but files in /nix/store are read-only)
+    EFI_VARS_DIR=$(mktemp -d /tmp/ekaos-efi-vars.XXXXXX)
+    EFI_VARS="$EFI_VARS_DIR/efi-vars.fd"
+
+    if [ -f "$EFI_VARS_TEMPLATE" ]; then
+      cp "$EFI_VARS_TEMPLATE" "$EFI_VARS"
+      chmod u+w "$EFI_VARS"
+    else
+      # If template doesn't exist, create an empty EFI vars file
+      # using OVMF's vars template
+      cp "${pkgs.OVMF.variables}" "$EFI_VARS"
+      chmod u+w "$EFI_VARS"
+    fi
+
+    # Cleanup on exit
+    trap "rm -rf $EFI_VARS_DIR" EXIT
 
     # QEMU arguments
     QEMU_OPTS=(
@@ -57,9 +75,9 @@ let
       -drive if=pflash,format=raw,unit=1,file="$EFI_VARS"
     )
 
-    # Main disk
+    # Main disk (snapshot mode for read-only nix store files)
     QEMU_OPTS+=(
-      -drive file="$DISK_IMAGE",if=none,id=drive0,format=qcow2
+      -drive file="$DISK_IMAGE",if=none,id=drive0,format=qcow2,snapshot=on
       -device virtio-blk-pci,drive=drive0
     )
 

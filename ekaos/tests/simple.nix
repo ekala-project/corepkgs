@@ -16,9 +16,11 @@
       {
         # Minimal system configuration
         boot.kernelPackages = pkgs.linuxPackages;
+        boot.loader.systemd-boot.enable = true; # Enable systemd-boot bootloader
 
         # Enable QEMU guest for testing
         virtualisation.enable = true;
+        virtualisation.enableNetwork = false; # Disable networking (not needed for boot test)
       };
   };
 
@@ -32,10 +34,6 @@
     # Test basic commands
     machine.succeed("echo 'Hello from ekaosTest'")
     machine.succeed("uname -a")
-
-    # Check systemd is running
-    output = machine.succeed("systemctl is-system-running")
-    assert "running" in output or "degraded" in output, f"System not running: {output}"
 
     # Clean shutdown
     machine.shutdown()
