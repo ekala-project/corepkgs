@@ -48,7 +48,11 @@ let
 
   # Generate user/group switching using chpst
   mkUserSwitch =
-    { user, group, ... }:
+    config:
+    let
+      user = config.user or "root";
+      group = config.group or "root";
+    in
     if user != "root" then
       let
         userSpec = if group != "root" then "${user}:${group}" else user;
@@ -64,24 +68,24 @@ let
       cfg = config.runit or { };
 
       # Working directory change
-      workingDirCmd = optionalString (config.workingDirectory != null) ''
+      workingDirCmd = optionalString ((config.workingDirectory or null) != null) ''
         cd ${escapeShellArg (toString config.workingDirectory)}
       '';
 
       # Environment setup
-      envExports = if config.environment != { } then mkEnvironmentExports config.environment else "";
+      envExports = if (config.environment or { }) != { } then mkEnvironmentExports config.environment else "";
 
       # PATH setup
-      pathExport = mkPathExport config.path;
+      pathExport = mkPathExport (config.path or [ ]);
 
       # preStart hook
-      preStartCmd = optionalString (config.preStart != "") ''
+      preStartCmd = optionalString ((config.preStart or "") != "") ''
         # preStart hook
         ${config.preStart}
       '';
 
       # Extra run script content
-      extraRun = optionalString (cfg.extraRunScript != "") cfg.extraRunScript;
+      extraRun = optionalString ((cfg.extraRunScript or "") != "") cfg.extraRunScript;
 
       # User switching and exec
       userExec = mkUserSwitch config;
@@ -92,10 +96,10 @@ let
       #!/bin/sh
       set -e
 
-      ${optionalString (workingDirCmd != "") workingDirCmd}
       ${optionalString (envExports != "") envExports}
       ${optionalString (pathExport != "") pathExport}
       ${optionalString (preStartCmd != "") preStartCmd}
+      ${optionalString (workingDirCmd != "") workingDirCmd}
       ${optionalString (extraRun != "") extraRun}
 
       ${userExec}${commandLine}
@@ -106,8 +110,10 @@ let
     name: config:
     let
       cfg = config.runit or { };
-      hasPostStop = config.postStop != "";
-      hasExtra = cfg.extraFinishScript != "";
+      postStop = config.postStop or "";
+      hasPostStop = postStop != "";
+      extraFinish = cfg.extraFinishScript or "";
+      hasExtra = extraFinish != "";
     in
     if hasPostStop || hasExtra then
       pkgs.writeScript "${name}-finish" ''
@@ -116,9 +122,9 @@ let
 
         ${optionalString hasPostStop ''
           # postStop hook
-          ${config.postStop}
+          ${postStop}
         ''}
-        ${optionalString hasExtra cfg.extraFinishScript}
+        ${optionalString hasExtra extraFinish}
       ''
     else
       null;
@@ -128,7 +134,8 @@ let
     name: config:
     let
       cfg = config.runit or { };
-      checkScriptContent = cfg.extraConfig.checkScript or null;
+      extraConfig = cfg.extraConfig or { };
+      checkScriptContent = extraConfig.checkScript or null;
     in
     if checkScriptContent != null then pkgs.writeScript "${name}-check" checkScriptContent else null;
 
@@ -137,8 +144,9 @@ let
     name: config:
     let
       cfg = config.runit or { };
+      logScript = cfg.logScript or null;
     in
-    if cfg.logScript != null then pkgs.writeScript "${name}-log-run" cfg.logScript else null;
+    if logScript != null then pkgs.writeScript "${name}-log-run" logScript else null;
 
   # Build the complete service directory
   mkServiceDirectory =

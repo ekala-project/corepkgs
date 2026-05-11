@@ -77,7 +77,7 @@ let
       # All dependencies
       allDeps = defaultDeps ++ extraDependencies;
 
-      # Setup phase: Create service directory and symlink all services
+      # Setup phase: Create service directory and copy all services
       setupServices = ''
         echo "=== Setting up runit service directory ===" >&2
 
@@ -85,12 +85,13 @@ let
         export RUNIT_SERVICE_DIR="$TMPDIR/service"
         mkdir -p "$RUNIT_SERVICE_DIR"
 
-        # Symlink all service directories
+        # Copy all service directories (not symlink, runit needs writable dirs)
         ${concatStringsSep "\n" (
           mapAttrsToList (
             name: deriv: ''
-              echo "Linking service: ${name}" >&2
-              ln -s ${deriv} "$RUNIT_SERVICE_DIR/${name}"
+              echo "Copying service: ${name}" >&2
+              cp -r ${deriv} "$RUNIT_SERVICE_DIR/${name}"
+              chmod -R u+w "$RUNIT_SERVICE_DIR/${name}"
             ''
           ) serviceDerivations
         )}
@@ -120,15 +121,9 @@ let
         # Start runit supervisor
         runitTestStart
 
-        # Wait for all services to be supervised
-        ${concatStringsSep "\n" (
-          map (name: ''
-            runitTestWaitService "${name}"
-          '') serviceNames
-        )}
-
-        # Show service status
-        runitTestStatus
+        # Give services a moment to start
+        # (tests will use runitTestWaitPort to wait for specific ports)
+        sleep 2
       '';
 
       # Run the test script
