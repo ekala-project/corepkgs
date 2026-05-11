@@ -24,7 +24,7 @@ let
     # Auto-generated ekaosTest script
 
     import sys
-    from test_driver import Machine, start_all, subtest
+    from test_driver import Machine, register_machine, start_all, subtest
 
     # Define machines
     ${machinesPython}

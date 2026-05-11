@@ -48,7 +48,7 @@
 let
   qemu-common = import ../../ekaos/lib/qemu-common.nix { inherit lib stdenv; };
 
-  qemu = buildPackages.qemu;
+  qemu = buildPackages.qemu_kvm;
 
   modulesClosure = makeModulesClosure {
     kernel = lib.getOutput "modules" kernel;

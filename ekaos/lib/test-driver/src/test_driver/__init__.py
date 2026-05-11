@@ -8,6 +8,7 @@ from .logger import log, log_error, log_warning, log_success
 
 __all__ = [
     "Machine",
+    "register_machine",
     "start_all",
     "subtest",
     "log",

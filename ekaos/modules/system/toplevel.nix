@@ -57,6 +57,21 @@ let
     substituteInPlace $out/activate \
       --replace '@out@' "$out"
 
+    # Create bin directory and switch-to-configuration wrapper
+    mkdir -p $out/bin
+    cat > $out/bin/switch-to-configuration <<'WRAPPER'
+    #!${pkgs.runtimeShell}
+    # Wrapper for ekaos activation (NixOS compatibility)
+    set -e
+    action="''${1:-switch}"
+    exec $out/activate "$action"
+    WRAPPER
+    chmod +x $out/bin/switch-to-configuration
+
+    # Substitute $out in switch-to-configuration
+    substituteInPlace $out/bin/switch-to-configuration \
+      --replace '$out' "$out"
+
     # Create symlinks to key components
     ln -s ${config.system.build.etc}/etc $out/etc
     ln -s ${config.system.path} $out/sw
