@@ -11,7 +11,7 @@ let
 
 in
 
-{
+rec {
   # Test 1: Simple HTTP server smoke test
   #
   # Starts Python's http.server and verifies it responds to requests
@@ -24,7 +24,6 @@ in
       "--bind"
       "127.0.0.1"
     ];
-    user = "nobody";
     description = "Simple HTTP server for testing";
   } ''
     # Wait for HTTP server to be ready
@@ -73,7 +72,6 @@ in
             server.serve_forever()
           ''
         ];
-        user = "nobody";
         description = "Backend HTTP service";
       };
 
@@ -107,7 +105,6 @@ in
             server.serve_forever()
           ''
         ];
-        user = "nobody";
         description = "Frontend proxy service";
       };
     };
@@ -132,8 +129,8 @@ in
         exit 1
       fi
 
-      # Check proxy header
-      if ${pkgs.curl}/bin/curl -s -I http://127.0.0.1:8080 | ${pkgs.gnugrep}/bin/grep -q "X-Proxied: true"; then
+      # Check proxy header (using -v to see headers in GET request)
+      if ${pkgs.curl}/bin/curl -s -v http://127.0.0.1:8080 2>&1 | ${pkgs.gnugrep}/bin/grep -q "X-Proxied: true"; then
         echo "Frontend proxy OK"
       else
         echo "ERROR: Proxy header missing"
@@ -156,7 +153,6 @@ in
       "--bind"
       "127.0.0.1"
     ];
-    user = "nobody";
     workingDirectory = "/tmp/webroot";
     description = "HTTP server with setup";
 
@@ -206,7 +202,6 @@ in
         server.serve_forever()
       ''
     ];
-    user = "nobody";
     description = "Service with custom environment";
 
     environment = {
@@ -235,10 +230,10 @@ in
     # List of tests
     ${pkgs.coreutils}/bin/cat > $TMPDIR/tests <<EOF
     ${builtins.concatStringsSep "\n" [
-      "${pkgs.callPackage ./default.nix { }."simple-http"}"
-      "${pkgs.callPackage ./default.nix { }."multi-service"}"
-      "${pkgs.callPackage ./default.nix { }."with-prestart"}"
-      "${pkgs.callPackage ./default.nix { }."with-environment"}"
+      "${simple-http}"
+      "${multi-service}"
+      "${with-prestart}"
+      "${with-environment}"
     ]}
     EOF
 

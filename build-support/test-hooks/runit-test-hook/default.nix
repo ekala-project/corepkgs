@@ -3,7 +3,7 @@
   stdenv,
   makeSetupHook,
   runit,
-  netcat-gnu,
+  netcat,
 }:
 
 makeSetupHook {
@@ -11,12 +11,12 @@ makeSetupHook {
 
   propagatedBuildInputs = [
     runit
-    netcat-gnu
+    netcat
   ];
 
   substitutions = {
     runitPackage = runit;
-    netcatPackage = netcat-gnu;
+    netcatPackage = netcat;
   };
 
   meta = {

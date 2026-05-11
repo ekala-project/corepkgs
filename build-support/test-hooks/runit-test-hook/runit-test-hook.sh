@@ -118,7 +118,7 @@ runitTestStop() {
     fi
 
     # Kill any lingering runsv processes (in case they didn't stop)
-    pkill -f "runsv $RUNIT_SERVICE_DIR" || true
+    @procpsPackage@/bin/pkill -f "runsv $RUNIT_SERVICE_DIR" || true
 
     RUNIT_PID=""
     RUNIT_STARTED=""
