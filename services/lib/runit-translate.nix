@@ -73,7 +73,8 @@ let
       '';
 
       # Environment setup
-      envExports = if (config.environment or { }) != { } then mkEnvironmentExports config.environment else "";
+      envExports =
+        if (config.environment or { }) != { } then mkEnvironmentExports config.environment else "";
 
       # PATH setup
       pathExport = mkPathExport (config.path or [ ]);

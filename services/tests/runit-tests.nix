@@ -87,13 +87,11 @@ let
 
         # Copy all service directories (not symlink, runit needs writable dirs)
         ${concatStringsSep "\n" (
-          mapAttrsToList (
-            name: deriv: ''
-              echo "Copying service: ${name}" >&2
-              cp -r ${deriv} "$RUNIT_SERVICE_DIR/${name}"
-              chmod -R u+w "$RUNIT_SERVICE_DIR/${name}"
-            ''
-          ) serviceDerivations
+          mapAttrsToList (name: deriv: ''
+            echo "Copying service: ${name}" >&2
+            cp -r ${deriv} "$RUNIT_SERVICE_DIR/${name}"
+            chmod -R u+w "$RUNIT_SERVICE_DIR/${name}"
+          '') serviceDerivations
         )}
 
         echo "Service directory ready: $RUNIT_SERVICE_DIR" >&2
@@ -109,7 +107,8 @@ let
 
       nativeBuildInputs = [
         runitTestHook
-      ] ++ allDeps;
+      ]
+      ++ allDeps;
 
       dontUnpack = true;
       dontBuild = true;
@@ -187,12 +186,20 @@ let
       testScript,
       ...
     }@args:
-    mkRunitTest ({
-      inherit name testScript;
-      services = {
-        inherit server client;
-      };
-    } // (removeAttrs args [ "name" "server" "client" "testScript" ]));
+    mkRunitTest (
+      {
+        inherit name testScript;
+        services = {
+          inherit server client;
+        };
+      }
+      // (removeAttrs args [
+        "name"
+        "server"
+        "client"
+        "testScript"
+      ])
+    );
 
 in
 

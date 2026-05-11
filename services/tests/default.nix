@@ -3,7 +3,9 @@
 # These tests demonstrate lightweight service-to-service testing
 # within the nix-build sandbox using runit supervision.
 
-{ pkgs ? import ../../. { } }:
+{
+  pkgs ? import ../../. { },
+}:
 
 let
   runitTestsLib = pkgs.callPackage ./runit-tests.nix { };
@@ -15,33 +17,36 @@ rec {
   # Test 1: Simple HTTP server smoke test
   #
   # Starts Python's http.server and verifies it responds to requests
-  simple-http = mkServiceTest "http-server" {
-    command = "${pkgs.python3}/bin/python3";
-    args = [
-      "-m"
-      "http.server"
-      "8080"
-      "--bind"
-      "127.0.0.1"
-    ];
-    description = "Simple HTTP server for testing";
-  } ''
-    # Wait for HTTP server to be ready
-    runitTestWaitPort 8080
+  simple-http =
+    mkServiceTest "http-server"
+      {
+        command = "${pkgs.python3}/bin/python3";
+        args = [
+          "-m"
+          "http.server"
+          "8080"
+          "--bind"
+          "127.0.0.1"
+        ];
+        description = "Simple HTTP server for testing";
+      }
+      ''
+        # Wait for HTTP server to be ready
+        runitTestWaitPort 8080
 
-    echo "Testing HTTP server..."
+        echo "Testing HTTP server..."
 
-    # Make a request
-    response=$(${pkgs.curl}/bin/curl -s http://127.0.0.1:8080)
+        # Make a request
+        response=$(${pkgs.curl}/bin/curl -s http://127.0.0.1:8080)
 
-    if echo "$response" | ${pkgs.gnugrep}/bin/grep -q "Directory listing"; then
-      echo "HTTP server is working!"
-    else
-      echo "ERROR: HTTP server response unexpected"
-      echo "Response: $response"
-      exit 1
-    fi
-  '';
+        if echo "$response" | ${pkgs.gnugrep}/bin/grep -q "Directory listing"; then
+          echo "HTTP server is working!"
+        else
+          echo "ERROR: HTTP server response unexpected"
+          echo "Response: $response"
+          exit 1
+        fi
+      '';
 
   # Test 2: Multi-service interaction
   #
@@ -144,84 +149,90 @@ rec {
   # Test 3: Service with preStart hook
   #
   # Demonstrates using preStart to setup service dependencies
-  with-prestart = mkServiceTest "http-with-setup" {
-    command = "${pkgs.python3}/bin/python3";
-    args = [
-      "-m"
-      "http.server"
-      "8082"
-      "--bind"
-      "127.0.0.1"
-    ];
-    workingDirectory = "/tmp/webroot";
-    description = "HTTP server with setup";
+  with-prestart =
+    mkServiceTest "http-with-setup"
+      {
+        command = "${pkgs.python3}/bin/python3";
+        args = [
+          "-m"
+          "http.server"
+          "8082"
+          "--bind"
+          "127.0.0.1"
+        ];
+        workingDirectory = "/tmp/webroot";
+        description = "HTTP server with setup";
 
-    # Create content directory before starting
-    preStart = ''
-      mkdir -p /tmp/webroot
-      echo "Hello from preStart!" > /tmp/webroot/index.html
-    '';
-  } ''
-    runitTestWaitPort 8082
+        # Create content directory before starting
+        preStart = ''
+          mkdir -p /tmp/webroot
+          echo "Hello from preStart!" > /tmp/webroot/index.html
+        '';
+      }
+      ''
+        runitTestWaitPort 8082
 
-    echo "Testing preStart hook..."
+        echo "Testing preStart hook..."
 
-    response=$(${pkgs.curl}/bin/curl -s http://127.0.0.1:8082/index.html)
-    if echo "$response" | ${pkgs.gnugrep}/bin/grep -q "Hello from preStart!"; then
-      echo "preStart hook worked!"
-    else
-      echo "ERROR: preStart hook did not work"
-      echo "Response: $response"
-      exit 1
-    fi
-  '';
+        response=$(${pkgs.curl}/bin/curl -s http://127.0.0.1:8082/index.html)
+        if echo "$response" | ${pkgs.gnugrep}/bin/grep -q "Hello from preStart!"; then
+          echo "preStart hook worked!"
+        else
+          echo "ERROR: preStart hook did not work"
+          echo "Response: $response"
+          exit 1
+        fi
+      '';
 
   # Test 4: Service environment variables
   #
   # Tests that environment variables are properly passed to services
-  with-environment = mkServiceTest "env-test" {
-    command = "${pkgs.python3}/bin/python3";
-    args = [
-      "-c"
+  with-environment =
+    mkServiceTest "env-test"
+      {
+        command = "${pkgs.python3}/bin/python3";
+        args = [
+          "-c"
+          ''
+            from http.server import HTTPServer, BaseHTTPRequestHandler
+            import os
+
+            class Handler(BaseHTTPRequestHandler):
+                def do_GET(self):
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/plain')
+                    self.end_headers()
+                    msg = f"CUSTOM_VAR={os.environ.get('CUSTOM_VAR', 'NOT_SET')}\n"
+                    self.wfile.write(msg.encode())
+
+                def log_message(self, format, *args):
+                    pass
+
+            server = HTTPServer(('127.0.0.1', 8083), Handler)
+            server.serve_forever()
+          ''
+        ];
+        description = "Service with custom environment";
+
+        environment = {
+          CUSTOM_VAR = "test-value-123";
+          ANOTHER_VAR = "another-value";
+        };
+      }
       ''
-        from http.server import HTTPServer, BaseHTTPRequestHandler
-        import os
+        runitTestWaitPort 8083
 
-        class Handler(BaseHTTPRequestHandler):
-            def do_GET(self):
-                self.send_response(200)
-                self.send_header('Content-type', 'text/plain')
-                self.end_headers()
-                msg = f"CUSTOM_VAR={os.environ.get('CUSTOM_VAR', 'NOT_SET')}\n"
-                self.wfile.write(msg.encode())
+        echo "Testing environment variables..."
 
-            def log_message(self, format, *args):
-                pass
-
-        server = HTTPServer(('127.0.0.1', 8083), Handler)
-        server.serve_forever()
-      ''
-    ];
-    description = "Service with custom environment";
-
-    environment = {
-      CUSTOM_VAR = "test-value-123";
-      ANOTHER_VAR = "another-value";
-    };
-  } ''
-    runitTestWaitPort 8083
-
-    echo "Testing environment variables..."
-
-    response=$(${pkgs.curl}/bin/curl -s http://127.0.0.1:8083)
-    if echo "$response" | ${pkgs.gnugrep}/bin/grep -q "CUSTOM_VAR=test-value-123"; then
-      echo "Environment variables work!"
-    else
-      echo "ERROR: Environment variables not set correctly"
-      echo "Response: $response"
-      exit 1
-    fi
-  '';
+        response=$(${pkgs.curl}/bin/curl -s http://127.0.0.1:8083)
+        if echo "$response" | ${pkgs.gnugrep}/bin/grep -q "CUSTOM_VAR=test-value-123"; then
+          echo "Environment variables work!"
+        else
+          echo "ERROR: Environment variables not set correctly"
+          echo "Response: $response"
+          exit 1
+        fi
+      '';
 
   # Meta test: Run all tests
   all = pkgs.runCommand "all-runit-tests" { } ''
