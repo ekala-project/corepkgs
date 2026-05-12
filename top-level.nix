@@ -61,6 +61,10 @@ with final;
   # ekaosTests - Test suite for ekaos systems (individual tests can be built)
   ekaosTests = callPackage ./ekaos/tests { };
 
+  # integrationTests - Unified entry point for all integration test frameworks
+  # Includes runitTests, ekaosTests, and future test frameworks
+  integrationTests = callPackage ./integration-tests { };
+
   # vmTools - VM building utilities for ekaosTest and disk image creation
   vmTools = callPackage ./build-support/vm { };
   makeInitrd = callPackage ./build-support/kernel/make-initrd.nix;
