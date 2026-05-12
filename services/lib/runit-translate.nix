@@ -18,9 +18,7 @@ let
         name: value:
         let
           val =
-            if lib.isDerivation value then
-              value
-            else if lib.isPath value then
+            if lib.isPath value then
               toString value
             else
               value;
@@ -32,10 +30,7 @@ let
   # Generate PATH from package list
   mkPathExport =
     packages:
-    let
-      paths = map (pkg: "${pkg}/bin:${pkg}/sbin") packages;
-    in
-    if paths != [ ] then "export PATH=${concatStringsSep ":" paths}:$PATH" else "";
+    if packages != [ ] then "export PATH=${lib.makeBinPath packages}:$PATH" else "";
 
   # Generate command line with args
   mkCommandLine =
@@ -111,24 +106,18 @@ let
     name: config:
     let
       cfg = config.runit or { };
-      postStop = config.postStop or "";
-      hasPostStop = postStop != "";
-      extraFinish = cfg.extraFinishScript or "";
-      hasExtra = extraFinish != "";
+      postStop = config.postStop or ":";
+      extraFinish = cfg.extraFinishScript or ":";
     in
-    if hasPostStop || hasExtra then
       pkgs.writeScript "${name}-finish" ''
         #!/bin/sh
         # Arguments: $1 = exit code, $2 = signal number
 
-        ${optionalString hasPostStop ''
-          # postStop hook
-          ${postStop}
-        ''}
-        ${optionalString hasExtra extraFinish}
-      ''
-    else
-      null;
+        # postStop hook
+        ${postStop}
+
+        ${extraFinish}
+      '';
 
   # Generate optional check script
   mkCheckScript =
