@@ -31,33 +31,4 @@ rec {
 
   # Test 4: Service environment variables
   with-environment = callTest ./runit/test/with-environment.nix;
-
-  # Meta test: Run all tests
-  all = pkgs.runCommand "all-runit-tests" { } ''
-    echo "Running all runit tests..." >&2
-
-    # List of tests
-    ${pkgs.coreutils}/bin/cat > $TMPDIR/tests <<EOF
-    ${builtins.concatStringsSep "\n" [
-      "${simple-http}"
-      "${multi-service}"
-      "${with-prestart}"
-      "${with-environment}"
-    ]}
-    EOF
-
-    # Verify all passed
-    while read test; do
-      if [ -f "$test/result" ]; then
-        echo "✓ Test passed: $test" >&2
-      else
-        echo "✗ Test failed: $test" >&2
-        exit 1
-      fi
-    done < $TMPDIR/tests
-
-    echo "All runit tests passed!" >&2
-    mkdir -p $out
-    echo "success" > $out/result
-  '';
 }

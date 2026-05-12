@@ -1181,14 +1181,17 @@ rec {
 
 ### Running Tests
 
-Run individual tests or the full suite:
+Run individual tests or the full suite using the unified `integrationTests` entry point:
 
 ```bash
-# Run a specific test
-nix-build services/tests/default.nix -A simple-http
+# Run a specific test (recommended)
+nix-build -A integrationTests.runit.simple-http
 
 # Run all runit tests
-nix-build services/tests/default.nix -A all
+nix-build -A integrationTests.runit.all
+
+# Alternative: Direct path to test suite
+nix-build services/tests/default.nix -A simple-http
 
 # Check test results
 cat result/result  # Should contain "success"
@@ -1196,6 +1199,8 @@ cat result/result  # Should contain "success"
 # View service logs (if test failed)
 ls -la result/logs/
 ```
+
+The `integrationTests` attribute provides a unified namespace for all test frameworks (runit, ekaos, etc.) and is the recommended way to access tests.
 
 ### Example Tests
 
