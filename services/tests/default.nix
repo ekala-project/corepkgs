@@ -1,7 +1,10 @@
 # Example runit service tests
 #
-# These tests demonstrate lightweight service-to-service testing
-# within the nix-build sandbox using runit supervision.
+# These tests demonstrate module-based service testing using the unified
+# services module system. Services are defined using services.* options
+# just like in ekaos/NixOS configurations.
+#
+# Each test is defined in its own file in runit/test/ for better organization.
 
 {
   pkgs ? import ../../. { },
@@ -9,195 +12,25 @@
 
 let
   runitTestsLib = pkgs.callPackage ./runit-tests.nix { };
-  inherit (runitTestsLib) mkRunitTest mkServiceTest;
+  inherit (runitTestsLib) mkRunitTest;
+
+  # Helper to call mkRunitTest with test file that expects pkgs
+  callTest = testFile: mkRunitTest (pkgs.callPackage testFile { });
 
 in
 
 rec {
   # Test 1: Simple HTTP server smoke test
-  #
-  # Starts Python's http.server and verifies it responds to requests
-  simple-http =
-    mkServiceTest "http-server"
-      {
-        command = "${pkgs.python3}/bin/python3";
-        args = [
-          "-m"
-          "http.server"
-          "8080"
-          "--bind"
-          "127.0.0.1"
-        ];
-        description = "Simple HTTP server for testing";
-      }
-      ''
-        machine.wait_for_open_port(8080)
-        log("Testing HTTP server...")
-        response = machine.succeed("curl -s http://127.0.0.1:8080")
-        assert "Directory listing" in response, f"Expected directory listing, got: {response}"
-        log("HTTP server is working!")
-      '';
+  simple-http = callTest ./runit/test/simple-http.nix;
 
   # Test 2: Multi-service interaction
-  #
-  # Runs two services and tests their interaction via localhost
-  multi-service = mkRunitTest {
-    name = "multi-service-interaction";
-
-    services = {
-      # Backend HTTP server
-      backend = {
-        command = "${pkgs.python3}/bin/python3";
-        args = [
-          "-c"
-          ''
-            from http.server import HTTPServer, BaseHTTPRequestHandler
-
-            class Handler(BaseHTTPRequestHandler):
-                def do_GET(self):
-                    self.send_response(200)
-                    self.send_header('Content-type', 'text/plain')
-                    self.end_headers()
-                    self.wfile.write(b'backend response')
-
-                def log_message(self, format, *args):
-                    pass  # Suppress logs
-
-            server = HTTPServer(('127.0.0.1', 8081), Handler)
-            server.serve_forever()
-          ''
-        ];
-        description = "Backend HTTP service";
-      };
-
-      # Frontend proxy (using netcat for simplicity in this test)
-      frontend = {
-        command = "${pkgs.python3}/bin/python3";
-        args = [
-          "-c"
-          ''
-            from http.server import HTTPServer, BaseHTTPRequestHandler
-            import urllib.request
-
-            class ProxyHandler(BaseHTTPRequestHandler):
-                def do_GET(self):
-                    # Forward request to backend
-                    try:
-                        with urllib.request.urlopen('http://127.0.0.1:8081') as response:
-                            data = response.read()
-                            self.send_response(200)
-                            self.send_header('Content-type', 'text/plain')
-                            self.send_header('X-Proxied', 'true')
-                            self.end_headers()
-                            self.wfile.write(data)
-                    except Exception as e:
-                        self.send_error(500, str(e))
-
-                def log_message(self, format, *args):
-                    pass
-
-            server = HTTPServer(('127.0.0.1', 8080), ProxyHandler)
-            server.serve_forever()
-          ''
-        ];
-        description = "Frontend proxy service";
-      };
-    };
-
-    testScript = ''
-      with subtest("backend startup"):
-          machine.wait_for_open_port(8081)
-          response = machine.succeed("curl -s http://127.0.0.1:8081")
-          assert response == "backend response", f"Expected 'backend response', got: {response}"
-          log("Backend OK")
-
-      with subtest("frontend proxy"):
-          machine.wait_for_open_port(8080)
-          response = machine.succeed("curl -s http://127.0.0.1:8080")
-          assert response == "backend response", f"Expected proxied backend response, got: {response}"
-
-          # Check proxy header
-          verbose_output = machine.succeed("curl -s -v http://127.0.0.1:8080 2>&1")
-          assert "X-Proxied: true" in verbose_output, "Proxy header missing"
-          log("Frontend proxy OK")
-
-      log("Multi-service test passed!")
-    '';
-  };
+  multi-service = callTest ./runit/test/multi-service.nix;
 
   # Test 3: Service with preStart hook
-  #
-  # Demonstrates using preStart to setup service dependencies
-  with-prestart =
-    mkServiceTest "http-with-setup"
-      {
-        command = "${pkgs.python3}/bin/python3";
-        args = [
-          "-m"
-          "http.server"
-          "8082"
-          "--bind"
-          "127.0.0.1"
-        ];
-        workingDirectory = "/tmp/webroot";
-        description = "HTTP server with setup";
-
-        # Create content directory before starting
-        preStart = ''
-          mkdir -p /tmp/webroot
-          echo "Hello from preStart!" > /tmp/webroot/index.html
-        '';
-      }
-      ''
-        machine.wait_for_open_port(8082)
-        log("Testing preStart hook...")
-        response = machine.succeed("curl -s http://127.0.0.1:8082/index.html")
-        assert "Hello from preStart!" in response, f"Expected preStart content, got: {response}"
-        log("preStart hook worked!")
-      '';
+  with-prestart = callTest ./runit/test/with-prestart.nix;
 
   # Test 4: Service environment variables
-  #
-  # Tests that environment variables are properly passed to services
-  with-environment =
-    mkServiceTest "env-test"
-      {
-        command = "${pkgs.python3}/bin/python3";
-        args = [
-          "-c"
-          ''
-            from http.server import HTTPServer, BaseHTTPRequestHandler
-            import os
-
-            class Handler(BaseHTTPRequestHandler):
-                def do_GET(self):
-                    self.send_response(200)
-                    self.send_header('Content-type', 'text/plain')
-                    self.end_headers()
-                    msg = f"CUSTOM_VAR={os.environ.get('CUSTOM_VAR', 'NOT_SET')}\n"
-                    self.wfile.write(msg.encode())
-
-                def log_message(self, format, *args):
-                    pass
-
-            server = HTTPServer(('127.0.0.1', 8083), Handler)
-            server.serve_forever()
-          ''
-        ];
-        description = "Service with custom environment";
-
-        environment = {
-          CUSTOM_VAR = "test-value-123";
-          ANOTHER_VAR = "another-value";
-        };
-      }
-      ''
-        machine.wait_for_open_port(8083)
-        log("Testing environment variables...")
-        response = machine.succeed("curl -s http://127.0.0.1:8083")
-        assert "CUSTOM_VAR=test-value-123" in response, f"Expected environment variable in response, got: {response}"
-        log("Environment variables work!")
-      '';
+  with-environment = callTest ./runit/test/with-environment.nix;
 
   # Meta test: Run all tests
   all = pkgs.runCommand "all-runit-tests" { } ''

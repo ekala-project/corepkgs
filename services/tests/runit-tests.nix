@@ -1,18 +1,21 @@
-# runitTests - Lightweight service testing framework
+# runitTests - Module-based service testing framework
 #
 # Runs runit-supervised services in nix-build sandbox for service-to-service testing.
-# Uses the default nix sandbox's network namespace for localhost communication.
+# Uses the services module system for declarative service configuration.
 #
 # Usage:
 #   pkgs.runitTest {
 #     name = "my-service-test";
 #
-#     services = {
-#       webserver = {
-#         command = "${pkgs.python3}/bin/python3";
-#         args = [ "-m" "http.server" "8080" ];
-#       };
-#     };
+#     modules = [
+#       {
+#         services.webserver = {
+#           enable = true;
+#           command = "${pkgs.python3}/bin/python3";
+#           args = [ "-m" "http.server" "8080" ];
+#         };
+#       }
+#     ];
 #
 #     testScript = ''
 #       # Python test script (not bash!)
@@ -30,8 +33,8 @@ let
     optionalString
     ;
 
-  # Import existing runit translation library
-  runitLib = import ../lib/runit-translate.nix { inherit lib pkgs; };
+  # Import services module infrastructure
+  serviceModule = import ../lib/service-module.nix { inherit lib pkgs; };
 
   # Build the runit test driver (Python)
   runitTestDriver = pkgs.callPackage ./runit-test-driver { };
@@ -40,27 +43,37 @@ let
   #
   # Args:
   #   name: Test name
-  #   services: Attrset of service definitions (using common service options)
+  #   modules: List of configuration modules (using services.* options)
   #   testScript: Python script to run after services start
   #   extraDependencies: Additional packages for test script (default: [])
   #   timeout: Maximum test duration in seconds (default: 120)
   mkRunitTest =
     {
       name,
-      services,
+      modules,
       testScript,
       extraDependencies ? [ ],
       timeout ? 120,
       ...
     }@args:
     let
-      # Build service directories for each service
-      serviceDerivations = lib.mapAttrs (
-        serviceName: serviceConfig: runitLib.toRunitService serviceName serviceConfig
-      ) services;
+      # Evaluate modules through the module system
+      evaluated = lib.evalModules {
+        modules = [
+          {
+            options.services = serviceModule.mkServicesOption;
+          }
+        ] ++ modules;
+      };
+
+      # Extract evaluated services
+      services = evaluated.config.services;
+
+      # Build service directories using the module system
+      serviceDerivations = serviceModule.mkRunitServices services;
 
       # List of service names for iteration
-      serviceNames = lib.attrNames services;
+      serviceNames = lib.attrNames serviceDerivations;
 
       # Build the runitTestHook
       runitTestHook = pkgs.callPackage ../../build-support/test-hooks/runit-test-hook { };
@@ -168,47 +181,10 @@ PYTHON_TEST_SCRIPT
       maxBuildTime = timeout;
     };
 
-  # Helper: Create a simple single-service test
-  #
-  # Useful for quick smoke tests of individual services
-  mkServiceTest =
-    serviceName: serviceConfig: testScript:
-    mkRunitTest {
-      name = "${serviceName}-test";
-      services.${serviceName} = serviceConfig;
-      inherit testScript;
-    };
-
-  # Helper: Test service interaction (client-server)
-  #
-  # Runs two services and tests their communication
-  mkInteractionTest =
-    {
-      name,
-      server,
-      client,
-      testScript,
-      ...
-    }@args:
-    mkRunitTest (
-      {
-        inherit name testScript;
-        services = {
-          inherit server client;
-        };
-      }
-      // (removeAttrs args [
-        "name"
-        "server"
-        "client"
-        "testScript"
-      ])
-    );
-
 in
 
 {
-  inherit mkRunitTest mkServiceTest mkInteractionTest;
+  inherit mkRunitTest;
 
   # Alias for consistency with ekaosTest
   runitTest = mkRunitTest;

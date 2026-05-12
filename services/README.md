@@ -63,10 +63,18 @@ services/
 │   ├── nginx-system.nix                 # Nginx daemon (system service)
 │   └── http-server-cross-platform.nix   # HTTP server (all 7 builders!) (UPDATED!)
 ├── tests/
-│   ├── launchd-test.nix       # Launchd test suite
+│   ├── runit/
+│   │   └── test/               # Runit test cases (module-based)
+│   │       ├── simple-http.nix
+│   │       ├── multi-service.nix
+│   │       ├── with-prestart.nix
+│   │       └── with-environment.nix
+│   ├── runit-tests.nix         # Module-based runit test framework
+│   ├── default.nix             # Runit test suite entry point (UPDATED!)
+│   ├── launchd-test.nix        # Launchd test suite
 │   ├── systemd-system-test.nix # Systemd system services tests
-│   ├── rcd-test.nix           # BSD rc.d test suite
-│   └── validation-test.nix    # Configuration validation tests (NEW!)
+│   ├── rcd-test.nix            # BSD rc.d test suite
+│   └── validation-test.nix     # Configuration validation tests (NEW!)
 ├── default.nix                # Main entry point
 └── README.md                  # This file
 ```
@@ -968,6 +976,245 @@ See `../ekaos/README.md` for complete ekaos documentation and testing options.
 - `../cross-service-plan.md` - Full design document for cross-service interface
 - `../ekaos/README.md` - ekaos bootable system documentation
 - `../ekaos/missing-packages.md` - Package requirements for bootable systems
+
+## Runit Testing Framework
+
+The project includes a **module-based runit testing framework** that allows you to test services using the same module system and configuration format as production deployments. Tests run in the nix-build sandbox using runit for process supervision.
+
+### Overview
+
+The runit test framework (`services/tests/runit-tests.nix`) provides:
+- **Module evaluation**: Tests use `services.*` options just like ekaos/NixOS
+- **Runit supervision**: Services run under `runsvdir` in the sandbox
+- **Python test driver**: High-level test primitives for common operations
+- **Localhost networking**: Services can communicate via 127.0.0.1
+- **Automatic cleanup**: Services are stopped after tests complete
+
+### Writing a Test
+
+Tests are defined in separate files with the signature `{ pkgs, ... }: { ... }` and imported in `default.nix`:
+
+```nix
+# services/tests/runit/test/my-test.nix
+{ pkgs, ... }:
+
+{
+  name = "my-service-test";
+
+  # Define services using the module system
+  modules = [
+    {
+      services.webserver = {
+        enable = true;
+        command = "${pkgs.python3}/bin/python3";
+        args = [ "-m" "http.server" "8080" "--bind" "127.0.0.1" ];
+        description = "Test HTTP server";
+
+        # All module options available
+        environment = { PORT = "8080"; };
+        preStart = "echo 'Starting server...'";
+        workingDirectory = "/tmp/webroot";
+
+        # Runit-specific options
+        runit.logScript = ''
+          #!/bin/sh
+          exec svlogd -tt ./main
+        '';
+      };
+    }
+  ];
+
+  # Python test script (not bash!)
+  testScript = ''
+    machine.wait_for_open_port(8080)
+    response = machine.succeed("curl http://127.0.0.1:8080")
+    assert "Directory listing" in response
+    log("Test passed!")
+  '';
+}
+```
+
+Then import it in `services/tests/default.nix`:
+
+```nix
+{
+  pkgs ? import ../../. { },
+}:
+
+let
+  runitTestsLib = pkgs.callPackage ./runit-tests.nix { };
+  inherit (runitTestsLib) mkRunitTest;
+
+  # Helper to call mkRunitTest with test file that expects pkgs
+  callTest = testFile: mkRunitTest (pkgs.callPackage testFile { });
+in
+
+rec {
+  my-test = callTest ./runit/test/my-test.nix;
+}
+```
+
+### Test Script API
+
+The Python test driver provides these primitives via the `machine` object:
+
+**Command Execution:**
+- `machine.execute(command)` - Run command, return (returncode, output)
+- `machine.succeed(command)` - Assert command succeeds, return output
+- `machine.fail(command)` - Assert command fails
+
+**Service Management:**
+- `machine.wait_for_unit(service, timeout=60)` - Wait for runit service
+- `machine.sv_status(service)` - Get service status
+- `machine.sv_up(service)` - Start service
+- `machine.sv_down(service)` - Stop service
+- `machine.sv_restart(service)` - Restart service
+
+**Network Testing:**
+- `machine.wait_for_open_port(port, addr="127.0.0.1", timeout=60)` - Wait for TCP port
+- `machine.wait_for_closed_port(port, addr="127.0.0.1", timeout=60)` - Wait for port to close
+
+**Utilities:**
+- `machine.wait_until_succeeds(command, timeout=60)` - Retry until success
+- `machine.wait_until_fails(command, timeout=60)` - Retry until failure
+- `machine.wait_for_file(path, timeout=60)` - Wait for file to exist
+- `log(message)` - Print log message
+- `subtest(name)` - Create named test section (context manager)
+
+### Multi-Service Testing
+
+The module system makes it easy to test service interactions:
+
+```nix
+mkRunitTest {
+  name = "backend-frontend-test";
+
+  modules = [
+    {
+      services.backend = {
+        enable = true;
+        command = "${backendApp}/bin/backend";
+        args = [ "--port" "8081" ];
+        description = "Backend API";
+      };
+
+      services.frontend = {
+        enable = true;
+        command = "${frontendApp}/bin/frontend";
+        environment = {
+          BACKEND_URL = "http://127.0.0.1:8081";
+          PORT = "8080";
+        };
+        description = "Frontend proxy";
+      };
+    }
+  ];
+
+  testScript = ''
+    with subtest("backend startup"):
+        machine.wait_for_open_port(8081)
+        machine.succeed("curl http://127.0.0.1:8081/health")
+        log("Backend OK")
+
+    with subtest("frontend proxy"):
+        machine.wait_for_open_port(8080)
+        response = machine.succeed("curl http://127.0.0.1:8080")
+        assert "OK" in response
+        log("Frontend OK")
+  '';
+}
+```
+
+### Module Composition
+
+Tests can use module features like imports and conditionals:
+
+```nix
+# services/tests/common-test-services.nix
+{ config, lib, pkgs, ... }:
+{
+  services.database = {
+    enable = lib.mkDefault true;
+    command = "${pkgs.postgresql}/bin/postgres";
+    args = [ "-D" "/tmp/pgdata" ];
+  };
+}
+
+# services/tests/runit/test/my-test.nix
+{ pkgs, ... }:
+
+{
+  name = "my-test";
+
+  modules = [
+    ../common-test-services.nix  # Import shared config (from tests/ dir)
+    {
+      services.database.enable = true;  # Enable from common
+      services.api = {
+        enable = true;
+        command = "${pkgs.myapp}/bin/api";
+      };
+    }
+  ];
+
+  testScript = ''
+    machine.wait_for_open_port(5432)  # database
+    machine.wait_for_open_port(8080)  # api
+  '';
+}
+
+# services/tests/default.nix
+{
+  pkgs ? import ../../. { },
+}:
+
+let
+  runitTestsLib = pkgs.callPackage ./runit-tests.nix { };
+  inherit (runitTestsLib) mkRunitTest;
+  callTest = testFile: mkRunitTest (pkgs.callPackage testFile { });
+in
+
+rec {
+  my-test = callTest ./runit/test/my-test.nix;
+}
+```
+
+### Running Tests
+
+Run individual tests or the full suite:
+
+```bash
+# Run a specific test
+nix-build services/tests/default.nix -A simple-http
+
+# Run all runit tests
+nix-build services/tests/default.nix -A all
+
+# Check test results
+cat result/result  # Should contain "success"
+
+# View service logs (if test failed)
+ls -la result/logs/
+```
+
+### Example Tests
+
+The test suite (`services/tests/runit/test/`) includes the following tests, each in its own file:
+
+1. **simple-http.nix** - Basic HTTP server smoke test
+2. **multi-service.nix** - Backend-frontend interaction test
+3. **with-prestart.nix** - Service with preStart hook
+4. **with-environment.nix** - Environment variable passing
+
+All tests demonstrate module-based configuration using `services.*` options. Each test file has the signature `{ pkgs, ... }: { name, modules, testScript }` and is imported in `services/tests/default.nix`.
+
+### Benefits
+
+- **Identical to production**: Test configs match ekaos/production exactly
+- **Type-safe**: Module system validates all options before building
+- **Portable**: Service definitions work in tests and deployment
+- **Composable**: Share common services across tests via imports
+- **Fast**: Tests run in sandbox without VM overhead
 
 ## Testing
 
