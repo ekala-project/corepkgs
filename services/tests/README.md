@@ -27,21 +27,36 @@ nix-build sandbox
 
 ## Components
 
-### 1. runitTestHook
+### 1. runitTestDriver (Python)
+
+Python test driver providing nixosTest-compatible API for writing test scripts.
+
+**Location**: `services/tests/runit-test-driver/`
+
+**Python API** (via `machine` object):
+- `machine.execute(command, timeout)` - Run command, return (returncode, output)
+- `machine.succeed(command, timeout)` - Run command, assert success
+- `machine.fail(command, timeout)` - Run command, assert failure
+- `machine.wait_for_open_port(port, addr="localhost", timeout=900)` - Wait for TCP port
+- `machine.wait_until_succeeds(command, timeout=900)` - Retry until success
+- `machine.wait_for_unit(service, timeout=900)` - Wait for runit service
+- `machine.sv_status(service)` - Get service status
+- `machine.sv_up(service)`, `machine.sv_down(service)` - Control services
+
+**Test Organization**:
+- `subtest(name)` - Context manager for test sections
+- `log(message)` - Log messages with proper formatting
+- Automatic colored output with success/failure indicators
+
+### 2. runitTestHook
 
 Setup hook that manages runit supervision during tests.
 
 **Location**: `build-support/test-hooks/runit-test-hook/`
 
-**Provides**:
-- `runitTestStart` - Start runsvdir supervisor
-- `runitTestStop` - Stop all services (automatic cleanup)
-- `runitTestWaitPort <port>` - Wait for TCP port to be ready
-- `runitTestWaitSocket <path>` - Wait for Unix socket
-- `runitTestWaitService <name>` - Wait for service to be supervised
-- `runitTestStatus` - Show status of all services
+Automatically starts/stops runit services. Used internally by the framework.
 
-### 2. runitTests Library
+### 3. runitTests Library
 
 Framework for defining service tests.
 
@@ -52,7 +67,7 @@ Framework for defining service tests.
 - `mkServiceTest` - Quick test for a single service
 - `mkInteractionTest` - Test client-server communication
 
-### 3. Service Translation
+### 4. Service Translation
 
 Existing runit translation infrastructure (already in core-pkgs).
 
@@ -61,6 +76,8 @@ Existing runit translation infrastructure (already in core-pkgs).
 Converts common service definitions to runit service directories.
 
 ## Usage
+
+All test scripts are written in **Python** using a nixosTest-compatible API. The `machine` object provides methods for interacting with services.
 
 ### Example 1: Simple HTTP Server Test
 
@@ -71,17 +88,19 @@ in
 runitTestsLib.mkServiceTest "http-server" {
   command = "${pkgs.python3}/bin/python3";
   args = [ "-m" "http.server" "8080" "--bind" "127.0.0.1" ];
-  user = "nobody";
 } ''
-  # Wait for server
-  runitTestWaitPort 8080
+  # Wait for server (Python API)
+  machine.wait_for_open_port(8080)
+  log("Testing HTTP server...")
 
-  # Test it
-  ${pkgs.curl}/bin/curl http://127.0.0.1:8080
+  # Make request and check response
+  response = machine.succeed("curl -s http://127.0.0.1:8080")
+  assert "Directory listing" in response
+  log("HTTP server is working!")
 ''
 ```
 
-### Example 2: Multi-Service Test
+### Example 2: Multi-Service Test with Subtests
 
 ```nix
 runitTestsLib.mkRunitTest {
@@ -101,20 +120,23 @@ runitTestsLib.mkRunitTest {
   };
 
   testScript = ''
-    # Wait for services
-    runitTestWaitPort 8081  # backend
-    runitTestWaitPort 8080  # frontend
+    # Test backend with subtest context
+    with subtest("backend startup"):
+        machine.wait_for_open_port(8081)
+        response = machine.succeed("curl -s http://127.0.0.1:8081/api/health")
+        assert "ok" in response
+        log("Backend OK")
 
-    # Test backend directly
-    ${pkgs.curl}/bin/curl http://127.0.0.1:8081/api/health
-
-    # Test frontend → backend flow
-    ${pkgs.curl}/bin/curl http://127.0.0.1:8080
+    # Test frontend
+    with subtest("frontend proxy"):
+        machine.wait_for_open_port(8080)
+        response = machine.succeed("curl -s http://127.0.0.1:8080")
+        log("Frontend OK")
   '';
 }
 ```
 
-### Example 3: Service with Setup
+### Example 3: Service with Setup and Environment
 
 ```nix
 runitTestsLib.mkServiceTest "http-with-data" {
@@ -122,16 +144,110 @@ runitTestsLib.mkServiceTest "http-with-data" {
   args = [ "-m" "http.server" "8080" ];
   workingDirectory = "/tmp/webroot";
 
+  environment.DATA_PATH = "/tmp/webroot";
+
   preStart = ''
     mkdir -p /tmp/webroot
     echo "test data" > /tmp/webroot/test.txt
   '';
 } ''
-  runitTestWaitPort 8080
+  machine.wait_for_open_port(8080)
+  log("Testing preStart hook...")
 
-  ${pkgs.curl}/bin/curl http://127.0.0.1:8080/test.txt | \
-    grep "test data"
+  response = machine.succeed("curl -s http://127.0.0.1:8080/test.txt")
+  assert "test data" in response, f"Expected 'test data', got: {response}"
+  log("preStart hook worked!")
 ''
+```
+
+### Example 4: Using wait_until_succeeds
+
+```nix
+testScript = ''
+  # Wait for service to become healthy (with retries)
+  machine.wait_until_succeeds(
+      "curl -s http://127.0.0.1:8080/health | grep 'healthy'",
+      timeout=60
+  )
+
+  # Test the service
+  response = machine.succeed("curl -s http://127.0.0.1:8080/api/data")
+  log(f"Got response: {response}")
+'';
+```
+
+## Python API Reference
+
+The test driver provides a `machine` object with the following methods:
+
+### Command Execution
+
+```python
+# Execute command, return (returncode, output)
+returncode, output = machine.execute("ls -la", timeout=30)
+
+# Execute and assert success (raises exception on failure)
+output = machine.succeed("curl http://localhost:8080")
+
+# Execute and assert failure (raises exception on success)
+output = machine.fail("curl http://nonexistent:9999")
+```
+
+### Waiting and Polling
+
+```python
+# Wait for TCP port to be open
+machine.wait_for_open_port(8080, addr="localhost", timeout=900)
+
+# Wait for command to succeed (retries with exponential backoff)
+machine.wait_until_succeeds(
+    "curl -s http://localhost:8080/health | grep 'ok'",
+    timeout=60
+)
+
+# Wait for runit service to be running
+machine.wait_for_unit("myservice", timeout=900)
+```
+
+### Service Control
+
+```python
+# Get service status (returns sv status output)
+status = machine.sv_status("myservice")
+
+# Start service
+machine.sv_up("myservice")
+
+# Stop service
+machine.sv_down("myservice")
+```
+
+### Test Organization
+
+```python
+# Use subtests for hierarchical test organization
+with subtest("service startup"):
+    machine.wait_for_open_port(8080)
+    log("Service is up")
+
+with subtest("api functionality"):
+    response = machine.succeed("curl http://localhost:8080/api")
+    assert "data" in response
+
+# Log messages (automatically formatted and colored)
+log("Testing something important...")
+```
+
+### Assertions
+
+```python
+# Python assertions work as expected
+response = machine.succeed("curl -s http://localhost:8080")
+assert "expected" in response, f"Expected 'expected', got: {response}"
+
+# Check service status
+status = machine.sv_status("myservice")
+assert "run:" in status, "Service is not running"
 ```
 
 ## Building Tests
@@ -216,11 +332,15 @@ Both are now available in core-pkgs.
 
 2. **Test Setup**: The `preCheck` phase:
    - Creates `$TMPDIR/service/` directory
-   - Symlinks service directories into it
+   - Copies service directories into it
    - Starts `runsvdir` in background
    - Waits for all services to be supervised
 
-3. **Test Execution**: The `checkPhase` runs the test script with services running
+3. **Test Execution**: The `checkPhase`:
+   - Writes the Python testScript to `/build/test-script.py`
+   - Executes `python3 -m runit_test_driver --testscript /build/test-script.py`
+   - Test driver provides `machine`, `subtest`, and `log` to test script
+   - Test script runs with services already supervised
 
 4. **Cleanup**: The `postCheck` hook automatically stops runsvdir and all services
 
@@ -229,9 +349,18 @@ Both are now available in core-pkgs.
 ```
 services/
 ├── tests/
-│   ├── runit-tests.nix       # Test framework library
-│   ├── default.nix            # Example tests
-│   └── README.md              # This file
+│   ├── runit-tests.nix            # Test framework library
+│   ├── default.nix                 # Example tests
+│   ├── README.md                   # This file
+│   └── runit-test-driver/          # Python test driver
+│       ├── default.nix             # Package definition
+│       ├── setup.py                # Python package setup
+│       └── src/runit_test_driver/
+│           ├── __init__.py         # Module exports
+│           ├── __main__.py         # CLI entry point
+│           ├── driver.py           # Test driver (~150 lines)
+│           ├── machine.py          # RunitMachine API (~400 lines)
+│           └── logger.py           # Logging utilities (~70 lines)
 ├── lib/
 │   ├── runit-translate.nix    # Service → runit translation
 │   └── runit-options.nix      # Runit-specific options

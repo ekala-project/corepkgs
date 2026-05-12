@@ -11,16 +11,13 @@
 #       webserver = {
 #         command = "${pkgs.python3}/bin/python3";
 #         args = [ "-m" "http.server" "8080" ];
-#         user = "nobody";
 #       };
 #     };
 #
 #     testScript = ''
-#       # Wait for service
-#       runitTestWaitPort 8080
-#
-#       # Test it
-#       ${pkgs.curl}/bin/curl http://localhost:8080
+#       # Python test script (not bash!)
+#       machine.wait_for_open_port(8080)
+#       machine.succeed("curl http://localhost:8080")
 #     '';
 #   }
 
@@ -36,12 +33,15 @@ let
   # Import existing runit translation library
   runitLib = import ../lib/runit-translate.nix { inherit lib pkgs; };
 
+  # Build the runit test driver (Python)
+  runitTestDriver = pkgs.callPackage ./runit-test-driver { };
+
   # Build a test that runs runit services and executes a test script
   #
   # Args:
   #   name: Test name
   #   services: Attrset of service definitions (using common service options)
-  #   testScript: Bash script to run after services start
+  #   testScript: Python script to run after services start
   #   extraDependencies: Additional packages for test script (default: [])
   #   timeout: Maximum test duration in seconds (default: 120)
   mkRunitTest =
@@ -105,10 +105,13 @@ let
       # Required for Darwin localhost networking
       __darwinAllowLocalNetworking = true;
 
-      nativeBuildInputs = [
-        runitTestHook
-      ]
-      ++ allDeps;
+      nativeBuildInputs =
+        [
+          runitTestHook
+          runitTestDriver
+          pkgs.python3
+        ]
+        ++ allDeps;
 
       dontUnpack = true;
       dontBuild = true;
@@ -125,16 +128,17 @@ let
         sleep 2
       '';
 
-      # Run the test script
+      # Run the test script (Python)
       checkPhase = ''
         runHook preCheck
 
-        echo "=== Running test script ===" >&2
+        # Write Python test script to file
+        cat > /build/test-script.py <<'PYTHON_TEST_SCRIPT'
+${testScript}
+PYTHON_TEST_SCRIPT
 
-        # Run user's test script
-        ${testScript}
-
-        echo "=== Test completed successfully ===" >&2
+        # Run Python test driver
+        python3 -m runit_test_driver --testscript /build/test-script.py
 
         runHook postCheck
       '';

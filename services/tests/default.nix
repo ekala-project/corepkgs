@@ -31,21 +31,11 @@ rec {
         description = "Simple HTTP server for testing";
       }
       ''
-        # Wait for HTTP server to be ready
-        runitTestWaitPort 8080
-
-        echo "Testing HTTP server..."
-
-        # Make a request
-        response=$(${pkgs.curl}/bin/curl -s http://127.0.0.1:8080)
-
-        if echo "$response" | ${pkgs.gnugrep}/bin/grep -q "Directory listing"; then
-          echo "HTTP server is working!"
-        else
-          echo "ERROR: HTTP server response unexpected"
-          echo "Response: $response"
-          exit 1
-        fi
+        machine.wait_for_open_port(8080)
+        log("Testing HTTP server...")
+        response = machine.succeed("curl -s http://127.0.0.1:8080")
+        assert "Directory listing" in response, f"Expected directory listing, got: {response}"
+        log("HTTP server is working!")
       '';
 
   # Test 2: Multi-service interaction
@@ -115,34 +105,23 @@ rec {
     };
 
     testScript = ''
-      # Wait for both services
-      runitTestWaitPort 8081 localhost 30
-      runitTestWaitPort 8080 localhost 30
+      with subtest("backend startup"):
+          machine.wait_for_open_port(8081)
+          response = machine.succeed("curl -s http://127.0.0.1:8081")
+          assert response == "backend response", f"Expected 'backend response', got: {response}"
+          log("Backend OK")
 
-      echo "Testing backend directly..."
-      backend_response=$(${pkgs.curl}/bin/curl -s http://127.0.0.1:8081)
-      if [ "$backend_response" != "backend response" ]; then
-        echo "ERROR: Backend response unexpected: $backend_response"
-        exit 1
-      fi
-      echo "Backend OK"
+      with subtest("frontend proxy"):
+          machine.wait_for_open_port(8080)
+          response = machine.succeed("curl -s http://127.0.0.1:8080")
+          assert response == "backend response", f"Expected proxied backend response, got: {response}"
 
-      echo "Testing frontend proxy..."
-      frontend_response=$(${pkgs.curl}/bin/curl -s http://127.0.0.1:8080)
-      if [ "$frontend_response" != "backend response" ]; then
-        echo "ERROR: Frontend response unexpected: $frontend_response"
-        exit 1
-      fi
+          # Check proxy header
+          verbose_output = machine.succeed("curl -s -v http://127.0.0.1:8080 2>&1")
+          assert "X-Proxied: true" in verbose_output, "Proxy header missing"
+          log("Frontend proxy OK")
 
-      # Check proxy header (using -v to see headers in GET request)
-      if ${pkgs.curl}/bin/curl -s -v http://127.0.0.1:8080 2>&1 | ${pkgs.gnugrep}/bin/grep -q "X-Proxied: true"; then
-        echo "Frontend proxy OK"
-      else
-        echo "ERROR: Proxy header missing"
-        exit 1
-      fi
-
-      echo "Multi-service test passed!"
+      log("Multi-service test passed!")
     '';
   };
 
@@ -170,18 +149,11 @@ rec {
         '';
       }
       ''
-        runitTestWaitPort 8082
-
-        echo "Testing preStart hook..."
-
-        response=$(${pkgs.curl}/bin/curl -s http://127.0.0.1:8082/index.html)
-        if echo "$response" | ${pkgs.gnugrep}/bin/grep -q "Hello from preStart!"; then
-          echo "preStart hook worked!"
-        else
-          echo "ERROR: preStart hook did not work"
-          echo "Response: $response"
-          exit 1
-        fi
+        machine.wait_for_open_port(8082)
+        log("Testing preStart hook...")
+        response = machine.succeed("curl -s http://127.0.0.1:8082/index.html")
+        assert "Hello from preStart!" in response, f"Expected preStart content, got: {response}"
+        log("preStart hook worked!")
       '';
 
   # Test 4: Service environment variables
@@ -220,18 +192,11 @@ rec {
         };
       }
       ''
-        runitTestWaitPort 8083
-
-        echo "Testing environment variables..."
-
-        response=$(${pkgs.curl}/bin/curl -s http://127.0.0.1:8083)
-        if echo "$response" | ${pkgs.gnugrep}/bin/grep -q "CUSTOM_VAR=test-value-123"; then
-          echo "Environment variables work!"
-        else
-          echo "ERROR: Environment variables not set correctly"
-          echo "Response: $response"
-          exit 1
-        fi
+        machine.wait_for_open_port(8083)
+        log("Testing environment variables...")
+        response = machine.succeed("curl -s http://127.0.0.1:8083")
+        assert "CUSTOM_VAR=test-value-123" in response, f"Expected environment variable in response, got: {response}"
+        log("Environment variables work!")
       '';
 
   # Meta test: Run all tests

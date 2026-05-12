@@ -4,6 +4,7 @@
   makeSetupHook,
   runit,
   netcat,
+  procps,
 }:
 
 makeSetupHook {
@@ -12,11 +13,13 @@ makeSetupHook {
   propagatedBuildInputs = [
     runit
     netcat
+    procps
   ];
 
   substitutions = {
     runitPackage = runit;
     netcatPackage = netcat;
+    procpsPackage = procps;
   };
 
   meta = {
