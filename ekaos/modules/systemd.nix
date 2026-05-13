@@ -1,5 +1,5 @@
 # Systemd integration for ekaos
-# Leverages the existing services/ infrastructure
+# Consumes services.* definitions and generates systemd unit files
 {
   config,
   lib,
@@ -13,8 +13,13 @@ let
   # Import the services library
   servicesLib = import ../../services/lib/service-module.nix { inherit lib pkgs; };
 
-  # Generate systemd unit files from service definitions
-  systemdUnits = servicesLib.mkSystemdSystemServices config.systemd.services;
+  # Only consume services.* namespace for cross-platform service translation
+  # systemd.services.* is for direct systemd-specific configuration (raw units, etc.)
+  # and is not translated through the services library
+  crossPlatformServices = config.services;
+
+  # Generate systemd unit files from cross-platform service definitions
+  systemdUnits = servicesLib.mkSystemdSystemServices crossPlatformServices;
 
   # Combine all unit files into /etc/systemd/system
   systemdEtcDir = pkgs.runCommand "systemd-etc" { } ''
@@ -30,28 +35,8 @@ in
 
 {
   options = {
-    systemd.services = mkOption {
-      type = types.attrsOf (
-        types.submodule (import ../../services/lib/options.nix { inherit lib; }).commonOptions
-      );
-      default = { };
-      description = ''
-        Systemd services to run on the system.
-
-        These use the ekaos unified service interface and are
-        automatically translated to systemd unit files.
-      '';
-      example = literalExpression ''
-        {
-          myservice = {
-            enable = true;
-            description = "My Service";
-            command = "''${pkgs.mypackage}/bin/myservice";
-            restartPolicy = "always";
-          };
-        }
-      '';
-    };
+    # No options defined here - service modules define their own options
+    # at services.* or systemd.services.* as needed
 
     systemd.package = mkOption {
       type = types.package;
@@ -109,10 +94,7 @@ in
       }
     ];
 
-    # Essential systemd targets and services
-    systemd.services = {
-      # Minimal set of services for a bootable system
-      # More can be added by the user or by other modules
-    };
+    # No need to define systemd.services here - individual modules
+    # define their own services at services.* or systemd.services.* as needed
   };
 }

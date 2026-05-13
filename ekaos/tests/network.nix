@@ -46,8 +46,8 @@
 
         # Enable SSH
         services.openssh.enable = true;
-        services.openssh.permitRootLogin = "prohibit-password";
-        services.openssh.passwordAuthentication = true;
+        services.openssh.settings.permitRootLogin = "prohibit-password";
+        services.openssh.settings.passwordAuthentication = true;
 
         # Create test users
         users.users.alice = {
