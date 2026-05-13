@@ -22,4 +22,7 @@
 
   # Login functionality test (Phase 1)
   login = pkgs.ekaosTest ./login.nix;
+
+  # Network and SSH test (Phase 2)
+  network = pkgs.ekaosTest ./network.nix;
 }
