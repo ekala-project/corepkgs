@@ -34,6 +34,8 @@ This directory contains the implementation of a unified service management inter
 ✅ **Python test driver with test primitives** (NEW!)
 ✅ Full user/system service parity across platforms
 ✅ Working prototypes with SQLite service and HTTP server
+✅ **Docker image builder with runit supervision** (NEW!)
+✅ **Multi-process container support (sidecar patterns)** (NEW!)
 🔄 **System build testing in progress**
 
 ## Architecture
@@ -51,6 +53,7 @@ services/
 │   ├── runit-translate.nix    # Common → runit service directory
 │   ├── rcd-options.nix        # BSD rc.d-specific options
 │   ├── rcd-translate.nix      # Common → BSD rc.d script
+│   ├── docker-image.nix       # Docker image builder with runit (NEW!)
 │   ├── validate.nix           # Configuration validation (NEW!)
 │   └── service-module.nix     # Core module infrastructure
 ├── examples/
@@ -61,7 +64,12 @@ services/
 │   ├── http-server-launchd.nix          # HTTP server (cross-platform)
 │   ├── http-server-rcd.nix              # HTTP server (BSD rc.d) (NEW!)
 │   ├── nginx-system.nix                 # Nginx daemon (system service)
-│   └── http-server-cross-platform.nix   # HTTP server (all 7 builders!) (UPDATED!)
+│   ├── http-server-cross-platform.nix   # HTTP server (all 7 builders!) (UPDATED!)
+│   └── docker/                          # Docker image examples (NEW!)
+│       ├── nginx-with-exporter.nix      # Nginx + Prometheus exporter (observability sidecar)
+│       ├── app-with-logging.nix         # App + log shipper (log aggregation sidecar)
+│       ├── multi-service.nix            # Generic multi-service template
+│       └── README.md                    # Docker examples documentation
 ├── tests/
 │   ├── runit/
 │   │   └── test/               # Runit test cases (module-based)
@@ -336,6 +344,88 @@ sudo rcctl get my-service
 ```
 
 **Note**: OpenBSD rc.d uses sequential ordering (no rcorder). Services are started in alphabetical order. The `rcctl` utility is the recommended way to manage services.
+
+### Docker Containers with Runit (Multi-Process/Sidecar Pattern)
+
+The service system supports building Docker images with runit supervision, perfect for running multiple processes in a single container (sidecar pattern).
+
+```nix
+{ pkgs ? import ../. { } }:
+
+let
+  services = import ./services { inherit pkgs; };
+in
+
+services.buildRunitDockerImage
+  {
+    # Define multiple services
+    nginx = {
+      enable = true;
+      command = "${pkgs.nginx}/bin/nginx";
+      args = [ "-g" "daemon off;" ];
+      user = "nginx";
+    };
+
+    nginx-exporter = {
+      enable = true;
+      command = "${pkgs.prometheus-nginx-exporter}/bin/nginx-prometheus-exporter";
+      args = [ "-nginx.scrape-uri=http://localhost:8080/metrics" ];
+      preStart = ''
+        # Wait for nginx to be ready
+        for i in {1..30}; do
+          curl -sf http://localhost:8080 && break
+          sleep 1
+        done
+      '';
+    };
+  }
+  {
+    # Docker image configuration
+    name = "nginx-with-exporter";
+    tag = "latest";
+    exposedPorts = [ "8080/tcp" "9113/tcp" ];
+    extraContents = [ pkgs.curl ];
+  }
+```
+
+**Building and Running:**
+
+```bash
+# Build the Docker image
+nix-build my-image.nix
+
+# Load into Docker
+docker load < result
+
+# Run the container
+docker run -d -p 8080:8080 -p 9113:9113 nginx-with-exporter:latest
+
+# Check service status
+docker exec <container> sv status /service/*
+
+# View logs
+docker logs <container>
+
+# Control services
+docker exec <container> sv restart /service/nginx
+docker exec <container> sv stop /service/nginx-exporter
+```
+
+**Features:**
+
+- **Multi-process supervision**: Each service runs independently under runit
+- **Automatic restart**: Services restart automatically if they crash
+- **Graceful shutdown**: Proper signal handling (SIGTERM → cleanup → SIGKILL)
+- **Sidecar patterns**: Perfect for app + metrics/logging/proxy sidecars
+- **Clean container exit**: runsvdir as PID 1 handles zombies and signals correctly
+
+**Examples:**
+
+- `examples/docker/nginx-with-exporter.nix` - Observability sidecar (nginx + prometheus exporter)
+- `examples/docker/app-with-logging.nix` - Log aggregation sidecar (app + log shipper)
+- `examples/docker/multi-service.nix` - Generic multi-service template
+
+See [examples/docker/README.md](examples/docker/README.md) for detailed usage instructions and sidecar patterns.
 
 ## Example: SQLite Logger
 

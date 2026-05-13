@@ -79,6 +79,39 @@ let
     in
     serviceLib.mkRcdServicesOpenBSD services;
 
+  # Build Docker image with runit supervision
+  # Additional arguments:
+  #   - name: Docker image name
+  #   - tag: Docker image tag (default: "latest")
+  #   - extraContents: Additional packages to include
+  #   - exposedPorts: Ports to expose (e.g., ["8080/tcp" "9090/tcp"])
+  #   - imageConfig: Additional Docker config
+  #   - preStartCommands: Shell commands to run before starting runit
+  buildRunitDockerImage =
+    servicesConfig:
+    {
+      name,
+      tag ? "latest",
+      extraContents ? [ ],
+      exposedPorts ? [ ],
+      imageConfig ? { },
+      preStartCommands ? "",
+    }:
+    let
+      services = evalServices servicesConfig;
+    in
+    serviceLib.mkRunitDockerImage {
+      inherit
+        services
+        name
+        tag
+        extraContents
+        exposedPorts
+        imageConfig
+        preStartCommands
+        ;
+    };
+
 in
 {
   inherit
@@ -90,6 +123,7 @@ in
     buildRunitServices
     buildRcdServices
     buildRcdServicesOpenBSD
+    buildRunitDockerImage
     ;
 
   # Export library functions
