@@ -223,6 +223,8 @@ zstd: ✓ available
 
 **Important:** Do NOT search `top-level.nix` with grep to check for dependencies. Packages in `pkgs/` and `pkgs-many/` are automatically registered and may not appear in `top-level.nix`. Always use `nix-instantiate` to verify availability.
 
+**NOTE:** For non derivation attrs, use `nix-instantiate --eval -A <dep>` which can evaluate to non derivations
+
 ### Porting from nixpkgs
 
 When porting a package from nixpkgs to core-pkgs:
@@ -305,6 +307,32 @@ Before submitting changes, ensure:
 - [ ] `nix-build -A <package>` succeeds
 - [ ] `nix fmt <file>` run on all edited files
 - [ ] TODO comments added for missing dependencies
+
+## ekaos Reusable Modules
+
+ekaos provides **reusable service modules** using a cross-platform service interface that works across systemd, launchd, runit, and BSD rc.d.
+
+**Quick reference:** See `services/AGENTS.md` for service definition syntax and conventions.
+
+**Key points:**
+- Service modules in `ekaos/modules/services/` define options at `services.*`
+- Services are automatically translated to systemd units
+- Same interface works across multiple platforms and contexts
+- Full documentation in `services/README.md`
+
+**Example service module structure:**
+```nix
+services.myservice = {
+  enable = true;
+  command = "${pkgs.myapp}/bin/myapp";
+  args = [ "--port" "8080" ];
+  restartPolicy = "always";
+
+  systemd = {
+    wantedBy = [ "multi-user.target" ];
+  };
+};
+```
 
 ## Additional Notes
 
