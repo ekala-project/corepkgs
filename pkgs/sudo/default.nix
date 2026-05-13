@@ -1,0 +1,99 @@
+{
+  lib,
+  stdenv,
+  fetchurl,
+  buildPackages,
+  coreutils,
+  linux-pam,
+  groff,
+  sendmailPath ? "/run/wrappers/bin/sendmail",
+  withInsults ? false,
+}:
+
+stdenv.mkDerivation (finalAttrs: {
+  pname = "sudo";
+  version = "1.9.17p2";
+
+  __structuredAttrs = true;
+
+  src = fetchurl {
+    url = "https://www.sudo.ws/dist/sudo-${finalAttrs.version}.tar.gz";
+    hash = "sha256-SjihqzrbEZklftwqfEor1xRmXrYFsENohDsG2tos/Ps=";
+  };
+
+  prePatch = ''
+    # do not set sticky bit in nix store
+    substituteInPlace src/Makefile.in --replace-fail 04755 0755
+  '';
+
+  configureFlags = [
+    "--with-env-editor"
+    "--with-editor=/run/current-system/sw/bin/nano"
+    "--with-rundir=/run/sudo"
+    "--with-vardir=/var/db/sudo"
+    "--with-logpath=/var/log/sudo.log"
+    "--with-iologdir=/var/log/sudo-io"
+    "--with-sendmail=${sendmailPath}"
+    "--enable-tmpfiles.d=no"
+    "--with-passprompt=[sudo] password for %p: " # intentional trailing space
+  ]
+  ++ lib.optionals withInsults [
+    "--with-insults"
+    "--with-all-insults"
+  ];
+
+  outputs = [
+    "out"
+    "man"
+    "doc"
+    "dev"
+  ];
+
+  # The default stdenv ./configure flags for some reason cause the upstream's
+  # Makefile to `mkdir /var/db`, which fails in the sandbox. Since we split
+  # only trivial outputs - a single header and documentation, we can safely set
+  # the following:
+  setOutputFlags = false;
+
+  postConfigure = ''
+    cat >> pathnames.h <<'EOF'
+      #undef _PATH_MV
+      #define _PATH_MV "${coreutils}/bin/mv"
+    EOF
+    makeFlags="install_uid=$(id -u) install_gid=$(id -g)"
+    installFlags="sudoers_uid=$(id -u) sudoers_gid=$(id -g) sysconfdir=$out/etc rundir=$TMPDIR/dummy vardir=$TMPDIR/dummy DESTDIR=/"
+  '';
+
+  depsBuildBuild = [ buildPackages.stdenv.cc ];
+  nativeBuildInputs = [ groff ];
+  buildInputs = [ linux-pam ];
+
+  enableParallelBuilding = true;
+
+  doCheck = false; # needs root
+
+  postInstall = ''
+    rm $out/share/doc/sudo/ChangeLog
+  '';
+
+  meta = {
+    description = "Command to run commands as root";
+    longDescription = ''
+      Sudo (su "do") allows a system administrator to delegate
+      authority to give certain users (or groups of users) the ability
+      to run some (or all) commands as root or another user while
+      providing an audit trail of the commands and their arguments.
+    '';
+    homepage = "https://www.sudo.ws/";
+    # From https://www.sudo.ws/about/license/
+    license = with lib.licenses; [
+      sudo
+      bsd2
+      bsd3
+      zlib
+    ];
+    maintainers = [ ];
+    platforms = lib.platforms.linux;
+    mainProgram = "sudo";
+  };
+})
