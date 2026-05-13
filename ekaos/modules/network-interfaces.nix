@@ -149,29 +149,29 @@ in
 
   config = mkIf (configuredInterfaces != {}) {
     # Generate systemd-networkd .network files
-    environment.etc = listToAttrs (
-      mapAttrsToList (iface: icfg:
-        nameValuePair "systemd/network/50-${iface}.network" {
-          text = mkNetworkUnit iface icfg;
-        }
-      ) configuredInterfaces
-    );
+    environment.etc = mkMerge [
+      # Network configuration files
+      (listToAttrs (
+        mapAttrsToList (iface: icfg:
+          nameValuePair "systemd/network/50-${iface}.network" {
+            text = mkNetworkUnit iface icfg;
+          }
+        ) configuredInterfaces
+      ))
 
-    # Enable systemd-networkd service
-    systemd.services.systemd-networkd = {
-      enable = true;
-      description = "Network Configuration";
-      command = "${config.systemd.package}/lib/systemd/systemd-networkd";
-      user = "root";
-      restartPolicy = "always";
-    };
+      # Symlink systemd-networkd service from systemd package
+      {
+        "systemd/system/systemd-networkd.service".source =
+          "${config.systemd.package}/lib/systemd/system/systemd-networkd.service";
+      }
+    ];
 
     # Add activation script to enable systemd-networkd
     system.activationScripts.networkd = stringAfter [ "etc" ] ''
       # Enable systemd-networkd
       echo "Enabling systemd-networkd..."
       mkdir -p /etc/systemd/system/multi-user.target.wants
-      ln -sf ${config.systemd.package}/lib/systemd/system/systemd-networkd.service \
+      ln -sf ../systemd-networkd.service \
              /etc/systemd/system/multi-user.target.wants/systemd-networkd.service
     '';
   };

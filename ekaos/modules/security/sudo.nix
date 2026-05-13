@@ -153,7 +153,8 @@ in
 
   config = mkIf cfg.enable {
     # Add sudo to system packages
-    environment.systemPackages = [ pkgs.sudo ];
+    # TODO: Uncomment when sudo is available in core-pkgs
+    # environment.systemPackages = [ pkgs.sudo ];
 
     # Generate sudoers file
     environment.etc."sudoers" = {

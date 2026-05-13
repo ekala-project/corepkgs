@@ -126,7 +126,7 @@ let
         # User switching warnings (when not using platform with native support)
         ++
           optional
-            (config.user != "root" && builder == "rcd" && (config.rcd.variant or "freebsd") != "openbsd")
+            ((config.user or "root") != "root" && builder == "rcd" && (config.rcd.variant or "freebsd") != "openbsd")
             (
               mkWarning "User switching on ${builder} (${
                 config.rcd.variant or "freebsd"
@@ -134,7 +134,7 @@ let
             )
 
         # Working directory warnings
-        ++ optional (config.workingDirectory != null && builder == "rcd") (
+        ++ optional ((config.workingDirectory or null) != null && builder == "rcd") (
           mkWarning "Working directory requires cd in precmd on ${builder} - generated automatically"
         );
     in
