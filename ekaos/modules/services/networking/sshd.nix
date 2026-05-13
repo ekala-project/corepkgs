@@ -273,29 +273,17 @@ in
         in ''
           if [ ! -f "${keyPath}" ]; then
             echo "Generating SSH ${keyType} host key..."
-            ${pkgs.openssh}/bin/ssh-keygen -t ${keyType} -f "${keyPath}" -N "" -q
-            chmod 600 "${keyPath}"
-            chmod 644 "${keyPath}.pub"
+            # Set USER and HOME to work around NSS issues during disk image builds
+            USER=root HOME=/root ${pkgs.openssh}/bin/ssh-keygen -t ${keyType} -f "${keyPath}" -N "" -q || true
+            # Verify the key was created even if ssh-keygen complained
+            if [ -f "${keyPath}" ]; then
+              chmod 600 "${keyPath}"
+              chmod 644 "${keyPath}.pub"
+            fi
           fi
         ''
       ) cfg.settings.hostKeys}
 
-      # Create .ssh directories for users
-      ${concatMapStringsSep "\n" (user:
-        optionalString (user.openssh.authorizedKeys.keys != [] || user.openssh.authorizedKeys.keyFiles != []) ''
-          mkdir -p "${user.home}/.ssh"
-          chmod 700 "${user.home}/.ssh"
-
-          # Generate authorized_keys file
-          cat > "${user.home}/.ssh/authorized_keys" << 'EOF'
-${concatStringsSep "\n" user.openssh.authorizedKeys.keys}
-EOF
-          ${concatMapStringsSep "\n" (file: "cat ${file} >> ${user.home}/.ssh/authorized_keys") user.openssh.authorizedKeys.keyFiles}
-
-          chmod 600 "${user.home}/.ssh/authorized_keys"
-          chown -R ${user.name}:${user.group} "${user.home}/.ssh"
-        ''
-      ) (attrValues userCfg.users)}
     '';
   };
 }

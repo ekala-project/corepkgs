@@ -104,6 +104,8 @@ let
     config = {
       name = mkDefault name;
       isNormalUser = mkDefault (!config.isSystemUser);
+      # Normal users should default to "users" group, not "nogroup"
+      group = mkIf config.isNormalUser (mkDefault "users");
     };
   };
 
@@ -235,10 +237,14 @@ let
 
   # Generate home directory creation script
   createHomeDirs = concatMapStringsSep "\n" (user:
+    let
+      uid = if user.uid != null then toString user.uid else "1000";
+      gid = toString (findFirst (g: g.name == user.group) { gid = 100; } allGroups).gid;
+    in
     optionalString (user.createHome or false) ''
       if [ ! -d "${user.home}" ]; then
         mkdir -p "${user.home}"
-        chown ${user.name}:${user.group} "${user.home}"
+        chown ${uid}:${gid} "${user.home}"
         chmod 0700 "${user.home}"
       fi
     ''
@@ -248,6 +254,8 @@ let
   setupSSHKeys = concatMapStringsSep "\n" (user:
     let
       keys = user.openssh.authorizedKeys.keys or [ ];
+      uid = if user.uid != null then toString user.uid else "1000";
+      gid = toString (findFirst (g: g.name == user.group) { gid = 100; } allGroups).gid;
     in
     optionalString (keys != [ ]) ''
       if [ ! -d "${user.home}/.ssh" ]; then
@@ -258,7 +266,7 @@ let
       ${concatStringsSep "\n" keys}
       EOF
       chmod 0600 "${user.home}/.ssh/authorized_keys"
-      chown -R ${user.name}:${user.group} "${user.home}/.ssh"
+      chown -R ${uid}:${gid} "${user.home}/.ssh"
     ''
   ) allUsers;
 

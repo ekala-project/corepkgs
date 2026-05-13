@@ -10,26 +10,75 @@
 with lib;
 
 let
-  # Import the services library
-  servicesLib = import ../../services/lib/service-module.nix { inherit lib pkgs; };
+  # Filter to only include enabled services with command set
+  enabledServices = filterAttrs (
+    name: service:
+      (service.enable or false) == true
+      && (service.command or null) != null
+  ) config.services;
 
-  # Only consume services.* namespace for cross-platform service translation
-  # systemd.services.* is for direct systemd-specific configuration (raw units, etc.)
-  # and is not translated through the services library
-  crossPlatformServices = config.services;
+  # Generate a systemd unit file for a service
+  mkSystemdUnit = name: cfg:
+    let
+      # Map restartPolicy to systemd Restart directive
+      restartValue = {
+        always = "always";
+        on-failure = "on-failure";
+        never = "no";
+      }.${cfg.restartPolicy or "always"} or "always";
 
-  # Generate systemd unit files from cross-platform service definitions
-  systemdUnits = servicesLib.mkSystemdSystemServices crossPlatformServices;
+      # Build command with args
+      execStart = if (cfg.args or []) == []
+                  then cfg.command
+                  else "${cfg.command} ${concatStringsSep " " cfg.args}";
 
-  # Combine all unit files into /etc/systemd/system
-  systemdEtcDir = pkgs.runCommand "systemd-etc" { } ''
-    mkdir -p $out/systemd/system
+      # Environment variables
+      envVars = mapAttrsToList (k: v: "Environment=\"${k}=${v}\"") (cfg.environment or {});
 
-    # Copy all generated unit files
-    ${concatMapStringsSep "\n" (name: ''
-      cp ${systemdUnits.${name}}/*.service $out/systemd/system/ || true
-    '') (attrNames systemdUnits)}
-  '';
+      # Systemd-specific options
+      systemdCfg = cfg.systemd or {};
+
+      # Dependencies
+      after = systemdCfg.after or [];
+      wants = systemdCfg.wants or [];
+      requires = systemdCfg.requires or [];
+      before = systemdCfg.before or [];
+      wantedBy = systemdCfg.wantedBy or [ "multi-user.target" ];
+
+      # Service config overrides
+      serviceConfig = systemdCfg.serviceConfig or {};
+
+    in
+    pkgs.writeTextFile {
+      name = "${name}.service";
+      text = ''
+        [Unit]
+        Description=${cfg.description or name}
+        ${concatMapStringsSep "\n" (d: "After=${d}") after}
+        ${concatMapStringsSep "\n" (d: "Wants=${d}") wants}
+        ${concatMapStringsSep "\n" (d: "Requires=${d}") requires}
+        ${concatMapStringsSep "\n" (d: "Before=${d}") before}
+
+        [Service]
+        Type=${serviceConfig.Type or "simple"}
+        ExecStart=${execStart}
+        ${optionalString ((cfg.preStart or "") != "") "ExecStartPre=${pkgs.writeShellScript "${name}-prestart" cfg.preStart}"}
+        ${optionalString ((cfg.postStart or "") != "") "ExecStartPost=${pkgs.writeShellScript "${name}-poststart" cfg.postStart}"}
+        ${optionalString ((cfg.postStop or "") != "") "ExecStopPost=${pkgs.writeShellScript "${name}-poststop" cfg.postStop}"}
+        Restart=${restartValue}
+        ${optionalString (cfg.user or null != null) "User=${cfg.user}"}
+        ${optionalString (cfg.group or null != null) "Group=${cfg.group}"}
+        ${optionalString (cfg.workingDirectory or null != null) "WorkingDirectory=${cfg.workingDirectory}"}
+        ${concatStringsSep "\n" envVars}
+        ${concatStringsSep "\n" (mapAttrsToList (k: v: "${k}=${toString v}") serviceConfig)}
+
+        [Install]
+        ${concatMapStringsSep "\n" (t: "WantedBy=${t}") wantedBy}
+      '';
+    };
+
+  # Generate all systemd units
+  systemdUnits = mapAttrs mkSystemdUnit enabledServices;
 
 in
 
@@ -59,7 +108,7 @@ in
         map (
           name:
           nameValuePair "systemd/system/${name}.service" {
-            source = "${systemdUnits.${name}}/${name}.service";
+            source = systemdUnits.${name};
           }
         ) (attrNames systemdUnits)
       ))
