@@ -19,4 +19,7 @@
 
   # Boot process test
   boot-process = pkgs.ekaosTest ./boot-process.nix;
+
+  # Login functionality test (Phase 1)
+  login = pkgs.ekaosTest ./login.nix;
 }
