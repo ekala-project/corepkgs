@@ -20,6 +20,7 @@ let
   rcdOpts = import ./rcd-options.nix { inherit lib; };
   rcdTranslate = import ./rcd-translate.nix { inherit lib pkgs; };
   validate = import ./validate.nix { inherit lib pkgs; };
+  dockerImage = import ./docker-image.nix { inherit lib pkgs; };
 
   # Service option type
   serviceOpts =
@@ -180,10 +181,14 @@ in
     in
     mapAttrs (name: config: rcdTranslate.toRcdService "openbsd" name config) validatedServices;
 
+  # Build Docker image with runit supervision from service definitions
+  mkRunitDockerImage = dockerImage.mkRunitDockerImage;
+
   inherit
     systemdTranslate
     launchdTranslate
     runitTranslate
     rcdTranslate
+    dockerImage
     ;
 }
