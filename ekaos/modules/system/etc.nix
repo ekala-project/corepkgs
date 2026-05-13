@@ -143,6 +143,94 @@ in
         ekaos ${config.system.ekaos.version} \n \l
 
       '';
+
+      # Shell configuration
+      "bashrc".text = ''
+        # /etc/bashrc: system-wide bash configuration
+        # shellcheck shell=bash
+
+        # If not running interactively, don't do anything
+        [[ $- != *i* ]] && return
+
+        # Set up secure PATH
+        export PATH="/run/current-system/sw/bin:/usr/bin:/bin"
+
+        # Basic shell options
+        shopt -s checkwinsize
+        shopt -s histappend
+
+        # Command prompt
+        if [ "$EUID" -eq 0 ]; then
+          PS1='\[\033[01;31m\]\h\[\033[01;34m\] \w \$\[\033[00m\] '
+        else
+          PS1='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w \$\[\033[00m\] '
+        fi
+
+        # Aliases
+        alias ls='ls --color=auto'
+        alias ll='ls -lh'
+        alias la='ls -lah'
+        alias grep='grep --color=auto'
+
+        # Source user's bashrc if it exists
+        [ -f ~/.bashrc ] && source ~/.bashrc
+      '';
+
+      "profile".text = ''
+        # /etc/profile: system-wide environment and startup programs
+
+        # Set up PATH
+        export PATH="/run/current-system/sw/bin:/run/wrappers/bin:/usr/bin:/bin"
+
+        # Set up default environment variables
+        export LANG="C.UTF-8"
+        export PAGER="less"
+        export EDITOR="vi"
+
+        # XDG base directories
+        export XDG_DATA_DIRS="/run/current-system/sw/share''${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
+        export XDG_CONFIG_DIRS="/etc/xdg''${XDG_CONFIG_DIRS:+:$XDG_CONFIG_DIRS}"
+
+        # Source bash-specific profile
+        if [ -n "$BASH_VERSION" ]; then
+          [ -f /etc/bashrc ] && source /etc/bashrc
+        fi
+
+        # Source user's profile if it exists
+        [ -f ~/.profile ] && source ~/.profile
+      '';
+
+      "nsswitch.conf".text = ''
+        # /etc/nsswitch.conf: Name Service Switch configuration
+
+        passwd:    files
+        group:     files
+        shadow:    files
+
+        hosts:     files dns
+        networks:  files
+
+        services:  files
+        protocols: files
+        rpc:       files
+        ethers:    files
+        netmasks:  files
+        netgroup:  files
+        bootparams: files
+
+        automount: files
+        aliases:   files
+      '';
+
+      # Hostname configuration
+      "hostname".text = mkDefault "${config.networking.hostName or "ekaos"}";
+
+      # Hosts file
+      "hosts".text = ''
+        127.0.0.1 localhost
+        ::1 localhost
+        127.0.1.1 ${config.networking.hostName or "ekaos"}
+      '';
     };
   };
 }
