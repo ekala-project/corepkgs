@@ -48,12 +48,12 @@ let
 
     # Don't install any default routes
     # We'll let the system handle routing
-    ${optionalString (!cfg.allowRoutes) "nogateway"}
+    ${optionalString (!cfg.settings.allowRoutes) "nogateway"}
 
     # Wait for IP address before forking to background
     waitip
 
-    ${cfg.extraConfig}
+    ${cfg.settings.extraConfig}
   '';
 
 in
@@ -71,48 +71,99 @@ in
         '';
       };
 
-      allowRoutes = mkOption {
-        type = types.bool;
-        default = true;
-        description = ''
-          Whether to allow dhcpcd to install default routes.
-
-          When true, dhcpcd can set the default gateway.
-          When false, routing must be configured manually.
-        '';
+      description = mkOption {
+        type = types.str;
+        default = "DHCP Client Daemon";
+        description = "Service description";
       };
 
-      extraConfig = mkOption {
-        type = types.lines;
-        default = "";
-        example = ''
-          # Use a specific DNS server
-          static domain_name_servers=8.8.8.8 8.8.4.4
-        '';
-        description = ''
-          Extra configuration to append to dhcpcd.conf.
+      command = mkOption {
+        type = types.str;
+        internal = true;
+        description = "Command to run (set automatically)";
+      };
 
-          See dhcpcd.conf(5) for available options.
-        '';
+      args = mkOption {
+        type = types.listOf types.str;
+        internal = true;
+        default = [];
+        description = "Command arguments (set automatically)";
+      };
+
+      user = mkOption {
+        type = types.str;
+        default = "root";
+        description = "User to run service as";
+      };
+
+      restartPolicy = mkOption {
+        type = types.str;
+        default = "always";
+        description = "Restart policy";
+      };
+
+      systemd = mkOption {
+        type = types.attrsOf types.anything;
+        default = {};
+        description = "Systemd-specific options";
+      };
+
+      settings = mkOption {
+        type = types.submodule {
+          options = {
+            allowRoutes = mkOption {
+              type = types.bool;
+              default = true;
+              description = ''
+                Whether to allow dhcpcd to install default routes.
+
+                When true, dhcpcd can set the default gateway.
+                When false, routing must be configured manually.
+              '';
+            };
+
+            extraConfig = mkOption {
+              type = types.lines;
+              default = "";
+              example = ''
+                # Use a specific DNS server
+                static domain_name_servers=8.8.8.8 8.8.4.4
+              '';
+              description = ''
+                Extra configuration to append to dhcpcd.conf.
+
+                See dhcpcd.conf(5) for available options.
+              '';
+            };
+          };
+        };
+        default = {};
+        description = "dhcpcd-specific configuration";
       };
     };
   };
 
   config = mkIf cfg.enable {
+    # Define the dhcpcd service using cross-platform interface
+    services.dhcpcd = {
+      command = "${pkgs.dhcpcd}/bin/dhcpcd";
+      args = [ "--config" "${dhcpcdConf}" "--nobackground" ];
+      user = "root";
+      restartPolicy = "always";
+
+      # Systemd-specific options
+      systemd = {
+        after = [ "network-pre.target" ];
+        before = [ "network.target" ];
+        wantedBy = [ "multi-user.target" ];
+      };
+    };
+
     # Install dhcpcd configuration
     environment.etc."dhcpcd.conf".source = dhcpcdConf;
 
     # Add dhcpcd to system packages
     environment.systemPackages = [ pkgs.dhcpcd ];
-
-    # Create dhcpcd service
-    systemd.services.dhcpcd = {
-      enable = true;
-      description = "DHCP Client Daemon";
-      command = "${pkgs.dhcpcd}/bin/dhcpcd --config ${dhcpcdConf} --nobackground";
-      user = "root";
-      restartPolicy = "always";
-    };
 
     # Create required directories
     system.activationScripts.dhcpcd = stringAfter [ "etc" ] ''

@@ -27,7 +27,8 @@
   ./services/networking/sshd.nix
 
   # Service management
-  ./systemd.nix
+  ./services.nix  # Cross-platform service definitions
+  ./systemd.nix   # Systemd implementation (consumes services.*)
 
   # Virtualisation
   ./virtualisation/qemu-vm.nix
