@@ -153,8 +153,16 @@ in
 
   config = mkIf cfg.enable {
     # Add sudo to system packages
-    # TODO: Uncomment when sudo is available in core-pkgs
-    # environment.systemPackages = [ pkgs.sudo ];
+    environment.systemPackages = [ pkgs.sudo ];
+
+    # Set up security wrapper for sudo (requires setuid)
+    security.wrappers.sudo = {
+      source = "${pkgs.sudo}/bin/sudo";
+      owner = "root";
+      group = "root";
+      setuid = true;
+      permissions = "u+rx,g+x,o+x";
+    };
 
     # Generate sudoers file
     environment.etc."sudoers" = {
@@ -180,10 +188,13 @@ in
     };
 
     # Set up sudoers directory for drop-in files
-    system.activationScripts.sudo = stringAfter [ "etc" ] ''
-      # Create sudoers.d directory
-      mkdir -p /etc/sudoers.d
-      chmod 750 /etc/sudoers.d
-    '';
+    system.activationScripts.sudo = {
+      deps = [ "etc" ];
+      text = ''
+        # Create sudoers.d directory
+        mkdir -p /etc/sudoers.d
+        chmod 750 /etc/sudoers.d
+      '';
+    };
   };
 }
