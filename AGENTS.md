@@ -1,6 +1,13 @@
 # Agent Guide for core-pkgs
 
-This document provides guidelines for AI agents working with the core-pkgs repository. It covers packaging conventions, directory structure, and validation requirements.
+This document provides high-level guidelines for AI agents working with the core-pkgs repository. For detailed information on specific topics, see the `.skills/` directory.
+
+**Quick access to detailed guides:**
+- [`.skills/cmake.md`](.skills/cmake.md) - CMake build system
+- [`.skills/meson.md`](.skills/meson.md) - Meson build system
+- [`.skills/packaging.md`](.skills/packaging.md) - Packaging conventions
+- [`.skills/validation.md`](.skills/validation.md) - Validation and testing
+- [`.skills/porting.md`](.skills/porting.md) - Porting from nixpkgs
 
 ## Package Organization
 
@@ -43,9 +50,8 @@ Packages that produce multiple variants should use the `mkManyVariants` paradigm
 
 **Example structure:**
 ```
-pkgs-many/
-  python/
-    default.nix  # Uses mkManyVariants to create python39, python310, python311, etc.
+# Uses mkManyVariants to create python39, python310, python311, etc.
+pkgs-many/python/default.nix  
 ```
 
 The variants are automatically available in the package scope (e.g., `pkgs.python39`, `pkgs.python310`).
@@ -54,139 +60,72 @@ The variants are automatically available in the package scope (e.g., `pkgs.pytho
 
 ### Meta Attributes
 
-**Remove or clear the `meta.maintainers` field:**
-
-Maintainership will be tracked through tooling
+**Always set `meta.maintainers` to an empty list:**
 
 ```nix
-# CORRECT
 meta = {
   description = "Example package";
   license = lib.licenses.mit;
-  maintainers = [ ];  # Empty list
-};
-
-# INCORRECT
-meta = {
-  description = "Example package";
-  license = lib.licenses.mit;
-  maintainers = with lib.maintainers; [ alice bob ];  # Don't include maintainers
+  maintainers = [ ];  # Always empty
+  platforms = lib.platforms.linux;
 };
 ```
+
+**Detailed guide:** See [`.skills/packaging.md`](.skills/packaging.md) for complete meta attribute documentation.
 
 ### Testing
 
-**Default behavior:**
-- `doCheck = false;` is now the default - do NOT explicitly set this unless you're enabling tests
+**Key points:**
+- `doCheck = false;` is the default - don't set it explicitly
+- Prefer `passthru.tests` for unit tests
+- Only enable `doCheck = true;` for critical packages
 
-**Preferred way to run tests:**
-```nix
-stdenv.mkDerivation (finalAttrs: {
-  pname = "example";
-  version = "1.0.0";
-
-  # Don't set doCheck = false; it's already the default
-
-  # Instead, use passthru.tests for unit tests
-  passthru.tests = {
-    unittests = runUnitTests finalAttrs.finalPackage;
-  };
-
-  meta = {
-    description = "Example package";
-  };
-})
-```
+**Detailed guide:** See [`.skills/packaging.md`](.skills/packaging.md#testing) for testing patterns.
 
 ### Build Systems
 
-**Meson packages:**
-
-For packages using Meson as a build system, ensure you include the `meson.configurePhaseHook`:
-
-```nix
-nativeBuildInputs = [
-  meson
-  meson.configurePhaseHook  # Required for Meson configure phase
-  ninja
-  pkg-config
-];
-
-mesonBuildType = "release";  # Specify build type
-```
-
 **CMake packages:**
 
-For packages using cmake as a build system, ensure you include the `cmake.configurePhaseHook`:
+Include `cmake.configurePhaseHook` in nativeBuildInputs.
 
-```nix
-nativeBuildInputs = [
-  cmake
-  cmake.configurePhaseHook  # Required for CMake configure phase
-];
-```
+**Detailed guide:** See [`.skills/cmake.md`](.skills/cmake.md) for complete CMake documentation.
+
+**Meson packages:**
+
+Include `meson.configurePhaseHook` and `ninja` in nativeBuildInputs, specify `mesonBuildType`.
+
+**Detailed guide:** See [`.skills/meson.md`](.skills/meson.md) for complete Meson documentation.
 
 
 ## Validation Requirements
 
-All added or edited package attributes **must** pass the following validation steps:
+All added or edited package attributes **must** pass three validation steps:
 
 ### 1. Evaluation Check
-
-Verify the package evaluates correctly:
 
 ```bash
 nix-instantiate -A <package-name>
 ```
 
-**Example:**
-```bash
-nix-instantiate -A libxslt
-nix-instantiate -A bubblewrap
-nix-instantiate -A rpm
-```
-
-This checks that:
-- The Nix expression has no syntax errors
-- All dependencies are available
-- The derivation can be instantiated
+Verifies the Nix expression evaluates correctly.
 
 ### 2. Build Check
-
-Verify the package builds successfully:
 
 ```bash
 nix-build -A <package-name>
 ```
 
-**Example:**
-```bash
-nix-build -A libxslt
-nix-build -A bubblewrap
-nix-build -A rpm
-```
-
-This ensures:
-- The package compiles without errors
-- All build dependencies are correct
-- The build produces expected outputs
+Verifies the package builds successfully.
 
 ### 3. Format Check
-
-All edited Nix files **must** be formatted using `nix fmt`:
 
 ```bash
 nix fmt <path-to-file>
 ```
 
-**Examples:**
-```bash
-nix fmt pkgs/libxslt/default.nix
-nix fmt pkgs/bubblewrap/default.nix
-nix fmt top-level.nix
-```
+Ensures code follows formatting standards.
 
-**Important:** Always run `nix fmt` on files you've modified before considering the work complete.
+**Detailed guide:** See [`.skills/validation.md`](.skills/validation.md) for complete validation procedures, troubleshooting, and advanced validation techniques.
 
 ## Common Patterns
 
@@ -227,86 +166,30 @@ zstd: ✓ available
 
 ### Porting from nixpkgs
 
-When porting a package from nixpkgs to core-pkgs:
+When porting a package from nixpkgs:
 
 1. **Check dependencies first** - use `nix-instantiate -A <dep>` to verify all dependencies exist
 2. **Copy the package files** to the appropriate directory (`pkgs/` or `pkgs-many/`)
 3. **Remove/clear `meta.maintainers`** field
 4. **Remove update scripts** (e.g., `updateScript = gnome.updateScript { ... }`)
-5. **Add TODO comments** for missing dependencies:
-   ```nix
-   # TODO(corepkgs): Port pexpect when needed for msVarsTemplate support
-   ```
-6. **Validate** using the validation steps above
-7. **Format** the file with `nix fmt`
+5. **Add TODO comments** for missing dependencies
+6. **Validate** and **format** the files
 
-### Example: Complete Package Port
-
-```nix
-{
-  lib,
-  stdenv,
-  fetchFromGitHub,
-  meson,
-  ninja,
-  pkg-config,
-  libcap,
-}:
-
-stdenv.mkDerivation (finalAttrs: {
-  pname = "example";
-  version = "1.0.0";
-
-  src = fetchFromGitHub {
-    owner = "example";
-    repo = "example";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-  };
-
-  nativeBuildInputs = [
-    meson
-    meson.configurePhaseHook
-    ninja
-    pkg-config
-  ];
-
-  buildInputs = [
-    libcap
-  ];
-
-  mesonBuildType = "release";
-
-  # doCheck = false; is the default, don't set it
-
-  passthru.tests = {
-    # Add tests here if needed
-  };
-
-  meta = {
-    description = "Example package";
-    homepage = "https://github.com/example/example";
-    license = lib.licenses.mit;
-    maintainers = [ ];  # Empty list
-    platforms = lib.platforms.linux;
-  };
-})
-```
+**Detailed guide:** See [`.skills/porting.md`](.skills/porting.md) for complete porting workflow, examples, and troubleshooting.
 
 ## Validation Checklist
 
 Before submitting changes, ensure:
 
-- [ ] All dependencies verified to exist using `nix-instantiate -A <dep>`
-- [ ] Package directory created in `pkgs/` or `pkgs-many/` as appropriate
-- [ ] Explicit `top-level.nix` entry only if inputs deviate from defaults
+- [ ] All dependencies verified with `nix-instantiate -A <dep>`
+- [ ] Package in correct directory (`pkgs/` or `pkgs-many/`)
 - [ ] `meta.maintainers = [ ];` (empty list)
-- [ ] No `doCheck = false;` unless specifically enabling tests
-- [ ] Tests use `passthru.tests.unittests` pattern if applicable
 - [ ] `nix-instantiate -A <package>` succeeds
 - [ ] `nix-build -A <package>` succeeds
 - [ ] `nix fmt <file>` run on all edited files
 - [ ] TODO comments added for missing dependencies
+
+**Complete checklist:** See [`.skills/validation.md`](.skills/validation.md#validation-checklist) for the full validation checklist.
 
 ## ekaos Reusable Modules
 
@@ -334,43 +217,12 @@ services.myservice = {
 };
 ```
 
-## Additional Notes
+## Additional Resources
 
-### Update Scripts
+For detailed information on specific topics:
 
-Remove nixpkgs-specific update scripts when porting packages:
-
-```nix
-# REMOVE THIS:
-passthru = {
-  updateScript = gnome.updateScript {
-    packageName = pname;
-    versionPolicy = "none";
-  };
-};
-
-# REPLACE WITH:
-passthru = {
-  # Only include necessary passthru attributes
-};
-```
-
-### Strict Dependencies
-
-Enable strict dependencies when possible:
-
-```nix
-strictDeps = true;
-```
-
-This ensures proper separation of build-time and runtime dependencies.
-
-### Cross-Compilation
-
-For packages supporting cross-compilation, use the appropriate dependency sets:
-
-```nix
-depsBuildBuild = [ pkg-config ];  # Build platform tools
-nativeBuildInputs = [ meson ninja ];  # Build platform tools for host build
-buildInputs = [ libcap ];  # Host platform libraries
-```
+- **Build systems:** [`.skills/cmake.md`](.skills/cmake.md) and [`.skills/meson.md`](.skills/meson.md)
+- **Packaging:** [`.skills/packaging.md`](.skills/packaging.md) - includes dependency management, cross-compilation, and passthru attributes
+- **Validation:** [`.skills/validation.md`](.skills/validation.md) - includes troubleshooting and advanced validation
+- **Porting:** [`.skills/porting.md`](.skills/porting.md) - includes complete examples and best practices
+- **All skills:** [`.skills/README.md`](.skills/README.md) - index of all available skill guides
