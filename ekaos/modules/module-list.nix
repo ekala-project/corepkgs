@@ -19,6 +19,7 @@
 
   # Security modules
   ./security/pam.nix
+  ./security/wrappers
   ./security/sudo.nix
 
   # Service modules
