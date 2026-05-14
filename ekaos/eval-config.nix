@@ -21,6 +21,8 @@ let
     specialArgs = {
       inherit lib pkgs;
       modulesPath = ./modules;
+      # Pass extendModules so modules can create variants
+      extendModules = eval.extendModules;
     }
     // extraArgs;
   };
@@ -28,7 +30,7 @@ let
 in
 
 {
-  inherit (eval) config options;
+  inherit (eval) config options extendModules;
 
   # Expose the system closure for building
   system = eval.config.system.build.toplevel;
