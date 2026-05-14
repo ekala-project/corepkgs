@@ -4,6 +4,7 @@
   config,
   lib,
   pkgs,
+  extendModules,
   ...
 }:
 
@@ -132,6 +133,19 @@ let
     inherit (config.systemd) package;
   };
 
+  # Helper function to create service manager variants
+  # Each variant uses extendModules to enable a specific service manager
+  mkServiceManagerVariant = name:
+    (extendModules {
+      modules = [{
+        # Enable only the selected service manager, disable all others
+        serviceManager.systemd.enable = mkForce (name == "systemd");
+        serviceManager.runit.enable = mkForce (name == "runit");
+        serviceManager.launchd.enable = mkForce (name == "launchd");
+        serviceManager.rcd.enable = mkForce (name == "rcd");
+      }];
+    }).config.system.build.toplevel;
+
 in
 
 {
@@ -146,6 +160,20 @@ in
       type = types.str;
       default = "ekaos";
       description = "Label for the system (shown in boot menu).";
+    };
+
+    # Top-level systemd options for backward compatibility
+    # These are set by service-managers/systemd.nix when systemd is enabled
+    systemd.package = mkOption {
+      type = types.package;
+      default = pkgs.systemd;
+      description = "The systemd package to use.";
+    };
+
+    systemd.defaultTarget = mkOption {
+      type = types.str;
+      default = "multi-user.target";
+      description = "The default systemd target to boot into.";
     };
 
     system.build.toplevel = mkOption {
@@ -170,12 +198,62 @@ in
       description = "The nixos-enter tool for entering a NixOS chroot.";
     };
 
+    system.build.systemd = mkOption {
+      type = types.package;
+      description = ''
+        Complete system closure with systemd service manager.
+
+        This variant uses systemd for service management.
+        Build with: nix-build -A config.system.build.systemd
+      '';
+    };
+
+    system.build.runit = mkOption {
+      type = types.package;
+      description = ''
+        Complete system closure with runit service manager.
+
+        This variant uses runit for service management.
+        Build with: nix-build -A config.system.build.runit
+      '';
+    };
+
+    system.build.launchd = mkOption {
+      type = types.package;
+      description = ''
+        Complete system closure with launchd service manager (stub).
+
+        Note: This is a stub for architecture completeness.
+        launchd is macOS-specific and cannot run as PID 1 on Linux.
+      '';
+    };
+
+    system.build.rcd = mkOption {
+      type = types.package;
+      description = ''
+        Complete system closure with BSD rc.d service manager (stub).
+
+        Note: This is a stub for architecture completeness.
+        rc.d requires BSD kernel and userland.
+      '';
+    };
+
     system.path = mkOption {
       type = types.package;
       description = ''
         The system environment (/run/current-system/sw).
 
         Contains all packages that should be available system-wide.
+      '';
+    };
+
+    system.extraDependencies = mkOption {
+      type = types.listOf types.package;
+      default = [];
+      description = ''
+        Extra build-time dependencies for the system.
+        These packages will be referenced by the system derivation to ensure
+        they're built and available at build time.
       '';
     };
 
@@ -188,7 +266,15 @@ in
   };
 
   config = {
+    # Default system build (uses systemd by default via misc/defaults.nix)
     system.build.toplevel = baseSystem;
+
+    # Service manager variants - lazily evaluated via extendModules
+    # Users select the service manager by choosing which build attribute to use
+    system.build.systemd = mkServiceManagerVariant "systemd";
+    system.build.runit = mkServiceManagerVariant "runit";
+    system.build.launchd = mkServiceManagerVariant "launchd";
+    system.build.rcd = mkServiceManagerVariant "rcd";
 
     # Build system path from packages
     system.path = pkgs.buildEnv {

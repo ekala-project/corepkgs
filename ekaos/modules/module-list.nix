@@ -29,7 +29,15 @@
 
   # Service management
   ./services.nix  # Cross-platform service definitions
-  ./systemd.nix   # Systemd implementation (consumes services.*)
+  # Service manager implementations (opt-in via enable options)
+  ./service-managers/systemd.nix
+  ./service-managers/runit.nix
+  ./service-managers/launchd.nix
+  ./service-managers/rcd.nix
+
+  # Miscellaneous
+  ./misc/assertions.nix  # Assertion checking
+  ./misc/defaults.nix  # System defaults (including default service manager)
 
   # Virtualisation
   ./virtualisation/qemu-vm.nix
