@@ -32,7 +32,7 @@ let
     set -e
 
     # Paths
-    DISK_IMAGE="${diskImage}/nixos.qcow2"
+    DISK_IMAGE="${diskImage}/ekaos.qcow2"
     EFI_VARS_TEMPLATE="${diskImage}/efi-vars.fd"
     OVMF_CODE="${pkgs.OVMF.firmware}"
 
