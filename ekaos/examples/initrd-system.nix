@@ -89,25 +89,6 @@
     systemd
   ];
 
-  # Example service
-  systemd.services.boot-marker = {
-    enable = true;
-    description = "Initrd Boot Marker Service";
-    command = "${pkgs.coreutils}/bin/echo";
-    args = [
-      "========================================="
-      "ekaos BOOTED WITH INITRD!"
-      "Two-stage boot process complete"
-      "Stage-1: initramfs → Stage-2: systemd"
-      "========================================="
-    ];
-
-    systemd = {
-      wantedBy = [ "multi-user.target" ];
-      after = [ "multi-user.target" ];
-    };
-  };
-
   # Example /etc file
   environment.etc."initrd-enabled".text = ''
     This system uses initramfs for boot.

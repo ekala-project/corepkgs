@@ -93,9 +93,6 @@ nodes = {
     virtualisation.memorySize = 2048;
     virtualisation.cores = 2;
     virtualisation.diskSize = 8192;
-
-    # Your ekaos configuration
-    systemd.services.myservice = { ... };
   };
 };
 ```
@@ -183,14 +180,6 @@ with subtest("Database initialization"):
   nodes.webserver = { pkgs, ... }: {
     boot.kernelPackages = pkgs.linuxPackages;
     virtualisation.enable = true;
-
-    systemd.services.nginx = {
-      description = "Nginx Web Server";
-      wantedBy = [ "multi-user.target" ];
-      serviceConfig = {
-        ExecStart = "${pkgs.nginx}/bin/nginx -g 'daemon off;'";
-      };
-    };
   };
 
   testScript = ''

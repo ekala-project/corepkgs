@@ -61,15 +61,6 @@ Create a configuration file:
     vim
     git
   ];
-
-  # Add custom services using the unified interface
-  systemd.services.my-service = {
-    enable = true;
-    description = "My Custom Service";
-    command = "${pkgs.coreutils}/bin/echo";
-    args = [ "Hello from ekaos!" ];
-    restartPolicy = "always";
-  };
 }
 ```
 
@@ -160,29 +151,6 @@ system.ekaos.version = "24.11";
 system.ekaos.label = "my-system";
 
 environment.systemPackages = [ pkgs.vim pkgs.git ];
-```
-
-### Systemd Services
-
-Uses the unified service interface from `services/`:
-
-```nix
-systemd.services.myservice = {
-  enable = true;
-  description = "My Service";
-  command = "${pkgs.mypackage}/bin/myservice";
-  args = [ "--flag" "value" ];
-  restartPolicy = "always";
-
-  environment = {
-    VAR = "value";
-  };
-
-  # Systemd-specific options
-  systemd.serviceConfig = {
-    PrivateTmp = true;
-  };
-};
 ```
 
 ### Initramfs (initrd) Options
@@ -467,10 +435,6 @@ nix-build ekaos/tests -A all
   nodes.machine = { config, pkgs, ... }: {
     boot.kernelPackages = pkgs.linuxPackages;
     virtualisation.enable = true;
-
-    systemd.services.my-service = {
-      # Your service configuration
-    };
   };
 
   testScript = ''
@@ -557,25 +521,6 @@ System booted and systemd started
 **No output on serial console:**
 - Ensure kernel params: `boot.kernelParams = [ "console=ttyS0,115200" ]`
 - Check VM configuration: `virtualisation.serialConsole = true`
-
-## Integration with Services
-
-ekaos integrates with the existing `services/` infrastructure:
-
-```nix
-systemd.services = {
-  # Uses the same interface as services/
-  my-service = {
-    enable = true;
-    description = "My Service";
-    command = "${pkgs.python3}/bin/python3";
-    args = [ "-m" "http.server" "8080" ];
-    restartPolicy = "always";
-  };
-};
-```
-
-Services are automatically translated to systemd units and placed in `/etc/systemd/system/`.
 
 ## Current Limitations
 

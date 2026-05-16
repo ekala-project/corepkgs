@@ -35,25 +35,6 @@
     systemd
   ];
 
-  # Test service that prints success message
-  systemd.services.boot-success = {
-    enable = true;
-    description = "Boot Success Marker";
-    command = "${pkgs.coreutils}/bin/echo";
-    args = [
-      "========================================="
-      "ekaos BOOT TEST SUCCESS!"
-      "System booted and systemd started"
-      "========================================="
-    ];
-
-    # Run after multi-user target
-    systemd = {
-      wantedBy = [ "multi-user.target" ];
-      after = [ "multi-user.target" ];
-    };
-  };
-
   # Add a simple test file to /etc
   environment.etc."boot-test-marker".text = ''
     ekaos boot test
