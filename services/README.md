@@ -95,10 +95,8 @@ services/
 { pkgs ? import ../. { } }:
 
 let
-  services = import ./services { inherit pkgs; };
-
-  serviceConfig = {
-    my-service = {
+  my-config = {
+    services.my-service = {
       enable = true;
       description = "My Example Service";
 
@@ -151,16 +149,18 @@ let
       };
     };
   };
+
+  ekaosEval = ekaosSystem my-config;
 in
 {
   # Build for different platforms and contexts
-  systemdUserService = services.buildSystemdUserServices serviceConfig;
-  systemdSystemService = services.buildSystemdSystemServices serviceConfig;
-  launchdUserAgent = services.buildLaunchdUserAgents serviceConfig;
-  launchdDaemon = services.buildLaunchdDaemons serviceConfig;
-  runitService = services.buildRunitServices serviceConfig;
-  rcdService = services.buildRcdServices serviceConfig;            # FreeBSD/NetBSD/DragonFly
-  rcdServiceOpenBSD = services.buildRcdServicesOpenBSD serviceConfig; # OpenBSD
+  systemdUserService = ekaosEval.config.user.build.systemd;
+  systemdSystemService = ekaosEval.config.system.build.systemd;
+  launchdUserAgent = ekaosEval.config.user.build.launchd;
+  launchdDaemon = ekaosEval.config.system.build.launchd;
+  runitService = ekaosEval.config.system.build.runit;
+  rcdService = ekaosEval.config.system.build.rcd;            # FreeBSD/NetBSD/DragonFly
+  # OpenBSD variant would use different kernel
 }
 ```
 
@@ -828,42 +828,6 @@ Stage-1 Init (initramfs)
         multi-user.target
 ```
 
-### Using Services in ekaos
-
-Define system services in ekaos configuration using the same interface:
-
-```nix
-# ekaos system configuration
-{ config, lib, pkgs, ... }:
-
-{
-  system.ekaos.version = "24.11";
-
-  boot.loader.systemd-boot.enable = true;
-  boot.kernelPackages = pkgs.linuxPackages;
-
-  # Services use the same interface as services/
-  systemd.services = {
-    my-service = {
-      enable = true;
-      description = "My Service";
-      command = "${pkgs.python3}/bin/python3";
-      args = [ "-m" "http.server" "8080" ];
-      restartPolicy = "always";
-
-      environment = {
-        PORT = "8080";
-      };
-
-      # Systemd-specific options still work
-      systemd.serviceConfig = {
-        PrivateTmp = true;
-      };
-    };
-  };
-}
-```
-
 Build a bootable system:
 
 ```bash
@@ -935,34 +899,6 @@ The kernel packages include:
 - `kernel` - The Linux kernel itself
 - `modules` - Kernel modules for the selected version
 - All necessary tools for building initramfs and kernel modules
-
-### Example: Bootable HTTP Server
-
-Create a complete bootable system with an HTTP server:
-
-```nix
-{ config, pkgs, ... }:
-
-{
-  system.ekaos.label = "http-server-system";
-
-  boot.loader.systemd-boot.enable = true;
-  boot.kernelPackages = pkgs.linuxPackages;
-
-  systemd.services.http-server = {
-    enable = true;
-    description = "HTTP Server";
-    command = "${pkgs.python3}/bin/python3";
-    args = [ "-m" "http.server" "8080" ];
-    restartPolicy = "always";
-
-    systemd = {
-      wantedBy = [ "multi-user.target" ];
-      after = [ "network.target" ];
-    };
-  };
-}
-```
 
 Build and test in a VM:
 
@@ -1040,6 +976,155 @@ cd /home/jon/projects/core-pkgs/ekaos
 This builds a bootable VM, boots it, and verifies successful systemd startup in ~30 seconds.
 
 See `../ekaos/README.md` for complete ekaos documentation and testing options.
+
+## Multi-Service-Manager Architecture (ekaos Variants)
+
+ekaos now supports building system variants with different service managers from a single configuration using the `extendModules` pattern. This allows you to use the same service definitions with systemd, runit, launchd, or BSD rc.d.
+
+### Overview
+
+The multi-service-manager architecture provides:
+- **Zero-assumption base**: Service definitions don't assume a specific supervisor
+- **Easy switching**: Select service manager by build attribute
+- **Lazy evaluation**: Variants only built when accessed
+- **Type-safe**: Module system enforces mutual exclusion
+- **Backward compatible**: systemd is the default
+
+### Building Service Manager Variants
+
+Define your services once, then build for different service managers:
+
+```nix
+# ekaos configuration
+{ config, pkgs, ... }:
+
+{
+  system.ekaos.label = "multi-manager-system";
+  boot.loader.systemd-boot.enable = true;
+  boot.kernelPackages = pkgs.linuxPackages;
+
+  # Define services using the common interface
+  services.nginx = {
+    enable = true;
+    description = "Nginx Web Server";
+    command = "${pkgs.nginx}/bin/nginx";
+    args = [ "-g" "daemon off;" ];
+    restartPolicy = "always";
+  };
+}
+```
+
+**Build different variants:**
+
+```bash
+# Build with systemd (default)
+nix-build ekaos -A config.system.build.toplevel
+# or explicitly:
+nix-build ekaos -A config.system.build.systemd
+
+# Build with runit
+nix-build ekaos -A config.system.build.runit
+
+# Build with launchd (stub for architecture completeness)
+nix-build ekaos -A config.system.build.launchd
+
+# Build with BSD rc.d (stub for architecture completeness)
+nix-build ekaos -A config.system.build.rcd
+```
+
+### Service Manager Selection
+
+Each variant uses `extendModules` to enable a specific service manager:
+
+```nix
+# Internal implementation (in ekaos/modules/system/toplevel.nix)
+system.build.systemd = mkServiceManagerVariant "systemd";
+system.build.runit = mkServiceManagerVariant "runit";
+```
+
+**Key principles:**
+- Only one service manager enabled at a time (mutual exclusion)
+- Service manager selected implicitly by build attribute
+- Users don't manually set `serviceManager.<name>.enable`
+- All variants generated lazily (only evaluated when accessed)
+
+### Variant Comparison
+
+Each service manager variant produces a different system closure:
+
+```bash
+# Compare systemd vs runit variants
+nix-instantiate ekaos -A config.system.build.systemd --eval-only
+# → /nix/store/abc...
+
+nix-instantiate ekaos -A config.system.build.runit --eval-only
+# → /nix/store/xyz...  (different path!)
+
+# View service manager status
+nix-instantiate --eval --expr '
+  let eval = import ./ekaos/eval-config.nix {
+    inherit (import <nixpkgs> {}) lib pkgs;
+  } { modules = [ ./my-config.nix ]; };
+  in {
+    default = eval.config.serviceManager.systemd.enable;
+    runit = eval.config.system.build.runit.config.serviceManager.runit.enable;
+  }
+'
+# → { default = true; runit = true; }
+```
+
+### Platform Support
+
+| Service Manager | Status | Notes |
+|----------------|---------|-------|
+| **systemd** | ✅ Full | Default, complete implementation |
+| **runit** | ✅ Full | Complete service directory generation |
+| **launchd** | ⚠️ Stub | macOS-specific, architecture completeness only |
+| **rc.d** | ⚠️ Stub | BSD-specific, architecture completeness only |
+
+**Note:** launchd and rc.d are stubs because they require non-Linux kernels. They're provided for architectural completeness and potential future cross-platform work.
+
+### Advanced: Using extendModules Directly
+
+You can create custom variants using `extendModules`:
+
+```nix
+let
+  baseEval = import ./ekaos/eval-config.nix { inherit lib pkgs; } {
+    modules = [ ./my-config.nix ];
+  };
+
+  # Create custom runit variant with extra config
+  customRunit = baseEval.extendModules {
+    modules = [{
+      serviceManager.systemd.enable = lib.mkForce false;
+      serviceManager.runit.enable = lib.mkForce true;
+
+      # Add runit-specific configuration
+      services.myapp.runit = {
+        logScript = ''
+          #!/bin/sh
+          exec svlogd -tt /var/log/myapp
+        '';
+      };
+    }];
+  };
+in
+  customRunit.config.system.build.toplevel
+```
+
+### Benefits for Multi-Platform Development
+
+1. **Write once, run anywhere**: Same service definitions work across platforms
+2. **Test on different supervisors**: Verify service behavior with different managers
+3. **Migration path**: Easy to switch service managers in production
+4. **Composability**: Service modules reusable across all variants
+
+### See Also
+
+- `../extend-modules-plan.md` - Complete implementation details
+- `../ekaos/README.md` - ekaos system documentation
+- `ekaos/modules/service-managers/` - Service manager implementations
 
 ## Future Work
 
