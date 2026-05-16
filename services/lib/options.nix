@@ -133,5 +133,25 @@ in
         Shell commands to run after the service stops.
       '';
     };
+
+    after = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      example = [ "database" "cache" ];
+      description = ''
+        List of services that must start before this service.
+        This creates an ordering dependency.
+      '';
+    };
+
+    before = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      example = [ "application" ];
+      description = ''
+        List of services that must start after this service.
+        This creates a reverse ordering dependency.
+      '';
+    };
   };
 }
