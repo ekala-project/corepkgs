@@ -30,7 +30,7 @@
   libcap,
   libcap_ng,
   socat,
-  libslirp ? null,
+  libslirp,
   libcbor,
   guestAgentSupport ?
     (with stdenv.hostPlatform; isLinux || isNetBSD || isOpenBSD || isSunOS || isWindows) && !minimal,

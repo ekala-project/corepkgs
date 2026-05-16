@@ -44,13 +44,6 @@ with final;
   linuxPackages_6_12 = linux.packagesFor linux.kernels.linux_6_12;
   linuxPackages_6_18 = linuxPackages;
 
-  # qemu - disable docs to avoid sphinx dependencies for now
-  # disable smartcard support to avoid libcacard dependency
-  qemu = prev.qemu.override {
-    enableDocs = false;
-    smartcardSupport = false;
-  };
-
   # qemu_kvm - QEMU with only host CPU support (for vmTools)
   # This is required for vmTools to work correctly with direct kernel boot
   qemu_kvm = lowPrio (qemu.override { hostCpuOnly = true; });
