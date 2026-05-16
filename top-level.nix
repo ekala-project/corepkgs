@@ -65,6 +65,10 @@ with final;
   # Includes runitTests, ekaosTests, and future test frameworks
   integrationTests = callPackage ./integration-tests { };
 
+  # mkDevShell - Development shell with service management
+  # Creates development environments with running services using ekaos modules
+  mkDevShell = (callPackage ./dev-shell { }).mkDevShell;
+
   # vmTools - VM building utilities for ekaosTest and disk image creation
   vmTools = callPackage ./build-support/vm { };
   makeInitrd = callPackage ./build-support/kernel/make-initrd.nix;
