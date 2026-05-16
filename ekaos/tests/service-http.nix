@@ -71,38 +71,6 @@ in
           python3
           coreutils
         ];
-
-        # Define HTTP server service
-        systemd.services.http-server = {
-          description = "Simple HTTP Server Test Service";
-          wantedBy = [ "multi-user.target" ];
-          after = [ "network.target" ];
-
-          path = with pkgs; [
-            coreutils
-            python3
-          ];
-
-          environment = {
-            PORT = "8080";
-            PYTHONUNBUFFERED = "1"; # For immediate log output
-          };
-
-          serviceConfig = {
-            ExecStart = serverScript;
-            Restart = "always";
-            RestartSec = 5;
-
-            # Security hardening
-            PrivateTmp = true;
-            NoNewPrivileges = true;
-          };
-
-          preStart = ''
-            echo "Starting HTTP server on port 8080..."
-            echo "Platform: $(uname -s)"
-          '';
-        };
       };
   };
 

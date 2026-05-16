@@ -32,7 +32,4 @@
     util-linux
     systemd
   ];
-
-  # No custom services for minimal system
-  # systemd.services = {};
 }

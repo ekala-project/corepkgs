@@ -21,22 +21,27 @@ let
       ''
         mkdir -p $out/etc
 
-        ${concatMapStringsSep "\n" (file: ''
-          mkdir -p $out/etc/$(dirname ${escapeShellArg file.target})
-          ${
-            if file.source != null then
-              ''
-                ln -s ${file.source} $out/etc/${escapeShellArg file.target}
-              ''
-            else
-              ''
-                cat > $out/etc/${escapeShellArg file.target} <<'EOF'
-                ${file.text}
-                EOF
-                ${optionalString (file.mode != null) "chmod ${file.mode} $out/etc/${escapeShellArg file.target}"}
-              ''
-          }
-        '') etc'}
+        ${concatMapStringsSep "\n" (file:
+          let
+            # If text is provided but source is not, create a source file
+            source = if file.source != null
+                     then file.source
+                     else if file.text != null
+                     then pkgs.writeText file.target file.text
+                     else null;
+          in
+          ''
+            mkdir -p $out/etc/$(dirname ${escapeShellArg file.target})
+            ${
+              if source != null then
+                ''
+                  ln -s ${source} $out/etc/${escapeShellArg file.target}
+                ''
+              else
+                throw "etc file ${file.target} has neither source nor text"
+            }
+          ''
+        ) etc'}
       '';
 
 in
@@ -82,8 +87,7 @@ in
             };
 
             config = {
-              # Ensure either text or source is set
-              source = mkIf (config.text != null) (mkDefault (pkgs.writeText name config.text));
+              # No auto-conversion needed - handled in etcDir build
             };
           }
         )

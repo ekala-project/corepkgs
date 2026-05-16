@@ -22,32 +22,6 @@
         boot.kernelPackages = pkgs.linuxPackages;
 
         virtualisation.enable = true;
-
-        # Define a simple test service
-        systemd.services.test-service = {
-          description = "Test Service";
-          wantedBy = [ "multi-user.target" ];
-
-          serviceConfig = {
-            Type = "oneshot";
-            RemainAfterExit = true;
-            ExecStart = "${pkgs.coreutils}/bin/echo 'Test service started'";
-          };
-        };
-
-        # Define a simple web server for port testing
-        systemd.services.test-webserver = {
-          description = "Test Web Server";
-          wantedBy = [ "multi-user.target" ];
-          after = [ "network.target" ];
-
-          serviceConfig = {
-            ExecStart = ''
-              ${pkgs.python3}/bin/python3 -m http.server 8080
-            '';
-            Restart = "always";
-          };
-        };
       };
   };
 

@@ -20,7 +20,7 @@
 
         # Enable QEMU guest for testing
         virtualisation.enable = true;
-        virtualisation.enableNetwork = false; # Disable networking (not needed for boot test)
+        virtualisation.enableNetwork = true;
       };
   };
 

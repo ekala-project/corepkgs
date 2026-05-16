@@ -46,11 +46,14 @@ class Machine:
 
         log(f"Shutting down machine '{self.name}'")
 
+        # TODO: Implement proper VM shutdown via QMP or serial console
+        # For now, just kill the QEMU process since execute() is non-functional
         try:
-            self.execute("poweroff", check_return=False)
-            self.wait_for_shutdown()
-        except Exception as e:
-            log(f"Graceful shutdown failed, killing: {e}")
+            self.process.terminate()
+            self.process.wait(timeout=5)
+            log(f"Machine '{self.name}' shut down")
+        except subprocess.TimeoutExpired:
+            log(f"Terminate timeout, killing machine '{self.name}'")
             self.process.kill()
             self.process.wait()
 

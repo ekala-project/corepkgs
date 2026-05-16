@@ -57,18 +57,12 @@ in
           nodes.machine = { config, pkgs, ... }: {
             boot.kernelPackages = pkgs.linuxPackages;
             boot.loader.systemd-boot.enable = true;
-            systemd.services.myservice = { ... };
           };
       '';
       example = literalExpression ''
         {
           machine = { config, pkgs, ... }: {
             boot.kernelPackages = pkgs.linuxPackages;
-            systemd.services.test = {
-              enable = true;
-              command = "''${pkgs.coreutils}/bin/echo";
-              args = [ "Hello" ];
-            };
           };
         }
       '';

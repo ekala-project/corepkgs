@@ -157,6 +157,11 @@ in
           if [ ! -d /etc ]; then
             mkdir -p /etc
           fi
+
+          # Copy files from /etc/static to /etc
+          if [ -d /etc/static ]; then
+            cp -rL /etc/static/* /etc/ 2>/dev/null || true
+          fi
         '';
         supportsDryActivation = true;
       };
