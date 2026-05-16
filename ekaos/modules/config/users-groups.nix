@@ -13,132 +13,134 @@ let
   cfg = config.users;
 
   # User type definition
-  userOpts = {
-    name,
-    config,
-    ...
-  }:
-  {
-    options = {
-      name = mkOption {
-        type = types.str;
-        description = "The name of the user account. If undefined, the name of the attribute set will be used.";
+  userOpts =
+    {
+      name,
+      config,
+      ...
+    }:
+    {
+      options = {
+        name = mkOption {
+          type = types.str;
+          description = "The name of the user account. If undefined, the name of the attribute set will be used.";
+        };
+
+        uid = mkOption {
+          type = types.nullOr types.int;
+          default = null;
+          description = "The user ID for the user. If null, an ID will be assigned automatically.";
+        };
+
+        group = mkOption {
+          type = types.str;
+          default = "nogroup";
+          description = "The user's primary group.";
+        };
+
+        extraGroups = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "The user's auxiliary groups.";
+        };
+
+        home = mkOption {
+          type = types.str;
+          default = if config.isSystemUser then "/var/empty" else "/home/${config.name}";
+          description = "The user's home directory.";
+        };
+
+        createHome = mkOption {
+          type = types.bool;
+          default = !config.isSystemUser;
+          description = "Whether to create the home directory if it doesn't exist.";
+        };
+
+        shell = mkOption {
+          type = types.str;
+          default = "/run/current-system/sw/bin/bash";
+          description = "The user's login shell.";
+        };
+
+        description = mkOption {
+          type = types.str;
+          default = "";
+          description = "A short description of the user (GECOS field).";
+        };
+
+        isSystemUser = mkOption {
+          type = types.bool;
+          default = false;
+          description = "Whether the user is a system user.";
+        };
+
+        isNormalUser = mkOption {
+          type = types.bool;
+          default = false;
+          description = "Whether the user is a normal user (not a system user).";
+        };
+
+        hashedPassword = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+          description = "The user's hashed password. Use mkpasswd to generate.";
+        };
+
+        initialPassword = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+          description = ''
+            The user's initial password (plaintext). Only used if hashedPassword is null.
+            WARNING: This is stored in the Nix store, which is world-readable.
+          '';
+        };
+
+        openssh.authorizedKeys.keys = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "SSH public keys for the user.";
+        };
       };
 
-      uid = mkOption {
-        type = types.nullOr types.int;
-        default = null;
-        description = "The user ID for the user. If null, an ID will be assigned automatically.";
-      };
-
-      group = mkOption {
-        type = types.str;
-        default = "nogroup";
-        description = "The user's primary group.";
-      };
-
-      extraGroups = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "The user's auxiliary groups.";
-      };
-
-      home = mkOption {
-        type = types.str;
-        default = if config.isSystemUser then "/var/empty" else "/home/${config.name}";
-        description = "The user's home directory.";
-      };
-
-      createHome = mkOption {
-        type = types.bool;
-        default = !config.isSystemUser;
-        description = "Whether to create the home directory if it doesn't exist.";
-      };
-
-      shell = mkOption {
-        type = types.str;
-        default = "/run/current-system/sw/bin/bash";
-        description = "The user's login shell.";
-      };
-
-      description = mkOption {
-        type = types.str;
-        default = "";
-        description = "A short description of the user (GECOS field).";
-      };
-
-      isSystemUser = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether the user is a system user.";
-      };
-
-      isNormalUser = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether the user is a normal user (not a system user).";
-      };
-
-      hashedPassword = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        description = "The user's hashed password. Use mkpasswd to generate.";
-      };
-
-      initialPassword = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        description = ''
-          The user's initial password (plaintext). Only used if hashedPassword is null.
-          WARNING: This is stored in the Nix store, which is world-readable.
-        '';
-      };
-
-      openssh.authorizedKeys.keys = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "SSH public keys for the user.";
+      config = {
+        name = mkDefault name;
+        isNormalUser = mkDefault (!config.isSystemUser);
+        # Normal users should default to "users" group, not "nogroup"
+        group = mkIf config.isNormalUser (mkDefault "users");
       };
     };
-
-    config = {
-      name = mkDefault name;
-      isNormalUser = mkDefault (!config.isSystemUser);
-      # Normal users should default to "users" group, not "nogroup"
-      group = mkIf config.isNormalUser (mkDefault "users");
-    };
-  };
 
   # Group type definition
-  groupOpts = {
-    name,
-    config,
-    ...
-  }:
-  {
-    options = {
-      name = mkOption {
-        type = types.str;
-        description = "The name of the group. If undefined, the name of the attribute set will be used.";
+  groupOpts =
+    {
+      name,
+      config,
+      ...
+    }:
+    {
+      options = {
+        name = mkOption {
+          type = types.str;
+          description = "The name of the group. If undefined, the name of the attribute set will be used.";
+        };
+
+        gid = mkOption {
+          type = types.nullOr types.int;
+          default = null;
+          description = "The group ID. If null, an ID will be assigned automatically.";
+        };
+
+        members = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "The group members.";
+        };
       };
 
-      gid = mkOption {
-        type = types.nullOr types.int;
-        default = null;
-        description = "The group ID. If null, an ID will be assigned automatically.";
-      };
-
-      members = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "The group members.";
+      config = {
+        name = mkDefault name;
       };
     };
-
-    config = {
-      name = mkDefault name;
-    };
-  };
 
   # Get all users as a list
   users = attrValues cfg.users;
@@ -167,22 +169,71 @@ let
 
   # System groups (predefined)
   systemGroups = [
-    { name = "root"; gid = 0; }
-    { name = "wheel"; gid = 1; members = [ ]; }
-    { name = "kmem"; gid = 2; }
-    { name = "tty"; gid = 3; }
-    { name = "messagebus"; gid = 4; }
-    { name = "systemd-journal"; gid = 5; }
-    { name = "disk"; gid = 6; }
-    { name = "audio"; gid = 7; }
-    { name = "video"; gid = 8; }
-    { name = "lp"; gid = 9; }
-    { name = "uucp"; gid = 10; }
-    { name = "cdrom"; gid = 11; }
-    { name = "tape"; gid = 12; }
-    { name = "dialout"; gid = 13; }
-    { name = "users"; gid = 100; }
-    { name = "nogroup"; gid = 65534; }
+    {
+      name = "root";
+      gid = 0;
+    }
+    {
+      name = "wheel";
+      gid = 1;
+      members = [ ];
+    }
+    {
+      name = "kmem";
+      gid = 2;
+    }
+    {
+      name = "tty";
+      gid = 3;
+    }
+    {
+      name = "messagebus";
+      gid = 4;
+    }
+    {
+      name = "systemd-journal";
+      gid = 5;
+    }
+    {
+      name = "disk";
+      gid = 6;
+    }
+    {
+      name = "audio";
+      gid = 7;
+    }
+    {
+      name = "video";
+      gid = 8;
+    }
+    {
+      name = "lp";
+      gid = 9;
+    }
+    {
+      name = "uucp";
+      gid = 10;
+    }
+    {
+      name = "cdrom";
+      gid = 11;
+    }
+    {
+      name = "tape";
+      gid = 12;
+    }
+    {
+      name = "dialout";
+      gid = 13;
+    }
+    {
+      name = "users";
+      gid = 100;
+    }
+    {
+      name = "nogroup";
+      gid = 65534;
+    }
   ];
 
   # Merge system and user-defined users/groups
@@ -190,7 +241,8 @@ let
   allGroups = systemGroups ++ groups;
 
   # Generate passwd file
-  passwdContent = concatMapStringsSep "\n" (user:
+  passwdContent = concatMapStringsSep "\n" (
+    user:
     let
       uid = if user.uid != null then toString user.uid else "1000";
       gid = toString (findFirst (g: g.name == user.group) { gid = 100; } allGroups).gid;
@@ -202,24 +254,23 @@ let
   ) allUsers;
 
   # Generate group file
-  groupContent = concatMapStringsSep "\n" (group:
+  groupContent = concatMapStringsSep "\n" (
+    group:
     let
       gid = if group.gid != null then toString group.gid else "1000";
       members = concatStringsSep "," (
-        group.members or [ ] ++ (
-          filter (m: m != "") (
-            map (user:
-              if elem group.name user.extraGroups or [ ] then user.name else ""
-            ) allUsers
-          )
-        )
+        group.members or [ ]
+        ++ (filter (m: m != "") (
+          map (user: if elem group.name user.extraGroups or [ ] then user.name else "") allUsers
+        ))
       );
     in
     "${group.name}:x:${gid}:${members}"
   ) allGroups;
 
   # Generate shadow file
-  shadowContent = concatMapStringsSep "\n" (user:
+  shadowContent = concatMapStringsSep "\n" (
+    user:
     let
       # Hash password if initialPassword is set
       hashedPass =
@@ -228,7 +279,7 @@ let
         else if user.initialPassword or null != null then
           # Use mkpasswd from whois package to hash password
           # For now, use a simple hash - in production, use proper hashing
-          user.initialPassword  # INSECURE: This should be hashed
+          user.initialPassword # INSECURE: This should be hashed
         else
           "!"; # Locked account
     in
@@ -236,7 +287,8 @@ let
   ) allUsers;
 
   # Generate home directory creation script
-  createHomeDirs = concatMapStringsSep "\n" (user:
+  createHomeDirs = concatMapStringsSep "\n" (
+    user:
     let
       uid = if user.uid != null then toString user.uid else "1000";
       gid = toString (findFirst (g: g.name == user.group) { gid = 100; } allGroups).gid;
@@ -251,7 +303,8 @@ let
   ) allUsers;
 
   # Generate SSH authorized_keys setup
-  setupSSHKeys = concatMapStringsSep "\n" (user:
+  setupSSHKeys = concatMapStringsSep "\n" (
+    user:
     let
       keys = user.openssh.authorizedKeys.keys or [ ];
       uid = if user.uid != null then toString user.uid else "1000";

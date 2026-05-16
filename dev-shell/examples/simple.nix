@@ -1,5 +1,7 @@
 # Simple development shell example with a single HTTP server service
-{ pkgs ? import ../../. { } }:
+{
+  pkgs ? import ../../. { },
+}:
 
 pkgs.mkDevShell {
   # Service configuration using ekaos modules
@@ -11,7 +13,13 @@ pkgs.mkDevShell {
 
         # Use Python's built-in HTTP server
         command = "${pkgs.python3}/bin/python3";
-        args = [ "-m" "http.server" "8080" "--bind" "127.0.0.1" ];
+        args = [
+          "-m"
+          "http.server"
+          "8080"
+          "--bind"
+          "127.0.0.1"
+        ];
 
         workingDirectory = toString ./.;
 

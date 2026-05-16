@@ -33,15 +33,16 @@ let
     root ALL=(ALL:ALL) ALL
 
     # Wheel group privileges
-    ${if cfg.wheelNeedsPassword then
-      "%wheel ALL=(ALL:ALL) ALL"
-    else
-      "%wheel ALL=(ALL:ALL) NOPASSWD: ALL"
+    ${
+      if cfg.wheelNeedsPassword then "%wheel ALL=(ALL:ALL) ALL" else "%wheel ALL=(ALL:ALL) NOPASSWD: ALL"
     }
 
     # User-specific rules
-    ${concatMapStringsSep "\n" (rule:
-      "${rule.users} ${rule.hosts}=(${rule.runAs}) ${if rule.nopasswd then "NOPASSWD: " else ""}${rule.commands}"
+    ${concatMapStringsSep "\n" (
+      rule:
+      "${rule.users} ${rule.hosts}=(${rule.runAs}) ${
+        if rule.nopasswd then "NOPASSWD: " else ""
+      }${rule.commands}"
     ) cfg.extraRules}
 
     # Extra configuration
@@ -114,7 +115,7 @@ in
 
       extraRules = mkOption {
         type = types.listOf ruleType;
-        default = [];
+        default = [ ];
         example = literalExpression ''
           [
             {

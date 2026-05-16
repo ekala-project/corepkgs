@@ -14,41 +14,44 @@ let
 
   # Filter to only include enabled services with command set
   enabledServices = filterAttrs (
-    name: service:
-      (service.enable or false) == true
-      && (service.command or null) != null
+    name: service: (service.enable or false) == true && (service.command or null) != null
   ) config.services;
 
   # Generate a systemd unit file for a service
-  mkSystemdUnit = name: serviceCfg:
+  mkSystemdUnit =
+    name: serviceCfg:
     let
       # Map restartPolicy to systemd Restart directive
-      restartValue = {
-        always = "always";
-        on-failure = "on-failure";
-        never = "no";
-      }.${serviceCfg.restartPolicy or "always"} or "always";
+      restartValue =
+        {
+          always = "always";
+          on-failure = "on-failure";
+          never = "no";
+        }
+        .${serviceCfg.restartPolicy or "always"} or "always";
 
       # Build command with args
-      execStart = if (serviceCfg.args or []) == []
-                  then serviceCfg.command
-                  else "${serviceCfg.command} ${concatStringsSep " " serviceCfg.args}";
+      execStart =
+        if (serviceCfg.args or [ ]) == [ ] then
+          serviceCfg.command
+        else
+          "${serviceCfg.command} ${concatStringsSep " " serviceCfg.args}";
 
       # Environment variables
-      envVars = mapAttrsToList (k: v: "Environment=\"${k}=${v}\"") (serviceCfg.environment or {});
+      envVars = mapAttrsToList (k: v: "Environment=\"${k}=${v}\"") (serviceCfg.environment or { });
 
       # Systemd-specific options
-      systemdCfg = serviceCfg.systemd or {};
+      systemdCfg = serviceCfg.systemd or { };
 
       # Dependencies
-      after = systemdCfg.after or [];
-      wants = systemdCfg.wants or [];
-      requires = systemdCfg.requires or [];
-      before = systemdCfg.before or [];
+      after = systemdCfg.after or [ ];
+      wants = systemdCfg.wants or [ ];
+      requires = systemdCfg.requires or [ ];
+      before = systemdCfg.before or [ ];
       wantedBy = systemdCfg.wantedBy or [ "multi-user.target" ];
 
       # Service config overrides
-      serviceConfig = systemdCfg.serviceConfig or {};
+      serviceConfig = systemdCfg.serviceConfig or { };
 
     in
     pkgs.writeTextFile {
@@ -64,13 +67,21 @@ let
         [Service]
         Type=${serviceConfig.Type or "simple"}
         ExecStart=${execStart}
-        ${optionalString ((serviceCfg.preStart or "") != "") "ExecStartPre=${pkgs.writeShellScript "${name}-prestart" serviceCfg.preStart}"}
-        ${optionalString ((serviceCfg.postStart or "") != "") "ExecStartPost=${pkgs.writeShellScript "${name}-poststart" serviceCfg.postStart}"}
-        ${optionalString ((serviceCfg.postStop or "") != "") "ExecStopPost=${pkgs.writeShellScript "${name}-poststop" serviceCfg.postStop}"}
+        ${optionalString (
+          (serviceCfg.preStart or "") != ""
+        ) "ExecStartPre=${pkgs.writeShellScript "${name}-prestart" serviceCfg.preStart}"}
+        ${optionalString (
+          (serviceCfg.postStart or "") != ""
+        ) "ExecStartPost=${pkgs.writeShellScript "${name}-poststart" serviceCfg.postStart}"}
+        ${optionalString (
+          (serviceCfg.postStop or "") != ""
+        ) "ExecStopPost=${pkgs.writeShellScript "${name}-poststop" serviceCfg.postStop}"}
         Restart=${restartValue}
         ${optionalString (serviceCfg.user or null != null) "User=${serviceCfg.user}"}
         ${optionalString (serviceCfg.group or null != null) "Group=${serviceCfg.group}"}
-        ${optionalString (serviceCfg.workingDirectory or null != null) "WorkingDirectory=${serviceCfg.workingDirectory}"}
+        ${optionalString (
+          serviceCfg.workingDirectory or null != null
+        ) "WorkingDirectory=${serviceCfg.workingDirectory}"}
         ${concatStringsSep "\n" envVars}
         ${concatStringsSep "\n" (mapAttrsToList (k: v: "${k}=${toString v}") serviceConfig)}
 
@@ -149,22 +160,15 @@ in
 
         # Create symlinks for essential systemd targets
         {
-          "systemd/system/multi-user.target".source =
-            "${cfg.package}/lib/systemd/system/multi-user.target";
-          "systemd/system/sysinit.target".source =
-            "${cfg.package}/lib/systemd/system/sysinit.target";
+          "systemd/system/multi-user.target".source = "${cfg.package}/lib/systemd/system/multi-user.target";
+          "systemd/system/sysinit.target".source = "${cfg.package}/lib/systemd/system/sysinit.target";
           "systemd/system/basic.target".source = "${cfg.package}/lib/systemd/system/basic.target";
-          "systemd/system/sockets.target".source =
-            "${cfg.package}/lib/systemd/system/sockets.target";
-          "systemd/system/timers.target".source =
-            "${cfg.package}/lib/systemd/system/timers.target";
+          "systemd/system/sockets.target".source = "${cfg.package}/lib/systemd/system/sockets.target";
+          "systemd/system/timers.target".source = "${cfg.package}/lib/systemd/system/timers.target";
           "systemd/system/paths.target".source = "${cfg.package}/lib/systemd/system/paths.target";
-          "systemd/system/local-fs.target".source =
-            "${cfg.package}/lib/systemd/system/local-fs.target";
-          "systemd/system/remote-fs.target".source =
-            "${cfg.package}/lib/systemd/system/remote-fs.target";
-          "systemd/system/default.target".source =
-            "${cfg.package}/lib/systemd/system/${cfg.defaultTarget}";
+          "systemd/system/local-fs.target".source = "${cfg.package}/lib/systemd/system/local-fs.target";
+          "systemd/system/remote-fs.target".source = "${cfg.package}/lib/systemd/system/remote-fs.target";
+          "systemd/system/default.target".source = "${cfg.package}/lib/systemd/system/${cfg.defaultTarget}";
         }
       ];
 

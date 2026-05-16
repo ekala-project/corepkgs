@@ -41,7 +41,10 @@ in
     networking.nameservers = mkOption {
       type = types.listOf types.str;
       default = [ ];
-      example = [ "8.8.8.8" "8.8.4.4" ];
+      example = [
+        "8.8.8.8"
+        "8.8.4.4"
+      ];
       description = ''
         List of nameservers to use for DNS resolution.
 
@@ -52,7 +55,10 @@ in
     networking.search = mkOption {
       type = types.listOf types.str;
       default = [ ];
-      example = [ "example.com" "local" ];
+      example = [
+        "example.com"
+        "local"
+      ];
       description = ''
         List of search domains for DNS resolution.
       '';

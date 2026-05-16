@@ -27,8 +27,14 @@
         # Basic networking configuration
         networking.hostName = "testserver";
         networking.domain = "example.com";
-        networking.nameservers = [ "8.8.8.8" "8.8.4.4" ];
-        networking.search = [ "example.com" "local" ];
+        networking.nameservers = [
+          "8.8.8.8"
+          "8.8.4.4"
+        ];
+        networking.search = [
+          "example.com"
+          "local"
+        ];
         networking.extraHosts = ''
           192.168.1.100 server1.example.com server1
         '';

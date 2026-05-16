@@ -34,7 +34,10 @@
           home = "/home/alice";
           description = "Alice Test User";
           initialPassword = "testpass";
-          extraGroups = [ "wheel" "users" ];
+          extraGroups = [
+            "wheel"
+            "users"
+          ];
         };
 
         # Create another test user

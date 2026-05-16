@@ -1,8 +1,17 @@
-{ lib, pkgs, processCompose, processComposeConfig, tui, logDir, dataDir }:
+{
+  lib,
+  pkgs,
+  processCompose,
+  processComposeConfig,
+  tui,
+  logDir,
+  dataDir,
+}:
 
 let
   # Helper to create a utility script
-  mkUtility = name: description: script:
+  mkUtility =
+    name: description: script:
     pkgs.writeShellScriptBin name ''
       set -e
 

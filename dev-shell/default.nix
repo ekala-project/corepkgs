@@ -1,4 +1,8 @@
-{ lib, pkgs, stdenv }:
+{
+  lib,
+  pkgs,
+  stdenv,
+}:
 
 let
   # Import the process-compose translation layer
@@ -8,15 +12,20 @@ let
   serviceLib = import ../services/lib/service-module.nix { inherit lib pkgs; };
 
   # Simple mkShell implementation (Phase 1 - basic version)
-  mkShell = attrs: stdenv.mkDerivation ({
-    name = "dev-shell";
-    phases = [ "buildPhase" ];
-    buildPhase = ''
-      echo "This derivation is not meant to be built, only to be used with nix-shell"
-      touch $out
-    '';
-    shellHook = "";
-  } // attrs);
+  mkShell =
+    attrs:
+    stdenv.mkDerivation (
+      {
+        name = "dev-shell";
+        phases = [ "buildPhase" ];
+        buildPhase = ''
+          echo "This derivation is not meant to be built, only to be used with nix-shell"
+          touch $out
+        '';
+        shellHook = "";
+      }
+      // attrs
+    );
 
 in
 
@@ -51,7 +60,8 @@ in
           {
             options.services = serviceLib.mkServicesOption;
           }
-        ] ++ modules;
+        ]
+        ++ modules;
       };
 
       # Extract enabled services
@@ -87,10 +97,12 @@ in
         echo "================================================"
         echo "Development Shell with Services"
         echo "================================================"
-        ${lib.optionalString (enabledServices != {}) ''
+        ${lib.optionalString (enabledServices != { }) ''
           echo ""
           echo "Available services:"
-          ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: _: "  echo \"  - ${name}\"") enabledServices)}
+          ${lib.concatStringsSep "\n" (
+            lib.mapAttrsToList (name: _: "  echo \"  - ${name}\"") enabledServices
+          )}
           echo ""
           echo "Service management commands:"
           echo "  pc-up       - Start all services (with TUI)"
@@ -107,19 +119,19 @@ in
       '';
 
     in
-    mkShell (shellArgs // {
-      buildInputs = buildInputs
-        ++ packages
-        ++ [ processComposePackage ]
-        ++ (lib.attrValues utilities);
+    mkShell (
+      shellArgs
+      // {
+        buildInputs = buildInputs ++ packages ++ [ processComposePackage ] ++ (lib.attrValues utilities);
 
-      shellHook = enhancedShellHook;
+        shellHook = enhancedShellHook;
 
-      # Make process-compose config available as environment variable
-      PROCESS_COMPOSE_CONFIG = "${processComposeConfig}";
+        # Make process-compose config available as environment variable
+        PROCESS_COMPOSE_CONFIG = "${processComposeConfig}";
 
-      # Set data and log directories
-      DEV_DATA_DIR = processCompose.dataDir;
-      DEV_LOG_DIR = processCompose.logDir;
-    });
+        # Set data and log directories
+        DEV_DATA_DIR = processCompose.dataDir;
+        DEV_LOG_DIR = processCompose.logDir;
+      }
+    );
 }

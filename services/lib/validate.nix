@@ -126,7 +126,11 @@ let
         # User switching warnings (when not using platform with native support)
         ++
           optional
-            ((config.user or "root") != "root" && builder == "rcd" && (config.rcd.variant or "freebsd") != "openbsd")
+            (
+              (config.user or "root") != "root"
+              && builder == "rcd"
+              && (config.rcd.variant or "freebsd") != "openbsd"
+            )
             (
               mkWarning "User switching on ${builder} (${
                 config.rcd.variant or "freebsd"

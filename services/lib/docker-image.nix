@@ -36,12 +36,10 @@ let
     serviceDirs:
     pkgs.runCommand "runit-services-root" { } ''
       mkdir -p $out/etc/sv
-      ${concatMapStringsSep "\n" (
-        svc: ''
-          cp -r ${svc.path} $out/etc/sv/${svc.name}
-          chmod -R u+w $out/etc/sv/${svc.name}
-        ''
-      ) serviceDirs}
+      ${concatMapStringsSep "\n" (svc: ''
+        cp -r ${svc.path} $out/etc/sv/${svc.name}
+        chmod -R u+w $out/etc/sv/${svc.name}
+      '') serviceDirs}
     '';
 
   # Generate the entrypoint script that sets up and runs runit
@@ -110,7 +108,8 @@ let
       uniqueGroups = lib.unique (map (spec: spec.group) userSpecs);
 
       # Find spec for a given user/group name
-      findSpec = name: builtins.head (builtins.filter (spec: spec.user == name || spec.group == name) userSpecs);
+      findSpec =
+        name: builtins.head (builtins.filter (spec: spec.user == name || spec.group == name) userSpecs);
 
       mkGroupLine =
         name:
@@ -197,35 +196,33 @@ in
         runitPackage
         pkgs.busybox # Provides /bin/sh and basic utilities
         serviceRoot
-      ] ++ extraContents;
+      ]
+      ++ extraContents;
 
       # Set up users, groups, and directory structure
-      fakeRootCommands =
-        ''
-          # Set up users and groups
-          ${if userSpecs != [ ] then mkUserCreationCommands userSpecs else "# No custom users needed"}
+      fakeRootCommands = ''
+        # Set up users and groups
+        ${if userSpecs != [ ] then mkUserCreationCommands userSpecs else "# No custom users needed"}
 
-          # Create standard directories
-          mkdir -p service var/log tmp
+        # Create standard directories
+        mkdir -p service var/log tmp
 
-          # Set permissions on log directory
-          chmod 1777 tmp
+        # Set permissions on log directory
+        chmod 1777 tmp
 
-          # Set ownership for user-specific log directories
-          ${concatMapStringsSep "\n" (spec: ''
-            if [ -d var/log/${spec.user} ]; then
-              chown -R ${
-                if spec.uid != null then toString spec.uid else "1000"
-              }:${
-                if spec.gid != null then toString spec.gid else "1000"
-              } var/log/${spec.user}
-            fi
-          '') userSpecs}
-        ''
-        + optionalString ((imageConfig.extraFakeRootCommands or "") != "") ''
-          # Extra fakeroot commands from imageConfig
-          ${imageConfig.extraFakeRootCommands}
-        '';
+        # Set ownership for user-specific log directories
+        ${concatMapStringsSep "\n" (spec: ''
+          if [ -d var/log/${spec.user} ]; then
+            chown -R ${if spec.uid != null then toString spec.uid else "1000"}:${
+              if spec.gid != null then toString spec.gid else "1000"
+            } var/log/${spec.user}
+          fi
+        '') userSpecs}
+      ''
+      + optionalString ((imageConfig.extraFakeRootCommands or "") != "") ''
+        # Extra fakeroot commands from imageConfig
+        ${imageConfig.extraFakeRootCommands}
+      '';
 
       # Docker image configuration
       config = lib.recursiveUpdate {

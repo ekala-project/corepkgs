@@ -21,14 +21,17 @@ let
       ''
         mkdir -p $out/etc
 
-        ${concatMapStringsSep "\n" (file:
+        ${concatMapStringsSep "\n" (
+          file:
           let
             # If text is provided but source is not, create a source file
-            source = if file.source != null
-                     then file.source
-                     else if file.text != null
-                     then pkgs.writeText file.target file.text
-                     else null;
+            source =
+              if file.source != null then
+                file.source
+              else if file.text != null then
+                pkgs.writeText file.target file.text
+              else
+                null;
           in
           ''
             mkdir -p $out/etc/$(dirname ${escapeShellArg file.target})

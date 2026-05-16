@@ -14,45 +14,52 @@ let
 
   # Filter to only include enabled services with command set
   enabledServices = filterAttrs (
-    name: service:
-      (service.enable or false) == true
-      && (service.command or null) != null
+    name: service: (service.enable or false) == true && (service.command or null) != null
   ) config.services;
 
   # Generate a runit service directory for a service
-  mkRunitService = name: serviceCfg:
+  mkRunitService =
+    name: serviceCfg:
     let
       # Build command with args
-      execCommand = if (serviceCfg.args or []) == []
-                    then serviceCfg.command
-                    else "${serviceCfg.command} ${concatStringsSep " " serviceCfg.args}";
+      execCommand =
+        if (serviceCfg.args or [ ]) == [ ] then
+          serviceCfg.command
+        else
+          "${serviceCfg.command} ${concatStringsSep " " serviceCfg.args}";
 
       # Environment setup
       envSetup = concatStringsSep "\n" (
-        mapAttrsToList (k: v: "export ${k}=\"${v}\"") (serviceCfg.environment or {})
+        mapAttrsToList (k: v: "export ${k}=\"${v}\"") (serviceCfg.environment or { })
       );
 
       # PATH setup
-      pathPackages = serviceCfg.path or [];
-      pathSetup = optionalString (pathPackages != []) ''
+      pathPackages = serviceCfg.path or [ ];
+      pathSetup = optionalString (pathPackages != [ ]) ''
         export PATH="${makeBinPath pathPackages}:$PATH"
       '';
 
       # User/group switching
-      userGroup = if (serviceCfg.user or null) != null
-                  then (if (serviceCfg.group or null) != null
-                        then "${serviceCfg.user}:${serviceCfg.group}"
-                        else serviceCfg.user)
-                  else null;
+      userGroup =
+        if (serviceCfg.user or null) != null then
+          (
+            if (serviceCfg.group or null) != null then
+              "${serviceCfg.user}:${serviceCfg.group}"
+            else
+              serviceCfg.user
+          )
+        else
+          null;
 
       chpstCmd = optionalString (userGroup != null) "${pkgs.runit}/bin/chpst -u ${userGroup} ";
 
       # Working directory
-      cdCmd = optionalString ((serviceCfg.workingDirectory or null) != null)
-        "cd ${serviceCfg.workingDirectory}";
+      cdCmd = optionalString (
+        (serviceCfg.workingDirectory or null) != null
+      ) "cd ${serviceCfg.workingDirectory}";
 
       # Runit-specific options
-      runitCfg = serviceCfg.runit or {};
+      runitCfg = serviceCfg.runit or { };
 
       # Run script
       runScript = pkgs.writeScript "${name}-run" ''
@@ -74,24 +81,28 @@ let
       '';
 
       # Finish script (for postStop hook)
-      finishScript = if (serviceCfg.postStop or "") != "" || (runitCfg.extraFinishScript or "") != ""
-                     then pkgs.writeScript "${name}-finish" ''
-                       #!/bin/sh
-                       # Finish script for ${name}
-                       # Arguments: $1 = exit code, $2 = exit signal (if killed by signal)
+      finishScript =
+        if (serviceCfg.postStop or "") != "" || (runitCfg.extraFinishScript or "") != "" then
+          pkgs.writeScript "${name}-finish" ''
+            #!/bin/sh
+            # Finish script for ${name}
+            # Arguments: $1 = exit code, $2 = exit signal (if killed by signal)
 
-                       ${serviceCfg.postStop or ""}
-                       ${runitCfg.extraFinishScript or ""}
-                     ''
-                     else null;
+            ${serviceCfg.postStop or ""}
+            ${runitCfg.extraFinishScript or ""}
+          ''
+        else
+          null;
 
       # Log script (optional)
-      logScript = if (runitCfg.logScript or null) != null
-                  then pkgs.writeScript "${name}-log" runitCfg.logScript
-                  else null;
+      logScript =
+        if (runitCfg.logScript or null) != null then
+          pkgs.writeScript "${name}-log" runitCfg.logScript
+        else
+          null;
 
     in
-    pkgs.runCommand "${name}-runit-service" {} ''
+    pkgs.runCommand "${name}-runit-service" { } ''
       mkdir -p $out
 
       # Create run script
@@ -113,11 +124,11 @@ let
 
       # Create check script if defined
       ${optionalString ((runitCfg.extraConfig.checkScript or "") != "") ''
-        cat > $out/check <<'EOF'
-#!/bin/sh
-${runitCfg.extraConfig.checkScript}
-EOF
-        chmod +x $out/check
+                cat > $out/check <<'EOF'
+        #!/bin/sh
+        ${runitCfg.extraConfig.checkScript}
+        EOF
+                chmod +x $out/check
       ''}
     '';
 

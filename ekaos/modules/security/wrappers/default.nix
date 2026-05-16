@@ -20,20 +20,22 @@ let
       inherit sourceProg;
 
       # Extract unsecvars.h from glibc source for environment variable filtering
-      unsecvars = pkgs.runCommand "glibc-unsecvars"
-        {
-          src = pkgs.glibc.src or (builtins.fetchTarball {
-            url = "https://ftp.gnu.org/gnu/glibc/glibc-2.40.tar.xz";
-            sha256 = "0jv1n66jlvf6xvc0bxhz7pxk3s9dqsf3xnkxx4p4xj4gna8jx2mg";
-          });
-        }
-        ''
-          mkdir $out
-          tar -xf $src --strip-components=1 -C . glibc-*/sysdeps/generic/unsecvars.h 2>/dev/null || \
-          tar -xf $src --wildcards -C . '*/sysdeps/generic/unsecvars.h' --strip-components=3 || \
-          echo '/* Fallback: empty unsecvars */\n#define UNSECURE_ENVVARS ""' > unsecvars.h
-          cp unsecvars.h $out/ || cp ./sysdeps/generic/unsecvars.h $out/
-        '';
+      unsecvars =
+        pkgs.runCommand "glibc-unsecvars"
+          {
+            src =
+              pkgs.glibc.src or (builtins.fetchTarball {
+                url = "https://ftp.gnu.org/gnu/glibc/glibc-2.40.tar.xz";
+                sha256 = "0jv1n66jlvf6xvc0bxhz7pxk3s9dqsf3xnkxx4p4xj4gna8jx2mg";
+              });
+          }
+          ''
+            mkdir $out
+            tar -xf $src --strip-components=1 -C . glibc-*/sysdeps/generic/unsecvars.h 2>/dev/null || \
+            tar -xf $src --wildcards -C . '*/sysdeps/generic/unsecvars.h' --strip-components=3 || \
+            echo '/* Fallback: empty unsecvars */\n#define UNSECURE_ENVVARS ""' > unsecvars.h
+            cp unsecvars.h $out/ || cp ./sysdeps/generic/unsecvars.h $out/
+          '';
     };
 
   fileModeType =
@@ -154,27 +156,33 @@ let
 
   # Helper to resolve user/group names to numeric IDs
   # This is needed because during disk image build, the user database isn't available
-  resolveUid = user:
-    if user == "root" then "0"
-    else if config.users.users ? ${user} && config.users.users.${user}.uid != null
-    then toString config.users.users.${user}.uid
-    else user;
+  resolveUid =
+    user:
+    if user == "root" then
+      "0"
+    else if config.users.users ? ${user} && config.users.users.${user}.uid != null then
+      toString config.users.users.${user}.uid
+    else
+      user;
 
-  resolveGid = group:
-    if group == "root" then "0"
-    else if config.users.groups ? ${group} && config.users.groups.${group}.gid != null
-    then toString config.users.groups.${group}.gid
-    else group;
+  resolveGid =
+    group:
+    if group == "root" then
+      "0"
+    else if config.users.groups ? ${group} && config.users.groups.${group}.gid != null then
+      toString config.users.groups.${group}.gid
+    else
+      group;
 
   mkWrappedPrograms = map (
     opts:
-      let
-        optsWithIds = opts // {
-          owner = resolveUid opts.owner;
-          group = resolveGid opts.group;
-        };
-      in
-      if opts.capabilities != "" then mkSetcapProgram optsWithIds else mkSetuidProgram optsWithIds
+    let
+      optsWithIds = opts // {
+        owner = resolveUid opts.owner;
+        group = resolveGid opts.group;
+      };
+    in
+    if opts.capabilities != "" then mkSetcapProgram optsWithIds else mkSetuidProgram optsWithIds
   ) (lib.attrValues wrappers);
 in
 {
@@ -233,7 +241,10 @@ in
 
     # Create wrappers during system activation
     system.activationScripts.wrappers = {
-      deps = [ "etc" "users" ];
+      deps = [
+        "etc"
+        "users"
+      ];
       text = ''
         echo "Setting up security wrappers..."
 
