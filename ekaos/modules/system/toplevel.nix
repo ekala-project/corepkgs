@@ -135,15 +135,18 @@ let
 
   # Helper function to create service manager variants
   # Each variant uses extendModules to enable a specific service manager
-  mkServiceManagerVariant = name:
+  mkServiceManagerVariant =
+    name:
     (extendModules {
-      modules = [{
-        # Enable only the selected service manager, disable all others
-        serviceManager.systemd.enable = mkForce (name == "systemd");
-        serviceManager.runit.enable = mkForce (name == "runit");
-        serviceManager.launchd.enable = mkForce (name == "launchd");
-        serviceManager.rcd.enable = mkForce (name == "rcd");
-      }];
+      modules = [
+        {
+          # Enable only the selected service manager, disable all others
+          serviceManager.systemd.enable = mkForce (name == "systemd");
+          serviceManager.runit.enable = mkForce (name == "runit");
+          serviceManager.launchd.enable = mkForce (name == "launchd");
+          serviceManager.rcd.enable = mkForce (name == "rcd");
+        }
+      ];
     }).config.system.build.toplevel;
 
 in
@@ -249,7 +252,7 @@ in
 
     system.extraDependencies = mkOption {
       type = types.listOf types.package;
-      default = [];
+      default = [ ];
       description = ''
         Extra build-time dependencies for the system.
         These packages will be referenced by the system derivation to ensure

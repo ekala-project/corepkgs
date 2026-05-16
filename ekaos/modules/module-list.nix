@@ -28,7 +28,7 @@
   ./services/networking/sshd.nix
 
   # Service management
-  ./services.nix  # Cross-platform service definitions
+  ./services.nix # Cross-platform service definitions
   # Service manager implementations (opt-in via enable options)
   ./service-managers/systemd.nix
   ./service-managers/runit.nix
@@ -36,8 +36,8 @@
   ./service-managers/rcd.nix
 
   # Miscellaneous
-  ./misc/assertions.nix  # Assertion checking
-  ./misc/defaults.nix  # System defaults (including default service manager)
+  ./misc/assertions.nix # Assertion checking
+  ./misc/defaults.nix # System defaults (including default service manager)
 
   # Virtualisation
   ./virtualisation/qemu-vm.nix

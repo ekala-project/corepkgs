@@ -63,7 +63,8 @@ let
           {
             options.services = serviceModule.mkServicesOption;
           }
-        ] ++ modules;
+        ]
+        ++ modules;
       };
 
       # Extract evaluated services
@@ -118,13 +119,12 @@ let
       # Required for Darwin localhost networking
       __darwinAllowLocalNetworking = true;
 
-      nativeBuildInputs =
-        [
-          runitTestHook
-          runitTestDriver
-          pkgs.python3
-        ]
-        ++ allDeps;
+      nativeBuildInputs = [
+        runitTestHook
+        runitTestDriver
+        pkgs.python3
+      ]
+      ++ allDeps;
 
       dontUnpack = true;
       dontBuild = true;
@@ -143,17 +143,17 @@ let
 
       # Run the test script (Python)
       checkPhase = ''
-        runHook preCheck
+                runHook preCheck
 
-        # Write Python test script to file
-        cat > /build/test-script.py <<'PYTHON_TEST_SCRIPT'
-${testScript}
-PYTHON_TEST_SCRIPT
+                # Write Python test script to file
+                cat > /build/test-script.py <<'PYTHON_TEST_SCRIPT'
+        ${testScript}
+        PYTHON_TEST_SCRIPT
 
-        # Run Python test driver
-        python3 -m runit_test_driver --testscript /build/test-script.py
+                # Run Python test driver
+                python3 -m runit_test_driver --testscript /build/test-script.py
 
-        runHook postCheck
+                runHook postCheck
       '';
 
       # postCheck hook (includes runitTestStop from hook)

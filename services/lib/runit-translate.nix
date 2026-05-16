@@ -17,11 +17,7 @@ let
       mapAttrsToList (
         name: value:
         let
-          val =
-            if lib.isPath value then
-              toString value
-            else
-              value;
+          val = if lib.isPath value then toString value else value;
         in
         "export ${name}=${escapeShellArg (toString val)}"
       ) env
@@ -29,8 +25,7 @@ let
 
   # Generate PATH from package list
   mkPathExport =
-    packages:
-    if packages != [ ] then "export PATH=${lib.makeBinPath packages}:$PATH" else "";
+    packages: if packages != [ ] then "export PATH=${lib.makeBinPath packages}:$PATH" else "";
 
   # Generate command line with args
   mkCommandLine =
@@ -109,15 +104,15 @@ let
       postStop = config.postStop or ":";
       extraFinish = cfg.extraFinishScript or ":";
     in
-      pkgs.writeScript "${name}-finish" ''
-        #!/bin/sh
-        # Arguments: $1 = exit code, $2 = signal number
+    pkgs.writeScript "${name}-finish" ''
+      #!/bin/sh
+      # Arguments: $1 = exit code, $2 = signal number
 
-        # postStop hook
-        ${postStop}
+      # postStop hook
+      ${postStop}
 
-        ${extraFinish}
-      '';
+      ${extraFinish}
+    '';
 
   # Generate optional check script
   mkCheckScript =

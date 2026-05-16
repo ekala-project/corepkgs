@@ -1,58 +1,81 @@
 { lib, pkgs }:
 
 let
-  inherit (lib) concatStringsSep escapeShellArg optionalString mapAttrsToList;
+  inherit (lib)
+    concatStringsSep
+    escapeShellArg
+    optionalString
+    mapAttrsToList
+    ;
 
   # Translate restart policy from ekaos to process-compose
-  translateRestartPolicy = policy:
-    if policy == "always" then "always"
-    else if policy == "on-failure" then "on_failure"
-    else if policy == "never" then "no"
-    else "on_failure"; # default
+  translateRestartPolicy =
+    policy:
+    if policy == "always" then
+      "always"
+    else if policy == "on-failure" then
+      "on_failure"
+    else if policy == "never" then
+      "no"
+    else
+      "on_failure"; # default
 
   # Build the command string with lifecycle hooks
-  buildCommand = serviceName: config:
+  buildCommand =
+    serviceName: config:
     let
       # Base command with arguments
-      baseCommand = if config.args != [] then
-        "${config.command} ${concatStringsSep " " (map escapeShellArg config.args)}"
-      else
-        config.command;
+      baseCommand =
+        if config.args != [ ] then
+          "${config.command} ${concatStringsSep " " (map escapeShellArg config.args)}"
+        else
+          config.command;
 
       # Combine preStart hook with main command
-      fullCommand = if config.preStart != "" then ''
-        #!/bin/sh
-        set -e
-        # preStart hook for ${serviceName}
-        ${config.preStart}
+      fullCommand =
+        if config.preStart != "" then
+          ''
+            #!/bin/sh
+            set -e
+            # preStart hook for ${serviceName}
+            ${config.preStart}
 
-        # Main service command
-        exec ${baseCommand}
-      '' else ''
-        #!/bin/sh
-        exec ${baseCommand}
-      '';
+            # Main service command
+            exec ${baseCommand}
+          ''
+        else
+          ''
+            #!/bin/sh
+            exec ${baseCommand}
+          '';
     in
-      fullCommand;
+    fullCommand;
 
   # Convert service configuration to process-compose process entry
-  serviceToProcess = serviceName: config:
+  serviceToProcess =
+    serviceName: config:
     let
       # Build environment section
-      envSection = if config.environment != {} then
-        lib.mapAttrs (name: value: toString value) config.environment
-      else {};
+      envSection =
+        if config.environment != { } then
+          lib.mapAttrs (name: value: toString value) config.environment
+        else
+          { };
 
       # Build depends_on section
-      after = config.after or [];
-      dependsSection = if after != [] then
-        lib.listToAttrs (map (dep: {
-          name = dep;
-          value = {
-            condition = "process_started";
-          };
-        }) after)
-      else {};
+      after = config.after or [ ];
+      dependsSection =
+        if after != [ ] then
+          lib.listToAttrs (
+            map (dep: {
+              name = dep;
+              value = {
+                condition = "process_started";
+              };
+            }) after
+          )
+        else
+          { };
 
       # Build the process entry with all fields
       baseEntry = {
@@ -61,25 +84,26 @@ let
       };
 
       # Add optional fields
-      withWorkingDir = if config.workingDirectory != null then
-        baseEntry // { working_dir = config.workingDirectory; }
-      else
-        baseEntry;
+      withWorkingDir =
+        if config.workingDirectory != null then
+          baseEntry // { working_dir = config.workingDirectory; }
+        else
+          baseEntry;
 
-      withEnvironment = if envSection != {} then
-        withWorkingDir // { environment = envSection; }
-      else
-        withWorkingDir;
+      withEnvironment =
+        if envSection != { } then withWorkingDir // { environment = envSection; } else withWorkingDir;
 
-      processEntry = if dependsSection != {} then
-        withEnvironment // { depends_on = dependsSection; }
-      else
-        withEnvironment;
+      processEntry =
+        if dependsSection != { } then
+          withEnvironment // { depends_on = dependsSection; }
+        else
+          withEnvironment;
     in
-      processEntry;
+    processEntry;
 
   # Generate process-compose YAML from service configurations
-  servicesToProcessCompose = services:
+  servicesToProcessCompose =
+    services:
     let
       # Filter enabled services
       enabledServices = lib.filterAttrs (name: cfg: cfg.enable) services;
@@ -99,24 +123,27 @@ let
         processes = processes;
       };
     in
-      config;
+    config;
 
   # Convert Nix attribute set to YAML string
   # This is a simplified YAML generator for our use case
-  toYAML = attrs:
+  toYAML =
+    attrs:
     let
       indent = level: lib.concatStrings (lib.genList (_: "  ") level);
 
-      escapeString = str:
+      escapeString =
+        str:
         if lib.hasInfix "\n" str then
           # Multi-line string
           "|\n" + lib.concatMapStringsSep "\n" (line: "  ${line}") (lib.splitString "\n" str)
         else if lib.hasInfix "\"" str || lib.hasInfix ":" str then
-          "\"${lib.replaceStrings ["\"" "\\"] ["\\\"" "\\\\"] str}\""
+          "\"${lib.replaceStrings [ "\"" "\\" ] [ "\\\"" "\\\\" ] str}\""
         else
           str;
 
-      toYAMLValue = level: value:
+      toYAMLValue =
+        level: value:
         if builtins.isAttrs value then
           toYAMLAttrs level value
         else if builtins.isList value then
@@ -130,42 +157,41 @@ let
         else
           toString value;
 
-      toYAMLAttrs = level: attrs:
+      toYAMLAttrs =
+        level: attrs:
         let
-          entries = lib.mapAttrsToList (name: value:
-            "${indent level}${name}: ${toYAMLValue (level + 1) value}"
+          entries = lib.mapAttrsToList (
+            name: value: "${indent level}${name}: ${toYAMLValue (level + 1) value}"
           ) attrs;
         in
-          if level == 0 then
-            lib.concatStringsSep "\n" entries
-          else
-            "\n" + lib.concatStringsSep "\n" entries;
+        if level == 0 then lib.concatStringsSep "\n" entries else "\n" + lib.concatStringsSep "\n" entries;
 
-      toYAMLList = level: list:
+      toYAMLList =
+        level: list:
         let
-          entries = map (value:
-            "${indent level}- ${toYAMLValue (level + 1) value}"
-          ) list;
+          entries = map (value: "${indent level}- ${toYAMLValue (level + 1) value}") list;
         in
-          "\n" + lib.concatStringsSep "\n" entries;
+        "\n" + lib.concatStringsSep "\n" entries;
     in
-      toYAMLValue 0 attrs;
+    toYAMLValue 0 attrs;
 
   # Build a process-compose configuration file
-  buildProcessComposeConfig = services:
+  buildProcessComposeConfig =
+    services:
     let
       config = servicesToProcessCompose services;
       yamlContent = toYAML config;
     in
-      pkgs.writeTextFile {
-        name = "process-compose.yaml";
-        text = yamlContent;
-      };
+    pkgs.writeTextFile {
+      name = "process-compose.yaml";
+      text = yamlContent;
+    };
 
 in
 {
   inherit
     servicesToProcessCompose
     buildProcessComposeConfig
-    toYAML;
+    toYAML
+    ;
 }

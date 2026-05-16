@@ -19,21 +19,22 @@ let
   '';
 
   # Build a simple Docker image for testing
-  testImage = services.buildRunitDockerImage
-    {
-      test-service = {
-        enable = true;
-        description = "Test service";
-        command = "${testApp}/bin/test-app";
-        user = "testuser";
-        group = "testgroup";
+  testImage =
+    services.buildRunitDockerImage
+      {
+        test-service = {
+          enable = true;
+          description = "Test service";
+          command = "${testApp}/bin/test-app";
+          user = "testuser";
+          group = "testgroup";
+        };
+      }
+      {
+        name = "runit-test-image";
+        tag = "test";
+        exposedPorts = [ "8080/tcp" ];
       };
-    }
-    {
-      name = "runit-test-image";
-      tag = "test";
-      exposedPorts = [ "8080/tcp" ];
-    };
 
 in
 pkgs.runCommand "docker-image-build-test"

@@ -19,8 +19,9 @@ let
 
     # Listening
     Port ${toString cfg.settings.ports}
-    ${optionalString (cfg.settings.listenAddresses != [])
-      (concatMapStringsSep "\n" (addr: "ListenAddress ${addr}") cfg.settings.listenAddresses)}
+    ${optionalString (cfg.settings.listenAddresses != [ ]) (
+      concatMapStringsSep "\n" (addr: "ListenAddress ${addr}") cfg.settings.listenAddresses
+    )}
 
     # Host keys
     ${concatMapStringsSep "\n" (key: "HostKey ${key}") cfg.settings.hostKeys}
@@ -84,7 +85,7 @@ in
       args = mkOption {
         type = types.listOf types.str;
         internal = true;
-        default = [];
+        default = [ ];
         description = "Command arguments (set automatically)";
       };
 
@@ -102,7 +103,7 @@ in
 
       systemd = mkOption {
         type = types.attrsOf types.anything;
-        default = {};
+        default = { };
         description = "Systemd-specific options";
       };
 
@@ -119,8 +120,11 @@ in
 
             listenAddresses = mkOption {
               type = types.listOf types.str;
-              default = [];
-              example = [ "0.0.0.0" "[::]" ];
+              default = [ ];
+              example = [
+                "0.0.0.0"
+                "[::]"
+              ];
               description = ''
                 List of addresses for sshd to listen on.
 
@@ -129,7 +133,12 @@ in
             };
 
             permitRootLogin = mkOption {
-              type = types.enum [ "yes" "no" "prohibit-password" "forced-commands-only" ];
+              type = types.enum [
+                "yes"
+                "no"
+                "prohibit-password"
+                "forced-commands-only"
+              ];
               default = "prohibit-password";
               description = ''
                 Whether root can login via SSH.
@@ -160,7 +169,17 @@ in
             };
 
             logLevel = mkOption {
-              type = types.enum [ "QUIET" "FATAL" "ERROR" "INFO" "VERBOSE" "DEBUG" "DEBUG1" "DEBUG2" "DEBUG3" ];
+              type = types.enum [
+                "QUIET"
+                "FATAL"
+                "ERROR"
+                "INFO"
+                "VERBOSE"
+                "DEBUG"
+                "DEBUG1"
+                "DEBUG2"
+                "DEBUG3"
+              ];
               default = "INFO";
               description = ''
                 Logging verbosity level.
@@ -192,7 +211,7 @@ in
             };
           };
         };
-        default = {};
+        default = { };
         description = "OpenSSH-specific configuration";
       };
     };
@@ -202,7 +221,11 @@ in
     # Define the openssh service using cross-platform interface
     services.openssh = {
       command = "${pkgs.openssh}/bin/sshd";
-      args = [ "-D" "-f" "${sshdConfig}" ];
+      args = [
+        "-D"
+        "-f"
+        "${sshdConfig}"
+      ];
       user = "root";
       restartPolicy = "always";
 
@@ -264,13 +287,20 @@ in
       chmod 711 /var/empty
 
       # Generate host keys if they don't exist
-      ${concatMapStringsSep "\n" (keyPath:
+      ${concatMapStringsSep "\n" (
+        keyPath:
         let
-          keyType = if hasSuffix "_rsa_key" keyPath then "rsa"
-                    else if hasSuffix "_ed25519_key" keyPath then "ed25519"
-                    else if hasSuffix "_ecdsa_key" keyPath then "ecdsa"
-                    else "rsa";
-        in ''
+          keyType =
+            if hasSuffix "_rsa_key" keyPath then
+              "rsa"
+            else if hasSuffix "_ed25519_key" keyPath then
+              "ed25519"
+            else if hasSuffix "_ecdsa_key" keyPath then
+              "ecdsa"
+            else
+              "rsa";
+        in
+        ''
           if [ ! -f "${keyPath}" ]; then
             echo "Generating SSH ${keyType} host key..."
             # Set USER and HOME to work around NSS issues during disk image builds

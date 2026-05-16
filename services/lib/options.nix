@@ -137,7 +137,10 @@ in
     after = mkOption {
       type = types.listOf types.str;
       default = [ ];
-      example = [ "database" "cache" ];
+      example = [
+        "database"
+        "cache"
+      ];
       description = ''
         List of services that must start before this service.
         This creates an ordering dependency.

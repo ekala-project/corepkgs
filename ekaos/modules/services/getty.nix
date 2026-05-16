@@ -83,9 +83,11 @@ in
     environment.etc = mkMerge [
       # Create getty service units for each tty
       (listToAttrs (
-        map (ttyNumber: let
-          ttyName = "tty${toString ttyNumber}";
-        in
+        map (
+          ttyNumber:
+          let
+            ttyName = "tty${toString ttyNumber}";
+          in
           nameValuePair "systemd/system/getty@${ttyName}.service" {
             text = mkGettyUnit ttyName;
           }
@@ -94,9 +96,11 @@ in
 
       # Create symlinks in wants directory to auto-start gettys
       (listToAttrs (
-        map (ttyNumber: let
-          ttyName = "tty${toString ttyNumber}";
-        in
+        map (
+          ttyNumber:
+          let
+            ttyName = "tty${toString ttyNumber}";
+          in
           nameValuePair "systemd/system/multi-user.target.wants/getty@${ttyName}.service" {
             source = "/dev/null"; # Placeholder - will be created by activation script
           }
@@ -117,12 +121,16 @@ in
     system.activationScripts.getty = stringAfter [ "etc" ] ''
       # Create getty service symlinks for multi-user.target
       mkdir -p /etc/systemd/system/multi-user.target.wants
-      ${concatMapStringsSep "\n" (ttyNumber: let
-        ttyName = "tty${toString ttyNumber}";
-      in ''
-        ln -sf ../getty@${ttyName}.service \
-               /etc/systemd/system/multi-user.target.wants/getty@${ttyName}.service
-      '') (range 1 cfg.ttyCount)}
+      ${concatMapStringsSep "\n" (
+        ttyNumber:
+        let
+          ttyName = "tty${toString ttyNumber}";
+        in
+        ''
+          ln -sf ../getty@${ttyName}.service \
+                 /etc/systemd/system/multi-user.target.wants/getty@${ttyName}.service
+        ''
+      ) (range 1 cfg.ttyCount)}
     '';
   };
 }

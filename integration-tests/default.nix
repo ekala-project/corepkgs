@@ -10,7 +10,9 @@
 #
 # Future test frameworks can be added here as they are developed.
 
-{ pkgs ? import ../. { } }:
+{
+  pkgs ? import ../. { },
+}:
 
 rec {
   # Runit service tests

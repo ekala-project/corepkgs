@@ -74,7 +74,7 @@ in
 
               args = mkOption {
                 type = types.listOf types.str;
-                default = [];
+                default = [ ];
                 internal = true;
               };
 
@@ -85,14 +85,14 @@ in
 
               systemd = mkOption {
                 type = types.attrsOf types.anything;
-                default = {};
+                default = { };
               };
             };
 
             config = mkIf cfg.enable {
               services.sqlite-logger = {
                 command = "${sqliteLogger}";
-                args = [];
+                args = [ ];
                 systemd = {
                   after = [ "local-fs.target" ];
                   wantedBy = [ "multi-user.target" ];

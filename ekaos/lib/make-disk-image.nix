@@ -732,16 +732,22 @@ let
                 mkdir -p "$(dirname ${device})"
                 ln -s /dev/vda ${device}
               ''
-            ) (config.boot.loader.grub.devices or [])
+            ) (config.boot.loader.grub.devices or [ ])
           )}
           ${
             let
               limine = config.boot.loader.limine or { };
             in
-            lib.optionalString ((limine.enable or false) && (limine.biosSupport or false) && (limine.biosDevice or "/dev/vda") != "/dev/vda") ''
-              mkdir -p "$(dirname ${limine.biosDevice})"
-              ln -s /dev/vda ${limine.biosDevice}
-            ''
+            lib.optionalString
+              (
+                (limine.enable or false)
+                && (limine.biosSupport or false)
+                && (limine.biosDevice or "/dev/vda") != "/dev/vda"
+              )
+              ''
+                mkdir -p "$(dirname ${limine.biosDevice})"
+                ln -s /dev/vda ${limine.biosDevice}
+              ''
           }
 
           # Set up core system link, bootloader (sd-boot, GRUB, uboot, etc.), etc.

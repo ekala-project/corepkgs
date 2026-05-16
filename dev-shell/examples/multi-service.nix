@@ -1,6 +1,8 @@
 # Multi-service development shell example
 # Demonstrates service dependencies and inter-service communication
-{ pkgs ? import ../../. { } }:
+{
+  pkgs ? import ../../. { },
+}:
 
 pkgs.mkDevShell {
   # Service configuration using ekaos modules
@@ -12,7 +14,13 @@ pkgs.mkDevShell {
         description = "Backend API Server";
 
         command = "${pkgs.python3}/bin/python3";
-        args = [ "-m" "http.server" "8081" "--bind" "127.0.0.1" ];
+        args = [
+          "-m"
+          "http.server"
+          "8081"
+          "--bind"
+          "127.0.0.1"
+        ];
 
         workingDirectory = toString ./.;
 
@@ -36,7 +44,13 @@ pkgs.mkDevShell {
         description = "Frontend HTTP Server";
 
         command = "${pkgs.python3}/bin/python3";
-        args = [ "-m" "http.server" "8080" "--bind" "127.0.0.1" ];
+        args = [
+          "-m"
+          "http.server"
+          "8080"
+          "--bind"
+          "127.0.0.1"
+        ];
 
         workingDirectory = toString ./.;
 
@@ -52,26 +66,26 @@ pkgs.mkDevShell {
         after = [ "backend" ];
 
         preStart = ''
-          echo "Starting frontend on http://127.0.0.1:8080"
-          echo "Backend URL: $BACKEND_URL"
-          mkdir -p ./frontend-data
-          cat > ./frontend-data/index.html <<EOF
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Multi-Service Dev Shell</title>
-</head>
-<body>
-    <h1>Multi-Service Example</h1>
-    <p>Frontend running on port 8080</p>
-    <p>Backend API on port 8081</p>
-    <ul>
-        <li><a href="http://127.0.0.1:8080">Frontend</a></li>
-        <li><a href="http://127.0.0.1:8081">Backend API</a></li>
-    </ul>
-</body>
-</html>
-EOF
+                    echo "Starting frontend on http://127.0.0.1:8080"
+                    echo "Backend URL: $BACKEND_URL"
+                    mkdir -p ./frontend-data
+                    cat > ./frontend-data/index.html <<EOF
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Multi-Service Dev Shell</title>
+          </head>
+          <body>
+              <h1>Multi-Service Example</h1>
+              <p>Frontend running on port 8080</p>
+              <p>Backend API on port 8081</p>
+              <ul>
+                  <li><a href="http://127.0.0.1:8080">Frontend</a></li>
+                  <li><a href="http://127.0.0.1:8081">Backend API</a></li>
+              </ul>
+          </body>
+          </html>
+          EOF
         '';
       };
 

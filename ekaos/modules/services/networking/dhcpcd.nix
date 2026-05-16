@@ -86,7 +86,7 @@ in
       args = mkOption {
         type = types.listOf types.str;
         internal = true;
-        default = [];
+        default = [ ];
         description = "Command arguments (set automatically)";
       };
 
@@ -104,7 +104,7 @@ in
 
       systemd = mkOption {
         type = types.attrsOf types.anything;
-        default = {};
+        default = { };
         description = "Systemd-specific options";
       };
 
@@ -137,7 +137,7 @@ in
             };
           };
         };
-        default = {};
+        default = { };
         description = "dhcpcd-specific configuration";
       };
     };
@@ -147,7 +147,11 @@ in
     # Define the dhcpcd service using cross-platform interface
     services.dhcpcd = {
       command = "${pkgs.dhcpcd}/bin/dhcpcd";
-      args = [ "--config" "${dhcpcdConf}" "--nobackground" ];
+      args = [
+        "--config"
+        "${dhcpcdConf}"
+        "--nobackground"
+      ];
       user = "root";
       restartPolicy = "always";
 

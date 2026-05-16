@@ -13,44 +13,46 @@ let
   cfg = config.security.pam;
 
   # PAM service type definition
-  pamServiceOpts = {
-    name,
-    config,
-    ...
-  }:
-  {
-    options = {
-      name = mkOption {
-        type = types.str;
-        description = "Name of the PAM service.";
+  pamServiceOpts =
+    {
+      name,
+      config,
+      ...
+    }:
+    {
+      options = {
+        name = mkOption {
+          type = types.str;
+          description = "Name of the PAM service.";
+        };
+
+        text = mkOption {
+          type = types.nullOr types.lines;
+          default = null;
+          description = "PAM service configuration as text. If null, a default config will be generated.";
+        };
+
+        unixAuth = mkOption {
+          type = types.bool;
+          default = true;
+          description = "Whether to enable standard UNIX authentication (pam_unix.so).";
+        };
+
+        allowNullPassword = mkOption {
+          type = types.bool;
+          default = false;
+          description = "Whether to allow null (empty) passwords.";
+        };
       };
 
-      text = mkOption {
-        type = types.nullOr types.lines;
-        default = null;
-        description = "PAM service configuration as text. If null, a default config will be generated.";
-      };
-
-      unixAuth = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Whether to enable standard UNIX authentication (pam_unix.so).";
-      };
-
-      allowNullPassword = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to allow null (empty) passwords.";
+      config = {
+        name = mkDefault name;
       };
     };
-
-    config = {
-      name = mkDefault name;
-    };
-  };
 
   # Generate PAM service file content
-  mkPamService = service:
+  mkPamService =
+    service:
     if service.text != null then
       service.text
     else
