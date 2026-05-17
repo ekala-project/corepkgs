@@ -17,6 +17,7 @@
   freetype ? null,
   xorg ? { },
   zlib,
+  callPackage,
 }:
 
 let
@@ -134,8 +135,14 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   passthru = {
-    home = "$out";
+    home = placeholder "out";
     javaVersion = majorVersion;
+    buildMavenPackage = callPackage ./build-maven-package.nix {
+      jdk = finalAttrs.finalPackage;
+    };
+    buildGradlePackage = callPackage ./build-gradle-package.nix {
+      jdk = finalAttrs.finalPackage;
+    };
   };
 
   meta = {
