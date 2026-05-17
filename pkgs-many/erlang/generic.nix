@@ -178,7 +178,6 @@ stdenv.mkDerivation {
     '';
 
     platforms = lib.platforms.unix;
-    teams = [ lib.teams.beam ];
     license = lib.licenses.asl20;
   };
 }
