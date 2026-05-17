@@ -24,11 +24,8 @@ with final;
   qt5 = null;
   libsForQt5 = null;
   qt6 = null;
-  openjdk = null;
-  openjdk11 = null;
   haskellPackages = null;
   ocamlPackages = null;
-  phpExtensions = null;
 
   # Linux kernel packages (for ekaos and other system builders)
   # Use linux scope which is auto-called from pkgs/linux/default.nix
@@ -146,7 +143,6 @@ with final;
   libsysprof-capture = null;
   libverto = null;
   libvirt = null;
-  libzip = null;
   lilypond = null;
   lingua = null;
   lynx = null;
@@ -163,7 +159,7 @@ with final;
   neovim = null;
   netpbm = null;
   nmap = null;
-  nodejs = null;
+  nodejs_latest = nodejs.v23;
   ntp = null;
   nwdiag = null;
   objgraph = null;
@@ -175,7 +171,7 @@ with final;
   opensbi = null; # RISC-V
   ostinato = null;
   pango = null;
-  php = null;
+  # PHP - already declared above with Java
   pika = null;
   pinentry = null;
   po4a = null;
@@ -800,6 +796,10 @@ with final;
   buildGo124Module = callPackage ./build-support/go/module.nix {
     go = buildPackages.go_1_24;
   };
+
+  buildMavenPackage = java.buildMavenPackage;
+  buildGradlePackage = java.buildGradlePackage;
+  buildNpmPackage = nodejs.buildNpmPackage;
 
   # TODO(corepkgs): proper attrset of utilities
   gnome = { };
