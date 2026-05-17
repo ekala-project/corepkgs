@@ -39,6 +39,28 @@ rec {
   #   - service-management: Test systemd service lifecycle
   ekaos = pkgs.ekaosTests or { };
 
+  # Language system tests
+  #
+  # Basic smoke tests for all supported programming languages.
+  # Each test verifies the language interpreter/compiler can run
+  # a simple "Hello, World!" program.
+  #
+  # Available tests:
+  #   - java: OpenJDK compile and run test
+  #   - nodejs: Node.js runtime test
+  #   - php: PHP interpreter test
+  #   - julia: Julia runtime test
+  #   - r: R language test
+  #   - zig: Zig compiler test
+  #   - nim: Nim compiler test
+  #   - crystal: Crystal compiler test
+  #   - elixir: Elixir runtime test
+  #   - kotlin: Kotlin compiler test
+  #   - scala: Scala runtime test
+  #   - clojure: Clojure runtime test
+  #   - all: Meta-test running all language tests
+  languages = import ./languages { inherit pkgs; };
+
   # Placeholder for future test frameworks:
   #
   # systemd = ...;      # Systemd-specific integration tests
