@@ -100,6 +100,7 @@ mapAliases {
   luajit_openresty = lua.luajit_openresty;
   ncurses5 = ncurses.v5;
   ncurses6 = ncurses.v6;
+  nimble = nim;
   openssl_oqs = openssl.oqs;
   perl538 = perl.v5_38;
   perl540 = perl.v5_40;
