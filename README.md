@@ -45,6 +45,7 @@ pkgs/         # Subdirectories are automatically imported to pkgs
 python/       # Python related packaging
   pkgs/       # Directory for python package set, automatically imported
 perl/         # Perl related packaging (interpreter) and packages
+pkgs-many/    # Multi-version packages (java, nodejs, php, etc.)
 top-level.nix # Overlay for specifying overrides at `pkgs` scope
 default.nix   # Entry point for people to import
 ```
