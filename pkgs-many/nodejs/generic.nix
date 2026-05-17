@@ -19,6 +19,7 @@
   c-ares,
   brotli,
   pkg-config,
+  callPackage,
 }:
 
 let
@@ -87,6 +88,9 @@ stdenv.mkDerivation (finalAttrs: {
     inherit python3;
     majorVersion = majorVersion;
     minorVersion = minorVersion;
+    buildNpmPackage = callPackage ./build-npm-package.nix {
+      nodejs = finalAttrs.finalPackage;
+    };
   };
 
   meta = {
