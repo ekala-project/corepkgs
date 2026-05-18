@@ -728,6 +728,8 @@ with final;
     else
       null;
 
+  pnpmConfigHook = pnpmDeps.pnpmConfigHook;
+
   # TODO(corepkgs): This should be moved into unixtools
   procps = if stdenv.hostPlatform.isLinux then procps-ng else unixtools.procps;
 
