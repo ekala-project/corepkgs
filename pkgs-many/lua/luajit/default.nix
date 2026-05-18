@@ -115,7 +115,7 @@ stdenv.mkDerivation (finalAttrs: {
   postInstall = ''
     mkdir -p $out/nix-support
     cp ${
-      replaceVars ../lua-5/utils.sh {
+      replaceVars ../utils.sh {
         luapathsearchpaths = lib.escapeShellArgs finalAttrs.LuaPathSearchPaths;
         luacpathsearchpaths = lib.escapeShellArgs finalAttrs.LuaCPathSearchPaths;
       }
