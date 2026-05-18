@@ -224,6 +224,8 @@ with final;
   zmqpp = null;
   # keep-sorted end
 
+  yq = with python3Packages; toPythonApplication yq;
+
   # TODO(corepkgs): support darwin
   darwin = {
     autoSignDarwinBinariesHook = null;
