@@ -81,6 +81,7 @@ stdenv.mkDerivation (finalAttrs: {
 
     # Install npm in the same output
     # npm is bundled with Node.js source
+    patchShebangs --host ''${!outputBin}/bin
   '';
 
   passthru = {
