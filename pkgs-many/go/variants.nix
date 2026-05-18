@@ -8,8 +8,8 @@
   };
 
   v1_25 = {
-    version = "1.25.4";
-    src-hash = "sha256-FgBDt/F7bWC1A2lDaRf9qNUDRkC6Oa4kMca5WoicyYw=";
+    version = "1.25.10";
+    src-hash = "sha256-IM8EqS5a+ZdI40G8iZb6KAkMmsmHZfoRXsXd9B169B0=";
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
