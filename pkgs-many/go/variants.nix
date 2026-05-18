@@ -14,4 +14,14 @@
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
   };
+
+  v1_26 = {
+    version = "1.26.3";
+    src-hash = "sha256-HGRoddCqh5kTMYTtV895/yS97+jIggRwYCqdPW2Rkrg=";
+    bootstrap = ./bootstrap/bootstrap122.nix;
+    iana-patch = ./patches/1.25/iana-etc-1.25.patch;
+    buildGoModuleSuffix = "126";
+    bootstrapGo = buildPackages: buildPackages.go.v1_25;
+  };
+
 }
