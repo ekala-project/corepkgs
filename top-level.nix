@@ -183,7 +183,6 @@ with final;
   pygame-ce = null;
   quart = null;
   rich = null;
-  ripgrep = null;
   rocksdb = null;
   rsyslog = null;
   sage = null;
