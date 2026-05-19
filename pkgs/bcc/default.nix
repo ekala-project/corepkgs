@@ -135,13 +135,7 @@ python3Packages.buildPythonApplication rec {
     description = "Dynamic Tracing Tools for Linux";
     homepage = "https://iovisor.github.io/bcc/";
     license = lib.licenses.asl20;
-    maintainers = with lib.maintainers; [
-      ragge
-      mic92
-      thoughtpolice
-      martinetd
-      ryan4yin
-    ];
+    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 }
