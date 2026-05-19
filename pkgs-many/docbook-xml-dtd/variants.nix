@@ -1,44 +1,34 @@
 {
   v4_1_2 = rec {
     version = "4.1.2";
-    src-urls = [
-      "https://docbook.org/xml/${version}/docbkx412.zip"
-    ];
-    src-hash = "sha256-DgiKvTPoVolWAhW/oU94gZhF2SWijjSD0r4TnCKGtBg=";
+    src-url = "https://www.oasis-open.org/docbook/xml/4.1.2/docbkx412.zip";
+    src-hash = "sha256-MPBkQGTg6nF1FDglGUCxQx9GrK2oFKBihw9IbHcud3I=";
     # DocBook 4.1.2 doesn't come with an XML catalog. Use the one from 4.2.
-    docbook42catalog-url = "https://docbook.org/xml/4.2/catalog.xml";
-    docbook42catalog-hash = "sha256-GOL7W1KDzWGbN37DBTeCPqUhubPdQDoehnLKOaAaomI=";
+    docbook42catalog-url = "https://www.oasis-open.org/docbook/xml/4.2/catalog.xml";
+    docbook42catalog-hash = "sha256-J0g0JhEzZpuYlm0qU+lKmLc1oUbD5FKQHuUAKrC5kKI=";
   };
 
   v4_2 = rec {
     version = "4.2";
-    src-urls = [
-      "https://docbook.org/xml/${version}/docbook-xml-${version}.zip"
-    ];
-    src-hash = "sha256-rGU1nNPlAx56uu02ldz6Y28KgmpczjJZYPQQyie/HuE=";
+    src-url = "https://www.oasis-open.org/docbook/xml/${version}/docbook-xml-${version}.zip";
+    src-hash = "sha256-rMRgHk+XoZYHa35ks2jZJIsHx6vyazSgLMpA7uvmD6I=";
   };
 
   v4_3 = rec {
     version = "4.3";
-    src-urls = [
-      "https://docbook.org/xml/${version}/docbook-xml-${version}.zip"
-    ];
-    src-hash = "sha256-Dh0KI+WNuUVvVx0E1ilwti/scFz/YX7tC9L1YHHSCn8=";
+    src-url = "https://www.oasis-open.org/docbook/xml/${version}/docbook-xml-${version}.zip";
+    src-hash = "sha256-IwaKlOpv1ISwBMWnPsNqZqpH6o8Na2LMFpWTH1wUNGQ=";
   };
 
   v4_4 = rec {
     version = "4.4";
-    src-urls = [
-      "https://docbook.org/xml/${version}/docbook-xml-${version}.zip"
-    ];
-    src-hash = "sha256-Er4kq7+BVeVPq4iSy0LRZ2z5PKyeRZCjNPSMlq9mRVI=";
+    src-url = "https://www.oasis-open.org/docbook/xml/${version}/docbook-xml-${version}.zip";
+    src-hash = "sha256-AvFZ64jEJU2V6DHFHBRLGGOyFtkJtf9FdDoc5vUnMJA=";
   };
 
   v4_5 = rec {
     version = "4.5";
-    src-urls = [
-      "https://docbook.org/xml/${version}/docbook-xml-${version}.zip"
-    ];
-    src-hash = "sha256-HpIeEZEjW3wBz5fcBMt3v1eCLS91OtUs8I62HGSfqJg=";
+    src-url = "https://www.oasis-open.org/docbook/xml/${version}/docbook-xml-${version}.zip";
+    src-hash = "sha256-Tk4DeiuDyYxslIGDkNS90/bhD27GLdeRiFlOJhkNx7Q=";
   };
 }

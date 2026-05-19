@@ -1,6 +1,6 @@
 {
   version,
-  src-urls,
+  src-url,
   src-hash,
   docbook42catalog-url ? null,
   docbook42catalog-hash ? null,
@@ -33,7 +33,7 @@ stdenv.mkDerivation {
   inherit version;
 
   src = fetchurl {
-    urls = src-urls;
+    url = src-url;
     hash = src-hash;
   };
 
