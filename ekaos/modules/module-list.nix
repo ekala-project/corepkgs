@@ -24,6 +24,8 @@
 
   # Service modules
   ./services/getty.nix
+  ./services/crond.nix
+  ./services/timesyncd.nix
   ./services/networking/dhcpcd.nix
   ./services/networking/sshd.nix
 
