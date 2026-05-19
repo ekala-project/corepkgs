@@ -115,7 +115,27 @@ let
 
 in
 
-{
+lib.extendMkDerivation {
+  constructDrv = stdenv.mkDerivation;
+
+  excludeDrvArgNames = [
+    "disabled"
+    "checkPhase"
+    "checkInputs"
+    "nativeCheckInputs"
+    "doCheck"
+    "doInstallCheck"
+    "pyproject"
+    "format"
+    "stdenv"
+    "dependencies"
+    "optional-dependencies"
+    "build-system"
+  ];
+
+  extendDrvArgs =
+    finalAttrs:
+    {
   # Build-time dependencies for the package
   nativeBuildInputs ? [ ],
 
@@ -195,12 +215,9 @@ in
 
   ...
 }@attrs:
-
-let
-  # Keep extra attributes from `attrs`, e.g., `patchPhase', etc.
-  self = stdenv.mkDerivation (
-    finalAttrs:
     let
+      # The attributes that stdenv.mkDerivation will actually use
+      # Keep extra attributes from `attrs`, e.g., `patchPhase', etc.
       getFinalPassthru =
         let
           pos = unsafeGetAttrPos "passthru" finalAttrs;
@@ -448,8 +465,7 @@ let
             "enabledTestPaths"
             "enabledTests"
           ] attrs
-        )
-  );
+        );
 
   # This derivation transformation function must be independent to `attrs`
   # for fixed-point arguments support in the future.
@@ -469,6 +485,4 @@ let
         };
     in
     drv: disablePythonPackage (toPythonModule drv);
-
-in
-transformDrv self
+}

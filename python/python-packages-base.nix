@@ -19,22 +19,20 @@ let
     lib.mirrorFunctionArgs f (
       origArgs:
       let
-        args = lib.fix (
-          lib.extends (_: previousAttrs: {
-            passthru = (previousAttrs.passthru or { }) // {
-              overridePythonAttrs = newArgs: makeOverridablePythonPackage f (overrideWith newArgs);
-            };
-          }) (_: origArgs)
-        );
-        result = f args;
-        overrideWith = newArgs: args // (if pkgs.lib.isFunction newArgs then newArgs args else newArgs);
+        result = f origArgs;
+        overrideWith =
+          newArgs:
+          if lib.isFunction newArgs then
+            origArgs // newArgs origArgs
+          else
+            origArgs // newArgs;
       in
-      if builtins.isAttrs result then
+      if lib.isAttrs result then
         result
-      else if builtins.isFunction result then
-        {
+        // {
           overridePythonAttrs = newArgs: makeOverridablePythonPackage f (overrideWith newArgs);
-          __functor = self: result;
+          overrideAttrs =
+            newArgs: makeOverridablePythonPackage (args: (f args).overrideAttrs newArgs) origArgs;
         }
       else
         result
@@ -42,7 +40,9 @@ let
     // {
       # Support overriding `f` itself, e.g. `buildPythonPackage.override { }`.
       # Ensure `makeOverridablePythonPackage` is applied to the result.
-      override = lib.mirrorFunctionArgs f.override (fdrv: makeOverridablePythonPackage (f.override fdrv));
+      override = lib.mirrorFunctionArgs f.override (
+        newArgs: makeOverridablePythonPackage (f.override newArgs)
+      );
     };
 
   overrideStdenvCompat =
