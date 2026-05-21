@@ -24,7 +24,7 @@ makeSetupHook {
 
   meta = {
     description = "Setup hook for running runit-supervised services during tests";
-    maintainers = with lib.maintainers; [ ];
+    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 } ./runit-test-hook.sh
