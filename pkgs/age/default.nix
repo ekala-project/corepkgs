@@ -41,7 +41,6 @@ buildGoModule (finalAttrs: {
     "TestScript/plugin"
   ];
 
-
   meta = {
     changelog = "https://github.com/FiloSottile/age/releases/tag/v${finalAttrs.version}";
     homepage = "https://age-encryption.org/";

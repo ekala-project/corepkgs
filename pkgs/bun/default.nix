@@ -96,24 +96,28 @@ stdenvNoCC.mkDerivation (finalAttrs: {
         hash = "sha256-lR7iruhV8IWVruxiJSJqKY0/6oOj3NZGXAnLzN9+hI8=";
       };
     };
-    updateScript = if common-updater-scripts != null then writeShellScript "update-bun" ''
-      set -o errexit
-      export PATH="${
-        lib.makeBinPath [
-          curl
-          jq
-          common-updater-scripts
-        ]
-      }"
-      NEW_VERSION=$(curl --silent https://api.github.com/repos/oven-sh/bun/releases/latest | jq '.tag_name | ltrimstr("bun-v")' --raw-output)
-      if [[ "${finalAttrs.version}" = "$NEW_VERSION" ]]; then
-          echo "The new version same as the old version."
-          exit 0
-      fi
-      for platform in ${lib.escapeShellArgs finalAttrs.meta.platforms}; do
-        update-source-version "bun" "$NEW_VERSION" --ignore-same-version --source-key="sources.$platform"
-      done
-    '' else null;
+    updateScript =
+      if common-updater-scripts != null then
+        writeShellScript "update-bun" ''
+          set -o errexit
+          export PATH="${
+            lib.makeBinPath [
+              curl
+              jq
+              common-updater-scripts
+            ]
+          }"
+          NEW_VERSION=$(curl --silent https://api.github.com/repos/oven-sh/bun/releases/latest | jq '.tag_name | ltrimstr("bun-v")' --raw-output)
+          if [[ "${finalAttrs.version}" = "$NEW_VERSION" ]]; then
+              echo "The new version same as the old version."
+              exit 0
+          fi
+          for platform in ${lib.escapeShellArgs finalAttrs.meta.platforms}; do
+            update-source-version "bun" "$NEW_VERSION" --ignore-same-version --source-key="sources.$platform"
+          done
+        ''
+      else
+        null;
   };
   meta = {
     homepage = "https://bun.sh";
