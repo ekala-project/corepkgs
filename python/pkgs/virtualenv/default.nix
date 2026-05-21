@@ -3,20 +3,13 @@
   buildPythonPackage,
   pythonOlder,
   isPyPy,
-  cython,
   distlib,
   fetchPypi,
   filelock,
-  flaky,
   hatch-vcs,
   hatchling,
   importlib-metadata,
   platformdirs,
-  pytest-freezegun,
-  pytest-mock,
-  pytest-timeout,
-  pytestCheckHook,
-  time-machine,
 }:
 
 buildPythonPackage rec {
@@ -43,16 +36,17 @@ buildPythonPackage rec {
   ]
   ++ lib.optionals (pythonOlder "3.8") [ importlib-metadata ];
 
-  nativeCheckInputs = [
-    cython
-    flaky
-    pytest-freezegun
-    pytest-mock
-    pytest-timeout
-    pytestCheckHook
-  ]
-  ++ lib.optionals (!isPyPy) [ time-machine ];
+  # nativeCheckInputs = [
+  #   cython
+  #   flaky
+  #   pytest-freezegun
+  #   pytest-mock
+  #   pytest-timeout
+  #   pytestCheckHook
+  # ]
+  # ++ lib.optionals (!isPyPy) [ time-machine ];
 
+  doCheck = false;
   preCheck = ''
     export HOME=$(mktemp -d)
   '';

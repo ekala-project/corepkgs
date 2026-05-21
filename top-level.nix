@@ -183,7 +183,6 @@ with final;
   pygame-ce = null;
   quart = null;
   rich = null;
-  ripgrep = null;
   rocksdb = null;
   rsyslog = null;
   sage = null;
@@ -223,6 +222,8 @@ with final;
   yara = null;
   zmqpp = null;
   # keep-sorted end
+
+  yq = with python3Packages; toPythonApplication yq;
 
   # TODO(corepkgs): support darwin
   darwin = {
@@ -727,6 +728,8 @@ with final;
     else
       null;
 
+  pnpmConfigHook = pnpmDeps.pnpmConfigHook;
+
   # TODO(corepkgs): This should be moved into unixtools
   procps = if stdenv.hostPlatform.isLinux then procps-ng else unixtools.procps;
 
@@ -790,6 +793,9 @@ with final;
 
   buildGoModule = buildGo125Module;
 
+  buildGo126Module = callPackage ./build-support/go/module.nix {
+    go = buildPackages.go.v1_26;
+  };
   buildGo125Module = callPackage ./build-support/go/module.nix {
     go = buildPackages.go_1_25;
   };

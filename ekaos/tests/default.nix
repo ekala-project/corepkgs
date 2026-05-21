@@ -25,4 +25,7 @@
 
   # Network and SSH test (Phase 2)
   network = pkgs.ekaosTest ./network.nix;
+
+  # Critical MVP packages test (nano, cronie, timesyncd)
+  critical-packages = pkgs.ekaosTest ./critical-packages.nix;
 }
