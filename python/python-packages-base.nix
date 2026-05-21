@@ -21,11 +21,7 @@ let
       let
         result = f origArgs;
         overrideWith =
-          newArgs:
-          if lib.isFunction newArgs then
-            origArgs // newArgs origArgs
-          else
-            origArgs // newArgs;
+          newArgs: if lib.isFunction newArgs then origArgs // newArgs origArgs else origArgs // newArgs;
       in
       if lib.isAttrs result then
         result
