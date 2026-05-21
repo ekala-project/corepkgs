@@ -120,7 +120,16 @@ in
       command = "${pkgs.cronie}/bin/crond";
       args = [
         "-n" # Run in foreground
-      ] ++ (if cfg.mailto == null then [ "-m" "off" ] else [ ]);
+      ]
+      ++ (
+        if cfg.mailto == null then
+          [
+            "-m"
+            "off"
+          ]
+        else
+          [ ]
+      );
 
       # Systemd-specific configuration
       systemd = {

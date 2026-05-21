@@ -31,7 +31,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
-    util-linux  # provides libuuid
+    util-linux # provides libuuid
     readline
     inih
     userspace-rcu
@@ -70,7 +70,14 @@ stdenv.mkDerivation (finalAttrs: {
     for binary in $out/sbin/*; do
       if [ -f "$binary" ] && [ -x "$binary" ]; then
         patchelf --shrink-rpath "$binary" || true
-        patchelf --set-rpath "$out/lib:${lib.makeLibraryPath [ readline userspace-rcu util-linux inih ]}" "$binary" || true
+        patchelf --set-rpath "$out/lib:${
+          lib.makeLibraryPath [
+            readline
+            userspace-rcu
+            util-linux
+            inih
+          ]
+        }" "$binary" || true
       fi
     done
   '';

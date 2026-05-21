@@ -59,11 +59,7 @@ let
           in
           if match1 != null then builtins.head match1 else null;
 
-        variantName =
-          if selectorLines != [ ] then
-            extractVariant (builtins.head selectorLines)
-          else
-            null;
+        variantName = if selectorLines != [ ] then extractVariant (builtins.head selectorLines) else null;
 
         # Load variants to verify the variant exists
         variants = import variantsNixPath;

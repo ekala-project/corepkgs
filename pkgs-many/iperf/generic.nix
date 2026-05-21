@@ -40,17 +40,18 @@ stdenv.mkDerivation (finalAttrs: {
   );
 
   configureFlags =
-    if isVersion2 then
-      [ "--enable-fastsampling" ]
-    else
-      [ "--with-openssl=${openssl.dev}" ];
+    if isVersion2 then [ "--enable-fastsampling" ] else [ "--with-openssl=${openssl.dev}" ];
 
-  outputs = if isVersion2 then [ "out" ] else [
-    "out"
-    "dev"
-    "lib"
-    "man"
-  ];
+  outputs =
+    if isVersion2 then
+      [ "out" ]
+    else
+      [
+        "out"
+        "dev"
+        "lib"
+        "man"
+      ];
 
   patches =
     if isVersion2 then
@@ -80,10 +81,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     homepage =
-      if isVersion2 then
-        "https://sourceforge.net/projects/iperf/"
-      else
-        "https://software.es.net/iperf/";
+      if isVersion2 then "https://sourceforge.net/projects/iperf/" else "https://software.es.net/iperf/";
     description = "Tool to measure IP bandwidth using UDP or TCP";
     platforms = lib.platforms.unix;
     license = if isVersion2 then lib.licenses.mit else lib.licenses.bsd3;

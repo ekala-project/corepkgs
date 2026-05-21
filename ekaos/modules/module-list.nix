@@ -26,6 +26,7 @@
   ./services/getty.nix
   ./services/crond.nix
   ./services/timesyncd.nix
+  ./services/journald.nix
   ./services/networking/dhcpcd.nix
   ./services/networking/sshd.nix
 

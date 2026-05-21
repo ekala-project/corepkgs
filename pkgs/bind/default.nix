@@ -48,7 +48,7 @@ stdenv.mkDerivation (finalAttrs: {
     "--without-gssapi"
     "--without-idn"
     "--disable-dnstap"
-    "--disable-doh"  # Disable DNS-over-HTTPS (requires libnghttp2)
+    "--disable-doh" # Disable DNS-over-HTTPS (requires libnghttp2)
     # Disable server components, we only want client tools
     "--disable-linux-caps"
   ];
