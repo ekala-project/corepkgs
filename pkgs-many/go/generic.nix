@@ -25,10 +25,8 @@
 }:
 
 let
-  goBootstrap = if bootstrapGo != null then
-    bootstrapGo buildPackages
-  else
-    buildPackages.callPackage bootstrap { };
+  goBootstrap =
+    if bootstrapGo != null then bootstrapGo buildPackages else buildPackages.callPackage bootstrap { };
 
   # We need a target compiler which is still runnable at build time,
   # to handle the cross-building case where build != host == target
@@ -75,9 +73,11 @@ stdenv.mkDerivation (finalAttrs: {
     })
     ./patches/common/remove-tools-1.11.patch
     ./patches/common/go-env-go_ldso.patch
-  ] ++ lib.optionals (packageOlder "1.26") [
+  ]
+  ++ lib.optionals (packageOlder "1.26") [
     ./patches/1.23/go_no_vendor_checks-1.23.patch
-  ] ++ lib.optionals (packageAtLeast "1.26") [
+  ]
+  ++ lib.optionals (packageAtLeast "1.26") [
     ./patches/go_no_vendor_checks-1.26.patch
   ];
 
