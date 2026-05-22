@@ -30,14 +30,14 @@
 let
   inherit (lib) optional optionals optionalString;
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "graphviz";
   version = "12.2.1";
 
   src = fetchFromGitLab {
     owner = "graphviz";
     repo = "graphviz";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-Uxqg/7+LpSGX4lGH12uRBxukVw0IswFPfpb2EkLsaiI=";
   };
 
@@ -90,6 +90,7 @@ stdenv.mkDerivation rec {
   '';
 
   passthru.tests = {
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
     inherit (python3.pkgs)
       graphviz
       pydot
@@ -109,4 +110,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.epl10;
     platforms = lib.platforms.unix;
   };
-}
+})

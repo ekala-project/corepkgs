@@ -22,12 +22,13 @@
 }@args:
 
 stdenv.mkDerivation (
+  finalAttrs:
   rec {
     pname = "db";
     inherit version;
 
     src = fetchurl {
-      url = "https://download.oracle.com/berkeley-db/db-${version}.tar.gz";
+      url = "https://download.oracle.com/berkeley-db/db-${finalAttrs.version}.tar.gz";
       sha256 = sha256;
     };
 
@@ -99,7 +100,9 @@ stdenv.mkDerivation (
 
     enableParallelBuilding = true;
 
-    doCheck = true;
+    doCheck = false;
+
+    passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
     checkPhase = ''
       make examples_c examples_cxx

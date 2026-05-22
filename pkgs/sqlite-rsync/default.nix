@@ -10,13 +10,13 @@ let
   archiveVersion = import ../sqlite/archive-version.nix lib;
 in
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "sqlite-rsync";
   version = "3.50.4";
 
   # nixpkgs-update: no auto update
   src = fetchurl {
-    url = "https://sqlite.org/2025/sqlite-src-${archiveVersion version}.zip";
+    url = "https://sqlite.org/2025/sqlite-src-${archiveVersion finalAttrs.version}.zip";
     hash = "sha256-t7TcBg82BTkC+2WzRLu+1ZLmSyKRomrAb+d+7Al4UOk=";
   };
 
@@ -27,6 +27,10 @@ stdenv.mkDerivation rec {
 
   installPhase = "install -Dt $out/bin sqlite3_rsync";
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = "Database remote-copy tool for SQLite";
     homepage = "https://www.sqlite.org/rsync.html";
@@ -35,4 +39,4 @@ stdenv.mkDerivation rec {
     mainProgram = "sqlite3_rsync";
     platforms = lib.platforms.unix;
   };
-}
+})

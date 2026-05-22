@@ -11,7 +11,7 @@ let
   rev = "b6754f574f8846eb842feba4ccbeeecb10bdfacc";
 in
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "mrustc";
   inherit version;
 
@@ -41,6 +41,10 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = "Mutabah's Rust Compiler";
     mainProgram = "mrustc";
@@ -53,4 +57,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.mit;
     platforms = [ "x86_64-linux" ];
   };
-}
+})

@@ -14,12 +14,12 @@
   vlc,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libssh2";
   version = "1.11.1";
 
   src = fetchurl {
-    url = "https://www.libssh2.org/download/libssh2-${version}.tar.gz";
+    url = "https://www.libssh2.org/download/libssh2-${finalAttrs.version}.tar.gz";
     hash = "sha256-2ex2y+NNuY7sNTn+LImdJrDIN8s+tGalaw8QnKv2WPc=";
   };
 
@@ -38,7 +38,10 @@ stdenv.mkDerivation rec {
   propagatedBuildInputs = [ openssl ]; # see Libs: in libssh2.pc
   buildInputs = [ zlib ] ++ lib.optional stdenv.hostPlatform.isMinGW windows.mingw_w64;
 
+  doCheck = false;
+
   passthru.tests = {
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
     inherit
       aria2
       libgit2
@@ -54,4 +57,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.all;
     license = with lib.licenses; [ bsd3 ];
   };
-}
+})

@@ -5,14 +5,14 @@
   openssl,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "meson-tools";
   version = "0.1";
 
   src = fetchFromGitHub {
     owner = "afaerber";
     repo = "meson-tools";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "1bvshfa9pa012yzdwapi3nalpgcwmfq7d3n3w3mlr357a6kq64qk";
   };
 
@@ -23,9 +23,13 @@ stdenv.mkDerivation rec {
     mv amlbootsig unamlbootsig amlinfo "$out/bin"
   '';
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     homepage = "https://github.com/afaerber/meson-tools";
     description = "Tools for Amlogic Meson ARM platforms";
     license = lib.licenses.gpl2Only;
   };
-}
+})

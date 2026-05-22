@@ -6,14 +6,14 @@
   cmake,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "doctest";
   version = "2.4.12";
 
   src = fetchFromGitHub {
     owner = "doctest";
     repo = "doctest";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-Fxs1EWydhqN9whx+Cn4fnZ4fhCEQvFgL5e9TUiXlnq8=";
   };
 
@@ -38,7 +38,9 @@ stdenv.mkDerivation rec {
     "-DDOCTEST_WITH_TESTS=OFF"
   ];
 
-  doCheck = true;
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   # Fix the build with LLVM 21 / GCC 15.
   #
@@ -58,4 +60,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.all;
     license = lib.licenses.mit;
   };
-}
+})

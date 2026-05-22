@@ -14,12 +14,12 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "gnutar";
   version = "1.35";
 
   src = fetchurl {
-    url = "mirror://gnu/tar/tar-${version}.tar.xz";
+    url = "mirror://gnu/tar/tar-${finalAttrs.version}.tar.xz";
     sha256 = "sha256-TWL/NzQux67XSFNTI5MMfPlKz3HDWRiCsmp+pQ8+3BY=";
   };
 
@@ -65,6 +65,8 @@ stdenv.mkDerivation rec {
   doCheck = false; # fails
   doInstallCheck = false; # fails
 
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = "GNU implementation of the `tar' archiver";
     longDescription = ''
@@ -87,4 +89,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.all;
     priority = 10;
   };
-}
+})

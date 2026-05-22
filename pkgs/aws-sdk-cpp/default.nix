@@ -32,7 +32,7 @@ let
       throw "Unknown host OS";
 in
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-sdk-cpp";
   # nixpkgs-update: no auto update
   version = "1.11.647";
@@ -40,7 +40,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "aws";
     repo = "aws-sdk-cpp";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-RJKR0xw3HTNItaLGyYCjibmfK3UBDA4hfAZzQ0xYg9U=";
   };
 
@@ -121,9 +121,12 @@ stdenv.mkDerivation rec {
 
   inherit requiredSystemFeatures;
 
+  doCheck = false;
+
   passthru = {
     tests = {
       inherit nix arrow-cpp;
+      unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
       cmake-find-package = stdenv.mkDerivation {
         pname = "aws-sdk-cpp-cmake-find-package-test";
         version = "0";
@@ -165,4 +168,4 @@ stdenv.mkDerivation rec {
     # building ec2 runs out of memory: cc1plus: out of memory allocating 33554372 bytes after a total of 74424320 bytes
     broken = stdenv.buildPlatform.is32bit && ((builtins.elem "ec2" apis) || (builtins.elem "*" apis));
   };
-}
+})

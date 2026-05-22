@@ -6,12 +6,12 @@
   autoreconfHook,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "patch";
   version = "2.8";
 
   src = fetchurl {
-    url = "mirror://gnu/patch/patch-${version}.tar.xz";
+    url = "mirror://gnu/patch/patch-${finalAttrs.version}.tar.xz";
     hash = "sha256-+Hzuae7CtPy/YKOWsDCtaqNBXxkqpffuhMrV4R9/WuM=";
   };
 
@@ -26,8 +26,12 @@ stdenv.mkDerivation rec {
     "ac_cv_func_strnlen_working=yes"
   ];
 
-  doCheck = stdenv.hostPlatform.libc != "musl"; # not cross;
+  doCheck = false;
   nativeCheckInputs = [ ed ];
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs {
+    doCheck = stdenv.hostPlatform.libc != "musl";
+  };
 
   meta = {
     description = "GNU Patch, a program to apply differences to files";
@@ -41,4 +45,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.all;
   };
-}
+})

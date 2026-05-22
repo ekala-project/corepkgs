@@ -8,12 +8,12 @@
   buildPackages,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "intltool";
   version = "0.51.0";
 
   src = fetchurl {
-    url = "https://launchpad.net/intltool/trunk/${version}/+download/${pname}-${version}.tar.gz";
+    url = "https://launchpad.net/intltool/trunk/${finalAttrs.version}/+download/${finalAttrs.pname}-${finalAttrs.version}.tar.gz";
     sha256 = "1karx4sb7bnm2j67q0q74hspkfn6lqprpy5r99vkn5bb36a4viv7";
   };
 
@@ -41,6 +41,10 @@ stdenv.mkDerivation rec {
     XMLParser
   ]);
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   postInstall = lib.optionalString (stdenv.hostPlatform != stdenv.buildPlatform) ''
     for f in $out/bin/*; do
       substituteInPlace $f --replace "${buildPackages.perl}" "${perlPackages.perl}"
@@ -52,4 +56,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix;
   };
-}
+})

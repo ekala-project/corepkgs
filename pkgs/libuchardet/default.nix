@@ -6,7 +6,7 @@
   cmake,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "uchardet";
   version = "0.0.8";
 
@@ -18,7 +18,7 @@ stdenv.mkDerivation rec {
   ];
 
   src = fetchurl {
-    url = "https://www.freedesktop.org/software/${pname}/releases/${pname}-${version}.tar.xz";
+    url = "https://www.freedesktop.org/software/${finalAttrs.pname}/releases/${finalAttrs.pname}-${finalAttrs.version}.tar.xz";
     sha256 = "sha256-6Xpgz8AKHBR6Z0sJe7FCKr2fp4otnOPz/cwueKNKxfA=";
   };
 
@@ -36,7 +36,11 @@ stdenv.mkDerivation rec {
     cmake.configurePhaseHook
   ];
 
-  doCheck = !stdenv.hostPlatform.isi686; # tests fail on i686
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs {
+    doCheck = !stdenv.hostPlatform.isi686;
+  };
 
   meta = {
     description = "Mozilla's Universal Charset Detector C/C++ API";
@@ -45,4 +49,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.mpl11;
     platforms = with lib.platforms; unix;
   };
-}
+})

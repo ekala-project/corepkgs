@@ -22,12 +22,12 @@
   coreutils,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "cups";
   version = "2.4.16";
 
   src = fetchurl {
-    url = "https://github.com/OpenPrinting/cups/releases/download/v${version}/cups-${version}-source.tar.gz";
+    url = "https://github.com/OpenPrinting/cups/releases/download/v${finalAttrs.version}/cups-${finalAttrs.version}-source.tar.gz";
     hash = "sha256-AzlYcgS0+UKN0FkuswHewL+epuqNzl2WkNVr5YWrqS0=";
   };
 
@@ -171,6 +171,10 @@ stdenv.mkDerivation rec {
       --replace-fail "Exec=htmlview" "Exec=xdg-open"
   '';
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     homepage = "https://openprinting.github.io/cups/";
     description = "Standards-based printing system for UNIX";
@@ -178,4 +182,4 @@ stdenv.mkDerivation rec {
     maintainers = [ ];
     platforms = lib.platforms.unix;
   };
-}
+})

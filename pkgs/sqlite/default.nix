@@ -25,18 +25,18 @@ let
   archiveVersion = import ./archive-version.nix lib;
 in
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "sqlite${lib.optionalString interactive "-interactive"}";
   version = "3.50.4";
 
   # nixpkgs-update: no auto update
   # NB! Make sure to update ./tools.nix src (in the same directory).
   src = fetchurl {
-    url = "https://sqlite.org/2025/sqlite-autoconf-${archiveVersion version}.tar.gz";
+    url = "https://sqlite.org/2025/sqlite-autoconf-${archiveVersion finalAttrs.version}.tar.gz";
     hash = "sha256-o9tYehuS7l3awvZrPttBsm+chnJ1eC1Gw6CIl31qWxg=";
   };
   docsrc = fetchurl {
-    url = "https://sqlite.org/2025/sqlite-doc-${archiveVersion version}.zip";
+    url = "https://sqlite.org/2025/sqlite-doc-${archiveVersion finalAttrs.version}.zip";
     hash = "sha256-+KA89GFQAxDHp4XJ1vhhIayUZWAZgs3Kxt4MWYfb/C8=";
   };
 
@@ -120,13 +120,14 @@ stdenv.mkDerivation rec {
   postInstall = ''
     mkdir -p $doc/share/doc
     unzip $docsrc
-    mv sqlite-doc-${archiveVersion version} $doc/share/doc/sqlite
+    mv sqlite-doc-${archiveVersion finalAttrs.version} $doc/share/doc/sqlite
   '';
 
   doCheck = false; # fails to link against tcl
 
   passthru = {
     tests = {
+      unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
       inherit (python3Packages) sqlalchemy;
       inherit
         sqldiff
@@ -145,7 +146,9 @@ stdenv.mkDerivation rec {
   };
 
   meta = {
-    changelog = "https://www.sqlite.org/releaselog/${lib.replaceStrings [ "." ] [ "_" ] version}.html";
+    changelog = "https://www.sqlite.org/releaselog/${
+      lib.replaceStrings [ "." ] [ "_" ] finalAttrs.version
+    }.html";
     description = "Self-contained, serverless, zero-configuration, transactional SQL database engine";
     downloadPage = "https://sqlite.org/download.html";
     homepage = "https://www.sqlite.org/";
@@ -154,4 +157,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix ++ lib.platforms.windows;
     pkgConfigModules = [ "sqlite3" ];
   };
-}
+})

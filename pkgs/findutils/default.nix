@@ -11,12 +11,12 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "findutils";
   version = "4.10.0";
 
   src = fetchurl {
-    url = "mirror://gnu/findutils/findutils-${version}.tar.xz";
+    url = "mirror://gnu/findutils/findutils-${finalAttrs.version}.tar.xz";
     sha256 = "sha256-E4fgtn/yR9Kr3pmPkN+/cMFJE5Glnd/suK5ph4nwpPU=";
   };
 
@@ -30,12 +30,7 @@ stdenv.mkDerivation rec {
   buildInputs = [ coreutils ]; # bin/updatedb script needs to call sort
 
   # Since glibc-2.25 the i686 tests hang reliably right after test-sleep.
-  doCheck =
-    !stdenv.hostPlatform.isDarwin
-    && !stdenv.hostPlatform.isFreeBSD
-    && !(stdenv.hostPlatform.libc == "glibc" && stdenv.hostPlatform.isi686)
-    && (stdenv.hostPlatform.libc != "musl")
-    && stdenv.hostPlatform == stdenv.buildPlatform;
+  doCheck = false;
 
   outputs = [
     "out"
@@ -68,6 +63,15 @@ stdenv.mkDerivation rec {
     moveToOutput share/man/man1/updatedb.1.gz $locate
   '';
 
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs {
+    doCheck =
+      !stdenv.hostPlatform.isDarwin
+      && !stdenv.hostPlatform.isFreeBSD
+      && !(stdenv.hostPlatform.libc == "glibc" && stdenv.hostPlatform.isi686)
+      && (stdenv.hostPlatform.libc != "musl")
+      && stdenv.hostPlatform == stdenv.buildPlatform;
+  };
+
   enableParallelBuilding = true;
 
   # bionic libc is super weird and has issues with fortify outside of its own libc, check this comment:
@@ -99,4 +103,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3Plus;
     mainProgram = "find";
   };
-}
+})

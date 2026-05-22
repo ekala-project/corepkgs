@@ -24,14 +24,14 @@
 let
   isFuse3 = packageBetween "3" "4";
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "fuse";
   inherit version;
 
   src = fetchFromGitHub {
     owner = "libfuse";
     repo = "libfuse";
-    rev = "${pname}-${version}";
+    rev = "${finalAttrs.pname}-${finalAttrs.version}";
     hash = src-hash;
   };
 
@@ -117,6 +117,8 @@ stdenv.mkDerivation rec {
   doCheck = false;
   doInstallCheck = true;
 
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   # Drop `/etc/fuse.conf` because it is a no-op config and
   # would conflict with our fuse module.
   postInstall = lib.optionalString isFuse3 ''
@@ -139,7 +141,7 @@ stdenv.mkDerivation rec {
       kernel module.
     '';
     homepage = "https://github.com/libfuse/libfuse";
-    changelog = "https://github.com/libfuse/libfuse/releases/tag/fuse-${version}";
+    changelog = "https://github.com/libfuse/libfuse/releases/tag/fuse-${finalAttrs.version}";
     platforms = lib.platforms.linux;
     license = with lib.licenses; [
       gpl2Only
@@ -148,4 +150,4 @@ stdenv.mkDerivation rec {
 
     outputsToInstall = [ "bin" ];
   };
-}
+})

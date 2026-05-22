@@ -13,14 +13,14 @@
   s2n-tls,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-c-auth";
   version = "0.9.1";
 
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-auth";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-8oQTTqBuEzhBUWqXHVYrGtaX44SmB2sJQZchiweHekM=";
   };
 
@@ -46,8 +46,11 @@ stdenv.mkDerivation rec {
     "-DBUILD_SHARED_LIBS=ON"
   ];
 
+  doCheck = false;
+
   passthru.tests = {
     inherit nix;
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
   };
 
   meta = {
@@ -56,4 +59,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
   };
-}
+})

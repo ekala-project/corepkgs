@@ -30,14 +30,14 @@ let
 
 in
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "shadow";
   version = "4.18.0";
 
   src = fetchFromGitHub {
     owner = "shadow-maint";
     repo = "shadow";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-M7We3JboNpr9H0ELbKcFtMvfmmVYaX9dYcsQ3sVX0lM=";
   };
 
@@ -123,8 +123,13 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
   };
 
+  doCheck = false;
+
   passthru = {
     shellPath = "/bin/nologin";
-    tests = { inherit (nixosTests) shadow; };
+    tests = {
+      unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+      inherit (nixosTests) shadow;
+    };
   };
-}
+})

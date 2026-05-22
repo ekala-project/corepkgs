@@ -13,13 +13,13 @@
   zstd,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "mtd-utils";
   version = "2.3.0";
 
   src = fetchgit {
     url = "git://git.infradead.org/mtd-utils.git";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-qQ8r0LBxwzdT9q9ILxKD1AfzLimaNHdc9BT3Rox1eXs=";
   };
 
@@ -27,7 +27,7 @@ stdenv.mkDerivation rec {
     autoreconfHook
     pkg-config
   ]
-  ++ lib.optional doCheck cmocka;
+  ++ lib.optional finalAttrs.doCheck cmocka;
   buildInputs = [
     acl
     libuuid
@@ -45,13 +45,13 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   configureFlags = [
-    (lib.enableFeature doCheck "unit-tests")
-    (lib.enableFeature doCheck "tests")
+    (lib.enableFeature finalAttrs.doCheck "unit-tests")
+    (lib.enableFeature finalAttrs.doCheck "tests")
   ];
 
   makeFlags = [ "AR:=$(AR)" ];
 
-  doCheck = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
+  doCheck = false;
 
   outputs = [
     "out"
@@ -64,6 +64,10 @@ stdenv.mkDerivation rec {
     mv include $dev/
   '';
 
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs {
+    doCheck = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
+  };
+
   meta = {
     description = "Tools for MTD filesystems";
     downloadPage = "https://git.infradead.org/mtd-utils.git";
@@ -72,4 +76,4 @@ stdenv.mkDerivation rec {
     maintainers = [ ];
     platforms = with lib.platforms; linux;
   };
-}
+})

@@ -9,14 +9,14 @@
   python3,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "vdo";
   version = "8.3.2.1";
 
   src = fetchFromGitHub {
     owner = "dm-vdo";
     repo = "vdo";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-y3u9f17jMV9dwhfJrsW/GOqszVNvPLDyETfku1t3Djo=";
   };
 
@@ -57,6 +57,10 @@ stdenv.mkDerivation rec {
     wrapPythonPrograms
   '';
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     homepage = "https://github.com/dm-vdo/vdo";
     description = "Set of userspace tools for managing pools of deduplicated and/or compressed block storage";
@@ -70,4 +74,4 @@ stdenv.mkDerivation rec {
     ];
     license = with lib.licenses; [ gpl2Plus ];
   };
-}
+})

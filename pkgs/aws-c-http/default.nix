@@ -11,7 +11,7 @@
   s2n-tls,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-c-http";
   # nixpkgs-update: no auto update
   version = "0.10.4";
@@ -19,7 +19,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-http";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-t9PoxOjgV9qLris+C18SaEwXodBGcgK591LZl0dajxU=";
   };
 
@@ -40,8 +40,11 @@ stdenv.mkDerivation rec {
     "-DBUILD_SHARED_LIBS=ON"
   ];
 
+  doCheck = false;
+
   passthru.tests = {
     inherit nix;
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
   };
 
   meta = {
@@ -50,4 +53,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
   };
-}
+})

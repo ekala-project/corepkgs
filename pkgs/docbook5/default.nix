@@ -5,12 +5,12 @@
   unzip,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "docbook5";
   version = "5.0.1";
 
   src = fetchurl {
-    url = "http://www.docbook.org/xml/${version}/docbook-${version}.zip";
+    url = "http://www.docbook.org/xml/${finalAttrs.version}/docbook-${finalAttrs.version}.zip";
     sha256 = "1iz3hq1lqgnshvlz4j9gvh4jy1ml74qf90vqf2ikbq0h4i2xzybs";
   };
 
@@ -31,9 +31,13 @@ stdenv.mkDerivation rec {
     ln -s $dst/dtd $out/xml/dtd/docbook
   '';
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = "Schemas for DocBook 5.0, a semantic markup language for technical documentation";
     homepage = "https://docbook.org/xml/5.0/";
     platforms = lib.platforms.all;
   };
-}
+})

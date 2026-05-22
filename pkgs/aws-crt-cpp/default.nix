@@ -17,7 +17,7 @@
   nix,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-crt-cpp";
   # nixpkgs-update: no auto update
   version = "0.34.3";
@@ -30,7 +30,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-crt-cpp";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-jKmIsWAzxnfsNgHavR6crhIQXVJq/PbQgaj4KVGrMP0=";
   };
 
@@ -69,8 +69,11 @@ stdenv.mkDerivation rec {
     moveToOutput lib/aws-crt-cpp/cmake "$dev"
   '';
 
+  doCheck = false;
+
   passthru.tests = {
     inherit nix;
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
   };
 
   meta = {
@@ -79,4 +82,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
   };
-}
+})

@@ -12,7 +12,7 @@
   s2n-tls,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-c-mqtt";
   # nixpkgs-update: no auto update
   version = "0.13.3";
@@ -20,7 +20,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-mqtt";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-Nf8c5iVl+NOPZFjsAPCMOGq2e7D8e7PafuMQh6t0DYw=";
   };
 
@@ -42,8 +42,11 @@ stdenv.mkDerivation rec {
     "-DBUILD_SHARED_LIBS=ON"
   ];
 
+  doCheck = false;
+
   passthru.tests = {
     inherit nix;
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
   };
 
   meta = {
@@ -52,4 +55,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
   };
-}
+})

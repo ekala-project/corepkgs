@@ -111,12 +111,13 @@ let
 
   # We need a recursive binding for self-reference in passthru
   self = stdenv.mkDerivation (
+    finalAttrs:
     rec {
       inherit version;
       pname = "perl";
 
       src = fetchurl {
-        url = "mirror://cpan/src/5.0/perl-${version}.tar.gz";
+        url = "mirror://cpan/src/5.0/perl-${finalAttrs.version}.tar.gz";
         inherit sha256;
       };
 
@@ -330,6 +331,9 @@ let
           perlOnHostForHost = override pkgsHostHost.${perlAttr};
           perlOnTargetForTarget =
             if lib.hasAttr perlAttr pkgsTargetTarget then (override pkgsTargetTarget.${perlAttr}) else { };
+        }
+        // {
+          tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
         };
 
       doCheck = false; # some tests fail, expensive
@@ -358,15 +362,15 @@ let
           --replace "$man" /no-such-path
       ''
       + lib.optionalString crossCompiling ''
-        mkdir -p $mini/lib/perl5/cross_perl/${version}
+        mkdir -p $mini/lib/perl5/cross_perl/${finalAttrs.version}
         for dir in cnf/{stub,cpan}; do
-          cp -r $dir/* $mini/lib/perl5/cross_perl/${version}
+          cp -r $dir/* $mini/lib/perl5/cross_perl/${finalAttrs.version}
         done
 
         mkdir -p $mini/bin
         install -m755 miniperl $mini/bin/perl
 
-        export runtimeArch="$(ls $out/lib/perl5/site_perl/${version})"
+        export runtimeArch="$(ls $out/lib/perl5/site_perl/${finalAttrs.version})"
         # wrapProgram should use a runtime-native SHELL by default, but
         # it actually uses a buildtime-native one. If we ever fix that,
         # we'll need to fix this to use a buildtime-native one.
@@ -375,9 +379,9 @@ let
         # miniperl can't load the native modules there. However, it can
         # (and sometimes needs to) load and run some of the pure perl
         # code there, so we add it anyway. When needed, stubs can be put
-        # into $mini/lib/perl5/cross_perl/${version}.
+        # into $mini/lib/perl5/cross_perl/${finalAttrs.version}.
         wrapProgram $mini/bin/perl --prefix PERL5LIB : \
-          "$mini/lib/perl5/cross_perl/${version}:$out/lib/perl5/${version}:$out/lib/perl5/${version}/$runtimeArch"
+          "$mini/lib/perl5/cross_perl/${finalAttrs.version}:$out/lib/perl5/${finalAttrs.version}:$out/lib/perl5/${finalAttrs.version}/$runtimeArch"
       ''; # */
 
       meta = {
@@ -411,7 +415,7 @@ let
       postUnpack = ''
         unpackFile ${perl-cross-src}
         chmod -R u+w ${perl-cross-src.name}
-        cp -R ${perl-cross-src.name}/* perl-${version}/
+        cp -R ${perl-cross-src.name}/* perl-${finalAttrs.version}/
       '';
 
       configurePlatforms = [

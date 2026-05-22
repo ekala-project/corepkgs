@@ -51,12 +51,12 @@ in
 
 assert pythonSupport -> python3 != null;
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = targetPrefix + basename + lib.optionalString hostCpuOnly "-host-cpu-only";
   version = "16.3";
 
   src = fetchurl {
-    url = "mirror://gnu/gdb/${basename}-${version}.tar.xz";
+    url = "mirror://gnu/gdb/${basename}-${finalAttrs.version}.tar.xz";
     hash = "sha256-vPzQlVKKmHkXrPn/8/FnIYFpSSbMGNYJyZ0AQsACJMU=";
   };
 
@@ -100,7 +100,7 @@ stdenv.mkDerivation rec {
     sourceHighlight
   ]
   ++ lib.optional pythonSupport python3
-  ++ lib.optional doCheck dejagnu
+  ++ lib.optional finalAttrs.doCheck dejagnu
   ++ lib.optional enableDebuginfod (elfutils.override { enableDebuginfod = true; })
   ++ lib.optional stdenv.hostPlatform.isDarwin libiconv;
 
@@ -185,6 +185,7 @@ stdenv.mkDerivation rec {
   doCheck = false;
 
   passthru = {
+    tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
     updateScript = writeScript "update-gdb" ''
       #!/usr/bin/env nix-shell
       #!nix-shell -i bash -p curl pcre common-updater-scripts
@@ -194,7 +195,7 @@ stdenv.mkDerivation rec {
       # Expect the text in format of '<h3>GDB version 12.1</h3>'
       new_version="$(curl -s https://www.sourceware.org/gdb/ |
           pcregrep -o1 '<h3>GDB version ([0-9.]+)</h3>')"
-      update-source-version ${pname} "$new_version"
+      update-source-version ${finalAttrs.pname} "$new_version"
     '';
   };
 
@@ -210,4 +211,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3Plus;
     platforms = with lib.platforms; linux ++ cygwin ++ freebsd ++ darwin;
   };
-}
+})

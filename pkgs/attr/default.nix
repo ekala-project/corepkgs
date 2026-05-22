@@ -10,12 +10,12 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "attr";
   version = "2.5.2";
 
   src = fetchurl {
-    url = "mirror://savannah/attr/attr-${version}.tar.gz";
+    url = "mirror://savannah/attr/attr-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-Ob9nRS+kHQlIwhl2AQU/SLPXigKTiXNDMqYwmmgMbIc=";
   };
 
@@ -37,6 +37,10 @@ stdenv.mkDerivation rec {
     done
   '';
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     homepage = "https://savannah.nongnu.org/projects/attr/";
     description = "Library and tools for manipulating extended attributes";
@@ -44,4 +48,4 @@ stdenv.mkDerivation rec {
     badPlatforms = lib.platforms.microblaze;
     license = lib.licenses.gpl2Plus;
   };
-}
+})

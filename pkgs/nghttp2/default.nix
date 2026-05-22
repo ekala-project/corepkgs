@@ -43,12 +43,12 @@ assert enableHpack -> enableApp;
 assert enableHttp3 -> enableApp;
 assert enableJemalloc -> enableApp;
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "nghttp2";
   version = "1.67.1";
 
   src = fetchurl {
-    url = "https://github.com/nghttp2/nghttp2/releases/download/v${version}/nghttp2-${version}.tar.bz2";
+    url = "https://github.com/nghttp2/nghttp2/releases/download/v${finalAttrs.version}/nghttp2-${finalAttrs.version}.tar.bz2";
     hash = "sha256-37cg1CQ6eVBYn6JjI3i+te6a1ELpS3lLO44soowdfio=";
   };
 
@@ -87,7 +87,7 @@ stdenv.mkDerivation rec {
   ];
 
   # Unit tests require CUnit and setting TZDIR environment variable
-  doCheck = enableTests;
+  doCheck = false;
   nativeCheckInputs = lib.optionals enableTests [
     cunit
     tzdata
@@ -114,6 +114,7 @@ stdenv.mkDerivation rec {
     '';
 
   passthru.tests = {
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = enableTests; };
     inherit curl libsoup_3;
   };
 
@@ -129,9 +130,9 @@ stdenv.mkDerivation rec {
       An experimental high level C++ library is also available.
     '';
     homepage = "https://nghttp2.org/";
-    changelog = "https://github.com/nghttp2/nghttp2/releases/tag/v${version}";
+    changelog = "https://github.com/nghttp2/nghttp2/releases/tag/v${finalAttrs.version}";
     # News articles with changes summary can be found here: https://nghttp2.org/blog/archives/
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
   };
-}
+})

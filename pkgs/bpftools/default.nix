@@ -15,7 +15,7 @@
   flex,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "bpftools";
 
   inherit (linuxHeaders) version src;
@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
   ];
   buildInputs =
     (
-      if (lib.versionAtLeast version "5.20") then
+      if (lib.versionAtLeast finalAttrs.version "5.20") then
         [
           libopcodes
           libbfd
@@ -78,6 +78,10 @@ stdenv.mkDerivation rec {
     install -Dm755 -t $out/bin bpf_dbg
   '';
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     homepage = "https://github.com/libbpf/bpftool";
     description = "Debugging/program analysis tools for the eBPF subsystem";
@@ -87,4 +91,4 @@ stdenv.mkDerivation rec {
     ];
     platforms = lib.platforms.linux;
   };
-}
+})

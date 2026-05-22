@@ -12,14 +12,14 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   version = "4.2.2";
   pname = "mpfr";
 
   src = fetchurl {
     urls = [
-      "https://www.mpfr.org/${pname}-${version}/${pname}-${version}.tar.xz"
-      "mirror://gnu/mpfr/${pname}-${version}.tar.xz"
+      "https://www.mpfr.org/${finalAttrs.pname}-${finalAttrs.version}/${finalAttrs.pname}-${finalAttrs.version}.tar.xz"
+      "mirror://gnu/mpfr/${finalAttrs.pname}-${finalAttrs.version}.tar.xz"
     ];
     hash = "sha256-tnugOD736KhWNzTi6InvXsPDuJigHQD6CmhprYHGzgE=";
   };
@@ -52,11 +52,12 @@ stdenv.mkDerivation rec {
       "--disable-decimal-float"
     ];
 
-  doCheck = true; # not cross;
+  doCheck = false;
 
   enableParallelBuilding = true;
 
   passthru = {
+    tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
     updateScript = writeScript "update-mpfr" ''
       #!/usr/bin/env nix-shell
       #!nix-shell -i bash -p curl pcre common-updater-scripts
@@ -66,7 +67,7 @@ stdenv.mkDerivation rec {
       # Expect the text in format of '<title>GNU MPFR version 4.1.1</title>'
       new_version="$(curl -s https://www.mpfr.org/mpfr-current/ |
           pcregrep -o1 '<title>GNU MPFR version ([0-9.]+)</title>')"
-      update-source-version ${pname} "$new_version"
+      update-source-version ${finalAttrs.pname} "$new_version"
     '';
   };
 
@@ -87,4 +88,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.lgpl2Plus;
     platforms = lib.platforms.all;
   };
-}
+})

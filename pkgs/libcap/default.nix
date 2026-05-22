@@ -27,12 +27,12 @@
 
 assert usePam -> pam != null;
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libcap";
   version = "2.77";
 
   src = fetchurl {
-    url = "mirror://kernel/linux/libs/security/linux-privs/libcap2/${pname}-${version}.tar.xz";
+    url = "mirror://kernel/linux/libs/security/linux-privs/libcap2/${finalAttrs.pname}-${finalAttrs.version}.tar.xz";
     hash = "sha256-iXvBi0Svwmxw54zq09uzHhVKzCS+4IWloJB5qI2/b1I=";
   };
 
@@ -100,8 +100,8 @@ stdenv.mkDerivation rec {
 
   postInstall = ''
     ${lib.optionalString (!isStatic) ''rm "$lib"/lib/*.a''}
-    mkdir -p "$doc/share/doc/${pname}-${version}"
-    cp License "$doc/share/doc/${pname}-${version}/"
+    mkdir -p "$doc/share/doc/${finalAttrs.pname}-${finalAttrs.version}"
+    cp License "$doc/share/doc/${finalAttrs.pname}-${finalAttrs.version}/"
   ''
   + lib.optionalString usePam ''
     mkdir -p "$pam/lib/security"
@@ -114,7 +114,10 @@ stdenv.mkDerivation rec {
     pkgsBuildHost.go
   ];
 
+  doCheck = false;
+
   passthru.tests = {
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
     inherit
       bind
       chrony
@@ -135,4 +138,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     license = lib.licenses.bsd3;
   };
-}
+})

@@ -29,7 +29,7 @@
 let
   underscoreVersion = lib.replaceStrings [ "." ] [ "_" ] version;
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "nss";
   inherit version;
 
@@ -242,4 +242,8 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.all;
   }
   // extraMeta;
-}
+
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+})

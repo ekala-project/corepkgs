@@ -21,12 +21,12 @@ let
     }:
     let
       legacySuffix = lib.optionalString (suffix != "-nons") "-ns";
-      self = stdenv.mkDerivation rec {
+      self = stdenv.mkDerivation (finalAttrs: {
         inherit pname;
         version = "1.79.2";
 
         src = fetchurl {
-          url = "https://github.com/docbook/xslt10-stylesheets/releases/download/release%2F${version}/docbook-xsl${suffix}-${version}.tar.bz2";
+          url = "https://github.com/docbook/xslt10-stylesheets/releases/download/release%2F${finalAttrs.version}/docbook-xsl${suffix}-${finalAttrs.version}.tar.bz2";
           inherit sha256;
         };
 
@@ -50,7 +50,8 @@ let
 
           # Add legacy sourceforge.net URIs to the catalog
           (replaceVars ./catalog-legacy-uris.patch {
-            inherit legacySuffix suffix version;
+            inherit legacySuffix suffix;
+            version = finalAttrs.version;
           })
         ]
         ++ lib.optionals withManOptDedupPatch [
@@ -64,7 +65,7 @@ let
         dontBuild = true;
 
         installPhase = ''
-          dst=$out/share/xml/${pname}
+          dst=$out/share/xml/${finalAttrs.pname}
           mkdir -p $dst
           rm -rf RELEASE* README* INSTALL TODO NEWS* BUGS install.sh tools Makefile tests extensions webhelp
           mv * $dst/
@@ -77,9 +78,12 @@ let
           ln -s $dst $out/share/xml/docbook-xsl${legacySuffix}
         '';
 
+        doCheck = false;
+
+        passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
         passthru.dbtoepub = writeScriptBin "dbtoepub" ''
           #!${bash}/bin/bash
-          exec -a dbtoepub ${ruby}/bin/ruby ${self}/share/xml/${pname}/epub/bin/dbtoepub "$@"
+          exec -a dbtoepub ${ruby}/bin/ruby ${finalAttrs.finalPackage}/share/xml/${finalAttrs.pname}/epub/bin/dbtoepub "$@"
         '';
 
         meta = {
@@ -88,7 +92,7 @@ let
           license = lib.licenses.mit;
           platforms = lib.platforms.all;
         };
-      };
+      });
     in
     self;
 

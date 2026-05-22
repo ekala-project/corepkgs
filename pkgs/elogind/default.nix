@@ -35,14 +35,14 @@
   enableSystemd ? false,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "elogind";
   version = "255.5";
 
   src = fetchFromGitHub {
     owner = "elogind";
     repo = "elogind";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-4KZr/NiiGVwzdDROhiX3GEQTUyIGva6ezb+xC2U3bkg=";
   };
 
@@ -152,10 +152,14 @@ stdenv.mkDerivation rec {
     (lib.mesonEnable "xenctrl" false)
   ];
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     homepage = "https://github.com/elogind/elogind";
     description = "systemd project's 'logind', extracted to a standalone package";
     platforms = lib.platforms.linux; # probably more
     license = lib.licenses.lgpl21Plus;
   };
-}
+})

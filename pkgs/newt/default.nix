@@ -11,12 +11,12 @@
 let
   pythonIncludePath = "${lib.getDev python3}/include/python";
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "newt";
   version = "0.52.24";
 
   src = fetchurl {
-    url = "https://releases.pagure.org/newt/newt-${version}.tar.gz";
+    url = "https://releases.pagure.org/newt/newt-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-Xe1+Ih+F9kJSHEmxgmyN4ZhFqjcrr11jClF3S1RPvbs=";
   };
 
@@ -64,13 +64,16 @@ stdenv.mkDerivation rec {
 
   postFixup = lib.optionalString stdenv.hostPlatform.isDarwin ''
     set -xe
-    install_name_tool -id $out/lib/libnewt.so.${version} $out/lib/libnewt.so.${version}
-    install_name_tool -change libnewt.so.${version} $out/lib/libnewt.so.${version} $out/bin/whiptail
-    install_name_tool -change libnewt.so.${version} $out/lib/libnewt.so.${version} \
+    install_name_tool -id $out/lib/libnewt.so.${finalAttrs.version} $out/lib/libnewt.so.${finalAttrs.version}
+    install_name_tool -change libnewt.so.${finalAttrs.version} $out/lib/libnewt.so.${finalAttrs.version} $out/bin/whiptail
+    install_name_tool -change libnewt.so.${finalAttrs.version} $out/lib/libnewt.so.${finalAttrs.version} \
       $out/lib/python*/site-packages/_snack* # glob for version & suffix
     set +x
   '';
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
   passthru.tests.pythonModule = (python3.withPackages (ps: [ ps.snack ])).overrideAttrs (
     { nativeBuildInputs, postBuild, ... }@_prevAttrs:
     {
@@ -98,4 +101,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     maintainers = [ ];
   };
-}
+})

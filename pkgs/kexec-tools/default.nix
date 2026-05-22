@@ -10,14 +10,14 @@
   zstd,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "kexec-tools";
   version = "2.0.32";
 
   src = fetchurl {
     urls = [
-      "mirror://kernel/linux/utils/kernel/kexec/${pname}-${version}.tar.xz"
-      "http://horms.net/projects/kexec/kexec-tools/${pname}-${version}.tar.xz"
+      "mirror://kernel/linux/utils/kernel/kexec/${finalAttrs.pname}-${finalAttrs.version}.tar.xz"
+      "http://horms.net/projects/kexec/kexec-tools/${finalAttrs.pname}-${finalAttrs.version}.tar.xz"
     ];
     sha256 = "sha256-j4FCKl/SNiz2ywAbUR5TVWXtDzLC9EUfteto/tZxCl0=";
   };
@@ -54,7 +54,10 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
+  doCheck = false;
+
   passthru = {
+    tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
     tests.kexec = nixosTests.kexec;
     updateScript = gitUpdater {
       url = "https://git.kernel.org/pub/scm/utils/kernel/kexec/kexec-tools.git";
@@ -79,4 +82,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Only;
     mainProgram = "kexec";
   };
-}
+})

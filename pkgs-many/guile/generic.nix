@@ -44,12 +44,13 @@ let
   srcExtension = if packageOlder "2.0" then "tar.gz" else "tar.xz";
 in
 builder (
+  finalAttrs:
   rec {
     pname = "guile";
     inherit version;
 
     src = fetchurl {
-      url = "mirror://gnu/${pname}/${pname}-${version}.${srcExtension}";
+      url = "mirror://gnu/${finalAttrs.pname}/${finalAttrs.pname}-${finalAttrs.version}.${srcExtension}";
       hash = src-hash;
     };
 
@@ -274,6 +275,7 @@ builder (
     inherit setupHook;
 
     passthru = rec {
+      tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
       effectiveVersion = lib.versions.majorMinor version;
       siteCcacheDir =
         if packageOlder "2.0" then "lib/guile/site-ccache" else "lib/guile/${effectiveVersion}/site-ccache";

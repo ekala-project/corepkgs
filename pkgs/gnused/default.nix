@@ -6,12 +6,12 @@
   perl,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "gnused";
   version = "4.9";
 
   src = fetchurl {
-    url = "mirror://gnu/sed/sed-${version}.tar.xz";
+    url = "mirror://gnu/sed/sed-${finalAttrs.version}.tar.xz";
     sha256 = "sha256-biJrcy4c1zlGStaGK9Ghq6QteYKSLaelNRljHSSXUYE=";
   };
 
@@ -29,6 +29,10 @@ stdenv.mkDerivation rec {
   # Prevents attempts of running 'help2man' on cross-built binaries.
   PERL = if stdenv.hostPlatform == stdenv.buildPlatform then null else "missing";
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     homepage = "https://www.gnu.org/software/sed/";
     description = "GNU sed, a batch stream editor";
@@ -44,4 +48,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     mainProgram = "sed";
   };
-}
+})

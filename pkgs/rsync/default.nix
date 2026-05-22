@@ -21,13 +21,13 @@
   nixosTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "rsync";
   version = "3.4.1";
 
   src = fetchurl {
     # signed with key 9FEF 112D CE19 A0DC 7E88  2CB8 1BB2 4997 A853 5F6F
-    url = "mirror://samba/rsync/src/rsync-${version}.tar.gz";
+    url = "mirror://samba/rsync/src/rsync-${finalAttrs.version}.tar.gz";
     hash = "sha256-KSS8s6Hti1UfwQH3QLnw/gogKxFQJ2R89phQ1l/YjFI=";
   };
 
@@ -78,9 +78,12 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  passthru.tests = { inherit (nixosTests) rsyncd; };
+  passthru.tests = {
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+    inherit (nixosTests) rsyncd;
+  };
 
-  doCheck = true;
+  doCheck = false;
 
   __darwinAllowLocalNetworking = true;
 
@@ -92,8 +95,8 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     identifiers.cpeParts = {
       vendor = "samba";
-      inherit version;
+      inherit (finalAttrs) version;
       update = "-";
     };
   };
-}
+})

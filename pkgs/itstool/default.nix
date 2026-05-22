@@ -8,12 +8,12 @@
   versionCheckHook,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "itstool";
   version = "2.0.7";
 
   src = fetchurl {
-    url = "http://files.itstool.org/${pname}/${pname}-${version}.tar.bz2";
+    url = "http://files.itstool.org/${finalAttrs.pname}/${finalAttrs.pname}-${finalAttrs.version}.tar.bz2";
     hash = "sha256-a5p80poSu5VZj1dQ6HY87niDahogf4W3TYsydbJ+h8o=";
   };
 
@@ -53,6 +53,10 @@ stdenv.mkDerivation rec {
   nativeInstallCheckInputs = [ versionCheckHook ];
   doInstallCheck = true;
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     homepage = "https://itstool.org/";
     description = "XML to PO and back again";
@@ -60,4 +64,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.all;
   };
-}
+})

@@ -4,16 +4,20 @@
   fetchurl,
 }:
 
-stdenv.mkDerivation rec {
-  name = "alsa-topology-conf-${version}";
+stdenv.mkDerivation (finalAttrs: {
+  name = "alsa-topology-conf-${finalAttrs.version}";
   version = "1.2.5.1";
 
   src = fetchurl {
-    url = "mirror://alsa/lib/${name}.tar.bz2";
+    url = "mirror://alsa/lib/${finalAttrs.name}.tar.bz2";
     hash = "sha256-98W64VRavNc4JLyX9OcsNA4Rq+oYi6DxwG9eCtd2sXk=";
   };
 
   dontBuild = true;
+
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   installPhase = ''
     runHook preInstall
@@ -34,4 +38,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.bsd3;
     platforms = lib.platforms.linux ++ lib.platforms.freebsd;
   };
-}
+})

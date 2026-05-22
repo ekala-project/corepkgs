@@ -24,7 +24,7 @@
   static ? stdenv.hostPlatform.isStatic,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "gtest";
   version = "1.17.0";
 
@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "google";
     repo = "googletest";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-HIHMxAUR4bjmFLoltJeIAVSulVQ6kVuIT2Ku+lwAx/4=";
   };
 
@@ -57,10 +57,14 @@ stdenv.mkDerivation rec {
     "-DCMAKE_CXX_STANDARD=${cxx_standard}"
   ];
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = "Google's framework for writing C++ tests";
     homepage = "https://github.com/google/googletest";
     license = lib.licenses.bsd3;
     platforms = lib.platforms.all;
   };
-}
+})

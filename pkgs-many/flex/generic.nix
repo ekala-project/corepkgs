@@ -32,7 +32,7 @@ let
 
   needsTexinfo = is2_5;
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "flex";
   inherit version;
 
@@ -85,6 +85,8 @@ stdenv.mkDerivation rec {
 
   doCheck = false;
 
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   postInstall = ''
     ln -s $out/bin/flex $out/bin/lex
   '';
@@ -96,4 +98,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     mainProgram = "flex";
   };
-}
+})

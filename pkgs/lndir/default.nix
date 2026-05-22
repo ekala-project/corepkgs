@@ -6,14 +6,14 @@
   coreutils,
 }:
 
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation (finalAttrs: {
   name = "lndir";
   version = "0.1.1";
 
   src = fetchFromGitHub {
     owner = "jonringer";
     repo = "lndir-simple";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-G+k7MExzG/lfUL6dpGFl4xWU3rOCZHbt4vU+/TMLZLs=";
   };
 
@@ -28,9 +28,13 @@ stdenvNoCC.mkDerivation rec {
       --prefix PATH : ${lib.makeBinPath [ coreutils ]}
   '';
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = "Xorg's lndir utility, but in simple script form";
     licenses = [ lib.licenses.gpl3Plus ];
     mainProgram = "lndir";
   };
-}
+})

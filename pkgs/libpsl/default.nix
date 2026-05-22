@@ -16,12 +16,12 @@
   publicsuffix-list,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libpsl";
   version = "0.21.5";
 
   src = fetchurl {
-    url = "https://github.com/rockdaboot/libpsl/releases/download/${version}/libpsl-${version}.tar.lz";
+    url = "https://github.com/rockdaboot/libpsl/releases/download/${finalAttrs.version}/libpsl-${finalAttrs.version}.tar.lz";
     hash = "sha256-mp9qjG7bplDPnqVUdc0XLdKEhzFoBOnHMgLZdXLNOi0=";
   };
 
@@ -81,7 +81,9 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  doCheck = true;
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   meta = {
     description = "C library for the Publix Suffix List";
@@ -93,10 +95,10 @@ stdenv.mkDerivation rec {
       the domain in a user interface or sorting domain lists by site.
     '';
     homepage = "https://rockdaboot.github.io/libpsl/";
-    changelog = "https://raw.githubusercontent.com/rockdaboot/libpsl/libpsl-${version}/NEWS";
+    changelog = "https://raw.githubusercontent.com/rockdaboot/libpsl/libpsl-${finalAttrs.version}/NEWS";
     license = lib.licenses.mit;
     mainProgram = "psl";
     platforms = lib.platforms.unix ++ lib.platforms.windows;
     pkgConfigModules = [ "libpsl" ];
   };
-}
+})

@@ -7,14 +7,14 @@
   libconfuse,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libite";
   version = "2.6.2";
 
   src = fetchFromGitHub {
     owner = "troglobit";
     repo = "libite";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-hm3cd7UnskfwEvcMRGHei8KLt0k+WlCzB1LMnZdYo+g=";
   };
 
@@ -23,6 +23,10 @@ stdenv.mkDerivation rec {
     pkg-config
   ];
   buildInputs = [ libconfuse ];
+
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   meta = {
     description = "Lightweight library of frog DNA";
@@ -47,4 +51,4 @@ stdenv.mkDerivation rec {
       bsd3
     ];
   };
-}
+})

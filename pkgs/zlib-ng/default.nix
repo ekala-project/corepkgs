@@ -8,14 +8,14 @@
   withZlibCompat ? false,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "zlib-ng";
   version = "2.2.5";
 
   src = fetchFromGitHub {
     owner = "zlib-ng";
     repo = "zlib-ng";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-c2RYqHi3hj/ViBzJcYWoNib27GAbq/B1SJUfvG7CPG4=";
   };
 
@@ -48,10 +48,14 @@ stdenv.mkDerivation rec {
   ]
   ++ lib.optionals withZlibCompat [ "-DZLIB_COMPAT=ON" ];
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = "Zlib data compression library for the next generation systems";
     homepage = "https://github.com/zlib-ng/zlib-ng";
     license = lib.licenses.zlib;
     platforms = lib.platforms.all;
   };
-}
+})

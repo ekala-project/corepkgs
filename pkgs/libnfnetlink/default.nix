@@ -4,14 +4,18 @@
   fetchurl,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libnfnetlink";
   version = "1.0.2";
 
   src = fetchurl {
-    url = "https://www.netfilter.org/projects/libnfnetlink/files/libnfnetlink-${version}.tar.bz2";
+    url = "https://www.netfilter.org/projects/libnfnetlink/files/libnfnetlink-${finalAttrs.version}.tar.bz2";
     sha256 = "0xn3rcrzxr6g82kfxzs9bqn2zvl2kf2yda30drwb9vr6sk1wfr5h";
   };
+
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   meta = {
     description = "Low-level library for netfilter related kernel/userspace communication";
@@ -28,4 +32,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2;
     platforms = lib.platforms.linux;
   };
-}
+})

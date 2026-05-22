@@ -6,12 +6,12 @@
   pkgsStatic,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "giflib";
   version = "5.2.2";
 
   src = fetchurl {
-    url = "mirror://sourceforge/giflib/giflib-${version}.tar.gz";
+    url = "mirror://sourceforge/giflib/giflib-${finalAttrs.version}.tar.gz";
     hash = "sha256-vn/70FfK3r4qoURUL9kMaDjGoIO16KkEi47jtmsp1fs=";
   };
 
@@ -52,7 +52,10 @@ stdenv.mkDerivation rec {
     sed -i '/ln -sf $(LIBGIFSOMAJOR)/ d' Makefile
   '';
 
+  doCheck = false;
+
   passthru.tests = {
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
     static = pkgsStatic.giflib;
   };
 
@@ -63,4 +66,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.mit;
     branch = "5.2";
   };
-}
+})

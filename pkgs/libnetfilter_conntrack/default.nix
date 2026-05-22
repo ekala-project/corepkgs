@@ -7,12 +7,12 @@
   libmnl,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libnetfilter_conntrack";
   version = "1.1.0";
 
   src = fetchurl {
-    url = "https://netfilter.org/projects/libnetfilter_conntrack/files/${pname}-${version}.tar.xz";
+    url = "https://netfilter.org/projects/libnetfilter_conntrack/files/${finalAttrs.pname}-${finalAttrs.version}.tar.xz";
     hash = "sha256-Z+3LTrgmwvjcmK8I2r/2jzs9D+b7fZ0Kwe5+zOD+aU4=";
   };
 
@@ -23,6 +23,10 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ pkg-config ];
 
   enableParallelBuilding = true;
+
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   meta = {
     description = "Userspace library providing an API to the in-kernel connection tracking state table";
@@ -36,4 +40,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
   };
-}
+})

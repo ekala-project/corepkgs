@@ -12,12 +12,12 @@
   autoreconfHook,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "opensp";
   version = "1.5.2";
 
   src = fetchurl {
-    url = "mirror://sourceforge/openjade/OpenSP-${version}.tar.gz";
+    url = "mirror://sourceforge/openjade/OpenSP-${finalAttrs.version}.tar.gz";
     sha256 = "1khpasr6l0a8nfz6kcf3s81vgdab8fm2dj291n5r2s53k228kx2p";
   };
 
@@ -69,10 +69,12 @@ stdenv.mkDerivation rec {
 
   doCheck = false; # fails
 
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = "Suite of SGML/XML processing tools";
     license = lib.licenses.mit;
     homepage = "https://openjade.sourceforge.net/";
     platforms = lib.platforms.unix;
   };
-}
+})

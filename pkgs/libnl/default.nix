@@ -17,14 +17,14 @@
   python,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libnl";
   version = "3.11.0";
 
   src = fetchFromGitHub {
     repo = "libnl";
     owner = "thom311";
-    rev = "libnl${lib.replaceStrings [ "." ] [ "_" ] version}";
+    rev = "libnl${lib.replaceStrings [ "." ] [ "_" ] finalAttrs.version}";
     hash = "sha256-GuYV2bUOhLedB/o9Rz6Py/G5HBK2iNefwrlkZJXgbnI=";
   };
 
@@ -62,8 +62,11 @@ stdenv.mkDerivation rec {
     mv "pythonlib/" "$py"
   '';
 
+  doCheck = false;
+
   passthru = {
     inherit pythonSupport;
+    tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
   };
 
   meta = {
@@ -72,4 +75,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.lgpl21;
     platforms = lib.platforms.linux;
   };
-}
+})

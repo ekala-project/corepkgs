@@ -14,14 +14,14 @@
   withDocs ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libusb";
   version = "1.0.29";
 
   src = fetchFromGitHub {
     owner = "libusb";
     repo = "libusb";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-m1w+uF8+2WCn72LvoaGUYa+R0PyXHtFFONQjdRfImYY=";
   };
 
@@ -66,6 +66,10 @@ stdenv.mkDerivation rec {
     ln -s $out/examples/bin/fxload $out/sbin/fxload
   '';
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     homepage = "https://libusb.info/";
     description = "Cross-platform user-mode USB device library";
@@ -75,4 +79,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.all;
     license = lib.licenses.lgpl21Plus;
   };
-}
+})

@@ -15,7 +15,7 @@
 # python binding generates a shared library which are unavailable with musl build
 assert enablePython -> !stdenv.hostPlatform.isStatic;
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libpwquality";
   version = "1.4.5";
 
@@ -30,7 +30,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "libpwquality";
     repo = "libpwquality";
-    rev = "${pname}-${version}";
+    rev = "${finalAttrs.pname}-${finalAttrs.version}";
     sha256 = "sha256-YjvHzd4iEBvg+qHOVJ7/y9HqyeT+QDalNE/jdNM9BNs=";
   };
 
@@ -83,6 +83,10 @@ stdenv.mkDerivation rec {
       # leave for now to avoid rebuilds on !enablePython before 24.11 fully lands
       [ "--disable-python-bindings" ];
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     homepage = "https://github.com/libpwquality/libpwquality";
     description = "Password quality checking and random password generation library";
@@ -104,4 +108,4 @@ stdenv.mkDerivation rec {
     ];
     platforms = lib.platforms.unix;
   };
-}
+})

@@ -16,12 +16,12 @@
   pkgsStatic,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "iproute2";
   version = "6.17.0";
 
   src = fetchurl {
-    url = "mirror://kernel/linux/utils/net/${pname}/${pname}-${version}.tar.xz";
+    url = "mirror://kernel/linux/utils/net/${finalAttrs.pname}/${finalAttrs.pname}-${finalAttrs.version}.tar.xz";
     hash = "sha256-l4HllBCrfeqOn3m7EP8UiOY9EPy7cFA7lEJronqOLew=";
   };
 
@@ -52,7 +52,7 @@ stdenv.mkDerivation rec {
   makeFlags = [
     "PREFIX=$(out)"
     "SBINDIR=$(out)/sbin"
-    "DOCDIR=$(TMPDIR)/share/doc/${pname}" # Don't install docs
+    "DOCDIR=$(TMPDIR)/share/doc/${finalAttrs.pname}" # Don't install docs
     "HDRDIR=$(dev)/include/iproute2"
   ]
   ++ lib.optionals stdenv.hostPlatform.isStatic [
@@ -96,12 +96,15 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
+  doCheck = false;
+
   passthru.updateScript = gitUpdater {
     # No nicer place to find latest release.
     url = "https://git.kernel.org/pub/scm/network/iproute2/iproute2.git";
     rev-prefix = "v";
   };
   # needed for nixos-anywhere
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
   passthru.tests.static = pkgsStatic.iproute2;
 
   meta = {
@@ -110,4 +113,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     license = lib.licenses.gpl2Only;
   };
-}
+})

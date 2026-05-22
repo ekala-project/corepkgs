@@ -9,12 +9,12 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "keyutils";
   version = "1.6.3";
 
   src = fetchurl {
-    url = "https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/snapshot/${pname}-${version}.tar.gz";
+    url = "https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/snapshot/${finalAttrs.pname}-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-ph1XBhNq5MBb1I+GGGvP29iN2L1RB+Phlckkz8Gzm7Q=";
   };
 
@@ -68,10 +68,14 @@ stdenv.mkDerivation rec {
     "USRLIBDIR=$(lib)/lib"
   ];
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     homepage = "https://people.redhat.com/dhowells/keyutils/";
     description = "Tools used to control the Linux kernel key management system";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
   };
-}
+})

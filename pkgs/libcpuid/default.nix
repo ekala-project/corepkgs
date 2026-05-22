@@ -5,18 +5,22 @@
   autoreconfHook,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libcpuid";
   version = "0.8.1";
 
   src = fetchFromGitHub {
     owner = "anrieff";
     repo = "libcpuid";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-+/TTlGk1ePPTHrSTSZmPHT2h3gKs9ouCF4ElvLWHF/g=";
   };
 
   nativeBuildInputs = [ autoreconfHook ];
+
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   meta = {
     homepage = "https://libcpuid.sourceforge.net/";
@@ -26,4 +30,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.bsd2;
     platforms = lib.platforms.x86;
   };
-}
+})

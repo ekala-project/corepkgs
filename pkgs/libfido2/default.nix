@@ -14,13 +14,13 @@
   pcsclite,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libfido2";
   version = "1.16.0";
 
   # releases on https://developers.yubico.com/libfido2/Releases/ are signed
   src = fetchurl {
-    url = "https://developers.yubico.com/${pname}/Releases/${pname}-${version}.tar.gz";
+    url = "https://developers.yubico.com/${finalAttrs.pname}/Releases/${finalAttrs.pname}-${finalAttrs.version}.tar.gz";
     hash = "sha256-jCtvsnm1tC6aySrecYMuSFhSZHtTYHxDuqr7vOzqBOQ=";
   };
 
@@ -66,6 +66,10 @@ stdenv.mkDerivation rec {
   # causes possible redefinition of _FORTIFY_SOURCE?
   hardeningDisable = [ "fortify3" ];
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = ''
       Provides library functionality for FIDO 2.0, including communication with a device over USB.
@@ -74,4 +78,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix;
   };
-}
+})

@@ -10,7 +10,7 @@
 
 assert enableNLS -> libnatspec != null;
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "zip";
   version = "3.0";
 
@@ -80,6 +80,10 @@ stdenv.mkDerivation rec {
   buildInputs =
     lib.optional enableNLS libnatspec ++ lib.optional stdenv.hostPlatform.isCygwin libiconv;
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = "Compressor/archiver for creating and modifying zipfiles";
     homepage = "http://www.info-zip.org";
@@ -87,4 +91,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.all;
     mainProgram = "zip";
   };
-}
+})

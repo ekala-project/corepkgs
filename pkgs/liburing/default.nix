@@ -4,14 +4,14 @@
   fetchFromGitHub,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "liburing";
   version = "2.12";
 
   src = fetchFromGitHub {
     owner = "axboe";
     repo = "liburing";
-    tag = "liburing-${version}";
+    tag = "liburing-${finalAttrs.version}";
     hash = "sha256-sEMzkyjrCc49ogfUnzdgNtEXmW0Tz/PUKo99C965428=";
   };
 
@@ -51,10 +51,14 @@ stdenv.mkDerivation rec {
     done
   '';
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = "Userspace library for the Linux io_uring API";
     homepage = "https://github.com/axboe/liburing";
     license = lib.licenses.lgpl21;
     platforms = lib.platforms.linux;
   };
-}
+})

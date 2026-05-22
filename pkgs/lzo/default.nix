@@ -5,12 +5,12 @@
   updateAutotoolsGnuConfigScriptsHook,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "lzo";
   version = "2.10";
 
   src = fetchurl {
-    url = "https://www.oberhumer.com/opensource/lzo/download/${pname}-${version}.tar.gz";
+    url = "https://www.oberhumer.com/opensource/lzo/download/${finalAttrs.pname}-${finalAttrs.version}.tar.gz";
     sha256 = "0wm04519pd3g8hqpjqhfr72q8qmbiwqaxcs3cndny9h86aa95y60";
   };
 
@@ -20,9 +20,11 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  doCheck = true; # not cross;
+  doCheck = false;
 
   strictDeps = true;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   meta = {
     description = "Real-time data (de)compression library";
@@ -39,4 +41,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.all;
   };
-}
+})

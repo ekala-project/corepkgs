@@ -12,14 +12,14 @@
   libexecinfo,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-c-event-stream";
   version = "0.5.7";
 
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-event-stream";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-JvjUrIj1bh5WZEzkauLSLIolxrT8CKIMjO7p1c35XZI=";
   };
 
@@ -41,8 +41,11 @@ stdenv.mkDerivation rec {
     "-DBUILD_SHARED_LIBS:BOOL=ON"
   ];
 
+  doCheck = false;
+
   passthru.tests = {
     inherit nix;
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
   };
 
   meta = {
@@ -51,4 +54,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
   };
-}
+})

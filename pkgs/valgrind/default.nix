@@ -9,12 +9,12 @@
   writeScript,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "valgrind";
   version = "3.26.0";
 
   src = fetchurl {
-    url = "https://sourceware.org/pub/${pname}/${pname}-${version}.tar.bz2";
+    url = "https://sourceware.org/pub/${finalAttrs.pname}/${finalAttrs.pname}-${finalAttrs.version}.tar.bz2";
     hash = "sha256-jVTHFwKRBvFkSq2vgCq5aS5T2T3QFcvRnnQZDrpha9c=";
   };
 
@@ -72,7 +72,6 @@ stdenv.mkDerivation rec {
 
   configureFlags = lib.optional stdenv.hostPlatform.isx86_64 "--enable-only64bit";
 
-  # TODO: move to passthru.tests
   doCheck = false;
 
   postInstall = ''
@@ -85,6 +84,7 @@ stdenv.mkDerivation rec {
   '';
 
   passthru = {
+    tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
     updateScript = writeScript "update-valgrind" ''
       #!/usr/bin/env nix-shell
       #!nix-shell -i bash -p curl pcre common-updater-scripts
@@ -95,7 +95,7 @@ stdenv.mkDerivation rec {
       #  'Current release: <a href="/downloads/current.html#current">valgrind-3.19.0</a>'
       new_version="$(curl -s https://valgrind.org/ |
           pcregrep -o1 'Current release: .*>valgrind-([0-9.]+)</a>')"
-      update-source-version ${pname} "$new_version"
+      update-source-version ${finalAttrs.pname} "$new_version"
     '';
   };
 
@@ -122,4 +122,4 @@ stdenv.mkDerivation rec {
     # history if you want to fix this.
     broken = stdenv.hostPlatform.isDarwin;
   };
-}
+})

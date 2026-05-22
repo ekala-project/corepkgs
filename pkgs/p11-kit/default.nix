@@ -14,14 +14,14 @@
   libintl,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "p11-kit";
   version = "0.25.10";
 
   src = fetchFromGitHub {
     owner = "p11-glue";
     repo = "p11-kit";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-srZyY14PqPoPMcEj/3WWEPrBuCcAGibvziKgZV1vxO8=";
     fetchSubmodules = true;
   };
@@ -68,7 +68,7 @@ stdenv.mkDerivation rec {
     ))
   ];
 
-  doCheck = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
+  doCheck = false;
 
   postPatch = ''
     # Install sample config files to $out/etc even though they will be loaded from /etc.
@@ -83,6 +83,8 @@ stdenv.mkDerivation rec {
     fi
   '';
 
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = "Library for loading and sharing PKCS#11 modules";
     longDescription = ''
@@ -92,8 +94,8 @@ stdenv.mkDerivation rec {
     '';
     homepage = "https://p11-glue.github.io/p11-glue/p11-kit.html";
     changelog = [
-      "https://github.com/p11-glue/p11-kit/raw/${version}/NEWS"
-      "https://github.com/p11-glue/p11-kit/releases/tag/${version}"
+      "https://github.com/p11-glue/p11-kit/raw/${finalAttrs.version}/NEWS"
+      "https://github.com/p11-glue/p11-kit/releases/tag/${finalAttrs.version}"
     ];
     platforms = lib.platforms.all;
     badPlatforms = [
@@ -103,4 +105,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.bsd3;
     mainProgram = "p11-kit";
   };
-}
+})

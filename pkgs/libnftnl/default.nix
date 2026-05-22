@@ -7,12 +7,12 @@
   gitUpdater,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   version = "1.3.0";
   pname = "libnftnl";
 
   src = fetchurl {
-    url = "https://netfilter.org/projects/${pname}/files/${pname}-${version}.tar.xz";
+    url = "https://netfilter.org/projects/${finalAttrs.pname}/files/${finalAttrs.pname}-${finalAttrs.version}.tar.xz";
     hash = "sha256-D0vkeou4t3o1DuWMvUtfrmJgrUhqUncGqxXP4d1Vo8Q=";
   };
 
@@ -25,6 +25,10 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   passthru.updateScript = gitUpdater {
     url = "https://git.netfilter.org/libnftnl";
     rev-prefix = "libnftnl-";
@@ -36,4 +40,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
   };
-}
+})

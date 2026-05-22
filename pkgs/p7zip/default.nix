@@ -4,14 +4,14 @@
   fetchFromGitHub,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "p7zip";
   version = "17.05";
 
   src = fetchFromGitHub {
     owner = "p7zip-project";
     repo = "p7zip";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-z3qXgv/TkNRbb85Ew1OcJNxoyssfzHShc0b0/4NZOb0=";
   };
 
@@ -37,6 +37,10 @@ stdenv.mkDerivation rec {
     ln -s $out/bin/7za $out/bin/7z || true
   '';
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = "A port of the 7-Zip archiver";
     homepage = "https://github.com/p7zip-project/p7zip";
@@ -44,4 +48,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     mainProgram = "7z";
   };
-}
+})

@@ -7,13 +7,13 @@
   flex,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libconfuse";
   version = "3.3";
 
   src = fetchFromGitHub {
     sha256 = "1npfk5jv59kk4n8pkyx89fn9s6p8x3gbffs42jaw24frgxfgp8ca";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     repo = "libconfuse";
     owner = "martinh";
   };
@@ -47,6 +47,10 @@ stdenv.mkDerivation rec {
   doInstallCheck = true;
   installCheckTarget = "check";
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     inherit (src.meta) homepage;
     description = "Small configuration file parser library for C";
@@ -63,4 +67,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.isc;
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
-}
+})

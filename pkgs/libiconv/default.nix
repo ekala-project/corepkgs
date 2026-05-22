@@ -10,12 +10,12 @@
 
 # assert !stdenv.hostPlatform.isLinux || stdenv.hostPlatform != stdenv.buildPlatform; # TODO: improve on cross
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libiconv";
   version = "1.18";
 
   src = fetchurl {
-    url = "mirror://gnu/libiconv/${pname}-${version}.tar.gz";
+    url = "mirror://gnu/libiconv/${finalAttrs.pname}-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-Owj19Pm064LxUacEC/1v5sb7ki7+SxZZxm6pMydpZeg=";
   };
 
@@ -78,7 +78,12 @@ stdenv.mkDerivation rec {
   ]
   ++ lib.optional stdenv.hostPlatform.isFreeBSD "--with-pic";
 
-  passthru = { inherit setupHooks; };
+  doCheck = false;
+
+  passthru = {
+    inherit setupHooks;
+    tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+  };
 
   meta = {
     description = "Iconv(3) implementation";
@@ -97,4 +102,4 @@ stdenv.mkDerivation rec {
     # This library is not needed on GNU platforms.
     hydraPlatforms = with lib.platforms; cygwin ++ darwin ++ freebsd;
   };
-}
+})

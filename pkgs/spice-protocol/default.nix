@@ -6,12 +6,12 @@
   ninja,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "spice-protocol";
   version = "0.14.5";
 
   src = fetchurl {
-    url = "https://www.spice-space.org/download/releases/${pname}-${version}.tar.xz";
+    url = "https://www.spice-space.org/download/releases/${finalAttrs.pname}-${finalAttrs.version}.tar.xz";
     sha256 = "sha256-uvWESfbonRn0dYma1fuRlv3EbAPMUyM/TjnPKXj5z/c=";
   };
 
@@ -25,10 +25,14 @@ stdenv.mkDerivation rec {
     ln -sv ../share/pkgconfig $out/lib/pkgconfig
   '';
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = "Protocol headers for the SPICE protocol";
     homepage = "https://www.spice-space.org/";
     license = lib.licenses.bsd3;
     platforms = lib.platforms.all;
   };
-}
+})

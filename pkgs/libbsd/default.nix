@@ -7,12 +7,12 @@
   gitUpdater,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libbsd";
   version = "0.12.2";
 
   src = fetchurl {
-    url = "https://libbsd.freedesktop.org/releases/${pname}-${version}.tar.xz";
+    url = "https://libbsd.freedesktop.org/releases/${finalAttrs.pname}-${finalAttrs.version}.tar.xz";
     hash = "sha256-uIzJFj0MZSqvOamZkdl03bocOpcR248bWDivKhRzEBQ=";
   };
 
@@ -24,7 +24,9 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  doCheck = true;
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   nativeBuildInputs = [ autoreconfHook ];
   propagatedBuildInputs = [ libmd ];
@@ -60,4 +62,4 @@ stdenv.mkDerivation rec {
     # See architectures defined in src/local-elf.h.
     badPlatforms = lib.platforms.microblaze;
   };
-}
+})

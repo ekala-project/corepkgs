@@ -35,7 +35,7 @@ stdenv.mkDerivation (finalAttrs: rec {
   ];
 
   src = fetchurl {
-    url = "mirror://sourceforge/tcl/tcl${version}-src.tar.gz";
+    url = "mirror://sourceforge/tcl/tcl${finalAttrs.version}-src.tar.gz";
     hash = src-hash;
   };
 
@@ -105,6 +105,8 @@ stdenv.mkDerivation (finalAttrs: rec {
 
   enableParallelBuilding = true;
 
+  doCheck = false;
+
   postInstall = ''
     make install-private-headers
     ln -s $out/bin/tclsh${release} $out/bin/tclsh
@@ -133,8 +135,9 @@ stdenv.mkDerivation (finalAttrs: rec {
     };
     mkTclDerivation = callPackage ./mk-tcl-derivation.nix { tcl = finalAttrs.finalPackage; };
     tclPackageHook = callPackage ./tcl-package-hook.nix { };
+    tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
     # verify that Tcl's clock library can access tzdata
-    tests.tzdata = runCommand "${pname}-test-tzdata" { } ''
+    tests.tzdata = runCommand "${finalAttrs.pname}-test-tzdata" { } ''
       ${finalAttrs.finalPackage}/bin/tclsh <(echo "set t [clock scan {2004-10-30 05:00:00} \
                                   -format {%Y-%m-%d %H:%M:%S} \
                                   -timezone :America/New_York]") > $out

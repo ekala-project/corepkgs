@@ -25,12 +25,12 @@
   bashNonInteractive,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "groff";
   version = "1.23.0";
 
   src = fetchurl {
-    url = "mirror://gnu/groff/${pname}-${version}.tar.gz";
+    url = "mirror://gnu/groff/${finalAttrs.pname}-${finalAttrs.version}.tar.gz";
     hash = "sha256-a5dX9ZK3UYtJAutq9+VFcL3Mujeocf3bLTCuOGNRHBM=";
   };
 
@@ -119,7 +119,9 @@ stdenv.mkDerivation rec {
     "GROFFBIN=${buildPackages.groff}/bin/groff"
   ];
 
-  doCheck = true;
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   postInstall = ''
     for f in 'man.local' 'mdoc.local'; do
@@ -175,4 +177,4 @@ stdenv.mkDerivation rec {
       "perl"
     ];
   };
-}
+})

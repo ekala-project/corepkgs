@@ -12,12 +12,12 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "gzip";
   version = "1.14";
 
   src = fetchurl {
-    url = "mirror://gnu/gzip/${pname}-${version}.tar.xz";
+    url = "mirror://gnu/gzip/${finalAttrs.pname}-${finalAttrs.version}.tar.xz";
     hash = "sha256-Aae4gb0iC/32Ffl7hxj4C9/T9q3ThbmT3Pbv0U6MCsY=";
   };
 
@@ -60,6 +60,10 @@ stdenv.mkDerivation rec {
       --add-flags "\''${GZIP_NO_TIMESTAMPS:+-n}"
   '';
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     homepage = "https://www.gnu.org/software/gzip/";
     description = "GNU zip compression program";
@@ -78,4 +82,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3Plus;
     mainProgram = "gzip";
   };
-}
+})

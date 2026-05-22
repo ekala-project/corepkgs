@@ -16,13 +16,13 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "c-ares";
   version = "1.34.5";
 
   src = fetchurl {
     # Note: tag name varies in some versions, e.g. v1.30.0, c-ares-1_17_0.
-    url = "https://github.com/c-ares/c-ares/releases/download/v${version}/c-ares-${version}.tar.gz";
+    url = "https://github.com/c-ares/c-ares/releases/download/v${finalAttrs.version}/c-ares-${finalAttrs.version}.tar.gz";
     hash = "sha256-fZNXkOmvCBwlxJX9E8LPzaR5KYNBjpY1jvbnMg7gY0Y=";
   };
 
@@ -49,9 +49,12 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
+  doCheck = false;
+
   passthru.tests = {
     inherit grpc;
     curl = (curl.override { c-aresSupport = true; }).tests.withCheck;
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
   };
 
   preFixup = lib.optionalString withCMake ''
@@ -61,8 +64,10 @@ stdenv.mkDerivation rec {
   meta = {
     description = "C library for asynchronous DNS requests";
     homepage = "https://c-ares.haxx.se";
-    changelog = "https://c-ares.org/changelog.html#${lib.replaceStrings [ "." ] [ "_" ] version}";
+    changelog = "https://c-ares.org/changelog.html#${
+      lib.replaceStrings [ "." ] [ "_" ] finalAttrs.version
+    }";
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
   };
-}
+})

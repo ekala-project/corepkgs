@@ -20,12 +20,12 @@ let
   libiconv' =
     if stdenv.hostPlatform.isDarwin || stdenv.hostPlatform.isFreeBSD then libiconvReal else libiconv;
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "man-db";
   version = "2.13.1";
 
   src = fetchurl {
-    url = "mirror://savannah/man-db/man-db-${version}.tar.xz";
+    url = "mirror://savannah/man-db/man-db-${finalAttrs.version}.tar.xz";
     hash = "sha256-iv67b362u4VCkpRYhB9cfm8kDjDIY1jB+8776gdsh9k=";
   };
 
@@ -113,11 +113,10 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  doCheck =
-    !stdenv.hostPlatform.isMusl # iconv binary
-  ;
+  doCheck = false;
 
   passthru.tests = {
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = !stdenv.hostPlatform.isMusl; };
     nixos = nixosTests.man;
   };
 
@@ -128,4 +127,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     mainProgram = "man";
   };
-}
+})

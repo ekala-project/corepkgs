@@ -11,7 +11,7 @@
   shared-mime-info,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "shared-mime-info";
   version = "2.4";
 
@@ -24,7 +24,7 @@ stdenv.mkDerivation rec {
     domain = "gitlab.freedesktop.org";
     owner = "xdg";
     repo = "shared-mime-info";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-5eyMkfSBUOD7p8woIYTgz5C/L8uQMXyr0fhL0l23VMA=";
   };
 
@@ -49,6 +49,10 @@ stdenv.mkDerivation rec {
     "-Dupdate-mimedb=true"
   ];
 
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
   meta = {
     description = "Database of common MIME types";
     homepage = "http://freedesktop.org/wiki/Software/shared-mime-info";
@@ -56,4 +60,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     mainProgram = "update-mime-database";
   };
-}
+})

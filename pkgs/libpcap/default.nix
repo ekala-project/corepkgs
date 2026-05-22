@@ -24,14 +24,14 @@
   haskellPackages,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libpcap";
   version = "1.10.5";
 
   __structuredAttrs = true;
 
   src = fetchurl {
-    url = "https://www.tcpdump.org/release/${pname}-${version}.tar.gz";
+    url = "https://www.tcpdump.org/release/${finalAttrs.pname}-${finalAttrs.version}.tar.gz";
     hash = "sha256-N87ZChmjAqfzLkWCJKAMNlwReQXCzTWsVEtogKgUiPA=";
   };
 
@@ -81,7 +81,10 @@ stdenv.mkDerivation rec {
     bashNonInteractive
   ];
 
+  doCheck = false;
+
   passthru.tests = {
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
     inherit
       ettercap
       nmap
@@ -101,4 +104,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     license = lib.licenses.bsd3;
   };
-}
+})

@@ -12,12 +12,12 @@
   nixosTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "mdadm";
   version = "4.4";
 
   src = fetchurl {
-    url = "mirror://kernel/linux/utils/raid/mdadm/mdadm-${version}.tar.xz";
+    url = "mirror://kernel/linux/utils/raid/mdadm/mdadm-${finalAttrs.version}.tar.xz";
     sha256 = "sha256-m0iPNe0VPfmZJLX+Qe7TgOhRLejxihGGKMrN1oGx1XM=";
   };
 
@@ -78,8 +78,11 @@ stdenv.mkDerivation rec {
     grep -r $out $out/bin && false || true
   '';
 
+  doCheck = false;
+
   passthru = {
     tests = {
+      unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
       inherit (nixosTests) systemd-initrd-swraid;
       installer-swraid = nixosTests.installer.swraid;
     };
@@ -96,4 +99,4 @@ stdenv.mkDerivation rec {
     mainProgram = "mdadm";
     platforms = lib.platforms.linux;
   };
-}
+})

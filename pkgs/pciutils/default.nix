@@ -11,14 +11,14 @@
   gitUpdater,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "pciutils";
   version = "3.14.0"; # with release-date database
 
   src = fetchFromGitHub {
     owner = "pciutils";
     repo = "pciutils";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-8wSvu8BGzETD1RfwL6/DfSCZcmuj1I+zNH033f48qNQ=";
   };
 
@@ -59,10 +59,15 @@ stdenv.mkDerivation rec {
     cp --reflink=auto ${hwdata}/share/hwdata/pci.ids $out/share/pci.ids
   '';
 
-  passthru.updateScript = gitUpdater {
-    # No nicer place to find latest release.
-    url = "https://github.com/pciutils/pciutils.git";
-    rev-prefix = "v";
+  doCheck = false;
+
+  passthru = {
+    tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+    updateScript = gitUpdater {
+      # No nicer place to find latest release.
+      url = "https://github.com/pciutils/pciutils.git";
+      rev-prefix = "v";
+    };
   };
 
   meta = {
@@ -72,4 +77,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     mainProgram = "lspci";
   };
-}
+})

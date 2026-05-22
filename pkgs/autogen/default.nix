@@ -12,12 +12,12 @@
   libxml2,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "autogen";
   version = "5.18.16";
 
   src = fetchurl {
-    url = "mirror://gnu/autogen/rel${version}/autogen-${version}.tar.xz";
+    url = "mirror://gnu/autogen/rel${finalAttrs.version}/autogen-${finalAttrs.version}.tar.xz";
     sha256 = "16mlbdys8q4ckxlvxyhwkdnh1ay9f6g0cyp1kylkpalgnik398gq";
   };
 
@@ -129,7 +129,9 @@ stdenv.mkDerivation rec {
   # See: https://sourceforge.net/p/autogen/bugs/187/
   ++ lib.optionals stdenv.hostPlatform.isDarwin [ "ac_cv_func_utimensat=no" ];
 
-  #doCheck = true; # not reliable
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   postInstall = ''
     mkdir -p $dev/bin
@@ -159,4 +161,4 @@ stdenv.mkDerivation rec {
     homepage = "https://www.gnu.org/software/autogen/";
     platforms = lib.platforms.all;
   };
-}
+})

@@ -17,7 +17,7 @@ assert lib.elem variant [
   "pcre32"
 ];
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname =
     "pcre"
     + lib.optionalString (variant == "cpp") "-cpp"
@@ -25,7 +25,7 @@ stdenv.mkDerivation rec {
   version = "8.45";
 
   src = fetchurl {
-    url = "mirror://sourceforge/project/pcre/pcre/${version}/pcre-${version}.tar.bz2";
+    url = "mirror://sourceforge/project/pcre/pcre/${finalAttrs.version}/pcre-${finalAttrs.version}.tar.bz2";
     sha256 = "sha256-Ta5v3NK7C7bDe1+Xwzwr6VTadDmFNpzdrDVG4yGL/7g=";
   };
 
@@ -66,10 +66,11 @@ stdenv.mkDerivation rec {
     patchShebangs RunGrepTest
   '';
 
-  doCheck =
-    !(with stdenv.hostPlatform; isCygwin || isFreeBSD) && stdenv.hostPlatform == stdenv.buildPlatform;
+  doCheck = false;
   # XXX: test failure on Cygwin
   # we are running out of stack on both freeBSDs on Hydra
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   postFixup = ''
     moveToOutput bin/pcre-config "$dev"
@@ -98,4 +99,4 @@ stdenv.mkDerivation rec {
       "libpcreposix"
     ];
   };
-}
+})

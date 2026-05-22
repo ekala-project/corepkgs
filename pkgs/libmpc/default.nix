@@ -12,12 +12,12 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libmpc";
   version = "1.3.1"; # to avoid clash with the MPD client
 
   src = fetchurl {
-    url = "mirror://gnu/mpc/mpc-${version}.tar.gz";
+    url = "mirror://gnu/mpc/mpc-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-q2QkkvXPiCt0qgy3MM1BCoHtzb7IlRg86TDnBsHHWbg=";
   };
 
@@ -33,7 +33,9 @@ stdenv.mkDerivation rec {
     updateAutotoolsGnuConfigScriptsHook
   ];
 
-  doCheck = true; # not cross;
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   meta = {
     description = "Library for multiprecision complex arithmetic with exact rounding";
@@ -46,4 +48,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.lgpl2Plus;
     platforms = lib.platforms.all;
   };
-}
+})

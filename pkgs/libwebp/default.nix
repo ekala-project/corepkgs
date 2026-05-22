@@ -34,14 +34,14 @@
   libwebp,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libwebp";
   version = "1.6.0";
 
   src = fetchFromGitHub {
     owner = "webmproject";
     repo = "libwebp";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-7i4fGBTsTjAkBzCjVqXqX4n22j6dLgF/0mz4ajNA45U=";
   };
 
@@ -83,7 +83,10 @@ stdenv.mkDerivation rec {
     ++ lib.optionals tiffSupport [ libtiff ]
     ++ lib.optionals gifSupport [ giflib ];
 
+  doCheck = false;
+
   passthru.tests = {
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
     inherit
       gd
       graphicsmagick
@@ -114,4 +117,4 @@ stdenv.mkDerivation rec {
       "libwebpmux"
     ];
   };
-}
+})

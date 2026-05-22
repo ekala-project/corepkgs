@@ -69,7 +69,7 @@ let
     '';
   };
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libsecret";
   version = "0.21.7";
 
@@ -80,7 +80,7 @@ stdenv.mkDerivation rec {
   ++ lib.optional withIntrospection "devdoc";
 
   src = fetchurl {
-    url = "mirror://gnome/sources/libsecret/${lib.versions.majorMinor version}/libsecret-${version}.tar.xz";
+    url = "mirror://gnome/sources/libsecret/${lib.versions.majorMinor finalAttrs.version}/libsecret-${finalAttrs.version}.tar.xz";
     hash = "sha256-a0UuR1BZCitWF63EACbyjS9JA94V8SUOHRxAv9aO1V4=";
   };
 
@@ -130,7 +130,7 @@ stdenv.mkDerivation rec {
     (lib.mesonOption "bashcompdir" "share/bash-completion/completions")
   ];
 
-  doCheck = stdenv.hostPlatform.isLinux && withIntrospection;
+  doCheck = false;
   separateDebugInfo = true;
 
   postPatch = ''
@@ -197,6 +197,8 @@ stdenv.mkDerivation rec {
     };
 
     tests = {
+      unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+
       libsecret-tpm2 = libsecret.override {
         withTpm2Tss = true;
         abrmdSupport = false;
@@ -220,4 +222,4 @@ stdenv.mkDerivation rec {
       else
         glib.meta.platforms;
   };
-}
+})

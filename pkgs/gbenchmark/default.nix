@@ -9,14 +9,14 @@
   prometheus-cpp ? null,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "gbenchmark";
   version = "1.9.4";
 
   src = fetchFromGitHub {
     owner = "google";
     repo = "benchmark";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-P7wJcKkIBoWtN9FCRticpBzYbEZPq71a0iW/2oDTZRU=";
   };
 
@@ -44,9 +44,10 @@ stdenv.mkDerivation rec {
   env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.cc.isClang "-Wno-c++17-attribute-extensions";
 
   # Tests fail on 32-bit due to not enough precision
-  doCheck = stdenv.hostPlatform.is64bit;
+  doCheck = false;
 
   passthru.tests = {
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = stdenv.hostPlatform.is64bit; };
     inherit prometheus-cpp;
   };
 
@@ -56,4 +57,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.asl20;
     platforms = lib.platforms.linux ++ lib.platforms.darwin ++ lib.platforms.freebsd;
   };
-}
+})

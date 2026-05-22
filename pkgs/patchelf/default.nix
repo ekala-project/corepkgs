@@ -9,12 +9,12 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "patchelf";
   version = "0.15.2";
 
   src = fetchurl {
-    url = "https://github.com/NixOS/${pname}/releases/download/${version}/${pname}-${version}.tar.bz2";
+    url = "https://github.com/NixOS/${finalAttrs.pname}/releases/download/${finalAttrs.version}/${finalAttrs.pname}-${finalAttrs.version}.tar.bz2";
     sha256 = "sha256-F3RfVkFZyOIo/EEtplogSLhGxLa0Igt3y/IkFuAvLXw=";
   };
 
@@ -25,7 +25,9 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   # fails 8 out of 24 tests, problems when loading libc.so.6
-  doCheck = stdenv.name == "stdenv-linux";
+  doCheck = false;
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   meta = {
     homepage = "https://github.com/NixOS/patchelf";
@@ -34,4 +36,4 @@ stdenv.mkDerivation rec {
     mainProgram = "patchelf";
     platforms = lib.platforms.all;
   };
-}
+})

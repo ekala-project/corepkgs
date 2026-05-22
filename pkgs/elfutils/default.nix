@@ -26,12 +26,12 @@
 }:
 
 # TODO: Look at the hardcoded paths to kernel, modules etc.
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "elfutils";
   version = "0.194";
 
   src = fetchurl {
-    url = "https://sourceware.org/elfutils/ftp/${version}/${pname}-${version}.tar.bz2";
+    url = "https://sourceware.org/elfutils/ftp/${finalAttrs.version}/${finalAttrs.pname}-${finalAttrs.version}.tar.bz2";
     hash = "sha256-CeL/Az05uqiziKLX+8U5C/3pmuO3xnx9qvdDP7zw8B4=";
   };
 
@@ -124,16 +124,13 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  doCheck =
-    # Backtrace unwinding tests rely on glibc-internal symbol names.
-    # Musl provides slightly different forms and fails.
-    # Let's disable tests there until musl support is fully upstreamed.
-    !stdenv.hostPlatform.isMusl
-    # Test suite tries using `uname` to determine whether certain tests
-    # can be executed, so we need to match build and host platform exactly.
-    && (stdenv.hostPlatform == stdenv.buildPlatform);
-  doInstallCheck = !stdenv.hostPlatform.isMusl && (stdenv.hostPlatform == stdenv.buildPlatform);
+  doCheck = false;
+  doInstallCheck = false;
 
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs {
+    doCheck = !stdenv.hostPlatform.isMusl && (stdenv.hostPlatform == stdenv.buildPlatform);
+    doInstallCheck = !stdenv.hostPlatform.isMusl && (stdenv.hostPlatform == stdenv.buildPlatform);
+  };
   passthru.updateScript = gitUpdater {
     url = "https://sourceware.org/git/elfutils.git";
     rev-prefix = "elfutils-";
@@ -153,4 +150,4 @@ stdenv.mkDerivation rec {
       gpl3Plus
     ];
   };
-}
+})

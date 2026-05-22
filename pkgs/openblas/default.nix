@@ -179,7 +179,7 @@ let
   shlibExt = stdenv.hostPlatform.extensions.sharedLibrary;
 
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "openblas";
   version = "0.3.30";
 
@@ -191,7 +191,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "OpenMathLib";
     repo = "OpenBLAS";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-foP2OXUL6ttgYvCxLsxUiVdkPoTvGiHomdNudbSUmSE=";
   };
 
@@ -290,9 +290,9 @@ stdenv.mkDerivation rec {
   );
 
   # The default "all" target unconditionally builds the "tests" target.
-  buildFlags = lib.optionals (!doCheck) [ "shared" ];
+  buildFlags = lib.optionals (!finalAttrs.doCheck) [ "shared" ];
 
-  doCheck = true;
+  doCheck = false;
   checkTarget = "tests";
 
   postInstall = ''
@@ -301,7 +301,7 @@ stdenv.mkDerivation rec {
         for alias in blas cblas lapack; do
           cat <<EOF > $out/lib/pkgconfig/$alias.pc
     Name: $alias
-    Version: ${version}
+    Version: ${finalAttrs.version}
     Description: $alias provided by the OpenBLAS package.
     Cflags: -I$dev/include
     Libs: -L$out/lib -lopenblas
@@ -332,14 +332,17 @@ stdenv.mkDerivation rec {
     ln -s $out/lib/libopenblas.a $out/lib/liblapacke.a
   '';
 
-  passthru.tests = {
-    inherit (python3.pkgs) numpy scipy scikit-learn;
-    inherit
-      ceres-solver
-      giac
-      octave
-      opencv
-      ;
+  passthru = {
+    tests = {
+      unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+      inherit (python3.pkgs) numpy scipy scikit-learn;
+      inherit
+        ceres-solver
+        giac
+        octave
+        opencv
+        ;
+    };
   };
 
   meta = {
@@ -348,4 +351,4 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/OpenMathLib/OpenBLAS";
     platforms = lib.attrNames configs;
   };
-}
+})
