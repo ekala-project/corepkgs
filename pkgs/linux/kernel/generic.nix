@@ -115,7 +115,7 @@ let
         features = kernelFeatures; # Ensure we know of all extra patches, etc.
       };
 
-      # TODO(corepkgs): This references NixOS modules, repleace with EkaOS usage
+      # This references NixOS modules, replace with EkaOS usage
       #intermediateNixConfig =
       #  configfile.moduleStructuredConfig.intermediateNixConfig
       #  # extra config in legacy string format
@@ -176,7 +176,7 @@ let
 
         generateConfig = ./generate-config.pl;
 
-        # TODO(corepkgs): Kernel NixOS modules
+        # Kernel NixOS modules
         kernelConfig = kernelConfigFun intermediateNixConfig;
         passAsFile = [ "kernelConfig" ];
 

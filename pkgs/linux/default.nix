@@ -1,7 +1,6 @@
 {
   pkgs,
-  # This is meant to be be a list of overlays
-  # TODO(corepkgs): make a config.overlays.linux
+  # This is meant to be a list of overlays
   kernelPackagesExtensions ? [ ],
   config,
   buildPackages,

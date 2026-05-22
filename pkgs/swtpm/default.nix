@@ -128,8 +128,6 @@ stdenv.mkDerivation (finalAttrs: {
     wrapProgram "$out/bin/swtpm_setup" --suffix PATH : "$out/bin"
   '';
 
-  # Test suite is the majority of the build time
-  # TODO(corepkgs): move unit tests to passthru.tests
   doCheck = false;
   enableParallelBuilding = true;
 
@@ -138,7 +136,10 @@ stdenv.mkDerivation (finalAttrs: {
     "man"
   ];
 
-  passthru.tests = { inherit (nixosTests) systemd-cryptenroll; };
+  passthru.tests = {
+    inherit (nixosTests) systemd-cryptenroll;
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+  };
 
   meta = {
     description = "Libtpms-based TPM emulator";

@@ -6,12 +6,12 @@
   dejagnu,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libffi";
   version = "3.3";
 
   src = fetchurl {
-    url = "https://github.com/libffi/libffi/releases/download/v${version}/${pname}-${version}.tar.gz";
+    url = "https://github.com/libffi/libffi/releases/download/v${finalAttrs.version}/${finalAttrs.pname}-${finalAttrs.version}.tar.gz";
     hash = "sha256-cvunkicD3fp6Ao1ROsFahcjVTI1n9V+lpIAohdxlIFY=";
   };
 
@@ -45,10 +45,13 @@ stdenv.mkDerivation rec {
 
   dontStrip = stdenv.hostPlatform != stdenv.buildPlatform; # Don't run the native `strip' when cross-compiling.
 
-  # TODO(corepkgs): Move to passthru
   doCheck = false;
 
   nativeCheckInputs = [ dejagnu ];
+
+  passthru.tests = {
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+  };
 
   meta = {
     description = "Foreign function call interface library";
@@ -72,4 +75,4 @@ stdenv.mkDerivation rec {
     # never built on aarch64-darwin since first introduction in nixpkgs
     broken = stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64;
   };
-}
+})

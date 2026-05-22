@@ -58,9 +58,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   dontStrip = stdenv.hostPlatform != stdenv.buildPlatform; # Don't run the native `strip' when cross-compiling.
 
-  # test suite depends on dejagnu which cannot be used during bootstrapping
-  # dejagnu also requires tcl which can't be built statically at the moment
-  # TODO(corepkgs): Move to passthru
   doCheck = false;
 
   nativeCheckInputs = [ dejagnu ];
@@ -71,6 +68,7 @@ stdenv.mkDerivation (finalAttrs: {
       pkg-config = testers.hasPkgConfigModules {
         package = finalAttrs.finalPackage;
       };
+      unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
     };
   };
 

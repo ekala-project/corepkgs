@@ -1,5 +1,5 @@
 {
-  # TODO(corepkgs): all of those are not strictly needed to run stdenv, watch for upstream changes
+  # These are not strictly needed to run stdenv, watch for upstream changes
   callPackage,
   lib,
   stdenv,

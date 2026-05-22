@@ -53,7 +53,6 @@ stdenv.mkDerivation (finalAttrs: {
     hwloc
   ];
 
-  # TODO(corepkgs): move to passthru
   doCheck = false;
 
   dontUseNinjaCheck = true;
@@ -73,8 +72,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeFlags = [
     (lib.cmakeBool "TBB_DISABLE_HWLOC_AUTOMATIC_SEARCH" false)
-    # The majority of the build is the test suite.
-    # TODO(corepkgs): Run in passthru
     (lib.cmakeBool "TBB_TEST" finalAttrs.doCheck)
   ];
 
@@ -93,6 +90,8 @@ stdenv.mkDerivation (finalAttrs: {
     # See: https://www-lb.open-mpi.org/projects/hwloc/doc/v2.12.2/synthetic.html
     HWLOC_SYNTHETIC = "node:1 core:1 pu:1";
   };
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   meta = {
     description = "oneAPI Threading Building Blocks";

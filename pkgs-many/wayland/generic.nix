@@ -35,12 +35,9 @@
 }:
 
 let
-  # TODO(corepkgs): enable these
-  # withDocs = !isScanner;
-  # withTests = !isScanner;
   withDocumentation =
     graphviz-nox != null && (!isScanner) && stdenv.hostPlatform == stdenv.buildPlatform;
-  withTests = false;
+  withTests = !isScanner;
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "wayland" + lib.optionalString isScanner "-scanner";

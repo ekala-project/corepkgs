@@ -55,7 +55,6 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optional finalAttrs.finalPackage.doCheck "-DJSON_TestDataDirectory=${testData}";
 
-  # TODO(corepkgs): move to passthru. Test suite isn't currently being ran anyway
   doCheck = false;
 
   # skip tests that require git or modify “installed files”
@@ -64,6 +63,8 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   postInstall = "rm -rf $out/lib64";
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 
   meta = {
     description = "JSON for Modern C++";

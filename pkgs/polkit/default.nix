@@ -40,7 +40,7 @@ let
   system = "/run/current-system/sw";
   setuid = "/run/wrappers/bin";
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "polkit";
   version = "126";
 
@@ -54,7 +54,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "polkit-org";
     repo = "polkit";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-ZSqgW//q5DFIsmY17U93mJcK/CHSCHphKTHsTxp40q8=";
   };
 
@@ -111,7 +111,6 @@ stdenv.mkDerivation rec {
     glib # in .pc Requires
   ];
 
-  # TODO(corepkgs): enable tests in passthru.tests
   # nativeCheckInputs = [
   #   dbus
   #   util-linux # for mount
@@ -163,7 +162,7 @@ stdenv.mkDerivation rec {
     patchShebangs \
       test/wrapper.py
 
-    # ‘libpolkit-agent-1.so’ should call the setuid wrapper on
+    # 'libpolkit-agent-1.so' should call the setuid wrapper on
     # NixOS.  Hard-coding the path is kinda ugly.  Maybe we can just
     # call through $PATH, but that might have security implications.
     substituteInPlace src/polkitagent/polkitagentsession.c \
@@ -190,6 +189,10 @@ stdenv.mkDerivation rec {
     ! test -e "$DESTDIR"
   '';
 
+  passthru.tests = {
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+  };
+
   meta = {
     homepage = "https://github.com/polkit-org/polkit";
     description = "Toolkit for defining and handling the policy that allows unprivileged processes to speak to privileged processes";
@@ -200,4 +203,4 @@ stdenv.mkDerivation rec {
       lib.systems.inspect.platformPatterns.isStatic
     ];
   };
-}
+})

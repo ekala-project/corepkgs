@@ -19,13 +19,13 @@
   pytest-mock,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "meson-python";
   version = "0.18.0";
   pyproject = true;
 
   src = fetchPypi {
-    inherit version;
+    inherit (finalAttrs) version;
     pname = "meson_python";
     hash = "sha256-xWqZ7J32aaQGYv5GlgMhr25LFBBsFNsihwnBYo4jhI0=";
   };
@@ -71,14 +71,17 @@ buildPythonPackage rec {
     else
       null;
 
-  # TODO(corepkgs): move to passthru tests
   doCheck = false;
   setupHooks = [ ./add-build-flags.sh ];
 
+  passthru.tests = {
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+  };
+
   meta = {
-    changelog = "https://github.com/mesonbuild/meson-python/blob/${version}/CHANGELOG.rst";
+    changelog = "https://github.com/mesonbuild/meson-python/blob/${finalAttrs.version}/CHANGELOG.rst";
     description = "Meson Python build backend (PEP 517)";
     homepage = "https://github.com/mesonbuild/meson-python";
     license = [ lib.licenses.mit ];
   };
-}
+})

@@ -1,6 +1,6 @@
 # THIS IS A GENERATED FILE.  DO NOT EDIT!
 {
-  # TODO(corepkgs): upstream changes
+  # Watch for upstream changes
   lib,
   font-adobe-100dpi ? null,
   font-adobe-75dpi ? null,

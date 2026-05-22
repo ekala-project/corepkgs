@@ -155,18 +155,16 @@ stdenv.mkDerivation (finalAttrs: {
     EOF
   '';
 
-  # TODO(corepkgs): Move to passthru
   doCheck = false;
   doInstallCheck = false;
-  # doInstallCheck =
-  #   stdenv.buildPlatform.canExecute stdenv.hostPlatform
-  #   && !stdenv.hostPlatform.isDarwin
-  #   # Tests rely on mocking, which can't work with static libs.
-  #   && !stdenv.hostPlatform.isStatic;
-  # Since we rewrote the load path in the dynamic loader for the TCTI
-  # The various tcti implementation should be placed in their target directory
-  # before we could run tests, so we make turn checkPhase into installCheckPhase
   installCheckTarget = "check";
+
+  passthru.tests.unit = finalAttrs.finalPackage.overrideAttrs {
+    doInstallCheck =
+      stdenv.buildPlatform.canExecute stdenv.hostPlatform
+      && !stdenv.hostPlatform.isDarwin
+      && !stdenv.hostPlatform.isStatic;
+  };
 
   meta = {
     description = "OSS implementation of the TCG TPM2 Software Stack (TSS2)";

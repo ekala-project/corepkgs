@@ -67,7 +67,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   strictDeps = true;
 
-  # TODO(corepkgs): move to passthru, majority of build time is tests
   doCheck = false;
 
   # Make tests work with musl
@@ -110,6 +109,7 @@ stdenv.mkDerivation (finalAttrs: {
   passthru = {
     tests = {
       bmakeMusl = pkgsMusl.bmake or null;
+      unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
     };
   };
 

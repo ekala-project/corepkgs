@@ -20,12 +20,12 @@
   nixosTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "openldap";
   version = "2.6.9";
 
   src = fetchurl {
-    url = "https://www.openldap.org/software/download/OpenLDAP/openldap-release/${pname}-${version}.tgz";
+    url = "https://www.openldap.org/software/download/OpenLDAP/openldap-release/${finalAttrs.pname}-${finalAttrs.version}.tgz";
     hash = "sha256-LLfcc+nINA3/DZk1f7qleKvzDMZhnwUhlyxVVoHmsv8=";
   };
 
@@ -129,8 +129,6 @@ stdenv.mkDerivation rec {
     rm -f tests/scripts/test076-authid-rewrite
   '';
 
-  # TODO(corepkgs): move to passthru.
-  # Tests take a very long time to complete
   doCheck = false;
 
   # The directory is empty and serve no purpose.
@@ -155,6 +153,7 @@ stdenv.mkDerivation rec {
   passthru.tests = {
     inherit (nixosTests) openldap;
     kerberosWithLdap = nixosTests.kerberos.ldap;
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
   };
 
   meta = {
@@ -163,4 +162,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.openldap;
     platforms = lib.platforms.unix;
   };
-}
+})

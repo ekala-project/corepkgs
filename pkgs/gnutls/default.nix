@@ -47,24 +47,15 @@ let
   # break cyclic dependency
   autoconf = buildPackages.autoconf.v2_69;
 
-  # XXX: Gnulib's `test-select' fails on FreeBSD:
-  # https://hydra.nixos.org/build/2962084/nixlog/1/raw .
-  doCheck = false;
-  # TODO(corepkgs): move to passthru.tests
-  # doCheck =
-  #   !stdenv.hostPlatform.isFreeBSD
-  #   && !stdenv.hostPlatform.isDarwin
-  #   && stdenv.buildPlatform == stdenv.hostPlatform;
-
   inherit (stdenv.hostPlatform) isDarwin;
 in
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "gnutls";
   version = "3.8.10";
 
   src = fetchurl {
-    url = "mirror://gnupg/gnutls/v${lib.versions.majorMinor version}/gnutls-${version}.tar.xz";
+    url = "mirror://gnupg/gnutls/v${lib.versions.majorMinor finalAttrs.version}/gnutls-${finalAttrs.version}.tar.xz";
     hash = "sha256-23+rfM55Hncn677yM0MByCHXmlUOxVye8Ja2ELA+trc=";
   };
 
@@ -166,7 +157,7 @@ stdenv.mkDerivation rec {
     autoconf
     automake
   ]
-  ++ lib.optionals doCheck [
+  ++ lib.optionals finalAttrs.doCheck [
     which
     net-tools
     util-linuxMinimal
@@ -174,7 +165,10 @@ stdenv.mkDerivation rec {
 
   propagatedBuildInputs = [ nettle ];
 
-  inherit doCheck;
+  # XXX: Gnulib's `test-select' fails on FreeBSD:
+  # https://hydra.nixos.org/build/2962084/nixlog/1/raw .
+  doCheck = false;
+
   # stdenv's `NIX_SSL_CERT_FILE=/no-cert-file.crt` breaks tests.
   # Also empty files won't work, and we want to avoid potentially impure /etc/
   preCheck = "NIX_SSL_CERT_FILE=${./dummy.crt}";
@@ -212,6 +206,7 @@ stdenv.mkDerivation rec {
     python3-gnutls = python3Packages.python3-gnutls;
     rsyslog = rsyslog.override { withGnutls = true; };
     static = pkgsStatic.gnutls;
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
   };
 
   meta = {
@@ -233,4 +228,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.lgpl21Plus;
     platforms = lib.platforms.all;
   };
-}
+})

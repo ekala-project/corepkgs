@@ -7,7 +7,6 @@
   lib,
   stdenvNoCC,
   perl,
-  # TODO(corepkgs): add
   signingUtils ? null,
   shell ? stdenvNoCC.shell,
 }:

@@ -9,7 +9,7 @@
   s2n-tls,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-c-io";
   # nixpkgs-update: no auto update
   version = "0.22.0";
@@ -17,7 +17,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-io";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-NOEjXk4s/FV4CdmyXOr4Oh2y+pFNrUMP/Sy+X+fVQc4=";
   };
 
@@ -36,11 +36,11 @@ stdenv.mkDerivation rec {
     "-DBUILD_SHARED_LIBS=ON"
   ];
 
-  # TODO(corepkgs): move to passthru
   doCheck = false;
 
   passthru.tests = {
     inherit nix;
+    unit = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
   };
 
   meta = {
@@ -49,4 +49,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
   };
-}
+})

@@ -428,7 +428,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   ## InstallCheck
 
-  # TODO(corepkgs): move to passthru.tests
   doCheck = false;
   doInstallCheck = false;
 
