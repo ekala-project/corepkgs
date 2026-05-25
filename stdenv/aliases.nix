@@ -46,6 +46,11 @@ mapAliases {
   db6 = db.v6_0;
   db60 = db.v6_0;
   db62 = db.v6_2;
+  docbook_xml_dtd_412 = docbook-xml-dtd.v4_1_2;
+  docbook_xml_dtd_42 = docbook-xml-dtd.v4_2;
+  docbook_xml_dtd_43 = docbook-xml-dtd.v4_3;
+  docbook_xml_dtd_44 = docbook-xml-dtd.v4_4;
+  docbook_xml_dtd_45 = docbook-xml-dtd.v4_5;
   elixir_1_17 = elixir.v1_17;
   elixir_1_18 = elixir;
   flang_20 = llvm.v20.pkgs.flang;
