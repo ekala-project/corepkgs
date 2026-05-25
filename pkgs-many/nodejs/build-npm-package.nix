@@ -2,9 +2,11 @@
   lib,
   stdenv,
   nodejs,
-  fetchurl,
+  fetchNpmDeps,
   makeWrapper,
 }:
+
+assert lib.assertMsg (nodejs ? npmInstallHook) "nodejs must have npmInstallHook in passthru";
 
 {
   pname,
@@ -16,8 +18,23 @@
   makeCacheWritable ? false,
   buildInputs ? [ ],
   nativeBuildInputs ? [ ],
+  dontNpmInstall ? false,
+  # Workspace support for monorepos
+  npmWorkspace ? null,  # e.g., "packages/cli" or "@scope/package-name"
   ...
 }@args:
+
+let
+  # Create npm-deps FOD if npmDepsHash is provided
+  npmDeps =
+    if npmDepsHash != "" then
+      fetchNpmDeps {
+        inherit src;
+        hash = npmDepsHash;
+      }
+    else
+      null;
+in
 
 stdenv.mkDerivation (
   args
@@ -26,6 +43,7 @@ stdenv.mkDerivation (
 
     nativeBuildInputs = [
       nodejs
+      nodejs.npmInstallHook
       makeWrapper
     ]
     ++ nativeBuildInputs;
@@ -38,6 +56,15 @@ stdenv.mkDerivation (
 
         export HOME=$TMPDIR
         export npm_config_cache=$TMPDIR/.npm
+
+        ${lib.optionalString (npmDeps != null) ''
+          # Populate npm cache from FOD
+          if [ -d "${npmDeps}" ]; then
+            cp -r "${npmDeps}" "$npm_config_cache"
+            chmod -R +w "$npm_config_cache"
+          fi
+        ''}
+
         ${lib.optionalString makeCacheWritable ''
           chmod -R +w $npm_config_cache || true
         ''}
@@ -51,20 +78,26 @@ stdenv.mkDerivation (
 
         # Install dependencies
         ${
-          if npmDepsHash != "" then
+          if npmDeps != null then
             ''
-              # Use pre-fetched dependencies
+              # Use pre-fetched dependencies from FOD
               npm ci --offline --cache=$npm_config_cache ${lib.concatStringsSep " " npmFlags}
             ''
           else
             ''
+              # Fetch dependencies (impure, requires network)
               npm install --cache=$npm_config_cache ${lib.concatStringsSep " " npmFlags}
             ''
         }
 
+        # Patch shebangs in node_modules after install
+        if [ -d node_modules ]; then
+          patchShebangs node_modules
+        fi
+
         # Run build script if it exists
         ${lib.optionalString (npmBuildScript != "") ''
-          if grep -q "\"${npmBuildScript}\"" package.json; then
+          if grep -q "\"${npmBuildScript}\"" package.json 2>/dev/null; then
             npm run ${npmBuildScript} --cache=$npm_config_cache
           fi
         ''}
@@ -72,32 +105,9 @@ stdenv.mkDerivation (
         runHook postBuild
       '';
 
-    installPhase =
-      args.installPhase or ''
-        runHook preInstall
-
-        mkdir -p $out/{lib,bin}
-
-        # Copy the entire package to lib
-        cp -r . $out/lib/${pname}
-
-        # Remove node_modules and reinstall production dependencies
-        rm -rf $out/lib/${pname}/node_modules
-        cd $out/lib/${pname}
-        npm install --production --cache=$npm_config_cache ${lib.concatStringsSep " " npmFlags}
-
-        # Create bin wrappers for executables in package.json
-        if [ -f package.json ]; then
-          # Check if package.json has a "bin" field
-          if grep -q '"bin"' package.json; then
-            # Extract bin entries and create wrappers
-            # This is a simplified version - real implementation would parse JSON properly
-            ln -s $out/lib/${pname}/node_modules/.bin/* $out/bin/ 2>/dev/null || true
-          fi
-        fi
-
-        runHook postInstall
-      '';
+    # installPhase is handled by npmInstallHook
+    # Users can override by setting installPhase or dontNpmInstall
+    inherit dontNpmInstall;
 
     passthru = args.passthru or { } // {
       inherit nodejs;
@@ -106,5 +116,8 @@ stdenv.mkDerivation (
     meta = args.meta or { } // {
       platforms = nodejs.meta.platforms;
     };
+  }
+  // lib.optionalAttrs (npmWorkspace != null) {
+    inherit npmWorkspace;
   }
 )

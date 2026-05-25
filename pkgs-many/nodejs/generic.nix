@@ -90,6 +90,9 @@ stdenv.mkDerivation (finalAttrs: {
     inherit python3;
     majorVersion = majorVersion;
     minorVersion = minorVersion;
+    npmInstallHook = callPackage ./npm-install-hook.nix {
+      nodejs = finalAttrs.finalPackage;
+    };
     buildNpmPackage = callPackage ./build-npm-package.nix {
       nodejs = finalAttrs.finalPackage;
     };
