@@ -346,8 +346,6 @@ with final;
     else
       null;
 
-  glibcInfo = callPackage ./pkgs/glibc/info.nix { };
-
   glibc_multi = callPackage ./pkgs/glibc/multi.nix {
     # The buildPackages is required for cross-compilation. The pkgsi686Linux set
     # has target and host always set to the same value based on target platform
