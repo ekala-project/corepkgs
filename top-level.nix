@@ -655,7 +655,6 @@ with final;
     enableDarwinSandbox = false;
   };
 
-  patchelf = callPackage ./pkgs/patchelf { };
   patchelfUnstable = lowPrio (callPackage ./pkgs/patchelf/unstable.nix { });
 
   # These are used when building compiler-rt / libgcc, prior to building libc.
@@ -1138,6 +1137,7 @@ with final;
   # TODO(corepkgs): alias?
   m4 = gnum4;
 
+  # TODO(corepkgs): mkManyVariants
   coreutils = callPackage ./pkgs/coreutils { };
 
   # The coreutils above is built with dependencies from
@@ -1282,6 +1282,7 @@ with final;
     };
   } ./build-support/setup-hooks/update-autotools-gnu-config-scripts.sh;
 
+  # TODO(corepkgs): mkManyVariants
   readline70 = callPackage ./pkgs/readline/7.0.nix { };
   readline = callPackage ./pkgs/readline/8.3.nix { };
 
@@ -1332,12 +1333,14 @@ with final;
   httpTwoLevelsUpdater = callPackage ./common-updater/http-two-levels-updater.nix { };
   unstableGitUpdater = callPackage ./common-updater/unstable-updater.nix { };
 
+  # TODO(corepkgs): mkManyVariants
   bzip2_1_1 = callPackage ./pkgs/bzip2/1_1.nix { };
 
   # Use Apple’s fork of libffi by default, which provides APIs and trampoline functionality that is not yet
   # merged upstream. This is needed by some packages (such as cffi).
   #
   # `libffiReal` is provided in case the upstream libffi package is needed on Darwin instead of the fork.
+  # TODO(corepkgs): mkManyVariants, fix alias
   libffiReal = callPackage ./pkgs/libffi { };
   libffi = if stdenv.hostPlatform.isDarwin then darwin.libffi else libffiReal;
   libffi_3_3 = callPackage ./pkgs/libffi/3.3.nix { };
@@ -1370,10 +1373,11 @@ with final;
     })
   );
 
-  sqlite = lowPrio (callPackage ./pkgs/sqlite { });
   sqlar = callPackage ./pkgs/sqlite/sqlar.nix { };
+  # TODO(corepkgs): mkManyVariants
   sqlite-interactive = (sqlite.override { interactive = true; }).bin;
 
+  # TODO(corepkgs): mkManyVariants
   gawk-with-extensions = callPackage ./pkgs/gawk/gawk-with-extensions.nix {
     extensions = gawkextlib.full;
   };
@@ -1414,6 +1418,8 @@ with final;
       guiSupport = false;
     };
   };
+
+  # TODO(corepkgs): mkManyVariants
   systemdMinimal = systemd.override {
     pname = "systemd-minimal";
     withAcl = false;
@@ -1478,6 +1484,7 @@ with final;
   };
   udev = if lib.meta.availableOn stdenv.hostPlatform systemdLibs then systemdLibs else libudev-zero;
 
+  # TODO(corepkgs): mkManyVariants
   inherit (callPackages ./pkgs/docbook-xsl { })
     docbook-xsl-nons # was docbook_xsl
     docbook-xsl-ns # was docbook-xsl-ns
@@ -1486,11 +1493,13 @@ with final;
   # Alias for compatibility
   docbook-xsl = docbook-xsl-nons;
 
+  # TODO: mkManyVariants
   inherit (callPackage ./pkgs/libxml2 { })
     libxml2_13
     libxml2
     ;
 
+  # TODO: mkManyVariants
   # Should always be the version with the most features
   w3m-full = w3m;
   # Version without X11
@@ -1511,12 +1520,14 @@ with final;
     imlib2 = imlib2-nox;
   };
 
+  # TODO(corepkgs): mkManyVariants
   c-aresMinimal = callPackage ./pkgs/c-ares { withCMake = false; };
 
   libkrb5 = krb5; # TODO(de11n) Try to make krb5 reuse libkrb5 as a dependency
 
   ngtcp2-gnutls = callPackage ./pkgs/ngtcp2/gnutls.nix { };
 
+  # TODO(corepkgs): mkManyVariants
   patchutils_0_3_3 = callPackage ./pkgs/patchutils/0.3.3.nix { };
   patchutils_0_4_2 = callPackage ./pkgs/patchutils/0.4.2.nix { };
 
@@ -1536,6 +1547,7 @@ with final;
     ];
   };
 
+  # TODO(corepkgs): mkManyVariants
   # The full-featured Git.
   gitFull = git.override {
     svnSupport = stdenv.buildPlatform == stdenv.hostPlatform;
@@ -1553,6 +1565,7 @@ with final;
     '';
   } gitFull.doc;
 
+  # TODO(corepkgs): mkManyVariants
   gitMinimal = git.override {
     withManual = false;
     osxkeychainSupport = false;
@@ -1578,6 +1591,7 @@ with final;
 
   buildcatrust = with python3.pkgs; toPythonApplication buildcatrust;
 
+  # TODO(corepk): mkManyVariants
   docbook_sgml_dtd_31 = callPackage ./pkgs/docbook-sgml-dtd/3.1.nix { };
   docbook_sgml_dtd_41 = callPackage ./pkgs/docbook-sgml-dtd/4.1.nix { };
 
@@ -1587,6 +1601,7 @@ with final;
   openssh = opensshPackages.openssh.override {
     etcDir = "/etc/ssh";
   };
+  # TODO(corepkgs): why?
   opensshTest = openssh.tests.openssh;
   opensshWithKerberos = openssh.override {
     withKerberos = true;
@@ -1602,7 +1617,7 @@ with final;
     withKerberos = true;
   };
 
-  unixtools = lib.recurseIntoAttrs (callPackages ./unixtools.nix { });
+  unixtools = lib.recurseIntoAttrs (callFromScope ./unixtools.nix { });
   inherit (unixtools)
     hexdump
     ps
@@ -1700,6 +1715,7 @@ with final;
   luaPackages = lua.pkgs;
   luajitPackages = lua.jit_2_1.pkgs;
 
+  # TODO(corepkgs): mkManyVariants
   asciidoc = callPackage ./pkgs/asciidoc {
     inherit (python3.pkgs)
       pygments
@@ -1719,6 +1735,7 @@ with final;
     enableExtraPlugins = true;
   };
 
+  # TODO(corepkgs): mkManyVariants
   imagemagick6_light = imagemagick6.override {
     bzip2Support = false;
     zlibSupport = false;
@@ -1859,6 +1876,7 @@ with final;
 
   defaultCrateOverrides = callPackage ./build-support/rust/default-crate-overrides.nix { };
 
+  # TODO(corepkgs): mkManyVariants
   inherit (callPackages ./pkgs/cargo-pgrx { })
     cargo-pgrx_0_12_0_alpha_1
     cargo-pgrx_0_12_6

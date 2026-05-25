@@ -156,5 +156,6 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "sqlite3";
     platforms = lib.platforms.unix ++ lib.platforms.windows;
     pkgConfigModules = [ "sqlite3" ];
+    priority = 10;
   };
 })
