@@ -223,6 +223,8 @@ with final;
 
   yq = with python3Packages; toPythonApplication yq;
 
+  noCurlPkgs = callFromScope ./curless-pkgs { };
+
   # TODO(corepkgs): support darwin
   darwin = {
     autoSignDarwinBinariesHook = null;
@@ -539,61 +541,7 @@ with final;
     if stdenv.buildPlatform != stdenv.hostPlatform then
       buildPackages.fetchurl # No need to do special overrides twice,
     else
-      lib.makeOverridable (import ./pkgs/fetchurl) {
-        inherit
-          lib
-          stdenvNoCC
-          buildPackages
-          cacert
-          config
-          ;
-        curl = buildPackages.curlMinimal.override (old: rec {
-          # break dependency cycles
-          fetchurl = stdenv.fetchurlBoot;
-          zlib = buildPackages.zlib.override { fetchurl = stdenv.fetchurlBoot; };
-          pkg-config = buildPackages.pkg-config.override (old: {
-            pkg-config = old.pkg-config.override {
-              fetchurl = stdenv.fetchurlBoot;
-            };
-          });
-          perl = buildPackages.perl.override {
-            inherit zlib;
-            fetchurl = stdenv.fetchurlBoot;
-          };
-          openssl = buildPackages.openssl.override {
-            fetchurl = stdenv.fetchurlBoot;
-            buildPackages = {
-              coreutils = buildPackages.coreutils.override {
-                fetchurl = stdenv.fetchurlBoot;
-                inherit perl;
-                xz = buildPackages.xz.override { fetchurl = stdenv.fetchurlBoot; };
-                gmpSupport = false;
-                aclSupport = false;
-                attrSupport = false;
-              };
-              inherit perl;
-            };
-            inherit perl;
-          };
-          libssh2 = buildPackages.libssh2.override {
-            fetchurl = stdenv.fetchurlBoot;
-            inherit zlib openssl;
-          };
-          libkrb5 = buildPackages.krb5.override {
-            fetchurl = stdenv.fetchurlBoot;
-            inherit pkg-config perl openssl;
-            withLibedit = false;
-            byacc = buildPackages.byacc.override { fetchurl = stdenv.fetchurlBoot; };
-            keyutils = buildPackages.keyutils.override { fetchurl = stdenv.fetchurlBoot; };
-          };
-          nghttp2 = buildPackages.nghttp2.override {
-            fetchurl = stdenv.fetchurlBoot;
-            inherit pkg-config;
-            enableApp = false; # curl just needs libnghttp2
-            enableTests = false; # avoids bringing `cunit` and `tzdata` into scope
-          };
-        });
-      };
+      noCurlPkgs.callPackage ./pkgs/fetchurl { };
 
   # TODO: proper freebsd port
   freebsd = { };
