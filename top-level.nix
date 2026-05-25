@@ -77,7 +77,6 @@ with final;
   azmq = null;
   babel = null;
   bear = null;
-  bind = null;
   blockdiag = null;
   breathe = null;
   chameleon = null;
@@ -119,7 +118,6 @@ with final;
   gunicorn = null;
   harfbuzz = null;
   highlight = null;
-  htop = null;
   icewm = null;
   imagemagick = null;
   imlib2 = null;
@@ -728,7 +726,8 @@ with final;
     else
       null;
 
-  pnpmConfigHook = pnpmDeps.pnpmConfigHook;
+  pnpmConfigHook = callPackage ./pkgs/pnpmConfigHook { };
+  fetchPnpmDeps = callPackage ./pkgs/fetchPnpmDeps { };
 
   # TODO(corepkgs): This should be moved into unixtools
   procps = if stdenv.hostPlatform.isLinux then procps-ng else unixtools.procps;
@@ -1635,11 +1634,15 @@ with final;
 
   docbook_sgml_dtd_31 = callPackage ./pkgs/docbook-sgml-dtd/3.1.nix { };
   docbook_sgml_dtd_41 = callPackage ./pkgs/docbook-sgml-dtd/4.1.nix { };
-  docbook_xml_dtd_412 = callPackage ./pkgs/docbook-xml-dtd/4.1.2.nix { };
-  docbook_xml_dtd_42 = callPackage ./pkgs/docbook-xml-dtd/4.2.nix { };
-  docbook_xml_dtd_43 = callPackage ./pkgs/docbook-xml-dtd/4.3.nix { };
-  docbook_xml_dtd_44 = callPackage ./pkgs/docbook-xml-dtd/4.4.nix { };
-  docbook_xml_dtd_45 = callPackage ./pkgs/docbook-xml-dtd/4.5.nix { };
+
+  # DocBook XML DTD is auto-imported from pkgs-many/docbook-xml-dtd via mkManyVariants
+  # docbook-xml-dtd defaults to v4_5 (DocBook XML 4.5) as the DocBook XML DTD
+  # Individual versions accessible as: docbook-xml-dtd.variants.v4_1_2, docbook-xml-dtd.variants.v4_2, etc.
+  docbook_xml_dtd_412 = docbook-xml-dtd.variants.v4_1_2;
+  docbook_xml_dtd_42 = docbook-xml-dtd.variants.v4_2;
+  docbook_xml_dtd_43 = docbook-xml-dtd.variants.v4_3;
+  docbook_xml_dtd_44 = docbook-xml-dtd.variants.v4_4;
+  docbook_xml_dtd_45 = docbook-xml-dtd.variants.v4_5;
 
   docutils = with python3Packages; toPythonApplication docutils;
 
