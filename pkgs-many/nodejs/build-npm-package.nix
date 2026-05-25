@@ -20,7 +20,7 @@ assert lib.assertMsg (nodejs ? npmInstallHook) "nodejs must have npmInstallHook 
   nativeBuildInputs ? [ ],
   dontNpmInstall ? false,
   # Workspace support for monorepos
-  npmWorkspace ? null,  # e.g., "packages/cli" or "@scope/package-name"
+  npmWorkspace ? null, # e.g., "packages/cli" or "@scope/package-name"
   ...
 }@args:
 
