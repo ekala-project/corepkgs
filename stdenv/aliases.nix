@@ -137,6 +137,8 @@ mapAliases {
   openjdk = java;
   openjdk11 = java.v11;
   openssl_oqs = openssl.oqs;
+  patchutils_0_3_3 = patchutils.v0_3_3;
+  patchutils_0_4_2 = patchutils.v0_4_2;
   perl538 = perl.v5_38;
   perl540 = perl.v5_40;
   phpExtensions = php.buildPecl;

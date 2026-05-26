@@ -1,26 +1,30 @@
 {
+  version,
+  src-hash,
+  patches ? [ ],
+  withPython ? false,
+  ...
+}:
+
+{
   lib,
   stdenv,
   fetchurl,
   perl,
+  python3,
   makeWrapper,
-  version,
-  sha256,
-  patches ? [ ],
-  extraBuildInputs ? [ ],
-  ...
 }:
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "patchutils";
   inherit version patches;
 
   src = fetchurl {
-    url = "http://cyberelk.net/tim/data/patchutils/stable/${pname}-${version}.tar.xz";
-    inherit sha256;
+    url = "http://cyberelk.net/tim/data/patchutils/stable/${finalAttrs.pname}-${finalAttrs.version}.tar.xz";
+    sha256 = src-hash;
   };
 
   nativeBuildInputs = [ makeWrapper ];
-  buildInputs = [ perl ] ++ extraBuildInputs;
+  buildInputs = [ perl ] ++ lib.optional withPython python3;
   hardeningDisable = [ "format" ];
 
   # tests fail when building in parallel
@@ -50,4 +54,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.all;
   };
-}
+})

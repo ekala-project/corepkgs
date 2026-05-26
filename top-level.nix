@@ -522,7 +522,7 @@ with final;
   fetchpatch =
     callPackage ./pkgs/fetchpatch {
       # 0.3.4 would change hashes: https://github.com/NixOS/nixpkgs/issues/25154
-      patchutils = __splicedPackages.patchutils_0_3_3;
+      patchutils = __splicedPackages.patchutils.v0_3_3;
     }
     // {
       tests = pkgs.tests.fetchpatch;
@@ -530,7 +530,7 @@ with final;
     };
   fetchpatch2 =
     callPackage ./pkgs/fetchpatch {
-      patchutils = __splicedPackages.patchutils_0_4_2;
+      patchutils = __splicedPackages.patchutils.v0_4_2;
     }
     // {
       tests = pkgs.tests.fetchpatch2;
@@ -1468,9 +1468,6 @@ with final;
 
   ngtcp2-gnutls = callPackage ./pkgs/ngtcp2/gnutls.nix { };
 
-  # TODO(corepkgs): mkManyVariants
-  patchutils_0_3_3 = callPackage ./pkgs/patchutils/0.3.3.nix { };
-  patchutils_0_4_2 = callPackage ./pkgs/patchutils/0.4.2.nix { };
 
   gitFull = git.variants.full;
 
