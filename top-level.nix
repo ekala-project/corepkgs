@@ -1317,10 +1317,8 @@ with final;
   # merged upstream. This is needed by some packages (such as cffi).
   #
   # `libffiReal` is provided in case the upstream libffi package is needed on Darwin instead of the fork.
-  # TODO(corepkgs): mkManyVariants, fix alias
-  libffiReal = callPackage ./pkgs/libffi { };
-  libffi = if stdenv.hostPlatform.isDarwin then darwin.libffi else libffiReal;
-  libffi_3_3 = callPackage ./pkgs/libffi/3.3.nix { };
+  libffiReal = prev.libffi;
+  libffi = if stdenv.hostPlatform.isDarwin then darwin.libffi else final.libffiReal;
 
   libuuid = if stdenv.hostPlatform.isLinux then util-linuxMinimal else null;
 

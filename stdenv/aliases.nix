@@ -94,6 +94,7 @@ mapAliases {
   jdk17 = java.v17;
   jdk21 = java;
   kotlinc = kotlin;
+  libffi_3_3 = libffiReal.v3_3;
   libpng12 = libpng.v1_2;
   libtool2 = libtool.v2_5;
   libtool_1_5 = libtool.v1_5;
