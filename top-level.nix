@@ -1649,16 +1649,7 @@ with final;
 
   defaultCrateOverrides = callPackage ./build-support/rust/default-crate-overrides.nix { };
 
-  # TODO(corepkgs): mkManyVariants
-  inherit (callPackages ./pkgs/cargo-pgrx { })
-    cargo-pgrx_0_12_0_alpha_1
-    cargo-pgrx_0_12_6
-    cargo-pgrx_0_16_0
-    cargo-pgrx_0_16_1
-    cargo-pgrx
-    ;
-
-  buildPgrxExtension = callPackage ./pkgs/cargo-pgrx/buildPgrxExtension.nix { };
+  buildPgrxExtension = callPackage ./pkgs-many/cargo-pgrx/buildPgrxExtension.nix { };
 
   rust-bindgen-unwrapped = callPackage ./pkgs/rust-bindgen/unwrapped.nix { };
   rustup-toolchain-install-master = callPackage ./pkgs/rustup-toolchain-install-master { };

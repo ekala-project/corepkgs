@@ -34,6 +34,10 @@ mapAliases {
   bolt_20 = llvm.v20.pkgs.bolt;
   bolt_21 = llvm.v21.pkgs.bolt;
   c-aresMinimal = c-ares.minimal;
+  cargo-pgrx_0_12_0_alpha_1 = cargo-pgrx.v0_12_0_alpha_1;
+  cargo-pgrx_0_12_6 = cargo-pgrx.v0_12_6;
+  cargo-pgrx_0_16_0 = cargo-pgrx.v0_16_0;
+  cargo-pgrx_0_16_1 = cargo-pgrx.v0_16_1;
   clang_18 = llvm.v18.pkgs.clang;
   clang_19 = llvm.v19.pkgs.clang;
   clang_20 = llvm.v20.pkgs.clang;
