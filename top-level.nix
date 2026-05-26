@@ -1525,27 +1525,6 @@ with final;
   nix = nixVersions.stable;
   nixStatic = pkgsStatic.nix;
 
-  # TODO(corepkgs): move into build-support
-  ensureNewerSourcesHook =
-    { year }:
-    makeSetupHook
-      {
-        name = "ensure-newer-sources-hook";
-      }
-      (
-        writeScript "ensure-newer-sources-hook.sh" ''
-          postUnpackHooks+=(_ensureNewerSources)
-          _ensureNewerSources() {
-            local r=$sourceRoot
-            # Avoid passing option-looking directory to find. The example is diffoscope-269:
-            #   https://salsa.debian.org/reproducible-builds/diffoscope/-/issues/378
-            [[ $r == -* ]] && r="./$r"
-            '${findutils}/bin/find' "$r" \
-              '!' -newermt '${year}-01-01' -exec touch -h -d '${year}-01-02' '{}' '+'
-          }
-        ''
-      );
-  # Zip file format only allows times after year 1980, which makes e.g. Python
   # wheel building fail with:
   # ValueError: ZIP does not support timestamps before 1980
   ensureNewerSourcesForZipFilesHook = ensureNewerSourcesHook { year = "1980"; };
