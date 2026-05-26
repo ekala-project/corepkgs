@@ -119,7 +119,6 @@ with final;
   harfbuzz = null;
   highlight = null;
   icewm = null;
-  imagemagick = null;
   imlib2 = null;
   jansson = null;
   jhead = null;
@@ -1569,81 +1568,6 @@ with final;
 
   luaPackages = lua.pkgs;
   luajitPackages = lua.jit_2_1.pkgs;
-
-  # TODO(corepkgs): mkManyVariants
-  asciidoc = callPackage ./pkgs/asciidoc {
-    inherit (python3.pkgs)
-      pygments
-      matplotlib
-      numpy
-      aafigure
-      recursive-pth-loader
-      ;
-    w3m = w3m-batch;
-    enableStandardFeatures = false;
-  };
-  asciidoc-full = asciidoc.override {
-    enableStandardFeatures = true;
-  };
-  asciidoc-full-with-plugins = asciidoc.override {
-    enableStandardFeatures = true;
-    enableExtraPlugins = true;
-  };
-
-  # TODO(corepkgs): mkManyVariants
-  imagemagick6_light = imagemagick6.override {
-    bzip2Support = false;
-    zlibSupport = false;
-    libX11Support = false;
-    libXtSupport = false;
-    fontconfigSupport = false;
-    freetypeSupport = false;
-    ghostscriptSupport = false;
-    libjpegSupport = false;
-    djvulibreSupport = false;
-    lcms2Support = false;
-    openexrSupport = false;
-    libpngSupport = false;
-    liblqr1Support = false;
-    librsvgSupport = false;
-    libtiffSupport = false;
-    libxml2Support = false;
-    openjpegSupport = false;
-    libwebpSupport = false;
-    libheifSupport = false;
-    libde265Support = false;
-  };
-  imagemagick6 = callPackage ./pkgs/imagemagick/6.x.nix { };
-  imagemagick6Big = imagemagick6.override {
-    ghostscriptSupport = true;
-  };
-  imagemagick_light = lowPrio (
-    imagemagick.override {
-      bzip2Support = false;
-      zlibSupport = false;
-      libX11Support = false;
-      libXtSupport = false;
-      fontconfigSupport = false;
-      freetypeSupport = false;
-      libraqmSupport = false;
-      libjpegSupport = false;
-      djvulibreSupport = false;
-      lcms2Support = false;
-      openexrSupport = false;
-      libjxlSupport = false;
-      libpngSupport = false;
-      liblqr1Support = false;
-      librsvgSupport = false;
-      libtiffSupport = false;
-      libxml2Support = false;
-      openjpegSupport = false;
-      libwebpSupport = false;
-      libheifSupport = false;
-    }
-  );
-  imagemagickBig = imagemagick.override {
-    ghostscriptSupport = true;
-  };
 
   inherit (texlive.schemes)
     texliveBasic

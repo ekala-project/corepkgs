@@ -22,6 +22,8 @@ with pkgs;
 mapAliases {
   # keep-sorted start
 
+  asciidoc-full = asciidoc.full;
+  asciidoc-full-with-plugins = asciidoc.full-with-plugins;
   autoconf269 = autoconf.v2_69;
   autoconf271 = autoconf.v2_71;
   automake116x = automake.v1_16;
@@ -94,6 +96,11 @@ mapAliases {
   icu76 = icu.v76;
   icu77 = icu.v77;
   icu78 = icu.v78;
+  imagemagick6 = imagemagick.v6;
+  imagemagick6Big = imagemagick.v6-big;
+  imagemagick6_light = imagemagick.v6-light;
+  imagemagickBig = imagemagick.v7-big;
+  imagemagick_light = imagemagick.v7-light;
   jdk = java;
   jdk11 = java.v11;
   jdk17 = java.v17;

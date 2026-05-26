@@ -1,55 +1,62 @@
 {
+  version,
+  src-hash,
+  bzip2Support ? true,
+  zlibSupport ? true,
+  libX11Support ? null,
+  libXtSupport ? null,
+  fontconfigSupport ? true,
+  freetypeSupport ? true,
+  ghostscriptSupport ? false,
+  libjpegSupport ? true,
+  djvulibreSupport ? true,
+  lcms2Support ? true,
+  openexrSupport ? null,
+  libjxlSupport ? true,
+  libpngSupport ? true,
+  liblqr1Support ? true,
+  libraqmSupport ? true,
+  librawSupport ? true,
+  librsvgSupport ? null,
+  libtiffSupport ? true,
+  libxml2Support ? true,
+  openjpegSupport ? null,
+  libwebpSupport ? null,
+  libheifSupport ? true,
+  fftwSupport ? true,
+  mkVariantPassthru,
+  ...
+}@variantArgs:
+
+{
   lib,
   stdenv,
   fetchFromGitHub,
   pkg-config,
   libtool,
-  bzip2Support ? true,
   bzip2,
-  zlibSupport ? true,
   zlib,
-  libX11Support ? !stdenv.hostPlatform.isMinGW,
   libX11,
-  libXtSupport ? !stdenv.hostPlatform.isMinGW,
   libXt,
-  fontconfigSupport ? true,
   fontconfig,
-  freetypeSupport ? true,
   freetype,
-  ghostscriptSupport ? false,
   ghostscript,
-  libjpegSupport ? true,
   libjpeg,
-  djvulibreSupport ? true,
   djvulibre,
-  lcms2Support ? true,
   lcms2,
-  openexrSupport ? !stdenv.hostPlatform.isMinGW,
   openexr,
-  libjxlSupport ? true,
   libjxl,
-  libpngSupport ? true,
   libpng,
-  liblqr1Support ? true,
   liblqr1,
-  libraqmSupport ? true,
   libraqm,
-  librawSupport ? true,
   libraw,
-  librsvgSupport ? !stdenv.hostPlatform.isMinGW,
   librsvg,
   pango,
-  libtiffSupport ? true,
   libtiff,
-  libxml2Support ? true,
   libxml2,
-  openjpegSupport ? !stdenv.hostPlatform.isMinGW,
   openjpeg,
-  libwebpSupport ? !stdenv.hostPlatform.isMinGW,
   libwebp,
-  libheifSupport ? true,
   libheif,
-  fftwSupport ? true,
   fftw,
   potrace,
   coreutils,
@@ -60,7 +67,17 @@
   python3,
 }:
 
-assert libXtSupport -> libX11Support;
+let
+  # Resolve null platform-default flags using the local stdenv
+  libX11Support' = if libX11Support == null then !stdenv.hostPlatform.isMinGW else libX11Support;
+  libXtSupport' = if libXtSupport == null then !stdenv.hostPlatform.isMinGW else libXtSupport;
+  openexrSupport' = if openexrSupport == null then !stdenv.hostPlatform.isMinGW else openexrSupport;
+  librsvgSupport' = if librsvgSupport == null then !stdenv.hostPlatform.isMinGW else librsvgSupport;
+  openjpegSupport' = if openjpegSupport == null then !stdenv.hostPlatform.isMinGW else openjpegSupport;
+  libwebpSupport' = if libwebpSupport == null then !stdenv.hostPlatform.isMinGW else libwebpSupport;
+in
+
+assert libXtSupport' -> libX11Support';
 assert libraqmSupport -> freetypeSupport;
 
 let
@@ -85,13 +102,13 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "imagemagick";
-  version = "7.1.2-8";
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "ImageMagick";
     repo = "ImageMagick";
     tag = finalAttrs.version;
-    hash = "sha256-2jSQ59Wi6/1dbS/AgM1DfW6WlwoYuJlnTLoM8Mc6Ji8=";
+    hash = src-hash;
   };
 
   outputs = [
@@ -110,8 +127,8 @@ stdenv.mkDerivation (finalAttrs: {
     "RMDelegate=${lib.getExe' coreutils "rm"}"
     "--with-frozenpaths"
     (lib.withFeatureAs (arch != null) "gcc-arch" arch)
-    (lib.withFeature librsvgSupport "rsvg")
-    (lib.withFeature librsvgSupport "pango")
+    (lib.withFeature librsvgSupport' "rsvg")
+    (lib.withFeature librsvgSupport' "pango")
     (lib.withFeature liblqr1Support "lqr")
     (lib.withFeature libjxlSupport "jxl")
     (lib.withFeatureAs ghostscriptSupport "gs-font-dir" "${ghostscript.fonts}/share/fonts")
@@ -144,12 +161,12 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optional libheifSupport libheif
   ++ lib.optional djvulibreSupport djvulibre
   ++ lib.optional libjxlSupport libjxl
-  ++ lib.optional openexrSupport openexr
-  ++ lib.optionals librsvgSupport [
+  ++ lib.optional openexrSupport' openexr
+  ++ lib.optionals librsvgSupport' [
     librsvg
     pango
   ]
-  ++ lib.optional openjpegSupport openjpeg;
+  ++ lib.optional openjpegSupport' openjpeg;
 
   propagatedBuildInputs = [
     curl
@@ -158,9 +175,9 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optional freetypeSupport freetype
   ++ lib.optional libjpegSupport libjpeg
   ++ lib.optional lcms2Support lcms2
-  ++ lib.optional libX11Support libX11
-  ++ lib.optional libXtSupport libXt
-  ++ lib.optional libwebpSupport libwebp
+  ++ lib.optional libX11Support' libX11
+  ++ lib.optional libXtSupport' libXt
+  ++ lib.optional libwebpSupport' libwebp
   ++ lib.optional fftwSupport fftw;
 
   postInstall = ''
@@ -183,14 +200,16 @@ stdenv.mkDerivation (finalAttrs: {
     done
   '';
 
-  passthru.tests = {
-    version = testers.testVersion { package = finalAttrs.finalPackage; };
-    inherit nixos-icons;
-    inherit (perlPackages) ImageMagick;
-    inherit (python3.pkgs) img2pdf willow;
-    pkg-config = testers.hasPkgConfigModules {
-      package = finalAttrs.finalPackage;
-      version = lib.head (lib.splitString "-" finalAttrs.version);
+  passthru = mkVariantPassthru variantArgs // {
+    tests = {
+      version = testers.testVersion { package = finalAttrs.finalPackage; };
+      inherit nixos-icons;
+      inherit (perlPackages) ImageMagick;
+      inherit (python3.pkgs) img2pdf willow;
+      pkg-config = testers.hasPkgConfigModules {
+        package = finalAttrs.finalPackage;
+        version = lib.head (lib.splitString "-" finalAttrs.version);
+      };
     };
   };
 

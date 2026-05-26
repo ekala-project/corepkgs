@@ -1,4 +1,11 @@
 {
+  version,
+  enableStandardFeatures ? false,
+  enableExtraPlugins ? false,
+  ...
+}:
+
+{
   fetchurl,
   lib,
   stdenv,
@@ -6,10 +13,8 @@
   fetchFromGitHub,
   autoreconfHook,
   installShellFiles,
-  enableStandardFeatures ? false,
   sourceHighlight,
   highlight,
-  pygments,
   graphviz,
   texliveMinimal,
   dblatexFull,
@@ -27,9 +32,6 @@
   gnused,
   coreutils,
 
-  # if true, enable all the below filters and backends
-  enableExtraPlugins ? false,
-
   # unzip is needed to extract filter and backend plugins
   unzip,
   # filters
@@ -45,11 +47,7 @@
   enableQrcodeFilter ? false,
   qrencode,
   enableMatplotlibFilter ? false,
-  matplotlib,
-  numpy,
   enableAafigureFilter ? false,
-  aafigure,
-  recursive-pth-loader,
   # backends
   enableDeckjsBackend ? false,
   enableOdfBackend ? false,
@@ -61,6 +59,12 @@
 }:
 
 let
+  pygments = python3.pkgs.pygments;
+  matplotlib = python3.pkgs.matplotlib;
+  numpy = python3.pkgs.numpy;
+  aafigure = python3.pkgs.aafigure;
+  recursive-pth-loader = python3.pkgs.recursive-pth-loader;
+  w3m-batch = w3m.batch;
 
   _enableDitaaFilter = (enableExtraPlugins && enableJava) || enableDitaaFilter;
   _enableMscgenFilter = enableExtraPlugins || enableMscgenFilter;
@@ -143,7 +147,7 @@ python3.pkgs.buildPythonApplication rec {
     "asciidoc"
     + lib.optionalString enableStandardFeatures "-full"
     + lib.optionalString enableExtraPlugins "-with-plugins";
-  version = "10.2.1";
+  inherit version;
   pyproject = true;
 
   src = fetchFromGitHub {
@@ -268,7 +272,7 @@ python3.pkgs.buildPythonApplication rec {
             -e "s|^XSLTPROC =.*|XSLTPROC = '${libxslt.bin}/bin/xsltproc'|" \
             -e "s|^DBLATEX =.*|DBLATEX = '${dblatexFull}/bin/dblatex'|" \
             ${lib.optionalString enableJava ''-e "s|^FOP =.*|FOP = '${fop}/bin/fop'|"''} \
-            -e "s|^W3M =.*|W3M = '${w3m}/bin/w3m'|" \
+            -e "s|^W3M =.*|W3M = '${w3m-batch}/bin/w3m'|" \
             -e "s|^LYNX =.*|LYNX = '${lynx}/bin/lynx'|" \
             -e "s|^XMLLINT =.*|XMLLINT = '${libxml2.bin}/bin/xmllint'|" \
             -e "s|^EPUBCHECK =.*|EPUBCHECK = '${epubcheck}/bin/epubcheck'|" \

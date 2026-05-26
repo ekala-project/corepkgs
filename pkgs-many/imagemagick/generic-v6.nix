@@ -1,54 +1,68 @@
 {
+  version,
+  src-hash,
+  bzip2Support ? true,
+  zlibSupport ? true,
+  libX11Support ? null,
+  libXtSupport ? null,
+  fontconfigSupport ? true,
+  freetypeSupport ? true,
+  ghostscriptSupport ? false,
+  libjpegSupport ? true,
+  djvulibreSupport ? true,
+  lcms2Support ? true,
+  openexrSupport ? null,
+  libpngSupport ? true,
+  liblqr1Support ? true,
+  librsvgSupport ? null,
+  libtiffSupport ? true,
+  libxml2Support ? true,
+  openjpegSupport ? null,
+  libwebpSupport ? null,
+  libheifSupport ? true,
+  libde265Support ? true,
+  mkVariantPassthru,
+  ...
+}@variantArgs:
+
+{
   lib,
   stdenv,
   fetchFromGitHub,
   pkg-config,
   libtool,
-  bzip2Support ? true,
   bzip2,
-  zlibSupport ? true,
   zlib,
-  libX11Support ? !stdenv.hostPlatform.isMinGW,
   libX11,
-  libXtSupport ? !stdenv.hostPlatform.isMinGW,
   libXt,
-  fontconfigSupport ? true,
   fontconfig,
-  freetypeSupport ? true,
   freetype,
-  ghostscriptSupport ? false,
   ghostscript,
-  libjpegSupport ? true,
   libjpeg,
-  djvulibreSupport ? true,
   djvulibre,
-  lcms2Support ? true,
   lcms2,
-  openexrSupport ? !stdenv.hostPlatform.isMinGW,
   openexr,
-  libpngSupport ? true,
   libpng,
-  liblqr1Support ? true,
   liblqr1,
-  librsvgSupport ? !stdenv.hostPlatform.isMinGW,
   librsvg,
-  libtiffSupport ? true,
   libtiff,
-  libxml2Support ? true,
   libxml2,
-  openjpegSupport ? !stdenv.hostPlatform.isMinGW,
   openjpeg,
-  libwebpSupport ? !stdenv.hostPlatform.isMinGW,
   libwebp,
-  libheifSupport ? true,
   libheif,
-  libde265Support ? true,
   libde265,
   fftw,
   testers,
 }:
 
 let
+  libX11Support' = if libX11Support == null then !stdenv.hostPlatform.isMinGW else libX11Support;
+  libXtSupport' = if libXtSupport == null then !stdenv.hostPlatform.isMinGW else libXtSupport;
+  openexrSupport' = if openexrSupport == null then !stdenv.hostPlatform.isMinGW else openexrSupport;
+  librsvgSupport' = if librsvgSupport == null then !stdenv.hostPlatform.isMinGW else librsvgSupport;
+  openjpegSupport' = if openjpegSupport == null then !stdenv.hostPlatform.isMinGW else openjpegSupport;
+  libwebpSupport' = if libwebpSupport == null then !stdenv.hostPlatform.isMinGW else libwebpSupport;
+
   arch =
     if stdenv.hostPlatform.system == "i686-linux" then
       "i686"
@@ -70,13 +84,13 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "imagemagick";
-  version = "6.9.13-10";
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "ImageMagick";
     repo = "ImageMagick6";
     rev = finalAttrs.version;
-    sha256 = "sha256-AdlJaCJOrN+NkkzzzgELtgAr5iZ9dvlVYVc7tYiM+R8=";
+    sha256 = src-hash;
   };
 
   outputs = [
@@ -91,7 +105,7 @@ stdenv.mkDerivation (finalAttrs: {
   configureFlags = [
     "--with-frozenpaths"
     (lib.withFeatureAs (arch != null) "gcc-arch" arch)
-    (lib.withFeature librsvgSupport "rsvg")
+    (lib.withFeature librsvgSupport' "rsvg")
     (lib.withFeature liblqr1Support "lqr")
     (lib.withFeatureAs ghostscriptSupport "gs-font-dir" "${ghostscript.fonts}/share/fonts")
     (lib.withFeature ghostscriptSupport "gslib")
@@ -119,9 +133,9 @@ stdenv.mkDerivation (finalAttrs: {
     ++ lib.optional libheifSupport libheif
     ++ lib.optional libde265Support libde265
     ++ lib.optional djvulibreSupport djvulibre
-    ++ lib.optional openexrSupport openexr
-    ++ lib.optional librsvgSupport librsvg
-    ++ lib.optional openjpegSupport openjpeg;
+    ++ lib.optional openexrSupport' openexr
+    ++ lib.optional librsvgSupport' librsvg
+    ++ lib.optional openjpegSupport' openjpeg;
 
   propagatedBuildInputs = [
     fftw
@@ -130,9 +144,9 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optional freetypeSupport freetype
   ++ lib.optional libjpegSupport libjpeg
   ++ lib.optional lcms2Support lcms2
-  ++ lib.optional libX11Support libX11
-  ++ lib.optional libXtSupport libXt
-  ++ lib.optional libwebpSupport libwebp;
+  ++ lib.optional libX11Support' libX11
+  ++ lib.optional libXtSupport' libXt
+  ++ lib.optional libwebpSupport' libwebp;
 
   doCheck = false; # fails 2 out of 76 tests
 
@@ -153,7 +167,9 @@ stdenv.mkDerivation (finalAttrs: {
     done
   '';
 
-  passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  passthru = mkVariantPassthru variantArgs // {
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  };
 
   meta = {
     homepage = "https://legacy.imagemagick.org/";
