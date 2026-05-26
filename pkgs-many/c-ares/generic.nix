@@ -1,9 +1,15 @@
 {
+  version,
+  src-hash,
+  withCMake ? true,
+  ...
+}:
+
+{
   lib,
   stdenv,
   fetchurl,
   updateAutotoolsGnuConfigScriptsHook,
-  withCMake ? true,
   cmake,
 
   # sensitive downstream packages
@@ -18,12 +24,12 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "c-ares";
-  version = "1.34.5";
+  inherit version;
 
   src = fetchurl {
     # Note: tag name varies in some versions, e.g. v1.30.0, c-ares-1_17_0.
     url = "https://github.com/c-ares/c-ares/releases/download/v${finalAttrs.version}/c-ares-${finalAttrs.version}.tar.gz";
-    hash = "sha256-fZNXkOmvCBwlxJX9E8LPzaR5KYNBjpY1jvbnMg7gY0Y=";
+    hash = src-hash;
   };
 
   outputs = [

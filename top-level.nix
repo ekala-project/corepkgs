@@ -1464,9 +1464,6 @@ with final;
     libxml2
     ;
 
-  # TODO(corepkgs): mkManyVariants
-  c-aresMinimal = callPackage ./pkgs/c-ares { withCMake = false; };
-
   libkrb5 = krb5; # TODO(de11n) Try to make krb5 reuse libkrb5 as a dependency
 
   ngtcp2-gnutls = callPackage ./pkgs/ngtcp2/gnutls.nix { };

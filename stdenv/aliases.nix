@@ -31,6 +31,7 @@ mapAliases {
   bolt_19 = llvm.v19.pkgs.bolt;
   bolt_20 = llvm.v20.pkgs.bolt;
   bolt_21 = llvm.v21.pkgs.bolt;
+  c-aresMinimal = c-ares.minimal;
   clang_18 = llvm.v18.pkgs.clang;
   clang_19 = llvm.v19.pkgs.clang;
   clang_20 = llvm.v20.pkgs.clang;
