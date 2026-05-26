@@ -136,6 +136,11 @@ mapAliases {
   nodejs_23 = nodejs.v23;
   openjdk = java;
   openjdk11 = java.v11;
+  openssh_gssapi = openssh.gssapi;
+  openssh_hpn = openssh.hpn;
+  openssh_hpnWithKerberos = openssh.hpnWithKerberos;
+  opensshTest = openssh.tests.openssh;
+  opensshWithKerberos = openssh.withKerberos;
   openssl_oqs = openssl.oqs;
   patchutils_0_3_3 = patchutils.v0_3_3;
   patchutils_0_4_2 = patchutils.v0_4_2;

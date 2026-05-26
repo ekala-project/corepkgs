@@ -1493,26 +1493,6 @@ with final;
 
   docutils = with python3Packages; toPythonApplication docutils;
 
-  opensshPackages = lib.dontRecurseIntoAttrs (callPackage ./pkgs/openssh { });
-  openssh = opensshPackages.openssh.override {
-    etcDir = "/etc/ssh";
-  };
-  # TODO(corepkgs): why?
-  opensshTest = openssh.tests.openssh;
-  opensshWithKerberos = openssh.override {
-    withKerberos = true;
-  };
-  openssh_hpn = opensshPackages.openssh_hpn.override {
-    etcDir = "/etc/ssh";
-  };
-  openssh_hpnWithKerberos = openssh_hpn.override {
-    withKerberos = true;
-  };
-  openssh_gssapi = opensshPackages.openssh_gssapi.override {
-    etcDir = "/etc/ssh";
-    withKerberos = true;
-  };
-
   unixtools = lib.recurseIntoAttrs (callFromScope ./unixtools.nix { });
   inherit (unixtools)
     hexdump

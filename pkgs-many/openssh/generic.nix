@@ -1,13 +1,17 @@
 {
   pname,
   version,
+  src-hash,
   extraDesc ? "",
-  src,
-  extraPatches ? [ ],
-  extraNativeBuildInputs ? [ ],
-  extraConfigureFlags ? [ ],
-  extraMeta ? { },
+  variant ? "openssh",
+  enableKerberos ? false,
+  etcDir ? null,
+  ...
 }:
+
+let
+  withKerberos = enableKerberos;
+in
 
 {
   lib,
@@ -27,8 +31,6 @@
   pkg-config,
   pam,
   libredirect,
-  etcDir ? null,
-  withKerberos ? false,
   withLdns ? true,
   krb5,
   libfido2,
@@ -49,8 +51,62 @@
 # FIDO support requires SK support
 assert withFIDO -> withSecurityKey;
 
+let
+  urlFor = ver: "mirror://openbsd/OpenSSH/portable/openssh-${ver}.tar.gz";
+
+  hpnPatchUrl = "https://raw.githubusercontent.com/freebsd/freebsd-ports/7d4f03d56d19a19a15399a03b3ceca8a0f5924b4/security/openssh-portable/files/extra-patch-hpn";
+
+  variantPatches = {
+    openssh = [
+      # Use ssh-keysign from PATH
+      # ssh-keysign is used for host-based authentication, and is designed to be used
+      # as SUID-root program. OpenSSH defaults to referencing it from libexec, which
+      # cannot be made SUID in Nix.
+      ./ssh-keysign-8.5.patch
+    ];
+    hpn = [
+      ./ssh-keysign-8.5.patch
+      # HPN Patch from FreeBSD ports
+      (fetchpatch {
+        name = "ssh-hpn-wo-channels.patch";
+        url = hpnPatchUrl;
+        stripLen = 1;
+        excludes = [ "channels.c" ];
+        hash = "sha256-BGR0Jn1JoD/0q9/TKjygg9C3UWeVf0R2DrH0esMzmpY=";
+      })
+      (fetchpatch {
+        name = "ssh-hpn-channels.patch";
+        url = hpnPatchUrl;
+        extraPrefix = "";
+        includes = [ "channels.c" ];
+        hash = "sha256-pDLUbjv5XIyByEbiRAXC3WMUPKmn15af1stVmcvr7fE=";
+      })
+    ];
+    gssapi = [
+      ./ssh-keysign-8.5.patch
+      (fetchpatch {
+        name = "openssh-gssapi.patch";
+        url = "https://salsa.debian.org/ssh-team/openssh/raw/debian/1%2510.1p1-1/debian/patches/gssapi.patch";
+        hash = "sha256-/wJ3AA+RscHjFRSeL0LENviKlCglpOi7HNuCxidpQV8=";
+      })
+    ];
+  };
+
+  extraPatches = variantPatches.${variant};
+
+  # NOTE: hpn and gssapi variants intentionally add autoreconfHook again
+  # (already in base nativeBuildInputs) to match upstream behavior.
+  extraNativeBuildInputs = lib.optionals (variant != "openssh") [ autoreconfHook ];
+
+  extraConfigureFlags = lib.optionals (variant == "hpn") [ "--with-hpn" ];
+in
 stdenv.mkDerivation (finalAttrs: {
-  inherit pname version src;
+  inherit pname version;
+
+  src = fetchurl {
+    url = urlFor version;
+    hash = src-hash;
+  };
 
   outputs = [
     "out"
@@ -271,6 +327,5 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix ++ lib.platforms.windows;
     mainProgram = "ssh";
-  }
-  // extraMeta;
+  };
 })
