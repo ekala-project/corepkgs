@@ -1,4 +1,11 @@
 {
+  version,
+  src-hash,
+  useImlib2Nox ? false,
+  ...
+}@variantArgs:
+
+{
   lib,
   stdenv,
   fetchFromSourcehut,
@@ -9,11 +16,12 @@
   zlib,
   sslSupport ? true,
   openssl,
-  graphicsSupport ? !stdenv.hostPlatform.isDarwin,
+  graphicsSupport ? !stdenv.hostPlatform.isDarwin && (variantArgs.graphicsSupport or true),
   imlib2,
-  x11Support ? graphicsSupport,
+  imlib2-nox,
+  x11Support ? graphicsSupport && (variantArgs.x11Support or true),
   libx11,
-  mouseSupport ? !stdenv.hostPlatform.isDarwin,
+  mouseSupport ? !stdenv.hostPlatform.isDarwin && (variantArgs.mouseSupport or true),
   gpm-ncurses,
   perl,
   man,
@@ -25,6 +33,8 @@
 }:
 
 let
+  imlib2-pkg = if useImlib2Nox then imlib2-nox else imlib2;
+
   mktable = buildPackages.stdenv.mkDerivation {
     name = "w3m-mktable";
     inherit (w3m) src;
@@ -40,13 +50,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "w3m";
-  version = "0.5.5";
+  inherit version;
 
   src = fetchFromSourcehut {
     owner = "~rkta";
     repo = "w3m";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-rz9tNkMg5xUqMpMdK2AQlKjCJlCjgLQOkj4A/eyPm0M=";
+    hash = src-hash;
   };
 
   env = {
@@ -93,7 +103,7 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optional sslSupport openssl
   ++ lib.optional mouseSupport gpm-ncurses
-  ++ lib.optional graphicsSupport imlib2
+  ++ lib.optional graphicsSupport imlib2-pkg
   ++ lib.optional x11Support libx11;
 
   postInstall = lib.optionalString graphicsSupport ''

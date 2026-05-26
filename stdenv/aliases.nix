@@ -150,5 +150,9 @@ mapAliases {
   tcl-8_5 = tcl.v8_5;
   tcl-8_6 = tcl.v8_6;
   tcl-9_0 = tcl.v9_0;
+  w3m-batch = w3m.batch;
+  w3m-full = w3m.full;
+  w3m-nographics = w3m.nographics;
+  w3m-nox = w3m.nox;
   # keep-sorted end
 }
