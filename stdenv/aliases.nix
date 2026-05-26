@@ -94,6 +94,7 @@ mapAliases {
   jdk17 = java.v17;
   jdk21 = java;
   kotlinc = kotlin;
+  libpng12 = libpng.v1_2;
   libtool2 = libtool.v2_5;
   libtool_1_5 = libtool.v1_5;
   lld_18 = llvm.v18.pkgs.lld;
