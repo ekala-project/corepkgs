@@ -1553,10 +1553,6 @@ with final;
 
   buildcatrust = with python3.pkgs; toPythonApplication buildcatrust;
 
-  # TODO(corepk): mkManyVariants
-  docbook_sgml_dtd_31 = callPackage ./pkgs/docbook-sgml-dtd/3.1.nix { };
-  docbook_sgml_dtd_41 = callPackage ./pkgs/docbook-sgml-dtd/4.1.nix { };
-
   docutils = with python3Packages; toPythonApplication docutils;
 
   opensshPackages = lib.dontRecurseIntoAttrs (callPackage ./pkgs/openssh { });
