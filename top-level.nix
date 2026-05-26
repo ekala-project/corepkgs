@@ -1609,16 +1609,10 @@ with final;
   wrapRustcWith = { rustc-unwrapped, ... }@args: callPackage ./build-support/rust/rustc-wrapper args;
   wrapRustc = rustc-unwrapped: wrapRustcWith { inherit rustc-unwrapped; };
 
-  rust_1_91 = callPackage ./pkgs/rust/1_91.nix { };
-  rust = rust_1_91;
-
   mrustc-minicargo = callPackage ./pkgs/mrustc/minicargo.nix { };
   mrustc-bootstrap = callPackage ./pkgs/mrustc/bootstrap.nix { };
 
-  rustPackages_1_91 = rust_1_91.packages.stable;
-  rustPackages = rustPackages_1_91;
-
-  inherit (rustPackages)
+  inherit (rust.pkgs)
     cargo
     cargo-auditable
     cargo-auditable-cargo-wrapper
@@ -1629,7 +1623,7 @@ with final;
     rustfmt
     ;
 
-  makeRustPlatform = callPackage ./pkgs/rust/make-rust-platform.nix { };
+  makeRustPlatform = callPackage ./pkgs-many/rust/make-rust-platform.nix { };
 
   buildRustCrate =
     let

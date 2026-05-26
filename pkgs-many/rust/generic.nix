@@ -1,31 +1,56 @@
 {
-  rustcVersion,
+  version,
   rustcSha256,
-  enableRustcDev ? true,
   bootstrapVersion,
   bootstrapHashes,
-  selectRustPackage,
+  enableRustcDev ? true,
   rustcPatches ? [ ],
-  llvmShared,
-  llvmSharedForBuild,
-  llvmSharedForHost,
-  llvmSharedForTarget,
-  llvmPackages, # Exposed through rustc for LTO in Firefox
-}:
+  mkVariantPassthru,
+  ...
+}@variantArgs:
+
 {
   stdenv,
   lib,
   newScope,
   callPackage,
+  pkgsBuildTarget,
   pkgsBuildBuild,
   pkgsBuildHost,
-  pkgsBuildTarget,
+  pkgsHostTarget,
   pkgsTargetTarget,
   makeRustPlatform,
   wrapRustcWith,
+  llvmPackages,
+  llvm,
+  wrapCCWith,
+  overrideCC,
+  fetchpatch,
 }:
 
 let
+  llvmSharedFor =
+    pkgSet:
+    pkgSet.llvmPackages.libllvm.override (
+      {
+        enableSharedLibraries = true;
+      }
+      // lib.optionalAttrs (stdenv.targetPlatform.useLLVM or false) {
+        # Force LLVM to compile using clang + LLVM libs when targeting pkgsLLVM
+        stdenv = pkgSet.stdenv.override {
+          allowedRequisites = null;
+          cc = pkgSet.pkgsBuildHost.llvmPackages.clangUseLLVM;
+        };
+      }
+    );
+
+  llvmShared = llvmSharedFor pkgsHostTarget;
+  llvmSharedForBuild = llvmSharedFor pkgsBuildBuild;
+  llvmSharedForHost = llvmSharedFor pkgsBuildHost;
+  llvmSharedForTarget = llvmSharedFor pkgsBuildTarget;
+
+  selectRustPackage = pkgs: pkgs.rust.v1_91;
+
   # Use `import` to make sure no packages sneak in here.
   lib' = import ../../build-support/rust/lib {
     inherit
@@ -36,35 +61,11 @@ let
       pkgsTargetTarget
       ;
   };
+
   # Allow faster cross compiler generation by reusing Build artifacts
   fastCross =
     (stdenv.buildPlatform == stdenv.hostPlatform) && (stdenv.hostPlatform != stdenv.targetPlatform);
-in
-{
-  lib = lib';
 
-  # Backwards compat before `lib` was factored out.
-  inherit (lib')
-    toTargetArch
-    toTargetOs
-    toRustTarget
-    toRustTargetSpec
-    IsNoStdTarget
-    toRustTargetForUseInEnvVars
-    envVars
-    ;
-
-  # This just contains tools for now. But it would conceivably contain
-  # libraries too, say if we picked some default/recommended versions to build
-  # by Hydra.
-  #
-  # In the end game, rustc, the rust standard library (`core`, `std`, etc.),
-  # and cargo would themselves be built with `buildRustCreate` like
-  # everything else. Tools and `build.rs` and procedural macro dependencies
-  # would be taken from `buildRustPackages` (and `bootstrapRustPackages` for
-  # anything provided prebuilt or their build-time dependencies to break
-  # cycles / purify builds). In this way, nixpkgs would be in control of all
-  # bootstrapping.
   packages = {
     prebuilt = callPackage ./bootstrap.nix {
       version = bootstrapVersion;
@@ -78,7 +79,7 @@ in
         # nothing in the final package set should refer to this.
         bootstrapRustPackages =
           if fastCross then
-            pkgsBuildBuild.rustPackages
+            pkgsBuildBuild.rust.pkgs
           else
             self.buildRustPackages.overrideScope (
               _: _:
@@ -93,7 +94,7 @@ in
         # Analogous to stdenv
         rustPlatform = makeRustPlatform self.buildRustPackages;
         rustc-unwrapped = self.callPackage ./rustc.nix {
-          version = rustcVersion;
+          inherit version;
           sha256 = rustcSha256;
           inherit enableRustcDev;
           inherit
@@ -132,4 +133,29 @@ in
       }
     );
   };
-}
+
+  rustc = packages.stable.rustc;
+in
+
+# Return rustc wrapper as the main derivation; expose everything via passthru
+rustc.overrideAttrs (oldAttrs: {
+  passthru =
+    (oldAttrs.passthru or { })
+    // mkVariantPassthru variantArgs
+    // {
+      # The full scope, analogous to llvm's `passthru.pkgs`
+      pkgs = packages.stable;
+      inherit packages;
+      lib = lib';
+      inherit (lib')
+        toTargetArch
+        toTargetOs
+        toRustTarget
+        toRustTargetSpec
+        IsNoStdTarget
+        toRustTargetForUseInEnvVars
+        envVars
+        ;
+      inherit variantArgs;
+    };
+})

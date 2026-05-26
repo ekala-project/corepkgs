@@ -1,60 +1,7 @@
-# New rust versions should first go to staging.
-# Things to check after updating:
-# 1. Rustc should produce rust binaries on x86_64-linux, aarch64-linux and x86_64-darwin:
-#    i.e. nix-shell -p fd or @GrahamcOfBorg build fd on github
-#    This testing can be also done by other volunteers as part of the pull
-#    request review, in case platforms cannot be covered.
-# 2. The LLVM version used for building should match with rust upstream.
-#    Check the version number in the src/llvm-project git submodule in:
-#    https://github.com/rust-lang/rust/blob/<version-tag>/.gitmodules
-
 {
-  stdenv,
-  lib,
-  newScope,
-  callPackage,
-  pkgsBuildTarget,
-  pkgsBuildBuild,
-  pkgsBuildHost,
-  pkgsHostTarget,
-  pkgsTargetTarget,
-  makeRustPlatform,
-  wrapRustcWith,
-  llvmPackages,
-  llvm,
-  wrapCCWith,
-  overrideCC,
-  fetchpatch,
-}@args:
-let
-  llvmSharedFor =
-    pkgSet:
-    pkgSet.llvmPackages.libllvm.override (
-      {
-        enableSharedLibraries = true;
-      }
-      // lib.optionalAttrs (stdenv.targetPlatform.useLLVM or false) {
-        # Force LLVM to compile using clang + LLVM libs when targeting pkgsLLVM
-        stdenv = pkgSet.stdenv.override {
-          allowedRequisites = null;
-          cc = pkgSet.pkgsBuildHost.llvmPackages.clangUseLLVM;
-        };
-      }
-    );
-in
-import ./default.nix
-  {
-    rustcVersion = "1.91.1";
+  v1_91 = {
+    version = "1.91.1";
     rustcSha256 = "sha256-ONziBdOfYVcSYfBEQjehzp7+y5cOdg2OxNlXr1tEVyM=";
-
-    llvmSharedForBuild = llvmSharedFor pkgsBuildBuild;
-    llvmSharedForHost = llvmSharedFor pkgsBuildHost;
-    llvmSharedForTarget = llvmSharedFor pkgsBuildTarget;
-
-    inherit llvmPackages;
-
-    # For use at runtime
-    llvmShared = llvmSharedFor pkgsHostTarget;
 
     # Note: the version MUST be the same version that we are building. Upstream
     # ensures that each released compiler can compile itself:
@@ -81,17 +28,5 @@ import ./default.nix
       loongarch64-unknown-linux-musl = "7b071bc98d1e42dd802cc5b5bb83a9467d02ad6621231363519c869d322dcd5f";
       x86_64-unknown-freebsd = "9e231fa573b6bb99654a689687aede2014d4c21ac3c8422534c990c859632f50";
     };
-
-    selectRustPackage = pkgs: pkgs.rust_1_91;
-  }
-
-  (
-    removeAttrs args [
-      "llvmPackages"
-      "llvm"
-      "wrapCCWith"
-      "overrideCC"
-      "pkgsHostTarget"
-      "fetchpatch"
-    ]
-  )
+  };
+}

@@ -157,6 +157,9 @@ mapAliases {
   r = r-lang;
   rLang = r-lang;
   readline70 = readline.v7_0;
+  rustPackages = rust.pkgs;
+  rustPackages_1_91 = rust.v1_91.pkgs;
+  rust_1_91 = rust.v1_91;
   scala_2_13 = scala.v2_13;
   scala_3 = scala;
   texinfo6 = texinfo.v6;
