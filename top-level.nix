@@ -1456,13 +1456,6 @@ with final;
   };
   udev = if lib.meta.availableOn stdenv.hostPlatform systemdLibs then systemdLibs else libudev-zero;
 
-
-  # TODO: mkManyVariants
-  inherit (callPackage ./pkgs/libxml2 { })
-    libxml2_13
-    libxml2
-    ;
-
   libkrb5 = krb5; # TODO(de11n) Try to make krb5 reuse libkrb5 as a dependency
 
   ngtcp2-gnutls = callPackage ./pkgs/ngtcp2/gnutls.nix { };

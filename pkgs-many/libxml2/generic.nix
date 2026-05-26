@@ -1,4 +1,14 @@
 {
+  version,
+  src,
+  extraPatches ? [ ],
+  extraMeta ? { },
+  freezeUpdateScript ? false,
+  mkVariantPassthru,
+  ...
+}@variantArgs:
+
+{
   stdenv,
   darwin,
   lib,
@@ -19,12 +29,6 @@
   gnome,
   testers,
   enableHttp ? false,
-
-  version,
-  extraPatches ? [ ],
-  src,
-  extraMeta ? { },
-  freezeUpdateScript ? false,
 }:
 
 let
@@ -120,7 +124,7 @@ stdenv'.mkDerivation (finalAttrs: {
     moveToOutput lib/libxml2.a "$static"
   '';
 
-  passthru = {
+  passthru = mkVariantPassthru variantArgs // {
     inherit pythonSupport;
 
     updateScript = gnome.updateScript {
@@ -137,6 +141,7 @@ stdenv'.mkDerivation (finalAttrs: {
         package = finalAttrs.finalPackage;
       };
     };
+    inherit variantArgs;
   };
 
   meta = {

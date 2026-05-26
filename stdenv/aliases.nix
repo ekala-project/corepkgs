@@ -114,6 +114,7 @@ mapAliases {
   libpng12 = libpng.v1_2;
   libtool2 = libtool.v2_5;
   libtool_1_5 = libtool.v1_5;
+  libxml2_13 = libxml2.v2_13;
   lld_18 = llvm.v18.pkgs.lld;
   lld_19 = llvm.v19.pkgs.lld;
   lld_20 = llvm.v20.pkgs.lld;
