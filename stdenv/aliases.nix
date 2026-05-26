@@ -139,6 +139,9 @@ mapAliases {
   readline70 = readline.v7_0;
   scala_2_13 = scala.v2_13;
   scala_3 = scala;
+  texinfo6 = texinfo.v6;
+  texinfo7 = texinfo.v7;
+  texinfoInteractive = texinfo.interactive;
   tcl-8_5 = tcl.v8_5;
   tcl-8_6 = tcl.v8_6;
   tcl-9_0 = tcl.v9_0;

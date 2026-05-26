@@ -1288,10 +1288,6 @@ with final;
 
   testers = callPackage ./build-support/testers { };
 
-  texinfo6 = texinfo.v6;
-  texinfo7 = texinfo.v7;
-  texinfoInteractive = texinfo.interactive;
-
   # TODO(corepkgs): remove hack
   threads =
     lib.optionalAttrs (stdenv.hostPlatform.isMinGW && !(stdenv.hostPlatform.useLLVM or false))
