@@ -1352,12 +1352,10 @@ with final;
   # TODO(corepkgs): mkManyVariants
   sqlite-interactive = (sqlite.override { interactive = true; }).bin;
 
-  # TODO(corepkgs): mkManyVariants
   gawk-with-extensions = callPackage ./pkgs/gawk/gawk-with-extensions.nix {
     extensions = gawkextlib.full;
   };
   gawkextlib = callPackage ./pkgs/gawk/gawkextlib.nix { };
-  gawkInteractive = gawk.override { interactive = true; };
 
   # TODO(corepkgs): alias?
   patch = gnupatch;

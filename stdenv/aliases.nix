@@ -61,6 +61,7 @@ mapAliases {
   flang_21 = llvm.v21.pkgs.flang;
   flex_2_5_39 = flex.v2_5_39;
   fuse3 = fuse;
+  gawkInteractive = gawk.interactive;
   gitFull = git.full;
   gitMinimal = git.minimal;
   gmp6 = gmp.v6_3;
