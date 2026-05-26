@@ -1,4 +1,10 @@
 {
+  version,
+  mkVariantPassthru,
+  ...
+}@variantArgs:
+
+{
   config,
   lib,
   stdenv,
@@ -37,7 +43,7 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "gtk+";
-  version = "2.24.33";
+  inherit version;
 
   src = fetchurl {
     url = "mirror://gnome/sources/gtk+/2.24/gtk+-${finalAttrs.version}.tar.xz";
@@ -141,13 +147,14 @@ stdenv.mkDerivation (finalAttrs: {
     moveToOutput bin/gtk-update-icon-cache "$out"
   '';
 
-  passthru = {
+  passthru = mkVariantPassthru variantArgs // {
     gtkExeEnvPostBuild = ''
       rm $out/lib/gtk-2.0/2.10.0/immodules.cache
       $out/bin/gtk-query-immodules-2.0 $out/lib/gtk-2.0/2.10.0/immodules/*.so > $out/lib/gtk-2.0/2.10.0/immodules.cache
     ''; # workaround for bug of nix-mode for Emacs */ '';
     inherit gdktarget;
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    inherit variantArgs;
   };
 
   meta = {

@@ -1,4 +1,10 @@
 {
+  version,
+  mkVariantPassthru,
+  ...
+}@variantArgs:
+
+{
   lib,
   stdenv,
   buildPackages,
@@ -70,7 +76,7 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "gtk4";
-  version = "4.20.3";
+  inherit version;
 
   outputs = [
     "out"
@@ -276,7 +282,7 @@ stdenv.mkDerivation (finalAttrs: {
       moveToOutput "share/doc" "$devdoc"
     '';
 
-  passthru = {
+  passthru = mkVariantPassthru variantArgs // {
     updateScript = gnome.updateScript {
       packageName = "gtk";
       versionPolicy = "odd-unstable";
@@ -287,6 +293,7 @@ stdenv.mkDerivation (finalAttrs: {
         package = finalAttrs.finalPackage;
       };
     };
+    inherit variantArgs;
   };
 
   meta = {

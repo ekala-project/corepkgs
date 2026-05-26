@@ -1,4 +1,10 @@
 {
+  version,
+  mkVariantPassthru,
+  ...
+}@variantArgs:
+
+{
   lib,
   stdenv,
   replaceVars,
@@ -62,7 +68,7 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "gtk+3";
-  version = "3.24.51";
+  inherit version;
 
   outputs = [
     "out"
@@ -266,13 +272,14 @@ stdenv.mkDerivation (finalAttrs: {
       sed '/^# ModulesPath =/d' -i "$out"/lib/gtk-*/*/immodules.cache
     '';
 
-  passthru = {
+  passthru = mkVariantPassthru variantArgs // {
     updateScript = gnome.updateScript {
       packageName = "gtk";
       attrPath = "gtk3";
       freeze = true;
     };
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    inherit variantArgs;
   };
 
   meta = {

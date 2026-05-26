@@ -1478,9 +1478,6 @@ with final;
   makeFontsConf = callPackage ./build-support/make-fonts-conf { };
   makeFontsCache = callPackage ./build-support/make-fonts-cache { };
 
-  gtk3 = callPackage ./pkgs/gtk/3.x.nix { };
-  gtk4 = callPackage ./pkgs/gtk/4.x.nix { };
-
   buildcatrust = with python3.pkgs; toPythonApplication buildcatrust;
 
   docutils = with python3Packages; toPythonApplication docutils;

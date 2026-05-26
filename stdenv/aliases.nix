@@ -81,6 +81,9 @@ mapAliases {
   gradle_7 = gradle.v7;
   gradle_8 = gradle;
   gradle_9 = gradle.v9;
+  gtk2 = gtk.v2;
+  gtk3 = gtk.v3;
+  gtk4 = gtk.v4;
   guile_1_8 = guile.v1_8;
   guile_2_0 = guile.v2_0;
   guile_2_2 = guile.v2_2;
