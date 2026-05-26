@@ -57,8 +57,10 @@ mapAliases {
   flang_21 = llvm.v21.pkgs.flang;
   flex_2_5_39 = flex.v2_5_39;
   fuse3 = fuse;
-  gmp6 = gmp.variants.v6_3;
-  gmpxx = gmp.variants.cxx;
+  gitFull = git.full;
+  gitMinimal = git.minimal;
+  gmp6 = gmp.v6_3;
+  gmpxx = gmp.cxx;
   go_1_24 = go.v1_24;
   go_1_25 = go.v1_25;
   gradle_7 = gradle.v7;

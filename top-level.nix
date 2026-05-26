@@ -1531,31 +1531,7 @@ with final;
   patchutils_0_3_3 = callPackage ./pkgs/patchutils/0.3.3.nix { };
   patchutils_0_4_2 = callPackage ./pkgs/patchutils/0.4.2.nix { };
 
-  git = callPackage ./pkgs/git {
-    perlLibs = [
-      perlPackages.LWP
-      perlPackages.URI
-      perlPackages.TermReadKey
-    ];
-    smtpPerlLibs = [
-      perlPackages.libnet
-      perlPackages.NetSMTPSSL
-      perlPackages.IOSocketSSL
-      perlPackages.NetSSLeay
-      perlPackages.AuthenSASL
-      perlPackages.DigestHMAC
-    ];
-  };
-
-  # TODO(corepkgs): mkManyVariants
-  # The full-featured Git.
-  gitFull = git.override {
-    svnSupport = stdenv.buildPlatform == stdenv.hostPlatform;
-    guiSupport = true;
-    sendEmailSupport = stdenv.buildPlatform == stdenv.hostPlatform;
-    withSsh = true;
-    withLibsecret = !stdenv.hostPlatform.isDarwin;
-  };
+  gitFull = git.variants.full;
 
   git-doc = lib.addMetaAttrs {
     description = "Additional documentation for Git";
@@ -1564,20 +1540,6 @@ with final;
       is referenced in the man pages of Git.
     '';
   } gitFull.doc;
-
-  # TODO(corepkgs): mkManyVariants
-  gitMinimal = git.override {
-    withManual = false;
-    osxkeychainSupport = false;
-    pythonSupport = false;
-    perlSupport = false;
-    withpcre2 = false;
-    # FIXME(corepkgs): these are hacks to break the infinite recursion
-    # Prefer plain zlib and curl without HTTP/3 to keep bootstrap cycle small.
-    # Avoid curl with HTTP/3 (nghttp3) to break the cmake→git→curl→nghttp3→cmake cycle.
-    curl = curlMinimal;
-    withZlibNg = false;
-  };
 
   deterministic-host-uname = deterministic-uname.override {
     forPlatform = stdenv.targetPlatform; # offset by 1 so it works in nativeBuildInputs

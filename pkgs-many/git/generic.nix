@@ -1,4 +1,18 @@
 {
+  version,
+  src-url,
+  src-hash,
+  isMinimal ? false,
+  withSsh ? false,
+  guiSupport ? false,
+  # null means "use platform default" (resolved below)
+  packageAtLeast,
+  packageOlder,
+  mkVariantPassthru,
+  ...
+}@variantArgs:
+
+{
   fetchurl,
   lib,
   stdenv,
@@ -14,7 +28,7 @@
   gnugrep,
   gnused,
   gawk,
-  coreutils, # needed at runtime by git-filter-branch etc
+  coreutils,
   openssh,
   pcre2,
   bash,
@@ -30,38 +44,39 @@
   makeWrapper,
   libiconv,
   libiconvReal,
-  svnSupport ? false,
   subversionClient,
-  perlLibs,
-  smtpPerlLibs,
-  perlSupport ? stdenv.buildPlatform == stdenv.hostPlatform,
-  nlsSupport ? true,
-  osxkeychainSupport ? stdenv.hostPlatform.isDarwin,
-  guiSupport ? false,
-  withManual ? true,
-  pythonSupport ? true,
-  withpcre2 ? true,
-  withZlibNg ? true,
-  sendEmailSupport ? perlSupport,
   nixosTests,
-  withLibsecret ? false,
   pkg-config,
   glib,
   libsecret,
-  gzip, # needed at runtime by gitweb.cgi
-  withSsh ? false,
+  gzip,
   sysctl,
-  deterministic-host-uname, # trick Makefile into targeting the host platform when cross-compiling
-  doInstallCheck ? !stdenv.hostPlatform.isDarwin, # extremely slow on darwin
+  deterministic-host-uname,
+  doInstallCheck ? !stdenv.hostPlatform.isDarwin,
   tests,
-}:
+}@pkgArgs:
+
+let
+  # Resolve platform-dependent defaults (null = auto-detect from platform)
+  isCross = !(lib.systems.equals stdenv.buildPlatform stdenv.hostPlatform);
+
+  perlSupport = !(isMinimal || isCross);
+  osxkeychainSupport = !isMinimal && stdenv.hostPlatform.isDarwin;
+  sendEmailSupport = perlSupport;
+  svnSupport = !isMinimal && !isCross;
+  withManual = !isMinimal;
+  withLibsecret = !isMinimal && !stdenv.hostPlatform.isDarwin;
+  effectiveCurl = if isMinimal then curl.minimal else curl;
+  withZlibNg = !isMinimal;
+  withpcre2 = !isMinimal;
+  pythonSupport = !isMinimal;
+in
 
 assert osxkeychainSupport -> stdenv.hostPlatform.isDarwin;
 assert sendEmailSupport -> perlSupport;
 assert svnSupport -> perlSupport;
 
 let
-  version = "2.51.2";
   svn = subversionClient.override { perlBindings = perlSupport; };
   gitwebPerlLibs = with perlPackages; [
     CGI
@@ -71,26 +86,34 @@ let
     FCGIProcManager
     HTMLTagCloud
   ];
+
+  perlLibs = [
+    perlPackages.LWP
+    perlPackages.URI
+    perlPackages.TermReadKey
+  ];
+
+  smtpPerlLibs = [
+    perlPackages.libnet
+    perlPackages.NetSMTPSSL
+    perlPackages.IOSocketSSL
+    perlPackages.NetSSLeay
+    perlPackages.AuthenSASL
+    perlPackages.DigestHMAC
+  ];
+
 in
 
 stdenv.mkDerivation (finalAttrs: {
   pname =
     "git"
     + lib.optionalString svnSupport "-with-svn"
-    + lib.optionalString (
-      !svnSupport && !guiSupport && !sendEmailSupport && !withManual && !pythonSupport && !withpcre2
-    ) "-minimal";
+    + lib.optionalString isMinimal "-minimal";
   inherit version;
 
   src = fetchurl {
-    url =
-      if lib.strings.hasInfix "-rc" version then
-        "https://www.kernel.org/pub/software/scm/git/testing/git-${
-          builtins.replaceStrings [ "-" ] [ "." ] version
-        }.tar.xz"
-      else
-        "https://www.kernel.org/pub/software/scm/git/git-${version}.tar.xz";
-    hash = "sha256-Iz1xQ6LVjmB1Xu6bdvVZ7HPqKzwpf1tQMWKs6VlmtOM=";
+    url = src-url;
+    hash = src-hash;
   };
 
   outputs = [ "out" ] ++ lib.optional withManual "doc";
@@ -101,31 +124,21 @@ stdenv.mkDerivation (finalAttrs: {
   enableParallelInstalling = true;
 
   patches = [
-    # This patch does two things: (1) use the right name for `docbook2texi',
-    # and (2) make sure `gitman.info' isn't produced since it's broken
-    # (duplicate node names).
     ./docbook2texi.patch
-    # Fix references to gettext.sh at runtime: hard-code it to
-    # ${pkgs.gettext}/bin/gettext.sh instead of assuming gettext.sh is in $PATH
     ./git-sh-i18n.patch
-    # Do not search for sendmail in /usr, only in $PATH
     ./git-send-email-honor-PATH.patch
   ]
   ++ lib.optionals withSsh [
-    # Hard-code the ssh executable to ${pkgs.openssh}/bin/ssh instead of
-    # searching in $PATH
     ./ssh-path.patch
   ];
 
   postPatch = ''
-    # Fix references to gettext introduced by ./git-sh-i18n.patch
     substituteInPlace git-sh-i18n.sh \
         --subst-var-by gettext ${gettext}
     substituteInPlace contrib/credential/libsecret/Makefile \
         --replace-fail 'pkg-config' "$PKG_CONFIG"
   ''
   + lib.optionalString doInstallCheck ''
-    # ensure we are using the correct shell when executing the test scripts
     patchShebangs t/*.sh
   ''
   + lib.optionalString withSsh ''
@@ -152,7 +165,7 @@ stdenv.mkDerivation (finalAttrs: {
     libxslt
   ];
   buildInputs = [
-    curl
+    effectiveCurl
     openssl
     (if withZlibNg then zlib-ng else zlib)
     expat
@@ -170,13 +183,12 @@ stdenv.mkDerivation (finalAttrs: {
     libsecret
   ];
 
-  # required to support pthread_cancel()
   env.NIX_LDFLAGS =
     lib.optionalString (stdenv.cc.isGNU && stdenv.hostPlatform.libc == "glibc") "-lgcc_s"
     + lib.optionalString (stdenv.hostPlatform.isFreeBSD) "-lthr";
 
   configureFlags = [
-    "ac_cv_prog_CURL_CONFIG=${lib.getDev curl}/bin/curl-config"
+    "ac_cv_prog_CURL_CONFIG=${lib.getDev effectiveCurl}/bin/curl-config"
   ]
   ++ lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
     "ac_cv_fread_reads_directories=yes"
@@ -192,8 +204,6 @@ stdenv.mkDerivation (finalAttrs: {
     "prefix=\${out}"
   ]
   ++ lib.optional withZlibNg "ZLIB_NG=1"
-  # Git does not allow setting a shell separately for building and run-time.
-  # Therefore lets leave it at the default /bin/sh when cross-compiling
   ++ lib.optional (stdenv.buildPlatform == stdenv.hostPlatform) "SHELL_PATH=${stdenv.shell}"
   ++ (if perlSupport then [ "PERL_PATH=${perlPackages.perl}/bin/perl" ] else [ "NO_PERL=1" ])
   ++ (if pythonSupport then [ "PYTHON_PATH=${python3}/bin/python" ] else [ "NO_PYTHON=1" ])
@@ -208,14 +218,6 @@ stdenv.mkDerivation (finalAttrs: {
     "NO_GETTEXT=YesPlease"
   ]
   ++ lib.optional withpcre2 "USE_LIBPCRE2=1"
-  ++ lib.optional (!nlsSupport) "NO_GETTEXT=1"
-  # git-gui refuses to start with the version of tk distributed with
-  # macOS Catalina. We can prevent git from building the .app bundle
-  # by specifying an invalid tk framework. The postInstall step will
-  # then ensure that git-gui uses tcl/tk from nixpkgs, which is an
-  # acceptable version.
-  #
-  # See https://github.com/Homebrew/homebrew-core/commit/dfa3ccf1e7d3901e371b5140b935839ba9d8b706
   ++ lib.optional stdenv.hostPlatform.isDarwin "TKFRAMEWORK=/nonexistent";
 
   disallowedReferences = lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
@@ -223,8 +225,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   postBuild = ''
-    # Set up the flags array for make in the same way as for the main build
-    # phase from stdenv.
     local flagsArray=(
         ''${enableParallelBuilding:+-j''${NIX_BUILD_CORES}}
         SHELL="$SHELL"
@@ -233,9 +233,6 @@ stdenv.mkDerivation (finalAttrs: {
     echoCmd 'build flags' "''${flagsArray[@]}"
   ''
   + lib.optionalString withManual ''
-    # Need to build the main Git documentation before building the
-    # contrib/subtree documentation, as the latter depends on the
-    # asciidoc.conf file created by the former.
     make -C Documentation PERL_PATH=${lib.getExe buildPackages.perlPackages.perl} "''${flagsArray[@]}"
   ''
   + ''
@@ -254,11 +251,6 @@ stdenv.mkDerivation (finalAttrs: {
     unset flagsArray
   '';
 
-  ## Install
-
-  # WARNING: Do not `rm` or `mv` files from the source tree; use `cp` instead.
-  #          We need many of these files during the installCheckPhase.
-
   installFlags = [ "NO_INSTALL_HARDLINKS=1" ];
 
   preInstall =
@@ -266,7 +258,6 @@ stdenv.mkDerivation (finalAttrs: {
       mkdir -p $out/libexec/git-core
       ln -s $out/share/git/contrib/credential/osxkeychain/git-credential-osxkeychain $out/libexec/git-core/
 
-      # ideally unneeded, but added for backwards compatibility
       mkdir -p $out/bin
       ln -s $out/libexec/git-core/git-credential-osxkeychain $out/bin/
 
@@ -276,7 +267,6 @@ stdenv.mkDerivation (finalAttrs: {
       mkdir -p $out/libexec/git-core
       ln -s $out/share/git/contrib/credential/libsecret/git-credential-libsecret $out/libexec/git-core/
 
-      # ideally unneeded, but added for backwards compatibility
       mkdir -p $out/bin
       ln -s $out/libexec/git-core/git-credential-libsecret $out/bin/
 
@@ -284,8 +274,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
 
   postInstall = ''
-    # Set up the flags array for make in the same way as for the main install
-    # phase from stdenv.
     local flagsArray=(
         ''${enableParallelInstalling:+-j''${NIX_BUILD_CORES}}
         SHELL="$SHELL"
@@ -293,23 +281,18 @@ stdenv.mkDerivation (finalAttrs: {
     concatTo flagsArray makeFlags makeFlagsArray installFlags installFlagsArray
     echoCmd 'install flags' "''${flagsArray[@]}"
 
-    # Install git-subtree.
     make -C contrib/subtree "''${flagsArray[@]}" install ${lib.optionalString withManual "install-doc"}
     rm -rf contrib/subtree
 
-    # Install contrib stuff.
     mkdir -p $out/share/git
     cp -a contrib $out/share/git/
     mkdir -p $out/share/bash-completion/completions
     ln -s $out/share/git/contrib/completion/git-prompt.sh $out/share/bash-completion/completions/
 
-    # grep is a runtime dependency, need to patch so that it's found
     substituteInPlace $out/libexec/git-core/git-sh-setup \
         --replace ' grep' ' ${gnugrep}/bin/grep' \
         --replace ' egrep' ' ${gnugrep}/bin/egrep'
 
-    # Fix references to the perl, sed, awk and various coreutil binaries used by
-    # shell scripts that git calls (e.g. filter-branch)
     SCRIPT="$(cat <<'EOS'
       BEGIN{
         @a=(
@@ -329,16 +312,12 @@ stdenv.mkDerivation (finalAttrs: {
       $out/libexec/git-core/git-{sh-setup,filter-branch,merge-octopus,mergetool,quiltimport,request-pull,submodule,subtree,web--browse}
 
 
-    # Also put git-http-backend into $PATH, so that we can use smart
-    # HTTP(s) transports for pushing
     ln -s $out/libexec/git-core/git-http-backend $out/bin/git-http-backend
     ln -s $out/share/git/contrib/git-jump/git-jump $out/bin/git-jump
   ''
   + lib.optionalString perlSupport ''
-    # wrap perl commands
     makeWrapper "$out/share/git/contrib/credential/netrc/git-credential-netrc.perl" $out/libexec/git-core/git-credential-netrc \
                 --set PERL5LIB   "$out/${perlPackages.perl.libPrefix}:${perlPackages.makePerlPath perlLibs}"
-    # ideally unneeded, but added for backwards compatibility
     ln -s $out/libexec/git-core/git-credential-netrc $out/bin/
 
     wrapProgram $out/libexec/git-core/git-cvsimport \
@@ -350,11 +329,8 @@ stdenv.mkDerivation (finalAttrs: {
     wrapProgram $out/libexec/git-core/git-cvsexportcommit \
                 --set GITPERLLIB "$out/${perlPackages.perl.libPrefix}:${perlPackages.makePerlPath perlLibs}"
 
-    # gzip (and optionally bzip2, xz, zip) are runtime dependencies for
-    # gitweb.cgi, need to patch so that it's found
     sed -i -e "s|'compressor' => \['gzip'|'compressor' => ['${gzip}/bin/gzip'|" \
         $out/share/gitweb/gitweb.cgi
-    # Give access to CGI.pm and friends (was removed from perl core in 5.22)
     for p in ${lib.concatStringsSep " " gitwebPerlLibs}; do
         sed -i -e "/use CGI /i use lib \"$p/${perlPackages.perl.libPrefix}\";" \
             "$out/share/gitweb/gitweb.cgi"
@@ -364,7 +340,6 @@ stdenv.mkDerivation (finalAttrs: {
   + (
     if svnSupport then
       ''
-        # wrap git-svn
         wrapProgram $out/libexec/git-core/git-svn \
           --set GITPERLLIB "$out/${perlPackages.perl.libPrefix}:${
             perlPackages.makePerlPath (perlLibs ++ [ svn.out ])
@@ -380,7 +355,6 @@ stdenv.mkDerivation (finalAttrs: {
   + (
     if sendEmailSupport then
       ''
-        # wrap git-send-email
         wrapProgram $out/libexec/git-core/git-send-email \
                      --set GITPERLLIB "$out/${perlPackages.perl.libPrefix}:${perlPackages.makePerlPath smtpPerlLibs}"
       ''
@@ -391,7 +365,6 @@ stdenv.mkDerivation (finalAttrs: {
   )
 
   + lib.optionalString withManual ''
-    # Install man pages
     make "''${flagsArray[@]}" install install-html \
       -C Documentation
   ''
@@ -399,7 +372,6 @@ stdenv.mkDerivation (finalAttrs: {
   + (
     if guiSupport then
       ''
-        # Wrap Tcl/Tk programs
         for prog in bin/gitk libexec/git-core/{git-gui,git-citool,git-gui--askpass}; do
           sed -i -e "s|exec 'wish'|exec '${tk}/bin/wish'|g" \
                  -e "s|exec wish|exec '${tk}/bin/wish'|g" \
@@ -415,7 +387,6 @@ stdenv.mkDerivation (finalAttrs: {
       ''
   )
   + lib.optionalString osxkeychainSupport ''
-    # enable git-credential-osxkeychain on darwin if desired (default)
     mkdir -p $out/etc
     cat > $out/etc/gitconfig << EOF
     [credential]
@@ -426,14 +397,11 @@ stdenv.mkDerivation (finalAttrs: {
     unset flagsArray
   '';
 
-  ## InstallCheck
-
   doCheck = false;
   doInstallCheck = false;
 
   installCheckTarget = "test";
 
-  # see also installCheckFlagsArray
   installCheckFlags = [
     "DEFAULT_TEST_TARGET=prove"
     "PERL_PATH=${buildPackages.perl}/bin/perl"
@@ -444,8 +412,6 @@ stdenv.mkDerivation (finalAttrs: {
   ) sysctl;
 
   preInstallCheck = ''
-    # Some tests break with high concurrency
-    # https://github.com/NixOS/nixpkgs/pull/403237
     if ((NIX_BUILD_CORES > 32)); then
       NIX_BUILD_CORES=32
     fi
@@ -466,25 +432,17 @@ stdenv.mkDerivation (finalAttrs: {
       fi
     }
 
-    # Shared permissions are forbidden in sandbox builds:
     substituteInPlace t/test-lib.sh \
       --replace "test_set_prereq POSIXPERM" ""
-    # TODO: Investigate while these still fail (without POSIXPERM):
-    # Tested to fail: 2.46.0
     disable_test t0001-init 'shared overrides system'
-    # Tested to fail: 2.46.0
     disable_test t0001-init 'init honors global core.sharedRepository'
-    # Tested to fail: 2.46.0
     disable_test t1301-shared-repo
-    # /build/git-2.44.0/contrib/completion/git-completion.bash: line 452: compgen: command not found
     disable_test t9902-completion
   ''
   + lib.optionalString (!sendEmailSupport) ''
-    # Disable sendmail tests
     disable_test t9001-send-email
   ''
   + ''
-    # Flaky tests:
     disable_test t0027-auto-crlf
     disable_test t1451-fsck-buffer
     disable_test t5319-multi-pack-index
@@ -497,18 +455,12 @@ stdenv.mkDerivation (finalAttrs: {
     disable_test t7513-interpret-trailers
     disable_test t2200-add-update
 
-    # Fails reproducibly on ZFS on Linux with formD normalization
     disable_test t0021-conversion
     disable_test t3910-mac-os-precompose
   ''
   + lib.optionalString stdenv.hostPlatform.isDarwin ''
-    # XXX: Some tests added in 2.24.0 fail.
-    # Please try to re-enable on the next release.
     disable_test t7816-grep-binary-pattern
-    # fail (as of 2.33.0)
-    #===(   18623;1208  8/?  224/?  2/? )= =fatal: Not a valid object name refs/tags/signed-empty
     disable_test t6300-for-each-ref
-    # not ok 1 - populate workdir (with 2.33.1 on x86_64-darwin)
     disable_test t5003-archive-zip
   ''
   + lib.optionalString (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64) ''
@@ -517,15 +469,10 @@ stdenv.mkDerivation (finalAttrs: {
   +
     lib.optionalString (stdenv.hostPlatform.isStatic && stdenv.hostPlatform.system == "x86_64-linux")
       ''
-        # https://github.com/NixOS/nixpkgs/pull/394957
-        # > t2082-parallel-checkout-attributes.sh            (Wstat: 256 (exited 1) Tests: 5 Failed: 1)
         disable_test t2082-parallel-checkout-attributes
       ''
   + lib.optionalString stdenv.hostPlatform.isMusl ''
-    # Test fails (as of 2.17.0, musl 1.1.19)
     disable_test t3900-i18n-commit
-    # Fails largely due to assumptions about BOM
-    # Tested to fail: 2.18.0
     disable_test t0028-working-tree-encoding
   '';
 
@@ -536,7 +483,7 @@ stdenv.mkDerivation (finalAttrs: {
     "share/git/contrib/credential"
   ];
 
-  passthru = {
+  passthru = mkVariantPassthru variantArgs // {
     shellPath = "/bin/git-shell";
     tests = {
       withInstallCheck = finalAttrs.finalPackage.overrideAttrs (_: {
@@ -545,7 +492,6 @@ stdenv.mkDerivation (finalAttrs: {
       buildbot-integration = nixosTests.buildbot;
     }
     // tests.fetchgit;
-    updateScript = ./update.sh;
   };
 
   meta = {
