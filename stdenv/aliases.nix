@@ -135,6 +135,7 @@ mapAliases {
   phpExtensions = php.buildPecl;
   r = r-lang;
   rLang = r-lang;
+  readline70 = readline.v7_0;
   scala_2_13 = scala.v2_13;
   scala_3 = scala;
   tcl-8_5 = tcl.v8_5;

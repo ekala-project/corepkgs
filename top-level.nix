@@ -1270,10 +1270,6 @@ with final;
     };
   } ./build-support/setup-hooks/update-autotools-gnu-config-scripts.sh;
 
-  # TODO(corepkgs): mkManyVariants
-  readline70 = callPackage ./pkgs/readline/7.0.nix { };
-  readline = callPackage ./pkgs/readline/8.3.nix { };
-
   util-linuxMinimal = util-linux.override {
     fetchurl = stdenv.fetchurlBoot;
     cryptsetupSupport = false;
