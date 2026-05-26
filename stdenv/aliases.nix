@@ -48,6 +48,9 @@ mapAliases {
   db6 = db.v6_0;
   db60 = db.v6_0;
   db62 = db.v6_2;
+  docbook-xsl-ns = docbook-xsl.ns;
+  docbook-xsl-nons = docbook-xsl.nons;
+  docbook_xsl = docbook-xsl.nons;
   docbook_sgml_dtd_31 = docbook-sgml-dtd.v3_1;
   docbook_sgml_dtd_41 = docbook-sgml-dtd.v4_1;
   docbook_xml_dtd_412 = docbook-xml-dtd.v4_1_2;

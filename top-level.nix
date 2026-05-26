@@ -1457,14 +1457,6 @@ with final;
   };
   udev = if lib.meta.availableOn stdenv.hostPlatform systemdLibs then systemdLibs else libudev-zero;
 
-  # TODO(corepkgs): mkManyVariants
-  inherit (callPackages ./pkgs/docbook-xsl { })
-    docbook-xsl-nons # was docbook_xsl
-    docbook-xsl-ns # was docbook-xsl-ns
-    ;
-
-  # Alias for compatibility
-  docbook-xsl = docbook-xsl-nons;
 
   # TODO: mkManyVariants
   inherit (callPackage ./pkgs/libxml2 { })
