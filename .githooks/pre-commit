@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Pre-commit hook: format staged files with `nix fmt`.
+#
+# Enable in this repo by running:
+#   git config core.hooksPath .githooks
+set -euo pipefail
+
+# Collect all staged (added/copied/modified/renamed) files.
+mapfile -t staged < <(git diff --cached --name-only --diff-filter=ACMR)
+
+if [ "${#staged[@]}" -eq 0 ]; then
+  exit 0
+fi
+
+# Filter to files that still exist on disk (skip e.g. submodule entries
+# or files removed after staging).
+existing=()
+for f in "${staged[@]}"; do
+  if [ -f "$f" ]; then
+    existing+=("$f")
+  fi
+done
+
+if [ "${#existing[@]}" -eq 0 ]; then
+  exit 0
+fi
+
+echo "pre-commit: running 'nix fmt' on ${#existing[@]} staged file(s)"
+
+# treefmt-based formatter accepts a list of paths to format.
+nix fmt -- "${existing[@]}"
+
+# Re-stage any of those files that were modified by the formatter.
+to_restage=()
+for f in "${existing[@]}"; do
+  if ! git diff --quiet -- "$f"; then
+    to_restage+=("$f")
+  fi
+done
+
+if [ "${#to_restage[@]}" -gt 0 ]; then
+  echo "pre-commit: re-staging formatted files:"
+  printf '  %s\n' "${to_restage[@]}"
+  git add -- "${to_restage[@]}"
+fi
