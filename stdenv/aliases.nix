@@ -37,6 +37,8 @@ mapAliases {
   clang_21 = llvm.v21.pkgs.clang;
   clj = clojure;
   cmakeMinimal = cmake.minimal;
+  coreutils-full = coreutils.full;
+  coreutils-prefixed = coreutils.prefixed;
   curlMinimal = curl.minimal;
   curlWithGnuTls = curl.gnutls;
   db4 = db.v4_8;

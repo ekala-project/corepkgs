@@ -1,4 +1,19 @@
 {
+  version,
+  src-url,
+  src-hash,
+  # No openssl in default version, so openssl-induced rebuilds aren't too big.
+  # It makes *sum functions significantly faster.
+  isMinimal ? true,
+  withPrefix ? false,
+  singleBinary ? "symlinks", # you can also pass "shebangs" or false
+  mkVariantPassthru,
+  packageAtLeast,
+  packageOlder,
+  ...
+}@variantArgs:
+
+{
   lib,
   stdenv,
   fetchurl,
@@ -19,13 +34,8 @@
   selinuxSupport ? false,
   libselinux,
   libsepol,
-  # No openssl in default version, so openssl-induced rebuilds aren't too big.
-  # It makes *sum functions significantly faster.
-  minimal ? true,
-  withOpenssl ? !minimal,
+  withOpenssl ? !isMinimal,
   openssl,
-  withPrefix ? false,
-  singleBinary ? "symlinks", # you can also pass "shebangs" or false
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus cannot use
@@ -47,12 +57,12 @@ let
   isCross = (stdenv.hostPlatform != stdenv.buildPlatform);
 in
 stdenv.mkDerivation (finalAttrs: {
-  pname = "coreutils" + (optionalString (!minimal) "-full");
-  version = "9.8";
+  pname = "coreutils" + (optionalString (!isMinimal) "-full");
+  inherit version;
 
   src = fetchurl {
-    url = "mirror://gnu/coreutils/coreutils-${finalAttrs.version}.tar.xz";
-    hash = "sha256-5tT9LYUskUGhwqGKE9FGoM1+RRlfcik6TkwETsbMyhU=";
+    url = src-url;
+    hash = src-hash;
   };
 
   patches = [
@@ -229,16 +239,16 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   postInstall =
-    optionalString (isCross && !minimal) ''
+    optionalString (isCross && !isMinimal) ''
       rm $out/share/man/man1/*
-      cp ${buildPackages.coreutils-full}/share/man/man1/* $out/share/man/man1
+      cp ${buildPackages.coreutils.variants.full}/share/man/man1/* $out/share/man/man1
     ''
     # du: 8.7 M locale + 0.4 M man pages
-    + optionalString minimal ''
+    + optionalString isMinimal ''
       rm -r "$out/share"
     '';
 
-  passthru = {
+  passthru = mkVariantPassthru variantArgs // {
     tests.unit = finalAttrs.finalPackage.overrideAttrs {
       doCheck =
         (!isCross)

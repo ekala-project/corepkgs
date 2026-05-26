@@ -1137,18 +1137,6 @@ with final;
   # TODO(corepkgs): alias?
   m4 = gnum4;
 
-  # TODO(corepkgs): mkManyVariants
-  coreutils = callPackage ./pkgs/coreutils { };
-
-  # The coreutils above is built with dependencies from
-  # bootstrapping. We cannot override it here, because that pulls in
-  # openssl from the previous stage as well.
-  coreutils-full = callPackage ./pkgs/coreutils { minimal = false; };
-  coreutils-prefixed = coreutils.override {
-    withPrefix = true;
-    singleBinary = false;
-  };
-
   # GNU libc provides libiconv so systems with glibc don't need to
   # build libiconv separately. Additionally, Apple forked/repackaged
   # libiconv, so build and use the upstream one with a compatible ABI,
