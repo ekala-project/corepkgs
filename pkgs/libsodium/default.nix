@@ -4,6 +4,7 @@
   fetchurl,
   autoreconfHook,
   testers,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -35,11 +36,10 @@ stdenv.mkDerivation (finalAttrs: {
     stdenv.hostPlatform.isMusl && stdenv.hostPlatform.isx86_32
   ) "--disable-ssp";
 
-  doCheck = true;
-
   passthru.tests = {
     pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
     pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
+    unittests = runUnitTests finalAttrs.finalPackage;
   };
 
   meta = {
