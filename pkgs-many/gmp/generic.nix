@@ -22,6 +22,7 @@
   m4,
   buildPackages,
   withStatic ? stdenv.hostPlatform.isStatic,
+  runUnitTests,
 }@args:
 
 let
@@ -79,11 +80,11 @@ stdenv.mkDerivation (finalAttrs: {
   ++ optional (!withStatic && stdenv.hostPlatform.isWindows) "--disable-static --enable-shared"
   ++ optional (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64) "--disable-assembly";
 
-  doCheck = true; # not cross;
-
   dontDisableStatic = withStatic;
 
   enableParallelBuilding = true;
+
+  passthru.tests.unittests = runUnitTests finalAttrs.finalPackage;
 
   meta = {
     homepage = "https://gmplib.org/";

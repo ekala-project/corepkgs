@@ -22,7 +22,9 @@
   runUnitTests,
 }@args:
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation (
+  finalAttrs:
+  {
     pname = "db";
     inherit version;
 
@@ -117,4 +119,6 @@ stdenv.mkDerivation (finalAttrs: {
           lib.licenses.${license};
       platforms = lib.platforms.unix;
     };
-  } // drvArgs)
+  }
+  // drvArgs
+)
