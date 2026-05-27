@@ -10,6 +10,7 @@
   withJemalloc ? false,
   jemalloc,
   curl,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -48,9 +49,8 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeBool "ENABLE_STATIC_LIB" stdenv.hostPlatform.isStatic)
   ];
 
-  doCheck = true;
-
   passthru.tests = {
+    unittests = runUnitTests finalAttrs.finalPackage;
     inherit curl;
   };
 
