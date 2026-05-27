@@ -11,6 +11,7 @@
   glib,
   liburing,
   gnome,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -46,16 +47,17 @@ stdenv.mkDerivation (finalAttrs: {
     "-Ddocs=true"
   ];
 
-  doCheck = true;
-
   postFixup = ''
     # Cannot be in postInstall, otherwise _multioutDocs hook in preFixup will move right back.
     moveToOutput "share/doc" "$devdoc"
   '';
 
-  passthru.updateScript = gnome.updateScript {
-    packageName = "libdex";
-    versionPolicy = "odd-unstable";
+  passthru = {
+    updateScript = gnome.updateScript {
+      packageName = "libdex";
+      versionPolicy = "odd-unstable";
+    };
+    tests.unittests = runUnitTests finalAttrs.finalPackage;
   };
 
   meta = {
