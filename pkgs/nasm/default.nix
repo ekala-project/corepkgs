@@ -4,22 +4,21 @@
   fetchurl,
   perl,
   gitUpdater,
+  runUnitTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "nasm";
   version = "2.16.03";
 
   src = fetchurl {
-    url = "https://www.nasm.us/pub/nasm/releasebuilds/${version}/${pname}-${version}.tar.xz";
+    url = "https://www.nasm.us/pub/nasm/releasebuilds/${finalAttrs.version}/${finalAttrs.pname}-${finalAttrs.version}.tar.xz";
     hash = "sha256-FBKhx2C70F2wJrbA0WV6/9ZjHNCmPN229zzG1KphYUg=";
   };
 
   nativeBuildInputs = [ perl ];
 
   enableParallelBuilding = true;
-
-  doCheck = true;
 
   checkPhase = ''
     runHook preCheck
@@ -30,10 +29,13 @@ stdenv.mkDerivation rec {
     runHook postCheck
   '';
 
-  passthru.updateScript = gitUpdater {
-    url = "https://github.com/netwide-assembler/nasm.git";
-    rev-prefix = "nasm-";
-    ignoredVersions = "rc.*";
+  passthru = {
+    updateScript = gitUpdater {
+      url = "https://github.com/netwide-assembler/nasm.git";
+      rev-prefix = "nasm-";
+      ignoredVersions = "rc.*";
+    };
+    tests.unittests = runUnitTests finalAttrs.finalPackage;
   };
 
   meta = {
@@ -43,4 +45,4 @@ stdenv.mkDerivation rec {
     mainProgram = "nasm";
     license = lib.licenses.bsd2;
   };
-}
+})
