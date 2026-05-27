@@ -19,10 +19,10 @@
   cxxSupport ? true,
   compat185 ? true,
   dbmSupport ? false,
+  runUnitTests,
 }@args:
 
-stdenv.mkDerivation (
-  rec {
+stdenv.mkDerivation (finalAttrs: {
     pname = "db";
     inherit version;
 
@@ -99,11 +99,11 @@ stdenv.mkDerivation (
 
     enableParallelBuilding = true;
 
-    doCheck = true;
-
     checkPhase = ''
       make examples_c examples_cxx
     '';
+
+    passthru.tests.unittests = runUnitTests finalAttrs.finalPackage;
 
     meta = {
       homepage = "https://www.oracle.com/database/technologies/related/berkeleydb.html";
@@ -117,6 +117,4 @@ stdenv.mkDerivation (
           lib.licenses.${license};
       platforms = lib.platforms.unix;
     };
-  }
-  // drvArgs
-)
+  } // drvArgs)
