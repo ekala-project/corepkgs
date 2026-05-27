@@ -17,14 +17,15 @@
   x11Support ? (stdenv.hostPlatform.isLinux || stdenv.hostPlatform.isDarwin),
   xorg,
   libx11,
+  runUnitTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "dbus";
   version = "1.14.10";
 
   src = fetchurl {
-    url = "https://dbus.freedesktop.org/releases/dbus/dbus-${version}.tar.xz";
+    url = "https://dbus.freedesktop.org/releases/dbus/dbus-${finalAttrs.version}.tar.xz";
     sha256 = "sha256-uh8h0r2dM52i1KqHgMCd8y/qh5mLc9ok9Jq53x42pQ8=";
   };
 
@@ -112,8 +113,6 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  doCheck = true;
-
   makeFlags = [
     # Fix paths in XML catalog broken by mismatching build/install datadir.
     "dtddir=${placeholder "out"}/share/xml/dbus-1"
@@ -132,13 +131,17 @@ stdenv.mkDerivation rec {
 
   passthru = {
     dbus-launch = "${dbus.lib}/bin/dbus-launch";
+
+    tests = {
+      unittests = runUnitTests finalAttrs.finalPackage;
+    };
   };
 
   meta = {
     description = "Simple interprocess messaging system";
     homepage = "https://www.freedesktop.org/wiki/Software/dbus/";
-    changelog = "https://gitlab.freedesktop.org/dbus/dbus/-/blob/dbus-${version}/NEWS";
+    changelog = "https://gitlab.freedesktop.org/dbus/dbus/-/blob/dbus-${finalAttrs.version}/NEWS";
     license = lib.licenses.gpl2Plus; # most is also under AFL-2.1
     platforms = lib.platforms.unix;
   };
-}
+})
