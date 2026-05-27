@@ -13,6 +13,7 @@
   versionCheckHook,
   testers,
   gitUpdater,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -71,8 +72,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   enableParallelBuilding = true;
 
-  doCheck = true;
-
   installFlags = [
     # Don't try to write to /var/cache/fontconfig at install time.
     "fc_cachedir=$(TMPDIR)/dummy"
@@ -112,6 +111,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     tests = {
+      unittests = runUnitTests finalAttrs.finalPackage;
       pkg-config = testers.hasPkgConfigModules {
         package = finalAttrs.finalPackage;
       };
