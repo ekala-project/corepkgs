@@ -8,6 +8,7 @@
   nixosTests,
   runCommand,
   python3,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -57,8 +58,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   enableParallelBuilding = true;
 
-  doCheck = true;
-
   passthru = {
     tests = {
       inherit (nixosTests) login shadow;
@@ -76,6 +75,7 @@ stdenv.mkDerivation (finalAttrs: {
         }
         touch "$out"
       '';
+      unittests = runUnitTests finalAttrs.finalPackage;
     };
     enabledCryptSchemeIds = [
       # https://github.com/besser82/libxcrypt/blob/v4.5.0/lib/hashes.conf
