@@ -3,6 +3,7 @@
   stdenv,
   fetchurl,
   autoreconfHook,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -19,9 +20,9 @@ stdenv.mkDerivation (finalAttrs: {
 
   enableParallelBuilding = true;
 
-  doCheck = true;
-
   nativeBuildInputs = [ autoreconfHook ];
+
+  passthru.tests.unittests = runUnitTests finalAttrs.finalPackage;
 
   meta = {
     homepage = "https://www.hadrons.org/software/libmd/";
