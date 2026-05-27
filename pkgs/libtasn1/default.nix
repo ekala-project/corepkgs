@@ -9,14 +9,15 @@
   gnutls,
   samba,
   qemu,
+  runUnitTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libtasn1";
   version = "4.20.0";
 
   src = fetchurl {
-    url = "mirror://gnu/libtasn1/libtasn1-${version}.tar.gz";
+    url = "mirror://gnu/libtasn1/libtasn1-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-kuDjvUwC1K7udgNrLd2D8McyukzaXLcdWDJysjWHp2w=";
   };
 
@@ -32,12 +33,12 @@ stdenv.mkDerivation rec {
     perl
   ];
 
-  doCheck = true;
   preCheck =
     if stdenv.hostPlatform.isDarwin then "export DYLD_LIBRARY_PATH=`pwd`/lib/.libs" else null;
 
   passthru.tests = {
     inherit gnutls samba qemu;
+    unittests = runUnitTests finalAttrs.finalPackage;
   };
 
   meta = {
@@ -50,6 +51,6 @@ stdenv.mkDerivation rec {
     '';
     license = lib.licenses.lgpl2Plus;
     platforms = lib.platforms.all;
-    changelog = "https://gitlab.com/gnutls/libtasn1/-/blob/v${version}/NEWS";
+    changelog = "https://gitlab.com/gnutls/libtasn1/-/blob/v${finalAttrs.version}/NEWS";
   };
-}
+})
