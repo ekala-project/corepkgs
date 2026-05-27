@@ -7,6 +7,7 @@
   fmt,
   catch2_3,
   staticBuild ? stdenv.hostPlatform.isStatic,
+  runUnitTests,
 
   # passthru
   bear,
@@ -67,10 +68,9 @@ stdenv.mkDerivation (finalAttrs: {
         '#define SPDLOG_FMT_EXTERNAL'
   '';
 
-  doCheck = true;
-
   passthru = {
     tests = {
+      unittests = runUnitTests finalAttrs.finalPackage;
       inherit bear tiledb;
     };
     updateScript = nix-update-script { };
