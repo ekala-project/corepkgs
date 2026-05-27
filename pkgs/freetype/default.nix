@@ -13,6 +13,7 @@
   libpng,
   gnumake,
   glib,
+  runUnitTests,
 
   # FreeType supports LCD filtering (colloquially referred to as sub-pixel rendering).
   # LCD filtering is also known as ClearType and covered by several Microsoft patents.
@@ -92,8 +93,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   enableParallelBuilding = true;
 
-  doCheck = true;
-
   # pkgsCross.mingwW64.pkg-config doesn't build
   # makeWrapper doesn't cross-compile to windows #120726
   postInstall = ''
@@ -107,6 +106,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   passthru.tests = {
+    unittests = runUnitTests finalAttrs.finalPackage;
     inherit
       cairo
       fontforge
