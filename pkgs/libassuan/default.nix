@@ -7,14 +7,15 @@
   libgpg-error,
   buildPackages,
   gitUpdater,
+  runUnitTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libassuan";
   version = "3.0.2";
 
   src = fetchurl {
-    url = "mirror://gnupg/libassuan/libassuan-${version}.tar.bz2";
+    url = "mirror://gnupg/libassuan/libassuan-${finalAttrs.version}.tar.bz2";
     hash = "sha256-0pMc2tJm5jNRD5lw4aLzRgVeNRuxn5t4kSR1uAdMNvY=";
   };
 
@@ -36,17 +37,18 @@ stdenv.mkDerivation rec {
     "--with-libgpg-error-prefix=${libgpg-error.dev}"
   ];
 
-  doCheck = true;
-
   # Make sure includes are fixed for callers who don't use libassuan-config
   postInstall = ''
     sed -i 's,#include <gpg-error.h>,#include "${libgpg-error.dev}/include/gpg-error.h",g' $dev/include/assuan.h
   '';
 
-  passthru.updateScript = gitUpdater {
-    url = "https://dev.gnupg.org/source/libassuan.git";
-    rev-prefix = "libassuan-";
-    ignoredVersions = ".*-base";
+  passthru = {
+    updateScript = gitUpdater {
+      url = "https://dev.gnupg.org/source/libassuan.git";
+      rev-prefix = "libassuan-";
+      ignoredVersions = ".*-base";
+    };
+    tests.unittests = runUnitTests finalAttrs.finalPackage;
   };
 
   meta = {
@@ -59,8 +61,8 @@ stdenv.mkDerivation rec {
       provided.
     '';
     homepage = "https://gnupg.org/software/libassuan/";
-    changelog = "https://dev.gnupg.org/source/libassuan/browse/master/NEWS;libassuan-${version}";
+    changelog = "https://dev.gnupg.org/source/libassuan/browse/master/NEWS;libassuan-${finalAttrs.version}";
     license = lib.licenses.lgpl2Plus;
     platforms = lib.platforms.all;
   };
-}
+})
