@@ -7,6 +7,7 @@
   python3Packages,
   staticOnly ? stdenv.hostPlatform.isStatic,
   testers,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -44,8 +45,6 @@ stdenv.mkDerivation (finalAttrs: {
     "lib"
   ];
 
-  doCheck = true;
-
   checkTarget = "test";
 
   # Don't bother with "man" output for now,
@@ -60,6 +59,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
     pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
     python = python3Packages.brotli;
+    unittests = runUnitTests finalAttrs.finalPackage;
   };
 
   meta = {
