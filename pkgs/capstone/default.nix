@@ -3,6 +3,7 @@
   stdenv,
   fetchFromGitHub,
   cmake,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -25,7 +26,7 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeBool "BUILD_SHARED_LIBS" true)
   ];
 
-  doCheck = true;
+  passthru.tests.unittests = runUnitTests finalAttrs.finalPackage;
 
   meta = {
     description = "Advanced disassembly library";
