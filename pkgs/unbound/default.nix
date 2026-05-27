@@ -52,6 +52,7 @@
   nix-update-script,
   # for passthru.tests
   gnutls,
+  runUnitTests,
 }:
 
 assert withDoH -> libnghttp2 != null;
@@ -160,8 +161,6 @@ stdenv.mkDerivation (finalAttrs: {
       sed -E '/CONFCMDLINE/ s;${storeDir}/[a-z0-9]{32}-;${storeDir}/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-;g' -i config.h
     '';
 
-  doCheck = true;
-
   postPatch = lib.optionalString withPythonModule ''
     substituteInPlace Makefile.in \
       --replace "\$(DESTDIR)\$(PYTHON_SITE_PKG)" "$out/${python.sitePackages}"
@@ -212,6 +211,7 @@ stdenv.mkDerivation (finalAttrs: {
       ];
     };
     tests = {
+      unittests = runUnitTests finalAttrs.finalPackage;
       inherit gnutls;
       nixos-test = nixosTests.unbound;
       nixos-test-exporter = nixosTests.prometheus-exporters.unbound;
