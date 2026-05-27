@@ -13,6 +13,7 @@
   fetchpatch,
   cmake,
   enableShared ? !stdenv.hostPlatform.isStatic,
+  runUnitTests,
 
   # tests
   mpd,
@@ -21,7 +22,7 @@
   spdlog,
 }:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation (finalAttrs: {
   pname = "fmt";
   inherit version;
 
@@ -46,10 +47,9 @@ stdenv.mkDerivation {
 
   cmakeFlags = [ (lib.cmakeBool "BUILD_SHARED_LIBS" enableShared) ];
 
-  doCheck = true;
-
   passthru = mkVariantPassthru variantArgs // {
     tests = {
+      unittests = runUnitTests finalAttrs.finalPackage;
       inherit
         mpd
         openimageio
@@ -72,4 +72,4 @@ stdenv.mkDerivation {
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
   };
-}
+})
