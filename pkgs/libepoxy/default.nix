@@ -11,6 +11,7 @@
   libx11,
   x11Support ? !stdenv.hostPlatform.isDarwin,
   testers,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -74,9 +75,8 @@ stdenv.mkDerivation (finalAttrs: {
     x11Support && !stdenv.hostPlatform.isDarwin
   ) ''-DLIBGL_PATH="${lib.getLib libGL}/lib"'';
 
-  doCheck = true;
-
   passthru.tests = {
+    unittests = runUnitTests finalAttrs.finalPackage;
     pkg-config = testers.hasPkgConfigModules {
       package = finalAttrs.finalPackage;
     };
