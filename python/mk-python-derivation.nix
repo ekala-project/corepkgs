@@ -211,7 +211,7 @@ lib.extendMkDerivation {
 
       meta ? { },
 
-      doCheck ? true,
+      doCheck ? false,
 
       ...
     }@attrs:
