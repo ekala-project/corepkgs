@@ -5,6 +5,7 @@
   autoreconfHook,
   nix-update-script,
   python3,
+  runUnitTests,
 
   # for passthru.tests
   ninja,
@@ -12,14 +13,14 @@
   spamassassin,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "re2c";
   version = "4.3";
 
   src = fetchFromGitHub {
     owner = "skvadrik";
     repo = "re2c";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-zPOENMfXXgTwds1t+Lrmz9+GTHJf2yRpQsGT7nLRvcg=";
   };
 
@@ -28,7 +29,6 @@ stdenv.mkDerivation rec {
     python3
   ];
 
-  doCheck = true;
   enableParallelBuilding = true;
 
   preCheck = ''
@@ -45,6 +45,7 @@ stdenv.mkDerivation rec {
     };
     tests = {
       inherit ninja php spamassassin;
+      unittests = runUnitTests finalAttrs.finalPackage;
     };
   };
 
@@ -54,4 +55,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.publicDomain;
     platforms = lib.platforms.all;
   };
-}
+})
