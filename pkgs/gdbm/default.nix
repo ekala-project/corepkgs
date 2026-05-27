@@ -4,6 +4,7 @@
   stdenv,
   testers,
   updateAutotoolsGnuConfigScriptsHook,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -28,8 +29,6 @@ stdenv.mkDerivation (finalAttrs: {
     "lib"
     "man"
   ];
-
-  doCheck = true;
 
   enableParallelBuilding = true;
 
@@ -57,9 +56,12 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   passthru = {
-    tests.version = testers.testVersion {
-      package = finalAttrs.finalPackage;
-      command = "gdbmtool --version";
+    tests = {
+      unittests = runUnitTests finalAttrs.finalPackage;
+      version = testers.testVersion {
+        package = finalAttrs.finalPackage;
+        command = "gdbmtool --version";
+      };
     };
   };
 
