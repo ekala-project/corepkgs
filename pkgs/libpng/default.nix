@@ -5,6 +5,7 @@
   zlib,
   apngSupport ? true,
   testers,
+  runUnitTests,
 }:
 
 assert zlib != null;
@@ -42,14 +43,13 @@ stdenv.mkDerivation (finalAttrs: {
 
   propagatedBuildInputs = [ zlib ];
 
-  doCheck = true;
-
   passthru = {
     inherit zlib;
 
     tests = {
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
       pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
+      unittests = runUnitTests finalAttrs.finalPackage;
     };
   };
 
