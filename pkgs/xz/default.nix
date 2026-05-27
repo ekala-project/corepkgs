@@ -6,6 +6,7 @@
   enableStatic ? stdenv.hostPlatform.isStatic,
   writeScript,
   testers,
+  runUnitTests,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -36,7 +37,6 @@ stdenv.mkDerivation (finalAttrs: {
   configureFlags = lib.optional enableStatic "--disable-shared";
 
   enableParallelBuilding = true;
-  doCheck = true;
 
   nativeBuildInputs = lib.optionals stdenv.hostPlatform.isOpenBSD [
     autoreconfHook
@@ -72,8 +72,11 @@ stdenv.mkDerivation (finalAttrs: {
           head -n1)"
       update-source-version ${finalAttrs.pname} "$new_version"
     '';
-    tests.pkg-config = testers.hasPkgConfigModules {
-      package = finalAttrs.finalPackage;
+    tests = {
+      pkg-config = testers.hasPkgConfigModules {
+        package = finalAttrs.finalPackage;
+      };
+      unittests = runUnitTests finalAttrs.finalPackage;
     };
   };
 
