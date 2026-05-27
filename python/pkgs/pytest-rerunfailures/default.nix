@@ -9,7 +9,7 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "pytest-rerunfailures";
   version = "16.0.1";
   pyproject = true;
@@ -19,7 +19,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "pytest-dev";
     repo = "pytest-rerunfailures";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-4/BgvfVcs7MdULlhafZypNzzag4ITALStHI1tIoAPL4=";
   };
 
@@ -31,11 +31,13 @@ buildPythonPackage rec {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Pytest plugin to re-run tests to eliminate flaky failures";
     homepage = "https://github.com/pytest-dev/pytest-rerunfailures";
-    changelog = "https://github.com/pytest-dev/pytest-rerunfailures/blob/${src.tag}/CHANGES.rst";
+    changelog = "https://github.com/pytest-dev/pytest-rerunfailures/blob/${finalAttrs.src.tag}/CHANGES.rst";
     license = lib.licenses.mpl20;
 
   };
-}
+})

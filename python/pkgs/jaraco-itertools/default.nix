@@ -8,7 +8,7 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "jaraco-itertools";
   version = "6.4.3";
   pyproject = true;
@@ -16,7 +16,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "jaraco";
     repo = "jaraco.itertools";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-LjWkyY9I8BBYpFm8TT3kq4vk63pNQrnZ15haJCQ5xlk=";
   };
 
@@ -38,9 +38,11 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "jaraco.itertools" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Tools for working with iterables";
     homepage = "https://github.com/jaraco/jaraco.itertools";
     license = lib.licenses.mit;
   };
-}
+})

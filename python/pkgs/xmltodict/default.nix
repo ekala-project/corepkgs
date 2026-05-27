@@ -6,7 +6,7 @@
   setuptools,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "xmltodict";
   version = "1.0.2";
   pyproject = true;
@@ -14,7 +14,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "martinblech";
     repo = "xmltodict";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-gnTNkh0GLfRmjMsLhfvpNrewfinNOhem0i3wzIZvKpA=";
   };
 
@@ -24,11 +24,13 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "xmltodict" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Makes working with XML feel like you are working with JSON";
     homepage = "https://github.com/martinblech/xmltodict";
-    changelog = "https://github.com/martinblech/xmltodict/blob/${src.tag}/CHANGELOG.md";
+    changelog = "https://github.com/martinblech/xmltodict/blob/${finalAttrs.src.tag}/CHANGELOG.md";
     license = lib.licenses.mit;
     maintainers = [ ];
   };
-}
+})

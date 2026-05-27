@@ -19,7 +19,7 @@
   rustPlatform,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "cryptography";
   version = "46.0.6";
   pyproject = true;
@@ -27,12 +27,12 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "pyca";
     repo = "cryptography";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-b6wQnPEf18ViqQVch+Jg1w0Cn372QKxLknD9rL4JjxY=";
   };
 
   cargoDeps = rustPlatform.fetchCargoVendor {
-    inherit pname version src;
+    inherit (finalAttrs) pname version src;
     hash = "sha256-5ElDEl7MdcQfu/hy+POSBcvkNCFAMo6La5s6uRhZ/fM=";
   };
 
@@ -67,7 +67,7 @@ buildPythonPackage rec {
     pytestCheckHook
     pytest-xdist
   ]
-  ++ optional-dependencies.ssh;
+  ++ finalAttrs.optional-dependencies.ssh;
 
   pytestFlags = [ "--disable-pytest-warnings" ];
 
@@ -78,6 +78,7 @@ buildPythonPackage rec {
 
   passthru = {
     vectors = cryptography-vectors;
+    tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
   };
 
   meta = {
@@ -88,7 +89,7 @@ buildPythonPackage rec {
       digests, and key derivation functions.
     '';
     homepage = "https://github.com/pyca/cryptography";
-    changelog = "https://cryptography.io/en/latest/changelog/#v" + lib.replaceString "." "-" version;
+    changelog = "https://cryptography.io/en/latest/changelog/#v" + lib.replaceString "." "-" finalAttrs.version;
     license = with lib.licenses; [
       asl20
       bsd3
@@ -96,4 +97,4 @@ buildPythonPackage rec {
     ];
     maintainers = [ ];
   };
-}
+})

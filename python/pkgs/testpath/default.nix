@@ -7,13 +7,13 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "testpath";
   version = "0.6.0";
   format = "pyproject";
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-LxuX5kQsAmgevgG9hPUxAop8rqGvOCUAD1I0XDAoXg8=";
   };
 
@@ -32,9 +32,11 @@ buildPythonPackage rec {
     export TMPDIR="/tmp"
   '';
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Test utilities for code working with files and commands";
     license = lib.licenses.mit;
     homepage = "https://github.com/jupyter/testpath";
   };
-}
+})

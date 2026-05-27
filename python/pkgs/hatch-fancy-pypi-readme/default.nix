@@ -10,7 +10,7 @@
   typing-extensions,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "hatch-fancy-pypi-readme";
   version = "25.1.0";
   format = "pyproject";
@@ -19,7 +19,7 @@ buildPythonPackage rec {
 
   src = fetchPypi {
     pname = "hatch_fancy_pypi_readme";
-    inherit version;
+    inherit (finalAttrs) version;
     hash = "sha256-nFjtPf+Q1R9DQUzjcAmtHVsPCP/J/CFpmKBjgPAcAEU=";
   };
 
@@ -44,6 +44,8 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "hatch_fancy_pypi_readme" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Fancy PyPI READMEs with Hatch";
     mainProgram = "hatch-fancy-pypi-readme";
@@ -51,4 +53,4 @@ buildPythonPackage rec {
     license = lib.licenses.mit;
 
   };
-}
+})

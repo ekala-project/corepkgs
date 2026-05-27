@@ -16,7 +16,7 @@
   tzdata,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "babel";
   version = "2.17.0";
   pyproject = true;
@@ -24,7 +24,7 @@ buildPythonPackage rec {
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-DFTP+xn2kM3MUqO1C8v3HgeoCNHIDVSfJFm50s8K+50=";
   };
 
@@ -47,12 +47,14 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "babel" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Collection of internationalizing tools";
     homepage = "https://babel.pocoo.org/";
-    changelog = "https://github.com/python-babel/babel/releases/tag/v${version}";
+    changelog = "https://github.com/python-babel/babel/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.bsd3;
 
     mainProgram = "pybabel";
   };
-}
+})

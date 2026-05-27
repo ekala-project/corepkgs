@@ -24,7 +24,7 @@
   uvloop,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "black";
   version = "25.1.0";
   format = "pyproject";
@@ -32,7 +32,7 @@ buildPythonPackage rec {
   disabled = pythonOlder "3.8";
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-M0ltXNEiKtczkTUrSujaFSU8Xeibk6gLPiyNmhnsJmY=";
   };
 
@@ -90,7 +90,7 @@ buildPythonPackage rec {
     pytestCheckHook
     parameterized
   ]
-  ++ lib.concatAttrValues optional-dependencies;
+  ++ lib.concatAttrValues finalAttrs.optional-dependencies;
 
   pytestFlags = [
     "-Wignore::DeprecationWarning"
@@ -125,12 +125,14 @@ buildPythonPackage rec {
   # multiple tests exceed max open files on hydra builders
   doCheck = !(stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isAarch64);
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Uncompromising Python code formatter";
     homepage = "https://github.com/psf/black";
-    changelog = "https://github.com/psf/black/blob/${version}/CHANGES.md";
+    changelog = "https://github.com/psf/black/blob/${finalAttrs.version}/CHANGES.md";
     license = lib.licenses.mit;
     mainProgram = "black";
 
   };
-}
+})

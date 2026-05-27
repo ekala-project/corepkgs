@@ -7,7 +7,7 @@
   wcwidth,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "prompt-toolkit";
   version = "3.0.52";
   pyproject = true;
@@ -15,14 +15,14 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "prompt-toolkit";
     repo = "python-prompt-toolkit";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-ggCy7xTvOkjy6DgsO/rPNtQiAQ4FjsK4ShrvkIHioNQ=";
   };
 
   postPatch = ''
     # https://github.com/prompt-toolkit/python-prompt-toolkit/issues/1988
     substituteInPlace src/prompt_toolkit/__init__.py \
-      --replace-fail 'metadata.version("prompt_toolkit")' '"${version}"'
+      --replace-fail 'metadata.version("prompt_toolkit")' '"${finalAttrs.version}"'
   '';
 
   build-system = [ setuptools ];
@@ -39,6 +39,8 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "prompt_toolkit" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Python library for building powerful interactive command lines";
     longDescription = ''
@@ -48,7 +50,7 @@ buildPythonPackage rec {
       with a nice interactive Python shell (called ptpython) built on top.
     '';
     homepage = "https://github.com/jonathanslenders/python-prompt-toolkit";
-    changelog = "https://github.com/prompt-toolkit/python-prompt-toolkit/releases/tag/${src.tag}";
+    changelog = "https://github.com/prompt-toolkit/python-prompt-toolkit/releases/tag/${finalAttrs.src.tag}";
     license = lib.licenses.bsd3;
   };
-}
+})

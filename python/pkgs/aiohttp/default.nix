@@ -49,7 +49,7 @@
   zlib-ng,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "aiohttp";
   version = "3.13.2";
   pyproject = true;
@@ -57,7 +57,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "aio-libs";
     repo = "aiohttp";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-LqYGrrWgSZazk0hjQvTFwqtU/PtMEaPi+m1Ya8Ds+pU=";
   };
 
@@ -99,7 +99,7 @@ buildPythonPackage rec {
   ++ lib.optionals (pythonOlder "3.11") [
     async-timeout
   ]
-  ++ optional-dependencies.speedups;
+  ++ finalAttrs.optional-dependencies.speedups;
 
   optional-dependencies.speedups = [
     aiodns
@@ -164,11 +164,13 @@ buildPythonPackage rec {
     export TMPDIR="/tmp"
   '';
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
-    changelog = "https://docs.aiohttp.org/en/${src.tag}/changes.html";
+    changelog = "https://docs.aiohttp.org/en/${finalAttrs.src.tag}/changes.html";
     description = "Asynchronous HTTP Client/Server for Python and asyncio";
     license = lib.licenses.asl20;
     homepage = "https://github.com/aio-libs/aiohttp";
 
   };
-}
+})

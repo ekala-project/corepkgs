@@ -6,7 +6,7 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "zope-event";
   version = "5.0";
   pyproject = true;
@@ -14,7 +14,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "zopefoundation";
     repo = "zope.event";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-85jXSrploTcskdOBI84KGGf9Bno41ZTtT/TrbgmTxiA=";
   };
 
@@ -28,10 +28,12 @@ buildPythonPackage rec {
 
   pythonNamespaces = [ "zope" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Event publishing system";
     homepage = "https://github.com/zopefoundation/zope.event";
-    changelog = "https://github.com/zopefoundation/zope.event/blob/${src.tag}/CHANGES.rst";
+    changelog = "https://github.com/zopefoundation/zope.event/blob/${finalAttrs.src.tag}/CHANGES.rst";
     license = lib.licenses.zpl21;
   };
-}
+})

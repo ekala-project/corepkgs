@@ -8,7 +8,7 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "ptyprocess";
   version = "0.7.0";
   pyproject = true;
@@ -16,7 +16,7 @@ buildPythonPackage rec {
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-XF0KO0jO7gtISF4MJgN8Cs19KXZco/u1yzgx00dCMiA=";
   };
 
@@ -38,11 +38,13 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "ptyprocess" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Run a subprocess in a pseudo terminal";
     homepage = "https://github.com/pexpect/ptyprocess";
-    changelog = "https://github.com/pexpect/ptyprocess/releases/tag/${version}";
+    changelog = "https://github.com/pexpect/ptyprocess/releases/tag/${finalAttrs.version}";
     license = lib.licenses.isc;
 
   };
-}
+})

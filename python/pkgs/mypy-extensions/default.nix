@@ -7,7 +7,7 @@
   pythonAtLeast,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "mypy-extensions";
   version = "1.1.0";
   pyproject = true;
@@ -15,7 +15,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "python";
     repo = "mypy_extensions";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-HNAFsWX4tU9hfZkKxLNJn1J+H3uTesQflbRPlo3GQ4k=";
   };
 
@@ -33,10 +33,12 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "mypy_extensions" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Experimental type system extensions for programs checked with the mypy typechecker";
     homepage = "https://www.mypy-lang.org";
     license = lib.licenses.mit;
 
   };
-}
+})

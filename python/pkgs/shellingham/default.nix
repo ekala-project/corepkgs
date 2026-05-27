@@ -36,6 +36,8 @@ buildPythonPackage (finalAttrs: {
 
   pythonImportsCheck = [ "shellingham" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Tool to detect the surrounding shell";
     homepage = "https://github.com/sarugaku/shellingham";
