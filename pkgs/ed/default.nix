@@ -5,6 +5,7 @@
   runtimeShellPackage,
   stdenv,
   testers,
+  runUnitTests,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus cannot use
@@ -31,12 +32,13 @@ stdenv.mkDerivation (finalAttrs: {
 
   strictDeps = true;
 
-  doCheck = true;
-
   passthru = {
-    tests.version = testers.testVersion {
-      package = finalAttrs.finalPackage;
-      command = "ed --version";
+    tests = {
+      version = testers.testVersion {
+        package = finalAttrs.finalPackage;
+        command = "ed --version";
+      };
+      unittests = runUnitTests finalAttrs.finalPackage;
     };
   };
 
