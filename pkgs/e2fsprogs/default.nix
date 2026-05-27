@@ -16,16 +16,17 @@
   libarchive,
   bash,
   bashNonInteractive,
+  runUnitTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "e2fsprogs";
   version = "1.47.3";
 
   __structuredAttrs = true;
 
   src = fetchurl {
-    url = "mirror://kernel/linux/kernel/people/tytso/e2fsprogs/v${version}/e2fsprogs-${version}.tar.xz";
+    url = "mirror://kernel/linux/kernel/people/tytso/e2fsprogs/v${finalAttrs.version}/e2fsprogs-${finalAttrs.version}.tar.xz";
     hash = "sha256-hX5u+AD+qiu0V4+8gQIUvl08iLBy6lPFOEczqWVzcyk=";
   };
 
@@ -87,12 +88,11 @@ stdenv.mkDerivation rec {
   ];
 
   nativeCheckInputs = [ buildPackages.perl ];
-  doCheck = true;
 
   postInstall = ''
     # avoid cycle between outputs
-    if [ -f $out/lib/${pname}/e2scrub_all_cron ]; then
-      mv $out/lib/${pname}/e2scrub_all_cron $bin/bin/
+    if [ -f $out/lib/${finalAttrs.pname}/e2scrub_all_cron ]; then
+      mv $out/lib/${finalAttrs.pname}/e2scrub_all_cron $bin/bin/
     fi
 
     moveToOutput bin/mk_cmds "$scripts"
@@ -127,11 +127,12 @@ stdenv.mkDerivation rec {
       ${e2fsprogs}/bin/e2fsck -n $out/disc | tee $out/success
       [ -e $out/success ]
     '';
+    unittests = runUnitTests finalAttrs.finalPackage;
   };
 
   meta = {
     homepage = "https://e2fsprogs.sourceforge.net/";
-    changelog = "https://e2fsprogs.sourceforge.net/e2fsprogs-release.html#${version}";
+    changelog = "https://e2fsprogs.sourceforge.net/e2fsprogs-release.html#${finalAttrs.version}";
     description = "Tools for creating and checking ext2/ext3/ext4 filesystems";
     license = with lib.licenses; [
       gpl2Plus
@@ -141,4 +142,4 @@ stdenv.mkDerivation rec {
     ];
     platforms = lib.platforms.unix;
   };
-}
+})
