@@ -5,14 +5,15 @@
 
   # Build runit-init as a static binary
   static ? false,
+  runUnitTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "runit";
   version = "2.2.0";
 
   src = fetchurl {
-    url = "http://smarden.org/runit/${pname}-${version}.tar.gz";
+    url = "http://smarden.org/runit/${finalAttrs.pname}-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-le9NKGi5eMcXn+R5AeXFeOEc8nPSkr1iCL06fMsCkpA=";
   };
 
@@ -25,9 +26,7 @@ stdenv.mkDerivation rec {
     "man"
   ];
 
-  sourceRoot = "admin/${pname}-${version}";
-
-  doCheck = true;
+  sourceRoot = "admin/${finalAttrs.pname}-${finalAttrs.version}";
 
   buildInputs = lib.optionals static [
     stdenv.cc.libc
@@ -60,6 +59,10 @@ stdenv.mkDerivation rec {
     cp -r ../man $man/share/man/man8
   '';
 
+  passthru.tests = {
+    unittests = runUnitTests finalAttrs.finalPackage;
+  };
+
   meta = {
     description = "UNIX init scheme with service supervision";
     license = lib.licenses.bsd3;
@@ -67,4 +70,4 @@ stdenv.mkDerivation rec {
     maintainers = [ ];
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
-}
+})
