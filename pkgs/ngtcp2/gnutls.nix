@@ -9,16 +9,17 @@
   ncurses,
   knot-dns,
   curlWithGnuTls,
+  runUnitTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "ngtcp2";
   version = "1.18.0";
 
   src = fetchFromGitHub {
     owner = "ngtcp2";
     repo = "ngtcp2";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-sywzNSyr237U1codaEHtHvz7nqYDiJwjVpr4hpLHE60=";
   };
 
@@ -36,10 +37,10 @@ stdenv.mkDerivation rec {
   configureFlags = [ "--with-gnutls=yes" ];
   enableParallelBuilding = true;
 
-  doCheck = true;
   nativeCheckInputs = [ cunit ] ++ lib.optional stdenv.hostPlatform.isDarwin ncurses;
 
-  passthru.tests = knot-dns.passthru.tests // {
+  passthru.tests = (knot-dns.passthru.tests or { }) // {
+    unittests = runUnitTests finalAttrs.finalPackage;
     inherit curlWithGnuTls;
   };
 
@@ -49,7 +50,7 @@ stdenv.mkDerivation rec {
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
   };
-}
+})
 
 /*
   Why split from ./default.nix?
