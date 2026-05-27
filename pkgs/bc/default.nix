@@ -9,13 +9,14 @@
   readline,
   ed,
   texinfo,
+  runUnitTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "bc";
   version = "1.08.2";
   src = fetchurl {
-    url = "mirror://gnu/bc/bc-${version}.tar.lz";
+    url = "mirror://gnu/bc/bc-${finalAttrs.version}.tar.lz";
     hash = "sha256-eeMeAiqEsx3YCYFQY9S46lkLQJY3pSxQ7J9Cwr8zJxE=";
   };
 
@@ -40,12 +41,12 @@ stdenv.mkDerivation rec {
     flex
   ];
 
-  doCheck = true; # not cross
-
   # Hack to make sure we never to the relaxation `$PATH` and hooks support for
   # compatibility. This will be replaced with something clearer in a future
   # masss-rebuild.
   strictDeps = true;
+
+  passthru.tests.unittests = runUnitTests finalAttrs.finalPackage;
 
   meta = {
     description = "GNU software calculator";
@@ -54,4 +55,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.all;
     mainProgram = "bc";
   };
-}
+})
