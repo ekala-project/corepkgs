@@ -6,6 +6,7 @@
   swig,
   testers,
   nix-update-script,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -45,14 +46,11 @@ stdenv.mkDerivation (finalAttrs: {
   passthru = {
     updateScript = nix-update-script { };
     tests = {
+      unittests = runUnitTests finalAttrs.finalPackage;
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
       pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
     };
   };
-
-  # assumption: build machine runs linux kernel 5.0 or newer
-  # see https://github.com/stevegrubb/libcap-ng?tab=readme-ov-file#note-to-distributions
-  doCheck = true;
 
   meta = {
     changelog = "https://people.redhat.com/sgrubb/libcap-ng/ChangeLog";
