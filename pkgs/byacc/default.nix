@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchurl,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -21,11 +22,11 @@ stdenv.mkDerivation (finalAttrs: {
     "--program-transform-name='s,^,b,'"
   ];
 
-  doCheck = true;
-
   postInstall = ''
     ln -s $out/bin/byacc $out/bin/yacc
   '';
+
+  passthru.tests.unittests = runUnitTests finalAttrs.finalPackage;
 
   meta = {
     homepage = "https://invisible-island.net/byacc/byacc.html";
