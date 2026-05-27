@@ -5,6 +5,7 @@
   fetchurl,
   gettext,
   genPosixLockObjOnly ? false,
+  runUnitTests,
 }:
 let
   genPosixLockObjOnlyAttrs = lib.optionalAttrs genPosixLockObjOnly {
@@ -23,12 +24,16 @@ let
   };
 in
 stdenv.mkDerivation (
-  rec {
+  finalAttrs:
+  let
+    genPosixLockObjOnlyAttrs' = genPosixLockObjOnlyAttrs;
+  in
+  {
     pname = "libgpg-error";
     version = "1.55";
 
     src = fetchurl {
-      url = "mirror://gnupg/${pname}/${pname}-${version}.tar.bz2";
+      url = "mirror://gnupg/${finalAttrs.pname}/${finalAttrs.pname}-${finalAttrs.version}.tar.bz2";
       hash = "sha256-lbF4FIhj8H1F3wzqZ+iAp5ue9x9dIwut3ABxEoUW73g=";
     };
 
@@ -72,11 +77,11 @@ stdenv.mkDerivation (
         echo '#undef USE_POSIX_THREADS_WEAK' >> config.h
       '';
 
-    doCheck = true; # not cross
+    passthru.tests.unittests = runUnitTests finalAttrs.finalPackage;
 
     meta = {
       homepage = "https://www.gnupg.org/software/libgpg-error/index.html";
-      changelog = "https://git.gnupg.org/cgi-bin/gitweb.cgi?p=libgpg-error.git;a=blob;f=NEWS;hb=refs/tags/libgpg-error-${version}";
+      changelog = "https://git.gnupg.org/cgi-bin/gitweb.cgi?p=libgpg-error.git;a=blob;f=NEWS;hb=refs/tags/libgpg-error-${finalAttrs.version}";
       description = "Small library that defines common error values for all GnuPG components";
       mainProgram = "gen-posix-lock-obj";
       longDescription = ''
@@ -89,5 +94,5 @@ stdenv.mkDerivation (
       platforms = lib.platforms.all;
     };
   }
-  // genPosixLockObjOnlyAttrs
+  // genPosixLockObjOnlyAttrs'
 )
