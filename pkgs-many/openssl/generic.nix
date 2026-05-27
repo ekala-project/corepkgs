@@ -56,6 +56,7 @@
   ),
   autoloadProviders ? needsOQSProvider,
   extraINIConfig ? (if oqsExtraINIConfig != null then oqsExtraINIConfig else null),
+  runUnitTests,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -285,7 +286,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   enableParallelBuilding = true;
 
-  doCheck = true;
   preCheck = ''
     patchShebangs util
   '';
@@ -400,6 +400,7 @@ stdenv.mkDerivation (finalAttrs: {
     tests = {
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
       pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
+      unittests = runUnitTests finalAttrs.finalPackage;
     };
   };
 
