@@ -33,6 +33,7 @@
   gdal,
   openimageio,
   testers,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -100,8 +101,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   enableParallelBuilding = true;
 
-  doCheck = true;
-
   # Avoid flakiness like https://gitlab.com/libtiff/libtiff/-/commit/94f6f7315b1
   enableParallelChecking = false;
 
@@ -120,6 +119,7 @@ stdenv.mkDerivation (finalAttrs: {
       pkg-config = testers.hasPkgConfigModules {
         package = finalAttrs.finalPackage;
       };
+      unittests = runUnitTests finalAttrs.finalPackage;
     };
     updateScript = nix-update-script { };
   };
