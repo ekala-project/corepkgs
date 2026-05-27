@@ -4,23 +4,23 @@
   fetchurl,
   autoreconfHook,
   pkgsCross,
+  runUnitTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "npth";
   version = "1.8";
 
   src = fetchurl {
-    url = "mirror://gnupg/npth/npth-${version}.tar.bz2";
+    url = "mirror://gnupg/npth/npth-${finalAttrs.version}.tar.bz2";
     hash = "sha256-i9JLTyOjBl1uWybpirqc54PqT9eBBpwbNdFJaU6Qyj4=";
   };
 
   nativeBuildInputs = [ autoreconfHook ];
 
-  doCheck = true;
-
   passthru.tests = {
     musl = pkgsCross.musl64.npth;
+    unittests = runUnitTests finalAttrs.finalPackage;
   };
 
   meta = {
@@ -38,4 +38,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.lgpl3;
     platforms = lib.platforms.all;
   };
-}
+})
