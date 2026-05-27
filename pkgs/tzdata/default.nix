@@ -4,6 +4,7 @@
   fetchurl,
   buildPackages,
   postgresql,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -67,7 +68,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   enableParallelBuilding = true;
 
-  doCheck = true;
   checkTarget = "check";
 
   installFlags = lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
@@ -92,7 +92,10 @@ stdenv.mkDerivation (finalAttrs: {
   # PostgreSQL is sensitive to tzdata updates, because the test-suite often breaks.
   # Upstream provides patches very quickly, we just need to apply them until the next
   # minor releases.
-  passthru.tests = postgresql;
+  passthru.tests = {
+    inherit postgresql;
+    unittests = runUnitTests finalAttrs.finalPackage;
+  };
 
   meta = {
     homepage = "http://www.iana.org/time-zones";
