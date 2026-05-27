@@ -11,6 +11,7 @@
   pcre2,
   libiconv,
   staticBuild ? stdenv.hostPlatform.isStatic,
+  runUnitTests,
   # for passthru.tests
   libgit2-glib,
   python3Packages,
@@ -73,7 +74,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   propagatedBuildInputs = lib.optional (!stdenv.hostPlatform.isLinux) libiconv;
 
-  doCheck = true;
   checkPhase = ''
     testArgs=(-v -xonline)
 
@@ -90,7 +90,10 @@ stdenv.mkDerivation (finalAttrs: {
     )
   '';
 
-  passthru.tests = lib.mapAttrs (_: v: v.override { libgit2 = finalAttrs.finalPackage; }) {
+  passthru.tests = {
+    unittests = runUnitTests finalAttrs.finalPackage;
+  }
+  // lib.mapAttrs (_: v: v.override { libgit2 = finalAttrs.finalPackage; }) {
     inherit libgit2-glib;
     inherit (python3Packages) pygit2;
     inherit (gitstatus) romkatv_libgit2;
