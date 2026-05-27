@@ -19,14 +19,51 @@ let
     lib.mirrorFunctionArgs f (
       origArgs:
       let
-        result = f origArgs;
+        # Build an updated argument set / fixed-point function, supporting all
+        # of: attrset origArgs, function origArgs, attrset newArgs, function
+        # newArgs.
         overrideWith =
-          newArgs: if lib.isFunction newArgs then origArgs // newArgs origArgs else origArgs // newArgs;
+          newArgs:
+          let
+            origIsFn = lib.isFunction origArgs;
+            newIsFn = lib.isFunction newArgs;
+          in
+          if origIsFn || newIsFn then
+            finalAttrs:
+            let
+              prev = if origIsFn then origArgs finalAttrs else origArgs;
+              over = if newIsFn then newArgs prev else newArgs;
+            in
+            prev // over
+          else
+            origArgs // (if newIsFn then newArgs origArgs else newArgs);
+        overridePythonAttrs = newArgs: makeOverridablePythonPackage f (overrideWith newArgs);
+
+        # Make `overridePythonAttrs` available on `finalAttrs.finalPackage`
+        # (i.e. inside the package's own fixed-point) by injecting it through
+        # the user's `passthru`. The `passthru` attrs are merged into the
+        # resulting derivation by `mkDerivation`, so `result.overridePythonAttrs`
+        # is also accessible at the top level.
+        injectOverride =
+          args:
+          let
+            mergePassthru = userAttrs: {
+              passthru = (userAttrs.passthru or { }) // {
+                inherit overridePythonAttrs;
+              };
+            };
+          in
+          if lib.isFunction args then
+            finalAttrs: args finalAttrs // mergePassthru (args finalAttrs)
+          else
+            args // mergePassthru args;
+
+        result = f (injectOverride origArgs);
       in
       if lib.isAttrs result then
         result
         // {
-          overridePythonAttrs = newArgs: makeOverridablePythonPackage f (overrideWith newArgs);
+          inherit overridePythonAttrs;
           overrideAttrs =
             newArgs: makeOverridablePythonPackage (args: (f args).overrideAttrs newArgs) origArgs;
         }

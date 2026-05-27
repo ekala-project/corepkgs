@@ -363,6 +363,13 @@ in
     } ./python-output-dist-hook.sh
   ) { };
 
+  pythonOutputTestSrcHook = callPackage (
+    { makePythonHook }:
+    makePythonHook {
+      name = "python-output-test-src-hook";
+    } ./python-output-test-src-hook.sh
+  ) { };
+
   pythonRecompileBytecodeHook = callPackage (
     { makePythonHook }:
     makePythonHook {
