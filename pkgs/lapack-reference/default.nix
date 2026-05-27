@@ -8,6 +8,7 @@
   # Compile with ILP64 interface
   blas64 ? false,
   testers,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -62,8 +63,6 @@ stdenv.mkDerivation (finalAttrs: {
       ln -s $out/lib/liblapacke64${canonicalExtension} $out/lib/liblapacke${canonicalExtension}
     '';
 
-  doCheck = true;
-
   # Some CBLAS related tests fail on Darwin:
   #  14 - CBLAS-xscblat2 (Failed)
   #  15 - CBLAS-xscblat3 (Failed)
@@ -84,7 +83,10 @@ stdenv.mkDerivation (finalAttrs: {
     runHook postCheck
   '';
 
-  passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  passthru.tests = {
+    pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    unittests = runUnitTests finalAttrs.finalPackage;
+  };
 
   meta = {
     description = "Linear Algebra PACKage";
