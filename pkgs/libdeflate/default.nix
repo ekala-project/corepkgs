@@ -7,6 +7,7 @@
   cmake,
   zlib,
   testers,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -37,9 +38,8 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config = testers.hasPkgConfigModules {
       package = finalAttrs.finalPackage;
     };
+    unittests = runUnitTests finalAttrs.finalPackage;
   };
-
-  doCheck = true;
 
   meta = {
     description = "Fast DEFLATE/zlib/gzip compressor and decompressor";
