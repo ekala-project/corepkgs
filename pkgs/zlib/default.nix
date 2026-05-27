@@ -12,6 +12,7 @@
   splitStaticOutput ? shared && static,
   testers,
   minizip,
+  runUnitTests,
 }:
 
 # Without either the build will actually still succeed because the build
@@ -133,7 +134,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   enableParallelBuilding = true;
-  doCheck = true;
 
   makeFlags = [
     "PREFIX=${stdenv.cc.targetPrefix}"
@@ -153,6 +153,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
     # uses `zlib` derivation:
     inherit minizip;
+    unittests = runUnitTests finalAttrs.finalPackage;
   };
 
   meta = {
