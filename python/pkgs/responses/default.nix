@@ -16,7 +16,7 @@
   urllib3,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "responses";
   version = "0.25.7";
   pyproject = true;
@@ -28,7 +28,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "getsentry";
     repo = "responses";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-eiJwu0sRtr3S4yAnbsIak7g03CNqOTS16rNXoXRQumA=";
   };
 
@@ -52,11 +52,13 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "responses" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Python module for mocking out the requests Python library";
     homepage = "https://github.com/getsentry/responses";
-    changelog = "https://github.com/getsentry/responses/blob/${src.tag}/CHANGES";
+    changelog = "https://github.com/getsentry/responses/blob/${finalAttrs.src.tag}/CHANGES";
     license = lib.licenses.asl20;
 
   };
-}
+})

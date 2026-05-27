@@ -9,7 +9,7 @@
   gitUpdater,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "psutil";
   version = "7.1.2";
   pyproject = true;
@@ -17,7 +17,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "giampaolo";
     repo = "psutil";
-    tag = "release-${version}";
+    tag = "release-${finalAttrs.version}";
     hash = "sha256-LyGnLrq+SzCQmz8/P5DOugoNEyuH0IC7uIp8UAPwH0U=";
   };
 
@@ -65,11 +65,13 @@ buildPythonPackage rec {
     rev-prefix = "release-";
   };
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Process and system utilization information interface";
     homepage = "https://github.com/giampaolo/psutil";
-    changelog = "https://github.com/giampaolo/psutil/blob/${src.tag}/HISTORY.rst";
+    changelog = "https://github.com/giampaolo/psutil/blob/${finalAttrs.src.tag}/HISTORY.rst";
     license = lib.licenses.bsd3;
 
   };
-}
+})

@@ -11,7 +11,7 @@
   typing-inspect,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "dataclasses-json";
   version = "0.6.7";
   pyproject = true;
@@ -21,14 +21,14 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "lidatong";
     repo = "dataclasses-json";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-AH/T6pa/CHtQNox67fqqs/BBnUcmThvbnSHug2p33qM=";
   };
 
   postPatch = ''
     substituteInPlace pyproject.toml \
       --replace-fail 'documentation =' 'Documentation =' \
-      --replace-fail 'version = "0.0.0"' 'version = "${version}"'
+      --replace-fail 'version = "0.0.0"' 'version = "${finalAttrs.version}"'
   '';
 
   build-system = [
@@ -55,11 +55,13 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "dataclasses_json" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Simple API for encoding and decoding dataclasses to and from JSON";
     homepage = "https://github.com/lidatong/dataclasses-json";
-    changelog = "https://github.com/lidatong/dataclasses-json/releases/tag/v${version}";
+    changelog = "https://github.com/lidatong/dataclasses-json/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.mit;
 
   };
-}
+})

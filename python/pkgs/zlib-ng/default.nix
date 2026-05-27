@@ -16,7 +16,7 @@
 let
   inherit (pkgs) zlib-ng;
 in
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "zlib-ng";
   version = "1.0.0";
   pyproject = true;
@@ -24,7 +24,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "pycompression";
     repo = "python-zlib-ng";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-t/PSby1LUTyp+7XXKZTWjRrPvAei1ZrGSGU2CIcAQBc=";
   };
 
@@ -58,10 +58,12 @@ buildPythonPackage rec {
     "test_decompress_infile_outfile_error"
   ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Drop-in replacement for Python's zlib and gzip modules using zlib-ng";
     homepage = "https://github.com/pycompression/python-zlib-ng";
-    changelog = "https://github.com/pycompression/python-zlib-ng/blob/${src.rev}/CHANGELOG.rst";
+    changelog = "https://github.com/pycompression/python-zlib-ng/blob/${finalAttrs.src.rev}/CHANGELOG.rst";
     license = lib.licenses.psfl;
   };
-}
+})

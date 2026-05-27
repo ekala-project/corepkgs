@@ -14,13 +14,13 @@
   pip,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "pep517";
   version = "0.13.1";
   format = "pyproject";
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-Gy+i/9OTi7S+/+XWFGy8sr2plqWk2p8xq//Ysk4Hsxc=";
   };
 
@@ -52,9 +52,11 @@ buildPythonPackage rec {
     rm tests/test_meta.py # wants to run pip
   '';
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Wrappers to build Python packages using PEP 517 hooks";
     license = lib.licenses.mit;
     homepage = "https://github.com/pypa/pep517";
   };
-}
+})

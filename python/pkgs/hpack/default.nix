@@ -7,7 +7,7 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "hpack";
   version = "4.1.0";
   pyproject = true;
@@ -15,7 +15,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "python-hyper";
     repo = "hpack";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-vbxfDlRDwMXuzkPO0oceCpSz1ekLNxLSj4iocdHo680=";
   };
 
@@ -28,11 +28,13 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "hpack" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
-    changelog = "https://github.com/python-hyper/hpack/blob/${src.rev}/CHANGELOG.rst";
+    changelog = "https://github.com/python-hyper/hpack/blob/${finalAttrs.src.rev}/CHANGELOG.rst";
     description = "Pure-Python HPACK header compression";
     homepage = "https://github.com/python-hyper/hpack";
     license = lib.licenses.mit;
     maintainers = [ ];
   };
-}
+})

@@ -11,13 +11,13 @@
   pyyaml,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "tomlkit";
   version = "0.13.3";
   pyproject = true;
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-QwzyR+5X3yuU7j++WI5x02KpQeu1Rd7Cm1OWHWGt0qE=";
   };
 
@@ -30,10 +30,12 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "tomlkit" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     homepage = "https://github.com/sdispater/tomlkit";
-    changelog = "https://github.com/sdispater/tomlkit/blob/${version}/CHANGELOG.md";
+    changelog = "https://github.com/sdispater/tomlkit/blob/${finalAttrs.version}/CHANGELOG.md";
     description = "Style-preserving TOML library for Python";
     license = lib.licenses.mit;
   };
-}
+})

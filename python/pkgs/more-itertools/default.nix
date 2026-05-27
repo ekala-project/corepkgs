@@ -8,7 +8,7 @@
   stdenv,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "more-itertools";
   version = "11.0.2";
   pyproject = true;
@@ -16,7 +16,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "more-itertools";
     repo = "more-itertools";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-ZKM9+3l0qNclcQRNOEk8IF59xqyh1+uvdDRriG3Z/ek=";
   };
 
@@ -30,6 +30,8 @@ buildPythonPackage rec {
   # OverflowError: Python int too large to convert to C long
   doCheck = !stdenv.hostPlatform.is32bit;
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     homepage = "https://more-itertools.readthedocs.org";
     changelog = "https://more-itertools.readthedocs.io/en/stable/versions.html";
@@ -38,4 +40,4 @@ buildPythonPackage rec {
     license = lib.licenses.mit;
     maintainers = [ ];
   };
-}
+})

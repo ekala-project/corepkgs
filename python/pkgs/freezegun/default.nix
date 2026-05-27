@@ -9,7 +9,7 @@
   setuptools,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "freezegun";
   version = "1.5.4";
   pyproject = true;
@@ -17,7 +17,7 @@ buildPythonPackage rec {
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-eYuTcv3U2QfzPotqWLxk5oLZ/6jUlM5g94AZfugfrtE=";
   };
 
@@ -36,11 +36,13 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "freezegun" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Library that allows your Python tests to travel through time";
     homepage = "https://github.com/spulec/freezegun";
-    changelog = "https://github.com/spulec/freezegun/blob/${version}/CHANGELOG";
+    changelog = "https://github.com/spulec/freezegun/blob/${finalAttrs.version}/CHANGELOG";
     license = lib.licenses.asl20;
 
   };
-}
+})

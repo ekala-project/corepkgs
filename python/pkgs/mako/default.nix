@@ -21,7 +21,7 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "mako";
   version = "1.3.10";
   pyproject = true;
@@ -31,7 +31,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "sqlalchemy";
     repo = "mako";
-    tag = "rel_${lib.replaceStrings [ "." ] [ "_" ] version}";
+    tag = "rel_${lib.replaceStrings [ "." ] [ "_" ] finalAttrs.version}";
     hash = "sha256-lxGlYyKbrDpr2LHcsqTow+s2l8+g+63M5j8xJt++tGo=";
   };
 
@@ -49,7 +49,7 @@ buildPythonPackage rec {
     mock
     pytestCheckHook
   ]
-  ++ lib.concatAttrValues optional-dependencies;
+  ++ lib.concatAttrValues finalAttrs.optional-dependencies;
 
   disabledTests = lib.optionals isPyPy [
     # https://github.com/sqlalchemy/mako/issues/315
@@ -61,6 +61,8 @@ buildPythonPackage rec {
     "test_bytestring_passthru"
   ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Super-fast templating language";
     mainProgram = "mako-render";
@@ -70,4 +72,4 @@ buildPythonPackage rec {
     platforms = lib.platforms.unix;
 
   };
-}
+})

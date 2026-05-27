@@ -16,7 +16,7 @@
   urllib3,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "requests";
   version = "2.32.5";
   pyproject = true;
@@ -28,7 +28,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "psf";
     repo = "requests";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-cEBalMFoYFaGG8M48k+OEBvzLegzrTNP1NxH2ljP6qg=";
   };
 
@@ -52,7 +52,7 @@ buildPythonPackage rec {
     pytest-xdist
     pytestCheckHook
   ]
-  ++ optional-dependencies.socks;
+  ++ finalAttrs.optional-dependencies.socks;
 
   disabledTests = [
     # Disable tests that require network access and use httpbin
@@ -82,11 +82,13 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "requests" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "HTTP library for Python";
     homepage = "http://docs.python-requests.org/";
-    changelog = "https://github.com/psf/requests/blob/v${version}/HISTORY.md";
+    changelog = "https://github.com/psf/requests/blob/v${finalAttrs.version}/HISTORY.md";
     license = lib.licenses.asl20;
 
   };
-}
+})

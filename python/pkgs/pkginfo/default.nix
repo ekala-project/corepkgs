@@ -6,13 +6,13 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "pkginfo";
   version = "1.12.1.2";
   pyproject = true;
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-XNlXgkrDbxQCYJZOujxr5kQqg1m4xI9K35AhDzOgS3s=";
   };
 
@@ -31,6 +31,8 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "pkginfo" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     changelog = "https://pypi.org/project/pkginfo/#pkginfo-changelog";
     description = "Query metadatdata from sdists, bdists or installed packages";
@@ -41,9 +43,9 @@ buildPythonPackage rec {
       written in the PKG-INFO file inside a source distriubtion (an sdist)
       or a binary distribution (e.g., created by running bdist_egg). It can
       also query the EGG-INFO directory of an installed distribution, and the
-      *.egg-info stored in a “development checkout” (e.g, created by running
+      *.egg-info stored in a "development checkout" (e.g, created by running
       setup.py develop).
     '';
     license = lib.licenses.mit;
   };
-}
+})

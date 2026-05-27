@@ -10,13 +10,13 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "filelock";
   version = "3.20.0";
   pyproject = true;
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-cR6UO07GvkLh1OZpC0jcF1yCKWdGa7McDCk/NDNME/Q=";
   };
 
@@ -39,11 +39,13 @@ buildPythonPackage rec {
     "tests/test_virtualenv.py"
   ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
-    changelog = "https://github.com/tox-dev/py-filelock/releases/tag/${version}";
+    changelog = "https://github.com/tox-dev/py-filelock/releases/tag/${finalAttrs.version}";
     description = "Platform independent file lock for Python";
     homepage = "https://github.com/benediktschmitt/py-filelock";
     license = lib.licenses.unlicense;
 
   };
-}
+})

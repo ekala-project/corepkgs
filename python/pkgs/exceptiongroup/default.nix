@@ -9,7 +9,7 @@
   typing-extensions,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "exceptiongroup";
   version = "1.3.0";
   pyproject = true;
@@ -19,7 +19,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "agronholm";
     repo = "exceptiongroup";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-b3Z1NsYKp0CecUq8kaC/j3xR/ZZHDIw4MhUeadizz88=";
   };
 
@@ -33,11 +33,13 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "exceptiongroup" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Backport of PEP 654 (exception groups)";
     homepage = "https://github.com/agronholm/exceptiongroup";
-    changelog = "https://github.com/agronholm/exceptiongroup/blob/${version}/CHANGES.rst";
+    changelog = "https://github.com/agronholm/exceptiongroup/blob/${finalAttrs.version}/CHANGES.rst";
     license = with lib.licenses; [ mit ];
 
   };
-}
+})

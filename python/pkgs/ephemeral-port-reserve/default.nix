@@ -6,18 +6,15 @@
   pytestCheckHook,
 }:
 
-let
+buildPythonPackage (finalAttrs: {
   pname = "ephemeral-port-reserve";
   version = "1.1.4";
-in
-buildPythonPackage {
-  inherit pname version;
   format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "Yelp";
     repo = "ephemeral-port-reserve";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-R6NRpfaT05PO/cTWgCakiGfCuCyucjVOXbAezn5x1cU=";
   };
 
@@ -32,10 +29,12 @@ buildPythonPackage {
 
   pythonImportsCheck = [ "ephemeral_port_reserve" ];
 
+  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
   meta = {
     description = "Find an unused port, reliably";
     mainProgram = "ephemeral-port-reserve";
     homepage = "https://github.com/Yelp/ephemeral-port-reserve/";
     license = lib.licenses.mit;
   };
-}
+})

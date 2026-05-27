@@ -57,14 +57,14 @@ let
     };
   };
 in
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "numpy";
   version = "1.26.4";
   pyproject = true;
   disabled = pythonOlder "3.9" || pythonAtLeast "3.13";
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     extension = "tar.gz";
     hash = "sha256-KgKrqe0S5KxOs+qUIcQgMBoMZGDZgw10qd+H76SRIBA=";
   };
@@ -185,6 +185,7 @@ buildPythonPackage rec {
     coreIncludeDir = "${numpy_1}/${python.sitePackages}/numpy/core/include";
     tests = {
       inherit sage;
+      unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
     };
   };
 
@@ -193,10 +194,10 @@ buildPythonPackage rec {
   env.NOSE_EXCLUDE = "test_large_file_support";
 
   meta = {
-    changelog = "https://github.com/numpy/numpy/releases/tag/v${version}";
+    changelog = "https://github.com/numpy/numpy/releases/tag/v${finalAttrs.version}";
     description = "Scientific tools for Python";
     mainProgram = "f2py";
     homepage = "https://numpy.org/";
     license = lib.licenses.bsd3;
   };
-}
+})
