@@ -8,6 +8,7 @@
   libiconv,
   gettext,
   xxd,
+  runUnitTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -58,7 +59,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   nativeCheckInputs = [ xxd ];
-  doCheck = true;
+
+  passthru.tests.unittests = runUnitTests finalAttrs.finalPackage;
 
   meta = {
     description = "Utilities for creating and checking FAT and VFAT file systems";
