@@ -3,6 +3,7 @@
   stdenv,
   fetchurl,
   updateAutotoolsGnuConfigScriptsHook,
+  runUnitTests,
   # for passthru.tests
   python3,
   perlPackages,
@@ -47,8 +48,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   outputMan = "dev"; # tiny page for a dev tool
 
-  doCheck = true; # not cross;
-
   preCheck = ''
     patchShebangs ./run.sh ./test-driver-wrapper.sh
   '';
@@ -61,6 +60,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   passthru.tests = {
+    unittests = runUnitTests finalAttrs.finalPackage;
     inherit python3;
     inherit (python3.pkgs) xmltodict;
     inherit (haskellPackages) hexpat;
