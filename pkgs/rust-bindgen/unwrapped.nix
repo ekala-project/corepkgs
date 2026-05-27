@@ -4,18 +4,19 @@
   rustPlatform,
   clang,
   rustfmt,
+  runUnitTests,
 }:
 let
   # bindgen hardcodes rustfmt outputs that use nightly features
   rustfmt-nightly = rustfmt.override { asNightly = true; };
 in
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "rust-bindgen-unwrapped";
   version = "0.72.1";
 
   src = fetchCrate {
     pname = "bindgen-cli";
-    inherit version;
+    inherit (finalAttrs) version;
     hash = "sha256-rhdQZcnlqVSUqvFDg0Scs1+DHGcKyazeS5H9HH7u8Fk=";
   };
 
@@ -28,10 +29,9 @@ rustPlatform.buildRustPackage rec {
   # Disable the "runtime" feature, so libclang is linked.
   buildNoDefaultFeatures = true;
   buildFeatures = [ "logging" ];
-  checkNoDefaultFeatures = buildNoDefaultFeatures;
-  checkFeatures = buildFeatures;
+  checkNoDefaultFeatures = finalAttrs.buildNoDefaultFeatures;
+  checkFeatures = finalAttrs.buildFeatures;
 
-  doCheck = true;
   nativeCheckInputs = [ clang ];
 
   RUSTFMT = "${rustfmt-nightly}/bin/rustfmt";
@@ -41,7 +41,10 @@ rustPlatform.buildRustPackage rec {
     patchShebangs .
   '';
 
-  passthru = { inherit clang; };
+  passthru = {
+    inherit clang;
+    tests.unittests = runUnitTests finalAttrs.finalPackage;
+  };
 
   meta = {
     description = "Automatically generates Rust FFI bindings to C (and some C++) libraries";
@@ -54,4 +57,4 @@ rustPlatform.buildRustPackage rec {
     mainProgram = "bindgen";
     platforms = lib.platforms.unix;
   };
-}
+})
