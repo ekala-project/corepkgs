@@ -334,13 +334,10 @@ let
       configureFlags ? [ ],
       configurePlatforms ? defaultConfigurePlatforms,
 
-      # TODO(@Ericson2314): Make unconditional / resolve #33599
-      # Check phase
-      doCheck ? config.doCheckByDefault or false,
-
-      # TODO(@Ericson2314): Make unconditional / resolve #33599
-      # InstallCheck phase
-      doInstallCheck ? config.doCheckByDefault or false,
+      # Ekapkgs: unittests should be move to passthru unless very quick
+      # and don't intoduce more dependencies
+      doCheck ? false,
+      doInstallCheck ? false,
 
       # TODO(@Ericson2314): Make always true and remove / resolve #178468
       strictDeps ? defaultStrictDeps,
