@@ -18,6 +18,7 @@
   glibcLocales,
   autoPatchelfHook,
   fetchpatch,
+  runUnitTests,
 
   # glib is only used during tests (test-bus-gvariant, test-bus-marshal)
   glib,
@@ -789,8 +790,6 @@ stdenv.mkDerivation (finalAttrs: {
     ]
   );
 
-  doCheck = true;
-
   # trigger the test -n "$DESTDIR" || mutate in upstreams build system
   preInstall = ''
     export DESTDIR=/
@@ -1006,6 +1005,8 @@ stdenv.mkDerivation (finalAttrs: {
       in
       relevantNixosTests
       // {
+        unittests = runUnitTests finalAttrs.finalPackage;
+
         cross =
           let
             systemString = if stdenv.buildPlatform.isAarch64 then "gnu64" else "aarch64-multiplatform";
