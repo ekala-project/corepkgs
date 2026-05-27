@@ -19,6 +19,7 @@
   pythonImportsCheckHook,
   pythonNamespacesHook,
   pythonOutputDistHook,
+  pythonOutputTestSrcHook,
   pythonRelaxDepsHook,
   pythonRemoveBinBytecodeHook,
   pythonRemoveTestsDirHook,
@@ -113,10 +114,42 @@ let
     "build-system"
   ];
 
+  # Python-specific attrs that should be visible to the user's `finalAttrs`
+  # fixed-point view but stripped from the underlying mkDerivation call so they
+  # are not forwarded to the `derivation` builtin (which cannot coerce attrsets
+  # like `optional-dependencies` to strings).
+  pythonOnlyAttrNames = [
+    "dependencies"
+    "optional-dependencies"
+    "build-system"
+  ];
+
+  # Wrap `stdenv.mkDerivation` so that the user's function sees a `finalAttrs`
+  # value containing Python-specific attributes (e.g. `optional-dependencies`),
+  # while the underlying `mkDerivation` receives a sanitised attrset.
+  pythonMkDerivation =
+    fn:
+    stdenv.mkDerivation (
+      drvFinalAttrs:
+      let
+        # Re-expose the Python-specific attrs that the inner `mkDerivation`
+        # doesn't track. These reference the user's own returned attrs, so the
+        # fixed-point still terminates as long as the user doesn't define them
+        # in terms of `finalAttrs.<pythonOnlyAttr>` itself.
+        userFinalAttrs = drvFinalAttrs // {
+          dependencies = userAttrs.dependencies or [ ];
+          optional-dependencies = userAttrs.optional-dependencies or { };
+          build-system = userAttrs.build-system or [ ];
+        };
+        userAttrs = fn userFinalAttrs;
+      in
+      removeAttrs userAttrs pythonOnlyAttrNames
+    );
+
 in
 
 lib.extendMkDerivation {
-  constructDrv = stdenv.mkDerivation;
+  constructDrv = pythonMkDerivation;
 
   excludeDrvArgNames = [
     "disabled"
@@ -166,6 +199,21 @@ lib.extendMkDerivation {
       strictDeps ? true,
 
       outputs ? [ "out" ],
+
+      # Files and/or directories (relative to the source root) to bundle into
+      # the `test_src` output. When non-empty, a "test_src" output is created
+      # and `passthru.tests.python` is auto-generated to run the package's
+      # test suite against the installed package without rebuilding.
+      #
+      # Typical usage is `testPaths = [ "tests" ];`. Packages whose suites
+      # reference sibling files (helper modules, fixture data, README files
+      # used by doctests, etc.) should list those alongside the test
+      # directory, e.g. `testPaths = [ "tests" "smartypants" "README.rst" ];`.
+      #
+      # The list is forwarded to the `pythonOutputTestSrcHook` as a
+      # whitespace-separated environment variable; entries must therefore
+      # not contain whitespace.
+      testPaths ? [ ],
 
       # used to disable derivation, useful for specific python versions
       disabled ? false,
@@ -242,6 +290,8 @@ lib.extendMkDerivation {
           throw "${name} does not configure a `format`. To build with setuptools as before, set `pyproject = true` and `build-system = [ setuptools ]`.`";
 
       withDistOutput = withDistOutput' format';
+
+      withTestSrcOutput = testPaths != [ ];
 
       validatePythonMatches =
         let
@@ -384,6 +434,9 @@ lib.extendMkDerivation {
       ++ optionals withDistOutput [
         pythonOutputDistHook
       ]
+      ++ optionals withTestSrcOutput [
+        pythonOutputTestSrcHook
+      ]
       ++ nativeBuildInputs
       ++ getFinalPassthru "build-system";
 
@@ -406,7 +459,7 @@ lib.extendMkDerivation {
 
       # Python packages don't have a checkPhase, only an installCheckPhase
       doCheck = false;
-      doInstallCheck = attrs.doCheck or true;
+      doInstallCheck = doCheck;
       nativeInstallCheckInputs = nativeCheckInputs ++ attrs.nativeInstallCheckInputs or [ ];
       installCheckInputs = checkInputs ++ attrs.installCheckInputs or [ ];
 
@@ -423,21 +476,89 @@ lib.extendMkDerivation {
         python.pythonOnBuildForHost
       ];
 
-      outputs = outputs ++ optional withDistOutput "dist";
-
-      passthru = {
-        inherit
-          disabled
-          pyproject
-          build-system
-          dependencies
-          optional-dependencies
-          ;
-      }
-      // {
-        updateScript = nix-update-script { };
-      }
-      // attrs.passthru or { };
+      outputs = outputs ++ optional withDistOutput "dist" ++ optional withTestSrcOutput "test_src";
+    }
+    // {
+      # Re-expose Python-specific attrs at the top-level of the returned
+      # attrset so that they're visible in the user's `finalAttrs` fixed-point
+      # view (see `pythonMkDerivation`). These are removed before being passed
+      # to `stdenv.mkDerivation`, so they never reach the `derivation` builtin.
+      inherit dependencies optional-dependencies build-system;
+    }
+    // optionalAttrs withTestSrcOutput {
+      inherit testPaths;
+    }
+    // {
+      passthru =
+        let
+          userPassthru = attrs.passthru or { };
+          # Forward test-related hooks from the parent derivation so that
+          # patchShebangs, environment setup, fixture preparation, etc. all
+          # apply in the auto-generated test derivation as well.
+          forwardedTestHookNames = [
+            "preCheck"
+            "postCheck"
+            "preInstallCheck"
+            "postInstallCheck"
+            "disabledTests"
+            "disabledTestPaths"
+            "enabledTestPaths"
+            "pytestFlags"
+            "pytestFlagsArray"
+            "unittestFlagsArray"
+            "PYTEST_DISABLE_PLUGIN_AUTOLOAD"
+          ];
+          forwardedTestHooks = lib.filterAttrs (n: _: attrs ? ${n}) (
+            lib.genAttrs forwardedTestHookNames (n: attrs.${n} or null)
+          );
+          autoTests = optionalAttrs withTestSrcOutput {
+            python = stdenv.mkDerivation (
+              {
+                name = "${name}-tests";
+                src = finalAttrs.finalPackage.test_src;
+                dontConfigure = true;
+                dontBuild = true;
+                # We still produce an empty `$out` because some preDist hooks
+                # (e.g. pytest's `pytestcachePhase`) expect it to exist.
+                installPhase = "mkdir -p $out";
+                # Python check hooks (pytestCheckHook, unittestCheckHook, ...)
+                # append themselves to preDistPhases, which runs after the
+                # installCheckPhase. We enable both doCheck and doInstallCheck
+                # so that any user-provided checkPhase / installCheckPhase
+                # forwarded below also executes.
+                doCheck = true;
+                doInstallCheck = true;
+                nativeBuildInputs = [
+                  python
+                  finalAttrs.finalPackage
+                ]
+                ++ nativeCheckInputs;
+                buildInputs = checkInputs;
+              }
+              // forwardedTestHooks
+              // optionalAttrs (attrs ? checkPhase) {
+                # Mirror the parent's handling: a user-supplied checkPhase is
+                # really an installCheckPhase in Python land.
+                installCheckPhase = attrs.checkPhase;
+              }
+              // optionalAttrs (attrs ? installCheckPhase) {
+                inherit (attrs) installCheckPhase;
+              }
+            );
+          };
+        in
+        {
+          inherit
+            disabled
+            pyproject
+            build-system
+            dependencies
+            optional-dependencies
+            ;
+          updateScript = nix-update-script { };
+          tests = autoTests // (userPassthru.tests or { });
+        }
+        // removeAttrs userPassthru [ "tests" ];
 
       meta = {
         # default to python's platforms
