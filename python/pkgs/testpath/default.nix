@@ -21,6 +21,8 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  testPaths = [ "tests" ];
+
   # exe are only required when testpath is used on windows
   # https://github.com/jupyter/testpath/blob/de8ca59539eb23b9781e55848b7d2646c8c61df9/testpath/commands.py#L128
   preBuild = lib.optionalString (!stdenv.hostPlatform.isWindows) ''
@@ -31,8 +33,6 @@ buildPythonPackage (finalAttrs: {
     # Work around https://github.com/jupyter/testpath/issues/24
     export TMPDIR="/tmp"
   '';
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Test utilities for code working with files and commands";

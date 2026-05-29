@@ -24,6 +24,8 @@ buildPythonPackage (finalAttrs: {
   # make the testsuite run with pytest, so we can disable individual tests
   nativeCheckInputs = [ pytestCheckHook ];
 
+  testPaths = [ "tests" ];
+
   enabledTestPaths = [ "tests/testextensions.py" ];
 
   disabledTests = lib.optionals (pythonAtLeast "3.14") [
@@ -32,8 +34,6 @@ buildPythonPackage (finalAttrs: {
   ];
 
   pythonImportsCheck = [ "mypy_extensions" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Experimental type system extensions for programs checked with the mypy typechecker";

@@ -27,6 +27,8 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  testPaths = [ "tests" ];
+
   disabledTests = [
     "benchmark"
     # these tests require network access
@@ -43,8 +45,6 @@ buildPythonPackage (finalAttrs: {
   ];
 
   pythonImportsCheck = [ "fastjsonschema" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "JSON schema validator for Python";

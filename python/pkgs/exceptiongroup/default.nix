@@ -29,11 +29,11 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  testPaths = [ "tests" ];
+
   doCheck = pythonAtLeast "3.11"; # infinite recursion with pytest
 
   pythonImportsCheck = [ "exceptiongroup" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Backport of PEP 654 (exception groups)";

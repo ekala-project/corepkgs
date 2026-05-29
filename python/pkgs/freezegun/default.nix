@@ -27,6 +27,8 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  testPaths = [ "tests" ];
+
   disabledTests = lib.optionals (pythonAtLeast "3.13") [
     # https://github.com/spulec/freezegun/issues/547
     "test_method_decorator_works_on_unittest_kwarg_frozen_time"
@@ -35,8 +37,6 @@ buildPythonPackage (finalAttrs: {
   ];
 
   pythonImportsCheck = [ "freezegun" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Library that allows your Python tests to travel through time";

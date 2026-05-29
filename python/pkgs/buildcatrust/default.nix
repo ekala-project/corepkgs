@@ -20,6 +20,8 @@ buildPythonPackage (finalAttrs: {
 
   # nativeCheckInputs = [ pytestCheckHook ];
 
+  testPaths = [ "buildcatrust/tests" ];
+
   disabledTestPaths = [
     # Non-hermetic, needs internet access (e.g. attempts to retrieve NSS store).
     "buildcatrust/tests/test_nonhermetic.py"
@@ -29,8 +31,6 @@ buildPythonPackage (finalAttrs: {
     "buildcatrust"
     "buildcatrust.cli"
   ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Build SSL/TLS trust stores";

@@ -24,8 +24,6 @@ buildPythonPackage (finalAttrs: {
 
   pythonImportsCheck = [ "pretend" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
-
   meta = {
     description = "Module for stubbing";
     homepage = "https://github.com/alex/pretend";

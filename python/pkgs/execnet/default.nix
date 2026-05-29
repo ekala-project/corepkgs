@@ -43,6 +43,8 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
+  testPaths = [ "testing" ];
+
   disabledTests = [
     # gets stuck
     "test_popen_io"
@@ -55,8 +57,6 @@ buildPythonPackage (finalAttrs: {
   pythonImportsCheck = [ "execnet" ];
 
   __darwinAllowLocalNetworking = true;
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Distributed Python deployment and communication";

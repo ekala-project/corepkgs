@@ -20,6 +20,8 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  testPaths = [ "tests" ];
+
   disabledTests = lib.optionals stdenv.hostPlatform.isDarwin [
     # can't find hostname in our darwin build environment
     "test_fqdn"
@@ -28,8 +30,6 @@ buildPythonPackage (finalAttrs: {
   __darwinAllowLocalNetworking = true;
 
   pythonImportsCheck = [ "ephemeral_port_reserve" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Find an unused port, reliably";

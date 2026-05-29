@@ -39,6 +39,13 @@ buildPythonPackage (finalAttrs: {
   ]
   ++ lib.optionals isPyPy [ tzdata ];
 
+  # Some tests read `babel/locale-data/*.dat` and `babel/global.dat` as
+  # plain files relative to the source root.
+  testPaths = [
+    "tests"
+    "babel"
+  ];
+
   disabledTests = [
     # fails on days switching from and to daylight saving time in EST
     # https://github.com/python-babel/babel/issues/988
@@ -46,8 +53,6 @@ buildPythonPackage (finalAttrs: {
   ];
 
   pythonImportsCheck = [ "babel" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Collection of internationalizing tools";

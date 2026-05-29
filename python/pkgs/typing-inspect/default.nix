@@ -32,8 +32,6 @@ buildPythonPackage (finalAttrs: {
 
   pythonImportsCheck = [ "typing_inspect" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
-
   meta = {
     description = "Runtime inspection utilities for Python typing module";
     homepage = "https://github.com/ilevkivskyi/typing_inspect";

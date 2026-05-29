@@ -34,14 +34,14 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
+  testPaths = [ "tests" ];
+
   disabledTests = [
     # reacts to our setup-hook pretending a version
     "test_custom_tag_pattern_get_version"
   ];
 
   pythonImportsCheck = [ "hatch_vcs" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     changelog = "https://github.com/ofek/hatch-vcs/releases/tag/v${finalAttrs.version}";

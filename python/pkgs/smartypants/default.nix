@@ -31,11 +31,17 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
+  # The tests reference the `smartypants` CLI script and `README.rst` at the
+  # source root, so bundle them into the `test_src` output.
+  testPaths = [
+    "tests"
+    "smartypants"
+    "README.rst"
+  ];
+
   preCheck = ''
     patchShebangs smartypants
   '';
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Translate plain ASCII quotation marks and other characters into “smart” typographic HTML entities";

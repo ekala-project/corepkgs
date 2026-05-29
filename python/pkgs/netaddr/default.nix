@@ -33,9 +33,9 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
-  pythonImportsCheck = [ "netaddr" ];
+  testPaths = [ "netaddr/tests" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  pythonImportsCheck = [ "netaddr" ];
 
   meta = {
     description = "Network address manipulation library for Python";

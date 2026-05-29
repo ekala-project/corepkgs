@@ -44,7 +44,7 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  testPaths = [ "tests" ];
 
   meta = {
     homepage = "https://github.com/python-poetry/cleo";

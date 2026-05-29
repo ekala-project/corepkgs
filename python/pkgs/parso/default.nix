@@ -22,7 +22,7 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  testPaths = [ "test" ];
 
   meta = {
     description = "Python Parser";

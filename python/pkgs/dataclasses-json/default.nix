@@ -46,6 +46,8 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
+  testPaths = [ "tests" ];
+
   disabledTestPaths = [
     # fails with the following error and avoid dependency on mypy
     # mypy_main(None, text_io, text_io, [__file__], clean_exit=True)
@@ -54,8 +56,6 @@ buildPythonPackage (finalAttrs: {
   ];
 
   pythonImportsCheck = [ "dataclasses_json" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Simple API for encoding and decoding dataclasses to and from JSON";

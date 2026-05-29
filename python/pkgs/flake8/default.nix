@@ -32,13 +32,18 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  # `tests/integration/test_main.py` invokes `bin/gen-pycodestyle-plugin`
+  # relative to the repository root.
+  testPaths = [
+    "tests"
+    "bin"
+  ];
+
   disabledTests = lib.optionals isPyPy [
     # tests fail due to slightly different error position
     "test_tokenization_error_is_a_syntax_error"
     "test_tokenization_error_but_not_syntax_error"
   ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     changelog = "https://github.com/PyCQA/flake8/blob/${finalAttrs.src.tag}/docs/source/release-notes/${finalAttrs.version}.rst";

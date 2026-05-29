@@ -44,8 +44,6 @@ buildPythonPackage (finalAttrs: {
 
   pythonImportsCheck = [ "jaraco.functools" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
-
   meta = {
     description = "Additional functools in the spirit of stdlib's functools";
     homepage = "https://github.com/jaraco/jaraco.functools";

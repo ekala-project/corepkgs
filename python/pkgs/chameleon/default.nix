@@ -26,9 +26,9 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
-  pythonImportsCheck = [ "chameleon" ];
+  testPaths = [ "src/chameleon/tests" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  pythonImportsCheck = [ "chameleon" ];
 
   meta = {
     changelog = "https://github.com/malthe/chameleon/blob/${finalAttrs.src.tag}/CHANGES.rst";

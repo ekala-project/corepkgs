@@ -50,9 +50,9 @@ buildPythonPackage (finalAttrs: {
   ]
   ++ lib.optionals (pythonOlder "3.11") [ tomli ];
 
-  pythonImportsCheck = [ "responses" ];
+  testPaths = [ "responses/tests" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  pythonImportsCheck = [ "responses" ];
 
   meta = {
     description = "Python module for mocking out the requests Python library";

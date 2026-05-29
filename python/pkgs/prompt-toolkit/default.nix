@@ -31,6 +31,8 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  testPaths = [ "tests" ];
+
   disabledTests = [
     # tests/test_completion.py:206: AssertionError
     # https://github.com/prompt-toolkit/python-prompt-toolkit/issues/1657
@@ -38,8 +40,6 @@ buildPythonPackage (finalAttrs: {
   ];
 
   pythonImportsCheck = [ "prompt_toolkit" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Python library for building powerful interactive command lines";

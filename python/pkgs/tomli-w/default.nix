@@ -26,9 +26,14 @@ buildPythonPackage (finalAttrs: {
     tomli
   ];
 
-  pythonImportsCheck = [ "tomli_w" ];
+  # `tests/test_for_profiler.py` reads a TOML file from the sibling
+  # `benchmark/` directory.
+  testPaths = [
+    "tests"
+    "benchmark"
+  ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  pythonImportsCheck = [ "tomli_w" ];
 
   meta = {
     description = "Write-only counterpart to Tomli, which is a read-only TOML parser";

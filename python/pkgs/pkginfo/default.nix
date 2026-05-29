@@ -20,6 +20,12 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  # The test suite reads example metadata from `docs/examples/`.
+  testPaths = [
+    "pkginfo"
+    "docs"
+  ];
+
   disabledTests = [
     # wheel metadata version mismatch 2.1 vs 2.2
     "test_get_metadata_w_module"
@@ -30,8 +36,6 @@ buildPythonPackage (finalAttrs: {
   ];
 
   pythonImportsCheck = [ "pkginfo" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     changelog = "https://pypi.org/project/pkginfo/#pkginfo-changelog";

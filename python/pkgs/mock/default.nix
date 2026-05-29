@@ -20,9 +20,9 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
-  pythonImportsCheck = [ "mock" ];
+  testPaths = [ "mock" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  pythonImportsCheck = [ "mock" ];
 
   meta = {
     description = "Rolling backport of unittest.mock for all Pythons";

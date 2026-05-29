@@ -51,6 +51,8 @@ buildPythonPackage (finalAttrs: {
     responses
   ];
 
+  testPaths = [ "tests" ];
+
   disabledTests = [
     # needs some ini file.
     "test_invalid_classifier"
@@ -60,8 +62,6 @@ buildPythonPackage (finalAttrs: {
     "test_symlink_data_dir"
     "test_symlink_module_pep621"
   ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     changelog = "https://github.com/pypa/flit/blob/${finalAttrs.version}/doc/history.rst";

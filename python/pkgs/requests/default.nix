@@ -75,14 +75,14 @@ buildPythonPackage (finalAttrs: {
     "test_text_response"
   ];
 
+  testPaths = [ "tests" ];
+
   disabledTestPaths = lib.optionals (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64) [
     # Fatal Python error: Aborted
     "tests/test_lowlevel.py"
   ];
 
   pythonImportsCheck = [ "requests" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "HTTP library for Python";

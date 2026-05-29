@@ -44,6 +44,11 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  testPaths = [
+    "tests"
+    "README.rst"
+  ];
+
   preCheck = ''
     rm -rf src
   '';
@@ -57,8 +62,6 @@ buildPythonPackage (finalAttrs: {
     "test_decompress_infile_outfile"
     "test_decompress_infile_outfile_error"
   ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Drop-in replacement for Python's zlib and gzip modules using zlib-ng";

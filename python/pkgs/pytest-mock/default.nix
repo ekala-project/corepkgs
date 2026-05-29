@@ -33,9 +33,9 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
-  pythonImportsCheck = [ "pytest_mock" ];
+  testPaths = [ "tests" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  pythonImportsCheck = [ "pytest_mock" ];
 
   meta = {
     description = "Thin wrapper around the mock package for easier use with pytest";

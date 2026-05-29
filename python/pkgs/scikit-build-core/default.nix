@@ -72,14 +72,14 @@ buildPythonPackage (finalAttrs: {
     "network"
   ];
 
+  testPaths = [ "tests" ];
+
   disabledTestPaths = [
     # store permissions issue in Nix:
     "tests/test_editable.py"
   ];
 
   pythonImportsCheck = [ "scikit_build_core" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Next generation Python CMake adaptor and Python API for plugins";
