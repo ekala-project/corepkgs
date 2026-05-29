@@ -172,7 +172,6 @@ with final;
   # PHP - already declared above with Java
   pika = null;
   pinentry = null;
-  po4a = null;
   poppler = null;
   postgresql = null;
   protobufc = null;
@@ -725,6 +724,8 @@ with final;
       cygwin.newlib-cygwin-headers
     else
       null;
+
+  po4a = perlPackages.Po4a;
 
   pnpmConfigHook = callPackage ./pkgs/pnpmConfigHook { };
   fetchPnpmDeps = callPackage ./pkgs/fetchPnpmDeps { };

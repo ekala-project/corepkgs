@@ -28479,7 +28479,7 @@ with self;
     };
   };
 
-  Po4a = callPackage ./patches/Po4a { };
+  Po4a = callPackage ./Po4a { };
 
   PodMinimumVersion = buildPerlPackage {
     pname = "Pod-MinimumVersion";
