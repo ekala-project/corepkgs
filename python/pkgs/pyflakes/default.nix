@@ -23,6 +23,8 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  testPaths = [ "pyflakes/test" ];
+
   disabledTests = lib.optionals isPyPy [
     # https://github.com/PyCQA/pyflakes/issues/779
     "test_eofSyntaxError"
@@ -32,8 +34,6 @@ buildPythonPackage (finalAttrs: {
   ];
 
   pythonImportsCheck = [ "pyflakes" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     homepage = "https://github.com/PyCQA/pyflakes";

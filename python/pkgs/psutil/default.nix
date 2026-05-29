@@ -33,6 +33,8 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  testPaths = [ "psutil/tests" ];
+
   # Segfaults on darwin:
   # https://github.com/giampaolo/psutil/issues/1715
   doCheck = !stdenv.hostPlatform.isDarwin;
@@ -64,8 +66,6 @@ buildPythonPackage (finalAttrs: {
   passthru.updateScript = gitUpdater {
     rev-prefix = "release-";
   };
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Process and system utilization information interface";

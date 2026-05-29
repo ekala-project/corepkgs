@@ -22,9 +22,9 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
-  pythonImportsCheck = [ "xmltodict" ];
+  testPaths = [ "tests" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  pythonImportsCheck = [ "xmltodict" ];
 
   meta = {
     description = "Makes working with XML feel like you are working with JSON";

@@ -18,9 +18,9 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
-  pythonImportsCheck = [ "semantic_version" ];
+  testPaths = [ "tests" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  pythonImportsCheck = [ "semantic_version" ];
 
   meta = {
     description = "Library implementing the 'SemVer' scheme";

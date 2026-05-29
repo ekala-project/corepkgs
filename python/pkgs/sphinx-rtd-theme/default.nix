@@ -44,14 +44,14 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
+  testPaths = [ "tests" ];
+
   disabledTests = [
     # docutils 0.21 compat
     "test_basic"
   ];
 
   pythonImportsCheck = [ "sphinx_rtd_theme" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Sphinx theme for readthedocs.org";

@@ -42,17 +42,17 @@ buildPythonPackage (finalAttrs: {
     pip
   ];
 
+  testPaths = [ "tests" ];
+
   disabledTests = [
     "test_setup_py"
     "test_issue_104"
   ];
 
   preCheck = ''
-    rm pytest.ini # wants flake8
-    rm tests/test_meta.py # wants to run pip
+    rm -f pytest.ini # wants flake8
+    rm -f tests/test_meta.py # wants to run pip
   '';
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Wrappers to build Python packages using PEP 517 hooks";

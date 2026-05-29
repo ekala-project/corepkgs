@@ -51,6 +51,8 @@ buildPythonPackage (finalAttrs: {
   ]
   ++ lib.concatAttrValues finalAttrs.optional-dependencies;
 
+  testPaths = [ "test" ];
+
   disabledTests = lib.optionals isPyPy [
     # https://github.com/sqlalchemy/mako/issues/315
     "test_alternating_file_names"
@@ -60,8 +62,6 @@ buildPythonPackage (finalAttrs: {
     # fails on pypy2.7
     "test_bytestring_passthru"
   ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Super-fast templating language";

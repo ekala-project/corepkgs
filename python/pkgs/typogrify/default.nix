@@ -39,8 +39,6 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
-
   meta = {
     description = "Filters to enhance web typography, including support for Django & Jinja templates";
     homepage = "https://github.com/justinmayer/typogrify";

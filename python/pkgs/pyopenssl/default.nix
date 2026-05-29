@@ -53,6 +53,8 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
+  testPaths = [ "tests" ];
+
   __darwinAllowLocalNetworking = true;
 
   disabledTests = [
@@ -94,8 +96,6 @@ buildPythonPackage (finalAttrs: {
     # https://github.com/pyca/pyopenssl/issues/974
     "test_verify_with_time"
   ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Python wrapper around the OpenSSL library";

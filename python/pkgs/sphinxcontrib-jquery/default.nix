@@ -48,9 +48,9 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
-  pythonNamespaces = [ "sphinxcontrib" ];
+  testPaths = [ "tests" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  pythonNamespaces = [ "sphinxcontrib" ];
 
   meta = {
     description = "Extension to include jQuery on newer Sphinx releases";

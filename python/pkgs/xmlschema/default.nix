@@ -34,6 +34,8 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
+  testPaths = [ "tests" ];
+
   disabledTests = [
     # Incorrect error message in pickling test for Python 3.12 in Debian
     # https://github.com/sissaschool/xmlschema/issues/412
@@ -41,8 +43,6 @@ buildPythonPackage (finalAttrs: {
   ];
 
   pythonImportsCheck = [ "xmlschema" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "XML Schema validator and data conversion library for Python";

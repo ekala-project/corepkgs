@@ -92,6 +92,8 @@ buildPythonPackage (finalAttrs: {
   ]
   ++ lib.concatAttrValues finalAttrs.optional-dependencies;
 
+  testPaths = [ "tests" ];
+
   pytestFlags = [
     "-Wignore::DeprecationWarning"
   ];
@@ -124,8 +126,6 @@ buildPythonPackage (finalAttrs: {
   ];
   # multiple tests exceed max open files on hydra builders
   doCheck = !(stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isAarch64);
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Uncompromising Python code formatter";

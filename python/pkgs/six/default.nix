@@ -30,8 +30,6 @@ buildPythonPackage (finalAttrs: {
 
   pythonImportsCheck = [ "six" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
-
   meta = {
     changelog = "https://github.com/benjaminp/six/blob/${finalAttrs.version}/CHANGES";
     description = "Python 2 and 3 compatibility library";

@@ -31,8 +31,6 @@ buildPythonPackage (finalAttrs: {
 
   pythonImportsCheck = [ "pytest_timeout" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
-
   meta = {
     description = "Pytest plugin to abort hanging tests";
     homepage = "https://github.com/pytest-dev/pytest-timeout/";

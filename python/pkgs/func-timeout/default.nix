@@ -18,6 +18,8 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  testPaths = [ "tests" ];
+
   disabledTests = [
     # Calculates the amount of time the machine slept but doesn't account for heavy loads
     "test_retry"
@@ -28,8 +30,6 @@ buildPythonPackage (finalAttrs: {
   ];
 
   pythonImportsCheck = [ "func_timeout" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Allows you to specify timeouts when calling any existing function. Also provides support for stoppable-threads";

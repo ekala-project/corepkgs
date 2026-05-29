@@ -34,7 +34,7 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  testPaths = [ "tests" ];
 
   meta = {
     changelog = "https://github.com/yaml/pyyaml/blob/${finalAttrs.src.rev}/CHANGES";

@@ -35,7 +35,11 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  # `testing/cffi1/test_parse_c_type.py` reads `src/cffi/parse_c_type.h`.
+  testPaths = [
+    "testing"
+    "src"
+  ];
 
   meta = {
     changelog = "https://github.com/python-cffi/cffi/releases/tag/v${finalAttrs.version}";

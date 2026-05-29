@@ -89,7 +89,8 @@ buildPythonPackage (finalAttrs: {
       digests, and key derivation functions.
     '';
     homepage = "https://github.com/pyca/cryptography";
-    changelog = "https://cryptography.io/en/latest/changelog/#v" + lib.replaceString "." "-" finalAttrs.version;
+    changelog =
+      "https://cryptography.io/en/latest/changelog/#v" + lib.replaceString "." "-" finalAttrs.version;
     license = with lib.licenses; [
       asl20
       bsd3

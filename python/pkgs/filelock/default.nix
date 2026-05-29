@@ -32,14 +32,14 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
+  testPaths = [ "tests" ];
+
   pythonImportsCheck = [ "filelock" ];
 
   disabledTestPaths = [
     # Circular dependency with virtualenv
     "tests/test_virtualenv.py"
   ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     changelog = "https://github.com/tox-dev/py-filelock/releases/tag/${finalAttrs.version}";

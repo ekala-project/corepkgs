@@ -20,9 +20,9 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
-  pythonImportsCheck = [ "hyperframe" ];
+  testPaths = [ "tests" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  pythonImportsCheck = [ "hyperframe" ];
 
   meta = {
     description = "HTTP/2 framing layer for Python";

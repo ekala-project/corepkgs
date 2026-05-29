@@ -26,14 +26,20 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
+  # chardet's test runner is a single `test.py` at the source root, with
+  # `setup.cfg` configuring pytest to use `python_files = test.py` and
+  # `tests/` containing the sample data files it loads.
+  testPaths = [
+    "tests"
+    "test.py"
+  ];
+
   disabledTests = [
     # flaky; https://github.com/chardet/chardet/issues/256
     "test_detect_all_and_detect_one_should_agree"
   ];
 
   pythonImportsCheck = [ "chardet" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     changelog = "https://github.com/chardet/chardet/releases/tag/${finalAttrs.version}";

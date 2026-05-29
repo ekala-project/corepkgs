@@ -44,7 +44,7 @@ buildPythonPackage (finalAttrs: {
 
   pythonImportsCheck = [ "certifi" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  testPaths = [ "certifi/tests" ];
 
   meta = {
     homepage = "https://github.com/certifi/python-certifi";

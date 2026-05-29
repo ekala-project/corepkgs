@@ -23,6 +23,8 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  testPaths = [ "tests" ];
+
   pythonImportsCheck = [ "betamax" ];
 
   disabledTestPaths = [
@@ -34,8 +36,6 @@ buildPythonPackage (finalAttrs: {
     "tests/regression/test_gzip_compression.py"
     "tests/regression/test_requests_2_11_body_matcher.py"
   ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "VCR imitation for requests";

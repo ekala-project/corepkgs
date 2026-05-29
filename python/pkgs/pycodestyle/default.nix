@@ -26,6 +26,15 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  # `tests/` imports the `testing` helper module and `postCheck` lints
+  # `pycodestyle.py` from the source root.
+  testPaths = [
+    "tests"
+    "testing"
+    "pycodestyle.py"
+    "setup.py"
+  ];
+
   # https://github.com/PyCQA/pycodestyle/blob/2.14.0/tox.ini#L16
   postCheck = ''
     ${python.interpreter} -m pycodestyle --statistics pycodestyle.py
@@ -35,8 +44,6 @@ buildPythonPackage (finalAttrs: {
     # PyPy reports a SyntaxError instead of ValueError
     "test_check_nullbytes"
   ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     changelog = "https://github.com/PyCQA/pycodestyle/blob/${finalAttrs.src.tag}/CHANGES.txt";

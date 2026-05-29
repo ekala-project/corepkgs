@@ -150,6 +150,8 @@ buildPythonPackage (finalAttrs: {
     "test_close"
   ];
 
+  testPaths = [ "tests" ];
+
   __darwinAllowLocalNetworking = true;
 
   preCheck = ''
@@ -163,8 +165,6 @@ buildPythonPackage (finalAttrs: {
     # Work around "OSError: AF_UNIX path too long"
     export TMPDIR="/tmp"
   '';
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     changelog = "https://docs.aiohttp.org/en/${finalAttrs.src.tag}/changes.html";

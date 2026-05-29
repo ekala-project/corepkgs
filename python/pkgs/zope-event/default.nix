@@ -28,8 +28,6 @@ buildPythonPackage (finalAttrs: {
 
   pythonNamespaces = [ "zope" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
-
   meta = {
     description = "Event publishing system";
     homepage = "https://github.com/zopefoundation/zope.event";

@@ -41,13 +41,13 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
+  testPaths = [ "tests" ];
+
   preCheck = ''
-    rm -r zstandard
+    rm -rf zstandard
   '';
 
   pythonImportsCheck = [ "zstandard" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Zstandard bindings for Python";

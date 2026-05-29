@@ -36,6 +36,17 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
+  # The CLI end-to-end tests build the project against `AUTHORS.md` /
+  # `README.md` etc. at the source root.
+  testPaths = [
+    "tests"
+    "src"
+    "AUTHORS.md"
+    "CHANGELOG.md"
+    "LICENSE.txt"
+    "README.md"
+  ];
+
   # Requires network connection
   disabledTests = [
     "test_build" # Requires internet
@@ -43,8 +54,6 @@ buildPythonPackage (finalAttrs: {
   ];
 
   pythonImportsCheck = [ "hatch_fancy_pypi_readme" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Fancy PyPI READMEs with Hatch";

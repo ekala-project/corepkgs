@@ -31,7 +31,7 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  testPaths = [ "tests" ];
 
   meta = {
     description = "Pytest plugin to re-run tests to eliminate flaky failures";

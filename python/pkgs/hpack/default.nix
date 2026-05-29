@@ -26,9 +26,9 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
-  pythonImportsCheck = [ "hpack" ];
+  testPaths = [ "tests" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  pythonImportsCheck = [ "hpack" ];
 
   meta = {
     changelog = "https://github.com/python-hyper/hpack/blob/${finalAttrs.src.rev}/CHANGELOG.rst";

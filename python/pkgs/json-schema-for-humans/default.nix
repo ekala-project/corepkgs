@@ -54,6 +54,11 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
+  testPaths = [
+    "tests"
+    "docs"
+  ];
+
   disabledTests = [
     # Tests require network access
     "test_references_url"
@@ -66,8 +71,6 @@ buildPythonPackage (finalAttrs: {
   ];
 
   pythonImportsCheck = [ "json_schema_for_humans" ];
-
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
 
   meta = {
     description = "Quickly generate HTML documentation from a JSON schema";

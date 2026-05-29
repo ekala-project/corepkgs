@@ -38,8 +38,6 @@ buildPythonPackage (finalAttrs: {
 
   pythonImportsCheck = [ "jaraco.itertools" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
-
   meta = {
     description = "Tools for working with iterables";
     homepage = "https://github.com/jaraco/jaraco.itertools";

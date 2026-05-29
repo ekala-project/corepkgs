@@ -34,9 +34,9 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
-  pythonImportsCheck = [ "shellingham" ];
+  testPaths = [ "tests" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  pythonImportsCheck = [ "shellingham" ];
 
   meta = {
     description = "Tool to detect the surrounding shell";

@@ -28,9 +28,9 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
-  pythonImportsCheck = [ "tomlkit" ];
+  testPaths = [ "tests" ];
 
-  passthru.tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+  pythonImportsCheck = [ "tomlkit" ];
 
   meta = {
     homepage = "https://github.com/sdispater/tomlkit";
