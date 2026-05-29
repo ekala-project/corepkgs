@@ -20,13 +20,25 @@ changes differ significantly from whath one would expct with Nixpkgs.
     when only a test-related input changes.
   - To run a package's tests, override with `doCheck = true` or evaluate the
     dedicated test derivation (e.g. `pkg.passthru.tests.*`).
-- `buildPythonPackage` exposes a `testDir` attribute for deferring test
+- `buildPythonPackage` exposes a `testPaths` attribute for deferring test
   execution into a separate derivation.
-  - When set, `testDir` should point to the directory (relative to the source
-    root) containing the package's test suite.
-  - An additional `test-src` output is produced containing just the test
-    sources, and a `passthru.tests.python` derivation is auto-generated that
-    runs the test suite against the installed package using the configured
+  - `testPaths` is a list of files and/or directories (relative to the source
+    root) that comprise the package's test suite. The typical case is
+    `testPaths = [ "tests" ];`, but the list may include sibling helper
+    modules, fixture data, root-level test scripts, or documentation files
+    referenced by the test suite (e.g.
+    `testPaths = [ "tests" "smartypants" "README.rst" ];`).
+  - When `testPaths` is non-empty, an additional `test_src` output is
+    produced containing just the listed paths (plus any root-level
+    `conftest.py`, `pytest.ini`, `setup.cfg`, `pyproject.toml`, or `tox.ini`),
+    and a `passthru.tests.python` derivation is auto-generated that runs the
+    test suite against the installed package using the configured
     `nativeCheckInputs` / `checkInputs`.
+  - The generated test derivation skips `configurePhase`, `buildPhase`, and
+    `installPhase`. It runs only the `checkPhase` / `installCheckPhase`
+    (plus any check hooks like `pytestCheckHook` that append to
+    `preDistPhases`), against the installed package which is provided as a
+    `nativeBuildInputs` entry. This avoids rebuilding the package just to
+    run its tests.
   - This decouples test execution from the main build, allowing test failures
     or test-only dependency churn to avoid invalidating downstream consumers.
