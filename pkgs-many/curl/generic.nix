@@ -178,7 +178,7 @@ stdenv.mkDerivation (finalAttrs: {
     ++ lib.optional idnSupport libidn2
     ++ lib.optional ldapSupport openldap
     ++ lib.optional computedOpensslSupport openssl
-    ++ lib.optional pslSupport libpsl
+    ++ lib.optional pslSupport libpsl.minimal
     ++ lib.optional rtmpSupport rtmpdump
     ++ lib.optional computedScpSupport libssh2
     ++ lib.optional wolfsslSupport wolfssl
