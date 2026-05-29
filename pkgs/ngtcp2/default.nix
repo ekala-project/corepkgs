@@ -29,7 +29,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   nativeBuildInputs = [
-    cmake
+    cmake.minimal
     cmake.configurePhaseHook
   ];
   buildInputs = [
