@@ -13,8 +13,8 @@ stdenvNoCC.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "jonringer";
     repo = "lndir-simple";
-    rev = "v${version}";
-    hash = "sha256-G+k7MExzG/lfUL6dpGFl4xWU3rOCZHbt4vU+/TMLZLs=";
+    rev = "6dab4d5081840ac1774728958d863cc2ebd07a3d";
+    hash = "sha256-a4UUm3J2lPy5r2eaNpUXN6fNfy3zJ7D0CACyqUB2iGY=";
   };
 
   nativeBuildInputs = [
