@@ -64,9 +64,13 @@ with final;
   makeInitrd = callPackage ./build-support/kernel/make-initrd.nix;
   makeModulesClosure = callPackage ./build-support/kernel/modules-closure.nix;
   closureInfo = callPackage ./build-support/closure-info.nix { };
+  nix-gitignore = callPackage ./build-support/nix-gitignore { };
 
   # qemu-utils alias for compatibility (qemu package provides qemu-img and utilities)
   qemu-utils = qemu;
+
+  # igraph-c alias for C library (to avoid conflict with python3Packages.igraph)
+  igraph-c = igraph;
 
   # keep-sorted start
   aafigure = null;
@@ -121,7 +125,6 @@ with final;
   icewm = null;
   imagemagick = null;
   imlib2 = null;
-  jansson = null;
   jhead = null;
   jre = null;
   knot-dns = null;
@@ -174,7 +177,6 @@ with final;
   pinentry = null;
   poppler = null;
   postgresql = null;
-  protobufc = null;
   psutils = null;
   pydantic = null;
   pygame-ce = null;
@@ -1056,7 +1058,26 @@ with final;
   removeReferencesTo = callPackage ./build-support/remove-references-to { };
   replaceVarsWith = callPackage ./build-support/replace-vars/replace-vars-with.nix { };
   replaceVars = callPackage ./build-support/replace-vars/replace-vars.nix { };
+  substituteAll = callPackage ./build-support/substitute-all/substitute-all.nix { };
   replaceDirectDependencies = callPackage ./build-support/replace-direct-dependencies.nix { };
+
+  # Docker and OCI container tools
+  dockerTools = callPackage ./build-support/docker {
+    writePython3 = buildPackages.writers.writePython3;
+    # TODO: These dependencies need to be ported to core-pkgs:
+    # - tarsum (requires docker.moby-src)
+    # - devShellTools
+    # - dockerAutoLayer (from auto-layer.nix)
+    # - dockerMakeLayers (from make-layers.nix, requires flatten-references-graph)
+  };
+  ociTools = callPackage ./build-support/oci-tools { };
+
+  # Helper tools for dockerTools
+  tarsum = callPackage ./build-support/docker/tarsum.nix { };
+  nix-prefetch-docker = callPackage ./build-support/docker/nix-prefetch-docker.nix { };
+  dockerAutoLayer = callPackage ./build-support/docker/auto-layer.nix { };
+  dockerMakeLayers = callPackage ./build-support/docker/make-layers.nix { };
+  fakeNss = callPackage ./build-support/fake-nss { };
 
   runUnitTests = pkg: pkg.overrideAttrs { doCheck = true; };
   runtimeShell = "${runtimeShellPackage}${runtimeShellPackage.shellPath}";
