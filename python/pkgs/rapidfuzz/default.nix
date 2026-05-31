@@ -56,6 +56,8 @@ buildPythonPackage rec {
     all = [ numpy ];
   };
 
+  pythonImportsCheck = [ "rapidfuzz" ];
+
   meta = {
     description = "Rapid fuzzy string matching";
     homepage = "https://github.com/maxbachmann/RapidFuzz";

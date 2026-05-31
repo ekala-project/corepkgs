@@ -141,6 +141,8 @@ buildPythonPackage rec {
       ;
   };
 
+  pythonImportsCheck = [ "PIL" ];
+
   meta = {
     homepage = "https://python-pillow.github.io/";
     changelog = "https://pillow.readthedocs.io/en/stable/releasenotes/${version}.html";

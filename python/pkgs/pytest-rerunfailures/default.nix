@@ -33,6 +33,8 @@ buildPythonPackage (finalAttrs: {
 
   testPaths = [ "tests" ];
 
+  pythonImportsCheck = [ "pytest_rerunfailures" ];
+
   meta = {
     description = "Pytest plugin to re-run tests to eliminate flaky failures";
     homepage = "https://github.com/pytest-dev/pytest-rerunfailures";

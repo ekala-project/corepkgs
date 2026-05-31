@@ -75,6 +75,8 @@ buildPythonPackage rec {
   doCheck = false;
   setupHooks = [ ./add-build-flags.sh ];
 
+  pythonImportsCheck = [ "mesonpy" ];
+
   meta = {
     changelog = "https://github.com/mesonbuild/meson-python/blob/${version}/CHANGELOG.rst";
     description = "Meson Python build backend (PEP 517)";

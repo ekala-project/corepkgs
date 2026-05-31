@@ -26,6 +26,8 @@ buildPythonPackage rec {
   # Tests in neither the archive nor the repo
   doCheck = false;
 
+  pythonImportsCheck = [ "pytest_expect" ];
+
   meta = {
     description = "py.test plugin to store test expectations and mark tests based on them";
     homepage = "https://github.com/gsnedders/pytest-expect";

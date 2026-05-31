@@ -20,6 +20,8 @@ buildPythonPackage rec {
   # https://github.com/PyCQA/mccabe/issues/93
   doCheck = false;
 
+  pythonImportsCheck = [ "mccabe" ];
+
   meta = {
     description = "McCabe checker, plugin for flake8";
     homepage = "https://github.com/flintwork/mccabe";

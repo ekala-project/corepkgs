@@ -41,6 +41,11 @@ buildPythonPackage (finalAttrs: {
     "src"
   ];
 
+  pythonImportsCheck = [
+    "cffi"
+    "_cffi_backend"
+  ];
+
   meta = {
     changelog = "https://github.com/python-cffi/cffi/releases/tag/v${finalAttrs.version}";
     description = "Foreign Function Interface for Python calling C code";

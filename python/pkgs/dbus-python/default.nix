@@ -90,6 +90,8 @@ lib.fix (
       runHook postCheck
     '';
 
+    pythonImportsCheck = [ "dbus" ];
+
     meta = {
       description = "Python DBus bindings";
       homepage = "https://gitlab.freedesktop.org/dbus/dbus-python";

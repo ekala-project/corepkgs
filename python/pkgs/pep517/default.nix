@@ -54,6 +54,8 @@ buildPythonPackage (finalAttrs: {
     rm -f tests/test_meta.py # wants to run pip
   '';
 
+  pythonImportsCheck = [ "pep517" ];
+
   meta = {
     description = "Wrappers to build Python packages using PEP 517 hooks";
     license = lib.licenses.mit;

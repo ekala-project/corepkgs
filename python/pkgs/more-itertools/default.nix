@@ -32,6 +32,8 @@ buildPythonPackage (finalAttrs: {
   # OverflowError: Python int too large to convert to C long
   doCheck = !stdenv.hostPlatform.is32bit;
 
+  pythonImportsCheck = [ "more_itertools" ];
+
   meta = {
     homepage = "https://more-itertools.readthedocs.org";
     changelog = "https://more-itertools.readthedocs.io/en/stable/versions.html";

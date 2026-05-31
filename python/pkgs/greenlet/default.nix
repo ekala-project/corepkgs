@@ -55,6 +55,8 @@ let
       doCheck = true;
     });
 
+    pythonImportsCheck = [ "greenlet" ];
+
     meta = {
       changelog = "https://github.com/python-greenlet/greenlet/blob/${version}/CHANGES.rst";
       homepage = "https://github.com/python-greenlet/greenlet";

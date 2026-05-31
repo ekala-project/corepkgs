@@ -21,6 +21,8 @@ buildPythonPackage rec {
 
   pythonNamespaces = [ "sphinxcontrib" ];
 
+  pythonImportsCheck = [ "sphinxcontrib.jsmath" ];
+
   meta = {
     description = "Sphinx extension which renders display math in HTML via JavaScript";
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-jsmath";

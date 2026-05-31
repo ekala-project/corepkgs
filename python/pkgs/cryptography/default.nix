@@ -81,6 +81,8 @@ buildPythonPackage (finalAttrs: {
     tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
   };
 
+  pythonImportsCheck = [ "cryptography" ];
+
   meta = {
     description = "Package which provides cryptographic recipes and primitives";
     longDescription = ''

@@ -45,6 +45,8 @@ buildPythonPackage (finalAttrs: {
     "test_tokenization_error_but_not_syntax_error"
   ];
 
+  pythonImportsCheck = [ "flake8" ];
+
   meta = {
     changelog = "https://github.com/PyCQA/flake8/blob/${finalAttrs.src.tag}/docs/source/release-notes/${finalAttrs.version}.rst";
     description = "Modular source code checker: pep8, pyflakes and co";

@@ -104,6 +104,8 @@ buildPythonPackage rec {
 
   hardeningDisable = lib.optional stdenv.hostPlatform.isMusl "fortify";
 
+  pythonImportsCheck = [ "pybind11" ];
+
   meta = {
     homepage = "https://github.com/pybind/pybind11";
     changelog = "https://github.com/pybind/pybind11/blob/${src.rev}/docs/changelog.rst";

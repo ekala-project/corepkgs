@@ -28,6 +28,8 @@ buildPythonPackage rec {
   # have the possibility of not correctly interfacing with newer lit versions
   doCheck = false;
 
+  pythonImportsCheck = [ "lit" ];
+
   meta = {
     description = "Portable tool for executing LLVM and Clang style test suites";
     mainProgram = "lit";

@@ -27,6 +27,8 @@ buildPythonPackage rec {
 
   pythonNamespaces = [ "sphinxcontrib" ];
 
+  pythonImportsCheck = [ "sphinxcontrib.htmlhelp" ];
+
   meta = {
     description = "Sphinx extension which renders HTML help files";
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-htmlhelp";

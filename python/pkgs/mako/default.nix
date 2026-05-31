@@ -63,6 +63,8 @@ buildPythonPackage (finalAttrs: {
     "test_bytestring_passthru"
   ];
 
+  pythonImportsCheck = [ "mako" ];
+
   meta = {
     description = "Super-fast templating language";
     mainProgram = "mako-render";

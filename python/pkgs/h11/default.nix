@@ -26,6 +26,8 @@ buildPythonPackage rec {
     inherit httpcore httpx;
   };
 
+  pythonImportsCheck = [ "h11" ];
+
   meta = {
     description = "Pure-Python, bring-your-own-I/O implementation of HTTP/1.1";
     homepage = "https://github.com/python-hyper/h11";

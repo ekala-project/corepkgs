@@ -34,6 +34,8 @@ buildPythonPackage (finalAttrs: {
     export TMPDIR="/tmp"
   '';
 
+  pythonImportsCheck = [ "testpath" ];
+
   meta = {
     description = "Test utilities for code working with files and commands";
     license = lib.licenses.mit;

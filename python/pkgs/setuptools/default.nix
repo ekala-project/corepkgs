@@ -41,6 +41,11 @@ buildPythonPackage rec {
     inherit distutils;
   };
 
+  pythonImportsCheck = [
+    "setuptools"
+    "pkg_resources"
+  ];
+
   meta = {
     description = "Utilities to facilitate the installation of Python packages";
     homepage = "https://github.com/pypa/setuptools";

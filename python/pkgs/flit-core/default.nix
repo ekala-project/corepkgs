@@ -20,6 +20,8 @@ buildPythonPackage rec {
     inherit flit;
   };
 
+  pythonImportsCheck = [ "flit_core" ];
+
   meta = {
     description = "Distribution-building parts of Flit. See flit package for more information";
     homepage = "https://github.com/pypa/flit";

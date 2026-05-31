@@ -24,6 +24,8 @@ buildPythonPackage (finalAttrs: {
 
   testPaths = [ "test" ];
 
+  pythonImportsCheck = [ "parso" ];
+
   meta = {
     description = "Python Parser";
     homepage = "https://parso.readthedocs.io/en/latest/";

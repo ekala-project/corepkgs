@@ -43,6 +43,8 @@ buildPythonPackage (finalAttrs: {
     patchShebangs smartypants
   '';
 
+  pythonImportsCheck = [ "smartypants" ];
+
   meta = {
     description = "Translate plain ASCII quotation marks and other characters into “smart” typographic HTML entities";
     homepage = "https://github.com/leohemsted/smartypants.py";
