@@ -133,7 +133,7 @@ let
       darwin = pkgs.darwin.shell_cmds;
     };
     hostname = {
-      linux = pkgs.hostname-debian;
+      linux = pkgs.net-tools;
       darwin = pkgs.darwin.shell_cmds;
       freebsd = pkgs.freebsd.bin;
       openbsd = pkgs.openbsd.hostname;
