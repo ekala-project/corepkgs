@@ -27,6 +27,8 @@ buildPythonPackage rec {
 
   buildInputs = [ glibcLocales ];
 
+  pythonImportsCheck = [ "sniffio" ];
+
   meta = {
     homepage = "https://github.com/python-trio/sniffio";
     license = lib.licenses.asl20;

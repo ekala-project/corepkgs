@@ -19,6 +19,8 @@ buildPythonPackage rec {
   # git to download a test suite.
   doCheck = false;
 
+  pythonImportsCheck = [ "toml" ];
+
   meta = {
     description = "Python library for parsing and creating TOML";
     homepage = "https://github.com/uiri/toml";

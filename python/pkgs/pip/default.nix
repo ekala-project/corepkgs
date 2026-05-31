@@ -118,6 +118,8 @@ let
       pytest = self.overridePythonAttrs { doCheck = true; };
     };
 
+    pythonImportsCheck = [ "pip" ];
+
     meta = {
       mainProgram = "pip";
       description = "PyPA recommended tool for installing Python packages";

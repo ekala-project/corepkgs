@@ -17,6 +17,11 @@ buildPythonPackage rec {
 
   doCheck = false;
 
+  pythonImportsCheck = [
+    "socks"
+    "sockshandler"
+  ];
+
   meta = {
     description = "SOCKS module for Python";
     license = lib.licenses.bsd3;

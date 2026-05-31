@@ -30,6 +30,8 @@ buildPythonPackage rec {
     inherit sage;
   };
 
+  pythonImportsCheck = [ "pexpect" ];
+
   meta = {
     homepage = "http://www.noah.org/wiki/Pexpect";
     description = "Automate interactive console applications such as ssh, ftp, etc";

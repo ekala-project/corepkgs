@@ -127,6 +127,12 @@ buildPythonPackage (finalAttrs: {
   # multiple tests exceed max open files on hydra builders
   doCheck = !(stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isAarch64);
 
+  pythonImportsCheck = [
+    "black"
+    "blackd"
+    "blib2to3"
+  ];
+
   meta = {
     description = "Uncompromising Python code formatter";
     homepage = "https://github.com/psf/black";

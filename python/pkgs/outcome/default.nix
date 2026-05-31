@@ -24,6 +24,8 @@ buildPythonPackage rec {
   # Has a test dependency on trio, which depends on outcome.
   doCheck = false;
 
+  pythonImportsCheck = [ "outcome" ];
+
   meta = {
     description = "Capture the outcome of Python function calls";
     homepage = "https://github.com/python-trio/outcome";

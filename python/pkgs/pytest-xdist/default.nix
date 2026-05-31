@@ -68,6 +68,8 @@ buildPythonPackage rec {
 
   setupHook = ./setup-hook.sh;
 
+  pythonImportsCheck = [ "xdist" ];
+
   meta = {
     changelog = "https://github.com/pytest-dev/pytest-xdist/blob/${src.tag}/CHANGELOG.rst";
     description = "Pytest plugin for distributed testing";

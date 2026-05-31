@@ -28,6 +28,11 @@ buildPythonPackage rec {
 
   testPaths = [ "toolz/tests" ];
 
+  pythonImportsCheck = [
+    "toolz"
+    "tlz"
+  ];
+
   meta = {
     homepage = "https://github.com/pytoolz/toolz";
     description = "List processing tools and functional utilities";

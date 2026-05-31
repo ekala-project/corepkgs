@@ -85,6 +85,8 @@ buildPythonPackage rec {
     inherit sage;
   };
 
+  pythonImportsCheck = [ "jinja2" ];
+
   meta = {
     changelog = "https://github.com/pallets/jinja/blob/${version}/CHANGES.rst";
     description = "Very fast and expressive template engine";

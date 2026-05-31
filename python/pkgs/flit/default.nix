@@ -63,6 +63,8 @@ buildPythonPackage (finalAttrs: {
     "test_symlink_module_pep621"
   ];
 
+  pythonImportsCheck = [ "flit" ];
+
   meta = {
     changelog = "https://github.com/pypa/flit/blob/${finalAttrs.version}/doc/history.rst";
     description = "Simple packaging tool for simple packages";

@@ -97,6 +97,8 @@ buildPythonPackage (finalAttrs: {
     "test_verify_with_time"
   ];
 
+  pythonImportsCheck = [ "OpenSSL" ];
+
   meta = {
     description = "Python wrapper around the OpenSSL library";
     homepage = "https://github.com/pyca/pyopenssl";

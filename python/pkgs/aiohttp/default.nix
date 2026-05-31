@@ -166,6 +166,8 @@ buildPythonPackage (finalAttrs: {
     export TMPDIR="/tmp"
   '';
 
+  pythonImportsCheck = [ "aiohttp" ];
+
   meta = {
     changelog = "https://docs.aiohttp.org/en/${finalAttrs.src.tag}/changes.html";
     description = "Asynchronous HTTP Client/Server for Python and asyncio";

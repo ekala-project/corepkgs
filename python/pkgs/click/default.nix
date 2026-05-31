@@ -58,6 +58,8 @@ buildPythonPackage rec {
       ;
   };
 
+  pythonImportsCheck = [ "click" ];
+
   meta = {
     changelog = "https://github.com/pallets/click/blob/${src.tag}/CHANGES.rst";
     homepage = "https://click.palletsprojects.com/";

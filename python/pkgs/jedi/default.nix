@@ -72,6 +72,8 @@ buildPythonPackage rec {
     "test/test_inference/test_mixed.py::test_compiled_signature_annotation_string"
   ];
 
+  pythonImportsCheck = [ "jedi" ];
+
   meta = {
     description = "Autocompletion tool for Python that can be used for text editors";
     homepage = "https://github.com/davidhalter/jedi";

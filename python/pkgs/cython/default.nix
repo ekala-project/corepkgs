@@ -91,6 +91,12 @@ buildPythonPackage rec {
   # https://github.com/cython/cython/issues/5089
   setupHook = ./setup-hook.sh;
 
+  pythonImportsCheck = [
+    "Cython"
+    "cython"
+    "pyximport"
+  ];
+
   meta = {
     homepage = "https://cython.org";
     description = "Optimising static compiler for both the Python and the extended Cython programming languages";

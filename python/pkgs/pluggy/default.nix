@@ -30,6 +30,8 @@ buildPythonPackage rec {
     pytest = callPackage ./tests.nix { };
   };
 
+  pythonImportsCheck = [ "pluggy" ];
+
   meta = {
     changelog = "https://github.com/pytest-dev/pluggy/blob/${src.rev}/CHANGELOG.rst";
     description = "Plugin and hook calling mechanisms for Python";

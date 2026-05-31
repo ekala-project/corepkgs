@@ -42,6 +42,8 @@ buildPythonPackage rec {
     pytestCheckHook
   ];
 
+  pythonImportsCheck = [ "html5lib" ];
+
   meta = {
     homepage = "https://github.com/html5lib/html5lib-python";
     downloadPage = "https://github.com/html5lib/html5lib-python/releases";

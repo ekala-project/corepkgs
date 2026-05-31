@@ -27,6 +27,8 @@ buildPythonPackage rec {
   # pypi tarball does not contain tests
   doCheck = false;
 
+  pythonImportsCheck = [ "htmlmin" ];
+
   meta = {
     description = "Configurable HTML Minifier with safety features";
     mainProgram = "htmlmin";

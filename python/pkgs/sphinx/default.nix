@@ -160,6 +160,8 @@ buildPythonPackage rec {
     inherit breathe;
   };
 
+  pythonImportsCheck = [ "sphinx" ];
+
   meta = {
     description = "Python documentation generator";
     longDescription = ''
