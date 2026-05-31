@@ -14,9 +14,11 @@
   getVersionFile,
 }:
 let
-  spirv-llvm-translator = buildPackages.spirv-llvm-translator.override {
-    inherit (buildLlvmPackages) llvm;
-  };
+  # Select the spirv-llvm-translator variant matching the LLVM major version.
+  # Falls back to the default variant if no matching variant exists.
+  spirv-llvm-translator =
+    buildPackages.spirv-llvm-translator.variants."v${lib.versions.major release_version}"
+      or buildPackages.spirv-llvm-translator;
 
   # The build requires an unwrapped clang but wrapped clang++ thus we need to
   # split the unwrapped clang out to prevent the build from finding the
