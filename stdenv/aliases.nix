@@ -55,10 +55,10 @@ mapAliases {
   elixir_1_18 = elixir;
   flang_20 = llvm.v20.pkgs.flang;
   flang_21 = llvm.v21.pkgs.flang;
-  flex_2_5_39 = flex.v2_5_39;
+  flex_2_5_39 = flex.v2_5;
   fuse3 = fuse;
   gmp6 = gmp.variants.v6_3;
-  gmpxx = gmp.variants.cxx;
+  gmpxx = gmp.variants.withCxx;
   go_1_24 = go.v1_24;
   go_1_25 = go.v1_25;
   gradle_7 = gradle.v7;
