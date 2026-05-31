@@ -82,6 +82,7 @@ stdenv.mkDerivation (
       ninja
     ]
     ++ lib.optionals enableManpages [
+      # TODO(corepkgs): add myst-parser and enable manpages
       # python3.pkgs.myst-parser
       # python3.pkgs.sphinx
     ]
