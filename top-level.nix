@@ -1774,7 +1774,7 @@ with final;
   # Package scopes accessible as: lua.v5_3.pkgs, lua.luajit_2_0.pkgs, etc.
 
   luaPackages = lua.pkgs;
-  luajitPackages = lua.jit_2_1.pkgs;
+  luajitPackages = lua.luajit_2_1.pkgs;
 
   asciidoc = callPackage ./pkgs/asciidoc {
     inherit (python3.pkgs)
