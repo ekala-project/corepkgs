@@ -233,7 +233,7 @@ stdenv.mkDerivation (
       # Note: we intentionally use `python3Packages` instead of `python3.pkgs`;
       # splicing does *not* work with the latter. (TODO: fix)
       python3Packages.sphinx
-      python3Packages.myst-parser
+      # python3Packages.myst-parser # TODO(corepkgs): add myst-parser package
     ];
 
     buildInputs = [
