@@ -10,14 +10,14 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "more-itertools";
-  version = "11.0.2";
+  version = "11.1.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "more-itertools";
     repo = "more-itertools";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-ZKM9+3l0qNclcQRNOEk8IF59xqyh1+uvdDRriG3Z/ek=";
+    hash = "sha256-fk2QRwOYgYfANtwRpEtGK5F+rRI2Gj25l0XaP9svJz8=";
   };
 
   build-system = [ flit-core ];
