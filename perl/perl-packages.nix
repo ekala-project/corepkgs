@@ -26948,13 +26948,13 @@ with self;
   };
 
   pacup = buildPerlPackage rec {
-    version = "3.3.11";
+    version = "3.4.0";
     pname = "pacup";
     src = fetchFromGitHub {
       owner = "pacstall";
       repo = pname;
       tag = version;
-      hash = "sha256-gTL6t//xO6TeRG1Vt4Ld7hVChSTyprUtXQTSwTKzwz4=";
+      hash = "sha256-AJKy9ke4hEs2JFnHqgELzdCiAIiF3MigILk4adDYHRk=";
     };
     preBuild = ''
       patchShebangs ./pacup
