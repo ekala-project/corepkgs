@@ -21,13 +21,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "boehm-gc";
-  version = "8.2.8";
+  version = "8.2.12";
 
   src = fetchFromGitHub {
     owner = "bdwgc";
     repo = "bdwgc";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-UQSLK/05uPal6/m+HMz0QwXVII1leonlmtSZsXjJ+/c=";
+    hash = "sha256-5yeAB5Y92YjOutwRXBJkMxoOLkmzmqIJs4PirKX89fE=";
   };
 
   outputs = [
