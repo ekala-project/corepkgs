@@ -8,12 +8,12 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "pkginfo";
-  version = "1.12.1.2";
+  version = "1.9.6";
   pyproject = true;
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;
-    hash = "sha256-XNlXgkrDbxQCYJZOujxr5kQqg1m4xI9K35AhDzOgS3s=";
+    hash = "sha256-j9WJbocYpDcvDqnMnZb2QXybmG4jpNEW3aJrYswp0EY=";
   };
 
   build-system = [ setuptools ];
