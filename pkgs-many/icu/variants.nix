@@ -16,8 +16,8 @@
     src-hash = "sha256-y5aN8+TS6H6LEcSaXQHHh70TuVRSgPxmQvgmUnYYyu8=";
   };
   v74 = {
-    version = "74.2";
-    src-hash = "sha256-aNsIIhKpbW9T411g9H04uWLp+dIHp0z6x4Apro/14Iw=";
+    version = "78.3";
+    src-hash = "sha256-Oi56R2BLpwLzRYeDCOb+/sphLuiVz0pfIi55Vfq/4MA=";
   };
   v73 = {
     version = "73.2";
