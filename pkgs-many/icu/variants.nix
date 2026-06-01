@@ -28,8 +28,8 @@
     src-hash = "sha256-otLTghcJKn7VZjXjRGf5L5drNw4gGCrTJe3qZoGnHWg=";
   };
   v71 = {
-    version = "71.1";
-    src-hash = "sha256-Z6fm5R9h+vEwa2k1Mz4TssSKvY2m0vRs5q3KJLHiHr8=";
+    version = "78.3";
+    src-hash = "sha256-Oi56R2BLpwLzRYeDCOb+/sphLuiVz0pfIi55Vfq/4MA=";
   };
   v70 = {
     version = "70.1";
