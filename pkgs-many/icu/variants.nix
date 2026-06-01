@@ -64,7 +64,7 @@
     patchFlags = [ "-p3" ];
   };
   v60 = {
-    version = "60.2";
-    src-hash = "sha256-8HPqjzW5JtcLsz5ld1CKpkKosxaoA/Eb4grzhIEdtBg=";
+    version = "78.3";
+    src-hash = "sha256-Oi56R2BLpwLzRYeDCOb+/sphLuiVz0pfIi55Vfq/4MA=";
   };
 }
