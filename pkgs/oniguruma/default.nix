@@ -7,12 +7,12 @@
 
 stdenv.mkDerivation rec {
   pname = "oniguruma";
-  version = "6.9.10";
+  version = "6.9.7.1";
 
   # Note: do not use fetchpatch or fetchFromGitHub to keep this package available in __bootPackages
   src = fetchurl {
     url = "https://github.com/kkos/oniguruma/releases/download/v${version}/onig-${version}.tar.gz";
-    sha256 = "sha256-Klz8WuJZ5Ol/hraN//wVLNr/6U4gYLdwy4JyONdp/AU=";
+    sha256 = "sha256-ZEQgS5w05utsCyMCHOiaA3Da0rL1wAzUTDQnU+CyBNk=";
   };
 
   outputs = [
