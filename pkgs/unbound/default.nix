@@ -60,13 +60,13 @@ assert withDNSTAP -> protobufc != null;
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "unbound";
-  version = "1.24.1";
+  version = "1.25.1";
 
   src = fetchFromGitHub {
     owner = "NLnetLabs";
     repo = "unbound";
     tag = "release-${finalAttrs.version}";
-    hash = "sha256-meWgu1UGhR9d8wVb8guqbnGE3UHs6uJHR20iDFnIThQ=";
+    hash = "sha256-1PXnxCPxoB5IrVBQIsrxiWAq+IoH7Ma9T1TTJsoTJc4=";
   };
 
   outputs = [
