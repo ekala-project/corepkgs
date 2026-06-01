@@ -4,8 +4,8 @@
     src-hash = "sha256-Yhf1jKObIxJ2Bc/Gx+DTR1/ksNYxVwETg9cWy0FheIY=";
   };
   v77 = {
-    version = "77.1";
-    src-hash = "sha256-WI5DH3cyfDkDH/u4hDwOO8EiwhE3RIX6h9xfP6/yQGE=";
+    version = "78.3";
+    src-hash = "sha256-Oi56R2BLpwLzRYeDCOb+/sphLuiVz0pfIi55Vfq/4MA=";
   };
   v76 = {
     version = "76.1";
