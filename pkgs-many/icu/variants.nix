@@ -48,8 +48,8 @@
     src-hash = "sha256-UqPyIJq5VVnBzwoU8kM4AB84lhW/AOJYXvPbxD7PCi4=";
   };
   v64 = {
-    version = "64.2";
-    src-hash = "sha256-Yn1dhHjm2W/IyQ/tSFEjkHmlYaaoueSLCJLyToLTHWw=";
+    version = "78.3";
+    src-hash = "sha256-Oi56R2BLpwLzRYeDCOb+/sphLuiVz0pfIi55Vfq/4MA=";
   };
   v63 = {
     version = "63.1";
