@@ -8,14 +8,12 @@
 
 stdenv.mkDerivation rec {
   pname = "libffi";
-  version = "3.3";
+  version = "3.5.2";
 
   src = fetchurl {
     url = "https://github.com/libffi/libffi/releases/download/v${version}/${pname}-${version}.tar.gz";
-    hash = "sha256-cvunkicD3fp6Ao1ROsFahcjVTI1n9V+lpIAohdxlIFY=";
+    hash = "sha256-86MIKiOzfCk6T80QUxR7Nx8v+R+n6hsqUuM1Z2usgtw=";
   };
-
-  patches = [ ];
 
   outputs = [
     "out"
