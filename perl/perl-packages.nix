@@ -18381,13 +18381,13 @@ with self;
 
   LatexIndent = buildPerlPackage rec {
     pname = "latexindent.pl";
-    version = "3.21";
+    version = "4.0.1";
 
     src = fetchFromGitHub {
       owner = "cmhughes";
       repo = pname;
       rev = "V${version}";
-      hash = "sha256-STXHOzsshyN7rc2VtJxxt6La4UPGpRYlMO8TX1Jd7pM=";
+      hash = "sha256-QRDtIEGeVtCSG8PioChNadoOLKGlhzJYFSMV248pIXc=";
     };
 
     outputs = [ "out" ];
