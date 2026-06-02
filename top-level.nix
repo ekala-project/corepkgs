@@ -636,7 +636,6 @@ with final;
 
   makePkgconfigItem = callPackage ./build-support/make-pkgconfigitem { };
 
-  # TODO(corepkgs): add openmpi package
   mpi = throw "mpi: openmpi is not yet available in core-pkgs";
 
   # Default libGL implementation.
@@ -664,7 +663,6 @@ with final;
   # On macOS, the SDK provides the OpenGL framework in `stdenv`.
   # Packages that use `libGLX` on macOS may need to depend on
   # `mesa_glu` directly if this doesn’t work.
-  # TODO(corepkgs): add mesa_glu package
   # TODO(corepkgs): add mesa_glu package
   libGLU = null;
 
@@ -1827,8 +1825,8 @@ with final;
     ghostscriptSupport = true;
   };
   # imagemagick is null; these overrides can't work until it's ported
-  imagemagick_light = null;
-  imagemagickBig = null;
+  imagemagick_light = imagemagick6_light;
+  imagemagickBig = imagemagick6Big;
 
   inherit (texlive.schemes)
     texliveBasic
