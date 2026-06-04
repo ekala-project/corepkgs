@@ -27,6 +27,9 @@ buildPythonPackage rec {
 
   pythonNamespaces = [ "sphinxcontrib" ];
 
+  # Check is disabled due to circular dependency of sphinx
+  # pythonImportsCheck = [ "sphinxcontrib.serializinghtml" ];
+
   meta = {
     description = "Sphinx extension which outputs \"serialized\" HTML files (json and pickle)";
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-serializinghtml";

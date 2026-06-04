@@ -27,6 +27,9 @@ buildPythonPackage rec {
 
   pythonNamespaces = [ "sphinxcontrib" ];
 
+  # Check is disabled due to circular dependency of sphinx
+  # pythonImportsCheck = [ "sphinxcontrib.htmlhelp" ];
+
   meta = {
     description = "Sphinx extension which renders HTML help files";
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-htmlhelp";

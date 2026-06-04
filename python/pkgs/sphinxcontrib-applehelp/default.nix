@@ -27,6 +27,9 @@ buildPythonPackage rec {
 
   pythonNamespaces = [ "sphinxcontrib" ];
 
+  # Check is disabled due to circular dependency of sphinx
+  # pythonImportsCheck = [ "sphinxcontrib.applehelp" ];
+
   meta = {
     description = "Sphinxcontrib-applehelp is a sphinx extension which outputs Apple help books";
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-applehelp";
