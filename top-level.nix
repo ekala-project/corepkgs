@@ -28,20 +28,6 @@ with final;
   haskellPackages = haskell.packages.ghc984Binary;
   ocamlPackages = null;
 
-  # Linux kernel packages (for ekaos and other system builders)
-  # Use linux scope which is auto-called from pkgs/linux/default.nix
-  # Note: 6.18 is required for vmTools (6.12 has issues with direct kernel boot)
-  # Override kernel with preferBuiltin=true to ensure DRM and framebuffer drivers
-  # are built-in rather than modules (required for vmTools direct kernel boot)
-  linuxPackages = linux.packagesFor (
-    linux.kernels.linux_6_18.override {
-      preferBuiltin = true;
-    }
-  );
-  linuxPackages_latest = linuxPackages;
-  linuxPackages_6_12 = linux.packagesFor linux.kernels.linux_6_12;
-  linuxPackages_6_18 = linuxPackages;
-
   # qemu_kvm - QEMU with only host CPU support (for vmTools)
   # This is required for vmTools to work correctly with direct kernel boot
   qemu_kvm = lowPrio (qemu.override { hostCpuOnly = true; });
@@ -1193,7 +1179,7 @@ with final;
   # Provided by libc on Operating Systems that use the Extensible Linker Format.
   elf-header = if stdenv.hostPlatform.isElf then null else elf-header-real;
 
-  inherit (callPackages ./pkgs/linux/pkgs/kernel-headers { inherit (pkgsBuildBuild) elf-header; })
+  inherit (callPackages ./pkgs/linux-support/pkgs/kernel-headers { inherit (pkgsBuildBuild) elf-header; })
     linuxHeaders
     makeLinuxHeaders
     ;
@@ -1489,7 +1475,7 @@ with final;
   # TODO(corepkgs): alias?
   su = shadow;
 
-  systemd = callPackage ./pkgs/linux/pkgs/systemd {
+  systemd = callPackage ./pkgs/linux-support/pkgs/systemd {
     # break some cyclic dependencies
     util-linux = util-linuxMinimal;
     # provide a super minimal gnupg used for systemd-machined

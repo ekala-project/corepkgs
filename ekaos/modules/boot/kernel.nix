@@ -12,8 +12,8 @@ with lib;
   options = {
     boot.kernelPackages = mkOption {
       type = types.unspecified;
-      defaultText = "pkgs.linuxPackages (linux_6_12)";
-      example = literalExpression "pkgs.linuxPackages_latest";
+      defaultText = "pkgs.linux.pkgs (linux 6.12)";
+      example = literalExpression "pkgs.linux.v6_18.pkgs";
       description = ''
         Kernel package set to use for the system.
 
@@ -21,10 +21,12 @@ with lib;
         and provides access to kernel modules.
 
         Available kernel packages:
-        - pkgs.linuxPackages - Default stable kernel (6.12)
-        - pkgs.linuxPackages_latest - Latest kernel (6.18)
-        - pkgs.linuxPackages_6_12 - Specific version 6.12
-        - pkgs.linuxPackages_6_18 - Specific version 6.18
+        - pkgs.linux.pkgs - Default stable kernel (6.12) modules
+        - pkgs.linux.v6_18.pkgs - Specific version 6.18 modules
+        - pkgs.linux.v6_12.pkgs - Specific version 6.12 modules
+
+        Legacy aliases (pkgs.linuxPackages, pkgs.linuxPackages_6_18, etc.)
+        are still available for backward compatibility.
       '';
     };
 

@@ -275,7 +275,7 @@ let
               ++ lib.optionals enableCommonConfig [
                 {
                   settings = commonStructuredConfig;
-                  _file = "pkgs/linux/kernel/common-config.nix";
+                  _file = "pkgs/linux-support/kernel/common-config.nix";
                 }
               ]
               ++ [

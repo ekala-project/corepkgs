@@ -8,11 +8,15 @@
 {
   lib,
   linux-support,
+  # Accept kernel-level overrides that may be passed via .override
+  preferBuiltin ? false,
 }:
 
 let
   # Build the mainline kernel for this variant's branch
-  kernel = linux-support.buildMainlineKernel branch;
+  baseKernel = linux-support.buildMainlineKernel branch;
+  kernel =
+    if preferBuiltin then baseKernel.override { inherit preferBuiltin; } else baseKernel;
 
   # Build the kernel module scope (linuxPackages) for this kernel
   kernelPackages = linux-support.packagesFor kernel;
