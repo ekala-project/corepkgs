@@ -21,6 +21,9 @@ buildPythonPackage rec {
 
   pythonNamespaces = [ "sphinxcontrib" ];
 
+  # Check is disabled due to circular dependency of sphinx
+  # pythonImportsCheck = [ "sphinxcontrib.jsmath" ];
+
   meta = {
     description = "Sphinx extension which renders display math in HTML via JavaScript";
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-jsmath";
