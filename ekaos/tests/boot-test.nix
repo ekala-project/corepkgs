@@ -23,7 +23,7 @@ let
 
         # Ensure boot works
         boot.loader.systemd-boot.enable = true;
-        boot.kernelPackages = pkgs.linux.packages.linux_default;
+        boot.kernelPackages = pkgs.linux.pkgs;
       }
     ];
   };

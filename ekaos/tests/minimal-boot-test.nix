@@ -19,7 +19,7 @@
   boot.loader.efi.efiSysMountPoint = "/boot";
 
   # Use default kernel
-  boot.kernelPackages = pkgs.linux.packages.linux_default;
+  boot.kernelPackages = pkgs.linux.pkgs;
 
   # Kernel parameters for testing
   boot.kernelParams = [

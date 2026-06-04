@@ -12,10 +12,6 @@
   fetchurl,
 }:
 
-# When adding a kernel:
-# - Update packageAliases.linux_latest to the latest version
-# - Update linux_latest_hardened when the patches become available
-
 let
   inherit (lib) recurseIntoAttrs dontRecurseIntoAttrs;
 
@@ -75,232 +71,63 @@ lib.makeScope pkgs.newScope (
 
     buildLinux = callPackage ./kernel/generic.nix { };
 
-    kernels =
-      recurseIntoAttrs {
-        # NOTE: PLEASE DO NOT ADD NEW DOWNSTREAM KERNELS TO NIXPKGS.
-        # New vendor kernels should go to nixos-hardware instead.
-        # e.g. https://github.com/NixOS/nixos-hardware/tree/master/microsoft/surface/kernel
-
-        linux_rpi1 = callPackage ./kernel/linux-rpi.nix {
-          kernelPatches = with kernelPatches; [
-            bridge_stp_helper
-            request_key_helper
-          ];
-          rpiVersion = 1;
-        };
-
-        linux_rpi2 = callPackage ./kernel/linux-rpi.nix {
-          kernelPatches = with kernelPatches; [
-            bridge_stp_helper
-            request_key_helper
-          ];
-          rpiVersion = 2;
-        };
-
-        linux_rpi3 = callPackage ./kernel/linux-rpi.nix {
-          kernelPatches = with kernelPatches; [
-            bridge_stp_helper
-            request_key_helper
-          ];
-          rpiVersion = 3;
-        };
-
-        linux_rpi4 = callPackage ./kernel/linux-rpi.nix {
-          kernelPatches = with kernelPatches; [
-            bridge_stp_helper
-            request_key_helper
-          ];
-          rpiVersion = 4;
-        };
-
-        linux_5_10 = callPackage ./kernel/mainline.nix {
-          branch = "5.10";
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-          ];
-        };
-
-        linux_rt_5_10 = callPackage ./kernel/linux-rt-5.10.nix {
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-            kernelPatches.export-rt-sched-migrate
-          ];
-        };
-
-        linux_5_15 = callPackage ./kernel/mainline.nix {
-          branch = "5.15";
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-          ];
-        };
-
-        linux_rt_5_15 = callPackage ./kernel/linux-rt-5.15.nix {
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-            kernelPatches.export-rt-sched-migrate
-          ];
-        };
-
-        linux_6_1 = callPackage ./kernel/mainline.nix {
-          branch = "6.1";
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-          ];
-        };
-
-        linux_rt_6_1 = callPackage ./kernel/linux-rt-6.1.nix {
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-            kernelPatches.export-rt-sched-migrate
-          ];
-        };
-
-        linux_6_6 = callPackage ./kernel/mainline.nix {
-          branch = "6.6";
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-          ];
-        };
-
-        linux_rt_6_6 = callPackage ./kernel/linux-rt-6.6.nix {
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-            kernelPatches.export-rt-sched-migrate
-          ];
-        };
-
-        linux_6_12 = callPackage ./kernel/mainline.nix {
-          branch = "6.12";
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-          ];
-        };
-
-        linux_6_17 = callPackage ./kernel/mainline.nix {
-          branch = "6.17";
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-          ];
-        };
-
-        linux_6_18 = callPackage ./kernel/mainline.nix {
-          branch = "6.18";
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-          ];
-        };
-
-        linux_testing =
-          let
-            testing = callPackage ./kernel/mainline.nix {
-              # A special branch that tracks the kernel under the release process
-              # i.e. which has at least a public rc1 and is not released yet.
-              branch = "testing";
-              kernelPatches = [
-                kernelPatches.bridge_stp_helper
-                kernelPatches.request_key_helper
-              ];
-            };
-            latest = packageAliases.linux_latest.kernel;
-          in
-          if latest.kernelAtLeast testing.baseVersion then latest else testing;
-
-        linux_default = packageAliases.linux_default.kernel;
-
-        linux_latest = packageAliases.linux_latest.kernel;
-
-        # Using zenKernels like this due lqx&zen came from one source, but may have different base kernel version
-        # https://github.com/NixOS/nixpkgs/pull/161773#discussion_r820134708
-        zenKernels = callPackage ./kernel/zen-kernels.nix;
-
-        linux_zen = zenKernels {
-          variant = "zen";
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-          ];
-        };
-
-        linux_lqx = zenKernels {
-          variant = "lqx";
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-          ];
-        };
-
-        # This contains the variants of the XanMod kernel
-        xanmodKernels = callPackage ./kernel/xanmod-kernels.nix;
-
-        linux_xanmod = xanmodKernels {
-          variant = "lts";
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-          ];
-        };
-        linux_xanmod_stable = xanmodKernels {
-          variant = "main";
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-          ];
-        };
-        linux_xanmod_latest = xanmodKernels {
-          variant = "main";
-          kernelPatches = [
-            kernelPatches.bridge_stp_helper
-            kernelPatches.request_key_helper
-          ];
-        };
-
-        linux_6_12_hardened = hardenedKernelFor kernels.linux_6_12 { };
-
-        linux_hardened = hardenedKernelFor packageAliases.linux_default.kernel { };
-      }
-      // lib.optionalAttrs config.allowAliases {
-        linux_libre = throw "linux_libre has been removed due to lack of maintenance";
-        linux_latest_libre = throw "linux_latest_libre has been removed due to lack of maintenance";
-
-        linux_4_19 = throw "linux 4.19 was removed because it will reach its end of life within 24.11";
-        linux_5_4 = throw "linux 5.4 was removed because it will reach its end of life within 25.11";
-        linux_6_9 = throw "linux 6.9 was removed because it has reached its end of life upstream";
-        linux_6_10 = throw "linux 6.10 was removed because it has reached its end of life upstream";
-        linux_6_11 = throw "linux 6.11 was removed because it has reached its end of life upstream";
-        linux_6_13 = throw "linux 6.13 was removed because it has reached its end of life upstream";
-        linux_6_14 = throw "linux 6.14 was removed because it has reached its end of life upstream";
-        linux_6_15 = throw "linux 6.15 was removed because it has reached its end of life upstream";
-        linux_6_16 = throw "linux 6.16 was removed because it has reached its end of life upstream";
-
-        linux_5_10_hardened = throw "linux_hardened on nixpkgs only contains latest stable and latest LTS";
-        linux_5_15_hardened = throw "linux_hardened on nixpkgs only contains latest stable and latest LTS";
-        linux_6_1_hardened = throw "linux_hardened on nixpkgs only contains latest stable and latest LTS";
-        linux_6_6_hardened = throw "linux_hardened on nixpkgs only contains latest stable and latest LTS";
-
-        linux_4_19_hardened = throw "linux 4.19 was removed because it will reach its end of life within 24.11";
-        linux_5_4_hardened = throw "linux_5_4_hardened was removed because it was broken";
-        linux_6_9_hardened = throw "linux 6.9 was removed because it has reached its end of life upstream";
-        linux_6_10_hardened = throw "linux 6.10 was removed because it has reached its end of life upstream";
-        linux_6_11_hardened = throw "linux 6.11 was removed because it has reached its end of life upstream";
-        linux_6_13_hardened = throw "linux 6.13 was removed because it has reached its end of life upstream";
-        linux_6_14_hardened = throw "linux 6.14 was removed because it has reached its end of life upstream";
-        linux_6_15_hardened = throw "linux 6.15 was removed because it has reached its end of life upstream";
-
-        linux_rt_5_4 = throw "linux_rt 5.4 has been removed because it will reach its end of life within 25.11";
-
-        linux_ham = throw "linux_ham has been removed in favour of the standard kernel packages";
+    # Build a mainline kernel from a branch name
+    buildMainlineKernel =
+      branch:
+      callPackage ./kernel/mainline.nix {
+        inherit branch;
+        kernelPatches = [
+          kernelPatches.bridge_stp_helper
+          kernelPatches.request_key_helper
+        ];
       };
+
+    inherit hardenedKernelFor;
+
+    # Build specialty kernels
+    buildRpiKernel =
+      rpiVersion:
+      callPackage ./kernel/linux-rpi.nix {
+        kernelPatches = with kernelPatches; [
+          bridge_stp_helper
+          request_key_helper
+        ];
+        inherit rpiVersion;
+      };
+
+    buildRtKernel =
+      rtFile:
+      callPackage rtFile {
+        kernelPatches = [
+          kernelPatches.bridge_stp_helper
+          kernelPatches.request_key_helper
+          kernelPatches.export-rt-sched-migrate
+        ];
+      };
+
+    zenKernels = callPackage ./kernel/zen-kernels.nix;
+    xanmodKernels = callPackage ./kernel/xanmod-kernels.nix;
+
+    buildZenKernel =
+      variant:
+      zenKernels {
+        inherit variant;
+        kernelPatches = [
+          kernelPatches.bridge_stp_helper
+          kernelPatches.request_key_helper
+        ];
+      };
+
+    buildXanmodKernel =
+      variant:
+      xanmodKernels {
+        inherit variant;
+        kernelPatches = [
+          kernelPatches.bridge_stp_helper
+          kernelPatches.request_key_helper
+        ];
+      };
+
     /*
       Linux kernel modules are inherently tied to a specific kernel.  So
       rather than provide specific instances of those packages for a
@@ -691,97 +518,6 @@ lib.makeScope pkgs.newScope (
         (lib.fixedPoints.composeManyExtensions kernelPackagesExtensions);
 
     hardenedPackagesFor = kernel: overrides: packagesFor (hardenedKernelFor kernel overrides);
-
-    vanillaPackages = {
-      # recurse to build modules for the kernels
-      linux_5_10 = recurseIntoAttrs (packagesFor kernels.linux_5_10);
-      linux_5_15 = recurseIntoAttrs (packagesFor kernels.linux_5_15);
-      linux_6_1 = recurseIntoAttrs (packagesFor kernels.linux_6_1);
-      linux_6_6 = recurseIntoAttrs (packagesFor kernels.linux_6_6);
-      linux_6_12 = recurseIntoAttrs (packagesFor kernels.linux_6_12);
-      linux_6_17 = recurseIntoAttrs (packagesFor kernels.linux_6_17);
-      linux_6_18 = recurseIntoAttrs (packagesFor kernels.linux_6_18);
-    }
-    // lib.optionalAttrs config.allowAliases {
-      linux_4_19 = throw "linux 4.19 was removed because it will reach its end of life within 24.11"; # Added 2024-09-21
-      linux_5_4 = throw "linux 5.4 was removed because it will reach its end of life within 25.11"; # Added 2025-10-22
-      linux_6_9 = throw "linux 6.9 was removed because it reached its end of life upstream"; # Added 2024-08-02
-      linux_6_10 = throw "linux 6.10 was removed because it reached its end of life upstream"; # Added 2024-10-23
-      linux_6_11 = throw "linux 6.11 was removed because it reached its end of life upstream"; # Added 2025-03-23
-      linux_6_13 = throw "linux 6.13 was removed because it reached its end of life upstream"; # Added 2025-06-22
-      linux_6_14 = throw "linux 6.14 was removed because it reached its end of life upstream"; # Added 2025-06-22
-      linux_6_15 = throw "linux 6.15 was removed because it reached its end of life upstream"; # Added 2025-08-23
-      linux_6_16 = throw "linux 6.16 was removed because it reached its end of life upstream"; # Added 2025-10-22
-    };
-
-    rtPackages = {
-      # realtime kernel packages
-      linux_rt_5_10 = packagesFor kernels.linux_rt_5_10;
-      linux_rt_5_15 = packagesFor kernels.linux_rt_5_15;
-      linux_rt_6_1 = packagesFor kernels.linux_rt_6_1;
-      linux_rt_6_6 = packagesFor kernels.linux_rt_6_6;
-    }
-    // lib.optionalAttrs config.allowAliases {
-      linux_rt_5_4 = throw "linux_rt 5.4 was removed because it will reach its end of life within 25.11"; # Added 2025-10-22
-    };
-
-    rpiPackages = {
-      linux_rpi1 = packagesFor kernels.linux_rpi1;
-      linux_rpi2 = packagesFor kernels.linux_rpi2;
-      linux_rpi3 = packagesFor kernels.linux_rpi3;
-      linux_rpi4 = packagesFor kernels.linux_rpi4;
-    };
-
-    packages = recurseIntoAttrs (
-      vanillaPackages
-      // rtPackages
-      // rpiPackages
-      // {
-
-        # Intentionally lacks recurseIntoAttrs, as -rc kernels will quite likely break out-of-tree modules and cause failed Hydra builds.
-        linux_testing = packagesFor kernels.linux_testing;
-
-        linux_hardened = recurseIntoAttrs (packagesFor kernels.linux_hardened);
-
-        linux_6_12_hardened = recurseIntoAttrs (packagesFor kernels.linux_6_12_hardened);
-
-        linux_zen = recurseIntoAttrs (packagesFor kernels.linux_zen);
-        linux_lqx = recurseIntoAttrs (packagesFor kernels.linux_lqx);
-        linux_xanmod = recurseIntoAttrs (packagesFor kernels.linux_xanmod);
-        linux_xanmod_stable = recurseIntoAttrs (packagesFor kernels.linux_xanmod_stable);
-        linux_xanmod_latest = recurseIntoAttrs (packagesFor kernels.linux_xanmod_latest);
-      }
-      // lib.optionalAttrs config.allowAliases {
-        linux_libre = throw "linux_libre has been removed due to lack of maintenance";
-        linux_latest_libre = throw "linux_latest_libre has been removed due to lack of maintenance";
-
-        linux_5_10_hardened = throw "linux_hardened on nixpkgs only contains latest stable and latest LTS";
-        linux_5_15_hardened = throw "linux_hardened on nixpkgs only contains latest stable and latest LTS";
-        linux_6_1_hardened = throw "linux_hardened on nixpkgs only contains latest stable and latest LTS";
-        linux_6_6_hardened = throw "linux_hardened on nixpkgs only contains latest stable and latest LTS";
-
-        linux_4_19_hardened = throw "linux 4.19 was removed because it will reach its end of life within 24.11";
-        linux_5_4_hardened = throw "linux_5_4_hardened was removed because it was broken";
-        linux_6_9_hardened = throw "linux 6.9 was removed because it has reached its end of life upstream";
-        linux_6_10_hardened = throw "linux 6.10 was removed because it has reached its end of life upstream";
-        linux_6_11_hardened = throw "linux 6.11 was removed because it has reached its end of life upstream";
-        linux_6_13_hardened = throw "linux 6.13 was removed because it has reached its end of life upstream";
-        linux_6_14_hardened = throw "linux 6.14 was removed because it has reached its end of life upstream";
-        linux_6_15_hardened = throw "linux 6.15 was removed because it has reached its end of life upstream";
-        linux_ham = throw "linux_ham has been removed in favour of the standard kernel packages";
-      }
-    );
-
-    packageAliases = {
-      linux_default = packages.linux_6_12;
-      # Update this when adding the newest kernel major version!
-      linux_latest = packages.linux_6_18;
-      linux_rt_default = packages.linux_rt_5_15;
-      linux_rt_latest = packages.linux_rt_6_6;
-    }
-    // lib.optionalAttrs config.allowAliases {
-      linux_mptcp = throw "'linux_mptcp' has been moved to https://github.com/teto/mptcp-flake";
-    };
 
     manualConfig = callPackage ./kernel/build.nix { };
 
