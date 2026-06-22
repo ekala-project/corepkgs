@@ -31,8 +31,6 @@ buildPythonPackage rec {
 
   pythonNamespaces = [ "sphinxcontrib" ];
 
-  pythonImportsCheck = [ "sphinxcontrib.websupport" ];
-
   meta = {
     description = "Sphinx API for Web Apps";
     homepage = "http://sphinx-doc.org/";

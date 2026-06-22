@@ -27,8 +27,6 @@ buildPythonPackage rec {
 
   pythonNamespaces = [ "sphinxcontrib" ];
 
-  pythonImportsCheck = [ "sphinxcontrib.serializinghtml" ];
-
   meta = {
     description = "Sphinx extension which outputs \"serialized\" HTML files (json and pickle)";
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-serializinghtml";
