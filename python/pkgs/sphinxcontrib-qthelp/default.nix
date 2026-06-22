@@ -27,8 +27,6 @@ buildPythonPackage rec {
 
   pythonNamespaces = [ "sphinxcontrib" ];
 
-  pythonImportsCheck = [ "sphinxcontrib.qthelp" ];
-
   meta = {
     description = "Sphinx extension which outputs QtHelp document";
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-qthelp";

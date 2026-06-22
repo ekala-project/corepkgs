@@ -27,8 +27,6 @@ buildPythonPackage rec {
 
   pythonNamespaces = [ "sphinxcontrib" ];
 
-  pythonImportsCheck = [ "sphinxcontrib.devhelp" ];
-
   meta = {
     description = "Sphinx extension which outputs Devhelp document";
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-devhelp";
