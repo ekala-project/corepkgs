@@ -29,7 +29,7 @@ stdenv.mkDerivation rec {
   hardeningDisable = lib.optional (stdenv.hostPlatform.libc == "bionic") "fortify";
 
   setupHooks = [
-    ../../../build-support/setup-hooks/role.bash
+    ../../build-support/setup-hooks/role.bash
     ./setup-hook.sh
   ];
 
