@@ -133,8 +133,7 @@ let
       darwin = pkgs.darwin.shell_cmds;
     };
     hostname = {
-      # TODO(corepkgs): add hostname-debian package
-      linux = throw "unixtools.hostname: hostname-debian is not yet available in core-pkgs";
+      linux = pkgs.hostname-debian;
       darwin = pkgs.darwin.shell_cmds;
       freebsd = pkgs.freebsd.bin;
       openbsd = pkgs.openbsd.hostname;
