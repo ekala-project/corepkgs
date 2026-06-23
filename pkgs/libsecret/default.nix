@@ -90,6 +90,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     meson
+    meson.configurePhaseHook
     ninja
     pkg-config
     gettext
@@ -130,7 +131,7 @@ stdenv.mkDerivation rec {
     (lib.mesonOption "bashcompdir" "share/bash-completion/completions")
   ];
 
-  doCheck = stdenv.hostPlatform.isLinux && withIntrospection;
+  doCheck = stdenv.hostPlatform.isLinux && withIntrospection && python3Packages ? pygobject3;
   separateDebugInfo = true;
 
   postPatch = ''
