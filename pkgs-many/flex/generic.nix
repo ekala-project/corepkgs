@@ -9,6 +9,7 @@
 {
   lib,
   stdenv,
+  gcc13Stdenv,
   buildPackages,
   fetchurl,
   bison,
@@ -24,6 +25,7 @@
 # or from a git tree (flex lexers are not pre-generated there).
 let
   is2_5 = packageOlder "2.6";
+  stdenv' = if is2_5 then gcc13Stdenv else stdenv;
   url =
     if is2_5 then
       "https://github.com/westes/flex/releases/download/flex-${version}/flex-${version}.tar.gz"
@@ -32,7 +34,7 @@ let
 
   needsTexinfo = is2_5;
 in
-stdenv.mkDerivation rec {
+stdenv'.mkDerivation rec {
   pname = "flex";
   inherit version;
 
