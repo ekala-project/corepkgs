@@ -133,7 +133,8 @@ let
       darwin = pkgs.darwin.shell_cmds;
     };
     hostname = {
-      linux = pkgs.hostname-debian;
+      # TODO(corepkgs): add hostname-debian package
+      linux = throw "unixtools.hostname: hostname-debian is not yet available in core-pkgs";
       darwin = pkgs.darwin.shell_cmds;
       freebsd = pkgs.freebsd.bin;
       openbsd = pkgs.openbsd.hostname;
@@ -145,7 +146,8 @@ let
       openbsd = pkgs.openbsd.ifconfig;
     };
     killall = {
-      linux = pkgs.psmisc;
+      # TODO(corepkgs): add psmisc package
+      linux = throw "unixtools.killall: psmisc is not yet available in core-pkgs";
       darwin = pkgs.darwin.shell_cmds;
     };
     locale = {
