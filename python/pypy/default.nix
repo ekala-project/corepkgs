@@ -211,6 +211,9 @@ stdenv.mkDerivation rec {
     lndir $out/lib-python/${if isPy3k then "3" else pythonVersion} $out/lib/${libPrefix}
     lndir $out/lib_pypy $out/lib/${libPrefix}
 
+    # lndir can create broken symlinks for empty directories (e.g. ctypes_config_cache)
+    find $out -xtype l -delete
+
     # Include a sitecustomize.py file
     cp ${../sitecustomize.py} $out/${
       if isPy38OrNewer then sitePackages else "lib/${libPrefix}/${sitePackages}"
