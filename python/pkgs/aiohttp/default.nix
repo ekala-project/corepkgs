@@ -10,43 +10,43 @@
 
   # build-system
   cython,
-  pkgconfig,
+  pkgconfig ? null,
   setuptools,
 
   # native dependencies
   llhttp,
 
   # dependencies
-  aiohappyeyeballs,
-  aiosignal,
-  async-timeout,
+  aiohappyeyeballs ? null,
+  aiosignal ? null,
+  async-timeout ? null,
   attrs,
-  backports-zstd,
-  frozenlist,
-  multidict,
-  propcache,
-  yarl,
+  backports-zstd ? null,
+  frozenlist ? null,
+  multidict ? null,
+  propcache ? null,
+  yarl ? null,
 
   # optional dependencies
-  aiodns,
-  brotli,
+  aiodns ? null,
+  brotli ? null,
   brotlicffi,
 
   # tests
-  blockbuster,
-  freezegun,
-  gunicorn,
-  isa-l,
-  isal,
-  proxy-py,
-  pytest-codspeed,
-  pytest-cov-stub,
-  pytest-mock,
-  pytest-xdist,
-  pytestCheckHook,
-  re-assert,
-  trustme,
-  zlib-ng,
+  blockbuster ? null,
+  freezegun ? null,
+  gunicorn ? null,
+  isa-l ? null,
+  isal ? null,
+  proxy-py ? null,
+  pytest-codspeed ? null,
+  pytest-cov-stub ? null,
+  pytest-mock ? null,
+  pytest-xdist ? null,
+  pytestCheckHook ? null,
+  re-assert ? null,
+  trustme ? null,
+  zlib-ng ? null,
 }:
 
 buildPythonPackage (finalAttrs: {
@@ -87,21 +87,22 @@ buildPythonPackage (finalAttrs: {
 
   env.AIOHTTP_USE_SYSTEM_DEPS = true;
 
-  dependencies = [
-    aiohappyeyeballs
-    aiosignal
-    attrs
-    frozenlist
-    multidict
-    propcache
-    yarl
-  ]
-  ++ lib.optionals (pythonOlder "3.11") [
-    async-timeout
-  ]
-  ++ finalAttrs.optional-dependencies.speedups;
+  dependencies =
+    lib.filter (x: x != null) [
+      aiohappyeyeballs
+      aiosignal
+      attrs
+      frozenlist
+      multidict
+      propcache
+      yarl
+    ]
+    ++ lib.optionals (pythonOlder "3.11") [
+      async-timeout
+    ]
+    ++ finalAttrs.optional-dependencies.speedups;
 
-  optional-dependencies.speedups = [
+  optional-dependencies.speedups = lib.filter (x: x != null) [
     aiodns
     backports-zstd
     (if isPyPy then brotlicffi else brotli)

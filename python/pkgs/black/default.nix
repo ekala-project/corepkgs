@@ -8,20 +8,20 @@
   pytestCheckHook,
   aiohttp,
   click,
-  colorama,
+  colorama ? null,
   hatch-fancy-pypi-readme,
   hatch-vcs,
   hatchling,
-  ipython,
+  ipython ? null,
   mypy-extensions,
   packaging,
   pathspec,
-  parameterized,
+  parameterized ? null,
   platformdirs,
-  tokenize-rt,
+  tokenize-rt ? null,
   tomli,
   typing-extensions,
-  uvloop,
+  uvloop ? null,
 }:
 
 buildPythonPackage (finalAttrs: {
@@ -73,10 +73,10 @@ buildPythonPackage (finalAttrs: {
   ];
 
   optional-dependencies = {
-    colorama = [ colorama ];
+    colorama = lib.optional (colorama != null) colorama;
     d = [ aiohttp ];
-    uvloop = [ uvloop ];
-    jupyter = [
+    uvloop = lib.optional (uvloop != null) uvloop;
+    jupyter = lib.filter (x: x != null) [
       ipython
       tokenize-rt
     ];
@@ -88,8 +88,8 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [
     pytestCheckHook
-    parameterized
   ]
+  ++ lib.optional (parameterized != null) parameterized
   ++ lib.concatAttrValues finalAttrs.optional-dependencies;
 
   testPaths = [ "tests" ];

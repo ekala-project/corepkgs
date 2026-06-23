@@ -20,16 +20,17 @@ in
 
   condaInstallHook = callPackage (
     {
+      lib,
       makePythonHook,
       gnutar,
-      lbzip2,
+      lbzip2 ? null,
     }:
     makePythonHook {
       name = "conda-install-hook";
       propagatedBuildInputs = [
         gnutar
-        lbzip2
-      ];
+      ]
+      ++ lib.optional (lbzip2 != null) lbzip2;
       substitutions = {
         inherit pythonSitePackages;
       };

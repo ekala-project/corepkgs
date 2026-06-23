@@ -12,34 +12,34 @@
 
   # native dependencies
   freetype,
-  lcms2,
-  libavif,
-  libimagequant,
+  lcms2 ? null,
+  libavif ? null,
+  libimagequant ? null,
   libjpeg,
-  libraqm,
+  libraqm ? null,
   libtiff,
   libwebp,
-  libxcb,
-  openjpeg,
-  zlib-ng,
+  libxcb ? null,
+  openjpeg ? null,
+  zlib-ng ? null,
 
   # optional dependencies
-  defusedxml,
-  olefile,
+  defusedxml ? null,
+  olefile ? null,
   typing-extensions,
 
   # tests
   numpy,
-  pytest-cov-stub,
+  pytest-cov-stub ? null,
   pytestCheckHook,
 
   # for passthru.tests
-  imageio,
-  matplotlib,
-  pilkit,
-  pydicom,
-  reportlab,
-  sage,
+  imageio ? null,
+  matplotlib ? null,
+  pilkit ? null,
+  pydicom ? null,
+  reportlab ? null,
+  sage ? null,
 }:
 
 buildPythonPackage rec {
@@ -62,7 +62,7 @@ buildPythonPackage rec {
   nativeBuildInputs = [ pkg-config ];
 
   # https://pillow.readthedocs.io/en/latest/installation/building-from-source.html#building-from-source
-  buildInputs = [
+  buildInputs = lib.filter (x: x != null) [
     freetype
     lcms2
     libavif
@@ -87,29 +87,37 @@ buildPythonPackage rec {
     in
     ''
       # The build process fails to find the pkg-config files for these dependencies
-      substituteInPlace setup.py \
-        --replace-fail 'AVIF_ROOT = None' 'AVIF_ROOT = ${getLibAndInclude libavif}' \
-        --replace-fail 'IMAGEQUANT_ROOT = None' 'IMAGEQUANT_ROOT = ${getLibAndInclude libimagequant}' \
-        --replace-fail 'JPEG2K_ROOT = None' 'JPEG2K_ROOT = ${getLibAndInclude openjpeg}'
+      ${lib.optionalString (libavif != null)
+        "substituteInPlace setup.py --replace-fail 'AVIF_ROOT = None' 'AVIF_ROOT = ${getLibAndInclude libavif}'"
+      }
+      ${lib.optionalString (libimagequant != null)
+        "substituteInPlace setup.py --replace-fail 'IMAGEQUANT_ROOT = None' 'IMAGEQUANT_ROOT = ${getLibAndInclude libimagequant}'"
+      }
+      ${lib.optionalString (openjpeg != null)
+        "substituteInPlace setup.py --replace-fail 'JPEG2K_ROOT = None' 'JPEG2K_ROOT = ${getLibAndInclude openjpeg}'"
+      }
 
-      # Build with X11 support
-      export LDFLAGS="$LDFLAGS -L${libxcb}/lib"
-      export CFLAGS="$CFLAGS -I${libxcb.dev}/include"
+      ${lib.optionalString (libxcb != null) ''
+        # Build with X11 support
+        export LDFLAGS="$LDFLAGS -L${libxcb}/lib"
+        export CFLAGS="$CFLAGS -I${libxcb.dev}/include"
+      ''}
     '';
 
   optional-dependencies = {
-    fpx = [ olefile ];
-    mic = [ olefile ];
+    fpx = lib.optional (olefile != null) olefile;
+    mic = lib.optional (olefile != null) olefile;
     typing = lib.optionals (pythonOlder "3.10") [ typing-extensions ];
-    xmp = [ defusedxml ];
+    xmp = lib.optional (defusedxml != null) defusedxml;
   };
 
-  nativeCheckInputs = [
-    pytest-cov-stub
-    pytestCheckHook
-    numpy
-  ]
-  ++ lib.concatAttrValues optional-dependencies;
+  nativeCheckInputs =
+    lib.optional (pytest-cov-stub != null) pytest-cov-stub
+    ++ [
+      pytestCheckHook
+      numpy
+    ]
+    ++ lib.concatAttrValues optional-dependencies;
 
   disabledTests = [
     # Code quality mismathch 9 vs 10
