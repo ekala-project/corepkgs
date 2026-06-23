@@ -145,8 +145,7 @@ let
       openbsd = pkgs.openbsd.ifconfig;
     };
     killall = {
-      # TODO(corepkgs): add psmisc package
-      linux = throw "unixtools.killall: psmisc is not yet available in core-pkgs";
+      linux = pkgs.psmisc;
       darwin = pkgs.darwin.shell_cmds;
     };
     locale = {
