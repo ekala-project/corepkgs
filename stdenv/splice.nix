@@ -17,7 +17,35 @@
 lib: pkgs: actuallySplice:
 
 let
-  inherit (lib.customisation) mapCrossIndex renameCrossIndexFrom;
+  # These functions are used by nixpkgs' lib.customisation but not yet available
+  # in our pinned nix-lib. Define them locally until the pin is updated.
+  mapCrossIndex =
+    f:
+    {
+      buildBuild,
+      buildHost,
+      buildTarget,
+      hostHost,
+      hostTarget,
+      targetTarget,
+    }:
+    {
+      buildBuild = f buildBuild;
+      buildHost = f buildHost;
+      buildTarget = f buildTarget;
+      hostHost = f hostHost;
+      hostTarget = f hostTarget;
+      targetTarget = f targetTarget;
+    };
+
+  renameCrossIndexFrom = prefix: x: {
+    buildBuild = x."${prefix}BuildBuild";
+    buildHost = x."${prefix}BuildHost";
+    buildTarget = x."${prefix}BuildTarget";
+    hostHost = x."${prefix}HostHost";
+    hostTarget = x."${prefix}HostTarget";
+    targetTarget = x."${prefix}TargetTarget";
+  };
 
   spliceReal =
     inputs:

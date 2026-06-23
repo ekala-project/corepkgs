@@ -635,8 +635,8 @@ with final;
 
   makePkgconfigItem = callPackage ./build-support/make-pkgconfigitem { };
 
-  # TODO(corepkgs): alias?
-  mpi = openmpi; # this attribute should used to build MPI applications
+  # TODO(corepkgs): add openmpi package
+  mpi = throw "mpi: openmpi is not yet available in core-pkgs";
 
   # Default libGL implementation.
   #
@@ -663,7 +663,12 @@ with final;
   # On macOS, the SDK provides the OpenGL framework in `stdenv`.
   # Packages that use `libGLX` on macOS may need to depend on
   # `mesa_glu` directly if this doesn’t work.
-  libGLU = if stdenv.hostPlatform.isDarwin then null else mesa_glu;
+  # TODO(corepkgs): add mesa_glu package
+  libGLU =
+    if stdenv.hostPlatform.isDarwin then
+      null
+    else
+      throw "libGLU: mesa_glu is not yet available in core-pkgs";
 
   # `libglvnd` does not work (yet?) on macOS.
   libGLX = if stdenv.hostPlatform.isDarwin then mesa else libglvnd;
@@ -671,13 +676,19 @@ with final;
   # On macOS, the SDK provides the GLUT framework in `stdenv`. Packages
   # that use `libGLX` on macOS may need to depend on `freeglut`
   # directly if this doesn’t work.
-  libglut = if stdenv.hostPlatform.isDarwin then null else freeglut;
+  # TODO(corepkgs): add freeglut package
+  libglut =
+    if stdenv.hostPlatform.isDarwin then
+      null
+    else
+      throw "libglut: freeglut is not yet available in core-pkgs";
+  # TODO(corepkgs): mesa needs glslang, libdisplay-info, libva, directx-headers, etc.
   mesa =
     if stdenv.hostPlatform.isDarwin then
       callPackage ./pkgs/mesa/darwin.nix { }
     else
-      callPackage ./pkgs/mesa { };
-  mesa_i686 = pkgsi686Linux.mesa; # make it build on Hydra
+      throw "mesa: requires glslang, libdisplay-info, libva and other packages not yet in core-pkgs";
+  mesa_i686 = null;
   libgbm = callPackage ./pkgs/mesa/gbm.nix { };
   mesa-gl-headers = callPackage ./pkgs/mesa/headers.nix { };
 
@@ -868,13 +879,9 @@ with final;
       '';
     });
 
+  # TODO(corepkgs): port llvm/multi.nix for clang multilib support
   wrapClangMulti =
-    clang:
-    callPackage ./development/compilers/llvm/multi.nix {
-      inherit clang;
-      gcc32 = pkgsi686Linux.gcc;
-      gcc64 = pkgs.gcc;
-    };
+    clang: throw "clang_multi is not yet available in core-pkgs (needs llvm/multi.nix ported)";
 
   gcc_multi = wrapCCMulti gcc;
   clang_multi = wrapClangMulti clang;
@@ -1346,10 +1353,8 @@ with final;
     name = "setup-debug-info-dirs-hook";
   } ./build-support/setup-hooks/setup-debug-info-dirs.sh;
 
-  stripJavaArchivesHook = makeSetupHook {
-    name = "strip-java-archives-hook";
-    propagatedBuildInputs = [ strip-nondeterminism ];
-  } ./build-support/setup-hooks/strip-java-archives.sh;
+  # TODO(corepkgs): add strip-nondeterminism package
+  stripJavaArchivesHook = throw "stripJavaArchivesHook: strip-nondeterminism is not yet available in core-pkgs";
 
   updateAutotoolsGnuConfigScriptsHook = makeSetupHook {
     name = "update-autotools-gnu-config-scripts-hook";
@@ -1397,7 +1402,7 @@ with final;
   libintl = if stdenv.hostPlatform.libc != "glibc" then gettext else null;
 
   # TODO(corepkgs): use mkManyVariants
-  libpng12 = callPackage ../development/libraries/libpng/12.nix { };
+  libpng12 = callPackage ./pkgs/libpng/12.nix { };
 
   # TODO(corepkgs): cleanup and move into pkgs
   common-updater-scripts = callPackage ./common-updater/scripts.nix { };
@@ -1431,10 +1436,8 @@ with final;
     else
       prev.ncurses;
 
-  pkgconf = callPackage ./build-support/pkg-config-wrapper {
-    pkg-config = pkgconf-unwrapped;
-    baseBinName = "pkgconf";
-  };
+  # TODO(corepkgs): add pkgconf-unwrapped package
+  pkgconf = throw "pkgconf: pkgconf-unwrapped is not yet available in core-pkgs; use pkg-config instead";
   pkg-config = callPackage ./build-support/pkg-config-wrapper {
     pkg-config = pkg-config-unwrapped;
   };
@@ -1459,8 +1462,8 @@ with final;
   # TODO(corepkgs): alias?
   patch = gnupatch;
 
-  # We don't need versioned package sets thanks to the tcl stubs mechanism
-  tclPackages = lib.recurseIntoAttrs (callPackage ./pkgs/tcl/packages.nix { });
+  # TODO(corepkgs): tcl package scope needs lib injected into its scope
+  tclPackages = { };
 
   # TODO(corepkgs): use mkManyVariants
   tk = tk-8_6;
@@ -1614,7 +1617,7 @@ with final;
 
   # The full-featured Git.
   gitFull = git.override {
-    svnSupport = stdenv.buildPlatform == stdenv.hostPlatform;
+    svnSupport = stdenv.buildPlatform == stdenv.hostPlatform && subversionClient != null;
     guiSupport = true;
     sendEmailSupport = stdenv.buildPlatform == stdenv.hostPlatform;
     withSsh = true;
@@ -1774,7 +1777,7 @@ with final;
   # Package scopes accessible as: lua.v5_3.pkgs, lua.luajit_2_0.pkgs, etc.
 
   luaPackages = lua.pkgs;
-  luajitPackages = lua.jit_2_1.pkgs;
+  luajitPackages = lua.luajit_2_1.pkgs;
 
   asciidoc = callPackage ./pkgs/asciidoc {
     inherit (python3.pkgs)
@@ -1787,13 +1790,9 @@ with final;
     w3m = w3m-batch;
     enableStandardFeatures = false;
   };
-  asciidoc-full = asciidoc.override {
-    enableStandardFeatures = true;
-  };
-  asciidoc-full-with-plugins = asciidoc.override {
-    enableStandardFeatures = true;
-    enableExtraPlugins = true;
-  };
+  # TODO(corepkgs): requires graphviz, lilypond, imagemagick, etc.
+  asciidoc-full = throw "asciidoc-full: standard features require graphviz, lilypond, and other packages not yet in core-pkgs";
+  asciidoc-full-with-plugins = throw "asciidoc-full-with-plugins: requires packages not yet in core-pkgs";
 
   imagemagick6_light = imagemagick6.override {
     bzip2Support = false;
@@ -1821,33 +1820,9 @@ with final;
   imagemagick6Big = imagemagick6.override {
     ghostscriptSupport = true;
   };
-  imagemagick_light = lowPrio (
-    imagemagick.override {
-      bzip2Support = false;
-      zlibSupport = false;
-      libX11Support = false;
-      libXtSupport = false;
-      fontconfigSupport = false;
-      freetypeSupport = false;
-      libraqmSupport = false;
-      libjpegSupport = false;
-      djvulibreSupport = false;
-      lcms2Support = false;
-      openexrSupport = false;
-      libjxlSupport = false;
-      libpngSupport = false;
-      liblqr1Support = false;
-      librsvgSupport = false;
-      libtiffSupport = false;
-      libxml2Support = false;
-      openjpegSupport = false;
-      libwebpSupport = false;
-      libheifSupport = false;
-    }
-  );
-  imagemagickBig = imagemagick.override {
-    ghostscriptSupport = true;
-  };
+  # imagemagick is null; these overrides can't work until it's ported
+  imagemagick_light = null;
+  imagemagickBig = null;
 
   inherit (texlive.schemes)
     texliveBasic
@@ -1861,20 +1836,11 @@ with final;
     texliveSmall
     texliveTeTeX
     ;
-  texlivePackages = recurseIntoAttrs (lib.mapAttrs (_: v: v.build) texlive.pkgs);
+  texlivePackages = lib.recurseIntoAttrs (lib.mapAttrs (_: v: v.build) texlive.pkgs);
 
-  imlib2Full = imlib2.override {
-    # Compilation error on Darwin with librsvg. For more information see:
-    # https://github.com/NixOS/nixpkgs/pull/166452#issuecomment-1090725613
-    svgSupport = !stdenv.hostPlatform.isDarwin;
-    heifSupport = !stdenv.hostPlatform.isDarwin;
-    webpSupport = true;
-    jxlSupport = true;
-    psSupport = true;
-  };
-  imlib2-nox = imlib2.override {
-    x11Support = false;
-  };
+  # imlib2 is null; these overrides can't work until it's ported
+  imlib2Full = null;
+  imlib2-nox = null;
   # TODO(corepkgs): alias
   man = man-db;
 
