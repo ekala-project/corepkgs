@@ -229,12 +229,14 @@ stdenv.mkDerivation (
       python
       ninja
     ]
-    ++ optionals enableManpages [
-      # Note: we intentionally use `python3Packages` instead of `python3.pkgs`;
-      # splicing does *not* work with the latter. (TODO: fix)
-      python3Packages.sphinx
-      python3Packages.myst-parser
-    ];
+    ++ optionals enableManpages (
+      [
+        # Note: we intentionally use `python3Packages` instead of `python3.pkgs`;
+        # splicing does *not* work with the latter. (TODO: fix)
+        python3Packages.sphinx
+      ]
+      ++ optional (python3Packages ? myst-parser) python3Packages.myst-parser
+    );
 
     buildInputs = [
       libxml2

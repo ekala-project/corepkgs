@@ -90,11 +90,14 @@ let
           bison
           flex
           installShellFiles
-          (buildPackages.python3.withPackages (p: [
-            p.libfdt
-            p.setuptools # for pkg_resources
-            p.pyelftools
-          ]))
+          (buildPackages.python3.withPackages (
+            p:
+            lib.optional (p ? libfdt) p.libfdt
+            ++ [
+              p.setuptools # for pkg_resources
+              p.pyelftools
+            ]
+          ))
           swig
           which # for scripts/dtc-version.sh
           perl # for oid build (secureboot)

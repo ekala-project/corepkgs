@@ -14,7 +14,7 @@ callPackage ./generic.nix (
 
     src = fetchurl {
       url = "mirror://sourceforge/tcl/tk${tcl.version}-src.tar.gz";
-      sha256 = "1yhgcalldrjlc5q614rlzg1crgd3b52dhrk1pncdaxvl2vgg2yj0";
+      hash = "sha256-QHrx3hZ0d9WYvWFm2ERZo73Mwvs0k2BwYVTmRqliD/o=";
     };
 
     patches = lib.optionals stdenv.hostPlatform.isDarwin [

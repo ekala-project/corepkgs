@@ -15,10 +15,10 @@
   freetype,
   fontconfig,
   libpaper,
-  jbig2dec,
+  jbig2dec ? null,
   libiconv,
-  ijs,
-  lcms2,
+  ijs ? null,
+  lcms2 ? null,
   callPackage,
   libice,
   libx11,
@@ -26,7 +26,7 @@
   libxt,
   bash,
   buildPackages,
-  openjpeg,
+  openjpeg ? null,
   fixDarwinDylibNames,
   cupsSupport ? config.ghostscript.cups or (!stdenv.hostPlatform.isDarwin),
   cups,
@@ -35,11 +35,11 @@
   dynamicDrivers ? true,
 
   # for passthru.tests
-  graphicsmagick,
-  imagemagick,
-  libspectre,
-  lilypond,
-  pstoedit,
+  graphicsmagick ? null,
+  imagemagick ? null,
+  libspectre ? null,
+  lilypond ? null,
+  pstoedit ? null,
   python3,
 }:
 
@@ -126,13 +126,10 @@ stdenv.mkDerivation rec {
     freetype
     fontconfig
     libpaper
-    jbig2dec
     libiconv
-    ijs
-    lcms2
     bash
-    openjpeg
   ]
+  ++ lib.optional (openjpeg != null) openjpeg
   ++ lib.optionals x11Support [
     libice
     libx11

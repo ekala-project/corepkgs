@@ -10,16 +10,16 @@
   zlib,
   libiconv,
   libpng,
-  libX11,
+  libX11 ? null,
   freetype,
-  ttfautohint,
-  gd,
-  libXaw,
+  ttfautohint ? null,
+  gd ? null,
+  libXaw ? null,
   icu,
   ghostscript,
-  libXpm,
-  libXmu,
-  libXext,
+  libXpm ? null,
+  libXmu ? null,
+  libXext ? null,
   perl,
   perlPackages,
   python3Packages,
@@ -27,28 +27,28 @@
   cmake,
   ninja,
   libpaper,
-  graphite2,
-  zziplib,
+  graphite2 ? null,
+  zziplib ? null,
   harfbuzz,
-  potrace,
+  potrace ? null,
   gmp,
   mpfr,
-  mupdf-headless,
+  mupdf-headless ? null,
   brotli,
   cairo,
   pixman,
   xorg,
-  clisp,
-  biber,
-  woff2,
+  clisp ? null,
+  biber ? null,
+  woff2 ? null,
   xxHash,
   makeWrapper,
   shortenPerlShebang,
   useFixedHashes,
-  asymptote,
-  biber-ms,
+  asymptote ? null,
+  biber-ms ? null,
   tlpdb,
-  luajit,
+  luajit ? null,
 }@args:
 
 # Useful resource covering build options:
@@ -674,23 +674,25 @@ rec {
     };
   };
 
-  asymptote = args.asymptote.overrideAttrs (
-    finalAttrs: prevAttrs: {
-      version = texlive.pkgs.asymptote.version;
+  asymptote = lib.optionalAttrs (args.asymptote != null) (
+    args.asymptote.overrideAttrs (
+      finalAttrs: prevAttrs: {
+        version = texlive.pkgs.asymptote.version;
 
-      # keep local src and patches even if duplicated in the top level asymptote
-      # so that top level updates do not break texlive
-      src = fetchurl {
-        url = "mirror://sourceforge/asymptote/${finalAttrs.version}/asymptote-${finalAttrs.version}.src.tgz";
-        hash = "sha256-+T0n2SX9C8Mz0Fb+vkny1x+TWETC+NN67MjfD+6Twys=";
-      };
+        # keep local src and patches even if duplicated in the top level asymptote
+        # so that top level updates do not break texlive
+        src = fetchurl {
+          url = "mirror://sourceforge/asymptote/${finalAttrs.version}/asymptote-${finalAttrs.version}.src.tgz";
+          hash = "sha256-+T0n2SX9C8Mz0Fb+vkny1x+TWETC+NN67MjfD+6Twys=";
+        };
 
-      texContainer = texlive.pkgs.asymptote.tex;
-      texdocContainer = texlive.pkgs.asymptote.texdoc;
+        texContainer = texlive.pkgs.asymptote.tex;
+        texdocContainer = texlive.pkgs.asymptote.texdoc;
 
-      # build issue with asymptote 2.95 has been fixed
-      postConfigure = "";
-    }
+        # build issue with asymptote 2.95 has been fixed
+        postConfigure = "";
+      }
+    )
   );
 
   inherit biber;
@@ -773,7 +775,7 @@ rec {
 } # un-indented
 
 //
-  lib.optionalAttrs (!clisp.meta.broken) # broken on aarch64 and darwin (#20062)
+  lib.optionalAttrs (clisp != null && !clisp.meta.broken) # broken on aarch64 and darwin (#20062)
     {
 
       xindy = stdenv.mkDerivation {

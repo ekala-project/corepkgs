@@ -21,14 +21,14 @@
   vala,
   gi-docgen,
   gnome,
-  gjs,
+  gjs ? null,
   libintl,
   dbus,
   withTpm2Tss ? false,
   abrmdSupport ? false,
   writeShellApplication,
   tpm2-tss,
-  tpm2-abrmd,
+  tpm2-abrmd ? null,
   libsecret,
 }:
 
@@ -117,11 +117,11 @@ stdenv.mkDerivation rec {
 
   nativeCheckInputs = [
     python3
-    python3Packages.dbus-python
-    python3Packages.pygobject3
     dbus
-    gjs
-  ];
+  ]
+  ++ lib.optional (python3Packages ? dbus-python) python3Packages.dbus-python
+  ++ lib.optional (python3Packages ? pygobject3) python3Packages.pygobject3
+  ++ lib.optional (gjs != null) gjs;
 
   mesonFlags = [
     (lib.mesonBool "introspection" withIntrospection)

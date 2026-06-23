@@ -1,7 +1,7 @@
 {
   v8_5 = {
     version = "8.5.19";
-    src-hash = "066vlr9k5f44w9gl9382hlxnryq00d5p6c7w5vq1fgc7v9b49w6k";
+    src-hash = "sha256-0/BEVtqHPRfwLvwwc0sDAPtsO4UCjURf4oS4MlOm2xg=";
     extraPatch = ''
       substituteInPlace 'generic/tclInt.h' --replace-fail 'typedef int ptrdiff_t;' ""
     '';

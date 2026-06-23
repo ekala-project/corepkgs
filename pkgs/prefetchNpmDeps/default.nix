@@ -1,12 +1,7 @@
 # prefetch-npm-deps: CLI tool for computing npm deps hash
 #
-# core-pkgs doesn't have the full Rust/Cargo infrastructure to build
-# prefetch-npm-deps from source, so we import the implementation from nixpkgs.
-
+# TODO: Build prefetch-npm-deps from source using the available Rust toolchain
+# instead of importing from nixpkgs.
 { }:
 
-let
-  # Import nixpkgs prefetch-npm-deps binary
-  nixpkgs = import <nixpkgs> { };
-in
-nixpkgs.prefetch-npm-deps
+throw "prefetchNpmDeps is not yet available in core-pkgs (needs to be built from source)"
