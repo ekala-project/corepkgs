@@ -3,7 +3,7 @@
   lib,
   fetchPypi,
   pytest,
-  u-msgpack-python,
+  u-msgpack-python ? null,
   six,
 }:
 
@@ -18,8 +18,7 @@ buildPythonPackage rec {
   };
 
   buildInputs = [ pytest ];
-  propagatedBuildInputs = [
-    u-msgpack-python
+  propagatedBuildInputs = lib.optional (u-msgpack-python != null) u-msgpack-python ++ [
     six
   ];
 

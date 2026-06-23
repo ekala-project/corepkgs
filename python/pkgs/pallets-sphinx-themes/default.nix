@@ -5,7 +5,7 @@
   sphinx,
   packaging,
   flit-core,
-  sphinx-notfound-page,
+  sphinx-notfound-page ? null,
 }:
 
 buildPythonPackage rec {
@@ -27,8 +27,8 @@ buildPythonPackage rec {
   dependencies = [
     packaging
     sphinx
-    sphinx-notfound-page
-  ];
+  ]
+  ++ lib.optional (sphinx-notfound-page != null) sphinx-notfound-page;
 
   pythonImportsCheck = [ "pallets_sphinx_themes" ];
 

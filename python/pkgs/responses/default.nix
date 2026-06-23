@@ -3,7 +3,7 @@
   buildPythonPackage,
   fetchFromGitHub,
   pytest-asyncio,
-  pytest-httpserver,
+  pytest-httpserver ? null,
   pytestCheckHook,
   pythonOlder,
   pyyaml,
@@ -11,8 +11,8 @@
   setuptools,
   tomli,
   tomli-w,
-  types-pyyaml,
-  types-toml,
+  types-pyyaml ? null,
+  types-toml ? null,
   urllib3,
 }:
 
@@ -37,17 +37,17 @@ buildPythonPackage (finalAttrs: {
   propagatedBuildInputs = [
     pyyaml
     requests
-    types-pyyaml
-    types-toml
     urllib3
-  ];
+  ]
+  ++ lib.optional (types-pyyaml != null) types-pyyaml
+  ++ lib.optional (types-toml != null) types-toml;
 
   nativeCheckInputs = [
     pytest-asyncio
-    pytest-httpserver
     pytestCheckHook
     tomli-w
   ]
+  ++ lib.optional (pytest-httpserver != null) pytest-httpserver
   ++ lib.optionals (pythonOlder "3.11") [ tomli ];
 
   testPaths = [ "responses/tests" ];

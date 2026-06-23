@@ -2,7 +2,7 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
-  flit-scm,
+  flit-scm ? null,
   pytestCheckHook,
   pythonAtLeast,
   pythonOlder,
@@ -23,7 +23,7 @@ buildPythonPackage (finalAttrs: {
     hash = "sha256-b3Z1NsYKp0CecUq8kaC/j3xR/ZZHDIw4MhUeadizz88=";
   };
 
-  build-system = [ flit-scm ];
+  build-system = lib.optional (flit-scm != null) flit-scm;
 
   dependencies = lib.optionals (pythonOlder "3.13") [ typing-extensions ];
 

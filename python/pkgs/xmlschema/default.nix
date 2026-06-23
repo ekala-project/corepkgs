@@ -1,7 +1,7 @@
 {
   lib,
   buildPythonPackage,
-  elementpath,
+  elementpath ? null,
   fetchFromGitHub,
   jinja2,
   lxml,
@@ -26,7 +26,7 @@ buildPythonPackage (finalAttrs: {
 
   build-system = [ setuptools ];
 
-  dependencies = [ elementpath ];
+  dependencies = lib.optional (elementpath != null) elementpath;
 
   nativeCheckInputs = [
     jinja2

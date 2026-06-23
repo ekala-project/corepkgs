@@ -3,7 +3,7 @@
   buildPythonPackage,
   fetchFromGitHub,
   setuptools-scm,
-  inflect,
+  inflect ? null,
   more-itertools,
   pytestCheckHook,
 }:
@@ -29,8 +29,7 @@ buildPythonPackage (finalAttrs: {
     sed -i "/coherent\.licensed/d" pyproject.toml
   '';
 
-  dependencies = [
-    inflect
+  dependencies = lib.optional (inflect != null) inflect ++ [
     more-itertools
   ];
 
