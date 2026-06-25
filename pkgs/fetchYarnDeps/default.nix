@@ -9,10 +9,12 @@
   jq,
   nodejs,
   diffutils,
-  yarn ? null,
+  yarn,
   makeSetupHook,
   cacert,
   callPackage,
+  nodejsInstallExecutables,
+  nodejsInstallManuals,
 }:
 
 let
@@ -22,13 +24,11 @@ let
   };
 
   nodejs-slim = nodejs;
-  nodejsInstallManuals = null;
-  nodejsInstallExecutables = null;
 in
 lib.fix (self: {
   prefetch-yarn-deps = stdenv.mkDerivation {
     pname = "prefetch-yarn-deps";
-    version = lib.trivial.release;
+    version = "0-unstable";
 
     dontUnpack = true;
     dontBuild = true;
@@ -63,7 +63,7 @@ lib.fix (self: {
 
   fixup-yarn-lock = stdenv.mkDerivation {
     pname = "fixup-yarn-lock";
-    version = lib.trivial.release;
+    version = "0-unstable";
 
     dontUnpack = true;
     dontBuild = true;

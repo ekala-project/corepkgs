@@ -820,6 +820,7 @@ with final;
   buildGradlePackage = java.buildGradlePackage;
   buildNpmPackage = nodejs.buildNpmPackage;
   buildNpmApplication = nodejs.buildNpmApplication;
+  buildPnpmApplication = nodejs.buildPnpmApplication;
 
   # TODO(corepkgs): proper attrset of utilities
   gnome = { };
