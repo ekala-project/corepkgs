@@ -160,25 +160,21 @@ lib.fix (self: {
     in
     lib.setFunctionArgs f (lib.functionArgs f);
 
-  yarnConfigHook =
-    if yarn == null then
-      throw "yarnConfigHook requires yarn which is not available in core-pkgs yet"
-    else
-      makeSetupHook {
-        name = "yarn-config-hook";
-        propagatedBuildInputs = [
-          yarn
-          self.fixup-yarn-lock
-        ];
-        substitutions = {
-          # Specify `diff` by abspath to ensure that the user's build
-          # inputs do not cause us to find the wrong binaries.
-          diff = "${diffutils}/bin/diff";
-        };
-        meta = {
-          description = "Install nodejs dependencies from an offline yarn cache produced by fetchYarnDeps";
-        };
-      } ./yarn-config-hook.sh;
+  yarnConfigHook = makeSetupHook {
+    name = "yarn-config-hook";
+    propagatedBuildInputs = [
+      yarn
+      self.fixup-yarn-lock
+    ];
+    substitutions = {
+      # Specify `diff` by abspath to ensure that the user's build
+      # inputs do not cause us to find the wrong binaries.
+      diff = "${diffutils}/bin/diff";
+    };
+    meta = {
+      description = "Install nodejs dependencies from an offline yarn cache produced by fetchYarnDeps";
+    };
+  } ./yarn-config-hook.sh;
 
   yarnBuildHook = makeSetupHook {
     name = "yarn-build-hook";
@@ -187,22 +183,18 @@ lib.fix (self: {
     };
   } ./yarn-build-hook.sh;
 
-  yarnInstallHook =
-    if yarn == null then
-      throw "yarnInstallHook requires yarn which is not available in core-pkgs yet"
-    else
-      makeSetupHook {
-        name = "yarn-install-hook";
-        propagatedBuildInputs = [
-          yarn
-          nodejsInstallManuals
-          nodejsInstallExecutables
-        ];
-        substitutions = {
-          jq = lib.getExe jq;
-        };
-        meta = {
-          description = "Prune yarn dependencies and install files for packages using Yarn 1";
-        };
-      } ./yarn-install-hook.sh;
+  yarnInstallHook = makeSetupHook {
+    name = "yarn-install-hook";
+    propagatedBuildInputs = [
+      yarn
+      nodejsInstallManuals
+      nodejsInstallExecutables
+    ];
+    substitutions = {
+      jq = lib.getExe jq;
+    };
+    meta = {
+      description = "Prune yarn dependencies and install files for packages using Yarn 1";
+    };
+  } ./yarn-install-hook.sh;
 })

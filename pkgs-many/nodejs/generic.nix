@@ -102,6 +102,9 @@ stdenv.mkDerivation (finalAttrs: {
     buildPnpmApplication = callPackage ./build-pnpm-application.nix {
       nodejs = finalAttrs.finalPackage;
     };
+    buildYarnApplication = callPackage ./build-yarn-application.nix {
+      nodejs = finalAttrs.finalPackage;
+    };
   };
 
   meta = {

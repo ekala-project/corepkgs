@@ -743,6 +743,15 @@ with final;
   pnpmConfigHook = callPackage ./pkgs/pnpmConfigHook { };
   fetchPnpmDeps = callPackage ./pkgs/fetchPnpmDeps { };
 
+  inherit (callPackages ./pkgs/fetchYarnDeps { })
+    fetchYarnDeps
+    fixup-yarn-lock
+    prefetch-yarn-deps
+    yarnConfigHook
+    yarnBuildHook
+    yarnInstallHook
+    ;
+
   # TODO(corepkgs): This should be moved into unixtools
   procps = if stdenv.hostPlatform.isLinux then procps-ng else unixtools.procps;
 
@@ -821,6 +830,7 @@ with final;
   buildNpmPackage = nodejs.buildNpmPackage;
   buildNpmApplication = nodejs.buildNpmApplication;
   buildPnpmApplication = nodejs.buildPnpmApplication;
+  buildYarnApplication = nodejs.buildYarnApplication;
 
   # TODO(corepkgs): proper attrset of utilities
   gnome = { };

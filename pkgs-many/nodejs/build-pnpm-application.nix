@@ -93,7 +93,8 @@ stdenv.mkDerivation (
       pnpm
       pnpmConfigHook
       makeWrapper
-    ] ++ nativeBuildInputs;
+    ]
+    ++ nativeBuildInputs;
 
     inherit buildInputs;
 
