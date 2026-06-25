@@ -71,7 +71,10 @@ stdenv.mkDerivation {
   meta = {
     homepage = "https://hwmon.wiki.kernel.org/lm_sensors";
     description = "Tools for reading hardware sensors";
-    license = with lib.licenses; [ lgpl21Plus gpl2Plus ];
+    license = with lib.licenses; [
+      lgpl21Plus
+      gpl2Plus
+    ];
     maintainers = [ ];
     platforms = lib.platforms.linux;
     mainProgram = "sensors";

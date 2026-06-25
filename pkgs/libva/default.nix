@@ -35,35 +35,32 @@ stdenv.mkDerivation (finalAttrs: {
 
   depsBuildBuild = [ pkg-config ];
 
-  nativeBuildInputs =
-    [
-      meson
-      meson.configurePhaseHook
-      pkg-config
-      ninja
-    ]
-    ++ lib.optional (!minimal) wayland-scanner;
+  nativeBuildInputs = [
+    meson
+    meson.configurePhaseHook
+    pkg-config
+    ninja
+  ]
+  ++ lib.optional (!minimal) wayland-scanner;
 
-  buildInputs =
-    [
-      libdrm
-    ]
-    ++ lib.optionals (!minimal) [
-      libx11
-      libxcb
-      libxext
-      wayland
-      libffi
-    ]
-    ++ lib.optional (!minimal && libGL != null) libGL;
+  buildInputs = [
+    libdrm
+  ]
+  ++ lib.optionals (!minimal) [
+    libx11
+    libxcb
+    libxext
+    wayland
+    libffi
+  ]
+  ++ lib.optional (!minimal && libGL != null) libGL;
 
   mesonFlags = lib.optionals (stdenv.hostPlatform.isLinux && mesa != null) [
     "-Ddriverdir=${mesa.driverLink or "/run/opengl-driver"}/lib/dri:/usr/lib/dri:/usr/lib32/dri"
   ];
 
   env =
-    lib.optionalAttrs
-      (stdenv.cc.bintools.isLLVM && lib.versionAtLeast stdenv.cc.bintools.version "17")
+    lib.optionalAttrs (stdenv.cc.bintools.isLLVM && lib.versionAtLeast stdenv.cc.bintools.version "17")
       {
         NIX_LDFLAGS = "--undefined-version";
       }
@@ -76,16 +73,15 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://01.org/linuxmedia/vaapi";
     license = lib.licenses.mit;
     maintainers = [ ];
-    pkgConfigModules =
-      [
-        "libva"
-        "libva-drm"
-      ]
-      ++ lib.optionals (!minimal) [
-        "libva-glx"
-        "libva-wayland"
-        "libva-x11"
-      ];
+    pkgConfigModules = [
+      "libva"
+      "libva-drm"
+    ]
+    ++ lib.optionals (!minimal) [
+      "libva-glx"
+      "libva-wayland"
+      "libva-x11"
+    ];
     platforms = lib.platforms.unix;
   };
 })
