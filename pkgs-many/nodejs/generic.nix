@@ -96,6 +96,9 @@ stdenv.mkDerivation (finalAttrs: {
     buildNpmPackage = callPackage ./build-npm-package.nix {
       nodejs = finalAttrs.finalPackage;
     };
+    buildNpmApplication = callPackage ./build-npm-application.nix {
+      nodejs = finalAttrs.finalPackage;
+    };
   };
 
   meta = {
