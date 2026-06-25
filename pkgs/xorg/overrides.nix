@@ -18,6 +18,11 @@
   libdrm,
   mesa,
   udev,
+  # Packages that moved out of xorg scope to top-level with lowercase names
+  libx11,
+  libxcb,
+  libxpm,
+  libxrender,
   bootstrap_cmds,
   clangStdenv,
   autoreconfHook,
@@ -722,4 +727,10 @@ self: super: {
   });
 
   xwd = addMainProgram super.xwd { };
+
+  # Aliases for packages that were moved to top-level with lowercase names
+  # but are still referenced as xorg.libX11 etc. by some packages (e.g. texlive)
+  libX11 = libx11;
+  libXpm = libxpm;
+  libXrender = libxrender;
 }

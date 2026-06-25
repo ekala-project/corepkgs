@@ -10,16 +10,20 @@
   zlib,
   libiconv,
   libpng,
-  libX11 ? null,
+  libx11,
+  libX11 ? libx11,
   freetype,
   ttfautohint ? null,
   gd ? null,
-  libXaw ? null,
+  libxaw,
+  libXaw ? libxaw,
   icu,
   ghostscript,
   libXpm ? null,
-  libXmu ? null,
-  libXext ? null,
+  libxmu,
+  libXmu ? libxmu,
+  libxext,
+  libXext ? libxext,
   perl,
   perlPackages,
   python3Packages,
@@ -29,7 +33,7 @@
   libpaper,
   graphite2 ? null,
   zziplib ? null,
-  harfbuzz,
+  harfbuzz ? null,
   potrace ? null,
   gmp,
   mpfr,
@@ -674,26 +678,28 @@ rec {
     };
   };
 
-  asymptote = lib.optionalAttrs (args.asymptote != null) (
-    args.asymptote.overrideAttrs (
-      finalAttrs: prevAttrs: {
-        version = texlive.pkgs.asymptote.version;
+  asymptote =
+    if args ? asymptote && args.asymptote != null then
+      args.asymptote.overrideAttrs (
+        finalAttrs: prevAttrs: {
+          version = texlive.pkgs.asymptote.version;
 
-        # keep local src and patches even if duplicated in the top level asymptote
-        # so that top level updates do not break texlive
-        src = fetchurl {
-          url = "mirror://sourceforge/asymptote/${finalAttrs.version}/asymptote-${finalAttrs.version}.src.tgz";
-          hash = "sha256-+T0n2SX9C8Mz0Fb+vkny1x+TWETC+NN67MjfD+6Twys=";
-        };
+          # keep local src and patches even if duplicated in the top level asymptote
+          # so that top level updates do not break texlive
+          src = fetchurl {
+            url = "mirror://sourceforge/asymptote/${finalAttrs.version}/asymptote-${finalAttrs.version}.src.tgz";
+            hash = "sha256-+T0n2SX9C8Mz0Fb+vkny1x+TWETC+NN67MjfD+6Twys=";
+          };
 
-        texContainer = texlive.pkgs.asymptote.tex;
-        texdocContainer = texlive.pkgs.asymptote.texdoc;
+          texContainer = texlive.pkgs.asymptote.tex;
+          texdocContainer = texlive.pkgs.asymptote.texdoc;
 
-        # build issue with asymptote 2.95 has been fixed
-        postConfigure = "";
-      }
-    )
-  );
+          # build issue with asymptote 2.95 has been fixed
+          postConfigure = "";
+        }
+      )
+    else
+      null;
 
   inherit biber;
   inherit biber-ms;

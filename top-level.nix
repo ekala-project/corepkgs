@@ -664,11 +664,8 @@ with final;
   # Packages that use `libGLX` on macOS may need to depend on
   # `mesa_glu` directly if this doesn’t work.
   # TODO(corepkgs): add mesa_glu package
-  libGLU =
-    if stdenv.hostPlatform.isDarwin then
-      null
-    else
-      throw "libGLU: mesa_glu is not yet available in core-pkgs";
+  # TODO(corepkgs): add mesa_glu package
+  libGLU = null;
 
   # `libglvnd` does not work (yet?) on macOS.
   libGLX = if stdenv.hostPlatform.isDarwin then mesa else libglvnd;
@@ -677,18 +674,13 @@ with final;
   # that use `libGLX` on macOS may need to depend on `freeglut`
   # directly if this doesn’t work.
   # TODO(corepkgs): add freeglut package
-  libglut =
-    if stdenv.hostPlatform.isDarwin then
-      null
-    else
-      throw "libglut: freeglut is not yet available in core-pkgs";
-  # TODO(corepkgs): mesa needs glslang, libdisplay-info, libva, directx-headers, etc.
-  mesa =
-    if stdenv.hostPlatform.isDarwin then
-      callPackage ./pkgs/mesa/darwin.nix { }
-    else
-      throw "mesa: requires glslang, libdisplay-info, libva and other packages not yet in core-pkgs";
-  mesa_i686 = null;
+  libglut = null;
+  libva-minimal = callPackage ./pkgs/libva { minimal = true; };
+  mesa = callPackage ./pkgs/mesa { };
+  valgrind-light = (valgrind.override { gdb = null; }).overrideAttrs (old: {
+    meta = old.meta // { description = "${old.meta.description} (without GDB)"; };
+  });
+  mesa_i686 = null; # TODO(corepkgs): needs pkgsi686Linux
   libgbm = callPackage ./pkgs/mesa/gbm.nix { };
   mesa-gl-headers = callPackage ./pkgs/mesa/headers.nix { };
 
@@ -1564,9 +1556,8 @@ with final;
   };
   # We do not want to include ukify in the normal systemd attribute as it
   # relies on Python at runtime.
-  systemdUkify = systemd.override {
-    withUkify = true;
-  };
+  # TODO(corepkgs): needs python3Packages.pefile
+  systemdUkify = throw "systemdUkify: python3Packages.pefile is not yet available in core-pkgs";
   udev = if lib.meta.availableOn stdenv.hostPlatform systemdLibs then systemdLibs else libudev-zero;
 
   inherit (callPackages ./pkgs/docbook-xsl { })
