@@ -52,9 +52,7 @@ let
       aliasesExpr;
 
   # Resolve string aliases (e.g. "v22") to actual variant attrsets from variantsRaw
-  aliases' = builtins.mapAttrs (
-    _: v: if builtins.isString v then variantsRaw.${v} else v
-  ) aliasesRaw;
+  aliases' = builtins.mapAttrs (_: v: if builtins.isString v then variantsRaw.${v} else v) aliasesRaw;
 
   variants' =
     if config.allowAliases then

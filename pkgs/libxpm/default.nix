@@ -50,7 +50,10 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description = "X Pixmap (XPM) image file format library";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxpm";
-    license = with lib.licenses; [ x11 mit ];
+    license = with lib.licenses; [
+      x11
+      mit
+    ];
     mainProgram = "sxpm";
     maintainers = [ ];
     pkgConfigModules = [ "xpm" ];

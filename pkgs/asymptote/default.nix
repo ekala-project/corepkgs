@@ -94,9 +94,7 @@ stdenv.mkDerivation (finalAttrs: {
       imagemagick
       boost
     ]
-    ++ lib.optionals stdenv.hostPlatform.isLinux (
-      lib.filter (x: x != null) [ libtirpc ]
-    );
+    ++ lib.optionals stdenv.hostPlatform.isLinux (lib.filter (x: x != null) [ libtirpc ]);
 
   propagatedBuildInputs =
     lib.filter (x: x != null) [ glm ]

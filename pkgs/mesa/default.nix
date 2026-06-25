@@ -261,44 +261,43 @@ stdenv.mkDerivation {
 
   strictDeps = true;
 
-  buildInputs =
-    [
-      directx-headers
-      elfutils
-      expat
-      spirv-tools
-      libdisplay-info
-      libdrm
-      libgbm
-      libglvnd
-      libpng
-      libunwind
-      libva-minimal
-      libx11
-      libxcb
-      xorg.libXext
-      xorg.libXfixes
-      xorg.libXrandr
-      libxshmfence
-      xorg.libXxf86vm
-      llvmPackages.clang
-      llvmPackages.clang-unwrapped
-      llvmPackages.libclc
-      llvmPackages.libllvm
-      lm_sensors
-      python3Packages.python # for shebang
-      spirv-llvm-translator
-      udev
-      vulkan-loader
-      wayland
-      wayland-protocols
-      xcbutilkeysyms
-      xorgproto
-      zstd
-    ]
-    ++ lib.optionals withValgrind [
-      valgrind-light
-    ];
+  buildInputs = [
+    directx-headers
+    elfutils
+    expat
+    spirv-tools
+    libdisplay-info
+    libdrm
+    libgbm
+    libglvnd
+    libpng
+    libunwind
+    libva-minimal
+    libx11
+    libxcb
+    xorg.libXext
+    xorg.libXfixes
+    xorg.libXrandr
+    libxshmfence
+    xorg.libXxf86vm
+    llvmPackages.clang
+    llvmPackages.clang-unwrapped
+    llvmPackages.libclc
+    llvmPackages.libllvm
+    lm_sensors
+    python3Packages.python # for shebang
+    spirv-llvm-translator
+    udev
+    vulkan-loader
+    wayland
+    wayland-protocols
+    xcbutilkeysyms
+    xorgproto
+    zstd
+  ]
+  ++ lib.optionals withValgrind [
+    valgrind-light
+  ];
 
   depsBuildBuild = [
     pkg-config

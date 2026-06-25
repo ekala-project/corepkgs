@@ -29,14 +29,13 @@ stdenv.mkDerivation (finalAttrs: {
 
   depsBuildBuild = [ pkg-config ];
 
-  nativeBuildInputs =
-    [
-      meson
-      meson.configurePhaseHook
-      pkg-config
-      ninja
-    ]
-    ++ lib.optional (stdenv.hostPlatform != stdenv.buildPlatform) wayland-scanner;
+  nativeBuildInputs = [
+    meson
+    meson.configurePhaseHook
+    pkg-config
+    ninja
+  ]
+  ++ lib.optional (stdenv.hostPlatform != stdenv.buildPlatform) wayland-scanner;
 
   buildInputs = [
     expat
