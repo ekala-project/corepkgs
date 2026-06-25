@@ -819,6 +819,7 @@ with final;
   buildMavenPackage = java.buildMavenPackage;
   buildGradlePackage = java.buildGradlePackage;
   buildNpmPackage = nodejs.buildNpmPackage;
+  buildNpmApplication = nodejs.buildNpmApplication;
 
   # TODO(corepkgs): proper attrset of utilities
   gnome = { };
