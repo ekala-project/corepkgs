@@ -13,7 +13,8 @@
   writeText,
   buildEnv,
   callPackage,
-  ghostscript_headless ? null,
+  ghostscript,
+  ghostscript_headless ? ghostscript,
   harfbuzz,
   makeWrapper,
   installShellFiles,
@@ -49,10 +50,14 @@ let
   # various binaries (compiled)
   bin = callPackage ./bin.nix {
     ghostscript = ghostscript_headless;
-    harfbuzz = harfbuzz.override {
-      withIcu = true;
-      withGraphite2 = true;
-    };
+    harfbuzz =
+      if harfbuzz != null then
+        harfbuzz.override {
+          withIcu = true;
+          withGraphite2 = true;
+        }
+      else
+        null;
     inherit useFixedHashes;
     tlpdb = overriddenTlpdb;
   };

@@ -38,8 +38,12 @@
   wayland,
   wayland-protocols,
   wayland-scanner,
+  libx11,
+  libxcb,
+  libxshmfence,
   xcbutilkeysyms,
   xorg,
+  xorgproto,
   zstd,
   enablePatentEncumberedCodecs ? true,
   withValgrind ? lib.meta.availableOn stdenv.hostPlatform valgrind-light,
@@ -258,7 +262,6 @@ stdenv.mkDerivation {
   strictDeps = true;
 
   buildInputs =
-    with xorg;
     [
       directx-headers
       elfutils
@@ -273,11 +276,11 @@ stdenv.mkDerivation {
       libva-minimal
       libx11
       libxcb
-      libXext
-      libXfixes
-      libXrandr
+      xorg.libXext
+      xorg.libXfixes
+      xorg.libXrandr
       libxshmfence
-      libXxf86vm
+      xorg.libXxf86vm
       llvmPackages.clang
       llvmPackages.clang-unwrapped
       llvmPackages.libclc
