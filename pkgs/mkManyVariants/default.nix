@@ -42,7 +42,7 @@ let
   # Do not use callFromScope as the genericExpr should get called from package scope later
   genericExpr = importIfPath genericBuilder;
 
-  aliases' =
+  aliasesRaw =
     if builtins.isFunction aliasesExpr then
       aliasesExpr {
         inherit lib;
@@ -50,6 +50,12 @@ let
       }
     else
       aliasesExpr;
+
+  # Resolve string aliases (e.g. "v22") to actual variant attrsets from variantsRaw
+  aliases' = builtins.mapAttrs (
+    _: v: if builtins.isString v then variantsRaw.${v} else v
+  ) aliasesRaw;
+
   variants' =
     if config.allowAliases then
       # Not sure if aliases or variants should have priority
