@@ -24,7 +24,8 @@ with final;
   qt5 = null;
   libsForQt5 = null;
   qt6 = null;
-  haskellPackages = null;
+  haskell = callPackage ./haskell { inherit config; };
+  haskellPackages = haskell.packages.ghc984Binary;
   ocamlPackages = null;
 
   # Linux kernel packages (for ekaos and other system builders)
