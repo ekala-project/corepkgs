@@ -1,7 +1,5 @@
 let
-  allKernels = builtins.fromJSON (
-    builtins.readFile ../../pkgs/linux-support/kernel/kernels-org.json
-  );
+  allKernels = builtins.fromJSON (builtins.readFile ../../pkgs/linux-support/kernel/kernels-org.json);
 in
 {
   v5_10 = {

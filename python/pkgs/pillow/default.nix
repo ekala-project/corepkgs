@@ -140,7 +140,6 @@ buildPythonPackage rec {
 
   passthru.tests = {
     inherit
-      imageio
       matplotlib
       pilkit
       pydicom
