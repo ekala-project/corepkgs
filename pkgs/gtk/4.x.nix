@@ -56,7 +56,6 @@
   libexecinfo,
   broadwaySupport ? true,
   testers,
-  darwinMinVersionHook,
 }:
 
 let

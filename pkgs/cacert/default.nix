@@ -26,7 +26,7 @@ let
     description = "Bundle of X.509 certificates of public Certificate Authorities (CA)";
     platforms = lib.platforms.all;
     maintainers = with lib.maintainers; [ ];
-    teams = [ lib.teams.security-review ];
+    teams = [ ];
     license = lib.licenses.mpl20;
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "mozilla" version // {
       product = "nss";

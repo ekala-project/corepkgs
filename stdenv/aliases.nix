@@ -94,10 +94,10 @@ mapAliases {
   linuxPackages_5_10 = linux.v5_10.pkgs;
   linuxPackages_5_15 = linux.v5_15.pkgs;
   linuxPackages_6_1 = linux.v6_1.pkgs;
-  linuxPackages_6_6 = linux.v6_6.pkgs;
   linuxPackages_6_12 = linux.v6_12.pkgs;
   linuxPackages_6_17 = linux.v6_17.pkgs;
   linuxPackages_6_18 = linux.v6_18.pkgs;
+  linuxPackages_6_6 = linux.v6_6.pkgs;
   linuxPackages_latest = linux.v6_18.pkgs;
   lld_18 = llvm.v18.pkgs.lld;
   lld_19 = llvm.v19.pkgs.lld;

@@ -9,7 +9,6 @@
   buildPackages,
   libiconv,
   curl,
-  apacheHttpd,
   testers,
 }:
 
