@@ -51,58 +51,74 @@ let
     else
       aliasesExpr;
 
-  # Resolve string aliases (e.g. "v22") to actual variant attrsets from variantsRaw
-  aliases' = builtins.mapAttrs (_: v: if builtins.isString v then variantsRaw.${v} else v) aliasesRaw;
-
-  variants' =
-    if config.allowAliases then
-      # Not sure if aliases or variants should have priority
-      variantsRaw // aliases'
-    else
-      variantsRaw;
-
-  defaultVariant = defaultSelector variants';
-
-  mkVariantPassthru =
-    variantArgs:
+  # Core variant-building logic, parameterized on the raw variant set.
+  # This allows extendVariants to re-derive everything with additional variants.
+  mkSet =
+    rawVariants:
     let
-      variants = builtins.mapAttrs (_: v: mkPackage (variantArgs // v)) variants';
-    in
-    variants // { inherit variants; };
+      # Resolve string aliases against the current raw variants
+      aliases' = builtins.mapAttrs (_: v: if builtins.isString v then rawVariants.${v} else v) aliasesRaw;
 
-  # This also allows for additional attrs to be passed through besides variant and src
-  mkVariantArgs =
-    { version, ... }@args:
-    args
-    // rec {
-      # Some helpers commonly used to determine packaging behavior
-      packageOlder = lib.versionOlder version;
-      packageAtLeast = lib.versionAtLeast version;
-      packageBetween = lower: higher: packageAtLeast lower && packageOlder higher;
-      # For variants to compose, the package expressions must do `passthru = mkVariantPassthru variantArgs`
-      # This allows for built variant args to be remembered, trying to do this construction
-      # before getting callPackage'd leads to infinite recursion as it's not lazy
-      inherit mkVariantPassthru;
+      currentVariants = if config.allowAliases then rawVariants // aliases' else rawVariants;
+
+      defaultVariant = defaultSelector currentVariants;
+
+      mkVariantPassthru =
+        variantArgs:
+        let
+          vs = builtins.mapAttrs (_: v: mkPackage (variantArgs // v)) currentVariants;
+        in
+        vs // { variants = vs; };
+
+      # This also allows for additional attrs to be passed through besides variant and src
+      mkVariantArgs =
+        { version, ... }@args:
+        args
+        // rec {
+          # Some helpers commonly used to determine packaging behavior
+          packageOlder = lib.versionOlder version;
+          packageAtLeast = lib.versionAtLeast version;
+          packageBetween = lower: higher: packageAtLeast lower && packageOlder higher;
+          # For variants to compose, the package expressions must do `passthru = mkVariantPassthru variantArgs`
+          # This allows for built variant args to be remembered, trying to do this construction
+          # before getting callPackage'd leads to infinite recursion as it's not lazy
+          inherit mkVariantPassthru;
+        };
+
+      # Re-call the generic builder with new variant args, re-wrap with makeOverridable
+      # to give it the same appearance as being called by callPackage
+      mkPackage =
+        variant:
+        let
+          variantArgs = mkVariantArgs (defaultVariant // variant);
+          pkg = callPackage (genericExpr variantArgs) { };
+        in
+        pkg.overrideAttrs (o: {
+          passthru =
+            o.passthru or { }
+            // mkVariantPassthru variantArgs
+            // {
+              inherit variantArgs;
+              extendVariants = extendVariantsFn rawVariants;
+            };
+        });
+
+    in
+    {
+      inherit mkVariantPassthru currentVariants;
     };
 
-  # Re-call the generic builder with new variant args, re-wrap with makeOverridable
-  # to give it the same appearance as being called by callPackage
-  mkPackage =
-    variant:
+  # Extend the variant set with additional variant definitions.
+  # Returns the default package of the extended set (with all variants in passthru).
+  extendVariantsFn =
+    baseRawVariants: extraVariants:
     let
-      variantArgs = mkVariantArgs (defaultVariant // variant);
-      pkg = callPackage (genericExpr variantArgs) { };
+      extended = mkSet (baseRawVariants // extraVariants);
     in
-    pkg.overrideAttrs (o: {
-      passthru =
-        o.passthru or { }
-        // mkVariantPassthru variantArgs
-        // {
-          inherit variantArgs;
-        };
-    });
+    defaultSelector (extended.mkVariantPassthru extended.currentVariants);
 
-  defaultPackage = defaultSelector (mkVariantPassthru variants');
+  topSet = mkSet variantsRaw;
+  defaultPackage = defaultSelector (topSet.mkVariantPassthru topSet.currentVariants);
 in
 # The calling scope will apply `callPackage`, so we need to return the partially
 # applied function
