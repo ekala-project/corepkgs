@@ -12,6 +12,10 @@
   ./system/activation.nix
   ./system/etc.nix
 
+  # Tasks
+  ./tasks/filesystems.nix
+  ./tasks/swap.nix
+
   # Config modules
   ./config/users-groups.nix
   ./networking.nix

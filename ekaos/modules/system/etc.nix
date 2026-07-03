@@ -124,18 +124,7 @@ in
 
     # Essential /etc files for a bootable system
     environment.etc = {
-      "fstab".text = ''
-        # Static file system configuration
-        # Managed by ekaos
-
-        # Special filesystems
-        proc /proc proc defaults 0 0
-        sysfs /sys sysfs defaults 0 0
-        devtmpfs /dev devtmpfs mode=0755,nosuid 0 0
-        devpts /dev/pts devpts mode=0620,gid=3,nosuid,noexec 0 0
-        tmpfs /run tmpfs mode=0755,nosuid,nodev,size=25% 0 0
-        tmpfs /dev/shm tmpfs mode=1777,nosuid,nodev 0 0
-      '';
+      # fstab is now managed by tasks/filesystems.nix
 
       "os-release".text = ''
         NAME="ekaos"
