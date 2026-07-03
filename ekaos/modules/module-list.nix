@@ -16,6 +16,8 @@
   ./config/users-groups.nix
   ./networking.nix
   ./network-interfaces.nix
+  ./networking/firewall.nix
+  ./networking/dns-zones.nix
 
   # Security modules
   ./security/pam.nix
