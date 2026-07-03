@@ -163,10 +163,19 @@ in
         fi
 
         # Aliases
-        alias ls='ls --color=auto'
-        alias ll='ls -lh'
-        alias la='ls -lah'
-        alias grep='grep --color=auto'
+        ${concatStringsSep "\n" (
+          mapAttrsToList (name: value: "alias ${name}=${escapeShellArg value}") (
+            config.programs.bash.shellAliases or {
+              ls = "ls --color=auto";
+              ll = "ls -lh";
+              la = "ls -lah";
+              grep = "grep --color=auto";
+            }
+          )
+        )}
+
+        # Interactive shell initialization
+        ${config.programs.bash.interactiveInit or ""}
 
         # Source user's bashrc if it exists
         [ -f ~/.bashrc ] && source ~/.bashrc
@@ -178,19 +187,33 @@ in
         # Set up PATH
         export PATH="/run/current-system/sw/bin:/run/wrappers/bin:/usr/bin:/bin"
 
-        # Set up default environment variables
-        export LANG="C.UTF-8"
-        export PAGER="less"
-        export EDITOR="vi"
+        # Locale (from i18n.defaultLocale)
+        if [ -f /etc/locale.conf ]; then
+          . /etc/locale.conf
+          export LANG
+        fi
+
+        # User-defined environment variables
+        ${concatStringsSep "\n" (
+          mapAttrsToList (name: value: "export ${name}=${escapeShellArg (toString value)}") (
+            config.environment.variables or { }
+          )
+        )}
 
         # XDG base directories
         export XDG_DATA_DIRS="/run/current-system/sw/share''${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
         export XDG_CONFIG_DIRS="/etc/xdg''${XDG_CONFIG_DIRS:+:$XDG_CONFIG_DIRS}"
 
+        # System shell initialization
+        ${config.environment.shell.init or ""}
+
         # Source bash-specific profile
         if [ -n "$BASH_VERSION" ]; then
           [ -f /etc/bashrc ] && source /etc/bashrc
         fi
+
+        # Login shell initialization
+        ${config.environment.shell.loginInit or ""}
 
         # Source user's profile if it exists
         [ -f ~/.profile ] && source ~/.profile

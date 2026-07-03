@@ -18,6 +18,9 @@
 
   # Config modules
   ./config/users-groups.nix
+  ./config/locale.nix
+  ./config/shell-environment.nix
+  ./config/nix-daemon.nix
   ./networking.nix
   ./network-interfaces.nix
   ./networking/firewall.nix

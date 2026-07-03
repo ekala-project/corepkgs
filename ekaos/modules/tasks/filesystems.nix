@@ -39,11 +39,7 @@ let
   fstabLine =
     fs:
     let
-      device =
-        if fs.label != null then
-          "/dev/disk/by-label/${escape fs.label}"
-        else
-          escape fs.device;
+      device = if fs.label != null then "/dev/disk/by-label/${escape fs.label}" else escape fs.device;
       mountPoint = escape fs.mountPoint;
       fsType = fs.fsType;
       options = concatStringsSep "," fs.options;
@@ -71,11 +67,7 @@ let
   swapFstab = concatMapStringsSep "\n" (
     dev:
     let
-      device =
-        if dev.label or null != null then
-          "/dev/disk/by-label/${dev.label}"
-        else
-          dev.device;
+      device = if dev.label or null != null then "/dev/disk/by-label/${dev.label}" else dev.device;
     in
     "${device} none swap ${concatStringsSep "," (dev.options or [ "defaults" ])} 0 0"
   ) swapDevices;
