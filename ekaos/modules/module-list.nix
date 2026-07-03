@@ -41,6 +41,9 @@
   ./service-managers/launchd.nix
   ./service-managers/rcd.nix
 
+  # Monitoring
+  ./monitoring/prometheus-scrape.nix
+
   # Miscellaneous
   ./misc/assertions.nix # Assertion checking
   ./misc/defaults.nix # System defaults (including default service manager)
