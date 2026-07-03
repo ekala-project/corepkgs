@@ -176,12 +176,21 @@ in
       # Extract user specifications
       userSpecs = extractUsers services;
 
+      # Auto-derive exposed ports from port contracts when not explicitly provided
+      autoExposedPorts = concatLists (
+        mapAttrsToList (
+          _: cfg: mapAttrsToList (_: pc: "${toString pc.port}/${pc.protocol or "tcp"}") (cfg.ports or { })
+        ) (filterAttrs (_: cfg: cfg.enable) services)
+      );
+
+      effectiveExposedPorts = if exposedPorts != [ ] then exposedPorts else lib.unique autoExposedPorts;
+
       # Convert exposed ports to Docker format
       exposedPortsConfig = builtins.listToAttrs (
         map (port: {
           name = port;
           value = { };
-        }) exposedPorts
+        }) effectiveExposedPorts
       );
 
       # Determine if we're using nixpkgs dockerTools or need to import

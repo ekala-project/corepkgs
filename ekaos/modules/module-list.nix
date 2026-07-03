@@ -33,6 +33,7 @@
   ./network-interfaces.nix
   ./networking/firewall.nix
   ./networking/dns-zones.nix
+  ./networking/port-contracts.nix
   ./networking/wireguard.nix
 
   # Security modules
