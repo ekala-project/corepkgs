@@ -7,6 +7,8 @@
 let
   inherit (pkgs) lib;
   serviceLib = import ./lib/service-module.nix { inherit lib pkgs; };
+  timerLib = import ./lib/timer-module.nix { inherit lib pkgs; };
+  tmpfilesLib = import ./lib/tmpfiles-module.nix { inherit lib pkgs; };
 
   # Evaluate a service configuration
   evalServices =
@@ -112,6 +114,53 @@ let
         ;
     };
 
+  # Evaluate timer configuration
+  evalTimers =
+    timersConfig:
+    let
+      eval = lib.evalModules {
+        modules = [
+          {
+            options.timers = timerLib.mkTimersOption;
+            config.timers = timersConfig;
+          }
+        ];
+      };
+    in
+    eval.config.timers;
+
+  # Build systemd timer files
+  buildSystemdTimers =
+    timersConfig:
+    let
+      timers = evalTimers timersConfig;
+    in
+    timerLib.mkSystemdTimers timers;
+
+  # Build launchd scheduled agent plists
+  buildLaunchdTimerAgents =
+    timersConfig:
+    let
+      timers = evalTimers timersConfig;
+    in
+    timerLib.mkLaunchdTimerAgents timers;
+
+  # Build runit timer services + crontab entries
+  buildRunitTimers =
+    timersConfig:
+    let
+      timers = evalTimers timersConfig;
+    in
+    timerLib.mkRunitTimers timers;
+
+  # Build BSD crontab entries
+  buildRcdTimers =
+    timersConfig:
+    let
+      timers = evalTimers timersConfig;
+    in
+    timerLib.mkRcdTimers timers;
+
 in
 {
   inherit
@@ -124,8 +173,15 @@ in
     buildRcdServices
     buildRcdServicesOpenBSD
     buildRunitDockerImage
+    evalTimers
+    buildSystemdTimers
+    buildLaunchdTimerAgents
+    buildRunitTimers
+    buildRcdTimers
     ;
 
   # Export library functions
   lib = serviceLib;
+  timerLib = timerLib;
+  tmpfilesLib = tmpfilesLib;
 }

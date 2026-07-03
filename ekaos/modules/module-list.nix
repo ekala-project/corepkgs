@@ -6,6 +6,10 @@
   ./boot/initrd.nix
   ./boot/stage-2.nix
   ./boot/systemd-boot.nix
+  ./boot/modprobe.nix
+
+  # Hardware
+  ./hardware/firmware.nix
 
   # System modules
   ./system/toplevel.nix
@@ -15,6 +19,8 @@
   # Tasks
   ./tasks/filesystems.nix
   ./tasks/swap.nix
+  ./tasks/timers.nix
+  ./tasks/tmpfiles.nix
 
   # Config modules
   ./config/users-groups.nix
