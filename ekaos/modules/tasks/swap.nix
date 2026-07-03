@@ -16,11 +16,7 @@ let
   swapFstabLines = concatMapStringsSep "\n" (
     dev:
     let
-      device =
-        if dev.label != null then
-          "/dev/disk/by-label/${dev.label}"
-        else
-          dev.device;
+      device = if dev.label != null then "/dev/disk/by-label/${dev.label}" else dev.device;
       options = concatStringsSep "," dev.options;
     in
     "${device} none swap ${options} 0 0"
@@ -143,33 +139,35 @@ in
   config = mkMerge [
     # Append swap entries to fstab
     (mkIf (enabledDevices != [ ]) {
-      system.activationScripts.swap = stringAfter [
-        "etc"
-        "filesystems"
-      ] ''
-        ${concatMapStringsSep "\n" (
-          dev:
-          let
-            device =
-              if dev.label != null then "/dev/disk/by-label/${dev.label}" else dev.device;
-          in
+      system.activationScripts.swap =
+        stringAfter
+          [
+            "etc"
+            "filesystems"
+          ]
           ''
-            # Activate swap: ${device}
-            ${optionalString (dev.size != null) ''
-              # Create swap file if it doesn't exist
-              if [ ! -f "${device}" ]; then
-                echo "Creating swap file ${device} (${toString dev.size} MiB)..."
-                dd if=/dev/zero of="${device}" bs=1M count=${toString dev.size} 2>/dev/null
-                chmod 600 "${device}"
-                ${pkgs.util-linux}/bin/mkswap "${device}"
-              fi
-            ''}
-            ${pkgs.util-linux}/bin/swapon ${
-              optionalString (dev.priority != null) "-p ${toString dev.priority}"
-            } "${device}" 2>/dev/null || true
-          ''
-        ) enabledDevices}
-      '';
+            ${concatMapStringsSep "\n" (
+              dev:
+              let
+                device = if dev.label != null then "/dev/disk/by-label/${dev.label}" else dev.device;
+              in
+              ''
+                # Activate swap: ${device}
+                ${optionalString (dev.size != null) ''
+                  # Create swap file if it doesn't exist
+                  if [ ! -f "${device}" ]; then
+                    echo "Creating swap file ${device} (${toString dev.size} MiB)..."
+                    dd if=/dev/zero of="${device}" bs=1M count=${toString dev.size} 2>/dev/null
+                    chmod 600 "${device}"
+                    ${pkgs.util-linux}/bin/mkswap "${device}"
+                  fi
+                ''}
+                ${pkgs.util-linux}/bin/swapon ${
+                  optionalString (dev.priority != null) "-p ${toString dev.priority}"
+                } "${device}" 2>/dev/null || true
+              ''
+            ) enabledDevices}
+          '';
     })
 
     # Zram swap
