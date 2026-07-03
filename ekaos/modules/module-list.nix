@@ -21,6 +21,7 @@
   ./security/pam.nix
   ./security/wrappers
   ./security/sudo.nix
+  ./security/acme.nix
 
   # Service modules
   ./services/getty.nix
