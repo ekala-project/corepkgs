@@ -156,5 +156,21 @@ in
         This creates a reverse ordering dependency.
       '';
     };
+
+    ports = mkOption {
+      type = types.attrsOf (types.submodule serviceTypes.portContract);
+      default = { };
+      example = literalExpression ''
+        {
+          http = { port = 8080; hostname = "myapp.example.com"; };
+          metrics = { port = 9090; internal = true; };
+        }
+      '';
+      description = ''
+        Ports this service listens on, keyed by a logical name.
+        Used for port collision detection, firewall auto-configuration,
+        reverse proxy auto-configuration, and Docker port exposure.
+      '';
+    };
   };
 }

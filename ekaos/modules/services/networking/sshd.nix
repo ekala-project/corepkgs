@@ -107,6 +107,14 @@ in
         description = "Systemd-specific options";
       };
 
+      ports = mkOption {
+        type = types.attrsOf (
+          types.submodule (import ../../../../services/lib/types.nix { inherit lib; }).portContract
+        );
+        default = { };
+        description = "Port contracts for this service.";
+      };
+
       settings = mkOption {
         type = types.submodule {
           options = {
@@ -228,6 +236,15 @@ in
       ];
       user = "root";
       restartPolicy = "always";
+
+      # Port contract
+      ports.ssh = {
+        port = cfg.settings.ports;
+        protocol = "tcp";
+        transport = "tcp";
+        internal = true;
+        openFirewall = true;
+      };
 
       # Systemd-specific options
       systemd = {

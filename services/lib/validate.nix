@@ -144,6 +144,75 @@ let
     in
     warnings;
 
+  # Check port contract consistency for a single service
+  checkPortContractConsistency =
+    name: config:
+    let
+      portContracts = config.ports or { };
+      httpTransports = [
+        "http"
+        "https"
+        "http2"
+        "grpc"
+      ];
+    in
+    lib.concatLists (
+      lib.mapAttrsToList (
+        portName: pc:
+        let
+          prefix = "service '${name}' port '${portName}'";
+        in
+        [ ]
+        # tls.acme requires hostname
+        ++ optional (pc.tls.acme or false && pc.hostname or null == null) (
+          mkError "${prefix}: tls.acme = true requires hostname to be set"
+        )
+        # tls.acme requires HTTP-family transport
+        ++ optional (pc.tls.acme or false && !(builtins.elem (pc.transport or "http") httpTransports)) (
+          mkError "${prefix}: tls.acme = true requires transport to be http, https, http2, or grpc"
+        )
+        # healthCheck.path requires HTTP-family transport
+        ++ optional (
+          pc.healthCheck.path or null != null && !(builtins.elem (pc.transport or "http") httpTransports)
+        ) (mkWarning "${prefix}: healthCheck.path is set but transport '${pc.transport}' is not HTTP-based")
+        # openFirewall + internal is contradictory
+        ++ optional (pc.openFirewall or false && pc.internal or false) (
+          mkWarning "${prefix}: openFirewall = true with internal = true is contradictory"
+        )
+      ) portContracts
+    );
+
+  # Check for port collisions across all services
+  checkPortCollisions =
+    services:
+    let
+      # Collect all (port, protocol, serviceName, portName) tuples
+      allPorts = lib.concatLists (
+        lib.mapAttrsToList (
+          svcName: cfg:
+          lib.mapAttrsToList (portName: pc: {
+            inherit svcName portName;
+            port = pc.port;
+            protocol = pc.protocol or "tcp";
+            key = "${toString pc.port}/${pc.protocol or "tcp"}";
+          }) (cfg.ports or { })
+        ) services
+      );
+
+      # Group by key
+      grouped = lib.groupBy (p: p.key) allPorts;
+
+      # Find collisions (groups with more than one entry)
+      collisions = lib.filterAttrs (_: es: builtins.length es > 1) grouped;
+    in
+    lib.mapAttrsToList (
+      key: entries:
+      let
+        serviceNames = map (e: "${e.svcName}.${e.portName}") entries;
+      in
+      mkError "Port collision on ${key}: claimed by ${lib.concatStringsSep ", " serviceNames}"
+    ) collisions;
+
   # Check for missing required dependencies
   checkRequiredDependencies =
     config:
@@ -205,7 +274,8 @@ let
         checkPlatformSpecificOptions builder config
         ++ checkUnsupportedCommonOptions builder config
         ++ checkRequiredDependencies config
-        ++ checkConfigConflicts config;
+        ++ checkConfigConflicts config
+        ++ checkPortContractConsistency name config;
 
       # Separate errors and warnings
       errors = builtins.filter (issue: issue.type == "error") issues;
@@ -256,15 +326,24 @@ let
       # Validate each service
       results = lib.mapAttrsToList (name: config: validateService builder name config) services;
 
+      # Cross-service port collision check
+      portCollisionErrors = checkPortCollisions services;
+
       # Collect all results with issues
       resultsWithIssues = builtins.filter (r: r.hasErrors || r.hasWarnings) results;
 
-      # Check if any have errors
-      anyErrors = builtins.any (r: r.hasErrors) results;
+      # Check if any have errors (per-service or cross-service)
+      anyErrors = builtins.any (r: r.hasErrors) results || portCollisionErrors != [ ];
 
       # Format all results
       formattedResults = map formatValidationResult resultsWithIssues;
-      allMessages = concatStringsSep "\n" formattedResults;
+      portCollisionMessages = map (e: "  × ${e.message}") portCollisionErrors;
+      portCollisionSection =
+        if portCollisionErrors != [ ] then
+          "\nPort Collisions:\n${concatStringsSep "\n" portCollisionMessages}\n"
+        else
+          "";
+      allMessages = concatStringsSep "\n" formattedResults + portCollisionSection;
     in
     if anyErrors then
       throw ''
@@ -296,6 +375,8 @@ in
     validateService
     validateServices
     formatValidationResult
+    checkPortCollisions
+    checkPortContractConsistency
     mkError
     mkWarning
     ;

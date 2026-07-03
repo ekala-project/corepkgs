@@ -21,8 +21,12 @@ let
   ];
 
   # Build a single node configuration
+  # When peerHosts is provided, injects /etc/hosts entries for peer VMs
   buildNode =
     name: config:
+    {
+      peerHosts ? "",
+    }:
     let
       # Import ekaos eval-config to build the system
       eval =
@@ -30,7 +34,14 @@ let
           inherit lib pkgs;
         })
           {
-            modules = testBaseModules ++ [ config ];
+            modules =
+              testBaseModules
+              ++ [
+                config
+              ]
+              ++ lib.optional (peerHosts != "") {
+                networking.extraHosts = peerHosts;
+              };
           };
     in
     {
@@ -91,19 +102,32 @@ in
 
   config = {
     # Build all nodes with defaults applied
-    builtNodes = mapAttrs (
-      name: nodeConfig:
-      buildNode name (
-        if isFunction config.defaults then
-          {
-            imports = [
-              nodeConfig
-              config.defaults
-            ];
-          }
-        else
-          nodeConfig
-      )
-    ) config.nodes;
+    # Each node gets /etc/hosts entries for all peer nodes
+    builtNodes =
+      let
+        nodeNames = attrNames config.nodes;
+        # Generate /etc/hosts entries mapping each node name to a test IP
+        # Uses 192.168.1.{index+1} for each VM in the test network
+        nodeIPs = lib.imap1 (i: name: {
+          inherit name;
+          ip = "192.168.1.${toString i}";
+        }) nodeNames;
+        # Build hosts file entries for all nodes
+        allHostEntries = concatMapStringsSep "\n" (n: "${n.ip} ${n.name}") nodeIPs;
+      in
+      mapAttrs (
+        name: nodeConfig:
+        buildNode name (
+          if isFunction config.defaults then
+            {
+              imports = [
+                nodeConfig
+                config.defaults
+              ];
+            }
+          else
+            nodeConfig
+        ) { peerHosts = allHostEntries; }
+      ) config.nodes;
   };
 }

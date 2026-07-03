@@ -161,23 +161,69 @@ let
     in
     timerLib.mkRcdTimers timers;
 
+  # Extract all port contracts from evaluated services
+  getPortContracts =
+    servicesConfig:
+    let
+      services = evalServices servicesConfig;
+      enabledServices = lib.filterAttrs (_: cfg: cfg.enable) services;
+    in
+    lib.concatLists (
+      lib.mapAttrsToList (
+        svcName: cfg:
+        lib.mapAttrsToList (portName: portCfg: {
+          serviceName = svcName;
+          inherit portName;
+          inherit (portCfg)
+            port
+            protocol
+            transport
+            hostname
+            path
+            internal
+            openFirewall
+            tls
+            healthCheck
+            ;
+        }) (cfg.ports or { })
+      ) enabledServices
+    );
+
+  # Check for port collisions without building (useful for CI)
+  checkPortContracts =
+    servicesConfig:
+    let
+      services = evalServices servicesConfig;
+      enabledServices = lib.filterAttrs (_: cfg: cfg.enable) services;
+      validate = import ./lib/validate.nix { inherit lib pkgs; };
+      collisions = validate.checkPortCollisions enabledServices;
+    in
+    if collisions != [ ] then
+      throw "Port contract validation failed:\n${
+        lib.concatMapStringsSep "\n" (e: "  × ${e.message}") collisions
+      }"
+    else
+      true;
+
 in
 {
   inherit
-    evalServices
-    buildSystemdUserServices
-    buildSystemdSystemServices
-    buildLaunchdUserAgents
     buildLaunchdDaemons
-    buildRunitServices
+    buildLaunchdTimerAgents
+    buildLaunchdUserAgents
     buildRcdServices
     buildRcdServicesOpenBSD
-    buildRunitDockerImage
-    evalTimers
-    buildSystemdTimers
-    buildLaunchdTimerAgents
-    buildRunitTimers
     buildRcdTimers
+    buildRunitDockerImage
+    buildRunitServices
+    buildRunitTimers
+    buildSystemdSystemServices
+    buildSystemdTimers
+    buildSystemdUserServices
+    checkPortContracts
+    evalServices
+    evalTimers
+    getPortContracts
     ;
 
   # Export library functions
