@@ -49,7 +49,9 @@ in
       ExecStart=${scriptDrv}
       User=${config.user}
       Group=${config.group}
-      ${optionalString (pathDirs != []) "Environment=\"PATH=${concatStringsSep ":" pathDirs}:/run/current-system/sw/bin\""}
+      ${optionalString (
+        pathDirs != [ ]
+      ) "Environment=\"PATH=${concatStringsSep ":" pathDirs}:/run/current-system/sw/bin\""}
       ${concatStringsSep "\n" envVars}
     '';
 }

@@ -31,13 +31,10 @@ let
 in
 {
   # Generate tmpfiles.d config file content
-  toTmpfilesConf =
-    rules: concatStringsSep "\n" (map ruleToTmpfilesLine rules);
+  toTmpfilesConf = rules: concatStringsSep "\n" (map ruleToTmpfilesLine rules);
 
   # Generate tmpfiles.d config as a derivation
   toTmpfilesConfFile =
     name: rules:
-    pkgs.writeText "${name}-tmpfiles.conf" (
-      concatStringsSep "\n" (map ruleToTmpfilesLine rules)
-    );
+    pkgs.writeText "${name}-tmpfiles.conf" (concatStringsSep "\n" (map ruleToTmpfilesLine rules));
 }

@@ -15,6 +15,7 @@
   ./system/toplevel.nix
   ./system/activation.nix
   ./system/etc.nix
+  ./system/logind.nix
 
   # Tasks
   ./tasks/filesystems.nix
@@ -31,6 +32,7 @@
   ./network-interfaces.nix
   ./networking/firewall.nix
   ./networking/dns-zones.nix
+  ./networking/wireguard.nix
 
   # Security modules
   ./security/pam.nix
@@ -45,6 +47,7 @@
   ./services/journald.nix
   ./services/networking/dhcpcd.nix
   ./services/networking/sshd.nix
+  ./services/databases/postgresql.nix
 
   # Service management
   ./services.nix # Cross-platform service definitions
@@ -63,4 +66,5 @@
 
   # Virtualisation
   ./virtualisation/qemu-vm.nix
+  ./virtualisation/podman.nix
 ]

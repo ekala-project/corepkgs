@@ -19,8 +19,7 @@ in
   };
 
   # Generate systemd tmpfiles.d config
-  mkSystemdTmpfiles =
-    name: rules: systemdTranslate.toTmpfilesConfFile name rules;
+  mkSystemdTmpfiles = name: rules: systemdTranslate.toTmpfilesConfFile name rules;
 
   # Generate shell script (for runit, launchd, rcd)
   mkShellTmpfiles = name: rules: shellTranslate.toShellScript name rules;
