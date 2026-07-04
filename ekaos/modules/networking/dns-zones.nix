@@ -138,6 +138,20 @@ in
       default = "/etc/dns/zones";
       description = "Directory where zone files are written.";
     };
+
+    forwardZones = mkOption {
+      type = types.attrsOf types.str;
+      default = { };
+      example = {
+        "fleet.internal" = "10.100.0.1";
+      };
+      description = ''
+        Zones to forward to an upstream resolver instead of serving locally.
+        Maps zone names to the IP address of the upstream DNS server.
+        Useful for delegating fleet service discovery zones to ekafleet's
+        built-in DNS authority.
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
@@ -149,7 +163,15 @@ in
           text = mkZoneFile domain;
         }
       ) allDomains
-    );
+    )
+    # Generate forward zone configuration
+    // optionalAttrs (cfg.forwardZones != { }) {
+      "dns/forward-zones.conf".text = concatStringsSep "\n" (
+        mapAttrsToList (
+          zone: addr: "${zone} ${addr}"
+        ) cfg.forwardZones
+      ) + "\n";
+    };
 
     # Create zone directory
     system.activationScripts.dns-zones = stringAfter [ "etc" ] ''

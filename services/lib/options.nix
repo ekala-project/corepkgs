@@ -172,5 +172,20 @@ in
         reverse proxy auto-configuration, and Docker port exposure.
       '';
     };
+
+    observability = mkOption {
+      type = types.submodule serviceTypes.observabilityContract;
+      default = { };
+      example = literalExpression ''
+        {
+          metrics = { path = "/metrics"; interval = 15; };
+        }
+      '';
+      description = ''
+        Observability configuration for this service.
+        Declares metrics endpoints for Prometheus scraping.
+        Distinct from healthCheck (liveness probes).
+      '';
+    };
   };
 }

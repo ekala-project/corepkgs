@@ -3,6 +3,42 @@
 
 let
   inherit (lib) types mkOption;
+
+  # Metrics endpoint options (distinct from health checks)
+  metricsOpts = {
+    options = {
+      path = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        example = "/metrics";
+        description = ''
+          HTTP path for Prometheus-compatible metrics scraping.
+          null disables metrics collection for this service.
+
+          This is distinct from healthCheck.path:
+          - healthCheck.path = liveness/readiness probe (200/503)
+          - metrics.path = Prometheus exposition format
+        '';
+      };
+
+      port = mkOption {
+        type = types.nullOr types.port;
+        default = null;
+        description = ''
+          Port serving metrics. null means use the service's primary port.
+          Useful when metrics are served on a separate admin port.
+        '';
+      };
+
+      interval = mkOption {
+        type = types.ints.positive;
+        default = 15;
+        description = ''
+          Scrape interval in seconds.
+        '';
+      };
+    };
+  };
 in
 {
   # A restart policy type
@@ -57,6 +93,20 @@ in
         default = 30;
         description = ''
           Health check interval in seconds.
+        '';
+      };
+    };
+  };
+
+  # Observability contract for a service
+  observabilityContract = {
+    options = {
+      metrics = mkOption {
+        type = types.submodule metricsOpts;
+        default = { };
+        description = ''
+          Metrics endpoint configuration. Consumed by the prometheus-scrape
+          module and fleet metrics collectors.
         '';
       };
     };

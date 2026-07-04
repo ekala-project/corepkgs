@@ -27,6 +27,21 @@ let
 
   portsToNftSet = ports: concatStringsSep ", " (map toString ports);
 
+  hasIdentityPolicies = cfg.identityPolicies != [ ];
+
+  # Generate nftables rules for a single identity policy
+  mkIdentityRule = policy:
+    let
+      srcSet = concatStringsSep ", " policy.fromIPs;
+      tcpRule = optionalString (policy.toPorts != [ ]) ''
+        iifname "${cfg.meshInterface}" ip saddr { ${srcSet} } tcp dport { ${portsToNftSet policy.toPorts} } accept comment "${policy.name}"
+      '';
+      udpRule = optionalString (policy.toUDPPorts != [ ]) ''
+        iifname "${cfg.meshInterface}" ip saddr { ${srcSet} } udp dport { ${portsToNftSet policy.toUDPPorts} } accept comment "${policy.name} (udp)"
+      '';
+    in
+    tcpRule + udpRule;
+
 in
 
 {
@@ -115,6 +130,54 @@ in
         Additional nftables rules appended to the input-allow chain.
       '';
     };
+
+    identityPolicies = mkOption {
+      type = types.listOf (types.submodule {
+        options = {
+          name = mkOption {
+            type = types.str;
+            description = "Human-readable policy name for comments.";
+          };
+
+          fromIPs = mkOption {
+            type = types.listOf types.str;
+            description = ''
+              Source IP addresses (typically WireGuard mesh IPs) allowed
+              to reach the target ports.
+            '';
+          };
+
+          toPorts = mkOption {
+            type = types.listOf types.port;
+            description = "Destination TCP ports the source IPs may connect to.";
+          };
+
+          toUDPPorts = mkOption {
+            type = types.listOf types.port;
+            default = [ ];
+            description = "Destination UDP ports the source IPs may connect to.";
+          };
+        };
+      });
+      default = [ ];
+      description = ''
+        Identity-based inter-service firewall policies for the WireGuard
+        mesh interface. Each policy allows specific source IPs to reach
+        specific destination ports. Populated by fleet identity contracts.
+
+        When non-empty, a default-deny policy is applied on the mesh
+        interface and only explicitly declared policies are allowed.
+      '';
+    };
+
+    meshInterface = mkOption {
+      type = types.str;
+      default = "wg0";
+      description = ''
+        WireGuard mesh interface name for identity-based policy enforcement.
+        Only used when identityPolicies is non-empty.
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
@@ -141,6 +204,12 @@ in
           # Allow established/related connections
           ct state established,related accept
           ct state invalid drop
+
+          ${optionalString hasIdentityPolicies ''
+            # Identity-based policy on mesh interface (before port-based rules)
+            iifname "${cfg.meshInterface}" jump identity-allow
+            iifname "${cfg.meshInterface}" drop comment "default deny on mesh"
+          ''}
 
           # Allow new connections to permitted ports
           jump input-allow
@@ -175,6 +244,12 @@ in
 
           ${cfg.extraInputRules}
         }
+
+        ${optionalString hasIdentityPolicies ''
+          chain identity-allow {
+            ${concatMapStringsSep "\n          " mkIdentityRule cfg.identityPolicies}
+          }
+        ''}
       }
     '';
 
