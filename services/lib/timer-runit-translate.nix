@@ -4,7 +4,12 @@
 { lib, pkgs }:
 
 let
-  inherit (lib) optionalString concatStringsSep concatMapStringsSep mapAttrsToList;
+  inherit (lib)
+    optionalString
+    concatStringsSep
+    concatMapStringsSep
+    mapAttrsToList
+    ;
 
   # Convert calendar shorthand to cron expression
   calendarToCron =
@@ -23,15 +28,12 @@ let
       # Best-effort: treat as daily for unknown expressions
       "0 0 * * *";
 
-  mkEnvExports =
-    env:
-    concatStringsSep "\n" (mapAttrsToList (k: v: "export ${k}=\"${v}\"") env);
+  mkEnvExports = env: concatStringsSep "\n" (mapAttrsToList (k: v: "export ${k}=\"${v}\"") env);
 
   mkPathExport =
     path:
-    optionalString (path != [ ]) "export PATH=\"${
-      concatStringsSep ":" (map (p: "${p}/bin") path)
-    }:$PATH\"";
+    optionalString (path != [ ])
+      "export PATH=\"${concatStringsSep ":" (map (p: "${p}/bin") path)}:$PATH\"";
 
 in
 {

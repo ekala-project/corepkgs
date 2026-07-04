@@ -14,7 +14,9 @@ let
   tmpfilesOpts = import ../../../services/lib/tmpfiles-options.nix { inherit lib; };
   tmpfilesModule = import ../../../services/lib/tmpfiles-module.nix { inherit lib pkgs; };
   shellTranslate = import ../../../services/lib/tmpfiles-shell-translate.nix { inherit lib pkgs; };
-  systemdTranslate = import ../../../services/lib/tmpfiles-systemd-translate.nix { inherit lib pkgs; };
+  systemdTranslate = import ../../../services/lib/tmpfiles-systemd-translate.nix {
+    inherit lib pkgs;
+  };
 
   cfg = config.tmpfiles;
 

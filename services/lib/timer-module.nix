@@ -44,21 +44,18 @@ in
     let
       enabled = filterAttrs (_: t: t.enable) timers;
     in
-    mapAttrs (
-      name: config:
-      {
-        timer = pkgs.writeTextFile {
-          name = "${name}.timer";
-          text = systemdTranslate.toTimerUnit name config;
-          destination = "/${name}.timer";
-        };
-        service = pkgs.writeTextFile {
-          name = "${name}.service";
-          text = systemdTranslate.toServiceUnit name config;
-          destination = "/${name}.service";
-        };
-      }
-    ) enabled;
+    mapAttrs (name: config: {
+      timer = pkgs.writeTextFile {
+        name = "${name}.timer";
+        text = systemdTranslate.toTimerUnit name config;
+        destination = "/${name}.timer";
+      };
+      service = pkgs.writeTextFile {
+        name = "${name}.service";
+        text = systemdTranslate.toServiceUnit name config;
+        destination = "/${name}.service";
+      };
+    }) enabled;
 
   # Generate launchd plist files with scheduling
   mkLaunchdTimerAgents =
@@ -81,11 +78,15 @@ in
     let
       enabled = filterAttrs (_: t: t.enable) timers;
       intervalTimers = filterAttrs (_: t: t.schedule.interval != null) enabled;
-      calendarTimers = filterAttrs (_: t: t.schedule.calendar != null && t.schedule.interval == null) enabled;
+      calendarTimers = filterAttrs (
+        _: t: t.schedule.calendar != null && t.schedule.interval == null
+      ) enabled;
     in
     {
       # Interval-based: runit service directories with sleep loops
-      services = mapAttrs (name: config: runitTranslate.toRunitIntervalService name config) intervalTimers;
+      services = mapAttrs (
+        name: config: runitTranslate.toRunitIntervalService name config
+      ) intervalTimers;
 
       # Calendar-based: crontab entries
       crontab = lib.concatStringsSep "\n" (
@@ -105,5 +106,10 @@ in
       );
     };
 
-  inherit systemdTranslate launchdTranslate runitTranslate rcdTranslate;
+  inherit
+    systemdTranslate
+    launchdTranslate
+    runitTranslate
+    rcdTranslate
+    ;
 }

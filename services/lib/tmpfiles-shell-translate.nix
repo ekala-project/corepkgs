@@ -57,6 +57,5 @@ in
     '';
 
   # Generate shell commands as text (for embedding in preStart etc.)
-  toShellCommands =
-    rules: concatMapStringsSep "\n" ruleToShellCommands rules;
+  toShellCommands = rules: concatMapStringsSep "\n" ruleToShellCommands rules;
 }
