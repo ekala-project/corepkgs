@@ -10,6 +10,7 @@
 
   # Hardware
   ./hardware/firmware.nix
+  ./hardware/facter
 
   # System modules
   ./system/toplevel.nix
