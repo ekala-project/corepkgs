@@ -1,7 +1,7 @@
 {
   v2_5 = rec {
-    version = "2.5.39";
-    src-hash = "sha256-cd0bWBWMk1AnEEyDDAGeSMcyUHCK9d70XqJWx4kxiUg=";
+    version = "2.6.4";
+    src-hash = "sha256-6HquAyvwfCb4WsDtMlCZjDdiHZX4vXSLMfFbM8Re6ZU=";
     needsTexinfo = true;
   };
 
