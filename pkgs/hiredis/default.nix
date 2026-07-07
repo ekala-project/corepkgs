@@ -7,13 +7,13 @@
 
 stdenv.mkDerivation rec {
   pname = "hiredis";
-  version = "1.2.0";
+  version = "1.4.0";
 
   src = fetchFromGitHub {
     owner = "redis";
     repo = "hiredis";
     rev = "v${version}";
-    sha256 = "sha256-ZxUITm3OcbERcvaNqGQU46bEfV+jN6safPalG0TVfBg=";
+    sha256 = "sha256-1qOwuszjiAQLKc7byKw45wVKUSvkTw7HfvRcejbr4OA=";
   };
 
   buildInputs = [
