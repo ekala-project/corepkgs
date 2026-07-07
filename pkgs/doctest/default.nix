@@ -9,24 +9,14 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "doctest";
-  version = "2.4.12";
+  version = "2.5.3";
 
   src = fetchFromGitHub {
     owner = "doctest";
     repo = "doctest";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-Fxs1EWydhqN9whx+Cn4fnZ4fhCEQvFgL5e9TUiXlnq8=";
+    hash = "sha256-+/IEISqN9HdaCJ0udLVUitOUziLvF/D3POecZMoXuho=";
   };
-
-  patches = [
-    # Fix the build with Clang.
-    (fetchpatch {
-      name = "doctest-disable-warnings.patch";
-      url = "https://github.com/doctest/doctest/commit/c8d9ed2398d45aa5425d913bd930f580560df30d.patch";
-      excludes = [ ".github/workflows/main.yml" ];
-      hash = "sha256-kOBy0om6MPM2vLXZjNLXiezZqVgNr/viBI7mXrOZts8=";
-    })
-  ];
 
   nativeBuildInputs = [
     cmake
