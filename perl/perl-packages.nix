@@ -18381,13 +18381,13 @@ with self;
 
   LatexIndent = buildPerlPackage rec {
     pname = "latexindent.pl";
-    version = "3.21";
+    version = "4.0.2";
 
     src = fetchFromGitHub {
       owner = "cmhughes";
       repo = pname;
       rev = "V${version}";
-      hash = "sha256-STXHOzsshyN7rc2VtJxxt6La4UPGpRYlMO8TX1Jd7pM=";
+      hash = "sha256-KT7FOVssCiyijr0oozbpRkKB5lEor4KkAVBq+T5ZakM=";
     };
 
     outputs = [ "out" ];
@@ -26948,13 +26948,13 @@ with self;
   };
 
   pacup = buildPerlPackage rec {
-    version = "3.3.11";
+    version = "3.4.0";
     pname = "pacup";
     src = fetchFromGitHub {
       owner = "pacstall";
       repo = pname;
       tag = version;
-      hash = "sha256-gTL6t//xO6TeRG1Vt4Ld7hVChSTyprUtXQTSwTKzwz4=";
+      hash = "sha256-KT7FOVssCiyijr0oozbpRkKB5lEor4KkAVBq+T5ZakM=";
     };
     preBuild = ''
       patchShebangs ./pacup
