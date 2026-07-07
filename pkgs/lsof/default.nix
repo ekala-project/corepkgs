@@ -8,11 +8,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "lsof";
-  version = "4.99.6";
+  version = "4.99.7";
 
   src = fetchurl {
     url = "https://github.com/lsof-org/lsof/releases/download/${finalAttrs.version}/lsof-${finalAttrs.version}.tar.gz";
-    hash = "sha256-YIHe34Qc1h+KAi/3y+BO14kYpH3qPDlSjIVxR0Fnqg8=";
+    hash = "sha256-ShA5GqsLjOH1OegqGWZpOyps8iWXKmUE67fsT6cWdd4=";
   };
 
   nativeBuildInputs = [
