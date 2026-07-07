@@ -23,19 +23,14 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxkbcommon";
-  version = "1.11.0";
+  version = "1.13.2";
 
   src = fetchFromGitHub {
     owner = "xkbcommon";
     repo = "libxkbcommon";
     tag = "xkbcommon-${finalAttrs.version}";
-    hash = "sha256-IV1dgGM8z44OQCQYQ5PiUUw/zAvG5IIxiBywYVw2ius=";
+    hash = "sha256-JdS4+HPHDUUOUq5TUX2F5DicHif8wD3cPvMocWhD4S4=";
   };
-
-  patches = [
-    # Disable one Xvfb test as it fails for permission checks.
-    ./disable-x11com.patch
-  ];
 
   outputs = [
     "out"
