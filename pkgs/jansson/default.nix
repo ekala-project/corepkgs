@@ -7,7 +7,7 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "jansson";
-  version = "2.15.0";
+  version = "2.15.1";
 
   outputs = [
     "dev"
@@ -18,7 +18,7 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "akheron";
     repo = "jansson";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-s7g1QvJjl9LsWw+VZsTQHCoEgw2Ad9+8V0b2NFml5rw=";
+    hash = "sha256-iOOZyrNlCbibT7qozH7B2RjAgG9yv+B2ldAaz8U6IhQ=";
   };
 
   nativeBuildInputs = [
