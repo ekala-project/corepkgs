@@ -15,13 +15,13 @@
 }:
 buildPythonPackage rec {
   pname = "setuptools-rust";
-  version = "1.12.1";
+  version = "1.13.0";
   pyproject = true;
 
   src = fetchPypi {
     pname = "setuptools_rust";
     inherit version;
-    hash = "sha256-ha5wmJ2Wyc/rXvec87rC1SALxVZPcgoG7c7tvfZmRkA=";
+    hash = "sha256-8q/PS67uaJkQzknPqKrU4IzOcvQXRJvMMokbhmT9xyY=";
   };
 
   build-system = [
