@@ -33,13 +33,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "linux-pam";
-  version = "1.7.1";
+  version = "1.7.2";
 
   src = fetchFromGitHub {
     owner = "linux-pam";
     repo = "linux-pam";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-kANcwxifQz2tYPSrSBSFiYNTm51Gr10L/zroCqm8ZHQ=";
+    hash = "sha256-V3XQqolinh+MqUefMDYJF9zP4fBJTHc7YKN+NEGjx1g=";
 
   };
 
@@ -101,6 +101,7 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.mesonOption "sysconfdir" "etc") # relative to meson prefix, which is $out
     (lib.mesonEnable "elogind" false)
     (lib.mesonEnable "econf" false)
+    (lib.mesonOption "vendordir" "")
     (lib.mesonEnable "selinux" false)
     (lib.mesonEnable "nis" false)
     (lib.mesonBool "xtests" false)
