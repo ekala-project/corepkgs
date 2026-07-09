@@ -5,7 +5,7 @@
   };
 
   v3 = rec {
-    version = "3.17.4";
-    src-hash = "sha256-G3+cBp8q8S8oLIcgWp0p+TAtzqXlKYbRSY/5Y3L7QO4=";
+    version = "3.18.2";
+    src-hash = "sha256-QArQMSStVxwUo6CgU2JlXBdFWjzlGXfZk1AVGLGeE70=";
   };
 }
