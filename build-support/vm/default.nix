@@ -257,13 +257,13 @@ let
 
   qemuCommandLinux = ''
     ${if (customQemu != null) then customQemu else (qemu-common.qemuBinary qemu)} \
-      -nographic -no-reboot \
+      -nographic -no-reboot -vga none \
       -device virtio-rng-pci \
       -chardev socket,id=store,path=virtio-store.sock \
       -device vhost-user-fs-pci,chardev=store,tag=store \
       -chardev socket,id=xchg,path=virtio-xchg.sock \
       -device vhost-user-fs-pci,chardev=xchg,tag=xchg \
-      ''${diskImage:+-drive file=$diskImage,if=virtio,cache=unsafe,werror=report} \
+      ''${diskImage:+-drive file=$diskImage,if=virtio,cache=unsafe,werror=report,format=raw} \
       -kernel ${kernel}/${img} \
       -initrd ${initrd}/initrd \
       -append "console=${qemu-common.qemuSerialDevice} panic=1 command=${stage2Init} mountDisk=$mountDisk loglevel=4" \
