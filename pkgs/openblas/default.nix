@@ -2,7 +2,6 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  fetchpatch,
   perl,
   which,
   # Most packages depending on openblas expect integer width to match
@@ -182,7 +181,7 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "openblas";
-  version = "0.3.30";
+  version = "0.3.33";
 
   outputs = [
     "out"
@@ -193,21 +192,8 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "OpenMathLib";
     repo = "OpenBLAS";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-foP2OXUL6ttgYvCxLsxUiVdkPoTvGiHomdNudbSUmSE=";
+    hash = "sha256-EArf0K2Gs+w8IRD5wkMOQv79e8yMoTgQfa9kzjXKn3Y=";
   };
-
-  patches = [
-    # Remove this once https://github.com/OpenMathLib/OpenBLAS/issues/5414 is
-    # resolved.
-    ./disable-sme-sgemm-kernel.patch
-
-    # https://github.com/OpenMathLib/OpenBLAS/issues/5460
-    (fetchpatch {
-      name = "0001-openblas-Use-generic-kernels-for-SCAL-on-POWER4-5.patch";
-      url = "https://github.com/OpenMathLib/OpenBLAS/commit/14c9dcaac70d9382de00ba4418643d9587f4950e.patch";
-      hash = "sha256-mIOqRc7tE1rV/krrAu630JwApZHdeHCdVmO5j6eDC8U=";
-    })
-  ];
 
   postPatch = ''
     # cc1: error: invalid feature modifier 'sve2' in '-march=armv8.5-a+sve+sve2+bf16'

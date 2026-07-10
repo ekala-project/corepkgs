@@ -18,12 +18,12 @@
 
 stdenv.mkDerivation rec {
   pname = "c-ares";
-  version = "1.34.5";
+  version = "1.34.7";
 
   src = fetchurl {
     # Note: tag name varies in some versions, e.g. v1.30.0, c-ares-1_17_0.
     url = "https://github.com/c-ares/c-ares/releases/download/v${version}/c-ares-${version}.tar.gz";
-    hash = "sha256-fZNXkOmvCBwlxJX9E8LPzaR5KYNBjpY1jvbnMg7gY0Y=";
+    hash = "sha256-VW94HdGIrZMtyCY/7grTqrpnW0zY5U2GkIaBtDzj4yc=";
   };
 
   outputs = [

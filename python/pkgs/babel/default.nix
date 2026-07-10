@@ -18,14 +18,14 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "babel";
-  version = "2.17.0";
+  version = "2.18.0";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;
-    hash = "sha256-DFTP+xn2kM3MUqO1C8v3HgeoCNHIDVSfJFm50s8K+50=";
+    hash = "sha256-uAuZoUvQhfys+hXJFl9lH7s0BuZsxgOr8RxXUJN8mS0=";
   };
 
   build-system = [ setuptools ];

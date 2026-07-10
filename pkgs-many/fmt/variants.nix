@@ -26,7 +26,7 @@
     ];
   };
   v12 = rec {
-    version = "12.0.0";
-    src-hash = "sha256-AZDmIeU1HbadC+K0TIAGogvVnxt0oE9U6ocpawIgl6g=";
+    version = "12.2.0";
+    src-hash = "sha256-Tc7PmNxUv7ajw6GaHPGEEtrD/fl6is7RB8TPestJa1o=";
   };
 }

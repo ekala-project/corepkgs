@@ -54,7 +54,20 @@ buildPythonPackage rec {
       url = "https://github.com/python/mypy/commit/7534898319cb7f16738c11e4bc1bdcef0eb13c38.patch";
       hash = "sha256-5jD0JBRnirmoMlUz9+n8G4AqHqCi8BaUX5rEl9NnLts=";
     })
+    # Fix compatibility with pathspec >= 1.0.0 (gitwildmatch -> gitignore).
+    # https://github.com/python/mypy/pull/20533
+    (fetchpatch {
+      url = "https://github.com/python/mypy/commit/7fee02ca109ad511bb55efd83ec13efc7f7eabfb.patch";
+      hash = "sha256-elTJ2oDTTi0RoFqs9+0okBhZuEccZPqpD1Npgs2hHfc=";
+      includes = [ "mypy/modulefinder.py" ];
+    })
   ];
+
+  postPatch = ''
+    # Fix "Missing type parameters for generic type PathSpec" with pathspec >= 1.1.1
+    substituteInPlace mypy/modulefinder.py \
+      --replace-fail 'list[tuple[str, PathSpec]]:' 'list[tuple[str, PathSpec]]:  # type: ignore[type-arg]'
+  '';
 
   passthru.updateScript = gitUpdater {
     rev-prefix = "v";

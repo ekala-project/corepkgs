@@ -9,13 +9,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "rlwrap";
-  version = "0.46.2";
+  version = "0.48";
 
   src = fetchFromGitHub {
     owner = "hanslub42";
     repo = "rlwrap";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-05q24Y097GCcipXEPTbel/YIAtQl4jDyA9JFjDDM41Y=";
+    hash = "sha256-Szgyjt/KRFEZMu6JX4Ulm2guTMwh9ejzjlfpkITWOI4=";
   };
 
   nativeBuildInputs = [
@@ -24,6 +24,16 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [ readline ];
+
+  # The .rb files (red-black tree definitions, not Ruby) have far-future
+  # timestamps, causing make to try regenerating .c files using rbgen
+  # (from libredblack) which isn't available. Ensure .c files are newer.
+  postPatch = ''
+    touch src/*.rb
+    touch src/*.c
+  '';
+
+  configureFlags = [ "--without-libptytty" ];
 
   env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.hostPlatform.isDarwin "-Wno-error=implicit-function-declaration";
 

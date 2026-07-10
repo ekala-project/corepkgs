@@ -14,12 +14,12 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "jq";
-  version = "1.8.1";
+  version = "1.8.2";
 
   # Note: do not use fetchpatch or fetchFromGitHub to keep this package available in __bootPackages
   src = fetchurl {
     url = "https://github.com/jqlang/jq/releases/download/jq-${finalAttrs.version}/jq-${finalAttrs.version}.tar.gz";
-    hash = "sha256-K+ZOcSnOyxHVkGKQ66EK9pT7nj5/n8IIoxHcM8qDfrA=";
+    hash = "sha256-cbjW6PX+gfbG0NEQ44kiUfbOdu0JWr0xXibm4Rk6868=";
   };
 
   outputs = [
@@ -31,7 +31,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   patches = [
-    ./musl.patch
   ]
   ++ lib.optionals stdenv.hostPlatform.is32bit [
     # needed because epoch conversion test here is right at the end of 32 bit integer space

@@ -1,8 +1,8 @@
 {
   lib,
   buildPythonPackage,
-  fetchFromGitHub,
-  flit-scm ? null,
+  fetchPypi,
+  flit-core,
   pytestCheckHook,
   pythonAtLeast,
   pythonOlder,
@@ -11,19 +11,24 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "exceptiongroup";
-  version = "1.3.0";
+  version = "1.3.1";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
 
-  src = fetchFromGitHub {
-    owner = "agronholm";
-    repo = "exceptiongroup";
-    tag = finalAttrs.version;
-    hash = "sha256-b3Z1NsYKp0CecUq8kaC/j3xR/ZZHDIw4MhUeadizz88=";
+  src = fetchPypi {
+    inherit (finalAttrs) pname version;
+    hash = "sha256-i0EkMsYFWwt9FMMQAArpM1LtZ1T3D6j3w0FB+RxOMhk=";
   };
 
-  build-system = lib.optional (flit-scm != null) flit-scm;
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace-fail 'requires = ["flit_scm"]' 'requires = ["flit_core"]' \
+      --replace-fail 'build-backend = "flit_scm:buildapi"' 'build-backend = "flit_core.buildapi"' \
+      --replace-fail 'dynamic = ["version"]' 'version = "${finalAttrs.version}"'
+  '';
+
+  build-system = [ flit-core ];
 
   dependencies = lib.optionals (pythonOlder "3.13") [ typing-extensions ];
 

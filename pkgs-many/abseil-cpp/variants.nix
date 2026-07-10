@@ -1,7 +1,7 @@
 {
   v202508 = {
-    version = "20250814.1";
-    src-hash = "sha256-SCQDORhmJmTb0CYm15zjEa7dkwc+lpW2s1d4DsMRovI=";
+    version = "20260526.0";
+    src-hash = "sha256-O9ClnGm4WSTX3g1Q2VYTMhUtGG52XBwxzgHtWW9WSG0=";
   };
   v202407 = {
     version = "20240722.1";

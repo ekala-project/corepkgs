@@ -17,11 +17,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "crystal";
-  version = "1.14.0";
+  version = "1.20.3";
 
   src = fetchurl {
     url = "https://github.com/crystal-lang/crystal/releases/download/${finalAttrs.version}/crystal-${finalAttrs.version}-1-linux-x86_64.tar.gz";
-    hash = "sha256-05R429yXj6GIP0pw8Bhs5QVM89mE6b6ZiCvfQqcP4r4=";
+    hash = "sha256-ti6iWyR3E/tj3Jkr60WbytiVVGXcwRoYH9Ik1OyVWmI=";
   };
 
   nativeBuildInputs = [

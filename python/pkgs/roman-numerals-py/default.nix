@@ -1,45 +1,32 @@
 {
   lib,
   buildPythonPackage,
-  fetchFromGitHub,
-  flit-core,
-  pytestCheckHook,
-  sphinx,
+  fetchPypi,
+  setuptools,
+  roman-numerals,
 }:
 
-buildPythonPackage (finalAttrs: {
+buildPythonPackage rec {
   pname = "roman-numerals-py";
-  version = "3.1.0";
+  version = "4.1.0";
   pyproject = true;
 
-  src = fetchFromGitHub {
-    owner = "AA-Turner";
-    repo = "roman-numerals";
-    tag = "v${finalAttrs.version}";
-    hash = "sha256-YLF09jYwXq48iMvmqbj/cocYJPp7RsCXzbN0DV9gpis=";
+  src = fetchPypi {
+    pname = "roman_numerals_py";
+    inherit version;
+    hash = "sha256-9deytMpS3YVe96uOs1kPQowLHqSAc2zjKwH+8qX42vk=";
   };
 
-  postPatch = ''
-    ls -lah
-    cp LICENCE.rst python/
+  build-system = [ setuptools ];
 
-    cd python
-  '';
-
-  build-system = [ flit-core ];
-
-  nativeCheckInputs = [ pytestCheckHook ];
-
-  testPaths = [ "tests" ];
+  dependencies = [ roman-numerals ];
 
   pythonImportsCheck = [ "roman_numerals" ];
 
   meta = {
-    description = "Manipulate roman numerals";
+    description = "Deprecated shim for roman-numerals";
     homepage = "https://github.com/AA-Turner/roman-numerals/";
-    changelog = "https://github.com/AA-Turner/roman-numerals/blob/${finalAttrs.src.tag}/CHANGES.rst";
     license = lib.licenses.cc0;
-    mainProgram = "roman-numerals-py";
     platforms = lib.platforms.all;
   };
-})
+}

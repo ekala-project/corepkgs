@@ -19,11 +19,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "julia";
-  version = "1.11.2";
+  version = "1.12.6";
 
   src = fetchurl {
     url = "https://github.com/JuliaLang/julia/releases/download/v${finalAttrs.version}/julia-${finalAttrs.version}-full.tar.gz";
-    hash = "sha256-pzZblplE8n3w2FY3FsqXaeB/P3e5+fu0i80RTd91LKQ=";
+    hash = "sha256-cR86qNbsXJAEWT6489U+NWTNdZrLqK1K2ulnr8IDMsw=";
   };
 
   postPatch = ''
