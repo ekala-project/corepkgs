@@ -29,6 +29,9 @@ let
           initrd = "@initrd@"; # Will be substituted
         };
       }
+      // {
+        "org.nixos.specialisation.v1" = { };
+      }
       // optionalAttrs (config.boot.loader.systemd-boot.enable or false) {
         "org.nixos.systemd-boot" = {
           sortKey = config.boot.loader.systemd-boot.sortKey;
@@ -88,28 +91,116 @@ let
       cp ${config.system.build.initrd}/initrd $out/initrd
     ''}
 
+    # Build UKI if requested
+    ${optionalString (builtins.elem "uki" config.boot.loader.efi.type) ''
+      echo "Building Unified Kernel Image (UKI)..."
+
+      # Determine the EFI stub path
+      stubName="linux${pkgs.stdenv.hostPlatform.efiArch}.efi.stub"
+      stub="${config.systemd.package}/lib/systemd/boot/efi/$stubName"
+
+      if [ ! -f "$stub" ]; then
+        echo "error: EFI stub not found at $stub" >&2
+        echo "hint: systemd must be built with withBootloader=true and withEfi=true" >&2
+        exit 1
+      fi
+
+      # Write kernel command line
+      echo -n "init=$out/init ${concatStringsSep " " config.boot.kernelParams}" > cmdline.txt
+
+      # Write os-release for the UKI .osrel section
+      cat > uki-os-release.txt <<OSREL
+NAME=ekaos
+ID=ekaos
+VERSION=${config.system.ekaos.version}
+VERSION_ID=${config.system.ekaos.version}
+PRETTY_NAME=ekaos ${config.system.ekaos.version} (${config.system.ekaos.label})
+OSREL
+
+      # Calculate VMA offsets from the stub's existing sections
+      # Each new section must be placed at a non-overlapping, page-aligned VMA
+      highest_end=$(objdump -h "$stub" | awk '
+        /^[[:space:]]+[0-9]+/ {
+          vma = strtonum("0x" $4)
+          size = strtonum("0x" $3)
+          end = vma + size
+          if (end > max) max = end
+        }
+        END { printf "%d", max }
+      ')
+
+      align=4096
+
+      # .osrel section
+      vma_osrel=$(( (highest_end + align - 1) / align * align ))
+      osrel_size=$(stat -c%s uki-os-release.txt)
+
+      # .cmdline section
+      vma_cmdline=$(( (vma_osrel + osrel_size + align - 1) / align * align ))
+      cmdline_size=$(stat -c%s cmdline.txt)
+
+      # .linux section
+      vma_linux=$(( (vma_cmdline + cmdline_size + align - 1) / align * align ))
+      kernelFile="${config.boot.kernelPackages.kernel}/${config.system.boot.loader.kernelFile}"
+      linux_size=$(stat -c%s "$kernelFile")
+
+      ${optionalString config.boot.initrd.enable ''
+        # .initrd section
+        vma_initrd=$(( (vma_linux + linux_size + align - 1) / align * align ))
+      ''}
+
+      objcopy \
+        --add-section .osrel=uki-os-release.txt --set-section-flags .osrel=readonly,data \
+        --change-section-vma .osrel=$vma_osrel \
+        --add-section .cmdline=cmdline.txt --set-section-flags .cmdline=readonly,data \
+        --change-section-vma .cmdline=$vma_cmdline \
+        --add-section .linux="$kernelFile" --set-section-flags .linux=readonly,data \
+        --change-section-vma .linux=$vma_linux \
+        ${optionalString config.boot.initrd.enable ''
+          --add-section .initrd=$out/initrd --set-section-flags .initrd=readonly,data \
+          --change-section-vma .initrd=$vma_initrd \
+        ''} \
+        "$stub" \
+        $out/uki.efi
+
+      echo "UKI built: $out/uki.efi"
+    ''}
+
     # Generate bootspec (boot.json)
     ${
-      if config.boot.initrd.enable then
-        ''
-          ${pkgs.jq}/bin/jq \
-            '."org.nixos.bootspec.v1".toplevel = $toplevel |
-             ."org.nixos.bootspec.v1".init = $init |
-             ."org.nixos.bootspec.v1".initrd = $initrd' \
+      let
+        hasUki = builtins.elem "uki" config.boot.loader.efi.type;
+        baseArgs =
+          ''
             --arg toplevel "$out" \
-            --arg init "$out/init" \
-            --arg initrd "$out/initrd" \
-            < ${bootspecJson} > $out/boot.json
-        ''
-      else
-        ''
-          ${pkgs.jq}/bin/jq \
-            '."org.nixos.bootspec.v1".toplevel = $toplevel |
-             ."org.nixos.bootspec.v1".init = $init' \
-            --arg toplevel "$out" \
-            --arg init "$out/init" \
-            < ${bootspecJson} > $out/boot.json
-        ''
+            --arg init "$out/init"
+          '';
+        initrdArgs = optionalString config.boot.initrd.enable ''
+          --arg initrd "$out/initrd"
+        '';
+        ukiArgs = optionalString hasUki ''
+          --arg uki "$out/uki.efi"
+        '';
+        baseFilter =
+          ''
+            ."org.nixos.bootspec.v1".toplevel = $toplevel |
+            ."org.nixos.bootspec.v1".init = $init
+          '';
+        initrdFilter = optionalString config.boot.initrd.enable ''
+          | ."org.nixos.bootspec.v1".initrd = $initrd
+        '';
+        ukiFilter = optionalString hasUki ''
+          | ."org.nixos.systemd-boot".uki = $uki
+        '';
+      in
+      ''
+        ${pkgs.jq}/bin/jq \
+          '${baseFilter}${initrdFilter}${ukiFilter}' \
+          ${baseArgs} \
+          ${initrdArgs} \
+          ${ukiArgs} \
+          < ${bootspecJson} > $out/boot.json
+      ''
     }
 
     # Create extra dependencies file for GC roots
@@ -127,6 +218,11 @@ let
     allowSubstitutes = false;
 
     buildCommand = systemBuilder;
+
+    nativeBuildInputs = lib.optionals (builtins.elem "uki" config.boot.loader.efi.type) [
+      pkgs.binutils
+      pkgs.gawk
+    ];
 
     # Pass through for use in scripts
     inherit (pkgs) jq;

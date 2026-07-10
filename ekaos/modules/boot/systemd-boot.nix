@@ -25,6 +25,7 @@ let
     inherit (cfg) consoleMode graceful;
 
     inherit (config.boot.loader) efi;
+    efiType = builtins.toJSON config.boot.loader.efi.type;
 
     # bootspec tools (may need to be created or imported)
     bootspecTools = pkgs.writeScriptBin "synthesize" ''
@@ -152,6 +153,22 @@ in
         default = "/boot";
         description = ''
           Where the EFI System Partition (ESP) is mounted.
+        '';
+      };
+
+      type = mkOption {
+        type = types.listOf (types.enum [ "efi" "uki" ]);
+        default = [ "efi" ];
+        description = ''
+          Boot entry types to install.
+
+          - "efi": Traditional BLS Type #1 entries with separate kernel/initrd files
+            and .conf entry files. This is the default and current behavior.
+          - "uki": Unified Kernel Image — a single .efi PE binary per generation
+            bundling the EFI stub, kernel, initrd, and command line. Discovered
+            by systemd-boot via Type #2 autodiscovery in /EFI/Linux/.
+
+          Both can be specified simultaneously for dual boot entries.
         '';
       };
     };

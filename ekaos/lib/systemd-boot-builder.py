@@ -34,6 +34,7 @@ GRACEFUL = "@graceful@"
 COPY_EXTRA_FILES = "@copyExtraFiles@"
 CHECK_MOUNTPOINTS = "@checkMountpoints@"
 STORE_DIR = "@storeDir@"
+EFI_TYPE = json.loads("@efiType@")  # e.g. ["efi"] or ["uki"] or ["efi", "uki"]
 
 @dataclass
 class BootSpec:
@@ -48,6 +49,7 @@ class BootSpec:
     sortKey: str  # noqa: N815
     devicetree: Path | None = None  # noqa: N815
     initrdSecrets: str | None = None  # noqa: N815
+    uki: Path | None = None
 
 
 libc = ctypes.CDLL("libc.so.6")
@@ -107,7 +109,12 @@ def write_loader_conf(profile: str | None, generation: int, specialisation: str 
     tmp = LOADER_CONF.with_suffix(".tmp")
     with tmp.open('x') as f:
         f.write(f"timeout {TIMEOUT}\n")
-        f.write("default %s\n" % generation_conf_filename(profile, generation, specialisation))
+        if "efi" in EFI_TYPE:
+            # Use traditional BLS Type #1 entry as default
+            f.write("default %s\n" % generation_conf_filename(profile, generation, specialisation))
+        elif "uki" in EFI_TYPE:
+            # For UKI-only mode, set default by UKI filename (Type #2)
+            f.write("default %s\n" % generation_uki_filename(profile, generation, specialisation))
         if not EDITOR:
             f.write("editor 0\n")
         if REBOOT_FOR_BITLOCKER:
@@ -144,14 +151,17 @@ def get_bootspec(profile: str | None, generation: int) -> BootSpec:
     return bootspec_from_json(bootspec_json)
 
 def bootspec_from_json(bootspec_json: dict[str, Any]) -> BootSpec:
-    specialisations = bootspec_json['org.nixos.specialisation.v1']
+    specialisations = bootspec_json.get('org.nixos.specialisation.v1', {})
     specialisations = {k: bootspec_from_json(v) for k, v in specialisations.items()}
     systemdBootExtension = bootspec_json.get('org.nixos.systemd-boot', {})
     sortKey = systemdBootExtension.get('sortKey', 'nixos')
     devicetree = systemdBootExtension.get('devicetree')
+    uki = systemdBootExtension.get('uki')
 
     if devicetree:
         devicetree = Path(devicetree)
+    if uki:
+        uki = Path(uki)
 
     main_json = bootspec_json['org.nixos.bootspec.v1']
     for attr in ("kernel", "initrd", "toplevel"):
@@ -162,6 +172,7 @@ def bootspec_from_json(bootspec_json: dict[str, Any]) -> BootSpec:
         specialisations=specialisations,
         sortKey=sortKey,
         devicetree=devicetree,
+        uki=uki,
     )
 
 
@@ -228,6 +239,30 @@ def write_entry(profile: str | None, generation: int, specialisation: str | None
     tmp_path.rename(entry_file)
 
 
+def generation_uki_filename(profile: str | None, generation: int, specialisation: str | None) -> str:
+    pieces = [
+        "ekaos",
+        profile or None,
+        "generation",
+        str(generation),
+        f"specialisation-{specialisation}" if specialisation else None,
+    ]
+    return "-".join(p for p in pieces if p) + ".efi"
+
+
+def write_uki_entry(profile: str | None, generation: int, specialisation: str | None,
+                    bootspec: BootSpec) -> None:
+    if specialisation:
+        bootspec = bootspec.specialisations[specialisation]
+    if bootspec.uki is None:
+        print(f"warning: no UKI found for generation {generation}, skipping UKI entry", file=sys.stderr)
+        return
+
+    uki_filename = generation_uki_filename(profile, generation, specialisation)
+    uki_dest = EFI_SYS_MOUNT_POINT / "EFI/Linux" / uki_filename
+    copy_if_not_exists(bootspec.uki, uki_dest)
+
+
 def get_generations(profile: str | None = None) -> list[SystemIdentifier]:
     gen_list = run(
         [
@@ -264,20 +299,37 @@ def remove_old_entries(gens: list[SystemIdentifier]) -> None:
         known_paths.append(copy_from_file(bootspec.initrd, True).name)
         if bootspec.devicetree is not None:
             known_paths.append(copy_from_file(bootspec.devicetree, True).name)
-    for path in (BOOT_MOUNT_POINT / "loader/entries").glob("nixos*-generation-[1-9]*.conf", case_sensitive=False):
-        if rex_profile.match(path.name):
-            prof = rex_profile.sub(r"\1", path.name)
-        else:
-            prof = None
-        try:
-            gen_number = int(rex_generation.sub(r"\1", path.name))
-        except ValueError:
-            continue
-        if (prof, gen_number, None) not in gens:
-            path.unlink()
-    for path in (BOOT_MOUNT_POINT / NIXOS_DIR).iterdir():
-        if path.name not in known_paths and not path.is_dir():
-            path.unlink()
+
+    # Clean up old BLS Type #1 entries
+    if "efi" in EFI_TYPE:
+        for path in (BOOT_MOUNT_POINT / "loader/entries").glob("nixos*-generation-[1-9]*.conf", case_sensitive=False):
+            if rex_profile.match(path.name):
+                prof = rex_profile.sub(r"\1", path.name)
+            else:
+                prof = None
+            try:
+                gen_number = int(rex_generation.sub(r"\1", path.name))
+            except ValueError:
+                continue
+            if (prof, gen_number, None) not in gens:
+                path.unlink()
+        for path in (BOOT_MOUNT_POINT / NIXOS_DIR).iterdir():
+            if path.name not in known_paths and not path.is_dir():
+                path.unlink()
+
+    # Clean up old UKI files
+    if "uki" in EFI_TYPE:
+        uki_dir = EFI_SYS_MOUNT_POINT / "EFI/Linux"
+        if uki_dir.is_dir():
+            known_uki_names = set()
+            for gen in gens:
+                known_uki_names.add(generation_uki_filename(gen.profile, gen.generation, None))
+                bootspec = get_bootspec(gen.profile, gen.generation)
+                for specialisation in bootspec.specialisations.keys():
+                    known_uki_names.add(generation_uki_filename(gen.profile, gen.generation, specialisation))
+            for path in uki_dir.glob("ekaos-*.efi"):
+                if path.name not in known_uki_names:
+                    path.unlink()
 
 
 def cleanup_esp() -> None:
@@ -373,8 +425,11 @@ def install_bootloader(args: argparse.Namespace) -> None:
                 + ["update"]
             )
 
-    (BOOT_MOUNT_POINT / NIXOS_DIR).mkdir(parents=True, exist_ok=True)
-    (BOOT_MOUNT_POINT / "loader/entries").mkdir(parents=True, exist_ok=True)
+    if "efi" in EFI_TYPE:
+        (BOOT_MOUNT_POINT / NIXOS_DIR).mkdir(parents=True, exist_ok=True)
+        (BOOT_MOUNT_POINT / "loader/entries").mkdir(parents=True, exist_ok=True)
+    if "uki" in EFI_TYPE:
+        (EFI_SYS_MOUNT_POINT / "EFI/Linux").mkdir(parents=True, exist_ok=True)
 
     gens = get_generations()
     for profile in get_profiles():
@@ -386,9 +441,15 @@ def install_bootloader(args: argparse.Namespace) -> None:
         try:
             bootspec = get_bootspec(gen.profile, gen.generation)
             is_default = Path(bootspec.init).parent == Path(args.default_config)
-            write_entry(*gen, machine_id, bootspec, current=is_default)
-            for specialisation in bootspec.specialisations.keys():
-                write_entry(gen.profile, gen.generation, specialisation, machine_id, bootspec, current=is_default)
+
+            if "efi" in EFI_TYPE:
+                write_entry(*gen, machine_id, bootspec, current=is_default)
+                for specialisation in bootspec.specialisations.keys():
+                    write_entry(gen.profile, gen.generation, specialisation, machine_id, bootspec, current=is_default)
+
+            if "uki" in EFI_TYPE:
+                write_uki_entry(*gen, bootspec)
+
             if is_default:
                 write_loader_conf(*gen)
         except OSError as e:
