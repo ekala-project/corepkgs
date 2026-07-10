@@ -7,7 +7,7 @@
 
 stdenv.mkDerivation rec {
   pname = "libsepol";
-  version = "3.9";
+  version = "3.11";
   se_url = "https://github.com/SELinuxProject/selinux/releases/download";
 
   outputs = [
@@ -19,7 +19,7 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "${se_url}/${version}/libsepol-${version}.tar.gz";
-    sha256 = "sha256-umMLWeUMX7+endRes3NPNzz3jWidjBDFNxFMm9dp+i4=";
+    sha256 = "sha256-efPSyI9Et+tc9U2XkuAyMil+F/l6F5Fj8nUAmaAPFk0=";
   };
 
   postPatch = lib.optionalString stdenv.hostPlatform.isStatic ''
