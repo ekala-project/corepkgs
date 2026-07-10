@@ -8,7 +8,7 @@
 
 stdenv.mkDerivation {
   pname = "patchelf";
-  version = "0.18.0-unstable-2025-08-13";
+  version = "0.19.1";
 
   src = fetchFromGitHub {
     owner = "NixOS";
