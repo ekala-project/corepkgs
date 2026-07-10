@@ -12,13 +12,13 @@
 stdenv.mkDerivation rec {
   pname = "aws-c-io";
   # nixpkgs-update: no auto update
-  version = "0.27.2";
+  version = "0.27.3";
 
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-io";
     rev = "v${version}";
-    hash = "sha256-0vzuSvJ/4you0YYnizjctKP5AcLm5sJieDOSCHwm1HM=";
+    hash = "sha256-xbZEopssOaGDMaua6bSatHHiIRPAx28CKuGoFe8aq1U=";
   };
 
   nativeBuildInputs = [
