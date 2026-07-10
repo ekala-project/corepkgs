@@ -33,13 +33,13 @@ assert enableJava -> openjdk != null;
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libjpeg-turbo";
-  version = "3.1.2";
+  version = "3.2.0";
 
   src = fetchFromGitHub {
     owner = "libjpeg-turbo";
     repo = "libjpeg-turbo";
     tag = finalAttrs.version;
-    hash = "sha256-tmeWLJxieV42f9ljSpKJoLER4QOYQLsLFC7jW54YZAk=";
+    hash = "sha256-SPxWCDt9hFQ8uRaaKLkpWp9oPhfcRkDBm5MarTgdmV4=";
   };
 
   patches =
