@@ -24,12 +24,6 @@ stdenv.mkDerivation rec {
     hash = "sha256-F92msxkYp4yZA3qUoSwS5GKUhcEO6DrYNln7w6U+jt0=";
   };
 
-  patches = [
-    # Fix redefinition when using linux/netlink.h from libbpf with musl
-    # https://github.com/libbpf/libbpf/pull/919
-    ./sync-uapi-move-constants-from-linux-kernel-h-to-linux-const-h.patch
-  ];
-
   nativeBuildInputs = [ pkg-config ];
   buildInputs = [
     elfutils
