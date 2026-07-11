@@ -157,7 +157,12 @@ in
       };
 
       type = mkOption {
-        type = types.listOf (types.enum [ "efi" "uki" ]);
+        type = types.listOf (
+          types.enum [
+            "efi"
+            "uki"
+          ]
+        );
         default = [ "efi" ];
         description = ''
           Boot entry types to install.
