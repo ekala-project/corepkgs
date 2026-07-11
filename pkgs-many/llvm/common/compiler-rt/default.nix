@@ -261,6 +261,8 @@ stdenv.mkDerivation (finalAttrs: {
       ln -s $out/lib/*/libclang_rt.builtins-*.a $out/lib/libcompiler_rt.a
     '';
 
+  passthru.ekapkgs-update.skip = true;
+
   meta = llvm_meta // {
     homepage = "https://compiler-rt.llvm.org/";
     description = "Compiler runtime libraries";

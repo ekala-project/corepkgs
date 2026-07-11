@@ -75,6 +75,8 @@ stdenv.mkDerivation (finalAttrs: {
       ln -s $out/lib/libunwind.dll.a $out/lib/libgcc_s.dll.a
     '';
 
+  passthru.ekapkgs-update.skip = true;
+
   meta = llvm_meta // {
     # Details: https://github.com/llvm/llvm-project/blob/main/libunwind/docs/index.rst
     homepage = "https://clang.llvm.org/docs/Toolchain.html#unwind-library";

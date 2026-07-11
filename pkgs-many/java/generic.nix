@@ -137,6 +137,7 @@ stdenv.mkDerivation (finalAttrs: {
   passthru = {
     home = placeholder "out";
     javaVersion = majorVersion;
+    ekapkgs-update.skip = true;
     buildMavenPackage = callPackage ./build-maven-package.nix {
       jdk = finalAttrs.finalPackage;
     };

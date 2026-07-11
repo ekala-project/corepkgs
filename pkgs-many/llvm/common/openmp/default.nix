@@ -88,6 +88,8 @@ stdenv.mkDerivation (finalAttrs: {
     patchShebangs ../tools/archer/tests/deflake.bash
   '';
 
+  passthru.ekapkgs-update.skip = true;
+
   meta = llvm_meta // {
     homepage = "https://openmp.llvm.org/";
     description = "Support for the OpenMP language";

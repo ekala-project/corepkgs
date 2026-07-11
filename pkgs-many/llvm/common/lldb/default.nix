@@ -41,6 +41,7 @@ stdenv.mkDerivation (
   finalAttrs:
   {
     passthru.monorepoSrc = monorepoSrc;
+    passthru.ekapkgs-update.skip = true;
     pname = "lldb";
     inherit version;
 

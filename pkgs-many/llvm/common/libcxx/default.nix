@@ -200,6 +200,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     isLLVM = true;
+    ekapkgs-update.skip = true;
   };
 
   meta = llvm_meta // {

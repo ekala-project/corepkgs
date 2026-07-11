@@ -86,6 +86,8 @@ stdenv.mkDerivation (finalAttrs: {
     "dev"
   ];
 
+  passthru.ekapkgs-update.skip = true;
+
   meta = llvm_meta // {
     homepage = "https://github.com/llvm/llvm-project/tree/main/bolt";
     description = "LLVM post-link optimizer";

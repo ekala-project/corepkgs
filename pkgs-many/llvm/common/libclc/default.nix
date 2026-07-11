@@ -104,6 +104,8 @@ stdenv.mkDerivation (finalAttrs: {
     install -Dt $dev/bin prepare_builtins
   '';
 
+  passthru.ekapkgs-update.skip = true;
+
   meta = {
     homepage = "http://libclc.llvm.org/";
     description = "Implementation of the library requirements of the OpenCL C programming language";

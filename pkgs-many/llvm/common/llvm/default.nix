@@ -597,6 +597,7 @@ stdenv.mkDerivation (
     passthru = {
       # For the update script:
       inherit monorepoSrc;
+      ekapkgs-update.skip = true;
       tests.withoutOptionalFeatures = libllvm.override {
         enablePFM = false;
         enablePolly = false;
