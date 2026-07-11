@@ -24,12 +24,12 @@
 
 buildPythonPackage rec {
   pname = "gevent";
-  version = "25.5.1";
+  version = "26.5.0";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-WCyUj6miMYi4kNC8Ewc0pQbQOaLlrYfa4nakVsxoPmE=";
+    hash = "sha256-FlXrBMHiDXGyqko8dSgWLdWP9sxGoDevHwH1NMgP77o=";
   };
 
   build-system = [
