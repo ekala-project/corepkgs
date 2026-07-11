@@ -18,7 +18,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "requests";
-  version = "2.32.5";
+  version = "2.34.2";
   pyproject = true;
 
   disabled = pythonOlder "3.9";
@@ -29,7 +29,7 @@ buildPythonPackage (finalAttrs: {
     owner = "psf";
     repo = "requests";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-cEBalMFoYFaGG8M48k+OEBvzLegzrTNP1NxH2ljP6qg=";
+    hash = "sha256-J2/sNpFUDHkNBeN7BfiMamv7YaWixZAZHxaqmPVEptc=";
   };
 
   build-system = [ setuptools ];
