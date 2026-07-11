@@ -87,6 +87,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   outputs = [ "out" ];
   requiredSystemFeatures = [ "big-parallel" ];
+  passthru.ekapkgs-update.skip = true;
+
   meta = llvm_meta // {
     homepage = "https://flang.llvm.org/";
     description = "LLVM-based Fortran frontend";

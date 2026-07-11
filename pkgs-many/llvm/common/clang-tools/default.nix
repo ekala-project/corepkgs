@@ -52,8 +52,9 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
+  passthru.ekapkgs-update.skip = true;
+
   meta = llvm_meta // {
     description = "Standalone command line tools for C++ development";
-
   };
 }

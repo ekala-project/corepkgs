@@ -186,6 +186,7 @@ stdenv.mkDerivation (
     passthru = {
       inherit libllvm;
       isClang = true;
+      ekapkgs-update.skip = true;
       hardeningUnsupportedFlagsByTargetPlatform =
         targetPlatform:
         [ "fortify3" ]

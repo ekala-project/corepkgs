@@ -77,5 +77,10 @@ llvmLib.overrideAttrs (oldAttrs: {
       # Add the full package scope as 'pkgs' passthru (like Python)
       pkgs = llvmPackages;
       inherit variantArgs;
+      # The inner llvm sets ekapkgs-update.skip since its file uses
+      # `inherit version` and can't be updated directly. The outer
+      # mkManyVariants wrapper CAN be updated via variants.nix, so
+      # clear the skip flag.
+      ekapkgs-update.skip = false;
     };
 })

@@ -82,6 +82,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   requiredSystemFeatures = [ "big-parallel" ];
+  passthru.ekapkgs-update.skip = true;
+
   meta = llvm_meta // {
     homepage = "https://mlir.llvm.org/";
     description = "Multi-Level IR Compiler Framework";

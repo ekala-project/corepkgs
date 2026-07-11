@@ -9,6 +9,8 @@ stdenv.mkDerivation {
   pname = "minizip";
   inherit (zlib) src version;
 
+  passthru.ekapkgs-update.skip = true;
+
   patchFlags = [ "-p3" ];
 
   nativeBuildInputs = [ autoreconfHook ];
