@@ -6,6 +6,7 @@
   libiconvReal,
   updateAutotoolsGnuConfigScriptsHook,
   darwin,
+  libidn2,
 }@args:
 
 let
@@ -59,6 +60,10 @@ stdenv.mkDerivation (finalAttrs: {
   */
   enableParallelChecking = false;
   enableParallelBuilding = true;
+
+  passthru.tests = {
+    inherit libidn2;
+  };
 
   meta = {
     homepage = "https://www.gnu.org/software/libunistring/";
