@@ -9,6 +9,8 @@
   inBootstrap ? false,
   pkg-config,
   gnumake,
+  runCommand,
+  testers,
 }:
 
 let
@@ -53,6 +55,19 @@ stdenv.mkDerivation rec {
   separateDebugInfo = true;
 
   passthru.tests = {
+    version = testers.testVersion {
+      package = gnumake;
+      command = "make --version";
+    };
+    simple = runCommand "gnumake-test" { } ''
+      cat > Makefile <<'EOF'
+      all:
+      	@echo "hello"
+      EOF
+      result=$(${gnumake}/bin/make -f Makefile)
+      test "$result" = "hello"
+      touch $out
+    '';
     # make sure that the override doesn't break bootstrapping
     gnumakeWithGuile = gnumake.override { guileSupport = true; };
   };
