@@ -5,6 +5,9 @@
   m4,
   perl,
   help2man,
+  bison,
+  runCommand,
+  testers,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -47,6 +50,32 @@ stdenv.mkDerivation rec {
   # Normal check and install check largely execute the same test suite
   doCheck = false;
   doInstallCheck = true;
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = bison;
+      command = "bison --version";
+    };
+    simple = runCommand "bison-test" { nativeBuildInputs = [ bison ]; } ''
+      cat > calc.y <<'EOF'
+      %{
+      #include <stdio.h>
+      int yylex(void);
+      void yyerror(const char *s);
+      %}
+      %token NUM
+      %%
+      input: NUM ;
+      %%
+      void yyerror(const char *s) { fprintf(stderr, "%s\n", s); }
+      int yylex(void) { return 0; }
+      int main(void) { return 0; }
+      EOF
+      bison -o calc.c calc.y
+      test -f calc.c
+      touch $out
+    '';
+  };
 
   meta = {
     homepage = "https://www.gnu.org/software/bison/";
