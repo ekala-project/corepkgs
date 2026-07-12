@@ -5,6 +5,7 @@
   fetchurl,
   gettext,
   libgpg-error,
+  gnupg,
 }:
 
 stdenv.mkDerivation rec {
@@ -35,6 +36,10 @@ stdenv.mkDerivation rec {
     mv $out/bin/*-config $dev/bin/
     rmdir --ignore-fail-on-non-empty $out/bin
   '';
+
+  passthru.tests = {
+    inherit gnupg;
+  };
 
   meta = {
     homepage = "https://www.gnupg.org";
