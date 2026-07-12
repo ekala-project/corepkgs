@@ -3,6 +3,7 @@
   stdenv,
   fetchurl,
   gettext,
+  acl,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -36,6 +37,10 @@ stdenv.mkDerivation rec {
       patchShebangs $script
     done
   '';
+
+  passthru.tests = {
+    inherit acl;
+  };
 
   meta = {
     homepage = "https://savannah.nongnu.org/projects/attr/";
