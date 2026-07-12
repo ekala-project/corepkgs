@@ -5,6 +5,9 @@
   updateAutotoolsGnuConfigScriptsHook,
   xz,
   coreutils ? null,
+  diffutils,
+  runCommand,
+  testers,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -71,6 +74,20 @@ stdenv.mkDerivation rec {
 
   # Test failure on QEMU only (#300550)
   doCheck = !stdenv.buildPlatform.isRiscV64;
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = diffutils;
+      command = "diff --version";
+    };
+    simple = runCommand "diffutils-test" { } ''
+      echo "hello" > a.txt
+      echo "world" > b.txt
+      ${diffutils}/bin/diff a.txt b.txt > diff.out || true
+      test -s diff.out
+      touch $out
+    '';
+  };
 
   meta = {
     homepage = "https://www.gnu.org/software/diffutils/diffutils.html";
