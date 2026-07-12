@@ -15,6 +15,8 @@
   nukeReferences,
   python3,
   lzip,
+  testers,
+  wget,
 
   withLibpsl ? false,
   libpsl,
@@ -114,6 +116,13 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     perlPackages.IOSocketSSL
   ];
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = wget;
+      command = "wget --version";
+    };
+  };
 
   meta = {
     description = "Tool for retrieving files using HTTP, HTTPS, and FTP";
