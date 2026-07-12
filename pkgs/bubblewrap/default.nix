@@ -10,6 +10,7 @@
   bash-completion,
   libcap,
   libselinux,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -52,6 +53,13 @@ stdenv.mkDerivation (finalAttrs: {
 
   # incompatible with Nix sandbox
   doCheck = false;
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "bwrap --version";
+    };
+  };
 
   meta = {
     changelog = "https://github.com/containers/bubblewrap/releases/tag/${finalAttrs.src.rev}";
