@@ -9,6 +9,8 @@
   withPCRE2 ? true,
   pcre2,
   writableTmpDirAsHomeHook,
+  runCommand,
+  testers,
 }:
 
 let
@@ -57,6 +59,17 @@ rustPlatform.buildRustPackage (finalAttrs: {
   + lib.optionalString withPCRE2 ''
     echo '(a(aa)aa)' | ${rg} -P '\((a*|(?R))*\)'
   '';
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+    };
+    simple = runCommand "ripgrep-test" { } ''
+      echo "hello world" > file.txt
+      ${finalAttrs.finalPackage}/bin/rg -c "world" file.txt > $out
+      test "$(cat $out)" = "1"
+    '';
+  };
 
   meta = {
     description = "Utility that combines the usability of The Silver Searcher with the raw speed of grep";
