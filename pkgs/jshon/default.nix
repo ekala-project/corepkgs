@@ -4,6 +4,9 @@
   fetchFromGitHub,
   fetchpatch,
   jansson,
+  jshon,
+  runCommand,
+  testers,
 }:
 
 stdenv.mkDerivation {
@@ -35,6 +38,18 @@ stdenv.mkDerivation {
   preInstall = ''
     export DESTDIR=$out
   '';
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = jshon;
+      command = "jshon --version";
+    };
+    simple = runCommand "jshon-test" { } ''
+      result=$(echo '{"key":"value"}' | ${jshon}/bin/jshon -e key -u)
+      test "$result" = "value"
+      touch $out
+    '';
+  };
 
   meta = {
     homepage = "http://kmkeen.com/jshon";
