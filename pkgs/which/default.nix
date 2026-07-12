@@ -2,6 +2,8 @@
   lib,
   stdenv,
   fetchurl,
+  runCommand,
+  testers,
   directoryListingUpdater,
 }:
 
@@ -17,9 +19,19 @@ stdenv.mkDerivation (finalAttrs: {
   strictDeps = true;
   enableParallelBuilding = true;
 
-  passthru.updateScript = directoryListingUpdater {
-    inherit (finalAttrs) pname version;
-    url = "https://ftp.gnu.org/gnu/which/";
+  passthru = {
+    tests = {
+      version = testers.testVersion {
+        package = finalAttrs.finalPackage;
+      };
+      lookup = runCommand "which-test-lookup" { } ''
+        ${finalAttrs.finalPackage}/bin/which which > $out
+      '';
+    };
+    updateScript = directoryListingUpdater {
+      inherit (finalAttrs) pname version;
+      url = "https://ftp.gnu.org/gnu/which/";
+    };
   };
 
   meta = {
