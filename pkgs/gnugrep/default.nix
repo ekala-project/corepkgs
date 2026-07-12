@@ -8,6 +8,9 @@
   libiconv,
   perl,
   runtimeShellPackage,
+  gnugrep,
+  runCommand,
+  testers,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -111,5 +114,15 @@ stdenv.mkDerivation {
 
   passthru = {
     inherit pcre2;
+    tests = {
+      version = testers.testVersion {
+        package = gnugrep;
+        command = "grep --version";
+      };
+      simple = runCommand "gnugrep-test" { } ''
+        echo "foo bar baz" | ${gnugrep}/bin/grep -o 'bar' > $out
+        test "$(cat $out)" = "bar"
+      '';
+    };
   };
 }
