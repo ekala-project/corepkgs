@@ -6,6 +6,7 @@
   util-linux,
   openssl,
   cacert,
+  testers,
   # The primary --enable-XXX variant. 'all' enables most features, but causes build-errors for some software,
   # requiring to build a special variant for that software. Example: 'haproxy'
   variant ? "all",
@@ -107,6 +108,13 @@ stdenv.mkDerivation (finalAttrs: {
     # moveToOutput also removes "$out" so recreate it
     mkdir -p "$out"
   '';
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "wolfssl-config --version";
+    };
+  };
 
   meta = {
     description = "Small, fast, portable implementation of TLS/SSL for embedded devices";
