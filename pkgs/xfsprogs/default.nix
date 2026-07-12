@@ -8,6 +8,7 @@
   readline,
   inih,
   userspace-rcu,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -81,6 +82,13 @@ stdenv.mkDerivation (finalAttrs: {
       fi
     done
   '';
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "mkfs.xfs -V";
+    };
+  };
 
   meta = {
     homepage = "https://xfs.wiki.kernel.org/";
