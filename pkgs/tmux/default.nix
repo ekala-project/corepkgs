@@ -16,6 +16,7 @@
   withUtempter ? false, # disabled in core-pkgs (libutempter not available)
   libutempter ? null,
   withSixel ? true,
+  testers,
   versionCheckHook,
   nix-update-script,
 }:
@@ -71,6 +72,12 @@ stdenv.mkDerivation (finalAttrs: {
   doInstallCheck = true;
 
   passthru = {
+    tests = {
+      version = testers.testVersion {
+        package = finalAttrs.finalPackage;
+        command = "tmux -V";
+      };
+    };
     terminfo = runCommand "tmux-terminfo" { nativeBuildInputs = [ ncurses ]; } (
       if stdenv.hostPlatform.isDarwin then
         ''
