@@ -6,10 +6,12 @@
   coreutils,
   libblocksruntime,
   llvmPackages,
+  meson,
   ninja,
   pkg-config,
   python3,
   replaceVars,
+  testers,
   writeShellScriptBin,
   zlib,
 }:
@@ -172,7 +174,14 @@ python3.pkgs.buildPythonApplication rec {
   '';
 
   env.hostPlatform = stdenv.targetPlatform.system;
-  passthru.configurePhaseHook = ./setup-hook.sh;
+  passthru = {
+    configurePhaseHook = ./setup-hook.sh;
+    tests = {
+      version = testers.testVersion {
+        package = meson;
+      };
+    };
+  };
 
   meta = {
     homepage = "https://mesonbuild.com";
