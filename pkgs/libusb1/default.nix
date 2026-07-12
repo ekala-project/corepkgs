@@ -12,6 +12,7 @@
   withExamples ? false,
   withStatic ? false,
   withDocs ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
+  pcsclite,
 }:
 
 stdenv.mkDerivation rec {
@@ -65,6 +66,10 @@ stdenv.mkDerivation rec {
     cp -r examples/.libs/* $out/examples/bin
     ln -s $out/examples/bin/fxload $out/sbin/fxload
   '';
+
+  passthru.tests = {
+    inherit pcsclite;
+  };
 
   meta = {
     homepage = "https://libusb.info/";
