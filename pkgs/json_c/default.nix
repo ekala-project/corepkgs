@@ -3,6 +3,7 @@
   stdenv,
   fetchFromGitHub,
   cmake,
+  elfutils,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -29,6 +30,10 @@ stdenv.mkDerivation (finalAttrs: {
   cmakeFlags = [
     (lib.cmakeBool "BUILD_APPS" false)
   ];
+
+  passthru.tests = {
+    inherit elfutils;
+  };
 
   meta = {
     description = "JSON implementation in C";
