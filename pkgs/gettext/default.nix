@@ -5,6 +5,9 @@
   libiconv,
   bashNonInteractive,
   updateAutotoolsGnuConfigScriptsHook,
+  gettext,
+  runCommand,
+  testers,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -106,6 +109,17 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
   enableParallelChecking = false; # fails sometimes
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = gettext;
+      command = "gettext --version";
+    };
+    simple = runCommand "gettext-test" { } ''
+      ${gettext}/bin/gettext "" > /dev/null
+      touch $out
+    '';
+  };
 
   meta = {
     description = "Well integrated set of translation tools and documentation";
