@@ -2,6 +2,8 @@
   lib,
   stdenv,
   fetchurl,
+  runCommand,
+  testers,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -43,6 +45,17 @@ stdenv.mkDerivation (finalAttrs: {
     "--with-syscmd-shell=${stdenv.shell}"
   ]
   ++ lib.optional stdenv.hostPlatform.isMinGW "CFLAGS=-fno-stack-protector";
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "m4 --version";
+    };
+    simple = runCommand "m4-test" { } ''
+      echo 'define(greeting, Hello $1)greeting(world)' | ${finalAttrs.finalPackage}/bin/m4 > $out
+      grep -q "Hello world" $out
+    '';
+  };
 
   meta = {
     description = "GNU M4, a macro processor";
