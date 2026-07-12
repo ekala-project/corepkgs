@@ -14,6 +14,8 @@
   replaceVars,
   swig,
   libyaml,
+  runCommand,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -99,6 +101,16 @@ stdenv.mkDerivation (finalAttrs: {
       # `-Dtests=disabled`; without it meson will attempt to run
       # hostPlatform binaries during the configurePhase.
       (with stdenv; buildPlatform.canExecute hostPlatform);
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+    };
+    simple = runCommand "dtc-test" { } ''
+      echo '/dts-v1/; / { model = "test"; };' | ${finalAttrs.finalPackage}/bin/dtc -O dtb > /dev/null
+      touch $out
+    '';
+  };
 
   meta = {
     description = "Device Tree Compiler";
