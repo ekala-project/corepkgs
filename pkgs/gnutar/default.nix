@@ -7,6 +7,9 @@
   libintl,
   aclSupport ? lib.meta.availableOn stdenv.hostPlatform acl,
   acl,
+  gnutar,
+  runCommand,
+  testers,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -64,6 +67,21 @@ stdenv.mkDerivation rec {
 
   doCheck = false; # fails
   doInstallCheck = false; # fails
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = gnutar;
+      command = "tar --version";
+    };
+    simple = runCommand "gnutar-test" { } ''
+      echo "hello" > file.txt
+      ${gnutar}/bin/tar cf archive.tar file.txt
+      rm file.txt
+      ${gnutar}/bin/tar xf archive.tar
+      test "$(cat file.txt)" = "hello"
+      touch $out
+    '';
+  };
 
   meta = {
     description = "GNU implementation of the `tar' archiver";
