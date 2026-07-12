@@ -2,6 +2,9 @@
   lib,
   bundlerApp,
   bundlerUpdateScript,
+  asciidoctor,
+  runCommand,
+  testers,
 }:
 
 bundlerApp {
@@ -15,6 +18,18 @@ bundlerApp {
 
   passthru = {
     updateScript = bundlerUpdateScript "asciidoctor";
+    tests = {
+      version = testers.testVersion {
+        package = asciidoctor;
+        command = "asciidoctor --version";
+      };
+      simple = runCommand "asciidoctor-test" { } ''
+        echo "= Test" > input.adoc
+        ${asciidoctor}/bin/asciidoctor -o output.html input.adoc
+        grep -q "<h1>Test</h1>" output.html
+        touch $out
+      '';
+    };
   };
 
   meta = {
