@@ -6,6 +6,7 @@
   ninja,
   pkg-config,
   glib,
+  slirp4netns,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -34,6 +35,10 @@ stdenv.mkDerivation (finalAttrs: {
   postPatch = ''
     echo ${finalAttrs.version} > .tarball-version
   '';
+
+  passthru.tests = {
+    inherit slirp4netns;
+  };
 
   meta = {
     description = "General purpose TCP-IP emulator";
