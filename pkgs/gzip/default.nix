@@ -5,6 +5,9 @@
   makeShellWrapper,
   updateAutotoolsGnuConfigScriptsHook,
   runtimeShellPackage,
+  gzip,
+  runCommand,
+  testers,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -59,6 +62,20 @@ stdenv.mkDerivation rec {
     wrapProgram $out/bin/gzip \
       --add-flags "\''${GZIP_NO_TIMESTAMPS:+-n}"
   '';
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = gzip;
+      command = "gzip --version";
+    };
+    simple = runCommand "gzip-test" { } ''
+      echo "hello nix" > input.txt
+      ${gzip}/bin/gzip input.txt
+      ${gzip}/bin/gunzip input.txt.gz
+      test "$(cat input.txt)" = "hello nix"
+      touch $out
+    '';
+  };
 
   meta = {
     homepage = "https://www.gnu.org/software/gzip/";
