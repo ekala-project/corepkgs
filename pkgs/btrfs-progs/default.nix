@@ -10,6 +10,7 @@
   zstd,
   python3,
   eudev,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -57,6 +58,13 @@ stdenv.mkDerivation (finalAttrs: {
   installFlags = [
     "udevdir=${placeholder "out"}/lib/udev"
   ];
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "btrfs --version";
+    };
+  };
 
   meta = {
     homepage = "https://btrfs.readthedocs.io/";
