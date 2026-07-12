@@ -9,6 +9,8 @@
   hwdata,
   static ? stdenv.hostPlatform.isStatic,
   gitUpdater,
+  pciutils,
+  testers,
 }:
 
 stdenv.mkDerivation rec {
@@ -59,10 +61,18 @@ stdenv.mkDerivation rec {
     cp --reflink=auto ${hwdata}/share/hwdata/pci.ids $out/share/pci.ids
   '';
 
-  passthru.updateScript = gitUpdater {
-    # No nicer place to find latest release.
-    url = "https://github.com/pciutils/pciutils.git";
-    rev-prefix = "v";
+  passthru = {
+    tests = {
+      version = testers.testVersion {
+        package = pciutils;
+        command = "lspci --version";
+      };
+    };
+    updateScript = gitUpdater {
+      # No nicer place to find latest release.
+      url = "https://github.com/pciutils/pciutils.git";
+      rev-prefix = "v";
+    };
   };
 
   meta = {
