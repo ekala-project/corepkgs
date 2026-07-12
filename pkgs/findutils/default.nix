@@ -4,6 +4,9 @@
   fetchurl,
   updateAutotoolsGnuConfigScriptsHook,
   coreutils,
+  findutils,
+  runCommand,
+  testers,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -69,6 +72,20 @@ stdenv.mkDerivation rec {
   '';
 
   enableParallelBuilding = true;
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = findutils;
+      command = "find --version";
+    };
+    simple = runCommand "findutils-test" { } ''
+      mkdir -p dir/sub
+      touch dir/a.txt dir/sub/b.txt
+      count=$(${findutils}/bin/find dir -name "*.txt" | wc -l)
+      test "$count" -eq 2
+      touch $out
+    '';
+  };
 
   # bionic libc is super weird and has issues with fortify outside of its own libc, check this comment:
   # https://github.com/NixOS/nixpkgs/pull/192630#discussion_r978985593
