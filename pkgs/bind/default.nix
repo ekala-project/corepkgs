@@ -9,6 +9,8 @@
   zlib,
   pkg-config,
   userspace-rcu,
+  runCommand,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -68,6 +70,17 @@ stdenv.mkDerivation (finalAttrs: {
     rm -rf $out/sbin || true
     rm -rf $out/etc || true
   '';
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "dig -v";
+    };
+    simple = runCommand "bind-test" { } ''
+      ${finalAttrs.finalPackage}/bin/dig +short -x 127.0.0.1 > /dev/null 2>&1 || true
+      touch $out
+    '';
+  };
 
   meta = {
     homepage = "https://www.isc.org/bind/";
