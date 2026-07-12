@@ -7,6 +7,9 @@
   help2man,
   texinfo,
   buildPackages,
+  libidn2,
+  runCommand,
+  testers,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -43,6 +46,18 @@ stdenv.mkDerivation rec {
   ];
   buildInputs = [ libunistring ] ++ lib.optional stdenv.hostPlatform.isDarwin libiconv;
   depsBuildBuild = [ buildPackages.stdenv.cc ];
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = libidn2;
+      command = "idn2 --version";
+    };
+    simple = runCommand "libidn2-test" { } ''
+      result=$(echo "example.com" | ${libidn2}/bin/idn2)
+      test "$result" = "example.com"
+      touch $out
+    '';
+  };
 
   meta = {
     homepage = "https://www.gnu.org/software/libidn/#libidn2";
