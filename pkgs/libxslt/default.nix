@@ -12,6 +12,7 @@
   libgcrypt,
   cryptoSupport ? false,
   pythonSupport ? libxml2.pythonSupport,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -86,6 +87,12 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     inherit pythonSupport;
+    tests = {
+      version = testers.testVersion {
+        package = finalAttrs.finalPackage;
+        command = "xsltproc --version";
+      };
+    };
   };
 
   meta = {
