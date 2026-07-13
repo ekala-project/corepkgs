@@ -13,6 +13,8 @@
   cereal,
   asciidoctor,
   cmake,
+  bpftrace,
+  testers,
   pkg-config,
   flex,
   bison,
@@ -73,6 +75,13 @@ stdenv.mkDerivation rec {
     "out"
     "man"
   ];
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = bpftrace;
+      command = "bpftrace --version";
+    };
+  };
 
   meta = {
     description = "High-level tracing language for Linux eBPF";
