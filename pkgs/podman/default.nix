@@ -30,6 +30,7 @@
   aardvark-dns,
   netavark,
   passt,
+  testers,
   versionCheckHook,
   coreutils,
   runtimeShell,
@@ -138,7 +139,12 @@ buildGoModule (finalAttrs: {
   ];
 
   passthru = {
-    tests = { };
+    tests = {
+      version = testers.testVersion {
+        package = finalAttrs.finalPackage;
+        command = "podman --version";
+      };
+    };
     # do not add qemu to this wrapper, store paths get written to the podman vm config and break when GCed
     binPath = lib.makeBinPath (
       lib.optionals stdenv.hostPlatform.isLinux [
