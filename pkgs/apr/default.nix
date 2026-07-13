@@ -4,6 +4,7 @@
   fetchurl,
   buildPackages,
   autoreconfHook,
+  aprutil,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -73,6 +74,10 @@ stdenv.mkDerivation (finalAttrs: {
   doCheck = false;
 
   enableParallelBuilding = true;
+
+  passthru.tests = {
+    inherit aprutil;
+  };
 
   meta = {
     homepage = "https://apr.apache.org/";
