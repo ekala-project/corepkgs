@@ -155,6 +155,10 @@ stdenv.mkDerivation (finalAttrs: {
     EOF
   '';
 
+  passthru.tests = {
+    inherit swtpm;
+  };
+
   # TODO(corepkgs): Move to passthru
   doCheck = false;
   doInstallCheck = false;
