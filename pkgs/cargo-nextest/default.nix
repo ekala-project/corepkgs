@@ -4,6 +4,8 @@
   rustPlatform,
   fetchFromGitHub,
   nix-update-script,
+  cargo-nextest,
+  testers,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -33,7 +35,13 @@ rustPlatform.buildRustPackage rec {
     "cargo-nextest"
   ];
 
-  passthru.updateScript = nix-update-script { };
+  passthru = {
+    tests.version = testers.testVersion {
+      package = cargo-nextest;
+      command = "cargo-nextest nextest --version";
+    };
+    updateScript = nix-update-script { };
+  };
 
   meta = {
     description = "Next-generation test runner for Rust projects";
