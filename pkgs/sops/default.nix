@@ -3,6 +3,7 @@
   buildGoModule,
   fetchFromGitHub,
   installShellFiles,
+  testers,
   versionCheckHook,
   nix-update-script,
   makeWrapper,
@@ -43,6 +44,11 @@ buildGoModule (finalAttrs: {
 
   nativeInstallCheckInputs = [ versionCheckHook ];
   doInstallCheck = true;
+
+  passthru.tests.version = testers.testVersion {
+    package = finalAttrs.finalPackage;
+    command = "sops --version";
+  };
 
   passthru.updateScript = nix-update-script { };
 
