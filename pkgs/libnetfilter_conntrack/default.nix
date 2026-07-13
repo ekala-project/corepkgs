@@ -5,6 +5,7 @@
   pkg-config,
   libnfnetlink,
   libmnl,
+  iptables,
 }:
 
 stdenv.mkDerivation rec {
@@ -23,6 +24,10 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ pkg-config ];
 
   enableParallelBuilding = true;
+
+  passthru.tests = {
+    inherit iptables;
+  };
 
   meta = {
     description = "Userspace library providing an API to the in-kernel connection tracking state table";
