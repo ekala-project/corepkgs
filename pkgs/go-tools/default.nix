@@ -2,6 +2,7 @@
   buildGoModule,
   lib,
   fetchFromGitHub,
+  testers,
 }:
 
 buildGoModule (finalAttrs: {
@@ -18,6 +19,13 @@ buildGoModule (finalAttrs: {
   vendorHash = "sha256-Wu8+e0r0bkztLbxekbHktoKjg6c8q7ls5APSEdO8CKs=";
 
   excludedPackages = [ "website" ];
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "staticcheck -version";
+    };
+  };
 
   meta = {
     description = "Collection of tools and libraries for working with Go code, including linters and static analysis";
