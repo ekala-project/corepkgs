@@ -5,6 +5,7 @@
   pkg-config,
   libmnl,
   gitUpdater,
+  nftables,
 }:
 
 stdenv.mkDerivation rec {
@@ -25,9 +26,14 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  passthru.updateScript = gitUpdater {
-    url = "https://git.netfilter.org/libnftnl";
-    rev-prefix = "libnftnl-";
+  passthru = {
+    tests = {
+      inherit nftables;
+    };
+    updateScript = gitUpdater {
+      url = "https://git.netfilter.org/libnftnl";
+      rev-prefix = "libnftnl-";
+    };
   };
 
   meta = {
