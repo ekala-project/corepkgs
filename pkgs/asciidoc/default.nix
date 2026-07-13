@@ -13,6 +13,8 @@
   graphviz,
   texliveMinimal,
   dblatexFull,
+  asciidoc,
+  testers,
   libxslt,
   w3m,
   lynx,
@@ -317,6 +319,13 @@ python3.pkgs.buildPythonApplication rec {
 
     runHook postCheck
   '';
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = asciidoc;
+      command = "asciidoc --version";
+    };
+  };
 
   meta = {
     description = "Text-based document generation system";
