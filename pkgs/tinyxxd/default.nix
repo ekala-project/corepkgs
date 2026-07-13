@@ -3,6 +3,8 @@
   stdenv,
   fetchFromGitHub,
   installShellFiles,
+  runCommand,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -28,6 +30,17 @@ stdenv.mkDerivation (finalAttrs: {
     ln -s $out/bin/{tiny,}xxd
     ln -s $out/share/man/man1/{tiny,}xxd.1.gz
   '';
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "tinyxxd --version";
+    };
+    simple = runCommand "tinyxxd-test" { } ''
+      echo "hello" | ${finalAttrs.finalPackage}/bin/tinyxxd > $out
+      grep -q "6865 6c6c" $out
+    '';
+  };
 
   meta = {
     homepage = "https://github.com/xyproto/tinyxxd";
