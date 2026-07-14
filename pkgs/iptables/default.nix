@@ -13,6 +13,8 @@
   libnftnl,
   libpcap,
   bash,
+  iptables,
+  testers,
   bashNonInteractive,
   nftablesCompat ? true,
   gitUpdater,
@@ -82,6 +84,12 @@ stdenv.mkDerivation rec {
   ];
 
   passthru = {
+    tests = {
+      version = testers.testVersion {
+        package = iptables;
+        command = "iptables --version";
+      };
+    };
     updateScript = gitUpdater {
       url = "https://git.netfilter.org/iptables";
       rev-prefix = "v";

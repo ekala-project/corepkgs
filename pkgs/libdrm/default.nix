@@ -8,6 +8,7 @@
   libpthread-stubs,
   libpciaccess,
   python3Packages,
+  mesa,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -51,6 +52,10 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals (!stdenv.hostPlatform.isLinux) [
     "-Detnaviv=disabled"
   ];
+
+  passthru.tests = {
+    inherit mesa;
+  };
 
   meta = {
     homepage = "https://gitlab.freedesktop.org/mesa/drm";

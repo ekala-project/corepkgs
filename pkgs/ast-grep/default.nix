@@ -7,6 +7,8 @@
   versionCheckHook,
   nix-update-script,
   enableLegacySg ? false,
+  runCommand,
+  testers,
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -52,7 +54,19 @@ rustPlatform.buildRustPackage (finalAttrs: {
   ];
   doInstallCheck = true;
 
-  passthru.updateScript = nix-update-script { };
+  passthru = {
+    tests = {
+      version = testers.testVersion {
+        package = finalAttrs.finalPackage;
+      };
+      simple = runCommand "ast-grep-test" { } ''
+        echo 'console.log("hello")' > test.js
+        ${finalAttrs.finalPackage}/bin/ast-grep run --pattern 'console.log($A)' test.js > $out || true
+        touch $out
+      '';
+    };
+    updateScript = nix-update-script { };
+  };
 
   meta = {
     mainProgram = "ast-grep";

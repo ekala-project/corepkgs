@@ -7,6 +7,8 @@
   perl,
   gdb,
   writeScript,
+  valgrind,
+  testers,
 }:
 
 stdenv.mkDerivation rec {
@@ -85,6 +87,12 @@ stdenv.mkDerivation rec {
   '';
 
   passthru = {
+    tests = {
+      version = testers.testVersion {
+        package = valgrind;
+        command = "valgrind --version";
+      };
+    };
     updateScript = writeScript "update-valgrind" ''
       #!/usr/bin/env nix-shell
       #!nix-shell -i bash -p curl pcre common-updater-scripts

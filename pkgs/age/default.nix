@@ -4,6 +4,8 @@
   fetchFromGitHub,
   installShellFiles,
   versionCheckHook,
+  runCommand,
+  testers,
 }:
 
 buildGoModule (finalAttrs: {
@@ -40,6 +42,19 @@ buildGoModule (finalAttrs: {
     "-skip"
     "TestScript/plugin"
   ];
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "age --version";
+    };
+    simple = runCommand "age-test" { } ''
+      ${finalAttrs.finalPackage}/bin/age-keygen -o key.txt 2>/dev/null
+      test -f key.txt
+      grep -q "AGE-SECRET-KEY" key.txt
+      touch $out
+    '';
+  };
 
   meta = {
     changelog = "https://github.com/FiloSottile/age/releases/tag/v${finalAttrs.version}";

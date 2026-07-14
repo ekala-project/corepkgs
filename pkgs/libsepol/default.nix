@@ -3,6 +3,7 @@
   stdenv,
   fetchurl,
   flex,
+  libselinux,
 }:
 
 stdenv.mkDerivation rec {
@@ -43,7 +44,12 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  passthru = { inherit se_url; };
+  passthru = {
+    inherit se_url;
+    tests = {
+      inherit libselinux;
+    };
+  };
 
   meta = {
     description = "SELinux binary policy manipulation library";

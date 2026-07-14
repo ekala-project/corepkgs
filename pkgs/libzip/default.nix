@@ -8,6 +8,7 @@
   xz,
   zstd,
   openssl,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -47,6 +48,10 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   enableParallelBuilding = true;
+
+  passthru.tests = {
+    pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  };
 
   meta = {
     homepage = "https://libzip.org/";

@@ -11,6 +11,8 @@
   libselinux,
   stdenv,
   makeBinaryWrapper,
+  runc,
+  testers,
 }:
 
 buildGoModule (finalAttrs: {
@@ -65,7 +67,12 @@ buildGoModule (finalAttrs: {
     runHook postInstall
   '';
 
-  passthru.tests = { };
+  passthru.tests = {
+    version = testers.testVersion {
+      package = runc;
+      command = "runc --version";
+    };
+  };
 
   meta = {
     homepage = "https://github.com/opencontainers/runc";

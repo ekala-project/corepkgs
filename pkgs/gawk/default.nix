@@ -8,6 +8,9 @@
   interactive ? false,
   readline,
   autoreconfHook, # no-pma fix
+  gawk,
+  runCommand,
+  testers,
 
   /*
     Test suite broke on:
@@ -76,6 +79,18 @@ stdenv.mkDerivation rec {
   ];
 
   inherit doCheck;
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = gawk;
+      command = "gawk --version";
+    };
+    simple = runCommand "gawk-test" { } ''
+      result=$(echo "hello world" | ${gawk}/bin/gawk '{ print $2 }')
+      test "$result" = "world"
+      touch $out
+    '';
+  };
 
   postInstall =
     (

@@ -7,6 +7,7 @@
   ninja,
   zlib,
   hwdata,
+  libdrm,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -35,6 +36,10 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.mesonOption "pci-ids" "${hwdata}/share/hwdata")
     (lib.mesonEnable "zlib" true)
   ];
+
+  passthru.tests = {
+    inherit libdrm;
+  };
 
   meta = {
     description = "Generic PCI access library";

@@ -40,6 +40,8 @@
     (lib.getLib targetPackages.stdenv.cc.cc)
   ],
   writeScript,
+  gdb,
+  testers,
 }:
 
 let
@@ -185,6 +187,12 @@ stdenv.mkDerivation rec {
   doCheck = false;
 
   passthru = {
+    tests = {
+      version = testers.testVersion {
+        package = gdb;
+        command = "gdb --version";
+      };
+    };
     updateScript = writeScript "update-gdb" ''
       #!/usr/bin/env nix-shell
       #!nix-shell -i bash -p curl pcre common-updater-scripts

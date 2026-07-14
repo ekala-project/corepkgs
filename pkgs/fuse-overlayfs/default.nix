@@ -5,6 +5,7 @@
   autoreconfHook,
   pkg-config,
   fuse3,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -33,7 +34,12 @@ stdenv.mkDerivation (finalAttrs: {
     "man"
   ];
 
-  passthru.tests = { };
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "fuse-overlayfs --version";
+    };
+  };
 
   meta = {
     description = "FUSE implementation for overlayfs";

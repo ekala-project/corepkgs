@@ -8,6 +8,7 @@
   readline,
   zlib,
   writeScript,
+  newt,
 }:
 
 stdenv.mkDerivation rec {
@@ -65,6 +66,9 @@ stdenv.mkDerivation rec {
   '';
 
   passthru = {
+    tests = {
+      inherit newt;
+    };
     updateScript = writeScript "update-slang" ''
       #!/usr/bin/env nix-shell
       #!nix-shell -i bash -p curl pcre common-updater-scripts

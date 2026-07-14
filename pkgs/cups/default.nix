@@ -18,6 +18,8 @@
   libusb1 ? null,
   gnutls ? null,
   avahi ? null,
+  cups,
+  testers,
   libpaper ? null,
   coreutils,
 }:
@@ -170,6 +172,13 @@ stdenv.mkDerivation rec {
     substituteInPlace "$out"/share/applications/cups.desktop \
       --replace-fail "Exec=htmlview" "Exec=xdg-open"
   '';
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = cups;
+      command = "cupsd --version";
+    };
+  };
 
   meta = {
     homepage = "https://openprinting.github.io/cups/";

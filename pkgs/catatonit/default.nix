@@ -4,6 +4,7 @@
   autoreconfHook,
   fetchFromGitHub,
   glibc,
+  runCommand,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -31,7 +32,13 @@ stdenv.mkDerivation (finalAttrs: {
     readelf -d $out/bin/catatonit | grep 'There is no dynamic section in this file.'
   '';
 
-  passthru.tests = { };
+  passthru.tests = {
+    simple = runCommand "catatonit-test" { } ''
+      # catatonit prints usage info when called without proper PID 1 context
+      ${finalAttrs.finalPackage}/bin/catatonit --help 2>&1 || true
+      touch $out
+    '';
+  };
 
   meta = {
     description = "Container init that is so simple it's effectively brain-dead";

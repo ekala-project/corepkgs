@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchurl,
+  lvm2,
 }:
 
 stdenv.mkDerivation rec {
@@ -29,6 +30,10 @@ stdenv.mkDerivation rec {
   hardeningDisable = lib.optional (stdenv.hostPlatform.isi686) "stackprotector";
 
   checkTarget = "partcheck"; # "check" needs root
+
+  passthru.tests = {
+    inherit lvm2;
+  };
 
   meta = {
     description = "Library for asynchronous I/O in Linux";

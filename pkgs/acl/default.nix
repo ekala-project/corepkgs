@@ -4,6 +4,7 @@
   fetchurl,
   gettext,
   attr,
+  coreutils,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -34,6 +35,10 @@ stdenv.mkDerivation rec {
   postPatch = ''
     patchShebangs .
   '';
+
+  passthru.tests = {
+    inherit coreutils;
+  };
 
   meta = {
     inherit (attr.meta) platforms badPlatforms;

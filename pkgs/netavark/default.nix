@@ -6,6 +6,7 @@
   mandown,
   protobuf,
   go-md2man,
+  testers,
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -33,7 +34,12 @@ rustPlatform.buildRustPackage (finalAttrs: {
     installManPage docs/netavark.1
   '';
 
-  passthru.tests = { };
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "netavark --version";
+    };
+  };
 
   meta = {
     changelog = "https://github.com/containers/netavark/releases/tag/${finalAttrs.src.rev}";

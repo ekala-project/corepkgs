@@ -4,6 +4,7 @@
   fetchFromGitHub,
   stdenv,
   nix-update-script,
+  testers,
 }:
 
 buildGoModule (finalAttrs: {
@@ -53,7 +54,13 @@ buildGoModule (finalAttrs: {
   # delve doesn't support --version
   doInstallCheck = false;
 
-  passthru.updateScript = nix-update-script { };
+  passthru = {
+    tests.version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "dlv version";
+    };
+    updateScript = nix-update-script { };
+  };
 
   meta = {
     description = "Debugger for the Go programming language";

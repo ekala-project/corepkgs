@@ -18,6 +18,8 @@
   argp-standalone,
   enableDebuginfod ? lib.meta.availableOn stdenv.hostPlatform libarchive,
   sqlite,
+  elfutils,
+  testers,
   curl,
   json_c,
   libmicrohttpd,
@@ -134,9 +136,17 @@ stdenv.mkDerivation rec {
     && (stdenv.hostPlatform == stdenv.buildPlatform);
   doInstallCheck = !stdenv.hostPlatform.isMusl && (stdenv.hostPlatform == stdenv.buildPlatform);
 
-  passthru.updateScript = gitUpdater {
-    url = "https://sourceware.org/git/elfutils.git";
-    rev-prefix = "elfutils-";
+  passthru = {
+    tests = {
+      version = testers.testVersion {
+        package = elfutils;
+        command = "eu-readelf --version";
+      };
+    };
+    updateScript = gitUpdater {
+      url = "https://sourceware.org/git/elfutils.git";
+      rev-prefix = "elfutils-";
+    };
   };
 
   meta = {

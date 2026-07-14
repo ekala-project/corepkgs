@@ -17,6 +17,9 @@ runCommandLocal "${libidn2.pname}-${libidn2.version}"
     ];
     passthru = {
       inherit (libidn2) out info devdoc; # no need to touch these store paths
+    }
+    // lib.optionalAttrs (libidn2 ? passthru.tests) {
+      inherit (libidn2.passthru) tests;
     };
     inherit (libidn2) meta;
   }

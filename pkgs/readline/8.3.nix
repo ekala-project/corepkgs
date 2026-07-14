@@ -7,6 +7,9 @@
   ncurses,
   termcap,
   curses-library ? if stdenv.hostPlatform.isWindows then termcap else ncurses,
+  bash,
+  sqlite,
+  bc,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -91,6 +94,10 @@ stdenv.mkDerivation (finalAttrs: {
     ln -s $out/lib/libhistory.so* $out/lib/libhistory.so
     ln -s $out/lib/libreadline.so* $out/lib/libreadline.so
   '';
+
+  passthru.tests = {
+    inherit bash sqlite bc;
+  };
 
   meta = {
     description = "Library for interactive line editing";

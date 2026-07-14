@@ -13,6 +13,8 @@
   libmnl,
   libnftnl,
   libpcap,
+  nftables,
+  testers,
   gmp,
   jansson,
   autoreconfHook,
@@ -98,6 +100,13 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   doCheck = false;
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = nftables;
+      command = "nft --version";
+    };
+  };
 
   meta = {
     description = "Project that aims to replace the existing {ip,ip6,arp,eb}tables framework";

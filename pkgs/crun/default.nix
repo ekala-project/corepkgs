@@ -11,6 +11,7 @@
   systemdMinimal,
   yajl,
   criu,
+  testers,
 }:
 
 let
@@ -89,6 +90,13 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   doCheck = false;
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "crun --version";
+    };
+  };
 
   meta = {
     description = "Fast and lightweight fully featured OCI runtime and C library for running containers";

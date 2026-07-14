@@ -13,6 +13,8 @@
   useMusl ? stdenv.hostPlatform.libc == "musl",
   musl,
   extraConfig ? "",
+  busybox,
+  testers,
 }:
 
 assert stdenv.hostPlatform.libc == "musl" -> useMusl;
@@ -216,7 +218,15 @@ stdenv.mkDerivation rec {
 
   doCheck = false; # tries to access the net
 
-  passthru.shellPath = "/bin/ash";
+  passthru = {
+    shellPath = "/bin/ash";
+    tests = {
+      version = testers.testVersion {
+        package = busybox;
+        command = "busybox --help";
+      };
+    };
+  };
 
   meta = {
     description = "Tiny versions of common UNIX utilities in a single small executable";

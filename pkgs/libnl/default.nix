@@ -12,6 +12,7 @@
   mscgen,
   asciidoc,
   sourceHighlight,
+  libpcap,
   pythonSupport ? false,
   swig,
   python,
@@ -64,6 +65,9 @@ stdenv.mkDerivation rec {
 
   passthru = {
     inherit pythonSupport;
+    tests = {
+      inherit libpcap;
+    };
   };
 
   meta = {

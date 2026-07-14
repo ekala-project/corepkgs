@@ -13,6 +13,7 @@
   python3,
   util-linux,
   check,
+  testers,
   enableStatic ? stdenv.hostPlatform.isStatic,
 }:
 
@@ -70,6 +71,13 @@ stdenv.mkDerivation (finalAttrs: {
     python3
     util-linux
   ];
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "parted --version";
+    };
+  };
 
   meta = {
     description = "Create, destroy, resize, check, and copy partitions";

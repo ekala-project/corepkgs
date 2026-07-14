@@ -3,6 +3,7 @@
   stdenv,
   fetchurl,
   linux-pam,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -47,6 +48,13 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   enableParallelBuilding = true;
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "crond -V";
+    };
+  };
 
   meta = {
     homepage = "https://github.com/cronie-crond/cronie";

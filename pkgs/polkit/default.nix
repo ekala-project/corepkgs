@@ -18,6 +18,8 @@
   libxslt,
   docbook-xsl-nons,
   dbus,
+  polkit,
+  testers,
   util-linux,
   docbook_xml_dtd_412,
   gtk-doc,
@@ -189,6 +191,13 @@ stdenv.mkDerivation rec {
         "$DESTDIR${system}/share"
     ! test -e "$DESTDIR"
   '';
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = polkit;
+      command = "pkaction --version";
+    };
+  };
 
   meta = {
     homepage = "https://github.com/polkit-org/polkit";

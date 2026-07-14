@@ -8,6 +8,8 @@
   libcap,
   libseccomp,
   libslirp,
+  slirp4netns,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -41,7 +43,12 @@ stdenv.mkDerivation (finalAttrs: {
     "man"
   ];
 
-  passthru.tests = { };
+  passthru.tests = {
+    version = testers.testVersion {
+      package = slirp4netns;
+      command = "slirp4netns --version";
+    };
+  };
 
   meta = {
     homepage = "https://github.com/rootless-containers/slirp4netns";

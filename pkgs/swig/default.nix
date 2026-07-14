@@ -7,6 +7,7 @@
   libtool,
   bison,
   pcre2,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -42,6 +43,13 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   enableParallelBuilding = true;
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "swig -version";
+    };
+  };
 
   meta = {
     changelog = "https://github.com/swig/swig/blob/${finalAttrs.src.rev}/CHANGES.current";

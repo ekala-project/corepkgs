@@ -4,6 +4,7 @@
   fetchurl,
   ncurses,
   groff,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -24,6 +25,13 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   enableParallelBuilding = true;
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "lsof -v";
+    };
+  };
 
   meta = {
     homepage = "https://github.com/lsof-org/lsof";

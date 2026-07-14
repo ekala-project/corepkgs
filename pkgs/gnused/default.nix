@@ -4,6 +4,9 @@
   fetchurl,
   updateAutotoolsGnuConfigScriptsHook,
   perl,
+  gnused,
+  runCommand,
+  testers,
 }:
 
 stdenv.mkDerivation rec {
@@ -28,6 +31,18 @@ stdenv.mkDerivation rec {
 
   # Prevents attempts of running 'help2man' on cross-built binaries.
   PERL = if stdenv.hostPlatform == stdenv.buildPlatform then null else "missing";
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = gnused;
+      command = "sed --version";
+    };
+    simple = runCommand "gnused-test" { } ''
+      result=$(echo "hello world" | ${gnused}/bin/sed 's/world/nix/')
+      test "$result" = "hello nix"
+      touch $out
+    '';
+  };
 
   meta = {
     homepage = "https://www.gnu.org/software/sed/";

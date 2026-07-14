@@ -3,6 +3,8 @@
   stdenv,
   fetchFromGitHub,
   cmake,
+  jshon,
+  nghttp2,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -43,6 +45,10 @@ stdenv.mkDerivation (finalAttrs: {
     substituteInPlace $dev/lib/cmake/jansson/janssonTargets-release.cmake \
       --replace-fail "''${_IMPORT_PREFIX}/lib" "$out/lib"
   '';
+
+  passthru.tests = {
+    inherit jshon nghttp2;
+  };
 
   meta = {
     description = "C library for encoding, decoding and manipulating JSON data";

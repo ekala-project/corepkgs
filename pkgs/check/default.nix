@@ -2,6 +2,7 @@
   fetchurl,
   lib,
   stdenv,
+  tpm2-tss,
 }:
 
 stdenv.mkDerivation rec {
@@ -20,6 +21,10 @@ stdenv.mkDerivation rec {
 
   # Test can randomly fail: https://hydra.nixos.org/build/7243912
   doCheck = false;
+
+  passthru.tests = {
+    inherit tpm2-tss;
+  };
 
   meta = {
     description = "Unit testing framework for C";

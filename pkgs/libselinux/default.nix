@@ -10,6 +10,7 @@
   python3,
   python3Packages,
   fts,
+  bubblewrap,
 }:
 
 assert enablePython -> swig != null && python3 != null;
@@ -104,6 +105,10 @@ stdenv.mkDerivation (finalAttrs: {
     mv $out/${python3.sitePackages}/selinux/* $py/${python3.sitePackages}/selinux/
     rm -rf $out/lib/python*
   '';
+
+  passthru.tests = {
+    inherit bubblewrap;
+  };
 
   meta = removeAttrs libsepol.meta [ "outputsToInstall" ] // {
     description = "SELinux core library";

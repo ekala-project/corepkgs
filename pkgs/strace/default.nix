@@ -6,6 +6,7 @@
   libunwind,
   buildPackages,
   elfutils,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -42,6 +43,13 @@ stdenv.mkDerivation (finalAttrs: {
     "--enable-mpers=check"
   ]
   ++ lib.optional stdenv.cc.isClang "CFLAGS=-Wno-unused-function";
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "strace --version";
+    };
+  };
 
   meta = {
     homepage = "https://strace.io/";

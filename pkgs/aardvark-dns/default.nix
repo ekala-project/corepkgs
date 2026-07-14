@@ -2,6 +2,7 @@
   lib,
   rustPlatform,
   fetchFromGitHub,
+  testers,
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -17,7 +18,12 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   cargoHash = "sha256-19EisvHJZJ1L3f0+pE6wgfChkRoYU8W/iaAppwbjbdQ=";
 
-  passthru.tests = { };
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "aardvark-dns --version";
+    };
+  };
 
   meta = {
     changelog = "https://github.com/containers/aardvark-dns/releases/tag/${finalAttrs.src.rev}";

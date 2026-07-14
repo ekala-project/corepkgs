@@ -5,6 +5,7 @@
   updateAutotoolsGnuConfigScriptsHook,
   # Note: -static hasn’t work on darwin
   static ? with stdenv.hostPlatform; isStatic && !isDarwin,
+  nghttp2,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -24,6 +25,10 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ];
 
   configureFlags = lib.optional static "LDFLAGS=-static";
+
+  passthru.tests = {
+    inherit nghttp2;
+  };
 
   meta = {
     description = "High-performance event loop/event model with lots of features";

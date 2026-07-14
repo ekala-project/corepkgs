@@ -3,6 +3,8 @@
   stdenv,
   fetchurl,
   perl,
+  bind,
+  xfsprogs,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -30,6 +32,10 @@ stdenv.mkDerivation (finalAttrs: {
   enableParallelBuilding = true;
 
   doCheck = false; # Skip tests for faster builds
+
+  passthru.tests = {
+    inherit bind xfsprogs;
+  };
 
   meta = {
     homepage = "https://liburcu.org/";

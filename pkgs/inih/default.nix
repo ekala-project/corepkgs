@@ -4,6 +4,7 @@
   fetchFromGitHub,
   meson,
   ninja,
+  xfsprogs,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -47,6 +48,10 @@ stdenv.mkDerivation (finalAttrs: {
     "out"
     "dev"
   ];
+
+  passthru.tests = {
+    inherit xfsprogs;
+  };
 
   meta = {
     homepage = "https://github.com/benhoyt/inih";

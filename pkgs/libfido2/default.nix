@@ -12,6 +12,7 @@
   zlib,
   withPcsclite ? true,
   pcsclite,
+  openssh,
 }:
 
 stdenv.mkDerivation rec {
@@ -65,6 +66,10 @@ stdenv.mkDerivation rec {
 
   # causes possible redefinition of _FORTIFY_SOURCE?
   hardeningDisable = [ "fortify3" ];
+
+  passthru.tests = {
+    inherit openssh;
+  };
 
   meta = {
     description = ''

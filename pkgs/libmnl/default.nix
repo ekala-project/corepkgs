@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchurl,
+  libnftnl,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -11,6 +12,10 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchurl {
     url = "https://netfilter.org/projects/libmnl/files/libmnl-${finalAttrs.version}.tar.bz2";
     hash = "sha256-J0ubkZ7zFSv7PaOhPJUN1g1uK81UIw/+yimNA7QNBSU=";
+  };
+
+  passthru.tests = {
+    inherit libnftnl;
   };
 
   meta = {

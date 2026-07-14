@@ -4,6 +4,9 @@
   fetchurl,
   ed,
   autoreconfHook,
+  gnupatch,
+  runCommand,
+  testers,
 }:
 
 stdenv.mkDerivation rec {
@@ -28,6 +31,24 @@ stdenv.mkDerivation rec {
 
   doCheck = stdenv.hostPlatform.libc != "musl"; # not cross;
   nativeCheckInputs = [ ed ];
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = gnupatch;
+      command = "patch --version";
+    };
+    simple = runCommand "gnupatch-test" { } ''
+      echo "hello" > file.txt
+      echo "--- file.txt
+      +++ file.txt
+      @@ -1 +1 @@
+      -hello
+      +world" > patch.diff
+      ${gnupatch}/bin/patch file.txt patch.diff
+      test "$(cat file.txt)" = "world"
+      touch $out
+    '';
+  };
 
   meta = {
     description = "GNU Patch, a program to apply differences to files";

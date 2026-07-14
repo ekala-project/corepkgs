@@ -12,6 +12,7 @@
   gettext,
   libffi,
   libintl,
+  gnutls,
 }:
 
 stdenv.mkDerivation rec {
@@ -82,6 +83,10 @@ stdenv.mkDerivation rec {
       export FAKED_MODE=1
     fi
   '';
+
+  passthru.tests = {
+    inherit gnutls;
+  };
 
   meta = {
     description = "Library for loading and sharing PKCS#11 modules";

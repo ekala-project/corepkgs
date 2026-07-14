@@ -3,6 +3,7 @@
   stdenv,
   fetchurl,
   ncurses,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -19,6 +20,12 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   enableParallelBuilding = true;
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+    };
+  };
 
   meta = {
     homepage = "https://htop.dev/";

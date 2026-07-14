@@ -7,6 +7,7 @@
   apr,
   expat,
   gnused,
+  testers,
   sslSupport ? true,
   openssl,
   bdbSupport ? true,
@@ -119,6 +120,12 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     inherit sslSupport bdbSupport ldapSupport;
+    tests = {
+      version = testers.testVersion {
+        package = finalAttrs.finalPackage;
+        command = "apu-1-config --version";
+      };
+    };
   };
 
   meta = {

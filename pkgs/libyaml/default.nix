@@ -3,6 +3,7 @@
   stdenv,
   fetchFromGitHub,
   autoreconfHook,
+  dtc,
 }:
 
 stdenv.mkDerivation rec {
@@ -22,6 +23,10 @@ stdenv.mkDerivation rec {
   ];
 
   nativeBuildInputs = [ autoreconfHook ];
+
+  passthru.tests = {
+    inherit dtc;
+  };
 
   meta = {
     homepage = "https://pyyaml.org/";

@@ -5,6 +5,7 @@
   autoreconfHook,
   perl,
   readline,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -36,6 +37,13 @@ stdenv.mkDerivation (finalAttrs: {
   configureFlags = [ "--without-libptytty" ];
 
   env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.hostPlatform.isDarwin "-Wno-error=implicit-function-declaration";
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "rlwrap --version";
+    };
+  };
 
   meta = with lib; {
     description = "Readline wrapper for console programs";

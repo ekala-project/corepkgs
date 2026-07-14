@@ -12,6 +12,7 @@
   libapparmor,
   libselinux,
   libseccomp,
+  testers,
   versionCheckHook,
 }:
 
@@ -71,6 +72,13 @@ buildGoModule (finalAttrs: {
     versionCheckHook
   ];
   versionCheckProgramArg = "--version";
+
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "buildah --version";
+    };
+  };
 
   meta = {
     description = "Tool which facilitates building OCI images";

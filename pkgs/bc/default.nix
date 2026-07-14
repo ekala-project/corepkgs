@@ -9,7 +9,9 @@
   readline,
   ed,
   texinfo,
+  runCommand,
   runUnitTests,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -46,7 +48,18 @@ stdenv.mkDerivation (finalAttrs: {
   # masss-rebuild.
   strictDeps = true;
 
-  passthru.tests.unittests = runUnitTests finalAttrs.finalPackage;
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "bc --version";
+    };
+    simple = runCommand "bc-test" { } ''
+      result=$(echo "2 + 3" | ${finalAttrs.finalPackage}/bin/bc)
+      test "$result" = "5"
+      touch $out
+    '';
+    unittests = runUnitTests finalAttrs.finalPackage;
+  };
 
   meta = {
     description = "GNU software calculator";
