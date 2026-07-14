@@ -13,6 +13,7 @@
   json_c,
   libical,
   pkg-config,
+  testers,
   python3Packages,
   readline,
   udev,
@@ -181,8 +182,16 @@ stdenv.mkDerivation (finalAttrs: {
 
   enableParallelBuilding = true;
 
-  passthru.updateScript = gitUpdater {
-    url = "https://git.kernel.org/pub/scm/bluetooth/bluez.git";
+  passthru = {
+    tests = {
+      version = testers.testVersion {
+        package = finalAttrs.finalPackage;
+        command = "bluetoothctl --version";
+      };
+    };
+    updateScript = gitUpdater {
+      url = "https://git.kernel.org/pub/scm/bluetooth/bluez.git";
+    };
   };
 
   meta = {
