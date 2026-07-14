@@ -330,6 +330,7 @@ let
       variants
       configOverrides
     ]
+    ++ config.overlays.pkgs
     ++ overlays
     ++ [
       stdenvOverrides

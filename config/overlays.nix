@@ -16,6 +16,14 @@ let
 in
 {
   options = {
+    overlays.pkgs = mkOption {
+      type = types.listOf overlayType;
+      default = [ ];
+      description = ''
+        Overlays to be applied to the top-level package set.
+      '';
+    };
+
     overlays.python = mkOption {
       type = types.listOf overlayType;
       default = [ ];
