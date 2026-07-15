@@ -59,6 +59,9 @@ with final;
   # igraph-c alias for C library (to avoid conflict with python3Packages.igraph)
   igraph-c = igraph;
 
+  # nv-codec-headers version aliases for ffmpeg
+  nv-codec-headers-12 = nv-codec-headers.override { majorVersion = "12"; };
+
   # keep-sorted start
   aafigure = null;
   actdiag = null;
