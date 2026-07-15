@@ -41,7 +41,7 @@
 
   # Feature flags
   withAlsa ? withHeadlessDeps && stdenv.hostPlatform.isLinux, # Alsa in/output supporT
-  withAmf ? withHeadlessDeps && lib.meta.availableOn stdenv.hostPlatform amf, # AMD Media Framework video encoding
+  withAmf ? withHeadlessDeps && amf != null && lib.meta.availableOn stdenv.hostPlatform amf, # AMD Media Framework video encoding
   withAom ? withHeadlessDeps && libaom != null, # AV1 reference encoder
   withAribb24 ? withFullDeps, # ARIB text and caption decoding
   withAribcaption ? withFullDeps && packageAtLeast "6.1", # ARIB STD-B24 Caption Decoder/Renderer
@@ -142,7 +142,7 @@
   withV4l2 ? withHeadlessDeps && stdenv.hostPlatform.isLinux && libv4l != null, # Video 4 Linux support
   withV4l2M2m ? withV4l2,
   withVaapi ? withHeadlessDeps && (with stdenv; isLinux || isFreeBSD), # Vaapi hardware acceleration
-  withVdpau ? withSmallDeps && !stdenv.hostPlatform.isMinGW, # Vdpau hardware acceleration
+  withVdpau ? withSmallDeps && !stdenv.hostPlatform.isMinGW && libvdpau != null, # Vdpau hardware acceleration
   withVidStab ? withHeadlessDeps && withGPL && vid-stab != null, # Video stabilization
   withVmaf ? withFullDeps && packageAtLeast "5", # Netflix's VMAF (Video Multi-Method Assessment Fusion)
   withVoAmrwbenc ? withFullDeps && withVersion3, # AMR-WB encoder
