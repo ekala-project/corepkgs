@@ -390,7 +390,7 @@ stdenv.mkDerivation {
   '';
 
   passthru = {
-    inherit (libglvnd) driverLink;
+    driverLink = libglvnd.driverLink or "/run/opengl-driver";
     inherit llvmPackages;
     inherit
       eglPlatforms
