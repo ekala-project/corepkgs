@@ -109,7 +109,7 @@ with final;
   gtkmm3 = null;
   gts = null;
   gunicorn = null;
-  harfbuzz = null;
+  harfbuzz = callPackage ./pkgs/harfbuzz { };
   highlight = null;
   icewm = null;
   imagemagick = null;
@@ -161,7 +161,7 @@ with final;
   openimageio = null;
   opensbi = null; # RISC-V
   ostinato = null;
-  pango = null;
+  pango = callPackage ./pkgs/pango { };
   # PHP - already declared above with Java
   pika = null;
   pinentry = null;
@@ -806,6 +806,13 @@ with final;
   buildGo124Module = callPackage ./build-support/go/module.nix {
     go = buildPackages.go_1_24;
   };
+
+  # TODO(corepkgs): Enable texlive for R PDF docs once texlive-bin deps (gd, potrace) are ported
+  R = callPackage ./pkgs/R {
+    texliveSmall = null;
+  };
+
+  buildRPackage = callPackage ./build-support/r { };
 
   buildMavenPackage = java.buildMavenPackage;
   buildGradlePackage = java.buildGradlePackage;
