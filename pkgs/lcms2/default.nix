@@ -1,0 +1,38 @@
+{
+  lib,
+  stdenv,
+  fetchurl,
+  libtiff,
+  libjpeg,
+  zlib,
+}:
+
+stdenv.mkDerivation rec {
+  pname = "lcms2";
+  version = "2.18";
+
+  src = fetchurl {
+    url = "mirror://sourceforge/lcms/lcms2-${version}.tar.gz";
+    hash = "sha256-7me+NWb0WTYsHuCU/eLBWdM/oDkKpO1fWvZ2+eUAQ0c=";
+  };
+
+  outputs = [
+    "bin"
+    "dev"
+    "out"
+  ];
+
+  buildInputs = [
+    libtiff
+    libjpeg
+    zlib
+  ];
+
+  meta = {
+    description = "Color management engine";
+    homepage = "http://www.littlecms.com/";
+    license = lib.licenses.mit;
+    platforms = lib.platforms.all;
+    maintainers = [ ];
+  };
+}
