@@ -30,7 +30,8 @@ let
   hasIdentityPolicies = cfg.identityPolicies != [ ];
 
   # Generate nftables rules for a single identity policy
-  mkIdentityRule = policy:
+  mkIdentityRule =
+    policy:
     let
       srcSet = concatStringsSep ", " policy.fromIPs;
       tcpRule = optionalString (policy.toPorts != [ ]) ''
@@ -132,33 +133,35 @@ in
     };
 
     identityPolicies = mkOption {
-      type = types.listOf (types.submodule {
-        options = {
-          name = mkOption {
-            type = types.str;
-            description = "Human-readable policy name for comments.";
-          };
+      type = types.listOf (
+        types.submodule {
+          options = {
+            name = mkOption {
+              type = types.str;
+              description = "Human-readable policy name for comments.";
+            };
 
-          fromIPs = mkOption {
-            type = types.listOf types.str;
-            description = ''
-              Source IP addresses (typically WireGuard mesh IPs) allowed
-              to reach the target ports.
-            '';
-          };
+            fromIPs = mkOption {
+              type = types.listOf types.str;
+              description = ''
+                Source IP addresses (typically WireGuard mesh IPs) allowed
+                to reach the target ports.
+              '';
+            };
 
-          toPorts = mkOption {
-            type = types.listOf types.port;
-            description = "Destination TCP ports the source IPs may connect to.";
-          };
+            toPorts = mkOption {
+              type = types.listOf types.port;
+              description = "Destination TCP ports the source IPs may connect to.";
+            };
 
-          toUDPPorts = mkOption {
-            type = types.listOf types.port;
-            default = [ ];
-            description = "Destination UDP ports the source IPs may connect to.";
+            toUDPPorts = mkOption {
+              type = types.listOf types.port;
+              default = [ ];
+              description = "Destination UDP ports the source IPs may connect to.";
+            };
           };
-        };
-      });
+        }
+      );
       default = [ ];
       description = ''
         Identity-based inter-service firewall policies for the WireGuard
