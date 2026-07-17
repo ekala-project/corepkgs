@@ -156,22 +156,20 @@ in
 
   config = mkIf cfg.enable {
     # Generate zone files in /etc/dns/zones/
-    environment.etc = listToAttrs (
-      map (
-        domain:
-        nameValuePair "dns/zones/${domain}.zone" {
-          text = mkZoneFile domain;
-        }
-      ) allDomains
-    )
-    # Generate forward zone configuration
-    // optionalAttrs (cfg.forwardZones != { }) {
-      "dns/forward-zones.conf".text = concatStringsSep "\n" (
-        mapAttrsToList (
-          zone: addr: "${zone} ${addr}"
-        ) cfg.forwardZones
-      ) + "\n";
-    };
+    environment.etc =
+      listToAttrs (
+        map (
+          domain:
+          nameValuePair "dns/zones/${domain}.zone" {
+            text = mkZoneFile domain;
+          }
+        ) allDomains
+      )
+      # Generate forward zone configuration
+      // optionalAttrs (cfg.forwardZones != { }) {
+        "dns/forward-zones.conf".text =
+          concatStringsSep "\n" (mapAttrsToList (zone: addr: "${zone} ${addr}") cfg.forwardZones) + "\n";
+      };
 
     # Create zone directory
     system.activationScripts.dns-zones = stringAfter [ "etc" ] ''

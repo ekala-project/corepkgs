@@ -19,9 +19,7 @@ let
   enabledServices = filterAttrs (_: s: (s.enable or false) == true) config.services;
 
   # Build a lookup: serviceName -> observability config (if any)
-  observabilityByService = mapAttrs (
-    _: svcCfg: svcCfg.observability or { }
-  ) enabledServices;
+  observabilityByService = mapAttrs (_: svcCfg: svcCfg.observability or { }) enabledServices;
 
   # Group health check contracts by service name for scrape job generation
   byService = groupBy (c: c.serviceName) healthCheckContracts;
@@ -35,10 +33,7 @@ let
 
       # Prefer observability.metrics.path, fall back to healthCheck.path
       metricsPath =
-        if (obsMetrics.path or null) != null then
-          obsMetrics.path
-        else
-          (head contracts).healthCheck.path;
+        if (obsMetrics.path or null) != null then obsMetrics.path else (head contracts).healthCheck.path;
 
       # Prefer observability.metrics.port for target, fall back to service port
       metricsPort = obsMetrics.port or null;
@@ -80,15 +75,15 @@ let
     serviceName: svcCfg:
     let
       obsMetrics = svcCfg.observability.metrics;
-      port = if obsMetrics.port or null != null then
-        obsMetrics.port
-      else
-        # Use first declared port from the service
-        let ports = svcCfg.ports or { }; in
-        if ports != { } then
-          (head (attrValues ports)).port
+      port =
+        if obsMetrics.port or null != null then
+          obsMetrics.port
         else
-          9090; # fallback
+          # Use first declared port from the service
+          let
+            ports = svcCfg.ports or { };
+          in
+          if ports != { } then (head (attrValues ports)).port else 9090; # fallback
     in
     {
       job_name = serviceName;
