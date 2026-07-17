@@ -129,6 +129,8 @@ stdenv.mkDerivation rec {
     libiconv
     bash
   ]
+  ++ lib.optional (jbig2dec != null) jbig2dec
+  ++ lib.optional (lcms2 != null) lcms2
   ++ lib.optional (openjpeg != null) openjpeg
   ++ lib.optionals x11Support [
     libice
