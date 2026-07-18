@@ -66,10 +66,8 @@ rec {
   # wraps programs in $out/bin with valid LUA_PATH/LUA_CPATH
   wrapLua = callPackage ./wrap-lua.nix { };
 
-  # TODO: do a proper port for ekapkgs
-  luarocks_bootstrap = toLuaModule (callPackage ../development/tools/misc/luarocks/default.nix { });
+  luarocks_bootstrap = toLuaModule (callPackage ./luarocks { });
 
   # a fork of luarocks used to generate nix lua derivations from rockspecs
-  # TODO: do a proper port for ekapkgs
-  luarocks-nix = toLuaModule (callPackage ../development/tools/misc/luarocks/luarocks-nix.nix { });
+  luarocks-nix = toLuaModule (callPackage ./luarocks/luarocks-nix.nix { });
 }
