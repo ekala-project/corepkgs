@@ -26,6 +26,7 @@
   pkgsHostHost,
   pkgsTargetTarget,
   pkgs, # Need global pkgs for overrides.nix
+  config, # For config.overlays.lua
   ...
 }@packageArgs:
 
@@ -80,11 +81,16 @@ let
                 selfTargetTarget = luaOnTargetForTarget.pkgs or { };
               };
 
-              extensions = lib.composeManyExtensions [
-                generatedPackages
-                overriddenPackages
-                overrides
-              ];
+              extensions = lib.composeManyExtensions (
+                [
+                  generatedPackages
+                  overriddenPackages
+                ]
+                ++ config.overlays.lua
+                ++ [
+                  overrides
+                ]
+              );
             in
             makeScopeWithSplicing' {
               inherit otherSplices;
