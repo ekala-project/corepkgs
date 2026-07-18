@@ -39,5 +39,13 @@ in
         Overlays to be applied to each haskell package set.
       '';
     };
+
+    overlays.r = mkOption {
+      type = types.listOf overlayType;
+      default = [ ];
+      description = ''
+        Overlays to be applied to the R package set.
+      '';
+    };
   };
 }
