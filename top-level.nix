@@ -814,6 +814,8 @@ with final;
 
   buildRPackage = callPackage ./build-support/r { };
 
+  rPackages = callPackage ./r { inherit config; };
+
   buildMavenPackage = java.buildMavenPackage;
   buildGradlePackage = java.buildGradlePackage;
   buildNpmPackage = nodejs.buildNpmPackage;
