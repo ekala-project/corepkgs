@@ -6,8 +6,8 @@
   };
 
   v3_6 = {
-    version = "3.6.3";
+    version = "3.8.4";
     # Scala 3 (Latest, Dotty)
-    src-hash = "sha256-I+PYPSRLS8Q0SJ/BEAoFwB7EcFERZpN5pGcD5cGwlNU=";
+    src-hash = "sha256-yy+aNY7ESe7EF9Y+/Ztvxr1moTsTR9ScJVceyihIV9M=";
   };
 }
