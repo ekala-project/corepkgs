@@ -1,5 +1,20 @@
 {
   "nodes": {
+    "lib": {
+      "locked": {
+        "lastModified": 1783187452,
+        "narHash": "sha256-aQVuGH8JDGmzKGbiRIYVx07C6UXdRxPRWxvPArpUXUo=",
+        "owner": "ekala-project",
+        "repo": "nix-lib",
+        "rev": "9acd37c8934331a3e53a099f8755101bc2a149e2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ekala-project",
+        "repo": "nix-lib",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1775036866,
@@ -34,6 +49,7 @@
     },
     "root": {
       "inputs": {
+        "lib": "lib",
         "nixpkgs": "nixpkgs",
         "systems": "systems",
         "treefmt-nix": "treefmt-nix"

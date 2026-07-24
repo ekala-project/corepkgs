@@ -6,7 +6,7 @@
 let
   pins = import ./pins.nix;
 
-  inherit (pins) lib;
+  lib = import pins.lib;
 
   filteredArgs = removeAttrs args [ "overlays" ];
   pkgs = import ./stdenv/impure.nix (

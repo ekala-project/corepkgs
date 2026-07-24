@@ -6,6 +6,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     systems.url = "github:nix-systems/default";
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    lib.url = "github:ekala-project/nix-lib";
   };
 
   outputs =
@@ -14,6 +15,7 @@
       systems,
       nixpkgs,
       treefmt-nix,
+      ...
     }:
     let
       forAllSystems = nixpkgs.lib.genAttrs (import systems);

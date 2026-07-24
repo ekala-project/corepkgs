@@ -1,8 +1,16 @@
+let
+  # Inherit pinning from flake.lock
+  lock = builtins.fromJSON (builtins.readFile ./flake.lock);
+  libInfo = lock.nodes.lib.locked;
+in
 {
-  lib = import (
-    builtins.fetchGit {
-      url = "https://github.com/ekala-project/nix-lib.git";
-      rev = "fd5cdc455e167022c720950fcc599c8a5ef618a1";
-    }
-  );
+  lib = builtins.fetchTree {
+    inherit (libInfo)
+      type
+      owner
+      repo
+      narHash
+      rev
+      ;
+  };
 }

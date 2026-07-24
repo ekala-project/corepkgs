@@ -1,5 +1,6 @@
 let
-  inherit (import ./pins.nix) lib;
+  pins = import ./pins.nix;
+  lib = import pins.lib;
 in
 lib.extend (
   self: _: {
