@@ -56,13 +56,8 @@ runitTestStart() {
     echo "Service directory: $RUNIT_SERVICE_DIR" >&2
     echo "Log directory: $RUNIT_LOG_DIR" >&2
 
-    # Start runsvdir
-    # Note: Redirect output on Darwin to prevent process orphaning
-    if [ "$(uname)" = "Darwin" ]; then
-        @runitPackage@/bin/runsvdir "$RUNIT_SERVICE_DIR" > "$RUNIT_LOG_DIR/runsvdir.log" 2>&1 &
-    else
-        @runitPackage@/bin/runsvdir "$RUNIT_SERVICE_DIR" &
-    fi
+    # Start runsvdir with output captured to log file
+    @runitPackage@/bin/runsvdir "$RUNIT_SERVICE_DIR" > "$RUNIT_LOG_DIR/runsvdir.log" 2>&1 &
 
     RUNIT_PID=$!
     RUNIT_STARTED=1

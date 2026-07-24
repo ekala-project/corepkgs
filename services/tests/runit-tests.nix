@@ -150,8 +150,8 @@ let
         ${testScript}
         PYTHON_TEST_SCRIPT
 
-                # Run Python test driver
-                python3 -m runit_test_driver --testscript /build/test-script.py
+                # Run Python test driver, capturing output to log file
+                python3 -m runit_test_driver --testscript /build/test-script.py 2>&1 | tee "$RUNIT_LOG_DIR/test-driver.log"
 
                 runHook postCheck
       '';
