@@ -83,11 +83,51 @@ let
           outputSplice = spliceReal (
             mapCrossIndex tryGetOutputs value' // { hostTarget = getOutputs value'.hostTarget; }
           );
+          # Splice passthru attributes of derivations so that sub-attributes
+          # (e.g. cmake.minimal) also carry __spliced and resolve correctly
+          # when used in nativeBuildInputs during cross-compilation.
+          passthruNames = builtins.filter (
+            n:
+            !builtins.elem n (
+              outputNames
+              ++ [
+                "__spliced"
+                "type"
+                "drvPath"
+                "outPath"
+                "drvAttrs"
+                "outputName"
+                "all"
+                "outputs"
+                "override"
+                "overrideAttrs"
+                "overrideDerivation"
+              ]
+            )
+          ) (builtins.attrNames defaultValue);
+          # Only splice passthru attrs that are derivations — recursing into
+          # arbitrary attrsets (e.g. stdenv internals) causes infinite recursion.
+          passthruSplice = lib.genAttrs passthruNames (
+            pname:
+            let
+              pvalue = defaultValue.${pname};
+              pvalue' = mapCrossIndex (x: x.${name}.${pname} or { }) inputs;
+            in
+            if lib.isDerivation pvalue then
+              let
+                pAugmented = pvalue // {
+                  __spliced = lib.filterAttrs (_: v: v != { }) pvalue';
+                };
+              in
+              pAugmented
+            else
+              pvalue
+          );
         in
         # The derivation along with its outputs, which we recur
         # on to splice them together.
         if lib.isDerivation defaultValue then
-          augmentedValue // lib.genAttrs outputNames (out: outputSplice.${out})
+          augmentedValue // passthruSplice // lib.genAttrs outputNames (out: outputSplice.${out})
         else if lib.isAttrs defaultValue then
           spliceReal value'
         else
