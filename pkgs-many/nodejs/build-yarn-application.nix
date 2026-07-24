@@ -135,8 +135,7 @@ stdenv.mkDerivation (
     meta = (args.meta or { }) // {
       platforms = nodejs.meta.platforms;
     };
-  }
-  // lib.optionalAttrs yarnKeepDevDeps {
-    inherit yarnKeepDevDeps;
+
+    ${if yarnKeepDevDeps then "yarnKeepDevDeps" else null} = yarnKeepDevDeps;
   }
 )

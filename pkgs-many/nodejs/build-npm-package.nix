@@ -116,8 +116,7 @@ stdenv.mkDerivation (
     meta = args.meta or { } // {
       platforms = nodejs.meta.platforms;
     };
-  }
-  // lib.optionalAttrs (npmWorkspace != null) {
-    inherit npmWorkspace;
+
+    ${if (npmWorkspace != null) then "npmWorkspace" else null} = npmWorkspace;
   }
 )

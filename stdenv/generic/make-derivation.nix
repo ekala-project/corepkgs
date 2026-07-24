@@ -644,7 +644,7 @@ let
             ${if requiredSystemFeaturesShouldBeSet then "requiredSystemFeatures" else null} =
               attrs.requiredSystemFeatures or [ ] ++ gccArchFeature;
           }
-          // optionalAttrs buildIsDarwin (
+          // (
             let
               allDependencies = concatLists (concatLists dependencies);
               allPropagatedDependencies = concatLists (concatLists propagatedDependencies);
@@ -668,9 +668,9 @@ let
               );
             in
             {
-              inherit __darwinAllowLocalNetworking;
+              ${if buildIsDarwin then "__darwinAllowLocalNetworking" else null} = __darwinAllowLocalNetworking;
               # TODO: remove `unique` once nix has a list canonicalization primitive
-              __sandboxProfile =
+              ${if buildIsDarwin then "__sandboxProfile" else null} =
                 let
                   profiles = [
                     extraSandboxProfile
@@ -684,10 +684,10 @@ let
                   final = concatStringsSep "\n" (filter (x: x != "") (unique profiles));
                 in
                 final;
-              __propagatedSandboxProfile = unique (
+              ${if buildIsDarwin then "__propagatedSandboxProfile" else null} = unique (
                 computedPropagatedSandboxProfile ++ [ propagatedSandboxProfile ]
               );
-              __impureHostDeps =
+              ${if buildIsDarwin then "__impureHostDeps" else null} =
                 computedImpureHostDeps
                 ++ computedPropagatedImpureHostDeps
                 ++ __propagatedImpureHostDeps
@@ -699,11 +699,12 @@ let
                   "/dev/urandom"
                   "/bin/sh"
                 ];
-              __propagatedImpureHostDeps = computedPropagatedImpureHostDeps ++ __propagatedImpureHostDeps;
+              ${if buildIsDarwin then "__propagatedImpureHostDeps" else null} =
+                computedPropagatedImpureHostDeps ++ __propagatedImpureHostDeps;
             }
           )
-          // optionalAttrs (isWindows || isCygwin) {
-            allowedImpureDLLs =
+          // {
+            ${if (isWindows || isCygwin) then "allowedImpureDLLs" else null} =
               allowedImpureDLLs
               ++ lib.optionals isCygwin [
                 "KERNEL32.dll"
@@ -805,7 +806,9 @@ let
 
     let
       mainProgram = meta.mainProgram or null;
-      env' = env // lib.optionalAttrs (mainProgram != null) { NIX_MAIN_PROGRAM = mainProgram; };
+      env' = env // {
+        ${if mainProgram != null then "NIX_MAIN_PROGRAM" else null} = mainProgram;
+      };
 
       derivationArg = makeDerivationArgument (
         removeAttrs attrs [
@@ -814,8 +817,8 @@ let
           "pos"
           "env"
         ]
-        // lib.optionalAttrs __structuredAttrs { env = checkedEnv; }
         // {
+          ${if __structuredAttrs then "env" else null} = checkedEnv;
           cmakeFlags = makeCMakeFlags attrs;
           mesonFlags = makeMesonFlags attrs;
         }

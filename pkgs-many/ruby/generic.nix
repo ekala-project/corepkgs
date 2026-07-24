@@ -395,9 +395,7 @@ lib.makeOverridable
           rubyEngine = "ruby";
           libPath = "lib/ruby/${ver.libDir}";
           gemPath = "lib/ruby/gems/${ver.libDir}";
-        }
-        // lib.optionalAttrs useBaseRuby {
-          inherit baseRuby;
+          ${if useBaseRuby then "baseRuby" else null} = baseRuby;
         };
     })
   )

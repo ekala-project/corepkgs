@@ -157,14 +157,10 @@ stdenv.mkDerivation (
     meta = (args.meta or { }) // {
       platforms = nodejs.meta.platforms;
     };
-  }
-  // lib.optionalAttrs (pnpmRoot != null) {
-    inherit pnpmRoot;
-  }
-  // lib.optionalAttrs (pnpmWorkspaces != [ ]) {
-    pnpmWorkspaces = builtins.concatStringsSep " " pnpmWorkspaces;
-  }
-  // lib.optionalAttrs (pnpmInstallFlags != [ ]) {
-    inherit pnpmInstallFlags;
+
+    ${if (pnpmRoot != null) then "pnpmRoot" else null} = pnpmRoot;
+    ${if (pnpmWorkspaces != [ ]) then "pnpmWorkspaces" else null} =
+      builtins.concatStringsSep " " pnpmWorkspaces;
+    ${if (pnpmInstallFlags != [ ]) then "pnpmInstallFlags" else null} = pnpmInstallFlags;
   }
 )

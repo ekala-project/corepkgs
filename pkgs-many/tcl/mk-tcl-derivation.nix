@@ -77,9 +77,7 @@ let
         }
         // meta;
 
-      }
-      // optionalAttrs (attrs ? checkPhase) {
-        installCheckPhase = attrs.checkPhase;
+        ${if (attrs ? checkPhase) then "installCheckPhase" else null} = attrs.checkPhase;
       }
     )
   );

@@ -484,9 +484,7 @@ lib.extendMkDerivation {
       # view (see `pythonMkDerivation`). These are removed before being passed
       # to `stdenv.mkDerivation`, so they never reach the `derivation` builtin.
       inherit dependencies optional-dependencies build-system;
-    }
-    // optionalAttrs withTestSrcOutput {
-      inherit testPaths;
+      ${if withTestSrcOutput then "testPaths" else null} = testPaths;
     }
     // {
       passthru =
@@ -536,13 +534,12 @@ lib.extendMkDerivation {
                 buildInputs = checkInputs;
               }
               // forwardedTestHooks
-              // optionalAttrs (attrs ? checkPhase) {
-                # Mirror the parent's handling: a user-supplied checkPhase is
-                # really an installCheckPhase in Python land.
-                installCheckPhase = attrs.checkPhase;
-              }
-              // optionalAttrs (attrs ? installCheckPhase) {
-                inherit (attrs) installCheckPhase;
+              // {
+                ${if (attrs ? checkPhase) then "installCheckPhase" else null} =
+                  # Mirror the parent's handling: a user-supplied checkPhase is
+                  # really an installCheckPhase in Python land.
+                  attrs.checkPhase;
+                ${if (attrs ? installCheckPhase) then "installCheckPhase" else null} = attrs.installCheckPhase;
               }
             );
           };
@@ -566,11 +563,9 @@ lib.extendMkDerivation {
         isBuildPythonPackage = python.meta.platforms;
       }
       // meta;
-    }
-    // optionalAttrs (attrs ? checkPhase) {
       # If given use the specified checkPhase, otherwise use the setup hook.
       # Longer-term we should get rid of `checkPhase` and use `installCheckPhase`.
-      installCheckPhase = attrs.checkPhase;
+      ${if (attrs ? checkPhase) then "installCheckPhase" else null} = attrs.checkPhase;
     }
     //
       lib.mapAttrs

@@ -445,408 +445,401 @@ in
 lib.fix (
   drv:
 
-  stdenv.mkDerivation (
-    {
-      inherit pname version;
+  stdenv.mkDerivation ({
+    inherit pname version;
 
-      outputs = [
-        "out"
-      ]
-      ++ (optional enableSeparateDataOutput "data")
-      ++ (optional enableSeparateDocOutput "doc")
-      ++ (optional enableSeparateBinOutput "bin")
-      ++ (optional enableSeparateIntermediatesOutput "intermediates");
+    outputs = [
+      "out"
+    ]
+    ++ (optional enableSeparateDataOutput "data")
+    ++ (optional enableSeparateDocOutput "doc")
+    ++ (optional enableSeparateBinOutput "bin")
+    ++ (optional enableSeparateIntermediatesOutput "intermediates");
 
-      setOutputFlags = false;
+    setOutputFlags = false;
 
-      pos = builtins.unsafeGetAttrPos "pname" args;
+    pos = builtins.unsafeGetAttrPos "pname" args;
 
-      prePhases = [ "setupCompilerEnvironmentPhase" ];
-      preConfigurePhases = [ "compileBuildDriverPhase" ];
-      preInstallPhases = [ "haddockPhase" ];
+    prePhases = [ "setupCompilerEnvironmentPhase" ];
+    preConfigurePhases = [ "compileBuildDriverPhase" ];
+    preInstallPhases = [ "haddockPhase" ];
 
-      inherit src;
+    inherit src;
 
-      inherit depsBuildBuild nativeBuildInputs;
-      buildInputs = otherBuildInputs ++ optionals (!isLibrary) propagatedBuildInputs;
-      propagatedBuildInputs = optionals isLibrary propagatedBuildInputs;
+    inherit depsBuildBuild nativeBuildInputs;
+    buildInputs = otherBuildInputs ++ optionals (!isLibrary) propagatedBuildInputs;
+    propagatedBuildInputs = optionals isLibrary propagatedBuildInputs;
 
-      env =
-        optionalAttrs (stdenv.buildPlatform.libc == "glibc") {
-          LOCALE_ARCHIVE = "${buildPackages.glibcLocales}/lib/locale/locale-archive";
-        }
-        // env';
+    env = {
+      ${if (stdenv.buildPlatform.libc == "glibc") then "LOCALE_ARCHIVE" else null} =
+        "${buildPackages.glibcLocales}/lib/locale/locale-archive";
+    }
+    // env';
 
-      prePatch =
-        optionalString (editedCabalFile != null) ''
-          echo "Replace Cabal file with edited version from ${newCabalFileUrl}."
-          cp ${newCabalFile} ${pname}.cabal
-        ''
-        + prePatch
-        + "\n"
-        + lib.optionalString (!dontConvertCabalFileToUnix) ''
-          sed -i -e 's/\r$//' *.cabal
-        '';
-
-      postPatch =
-        optionalString jailbreak ''
-          echo "Run jailbreak-cabal to lift version restrictions on build inputs."
-          ${jailbreak-cabal}/bin/jailbreak-cabal *.cabal
-        ''
-        + postPatch;
-
-      setupCompilerEnvironmentPhase = ''
-        NIX_BUILD_CORES=$(( NIX_BUILD_CORES < ${toString maxBuildCores} ? NIX_BUILD_CORES : ${toString maxBuildCores} ))
-        runHook preSetupCompilerEnvironment
-
-        echo "Build with ${ghc}."
-        ${optionalString (
-          isLibrary && hyperlinkSource && hscolour != null
-        ) "export PATH=${hscolour}/bin:$PATH"}
-
-        builddir="$(mktemp -d)"
-        setupPackageConfDir="$builddir/setup-package.conf.d"
-        mkdir -p $setupPackageConfDir
-        packageConfDir="$builddir/package.conf.d"
-        mkdir -p $packageConfDir
-
-        setupCompileFlags="${concatStringsSep " " setupCompileFlags}"
-        configureFlags="${concatStringsSep " " defaultConfigureFlags} $configureFlags"
+    prePatch =
+      optionalString (editedCabalFile != null) ''
+        echo "Replace Cabal file with edited version from ${newCabalFileUrl}."
+        cp ${newCabalFile} ${pname}.cabal
       ''
-      + ''
-        for p in "''${pkgsBuildBuild[@]}" "''${pkgsBuildHost[@]}" "''${pkgsBuildTarget[@]}"; do
-          ${buildPkgDb nativeGhc "$setupPackageConfDir"}
-        done
-        ${nativeGhcCommand}-pkg --package-db="$setupPackageConfDir" recache
-      ''
-      + ''
-        for p in "''${pkgsHostHost[@]}" "''${pkgsHostTarget[@]}"; do
-          ${buildPkgDb ghc "$packageConfDir"}
-          if [ -d "$p/include" ]; then
-            appendToVar configureFlags "--extra-include-dirs=$p/include"
-          fi
-          if [ -d "$p/lib" ]; then
-            appendToVar configureFlags "--extra-lib-dirs=$p/lib"
-          fi
-          if [[ -d "$p/Library/Frameworks" ]]; then
-            appendToVar configureFlags "--extra-framework-dirs=$p/Library/Frameworks"
-          fi
-      ''
-      + ''
-        done
-      ''
-      + (optionalString
-        (
-          stdenv.hostPlatform.isDarwin
-          && (enableSharedLibraries || enableSharedExecutables)
-          && !enableSeparateIntermediatesOutput
-        )
-        ''
-          local dynamicLinksDir="$out/lib/links"
-          mkdir -p $dynamicLinksDir
+      + prePatch
+      + "\n"
+      + lib.optionalString (!dontConvertCabalFileToUnix) ''
+        sed -i -e 's/\r$//' *.cabal
+      '';
 
-          for d in "$packageConfDir/"*; do
-            gawk -f ${unprettyConf} "$d" > tmp
-            mv tmp "$d"
-          done
+    postPatch =
+      optionalString jailbreak ''
+        echo "Run jailbreak-cabal to lift version restrictions on build inputs."
+        ${jailbreak-cabal}/bin/jailbreak-cabal *.cabal
+      ''
+      + postPatch;
 
-          for d in $(grep '^dynamic-library-dirs:' "$packageConfDir"/* | cut -d' ' -f2- | tr ' ' '\n' | sort -u); do
-            for lib in "$d/"*.{dylib,so}; do
-              ln -sf "$lib" "$dynamicLinksDir"
-            done
-          done
-          for f in "$packageConfDir/"*.conf; do
-            sed -i "s,dynamic-library-dirs: .*,dynamic-library-dirs: $dynamicLinksDir," "$f"
-          done
-        ''
+    setupCompilerEnvironmentPhase = ''
+      NIX_BUILD_CORES=$(( NIX_BUILD_CORES < ${toString maxBuildCores} ? NIX_BUILD_CORES : ${toString maxBuildCores} ))
+      runHook preSetupCompilerEnvironment
+
+      echo "Build with ${ghc}."
+      ${optionalString (
+        isLibrary && hyperlinkSource && hscolour != null
+      ) "export PATH=${hscolour}/bin:$PATH"}
+
+      builddir="$(mktemp -d)"
+      setupPackageConfDir="$builddir/setup-package.conf.d"
+      mkdir -p $setupPackageConfDir
+      packageConfDir="$builddir/package.conf.d"
+      mkdir -p $packageConfDir
+
+      setupCompileFlags="${concatStringsSep " " setupCompileFlags}"
+      configureFlags="${concatStringsSep " " defaultConfigureFlags} $configureFlags"
+    ''
+    + ''
+      for p in "''${pkgsBuildBuild[@]}" "''${pkgsBuildHost[@]}" "''${pkgsBuildTarget[@]}"; do
+        ${buildPkgDb nativeGhc "$setupPackageConfDir"}
+      done
+      ${nativeGhcCommand}-pkg --package-db="$setupPackageConfDir" recache
+    ''
+    + ''
+      for p in "''${pkgsHostHost[@]}" "''${pkgsHostTarget[@]}"; do
+        ${buildPkgDb ghc "$packageConfDir"}
+        if [ -d "$p/include" ]; then
+          appendToVar configureFlags "--extra-include-dirs=$p/include"
+        fi
+        if [ -d "$p/lib" ]; then
+          appendToVar configureFlags "--extra-lib-dirs=$p/lib"
+        fi
+        if [[ -d "$p/Library/Frameworks" ]]; then
+          appendToVar configureFlags "--extra-framework-dirs=$p/Library/Frameworks"
+        fi
+    ''
+    + ''
+      done
+    ''
+    + (optionalString
+      (
+        stdenv.hostPlatform.isDarwin
+        && (enableSharedLibraries || enableSharedExecutables)
+        && !enableSeparateIntermediatesOutput
       )
-      + ''
-        ${ghcCommand}-pkg --package-db="$packageConfDir" recache
+      ''
+        local dynamicLinksDir="$out/lib/links"
+        mkdir -p $dynamicLinksDir
 
-        runHook postSetupCompilerEnvironment
-      '';
-
-      compileBuildDriverPhase = ''
-        runHook preCompileBuildDriver
-
-        for i in Setup.hs Setup.lhs ${defaultSetupHs}; do
-          test -f $i && break
+        for d in "$packageConfDir/"*; do
+          gawk -f ${unprettyConf} "$d" > tmp
+          mv tmp "$d"
         done
 
-        echo setupCompileFlags: $setupCompileFlags
-        ${nativeGhcCommand} $setupCompileFlags --make -o Setup -odir $builddir -hidir $builddir $i
-
-        runHook postCompileBuildDriver
-      '';
-
-      configurePlatforms = [ ];
-      inherit configureFlags buildFlags;
-
-      hardeningDisable =
-        lib.optionals (args ? hardeningDisable) hardeningDisable
-        ++ lib.optional (ghc.isHaLVM or false) "all";
-
-      configurePhase = ''
-        runHook preConfigure
-
-        echo configureFlags: $configureFlags
-        ${setupCommand} configure $configureFlags 2>&1 | ${coreutils}/bin/tee "$NIX_BUILD_TOP/cabal-configure.log"
-        ${lib.optionalString (!allowInconsistentDependencies) ''
-          if grep -E -q -z 'Warning:.*depends on multiple versions' "$NIX_BUILD_TOP/cabal-configure.log"; then
-            echo >&2 "*** abort because of serious configure-time warning from Cabal"
-            exit 1
-          fi
-        ''}
-
-        runHook postConfigure
-      '';
-
-      buildPhase = ''
-        runHook preBuild
-      ''
-      + lib.optionalString (previousIntermediates != null) ''
-        mkdir -p dist;
-        rm -r dist/build
-        cp -r ${previousIntermediates}/${intermediatesDir}/build dist/build
-        find dist/build -exec chmod u+w {} +
-        find dist/build -exec touch -d '1970-01-01T00:00:00Z' {} +
-      ''
-      + ''
-        ${setupCommand} build ${buildTarget} $buildFlags
-        runHook postBuild
-      '';
-
-      inherit doCheck;
-
-      checkPhase = ''
-        runHook preCheck
-        checkFlagsArray+=(
-          "--show-details=streaming"
-          "--test-wrapper=${testWrapperScript}"
-          ${lib.escapeShellArgs (map (opt: "--test-option=${opt}") testFlags)}
-        )
-        export NIX_GHC_PACKAGE_PATH_FOR_TEST="''${NIX_GHC_PACKAGE_PATH_FOR_TEST:-$packageConfDir:}"
-        ${setupCommand} test ${testTargetsString} $checkFlags ''${checkFlagsArray:+"''${checkFlagsArray[@]}"}
-        runHook postCheck
-      '';
-
-      haddockPhase = ''
-        runHook preHaddock
-        ${optionalString (doHaddock && isLibrary) ''
-          ${setupCommand} haddock --html \
-            ${optionalString doHoogle "--hoogle"} \
-            ${optionalString doHaddockQuickjump "--quickjump"} \
-            ${optionalString (isLibrary && hyperlinkSource) "--hyperlink-source"} \
-            ${optionalString enableParallelBuilding "--haddock-option=-j$NIX_BUILD_CORES"} \
-            --haddock-option=--no-tmp-comp-dir \
-            ${lib.concatStringsSep " " haddockFlags}
-        ''}
-        runHook postHaddock
-      '';
-
-      installPhase = ''
-        runHook preInstall
-
-        ${
-          if !isLibrary && buildTarget == "" then
-            "${setupCommand} install"
-          else if !isLibrary then
-            "${setupCommand} copy ${buildTarget}"
-          else
-            ''
-              ${setupCommand} copy ${buildTarget}
-              local packageConfDir="$out/${ghcLibdir}/package.conf.d"
-              local packageConfFile="$packageConfDir/${pname}-${version}.conf"
-              mkdir -p "$packageConfDir"
-              ${setupCommand} register --gen-pkg-config=$packageConfFile
-              if [ -d "$packageConfFile" ]; then
-                mv "$packageConfFile/"* "$packageConfDir"
-                rmdir "$packageConfFile"
-              fi
-              for packageConfFile in "$packageConfDir/"*; do
-                local pkgId=$(gawk -f ${unprettyConf} "$packageConfFile" \
-                  | grep '^id:' | cut -d' ' -f2)
-                mv "$packageConfFile" "$packageConfDir/$pkgId.conf"
-              done
-
-              # delete confdir if there are no libraries
-              find $packageConfDir -maxdepth 0 -empty -delete;
-            ''
-        }
-
-
-        ${optionalString doCoverage "mkdir -p $out/share && cp -r dist/hpc $out/share"}
-
-        ${optionalString enableSeparateDocOutput ''
-          for x in ${docdir "$doc"}"/html/src/"*.html; do
-            remove-references-to -t $out $x
+        for d in $(grep '^dynamic-library-dirs:' "$packageConfDir"/* | cut -d' ' -f2- | tr ' ' '\n' | sort -u); do
+          for lib in "$d/"*.{dylib,so}; do
+            ln -sf "$lib" "$dynamicLinksDir"
           done
-          mkdir -p $doc
-        ''}
-        ${optionalString enableSeparateDataOutput "mkdir -p $data"}
+        done
+        for f in "$packageConfDir/"*.conf; do
+          sed -i "s,dynamic-library-dirs: .*,dynamic-library-dirs: $dynamicLinksDir," "$f"
+        done
+      ''
+    )
+    + ''
+      ${ghcCommand}-pkg --package-db="$packageConfDir" recache
 
-        runHook postInstall
-      '';
+      runHook postSetupCompilerEnvironment
+    '';
 
-      ${if doInstallIntermediates then "installIntermediatesPhase" else null} = ''
-        runHook preInstallIntermediates
-        intermediatesOutput=${if enableSeparateIntermediatesOutput then "$intermediates" else "$out"}
-        installIntermediatesDir="$intermediatesOutput/${intermediatesDir}"
-        mkdir -p "$installIntermediatesDir"
-        cp -r dist/build "$installIntermediatesDir"
-        runHook postInstallIntermediates
-      '';
+    compileBuildDriverPhase = ''
+      runHook preCompileBuildDriver
 
-      passthru = passthru // rec {
+      for i in Setup.hs Setup.lhs ${defaultSetupHs}; do
+        test -f $i && break
+      done
 
-        inherit pname version disallowGhcReference;
+      echo setupCompileFlags: $setupCompileFlags
+      ${nativeGhcCommand} $setupCompileFlags --make -o Setup -odir $builddir -hidir $builddir $i
 
-        compiler = ghc;
+      runHook postCompileBuildDriver
+    '';
 
-        getCabalDeps = {
-          inherit
-            buildDepends
-            buildTools
-            executableFrameworkDepends
-            executableHaskellDepends
-            executablePkgconfigDepends
-            executableSystemDepends
-            executableToolDepends
-            extraLibraries
-            libraryFrameworkDepends
-            libraryHaskellDepends
-            libraryPkgconfigDepends
-            librarySystemDepends
-            libraryToolDepends
-            pkg-configDepends
-            setupHaskellDepends
-            ;
-        }
-        // lib.optionalAttrs doCheck {
-          inherit
-            testDepends
-            testFrameworkDepends
-            testHaskellDepends
-            testPkgconfigDepends
-            testSystemDepends
-            testToolDepends
-            ;
-        }
-        // lib.optionalAttrs doBenchmark {
-          inherit
-            benchmarkDepends
-            benchmarkFrameworkDepends
-            benchmarkHaskellDepends
-            benchmarkPkgconfigDepends
-            benchmarkSystemDepends
-            benchmarkToolDepends
-            ;
-        };
+    configurePlatforms = [ ];
+    inherit configureFlags buildFlags;
 
-        getBuildInputs = rec {
-          inherit propagatedBuildInputs otherBuildInputs allPkgconfigDepends;
-          haskellBuildInputs = isHaskellPartition.right;
-          systemBuildInputs = isHaskellPartition.wrong;
-          isHaskellPartition = lib.partition isHaskellPkg (
-            propagatedBuildInputs ++ otherBuildInputs ++ depsBuildBuild ++ nativeBuildInputs
-          );
-        };
+    hardeningDisable =
+      lib.optionals (args ? hardeningDisable) hardeningDisable
+      ++ lib.optional (ghc.isHaLVM or false) "all";
 
-        isHaskellLibrary = isLibrary;
+    configurePhase = ''
+      runHook preConfigure
 
-        haddockDir = self: if doHaddock then "${docdir self.doc}/html" else null;
+      echo configureFlags: $configureFlags
+      ${setupCommand} configure $configureFlags 2>&1 | ${coreutils}/bin/tee "$NIX_BUILD_TOP/cabal-configure.log"
+      ${lib.optionalString (!allowInconsistentDependencies) ''
+        if grep -E -q -z 'Warning:.*depends on multiple versions' "$NIX_BUILD_TOP/cabal-configure.log"; then
+          echo >&2 "*** abort because of serious configure-time warning from Cabal"
+          exit 1
+        fi
+      ''}
 
-        envFunc =
-          {
-            withHoogle ? false,
-          }:
-          let
-            name = "ghc-shell-for-${drv.name}";
+      runHook postConfigure
+    '';
 
-            withPackages = if withHoogle then ghcWithHoogle else ghcWithPackages;
+    buildPhase = ''
+      runHook preBuild
+    ''
+    + lib.optionalString (previousIntermediates != null) ''
+      mkdir -p dist;
+      rm -r dist/build
+      cp -r ${previousIntermediates}/${intermediatesDir}/build dist/build
+      find dist/build -exec chmod u+w {} +
+      find dist/build -exec touch -d '1970-01-01T00:00:00Z' {} +
+    ''
+    + ''
+      ${setupCommand} build ${buildTarget} $buildFlags
+      runHook postBuild
+    '';
 
-            ghcEnvForBuild =
-              assert isCross;
-              buildHaskellPackages.ghcWithPackages (_: setupHaskellDepends);
+    inherit doCheck;
 
-            ghcEnv = withPackages (
-              _: otherBuildInputsHaskell ++ propagatedBuildInputs ++ lib.optionals (!isCross) setupHaskellDepends
-            );
+    checkPhase = ''
+      runHook preCheck
+      checkFlagsArray+=(
+        "--show-details=streaming"
+        "--test-wrapper=${testWrapperScript}"
+        ${lib.escapeShellArgs (map (opt: "--test-option=${opt}") testFlags)}
+      )
+      export NIX_GHC_PACKAGE_PATH_FOR_TEST="''${NIX_GHC_PACKAGE_PATH_FOR_TEST:-$packageConfDir:}"
+      ${setupCommand} test ${testTargetsString} $checkFlags ''${checkFlagsArray:+"''${checkFlagsArray[@]}"}
+      runHook postCheck
+    '';
 
-            ghcCommandCaps = lib.toUpper ghcCommand';
-          in
-          runCommandCC name {
-            inherit shellHook;
+    haddockPhase = ''
+      runHook preHaddock
+      ${optionalString (doHaddock && isLibrary) ''
+        ${setupCommand} haddock --html \
+          ${optionalString doHoogle "--hoogle"} \
+          ${optionalString doHaddockQuickjump "--quickjump"} \
+          ${optionalString (isLibrary && hyperlinkSource) "--hyperlink-source"} \
+          ${optionalString enableParallelBuilding "--haddock-option=-j$NIX_BUILD_CORES"} \
+          --haddock-option=--no-tmp-comp-dir \
+          ${lib.concatStringsSep " " haddockFlags}
+      ''}
+      runHook postHaddock
+    '';
 
-            depsBuildBuild = lib.optional isCross ghcEnvForBuild;
-            nativeBuildInputs = [
-              ghcEnv
-            ]
-            ++ optional (allPkgconfigDepends != [ ]) pkg-config
-            ++ collectedToolDepends;
-            buildInputs = otherBuildInputsSystem;
+    installPhase = ''
+      runHook preInstall
 
-            env = {
-              "NIX_${ghcCommandCaps}" = "${ghcEnv}/bin/${ghcCommand}";
-              "NIX_${ghcCommandCaps}PKG" = "${ghcEnv}/bin/${ghcCommand}-pkg";
-              "NIX_${ghcCommandCaps}_DOCDIR" = "${ghcEnv}/share/doc/ghc/html";
-              "NIX_${ghcCommandCaps}_LIBDIR" =
-                if ghc.isHaLVM or false then "${ghcEnv}/lib/HaLVM-${ghc.version}" else "${ghcEnv}/${ghcLibdir}";
-            }
-            // optionalAttrs (stdenv.buildPlatform.libc == "glibc") {
-              LOCALE_ARCHIVE = "${buildPackages.glibcLocales}/lib/locale/locale-archive";
-            }
-            // env';
-          } "echo $nativeBuildInputs $buildInputs > $out";
+      ${
+        if !isLibrary && buildTarget == "" then
+          "${setupCommand} install"
+        else if !isLibrary then
+          "${setupCommand} copy ${buildTarget}"
+        else
+          ''
+            ${setupCommand} copy ${buildTarget}
+            local packageConfDir="$out/${ghcLibdir}/package.conf.d"
+            local packageConfFile="$packageConfDir/${pname}-${version}.conf"
+            mkdir -p "$packageConfDir"
+            ${setupCommand} register --gen-pkg-config=$packageConfFile
+            if [ -d "$packageConfFile" ]; then
+              mv "$packageConfFile/"* "$packageConfDir"
+              rmdir "$packageConfFile"
+            fi
+            for packageConfFile in "$packageConfDir/"*; do
+              local pkgId=$(gawk -f ${unprettyConf} "$packageConfFile" \
+                | grep '^id:' | cut -d' ' -f2)
+              mv "$packageConfFile" "$packageConfDir/$pkgId.conf"
+            done
 
-        env = envFunc { };
+            # delete confdir if there are no libraries
+            find $packageConfDir -maxdepth 0 -empty -delete;
+          ''
+      }
 
+
+      ${optionalString doCoverage "mkdir -p $out/share && cp -r dist/hpc $out/share"}
+
+      ${optionalString enableSeparateDocOutput ''
+        for x in ${docdir "$doc"}"/html/src/"*.html; do
+          remove-references-to -t $out $x
+        done
+        mkdir -p $doc
+      ''}
+      ${optionalString enableSeparateDataOutput "mkdir -p $data"}
+
+      runHook postInstall
+    '';
+
+    ${if doInstallIntermediates then "installIntermediatesPhase" else null} = ''
+      runHook preInstallIntermediates
+      intermediatesOutput=${if enableSeparateIntermediatesOutput then "$intermediates" else "$out"}
+      installIntermediatesDir="$intermediatesOutput/${intermediatesDir}"
+      mkdir -p "$installIntermediatesDir"
+      cp -r dist/build "$installIntermediatesDir"
+      runHook postInstallIntermediates
+    '';
+
+    passthru = passthru // rec {
+
+      inherit pname version disallowGhcReference;
+
+      compiler = ghc;
+
+      getCabalDeps = {
+        inherit
+          buildDepends
+          buildTools
+          executableFrameworkDepends
+          executableHaskellDepends
+          executablePkgconfigDepends
+          executableSystemDepends
+          executableToolDepends
+          extraLibraries
+          libraryFrameworkDepends
+          libraryHaskellDepends
+          libraryPkgconfigDepends
+          librarySystemDepends
+          libraryToolDepends
+          pkg-configDepends
+          setupHaskellDepends
+          ;
+        ${if doCheck then "testDepends" else null} = testDepends;
+        ${if doCheck then "testFrameworkDepends" else null} = testFrameworkDepends;
+        ${if doCheck then "testHaskellDepends" else null} = testHaskellDepends;
+        ${if doCheck then "testPkgconfigDepends" else null} = testPkgconfigDepends;
+        ${if doCheck then "testSystemDepends" else null} = testSystemDepends;
+        ${if doCheck then "testToolDepends" else null} = testToolDepends;
+        ${if doBenchmark then "benchmarkDepends" else null} = benchmarkDepends;
+        ${if doBenchmark then "benchmarkFrameworkDepends" else null} = benchmarkFrameworkDepends;
+        ${if doBenchmark then "benchmarkHaskellDepends" else null} = benchmarkHaskellDepends;
+        ${if doBenchmark then "benchmarkPkgconfigDepends" else null} = benchmarkPkgconfigDepends;
+        ${if doBenchmark then "benchmarkSystemDepends" else null} = benchmarkSystemDepends;
+        ${if doBenchmark then "benchmarkToolDepends" else null} = benchmarkToolDepends;
       };
 
-      meta = {
-        inherit homepage platforms;
-      }
-      // optionalAttrs (args ? broken) { inherit broken; }
-      // optionalAttrs (args ? description) { inherit description; }
-      // optionalAttrs (args ? license) { inherit license; }
-      // optionalAttrs (args ? maintainers) { inherit maintainers; }
-      // optionalAttrs (args ? teams) { inherit teams; }
-      // optionalAttrs (args ? hydraPlatforms) { inherit hydraPlatforms; }
-      // optionalAttrs (args ? badPlatforms) { inherit badPlatforms; }
-      // optionalAttrs (args ? changelog) { inherit changelog; }
-      // optionalAttrs (args ? mainProgram) { inherit mainProgram; };
+      getBuildInputs = rec {
+        inherit propagatedBuildInputs otherBuildInputs allPkgconfigDepends;
+        haskellBuildInputs = isHaskellPartition.right;
+        systemBuildInputs = isHaskellPartition.wrong;
+        isHaskellPartition = lib.partition isHaskellPkg (
+          propagatedBuildInputs ++ otherBuildInputs ++ depsBuildBuild ++ nativeBuildInputs
+        );
+      };
 
-    }
-    // optionalAttrs (args ? sourceRoot) { inherit sourceRoot; }
-    // optionalAttrs (args ? setSourceRoot) { inherit setSourceRoot; }
-    // optionalAttrs (args ? preCompileBuildDriver) { inherit preCompileBuildDriver; }
-    // optionalAttrs (args ? postCompileBuildDriver) { inherit postCompileBuildDriver; }
-    // optionalAttrs (args ? preUnpack) { inherit preUnpack; }
-    // optionalAttrs (args ? postUnpack) { inherit postUnpack; }
-    // optionalAttrs (args ? patches) { inherit patches; }
-    // optionalAttrs (args ? patchPhase) { inherit patchPhase; }
-    // optionalAttrs (args ? preConfigure) { inherit preConfigure; }
-    // optionalAttrs (args ? postConfigure) { inherit postConfigure; }
-    // optionalAttrs (args ? preBuild) { inherit preBuild; }
-    // optionalAttrs (args ? postBuild) { inherit postBuild; }
-    // optionalAttrs (args ? doBenchmark) { inherit doBenchmark; }
-    // optionalAttrs (args ? checkPhase) { inherit checkPhase; }
-    // optionalAttrs (args ? preCheck) { inherit preCheck; }
-    // optionalAttrs (args ? postCheck) { inherit postCheck; }
-    // optionalAttrs (args ? preHaddock) { inherit preHaddock; }
-    // optionalAttrs (args ? postHaddock) { inherit postHaddock; }
-    // optionalAttrs (args ? preInstall) { inherit preInstall; }
-    // optionalAttrs (args ? installPhase) { inherit installPhase; }
-    // optionalAttrs (args ? postInstall) { inherit postInstall; }
-    // optionalAttrs (args ? preFixup) { inherit preFixup; }
-    // optionalAttrs (args ? postFixup) { inherit postFixup; }
-    // optionalAttrs (args ? dontStrip) { inherit dontStrip; }
-    // optionalAttrs (postPhases != [ ]) { inherit postPhases; }
-    // optionalAttrs (disallowedRequisites != [ ] || disallowGhcReference) {
-      disallowedRequisites = disallowedRequisites ++ (if disallowGhcReference then [ ghc ] else [ ]);
-    }
-    // optionalAttrs (__darwinAllowLocalNetworking || args ? __darwinAllowLocalNetworking) {
-      inherit __darwinAllowLocalNetworking;
-    }
-  )
+      isHaskellLibrary = isLibrary;
+
+      haddockDir = self: if doHaddock then "${docdir self.doc}/html" else null;
+
+      envFunc =
+        {
+          withHoogle ? false,
+        }:
+        let
+          name = "ghc-shell-for-${drv.name}";
+
+          withPackages = if withHoogle then ghcWithHoogle else ghcWithPackages;
+
+          ghcEnvForBuild =
+            assert isCross;
+            buildHaskellPackages.ghcWithPackages (_: setupHaskellDepends);
+
+          ghcEnv = withPackages (
+            _: otherBuildInputsHaskell ++ propagatedBuildInputs ++ lib.optionals (!isCross) setupHaskellDepends
+          );
+
+          ghcCommandCaps = lib.toUpper ghcCommand';
+        in
+        runCommandCC name {
+          inherit shellHook;
+
+          depsBuildBuild = lib.optional isCross ghcEnvForBuild;
+          nativeBuildInputs = [
+            ghcEnv
+          ]
+          ++ optional (allPkgconfigDepends != [ ]) pkg-config
+          ++ collectedToolDepends;
+          buildInputs = otherBuildInputsSystem;
+
+          env = {
+            "NIX_${ghcCommandCaps}" = "${ghcEnv}/bin/${ghcCommand}";
+            "NIX_${ghcCommandCaps}PKG" = "${ghcEnv}/bin/${ghcCommand}-pkg";
+            "NIX_${ghcCommandCaps}_DOCDIR" = "${ghcEnv}/share/doc/ghc/html";
+            "NIX_${ghcCommandCaps}_LIBDIR" =
+              if ghc.isHaLVM or false then "${ghcEnv}/lib/HaLVM-${ghc.version}" else "${ghcEnv}/${ghcLibdir}";
+            ${if (stdenv.buildPlatform.libc == "glibc") then "LOCALE_ARCHIVE" else null} =
+              "${buildPackages.glibcLocales}/lib/locale/locale-archive";
+          }
+          // env';
+        } "echo $nativeBuildInputs $buildInputs > $out";
+
+      env = envFunc { };
+
+    };
+
+    meta = {
+      inherit homepage platforms;
+      ${if (args ? broken) then "broken" else null} = broken;
+      ${if (args ? description) then "description" else null} = description;
+      ${if (args ? license) then "license" else null} = license;
+      ${if (args ? maintainers) then "maintainers" else null} = maintainers;
+      ${if (args ? teams) then "teams" else null} = teams;
+      ${if (args ? hydraPlatforms) then "hydraPlatforms" else null} = hydraPlatforms;
+      ${if (args ? badPlatforms) then "badPlatforms" else null} = badPlatforms;
+      ${if (args ? changelog) then "changelog" else null} = changelog;
+      ${if (args ? mainProgram) then "mainProgram" else null} = mainProgram;
+    };
+
+    ${if (args ? sourceRoot) then "sourceRoot" else null} = sourceRoot;
+    ${if (args ? setSourceRoot) then "setSourceRoot" else null} = setSourceRoot;
+    ${if (args ? preCompileBuildDriver) then "preCompileBuildDriver" else null} = preCompileBuildDriver;
+    ${if (args ? postCompileBuildDriver) then "postCompileBuildDriver" else null} =
+      postCompileBuildDriver;
+    ${if (args ? preUnpack) then "preUnpack" else null} = preUnpack;
+    ${if (args ? postUnpack) then "postUnpack" else null} = postUnpack;
+    ${if (args ? patches) then "patches" else null} = patches;
+    ${if (args ? patchPhase) then "patchPhase" else null} = patchPhase;
+    ${if (args ? preConfigure) then "preConfigure" else null} = preConfigure;
+    ${if (args ? postConfigure) then "postConfigure" else null} = postConfigure;
+    ${if (args ? preBuild) then "preBuild" else null} = preBuild;
+    ${if (args ? postBuild) then "postBuild" else null} = postBuild;
+    ${if (args ? doBenchmark) then "doBenchmark" else null} = doBenchmark;
+    ${if (args ? checkPhase) then "checkPhase" else null} = checkPhase;
+    ${if (args ? preCheck) then "preCheck" else null} = preCheck;
+    ${if (args ? postCheck) then "postCheck" else null} = postCheck;
+    ${if (args ? preHaddock) then "preHaddock" else null} = preHaddock;
+    ${if (args ? postHaddock) then "postHaddock" else null} = postHaddock;
+    ${if (args ? preInstall) then "preInstall" else null} = preInstall;
+    ${if (args ? installPhase) then "installPhase" else null} = installPhase;
+    ${if (args ? postInstall) then "postInstall" else null} = postInstall;
+    ${if (args ? preFixup) then "preFixup" else null} = preFixup;
+    ${if (args ? postFixup) then "postFixup" else null} = postFixup;
+    ${if (args ? dontStrip) then "dontStrip" else null} = dontStrip;
+    ${if (postPhases != [ ]) then "postPhases" else null} = postPhases;
+    ${if (disallowedRequisites != [ ] || disallowGhcReference) then "disallowedRequisites" else null} =
+      disallowedRequisites ++ (if disallowGhcReference then [ ghc ] else [ ]);
+    ${
+      if (__darwinAllowLocalNetworking || args ? __darwinAllowLocalNetworking) then
+        "__darwinAllowLocalNetworking"
+      else
+        null
+    } =
+      __darwinAllowLocalNetworking;
+  })
 )
