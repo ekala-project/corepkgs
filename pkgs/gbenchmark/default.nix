@@ -11,13 +11,13 @@
 
 stdenv.mkDerivation rec {
   pname = "gbenchmark";
-  version = "1.9.4";
+  version = "1.9.5";
 
   src = fetchFromGitHub {
     owner = "google";
     repo = "benchmark";
     rev = "v${version}";
-    hash = "sha256-P7wJcKkIBoWtN9FCRticpBzYbEZPq71a0iW/2oDTZRU=";
+    hash = "sha256-Mm4pG7zMB00iof32CxreoNBFnduPZTMp3reHMCIAFPQ=";
   };
 
   nativeBuildInputs = [
@@ -45,6 +45,13 @@ stdenv.mkDerivation rec {
 
   # Tests fail on 32-bit due to not enough precision
   doCheck = stdenv.hostPlatform.is64bit;
+
+  # locale_impermeability_test fails in the sandbox due to missing locale data
+  checkPhase = ''
+    runHook preCheck
+    ctest --force-new-ctest-process --exclude-regex locale_impermeability_test
+    runHook postCheck
+  '';
 
   passthru.tests = {
     inherit prometheus-cpp;
