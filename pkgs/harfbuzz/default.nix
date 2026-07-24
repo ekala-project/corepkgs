@@ -17,11 +17,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "harfbuzz";
-  version = "13.2.1";
+  version = "14.2.1";
 
   src = fetchurl {
     url = "https://github.com/harfbuzz/harfbuzz/releases/download/${finalAttrs.version}/harfbuzz-${finalAttrs.version}.tar.xz";
-    hash = "sha256-ZpXaPrfhvgqjCS/k2BQzoztH9FGSWcdZ1ynjqaVcFCk=";
+    hash = "sha256-pUpdjpOApB+7dizjZ7y/dwR5Lfyg2T8bvKhsWleQLg4=";
   };
 
   patches = [ ./disable-check-symbols-test.patch ];
@@ -45,6 +45,8 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.mesonEnable "icu" withIcu)
     (lib.mesonEnable "introspection" false)
     (lib.mesonEnable "docs" false)
+    (lib.mesonEnable "gpu" false)
+    (lib.mesonEnable "gpu_demo" false)
   ];
 
   depsBuildBuild = [
