@@ -15,13 +15,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "bubblewrap";
-  version = "0.11.0";
+  version = "0.11.2";
 
   src = fetchFromGitHub {
     owner = "containers";
     repo = "bubblewrap";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-8IDMLQPeO576N1lizVudXUmTV6hNOiowjzRpEWBsZ+U=";
+    hash = "sha256-MUjJMhJ8Q9sYQyGqA7zfMutYjMSZNmEHXs2H3WN4mbE=";
   };
 
   outputs = [
@@ -30,6 +30,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   mesonBuildType = "release";
+
+  env.NIX_CFLAGS_COMPILE = "-Wno-error=format-overflow";
 
   postPatch = ''
     substituteInPlace tests/libtest.sh \
