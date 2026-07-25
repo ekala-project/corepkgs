@@ -16,19 +16,19 @@
 
 buildPythonPackage rec {
   pname = "lxml";
-  version = "6.0.2";
+  version = "6.1.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "lxml";
     repo = "lxml";
     tag = "lxml-${version}";
-    hash = "sha256-Ri5SzfQJFghRcMAKHS5QKD365OZlio895fSlumq83vs=";
+    hash = "sha256-SRJaegK4PxgK0rdILVp3J92VnjPmExiD2AuMLoGQIbA=";
   };
 
   postPatch = ''
     substituteInPlace pyproject.toml \
-      --replace-fail 'Cython>=3.1.4' 'Cython'
+      --replace-fail 'Cython>=3.2.4' 'Cython'
   '';
 
   build-system = [
