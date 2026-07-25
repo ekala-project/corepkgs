@@ -15,7 +15,7 @@
 
 buildPythonPackage rec {
   pname = "importlib-metadata";
-  version = "8.7.0";
+  version = "9.0.0";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
@@ -23,8 +23,13 @@ buildPythonPackage rec {
   src = fetchPypi {
     pname = "importlib_metadata";
     inherit version;
-    hash = "sha256-0TuBrSI7iQqhbFRx8qwwVs92xfEPgtb5KS8LQV84kAA=";
+    hash = "sha256-pPV6tZnmouMBbXWVz9cutGYaUQbnh6lbzJDHEFuDHvw=";
   };
+
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace-fail '"coherent.licensed",' ""
+  '';
 
   build-system = [
     setuptools # otherwise cross build fails
