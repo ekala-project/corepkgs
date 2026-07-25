@@ -2,40 +2,34 @@ diff --git a/pyproject.toml b/pyproject.toml
 index 05cd96e..eb2000f 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
-@@ -1,12 +1,12 @@
+@@ -1,8 +1,7 @@
  [build-system]
- build-backend = "hatchling.build"
+ build-backend = "setuptools.build_meta"
  requires = [
--  "hatch-vcs",
-   "hatchling>=1.26",
+-  "setuptools>=77",
+-  "setuptools-scm>=8",
++  "setuptools>=77",
  ]
- 
+
  [project]
- name = "iniconfig"
-+version = "@version@"
- description = "brain-dead simple config-ini parsing"
- readme = "README.rst"
- license = "MIT"
-@@ -15,9 +15,6 @@ authors = [
-     { name = "Holger Krekel", email = "holger.krekel@gmail.com" },
+@@ -25,9 +24,7 @@ classifiers = [
+   "Topic :: Software Development :: Libraries",
+   "Topic :: Utilities",
  ]
- requires-python = ">=3.8"
 -dynamic = [
 -  "version",
 -]
- classifiers = [
-     "Development Status :: 4 - Beta",
-     "Intended Audience :: Developers",
-@@ -40,12 +37,6 @@ classifiers = [
- Homepage = "https://github.com/pytest-dev/iniconfig"
- 
- 
--[tool.hatch.version]
--source = "vcs"
++version = "@version@"
+ urls.Homepage = "https://github.com/pytest-dev/iniconfig"
+
+ [dependency-groups]
+@@ -41,9 +38,6 @@ packages = [ "iniconfig" ]
+ [tool.setuptools.package-data]
+ iniconfig = [ "py.typed" ]
+
+-[tool.setuptools_scm]
+-write_to = "src/iniconfig/_version.py"
 -
--[tool.hatch.build.hooks.vcs]
--version-file = "src/iniconfig/_version.py"
--
- [tool.hatch.build.targets.sdist]
- include = [
-     "/src",
+ [tool.ruff]
+
+ lint.extend-select = [
