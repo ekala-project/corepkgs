@@ -24,12 +24,12 @@
 let
   self = buildPythonPackage rec {
     pname = "urllib3";
-    version = "2.5.0";
+    version = "2.7.0";
     pyproject = true;
 
     src = fetchPypi {
       inherit pname version;
-      hash = "sha256-P8R3M8fkGdS8P2s9wrT4kLt0OQajDVa6Slv6S7/5J2A=";
+      hash = "sha256-Ix4Ow7Y86xRmfGe+YPLyxApRjLOLA69gq8gT2iZQX0w=";
     };
 
     build-system = [
@@ -39,7 +39,7 @@ let
 
     postPatch = ''
       substituteInPlace pyproject.toml \
-        --replace-fail ', "setuptools-scm>=8,<9"' ""
+        --replace-fail ', "setuptools-scm>=8,<11"' ""
     '';
 
     optional-dependencies = {
