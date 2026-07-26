@@ -55,5 +55,13 @@ in
         Overlays to be applied to each Lua package set.
       '';
     };
+
+    overlays.cuda = mkOption {
+      type = types.listOf overlayType;
+      default = [ ];
+      description = ''
+        Overlays to be applied to each CUDA package set.
+      '';
+    };
   };
 }
