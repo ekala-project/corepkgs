@@ -123,7 +123,7 @@ with final;
   libcaca = null;
   libgeotiff = null;
   libgit2-glib = null;
-  libglvnd = null;
+
   libguestfs = null;
   libjxl = null;
   libnatspec = null;
