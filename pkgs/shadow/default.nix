@@ -32,13 +32,13 @@ in
 
 stdenv.mkDerivation rec {
   pname = "shadow";
-  version = "4.18.0";
+  version = "4.19.4";
 
   src = fetchFromGitHub {
     owner = "shadow-maint";
     repo = "shadow";
     rev = version;
-    hash = "sha256-M7We3JboNpr9H0ELbKcFtMvfmmVYaX9dYcsQ3sVX0lM=";
+    hash = "sha256-vR6dwB3EttGY2DgQ20nOr9kNhF+nsAaBEyklcJAZ20Y=";
   };
 
   outputs = [
@@ -98,7 +98,8 @@ stdenv.mkDerivation rec {
     (lib.withFeature withLibbsd "libbsd")
   ]
   ++ lib.optional (stdenv.hostPlatform.libc != "glibc") "--disable-nscd"
-  ++ lib.optional withTcb "--with-tcb";
+  ++ lib.optional withTcb "--with-tcb"
+  ++ [ "--disable-logind" ];
 
   preBuild = lib.optionalString (stdenv.hostPlatform.libc == "glibc") ''
     substituteInPlace lib/nscd.c --replace /usr/sbin/nscd ${glibc'.bin}/bin/nscd
