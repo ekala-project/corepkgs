@@ -2,19 +2,19 @@ diff --git a/src/main.rs b/src/main.rs
 index 3cb6896..7f070e0 100644
 --- a/src/main.rs
 +++ b/src/main.rs
-@@ -275,7 +275,9 @@ fn install_single_toolchain(
+@@ -309,7 +309,9 @@ impl<'a> Installer<'a> {
 
-     // install
-     if maybe_dry_client.is_some() {
--        rename(&toolchain.dest, toolchain_path)?;
-+        rename(&toolchain.dest, toolchain_path.clone())?;
-+        nix_patchelf(toolchain_path)
-+            .expect("failed to patch toolchain for NixOS");
-         eprintln!(
-             "toolchain `{}` is successfully installed!",
-             toolchain.dest.display()
-@@ -291,6 +293,45 @@ fn install_single_toolchain(
-     Ok(())
+         // install
+         if self.actually_install {
+-            rename(&toolchain.dest, toolchain_path)?;
++            rename(&toolchain.dest, toolchain_path.clone())?;
++            nix_patchelf(toolchain_path)
++                .expect("failed to patch toolchain for NixOS");
+             eprintln!(
+                 "toolchain `{}` is successfully installed!",
+                 toolchain.dest.display()
+@@ -326,6 +328,45 @@ impl<'a> Installer<'a> {
+     }
  }
 
 +fn nix_patchelf(mut toolchain_path: PathBuf) -> Result<(), Error> {
@@ -57,5 +57,5 @@ index 3cb6896..7f070e0 100644
 +}
 +
  fn fetch_master_commit(client: &Client, github_token: Option<&str>) -> Result<String, Error> {
-     eprintln!("fetching master commit hash... ");
+     eprintln!("fetching HEAD commit hash... ");
      fetch_master_commit_via_git()
