@@ -81,7 +81,7 @@
   withFlite ? withFullDeps, # Voice Synthesis
   withFontconfig ? withHeadlessDeps, # Needed for drawtext filter
   withFreetype ? withHeadlessDeps, # Needed for drawtext filter
-  withFrei0r ? withFullDeps && withGPL, # frei0r video filtering
+  withFrei0r ? withFullDeps && withGPL && frei0r != null, # frei0r video filtering
   withFribidi ? withHeadlessDeps && fribidi != null, # Needed for drawtext filter
   withGme ? withFullDeps, # Game Music Emulator
   withGmp ? withHeadlessDeps && withVersion3, # rtmp(t)e support
