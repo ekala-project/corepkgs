@@ -7,7 +7,7 @@
 
   latest = {
     version = "3.121";
-    hash = "sha256-zloUvwiaT/ivyhMrEzPKHOKySgGFUzV1Kr9pEC0g3w=";
+    hash = "sha256-zloUvwiaT/ivyhxMrEzPKHOKySgGFUzV1Kr9pEC0g3w=";
     versionRegex = "NSS_(\\d+)_(\\d+)(?:_(\\d+))?_RTM";
     extraMeta = {
       # NOTE: Whenever you updated this version check if the `cacert` package also
