@@ -1,21 +1,25 @@
 {
   lib,
-  buildGoModule,
+  buildGo126Module,
   fetchFromGitHub,
   installShellFiles,
   makeWrapper,
 }:
 
-buildGoModule (finalAttrs: {
+buildGo126Module (finalAttrs: {
   pname = "skaffold";
-  version = "2.17.1";
+  version = "2.24.0";
 
   src = fetchFromGitHub {
     owner = "GoogleContainerTools";
     repo = "skaffold";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-Cbpfz0IXFopCeKNDwx8mB/1quhcOO3IWStsFmKeNPYg=";
+    hash = "sha256-d8KZmx43OhaBq4S1WexlUm//RwOlId3yGNIJBM9ASxY=";
   };
+
+  postPatch = ''
+    substituteInPlace go.mod --replace-fail 'go 1.26.4' 'go 1.26.3'
+  '';
 
   vendorHash = null;
 
