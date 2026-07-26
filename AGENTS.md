@@ -8,6 +8,7 @@ This document provides high-level guidelines for AI agents working with the core
 - [`.skills/packaging.md`](.skills/packaging.md) - Packaging conventions
 - [`.skills/validation.md`](.skills/validation.md) - Validation and testing
 - [`.skills/porting.md`](.skills/porting.md) - Porting from nixpkgs
+- [`docs/common-issues/`](docs/common-issues/README.md) - Fixing build failures after version updates
 
 ## Package Organization
 
@@ -126,6 +127,18 @@ nix fmt <path-to-file>
 Ensures code follows formatting standards.
 
 **Detailed guide:** See [`.skills/validation.md`](.skills/validation.md) for complete validation procedures, troubleshooting, and advanced validation techniques.
+
+## Fixing Build Failures After Version Updates
+
+See [`docs/common-issues/`](docs/common-issues/README.md) for detailed guides on fixing build failures. The most frequent patterns:
+
+- **Obsolete patches** — Remove `fetchpatch`/`fetchurl` entries that are already applied upstream. Also clean up unused imports. See [obsolete-patches.md](docs/common-issues/obsolete-patches.md).
+- **Python build system changes** — Upstream switches from `setuptools` to `hatchling`, pins incompatible tool versions, or adds unavailable dependencies. See [python-packages.md](docs/common-issues/python-packages.md).
+- **Compiler `-Werror` failures** — Suppress specific warnings with `env.NIX_CFLAGS_COMPILE`. See [compiler-errors.md](docs/common-issues/compiler-errors.md).
+- **CMake install paths** — Major version bumps may need explicit `-DCMAKE_INSTALL_INCLUDEDIR`/`-DCMAKE_INSTALL_LIBDIR` flags. See [cmake-packages.md](docs/common-issues/cmake-packages.md).
+- **Rust/Go hash mismatches** — Update `cargoHash`/`vendorHash`, or patch `go.mod` version pins. See [rust-packages.md](docs/common-issues/rust-packages.md).
+- **Transitive dependency failures** — "Build failed due to failed dependency" means a *different* package is broken. Fix that one first. See [dependency-failures.md](docs/common-issues/dependency-failures.md).
+- **mkManyVariants packages** — Version and hash live in `variants.nix`, not `default.nix`.
 
 ## Common Patterns
 
