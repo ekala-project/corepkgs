@@ -3,11 +3,11 @@
   argcomplete,
   buildPythonPackage,
   fetchPypi,
+  hatchling,
+  hatch-vcs,
   jq,
   pytestCheckHook,
   pyyaml,
-  setuptools,
-  setuptools-scm,
   replaceVars,
   tomlkit,
   xmltodict,
@@ -15,12 +15,12 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "yq";
-  version = "3.4.3";
+  version = "4.1.2";
   pyproject = true;
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;
-    hash = "sha256-ulhqGm8wz3BbL5IgZxLfIoHNMgKAIQ57e4Cty48lbjs=";
+    hash = "sha256-qPFIkw+L6zFw9FHWfynL4LOscTzS/JHs9R1DtIeea0w=";
   };
 
   patches = [
@@ -30,8 +30,8 @@ buildPythonPackage (finalAttrs: {
   ];
 
   build-system = [
-    setuptools
-    setuptools-scm
+    hatchling
+    hatch-vcs
   ];
 
   dependencies = [
