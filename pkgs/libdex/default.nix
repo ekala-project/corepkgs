@@ -33,6 +33,7 @@ stdenv.mkDerivation (finalAttrs: {
     gi-docgen
     gobject-introspection
     meson
+    meson.configurePhaseHook
     ninja
     pkg-config
     vala
