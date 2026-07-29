@@ -46,7 +46,7 @@
   withAribb24 ? withFullDeps, # ARIB text and caption decoding
   withAribcaption ? withFullDeps && packageAtLeast "6.1", # ARIB STD-B24 Caption Decoder/Renderer
   withAss ? withHeadlessDeps && stdenv.hostPlatform == stdenv.buildPlatform && libass != null, # (Advanced) SubStation Alpha subtitle rendering
-  withAvisynth ? withFullDeps, # AviSynth script files reading
+  withAvisynth ? withFullDeps && avisynthplus != null, # AviSynth script files reading
   withBluray ? withHeadlessDeps && libbluray != null, # BluRay reading
   withBs2b ? withFullDeps, # bs2b DSP library
   withBzlib ? withHeadlessDeps,
@@ -77,7 +77,7 @@
       && !(hostPlatform.isPower && hostPlatform.isBigEndian)
       && hostPlatform == buildPlatform
     )
-    && (if (packageAtLeast "6") then nv-codec-headers-12 != null else nv-codec-headers != null), # dynamically linked Nvidia code
+    && (if (packageAtLeast "6") then nv-codec-headers-12 != null else false), # dynamically linked Nvidia code (v12 headers only work with ffmpeg >= 6)
   withFlite ? withFullDeps, # Voice Synthesis
   withFontconfig ? withHeadlessDeps, # Needed for drawtext filter
   withFreetype ? withHeadlessDeps, # Needed for drawtext filter
