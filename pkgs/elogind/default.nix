@@ -48,6 +48,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     meson
+    meson.configurePhaseHook
     ninja
     m4
     pkg-config
