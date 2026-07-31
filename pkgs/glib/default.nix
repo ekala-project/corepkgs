@@ -32,6 +32,11 @@
   desktop-file-utils,
   shared-mime-info,
   testers,
+
+  # for passthru.tests
+  cairo,
+  dconf,
+  pango,
   gobject-introspection,
   libsystemtap,
   withSysprof ?
@@ -356,6 +361,7 @@ stdenv.mkDerivation (finalAttrs: {
         doCheck = true;
       });
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      inherit cairo dconf pango;
     };
 
     updateScript = gnome.updateScript {
