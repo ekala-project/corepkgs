@@ -48,7 +48,7 @@ stdenv.mkDerivation (finalAttrs: {
       substituteInPlace src/google/protobuf/testing/googletest.cc \
         --replace-fail 'tmpnam(b)' '"'$TMPDIR'/foo"'
     ''
-    + lib.optionalString (packageOlder "27") ''
+    + lib.optionalString (packageAtLeast "25" && packageOlder "27") ''
       # Fix missing #include <cstring> in utf8_validity.cc (needed with newer compilers)
       sed -i '1i #include <cstring>' third_party/utf8_range/utf8_validity.cc
     ''
