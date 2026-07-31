@@ -8,6 +8,11 @@
   bison,
   runCommand,
   testers,
+
+  # for passthru.tests
+  binutils,
+  elfutils,
+  flex,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -75,6 +80,7 @@ stdenv.mkDerivation rec {
       test -f calc.c
       touch $out
     '';
+    inherit binutils elfutils flex;
   };
 
   meta = {
