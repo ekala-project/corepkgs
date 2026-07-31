@@ -7,6 +7,11 @@
   writeScript,
   testers,
   runUnitTests,
+
+  # for passthru.tests
+  elfutils,
+  libarchive,
+  rpm,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -77,6 +82,7 @@ stdenv.mkDerivation (finalAttrs: {
         package = finalAttrs.finalPackage;
       };
       unittests = runUnitTests finalAttrs.finalPackage;
+      inherit elfutils libarchive rpm;
     };
   };
 
