@@ -20,6 +20,10 @@
   testers,
   enableHttp ? false,
 
+  # for passthru.tests
+  libxslt,
+  fontconfig,
+
   version,
   extraPatches ? [ ],
   src,
@@ -136,6 +140,7 @@ stdenv'.mkDerivation (finalAttrs: {
         moduleNames = [ "LibXml2" ];
         package = finalAttrs.finalPackage;
       };
+      inherit libxslt fontconfig;
     };
   };
 
