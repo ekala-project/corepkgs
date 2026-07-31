@@ -6,14 +6,14 @@
 
   armTrustedFirmwareTools,
   bzip2,
-  cbfstool,
+  cbfstool ? null,
   gzip,
   lz4,
-  lzop,
+  lzop ? null,
   openssl,
   ubootTools,
-  vboot-utils,
-  xilinx-bootgen,
+  vboot-utils ? null,
+  xilinx-bootgen ? null,
   xz,
   zstd,
 }:
@@ -74,7 +74,7 @@ rec {
 
   binman =
     let
-      btools = [
+      btools = lib.filter (x: x != null) [
         armTrustedFirmwareTools
         bzip2
         cbfstool
