@@ -43,10 +43,69 @@ stdenv.mkDerivation (finalAttrs: {
     inherit hash;
   };
 
-  postPatch = lib.optionalString (stdenv.hostPlatform.isDarwin && packageOlder "29") ''
-    substituteInPlace src/google/protobuf/testing/googletest.cc \
-      --replace-fail 'tmpnam(b)' '"'$TMPDIR'/foo"'
-  '';
+  postPatch =
+    lib.optionalString (stdenv.hostPlatform.isDarwin && packageOlder "29") ''
+      substituteInPlace src/google/protobuf/testing/googletest.cc \
+        --replace-fail 'tmpnam(b)' '"'$TMPDIR'/foo"'
+    ''
+    + lib.optionalString (packageOlder "27") ''
+      # Fix missing #include <cstring> in utf8_validity.cc (needed with newer compilers)
+      sed -i '1i #include <cstring>' third_party/utf8_range/utf8_validity.cc
+    ''
+    + lib.optionalString (packageAtLeast "27" && packageOlder "30") ''
+      # Remove absl::if_constexpr CMake target reference, removed in newer abseil-cpp
+      sed -i '/absl::if_constexpr/d' cmake/abseil-cpp.cmake
+
+      # Provide compatibility shim for absl/utility/internal/if_constexpr.h,
+      # which was removed in abseil-cpp 20260526
+      mkdir -p absl_shim/absl/utility/internal
+      cat > absl_shim/absl/utility/internal/if_constexpr.h << 'SHIMEOF'
+      #ifndef ABSL_UTILITY_INTERNAL_IF_CONSTEXPR_H_
+      #define ABSL_UTILITY_INTERNAL_IF_CONSTEXPR_H_
+      #include <type_traits>
+      #include <utility>
+      namespace absl {
+      namespace utility_internal {
+
+      template <bool condition>
+      struct IfConstexprElseImpl;
+
+      template <>
+      struct IfConstexprElseImpl<true> {
+        template <typename TrueFunc, typename FalseFunc, typename... Args>
+        static auto Run(TrueFunc&& true_func, FalseFunc&&, Args&&... args)
+            -> decltype(std::forward<TrueFunc>(true_func)(std::forward<Args>(args)...)) {
+          return std::forward<TrueFunc>(true_func)(std::forward<Args>(args)...);
+        }
+      };
+
+      template <>
+      struct IfConstexprElseImpl<false> {
+        template <typename TrueFunc, typename FalseFunc, typename... Args>
+        static auto Run(TrueFunc&&, FalseFunc&& false_func, Args&&... args)
+            -> decltype(std::forward<FalseFunc>(false_func)(std::forward<Args>(args)...)) {
+          return std::forward<FalseFunc>(false_func)(std::forward<Args>(args)...);
+        }
+      };
+
+      template <bool condition, typename TrueFunc, typename FalseFunc, typename... Args>
+      auto IfConstexprElse(TrueFunc&& true_func, FalseFunc&& false_func, Args&&... args)
+          -> decltype(IfConstexprElseImpl<condition>::Run(
+              std::forward<TrueFunc>(true_func),
+              std::forward<FalseFunc>(false_func),
+              std::forward<Args>(args)...)) {
+        return IfConstexprElseImpl<condition>::Run(
+            std::forward<TrueFunc>(true_func),
+            std::forward<FalseFunc>(false_func),
+            std::forward<Args>(args)...);
+      }
+
+      }  // namespace utility_internal
+      }  // namespace absl
+      #endif  // ABSL_UTILITY_INTERNAL_IF_CONSTEXPR_H_
+      SHIMEOF
+      export NIX_CFLAGS_COMPILE="''${NIX_CFLAGS_COMPILE:-} -isystem $(pwd)/absl_shim"
+    '';
 
   patches =
     lib.optionals (packageOlder "22") [
@@ -107,7 +166,10 @@ stdenv.mkDerivation (finalAttrs: {
     # https://github.com/protocolbuffers/protobuf/issues/10418
     # Also AnyTest.TestPackFromSerializationExceedsSizeLimit fails on 32-bit platforms
     # https://github.com/protocolbuffers/protobuf/issues/8460
-    !stdenv.hostPlatform.is32bit;
+    !stdenv.hostPlatform.is32bit
+    # Older protobuf versions (< 30) reference absl::if_constexpr in their test
+    # CMake config, which was removed in newer abseil-cpp releases
+    && packageAtLeast "30";
 
   nativeInstallCheckInputs = [
     versionCheckHook
