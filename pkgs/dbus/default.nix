@@ -18,6 +18,11 @@
   xorg,
   libx11,
   runUnitTests,
+
+  # for passthru.tests
+  elogind,
+  polkit,
+  bluez,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -134,6 +139,7 @@ stdenv.mkDerivation (finalAttrs: {
 
     tests = {
       unittests = runUnitTests finalAttrs.finalPackage;
+      inherit elogind polkit bluez;
     };
   };
 
