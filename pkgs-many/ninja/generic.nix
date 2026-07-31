@@ -23,6 +23,11 @@
   re2c,
   buildPackages,
   nix-update-script,
+
+  # for passthru.tests
+  mesa,
+  glib,
+  harfbuzz,
 }@args:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -110,7 +115,12 @@ stdenv.mkDerivation (finalAttrs: {
 
   setupHook = ./setup-hook.sh;
 
-  passthru.updateScript = nix-update-script { };
+  passthru = {
+    updateScript = nix-update-script { };
+    tests = {
+      inherit mesa glib harfbuzz;
+    };
+  };
 
   meta = {
     description = "Small build system with a focus on speed";
