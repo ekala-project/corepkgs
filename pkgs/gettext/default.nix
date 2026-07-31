@@ -8,6 +8,10 @@
   gettext,
   runCommand,
   testers,
+
+  # for passthru.tests
+  glib,
+  git,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -119,6 +123,7 @@ stdenv.mkDerivation rec {
       ${gettext}/bin/gettext "" > /dev/null
       touch $out
     '';
+    inherit glib git;
   };
 
   meta = {
