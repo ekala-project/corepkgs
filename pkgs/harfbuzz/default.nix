@@ -13,6 +13,9 @@
   withIcu ? false,
   icu,
   testers,
+
+  # for passthru.tests
+  pango,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -75,6 +78,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config = testers.hasPkgConfigModules {
       package = finalAttrs.finalPackage;
     };
+    inherit pango;
   };
 
   meta = {
