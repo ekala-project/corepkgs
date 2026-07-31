@@ -18,6 +18,10 @@
   help2man,
   flex ? null,
   texinfo ? null,
+  # for passthru.tests
+  elfutils,
+  libpcap,
+  iproute2,
 }:
 
 # Avoid 'fetchpatch' to allow 'flex' to be used as a possible 'gcc'
@@ -90,6 +94,10 @@ stdenv'.mkDerivation rec {
   postInstall = ''
     ln -s $out/bin/flex $out/bin/lex
   '';
+
+  passthru.tests = {
+    inherit elfutils libpcap iproute2;
+  };
 
   meta = {
     homepage = "https://github.com/westes/flex";
