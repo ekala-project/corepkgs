@@ -25,6 +25,10 @@
   libmicrohttpd,
   libarchive,
   gitUpdater,
+
+  # for passthru.tests
+  gdb,
+  strace,
 }:
 
 # TODO: Look at the hardcoded paths to kernel, modules etc.
@@ -142,6 +146,7 @@ stdenv.mkDerivation rec {
         package = elfutils;
         command = "eu-readelf --version";
       };
+      inherit gdb strace;
     };
     updateScript = gitUpdater {
       url = "https://sourceware.org/git/elfutils.git";
