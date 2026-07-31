@@ -8,7 +8,9 @@
 #   nix-build repo-packages.nix -A cmake_v4
 #   nix eval .#repo-packages.x86_64-linux --apply 'builtins.attrNames'
 
-{ system ? builtins.currentSystem }:
+{
+  system ? builtins.currentSystem,
+}:
 
 let
   pkgs = import ./. { inherit system; };
@@ -30,11 +32,7 @@ let
       dir = ./pkgs-many + "/${name}";
       versionsFile = dir + "/versions.nix";
       variantsFile = dir + "/variants.nix";
-      raw =
-        if builtins.pathExists versionsFile then
-          import versionsFile
-        else
-          import variantsFile;
+      raw = if builtins.pathExists versionsFile then import versionsFile else import variantsFile;
       # Handle the case where variants.nix uses a let-in block (returns an attrset)
       # or is a function (needs to be called — but we just need the names from file-based ones)
     in
@@ -53,15 +51,16 @@ let
       varNames = variantNamesFor name;
     in
     # Include the default package under its own name
-    { ${name} = pkgs.${name}; }
-    // lib.genAttrs
-      (map (vname: "${name}_${vname}") varNames)
-      (flatName:
-        let
-          vname = lib.removePrefix "${name}_" flatName;
-        in
-        pkgs.${name}.${vname}
-      );
+    {
+      ${name} = pkgs.${name};
+    }
+    // lib.genAttrs (map (vname: "${name}_${vname}") varNames) (
+      flatName:
+      let
+        vname = lib.removePrefix "${name}_" flatName;
+      in
+      pkgs.${name}.${vname}
+    );
 
   # Single packages: reference them lazily from pkgs by name.
   # Values are only evaluated when accessed.
