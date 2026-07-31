@@ -18,6 +18,9 @@
   x11Support ? !stdenv.hostPlatform.isDarwin,
   libxft,
   testers,
+
+  # for passthru.tests
+  vala,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -81,6 +84,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config = testers.hasPkgConfigModules {
       package = finalAttrs.finalPackage;
     };
+    inherit vala;
   };
 
   meta = {
