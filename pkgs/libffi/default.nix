@@ -7,6 +7,10 @@
   dejagnu,
   nix-update-script,
   testers,
+
+  # for passthru.tests
+  glib,
+  gobject-introspection,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -66,6 +70,7 @@ stdenv.mkDerivation (finalAttrs: {
       pkg-config = testers.hasPkgConfigModules {
         package = finalAttrs.finalPackage;
       };
+      inherit glib gobject-introspection;
     };
   };
 
