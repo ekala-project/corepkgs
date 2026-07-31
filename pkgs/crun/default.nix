@@ -9,7 +9,7 @@
   libseccomp,
   python3,
   systemdMinimal,
-  yajl,
+  json_c,
   criu,
   testers,
 }:
@@ -40,13 +40,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "crun";
-  version = "1.27.1";
+  version = "1.28";
 
   src = fetchFromGitHub {
     owner = "containers";
     repo = "crun";
     tag = finalAttrs.version;
-    hash = "sha256-cuzw0YbbV4LU5nOP2DZghLAIYhkSY3Qf1bdm+JskHZA=";
+    hash = "sha256-umbI+/RAN0erNKVL9Zdevg1nF8NXVwdu/MBRJskJdL8=";
     fetchSubmodules = true;
     leaveDotGit = true;
     postFetch = ''
@@ -68,7 +68,7 @@ stdenv.mkDerivation (finalAttrs: {
     libcap
     libseccomp
     systemdMinimal
-    yajl
+    json_c
   ];
 
   enableParallelBuilding = true;
