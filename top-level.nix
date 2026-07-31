@@ -63,6 +63,7 @@ with final;
   nv-codec-headers-12 = nv-codec-headers.override { majorVersion = "12"; };
 
   # keep-sorted start
+
   aafigure = null;
   actdiag = null;
   aria2 = null;
@@ -123,7 +124,6 @@ with final;
   libcaca = null;
   libgeotiff = null;
   libgit2-glib = null;
-
   libguestfs = null;
   libjxl = null;
   libnatspec = null;
