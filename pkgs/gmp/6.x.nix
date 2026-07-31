@@ -7,6 +7,10 @@
   buildPackages,
   withStatic ? stdenv.hostPlatform.isStatic,
   runUnitTests,
+
+  # for passthru.tests
+  gnutls,
+  coreutils,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -41,7 +45,10 @@ stdenv.mkDerivation (finalAttrs: {
   ];
   passthru = {
     static = finalAttrs.finalPackage.out;
-    tests.unittests = runUnitTests finalAttrs.finalPackage;
+    tests = {
+      unittests = runUnitTests finalAttrs.finalPackage;
+      inherit gnutls coreutils;
+    };
   };
 
   strictDeps = true;
