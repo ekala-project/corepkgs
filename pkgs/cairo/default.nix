@@ -22,6 +22,9 @@
   xcbSupport ? x11Support,
   libxcb,
   testers,
+
+  # for passthru.tests
+  pango,
 }:
 
 let
@@ -128,7 +131,10 @@ stdenv.mkDerivation (
           -es'|^Cflags:\(.*\)$|Cflags: \1 -I${freetype.dev}/include/freetype2 -I${freetype.dev}/include|g'
     '';
 
-    passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    passthru.tests = {
+      pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      inherit pango;
+    };
 
     meta = {
       description = "2D graphics library with support for multiple output devices";
