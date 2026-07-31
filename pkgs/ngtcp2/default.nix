@@ -15,11 +15,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "ngtcp2";
-  version = "1.24.0";
+  version = "1.25.0";
 
   src = fetchurl {
     url = "https://github.com/ngtcp2/ngtcp2/releases/download/v${finalAttrs.version}/ngtcp2-${finalAttrs.version}.tar.bz2";
-    hash = "sha256-pES+9ngFm7ij1qioCcEBpREM3zb662h5dGC40HFOD9M=";
+    hash = "sha256-jAy3gz62wLj0Eoh27ecxHuykmBLtP05xokPtiAPRttc=";
   };
 
   outputs = [
