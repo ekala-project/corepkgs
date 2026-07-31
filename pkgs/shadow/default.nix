@@ -32,13 +32,13 @@ in
 
 stdenv.mkDerivation rec {
   pname = "shadow";
-  version = "4.19.4";
+  version = "4.20.0";
 
   src = fetchFromGitHub {
     owner = "shadow-maint";
     repo = "shadow";
     rev = version;
-    hash = "sha256-vR6dwB3EttGY2DgQ20nOr9kNhF+nsAaBEyklcJAZ20Y=";
+    hash = "sha256-UafTyfK+pmW2wyAQnvHov9KIorf1HSc6haskfv7auHs=";
   };
 
   outputs = [
