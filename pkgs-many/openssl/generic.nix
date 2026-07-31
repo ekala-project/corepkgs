@@ -57,6 +57,11 @@
   autoloadProviders ? needsOQSProvider,
   extraINIConfig ? (if oqsExtraINIConfig != null then oqsExtraINIConfig else null),
   runUnitTests,
+
+  # for passthru.tests
+  git,
+  curl,
+  openssh,
 }:
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -401,6 +406,7 @@ stdenv.mkDerivation (finalAttrs: {
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
       pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
       unittests = runUnitTests finalAttrs.finalPackage;
+      inherit git curl openssh;
     };
   };
 
