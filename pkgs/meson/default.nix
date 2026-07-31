@@ -14,6 +14,11 @@
   testers,
   writeShellScriptBin,
   zlib,
+
+  # for passthru.tests
+  glib,
+  mesa,
+  harfbuzz,
 }:
 
 python3.pkgs.buildPythonApplication rec {
@@ -180,6 +185,7 @@ python3.pkgs.buildPythonApplication rec {
       version = testers.testVersion {
         package = meson;
       };
+      inherit glib mesa harfbuzz;
     };
   };
 
