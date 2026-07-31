@@ -33,6 +33,11 @@
   zlib,
   libsForQt5,
   gitUpdater,
+
+  # for passthru.tests
+  mesa,
+  gtest,
+  spdlog,
 }:
 
 let
@@ -190,6 +195,9 @@ stdenv.mkDerivation (finalAttrs: {
       url = "https://gitlab.kitware.com/cmake/cmake.git";
       rev-prefix = "v";
       ignoredVersions = "-"; # -rc1 and friends
+    };
+    tests = {
+      inherit mesa gtest spdlog;
     };
   };
 
