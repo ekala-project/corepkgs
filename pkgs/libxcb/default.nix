@@ -11,6 +11,11 @@
   windows,
   writeScript,
   testers,
+
+  # for passthru.tests
+  libx11,
+  cairo,
+  mesa,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxcb";
@@ -54,7 +59,10 @@ stdenv.mkDerivation (finalAttrs: {
         | sort -V | tail -n1)"
       update-source-version ${finalAttrs.pname} "$version"
     '';
-    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    tests = {
+      pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      inherit libx11 cairo mesa;
+    };
   };
 
   env = lib.optionalAttrs stdenv.hostPlatform.isMinGW {
