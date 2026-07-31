@@ -10,6 +10,11 @@
   xtrans,
   writeScript,
   testers,
+
+  # for passthru.tests
+  cairo,
+  mesa,
+  libxext,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "libx11";
@@ -63,7 +68,10 @@ stdenv.mkDerivation (finalAttrs: {
         | sort -V | tail -n1)"
       update-source-version ${finalAttrs.pname} "$version"
     '';
-    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    tests = {
+      pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      inherit cairo mesa libxext;
+    };
   };
 
   meta = {
