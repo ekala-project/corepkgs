@@ -6,6 +6,10 @@
   apngSupport ? true,
   testers,
   runUnitTests,
+
+  # for passthru.tests
+  cairo,
+  freetype,
 }:
 
 assert zlib != null;
@@ -50,6 +54,7 @@ stdenv.mkDerivation (finalAttrs: {
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
       pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
       unittests = runUnitTests finalAttrs.finalPackage;
+      inherit cairo freetype;
     };
   };
 
