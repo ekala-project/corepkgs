@@ -16,7 +16,7 @@
   python3,
   nix-update-script,
   versionCheckHook,
-  withSystemd ? lib.meta.availableOn stdenv.hostPlatform systemd,
+  withSystemd ? false,
   tlsSupport ? true,
   # Using system jemalloc fixes cross-compilation and various setups.
   # However the experimental 'active defragmentation' feature of redis requires
@@ -26,13 +26,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "redis";
-  version = "8.8.1";
+  version = "8.10.0";
 
   src = fetchFromGitHub {
     owner = "redis";
     repo = "redis";
     tag = finalAttrs.version;
-    hash = "sha256-VIzIv7NOmvuXygMXyWpYpnwKQ2rGguaGRd48/QjyYD8=";
+    hash = "sha256-ywSX682/CIqVzxACFTOhQ34VAEi6pYULDsus8lbih78=";
   };
 
   patches = lib.optional useSystemJemalloc (fetchpatch2 {
