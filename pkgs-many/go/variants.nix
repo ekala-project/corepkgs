@@ -16,8 +16,8 @@
   };
 
   v1_26 = {
-    version = "1.26.3";
-    src-hash = "sha256-HGRoddCqh5kTMYTtV895/yS97+jIggRwYCqdPW2Rkrg=";
+    version = "1.26.5";
+    src-hash = "sha256-SVvkvIcXasVnOS5bQRar2YRm0z17SdQedkzMaXay3EI=";
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "126";
