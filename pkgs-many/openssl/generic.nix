@@ -8,6 +8,7 @@
   mingw-linking-patch ? null,
   withDocs ? false,
   extraMeta ? { },
+  enableFips ? false,
   needsOQSProvider ? false,
   oqsExtraINIConfig ? null,
   packageAtLeast,
@@ -241,6 +242,8 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optional enableMD2 "enable-md2"
   ++ lib.optional enableSSL2 "enable-ssl2"
   ++ lib.optional enableSSL3 "enable-ssl3"
+  # Build the FIPS provider module. Requires OpenSSL >= 3.0.
+  ++ lib.optional (packageAtLeast "3.0.0" && enableFips) "enable-fips"
   # We select KTLS here instead of the configure-time detection (which we patch out).
   # KTLS should work on FreeBSD 13+ as well, so we could enable it if someone tests it.
   ++ lib.optional (packageAtLeast "3.0.0" && enableKTLS) "enable-ktls"
@@ -382,6 +385,23 @@ stdenv.mkDerivation (finalAttrs: {
     )
     + lib.optionalString (extraINIConfig != null) ''
       echo '${lib.generators.toINI { } extraINIConfig}' >> $etc/etc/ssl/openssl.cnf
+    ''
+    # Add the FIPS and base providers to openssl.cnf. The fips_sect contents
+    # (with HMAC) are appended in postFixup after patchelf/strip are done,
+    # since those modify fips.so and would invalidate the integrity hash.
+    + lib.optionalString enableFips ''
+      # Add the FIPS provider to the provider section
+      sed -i '/^[[:space:]]*#/!s|\[provider_sect\]|[provider_sect]\nfips = fips_sect|' $etc/etc/ssl/openssl.cnf
+
+      # Activate the default provider (if not already done by autoloadProviders)
+      ${lib.optionalString (!autoloadProviders) ''
+        sed -i '/^[[:space:]]*#/!s/\[default_sect\]/[default_sect]\nactivate = 1/g' $etc/etc/ssl/openssl.cnf
+      ''}
+
+      # Activate the base provider (needed alongside FIPS for non-crypto operations like encoding)
+      echo '[base_sect]
+      activate = 1' >> $etc/etc/ssl/openssl.cnf
+      sed -i '/^[[:space:]]*#/!s|\[provider_sect\]|[provider_sect]\nbase = base_sect|' $etc/etc/ssl/openssl.cnf
     '';
 
   allowedImpureDLLs = [ "CRYPT32.dll" ];
@@ -399,6 +419,18 @@ stdenv.mkDerivation (finalAttrs: {
       # cleanup cmake helpers for now (for OpenSSL >= 3.3), only rely on pkg-config.
       # pkg-config gets its paths fixed correctly
       rm -rf $dev/lib/cmake
+    ''
+    # Run fipsinstall after all fixup (patchelf, strip) is complete so the
+    # HMAC integrity hash matches the final fips.so binary. Inline the
+    # generated fips_sect into openssl.cnf (OpenSSL's .include directive
+    # does not reliably merge sections from included files).
+    # Use OPENSSL_CONF=/dev/null to prevent the openssl binary from loading
+    # the config (which references fips_sect before it exists).
+    + lib.optionalString enableFips ''
+      OPENSSL_CONF=/dev/null $bin/bin/openssl fipsinstall \
+        -out $etc/etc/ssl/fipsmodule.cnf \
+        -module $out/lib/ossl-modules/fips.so
+      cat $etc/etc/ssl/fipsmodule.cnf >> $etc/etc/ssl/openssl.cnf
     '';
 
   passthru = {

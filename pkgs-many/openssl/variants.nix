@@ -45,4 +45,9 @@
       };
     };
   };
+
+  # Configuration variant for FIPS 140 compliance
+  fips = {
+    enableFips = true;
+  };
 }
