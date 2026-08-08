@@ -20,11 +20,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "harfbuzz";
-  version = "14.2.1";
+  version = "14.3.0";
 
   src = fetchurl {
     url = "https://github.com/harfbuzz/harfbuzz/releases/download/${finalAttrs.version}/harfbuzz-${finalAttrs.version}.tar.xz";
-    hash = "sha256-pUpdjpOApB+7dizjZ7y/dwR5Lfyg2T8bvKhsWleQLg4=";
+    hash = "sha256-FgcNd8/Euh8ecyfoO/mz9ViYCByr25TlajPgT8iHTq4=";
   };
 
   patches = [ ./disable-check-symbols-test.patch ];
