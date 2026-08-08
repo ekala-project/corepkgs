@@ -28,14 +28,14 @@ let
 in
 buildPythonPackage rec {
   pname = "pybind11";
-  version = "3.0.4";
+  version = "3.1.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "pybind";
     repo = "pybind11";
     tag = "v${version}";
-    hash = "sha256-QZKnIOopEDsiRFkc1qQ+DaDHoTNuEEgQVeiAL0sQqak=";
+    hash = "sha256-rzpe7CrgIa5Df2OrB/9mxIJd3X5DA7FX0C+w7TcmAoQ=";
   };
 
   build-system = [
