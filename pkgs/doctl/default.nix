@@ -9,13 +9,13 @@
 
 buildGoModule (finalAttrs: {
   pname = "doctl";
-  version = "1.165.0";
+  version = "1.166.0";
 
   src = fetchFromGitHub {
     owner = "digitalocean";
     repo = "doctl";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-vwp7x7X6W38NQ4dAJv8ZTy0Q46oyk9AYxTs1gGwn9I4=";
+    hash = "sha256-m4KJ/WzmnLuL4/6RQV1sPUEc+PdKDNkTL2+HBGgN5x8=";
   };
 
   vendorHash = null;
