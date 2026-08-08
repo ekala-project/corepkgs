@@ -17,12 +17,12 @@
 let
   greenlet = buildPythonPackage rec {
     pname = "greenlet";
-    version = "3.5.3";
+    version = "3.5.4";
     pyproject = true;
 
     src = fetchPypi {
       inherit pname version;
-      hash = "sha256-ph78AY/T6zF+7KMaupDunn8m8iiEp5tsbscVv3G7YvE=";
+      hash = "sha256-AjKuHekKjgeGe7En16a6IwHoWRRUifJc2opgltq+HSA=";
     };
 
     build-system = [ setuptools ];
