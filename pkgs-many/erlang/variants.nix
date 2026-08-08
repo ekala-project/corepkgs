@@ -4,8 +4,8 @@
     hash = "sha256-3WxURI1o/CqN0KK+voUMk6al2mtsrqoniBJpDxKpxPo=";
   };
   v27 = {
-    version = "29.0.4";
-    hash = "sha256-Wq1aQ5a8IBJfY/N3f4AnfoSvodgdFo9lYEWpBy5YYTU=";
+    version = "29.0.5";
+    hash = "sha256-7fA+raUlkNcjAmbV6NkZolty3SPxMTt/M9drjtVn5Ig=";
   };
   v28 = {
     version = "28.3";
