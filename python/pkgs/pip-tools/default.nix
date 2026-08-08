@@ -19,7 +19,7 @@
 
 buildPythonPackage rec {
   pname = "pip-tools";
-  version = "7.5.3";
+  version = "7.6.0";
   pyproject = true;
 
   disabled = pythonOlder "3.9";
@@ -28,7 +28,7 @@ buildPythonPackage rec {
     owner = "jazzband";
     repo = "pip-tools";
     tag = "v${version}";
-    hash = "sha256-MkYGD/ropw+MLLrk4gRZZguOv5extzNNXwTy6NQnCu0=";
+    hash = "sha256-ggj8wdwF3lpsuMqp0spgbqVfGI3cZc+ms4SG0XAXCB4=";
   };
 
   patches = [
