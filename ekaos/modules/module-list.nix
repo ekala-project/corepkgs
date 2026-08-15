@@ -43,6 +43,9 @@
   ./security/acme.nix
   ./security/audit.nix
 
+  # Program modules
+  ./programs/git.nix
+
   # Service modules
   ./services/getty.nix
   ./services/crond.nix
