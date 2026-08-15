@@ -41,6 +41,7 @@
   ./security/wrappers
   ./security/sudo.nix
   ./security/acme.nix
+  ./security/audit.nix
 
   # Service modules
   ./services/getty.nix
