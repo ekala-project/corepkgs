@@ -49,6 +49,7 @@
   ./services/journald.nix
   ./services/networking/dhcpcd.nix
   ./services/networking/sshd.nix
+  ./services/networking/unbound.nix
   ./services/databases/postgresql.nix
 
   # Service management
