@@ -50,6 +50,7 @@
   ./services/journald.nix
   ./services/networking/dhcpcd.nix
   ./services/networking/sshd.nix
+  ./services/networking/bind.nix
   ./services/networking/unbound.nix
   ./services/databases/postgresql.nix
   ./services/databases/redis.nix
