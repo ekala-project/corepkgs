@@ -77,6 +77,7 @@
   ./misc/defaults.nix # System defaults (including default service manager)
 
   # Virtualisation
+  ./virtualisation/qemu-guest-agent.nix
   ./virtualisation/qemu-vm.nix
   ./virtualisation/podman.nix
 ]
