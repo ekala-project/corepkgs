@@ -51,6 +51,7 @@
   ./services/networking/sshd.nix
   ./services/networking/unbound.nix
   ./services/databases/postgresql.nix
+  ./services/databases/redis.nix
 
   # Service management
   ./services.nix # Cross-platform service definitions
