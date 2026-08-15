@@ -53,6 +53,8 @@
   ./services/databases/postgresql.nix
   ./services/databases/redis.nix
 
+  ./services/security/vault.nix
+
   # Service management
   ./services.nix # Cross-platform service definitions
   # Service manager implementations (opt-in via enable options)
