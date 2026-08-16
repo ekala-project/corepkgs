@@ -108,6 +108,12 @@ in
         description = "Systemd-specific options";
       };
 
+      package = mkOption {
+        type = types.package;
+        default = pkgs.dhcpcd;
+        description = "dhcpcd package to use.";
+      };
+
       settings = mkOption {
         type = types.submodule {
           options = {
@@ -146,7 +152,7 @@ in
   config = mkIf cfg.enable {
     # Define the dhcpcd service using cross-platform interface
     services.dhcpcd = {
-      command = "${pkgs.dhcpcd}/bin/dhcpcd";
+      command = "${cfg.package}/bin/dhcpcd";
       args = [
         "--config"
         "${dhcpcdConf}"
@@ -167,7 +173,7 @@ in
     environment.etc."dhcpcd.conf".source = dhcpcdConf;
 
     # Add dhcpcd to system packages
-    environment.systemPackages = [ pkgs.dhcpcd ];
+    environment.systemPackages = [ cfg.package ];
 
     # Create required directories
     system.activationScripts.dhcpcd = stringAfter [ "etc" ] ''
