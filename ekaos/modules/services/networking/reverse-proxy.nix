@@ -171,6 +171,12 @@ in
       description = "Port contracts for this service.";
     };
 
+    package = mkOption {
+      type = types.package;
+      default = pkgs.nginx;
+      description = "Nginx package to use for the reverse proxy.";
+    };
+
     extraHttpConfig = mkOption {
       type = types.lines;
       default = "";
@@ -187,7 +193,7 @@ in
     ];
 
     services.reverseProxy = {
-      command = "${pkgs.nginx}/bin/nginx";
+      command = "${cfg.package}/bin/nginx";
       args = [
         "-c"
         "${nginxConf}"
@@ -226,6 +232,6 @@ in
       mkdir -p /tmp/client_body /tmp/proxy /tmp/fastcgi /tmp/uwsgi /tmp/scgi
     '';
 
-    environment.systemPackages = [ pkgs.nginx ];
+    environment.systemPackages = [ cfg.package ];
   };
 }
