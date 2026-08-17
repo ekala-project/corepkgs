@@ -33,9 +33,12 @@ in
 
   config = mkIf cfg.enable {
     timers.fstrim = {
+      enable = true;
       description = "Discard unused filesystem blocks (TRIM)";
-      command = "${pkgs.util-linux}/bin/fstrim --listed-in /etc/fstab:/proc/self/mountinfo --verbose --quiet-unsupported";
-      schedule = cfg.interval;
+      script = ''
+        ${pkgs.util-linux}/bin/fstrim --listed-in /etc/fstab:/proc/self/mountinfo --verbose --quiet-unsupported
+      '';
+      schedule.calendar = cfg.interval;
       systemd = {
         wantedBy = [ "timers.target" ];
       };
