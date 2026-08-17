@@ -61,6 +61,17 @@ rec {
   #   - all: Meta-test running all language tests
   languages = import ./languages { inherit pkgs; };
 
+  # User services module tests
+  #
+  # Build-time tests for users.services.* option across service managers.
+  # Tests evaluate ekaos modules and verify generated unit files.
+  #
+  # Available tests:
+  #   - systemd.all: All systemd user service generation tests
+  #   - runit.all: All runit user service generation tests
+  #   - all: Combined test suite
+  user-services = import ../ekaos/tests/user-services.nix { inherit pkgs; };
+
   # Placeholder for future test frameworks:
   #
   # systemd = ...;      # Systemd-specific integration tests
