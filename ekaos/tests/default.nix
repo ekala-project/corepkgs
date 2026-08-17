@@ -28,4 +28,7 @@
 
   # Critical MVP packages test (nano, cronie, timesyncd)
   critical-packages = pkgs.ekaosTest ./critical-packages.nix;
+
+  # User services (users.services.*) module tests
+  user-services = import ./user-services.nix { inherit pkgs; };
 }
