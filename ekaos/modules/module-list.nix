@@ -28,6 +28,7 @@
   ./config/users-groups.nix
   ./config/locale.nix
   ./config/shell-environment.nix
+  ./config/sysctl.nix
   ./config/nix-daemon.nix
   ./networking.nix
   ./network-interfaces.nix
