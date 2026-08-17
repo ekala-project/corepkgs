@@ -58,6 +58,16 @@ with lib;
       };
     };
 
+    environment.binsh = mkOption {
+      type = types.str;
+      default = "${pkgs.bash}/bin/sh";
+      defaultText = literalExpression ''"''${pkgs.bash}/bin/sh"'';
+      description = ''
+        The shell executable linked to /bin/sh. The system assumes this
+        is a POSIX-compatible shell.
+      '';
+    };
+
     environment.shells = mkOption {
       type = types.listOf (types.either types.package types.path);
       default = [ ];
@@ -102,6 +112,14 @@ with lib;
   };
 
   config = {
+    # Create /bin/sh symlink
+    system.activationScripts.binsh = stringAfter [ "etc" ] ''
+      mkdir -p /bin
+      chmod 0755 /bin
+      ln -sfn "${config.environment.binsh}" /bin/.sh.tmp
+      mv /bin/.sh.tmp /bin/sh
+    '';
+
     # Generate /etc/shells from environment.shells
     environment.etc.shells = mkIf (config.environment.shells != [ ]) {
       text =
