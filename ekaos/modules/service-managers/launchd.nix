@@ -53,5 +53,9 @@ in
 
     # Stub: Would generate launchd plist files here if fully implemented
     # For now, this just ensures the module structure exists for variants
+
+    # User services (users.services.*) would generate LaunchAgent plists
+    # at /Library/LaunchAgents/ (global user agents) or
+    # ~/Library/LaunchAgents/ (per-user agents) when implemented.
   };
 }

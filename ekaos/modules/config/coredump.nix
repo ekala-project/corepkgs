@@ -13,9 +13,7 @@ let
 
   coredumpConf = pkgs.writeText "coredump.conf" (
     "[Coredump]\n"
-    + concatStringsSep "\n" (
-      mapAttrsToList (k: v: "${k}=${toString v}") cfg.settings
-    )
+    + concatStringsSep "\n" (mapAttrsToList (k: v: "${k}=${toString v}") cfg.settings)
     + "\n"
   );
 

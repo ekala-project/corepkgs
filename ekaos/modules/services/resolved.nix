@@ -23,9 +23,7 @@ let
   resolvedConf = pkgs.writeText "resolved.conf" (
     "[Resolve]\n"
     + concatStringsSep "\n" (
-      mapAttrsToList (
-        k: v: if v == null then "" else "${k}=${toResolvedValue v}"
-      ) cfg.settings
+      mapAttrsToList (k: v: if v == null then "" else "${k}=${toResolvedValue v}") cfg.settings
     )
     + "\n"
   );

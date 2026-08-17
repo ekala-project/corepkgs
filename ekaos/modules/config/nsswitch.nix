@@ -45,20 +45,22 @@ with lib;
   };
 
   config = {
-    environment.etc."nsswitch.conf".text = let
-      cfg = config.system.nssDatabases;
-    in ''
-      passwd:    ${concatStringsSep " " cfg.passwd}
-      group:     ${concatStringsSep " " cfg.group}
-      shadow:    ${concatStringsSep " " cfg.shadow}
+    environment.etc."nsswitch.conf".text =
+      let
+        cfg = config.system.nssDatabases;
+      in
+      ''
+        passwd:    ${concatStringsSep " " cfg.passwd}
+        group:     ${concatStringsSep " " cfg.group}
+        shadow:    ${concatStringsSep " " cfg.shadow}
 
-      hosts:     ${concatStringsSep " " cfg.hosts}
-      networks:  files
+        hosts:     ${concatStringsSep " " cfg.hosts}
+        networks:  files
 
-      services:  ${concatStringsSep " " cfg.services}
-      protocols: files
-      rpc:       files
-      ethers:    files
-    '';
+        services:  ${concatStringsSep " " cfg.services}
+        protocols: files
+        rpc:       files
+        ethers:    files
+      '';
   };
 }

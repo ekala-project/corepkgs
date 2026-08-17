@@ -125,10 +125,10 @@ with lib;
       text =
         let
           shellPath =
-            s: if isString s || isPath s then toString s else "${s}${s.shellPath or "/bin/${s.pname or s.name}"}";
+            s:
+            if isString s || isPath s then toString s else "${s}${s.shellPath or "/bin/${s.pname or s.name}"}";
         in
-        concatStringsSep "\n" (map shellPath config.environment.shells)
-        + "\n/bin/sh\n";
+        concatStringsSep "\n" (map shellPath config.environment.shells) + "\n/bin/sh\n";
     };
   };
 }

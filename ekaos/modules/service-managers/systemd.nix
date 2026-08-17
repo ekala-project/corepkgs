@@ -17,6 +17,11 @@ let
     name: service: (service.enable or false) == true && (service.command or null) != null
   ) config.services;
 
+  # Filter to only include enabled user services with command set
+  enabledUserServices = filterAttrs (
+    name: service: service.enable == true && service.command != null
+  ) config.users.services;
+
   # Generate a systemd unit file for a service
   mkSystemdUnit =
     name: serviceCfg:
@@ -93,6 +98,74 @@ let
   # Generate all systemd units
   systemdUnits = mapAttrs mkSystemdUnit enabledServices;
 
+  # Generate a systemd user unit file for a user service
+  mkUserSystemdUnit =
+    name: serviceCfg:
+    let
+      restartValue =
+        {
+          always = "always";
+          on-failure = "on-failure";
+          never = "no";
+        }
+        .${serviceCfg.restartPolicy} or "always";
+
+      execStart =
+        if serviceCfg.args == [ ] then
+          serviceCfg.command
+        else
+          "${serviceCfg.command} ${concatStringsSep " " serviceCfg.args}";
+
+      envVars = mapAttrsToList (k: v: "Environment=\"${k}=${v}\"") serviceCfg.environment;
+
+      systemdCfg = serviceCfg.systemd;
+
+      after = systemdCfg.after or [ ];
+      wants = systemdCfg.wants or [ ];
+      requires = systemdCfg.requires or [ ];
+      before = systemdCfg.before or [ ];
+      wantedBy = systemdCfg.wantedBy or [ "default.target" ];
+
+      serviceConfig = systemdCfg.serviceConfig or { };
+
+    in
+    pkgs.writeTextFile {
+      name = "${name}.service";
+      text = ''
+        [Unit]
+        Description=${serviceCfg.description}
+        ${concatMapStringsSep "\n" (d: "After=${d}") after}
+        ${concatMapStringsSep "\n" (d: "Wants=${d}") wants}
+        ${concatMapStringsSep "\n" (d: "Requires=${d}") requires}
+        ${concatMapStringsSep "\n" (d: "Before=${d}") before}
+
+        [Service]
+        Type=${serviceConfig.Type or "simple"}
+        ExecStart=${execStart}
+        ${optionalString (
+          serviceCfg.preStart != ""
+        ) "ExecStartPre=${pkgs.writeShellScript "${name}-prestart" serviceCfg.preStart}"}
+        ${optionalString (
+          serviceCfg.postStart != ""
+        ) "ExecStartPost=${pkgs.writeShellScript "${name}-poststart" serviceCfg.postStart}"}
+        ${optionalString (
+          serviceCfg.postStop != ""
+        ) "ExecStopPost=${pkgs.writeShellScript "${name}-poststop" serviceCfg.postStop}"}
+        Restart=${restartValue}
+        ${optionalString (
+          serviceCfg.workingDirectory != null
+        ) "WorkingDirectory=${serviceCfg.workingDirectory}"}
+        ${concatStringsSep "\n" envVars}
+        ${concatStringsSep "\n" (mapAttrsToList (k: v: "${k}=${toString v}") serviceConfig)}
+
+        [Install]
+        ${concatMapStringsSep "\n" (t: "WantedBy=${t}") wantedBy}
+      '';
+    };
+
+  # Generate all user systemd units
+  userSystemdUnits = mapAttrs mkUserSystemdUnit enabledUserServices;
+
 in
 
 {
@@ -147,6 +220,16 @@ in
               source = systemdUnits.${name};
             }
           ) (attrNames systemdUnits)
+        ))
+
+        # Copy user systemd unit files
+        (listToAttrs (
+          map (
+            name:
+            nameValuePair "systemd/user/${name}.service" {
+              source = userSystemdUnits.${name};
+            }
+          ) (attrNames userSystemdUnits)
         ))
 
         # Default systemd configuration
