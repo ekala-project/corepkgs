@@ -259,6 +259,17 @@ in
       description = "Label for the system (shown in boot menu).";
     };
 
+    system.stateVersion = mkOption {
+      type = types.str;
+      default = config.system.ekaos.version;
+      defaultText = literalExpression "config.system.ekaos.version";
+      description = ''
+        The version of ekaos at the time of initial installation. This is
+        used by modules to avoid breaking changes on existing deployments.
+        Do not change this after installation.
+      '';
+    };
+
     # Top-level systemd options for backward compatibility
     # These are set by service-managers/systemd.nix when systemd is enabled
     systemd.package = mkOption {
