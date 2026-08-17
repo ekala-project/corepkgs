@@ -53,5 +53,9 @@ in
 
     # Stub: Would generate rc.d scripts here if fully implemented
     # For now, this just ensures the module structure exists for variants
+
+    # User services (users.services.*) would generate per-user rc scripts
+    # when implemented. BSD rc.d has no native per-user service support,
+    # so this would likely require a wrapper mechanism.
   };
 }

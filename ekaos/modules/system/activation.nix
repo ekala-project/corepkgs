@@ -174,6 +174,11 @@ in
           # Reload systemd if it's running
           if [ -e /run/systemd/system ]; then
             systemctl daemon-reload || true
+
+            # Reload user service managers for all logged-in users
+            for uid in $(loginctl list-users --no-legend 2>/dev/null | awk '{print $1}'); do
+              systemctl --user -M "$uid@" daemon-reload 2>/dev/null || true
+            done
           fi
         '';
         supportsDryActivation = false;

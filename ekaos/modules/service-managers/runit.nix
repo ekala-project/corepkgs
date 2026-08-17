@@ -17,6 +17,11 @@ let
     name: service: (service.enable or false) == true && (service.command or null) != null
   ) config.services;
 
+  # Filter to only include enabled user services with command set
+  enabledUserServices = filterAttrs (
+    name: service: service.enable == true && service.command != null
+  ) config.users.services;
+
   # Generate a runit service directory for a service
   mkRunitService =
     name: serviceCfg:
@@ -135,6 +140,80 @@ let
   # Generate all runit services
   runitServices = mapAttrs mkRunitService enabledServices;
 
+  # Generate a runit user service directory
+  mkRunitUserService =
+    name: serviceCfg:
+    let
+      execCommand =
+        if serviceCfg.args == [ ] then
+          serviceCfg.command
+        else
+          "${serviceCfg.command} ${concatStringsSep " " serviceCfg.args}";
+
+      envSetup = concatStringsSep "\n" (
+        mapAttrsToList (k: v: "export ${k}=\"${v}\"") serviceCfg.environment
+      );
+
+      cdCmd = optionalString (serviceCfg.workingDirectory != null) "cd ${serviceCfg.workingDirectory}";
+
+      runitCfg = serviceCfg.runit;
+
+      runScript = pkgs.writeScript "${name}-run" ''
+        #!/bin/sh
+        # ${serviceCfg.description}
+
+        ${envSetup}
+        ${cdCmd}
+
+        # PreStart hook
+        ${serviceCfg.preStart}
+
+        # Extra run script content
+        ${runitCfg.extraRunScript or ""}
+
+        # Execute service (no chpst - runs as the logged-in user)
+        exec ${execCommand}
+      '';
+
+      finishScript =
+        if serviceCfg.postStop != "" || (runitCfg.extraFinishScript or "") != "" then
+          pkgs.writeScript "${name}-finish" ''
+            #!/bin/sh
+            # Finish script for ${name}
+            ${serviceCfg.postStop}
+            ${runitCfg.extraFinishScript or ""}
+          ''
+        else
+          null;
+
+      logScript =
+        if (runitCfg.logScript or null) != null then
+          pkgs.writeScript "${name}-log" runitCfg.logScript
+        else
+          null;
+
+    in
+    pkgs.runCommand "${name}-runit-user-service" { } ''
+      mkdir -p $out
+
+      cp ${runScript} $out/run
+      chmod +x $out/run
+
+      ${optionalString (finishScript != null) ''
+        cp ${finishScript} $out/finish
+        chmod +x $out/finish
+      ''}
+
+      ${optionalString (logScript != null) ''
+        mkdir -p $out/log
+        cp ${logScript} $out/log/run
+        chmod +x $out/log/run
+      ''}
+    '';
+
+  # Generate all runit user services
+  runitUserServices = mapAttrs mkRunitUserService enabledUserServices;
+
 in
 
 {
@@ -181,6 +260,7 @@ in
     {
       # Install runit service directories to /etc/sv/
       environment.etc = mkMerge [
+        # Install system runit service directories to /etc/sv/
         (listToAttrs (
           map (
             name:
@@ -188,6 +268,16 @@ in
               source = runitServices.${name};
             }
           ) (attrNames runitServices)
+        ))
+
+        # Install user runit service directories to /etc/sv-user/
+        (listToAttrs (
+          map (
+            name:
+            nameValuePair "sv-user/${name}" {
+              source = runitUserServices.${name};
+            }
+          ) (attrNames runitUserServices)
         ))
       ];
 

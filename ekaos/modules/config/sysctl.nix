@@ -29,9 +29,7 @@ in
     type =
       let
         highestValueType = types.ints.unsigned // {
-          merge =
-            loc: defs:
-            foldl (a: b: if b.value == null then null else max a b.value) 0 defs;
+          merge = loc: defs: foldl (a: b: if b.value == null then null else max a b.value) 0 defs;
         };
       in
       types.submodule {

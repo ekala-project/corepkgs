@@ -68,7 +68,10 @@ in
       extraOptions = mkOption {
         type = types.listOf types.str;
         default = [ ];
-        example = [ "single-request" "edns0" ];
+        example = [
+          "single-request"
+          "edns0"
+        ];
         description = ''
           Options to append to the resolv.conf options line.
           See resolv.conf(5) for available options.
