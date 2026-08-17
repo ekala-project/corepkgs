@@ -445,11 +445,10 @@ in
     # Add shadow package for user/group management tools
     environment.systemPackages = [ pkgs.shadow ];
 
-    # Ensure bash and nologin are available for shells
-    environment.etc."shells".text = ''
-      /run/current-system/sw/bin/bash
-      /run/current-system/sw/bin/sh
-      /run/current-system/sw/bin/nologin
-    '';
+    # Register default login shells
+    environment.shells = [
+      "/run/current-system/sw/bin/bash"
+      "/run/current-system/sw/bin/nologin"
+    ];
   };
 }

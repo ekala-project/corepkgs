@@ -58,6 +58,16 @@ with lib;
       };
     };
 
+    environment.shells = mkOption {
+      type = types.listOf (types.either types.package types.path);
+      default = [ ];
+      example = literalExpression "[ pkgs.bash pkgs.dash ]";
+      description = ''
+        A list of permissible login shells for user accounts.
+        /bin/sh is placed into /etc/shells implicitly.
+      '';
+    };
+
     programs.bash = {
       shellAliases = mkOption {
         type = types.attrsOf types.str;
@@ -91,6 +101,16 @@ with lib;
     };
   };
 
-  # Config is applied in system/etc.nix where /etc/profile and /etc/bashrc
-  # read these options. No additional config needed here.
+  config = {
+    # Generate /etc/shells from environment.shells
+    environment.etc.shells = mkIf (config.environment.shells != [ ]) {
+      text =
+        let
+          shellPath =
+            s: if isString s || isPath s then toString s else "${s}${s.shellPath or "/bin/${s.pname or s.name}"}";
+        in
+        concatStringsSep "\n" (map shellPath config.environment.shells)
+        + "\n/bin/sh\n";
+    };
+  };
 }
