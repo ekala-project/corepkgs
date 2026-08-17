@@ -52,9 +52,11 @@
   ./programs/tmux.nix
 
   # Service modules
+  ./services/dbus.nix
   ./services/getty.nix
   ./services/crond.nix
   ./services/fstrim.nix
+  ./services/resolved.nix
   ./services/timesyncd.nix
   ./services/journald.nix
   ./services/networking/dhcpcd.nix
