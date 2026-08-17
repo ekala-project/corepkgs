@@ -54,6 +54,7 @@
   # Service modules
   ./services/getty.nix
   ./services/crond.nix
+  ./services/fstrim.nix
   ./services/timesyncd.nix
   ./services/journald.nix
   ./services/networking/dhcpcd.nix
