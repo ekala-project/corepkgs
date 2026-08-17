@@ -100,6 +100,43 @@ in
       '';
     };
 
+    networking.enableIPv6 = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Whether to enable IPv6 support.";
+    };
+
+    networking.proxy = {
+      default = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        example = "http://proxy.example.com:8080";
+        description = ''
+          Default proxy URL used for HTTP, HTTPS, and FTP.
+          Sets the http_proxy, https_proxy, and ftp_proxy environment variables.
+        '';
+      };
+
+      noProxy = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        example = "127.0.0.1,localhost,.example.com";
+        description = "Comma-separated list of domains/IPs that bypass the proxy.";
+      };
+
+      httpProxy = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "HTTP proxy URL. Overrides networking.proxy.default for HTTP.";
+      };
+
+      httpsProxy = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "HTTPS proxy URL. Overrides networking.proxy.default for HTTPS.";
+      };
+    };
+
     networking.useDHCP = mkOption {
       type = types.bool;
       default = true;
@@ -169,6 +206,25 @@ in
           ${optionalString (resolvOptions != [ ]) "options ${concatStringsSep " " resolvOptions}"}
         '';
     };
+
+    # Disable IPv6 via sysctl if requested
+    boot.kernel.sysctl = mkIf (!cfg.enableIPv6) {
+      "net.ipv6.conf.all.disable_ipv6" = true;
+      "net.ipv6.conf.default.disable_ipv6" = true;
+    };
+
+    # Set proxy environment variables
+    environment.variables = mkMerge [
+      (mkIf (cfg.proxy.default != null || cfg.proxy.httpProxy != null) {
+        http_proxy = cfg.proxy.httpProxy or cfg.proxy.default;
+      })
+      (mkIf (cfg.proxy.default != null || cfg.proxy.httpsProxy != null) {
+        https_proxy = cfg.proxy.httpsProxy or cfg.proxy.default;
+      })
+      (mkIf (cfg.proxy.noProxy != null) {
+        no_proxy = cfg.proxy.noProxy;
+      })
+    ];
 
     # Add networking utilities
     environment.systemPackages = with pkgs; [
