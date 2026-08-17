@@ -360,6 +360,49 @@ in
       description = "Packages to install in the system environment.";
       example = literalExpression "[ pkgs.vim pkgs.git ]";
     };
+
+    environment.defaultPackages = mkOption {
+      type = types.listOf types.package;
+      default = with pkgs; [
+        coreutils
+        util-linux
+        systemd
+        bash
+        gnugrep
+        gnused
+        gawk
+        findutils
+        diffutils
+        gnutar
+        gzip
+        xz
+        zstd
+        less
+        procps-ng
+        iproute2
+        iputils
+        netcat
+        curl
+        which
+      ];
+      defaultText = literalExpression "[ pkgs.coreutils pkgs.util-linux ... ]";
+      description = ''
+        Set of default packages for a functional system. These can be
+        removed for a more minimal installation.
+      '';
+    };
+
+    environment.pathsToLink = mkOption {
+      type = types.listOf types.str;
+      default = [
+        "/bin"
+        "/sbin"
+        "/lib"
+        "/share"
+        "/etc"
+      ];
+      description = "List of directories to be symlinked in /run/current-system/sw.";
+    };
   };
 
   config = {
@@ -377,21 +420,11 @@ in
     system.path = pkgs.buildEnv {
       name = "system-path";
       paths = config.environment.systemPackages;
-      pathsToLink = [
-        "/bin"
-        "/sbin"
-        "/lib"
-        "/share"
-        "/etc"
-      ];
+      inherit (config.environment) pathsToLink;
+      ignoreCollisions = true;
     };
 
-    # Essential system packages
-    environment.systemPackages = [
-      pkgs.coreutils
-      pkgs.util-linux
-      pkgs.systemd
-      # Add more essential packages as needed
-    ];
+    # Include default packages in system environment
+    environment.systemPackages = config.environment.defaultPackages;
   };
 }
