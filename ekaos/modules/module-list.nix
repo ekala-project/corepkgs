@@ -45,6 +45,7 @@
   ./security/sudo.nix
   ./security/acme.nix
   ./security/audit.nix
+  ./security/hardening.nix
 
   # Program modules
   ./programs/git.nix
