@@ -30,6 +30,7 @@
   ./config/shell-environment.nix
   ./config/sysctl.nix
   ./config/nsswitch.nix
+  ./config/coredump.nix
   ./config/nix-daemon.nix
   ./networking.nix
   ./network-interfaces.nix
