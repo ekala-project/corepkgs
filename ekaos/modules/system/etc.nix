@@ -219,28 +219,6 @@ in
         [ -f ~/.profile ] && source ~/.profile
       '';
 
-      "nsswitch.conf".text = ''
-        # /etc/nsswitch.conf: Name Service Switch configuration
-
-        passwd:    files
-        group:     files
-        shadow:    files
-
-        hosts:     files dns
-        networks:  files
-
-        services:  files
-        protocols: files
-        rpc:       files
-        ethers:    files
-        netmasks:  files
-        netgroup:  files
-        bootparams: files
-
-        automount: files
-        aliases:   files
-      '';
-
       # Hostname configuration
       "hostname".text = mkDefault "${config.networking.hostName or "ekaos"}";
 
