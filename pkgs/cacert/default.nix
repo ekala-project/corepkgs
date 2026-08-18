@@ -25,7 +25,7 @@ let
     homepage = "https://firefox-source-docs.mozilla.org/security/nss/runbooks/rootstore.html#root-store-consumers";
     description = "Bundle of X.509 certificates of public Certificate Authorities (CA)";
     platforms = lib.platforms.all;
-    maintainers = with lib.maintainers; [ ];
+    maintainers = [ ];
     teams = [ ];
     license = lib.licenses.mpl20;
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "mozilla" version // {
