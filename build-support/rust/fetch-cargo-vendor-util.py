@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 import tomllib
 from os.path import islink, realpath
 from pathlib import Path
@@ -39,25 +40,36 @@ def create_http_session() -> requests.Session:
         status_forcelist=[500, 502, 503, 504]
     )
     session = requests.Session()
+    session.headers["User-Agent"] = "fetch-cargo-vendor-util (nix-build)"
     session.mount('http://', HTTPAdapter(max_retries=retries))
     session.mount('https://', HTTPAdapter(max_retries=retries))
     return session
 
 
 def download_file_with_checksum(session: requests.Session, url: str, destination_path: Path) -> str:
-    sha256_hash = hashlib.sha256()
-    with session.get(url, stream=True) as response:
-        if not response.ok:
-            raise Exception(f"Failed to fetch file from {url}. Status code: {response.status_code}")
-        with open(destination_path, "wb") as file:
-            for chunk in response.iter_content(1024):  # Download in chunks
-                if chunk:  # Filter out keep-alive chunks
-                    file.write(chunk)
-                    sha256_hash.update(chunk)
+    max_retries = 5
+    backoff_factor = 2.0
+    retryable_statuses = {403, 429, 500, 502, 503, 504}
 
-    # Compute the final checksum
-    checksum = sha256_hash.hexdigest()
-    return checksum
+    for attempt in range(max_retries + 1):
+        sha256_hash = hashlib.sha256()
+        with session.get(url, stream=True) as response:
+            if not response.ok:
+                if response.status_code in retryable_statuses and attempt < max_retries:
+                    delay = backoff_factor * (2 ** attempt)
+                    eprint(f"Got {response.status_code} fetching {url}, retrying in {delay}s (attempt {attempt + 1}/{max_retries})...")
+                    time.sleep(delay)
+                    continue
+                raise Exception(f"Failed to fetch file from {url}. Status code: {response.status_code}")
+            with open(destination_path, "wb") as file:
+                for chunk in response.iter_content(1024):
+                    if chunk:
+                        file.write(chunk)
+                        sha256_hash.update(chunk)
+
+        return sha256_hash.hexdigest()
+
+    raise Exception(f"Failed to fetch file from {url} after {max_retries} retries.")
 
 
 def get_download_url_for_tarball(pkg: dict[str, Any]) -> str:
