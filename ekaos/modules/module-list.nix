@@ -47,6 +47,9 @@
   ./networking.nix
   ./network-interfaces.nix
   ./networking/firewall.nix
+  ./networking/nat.nix
+  ./networking/nftables.nix
+  ./networking/iproute2.nix
   ./networking/dns-zones.nix
   ./networking/port-contracts.nix
   ./networking/wireguard.nix
