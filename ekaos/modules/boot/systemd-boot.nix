@@ -128,6 +128,16 @@ in
         '';
       };
 
+      memtest86.enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Whether to add a memtest86+ entry to the systemd-boot menu.
+
+          Requires the memtest86plus package.
+        '';
+      };
+
       extraInstallCommands = mkOption {
         type = types.lines;
         default = "";
@@ -203,5 +213,26 @@ in
 
     # Add systemd-boot to system packages for bootctl command
     environment.systemPackages = [ config.systemd.package ];
+
+    # Install memtest86+ boot entry
+    boot.loader.systemd-boot.extraInstallCommands = mkIf cfg.memtest86.enable ''
+      ${
+        let
+          memtest = pkgs.memtest86plus or (throw "memtest86plus package not available");
+        in
+        ''
+          # Copy memtest86+ binary
+          mkdir -p ${config.boot.loader.efi.efiSysMountPoint}/EFI/memtest86
+          cp ${memtest}/memtest.efi ${config.boot.loader.efi.efiSysMountPoint}/EFI/memtest86/memtest.efi 2>/dev/null || true
+
+          # Create boot entry
+          mkdir -p ${config.boot.loader.efi.efiSysMountPoint}/loader/entries
+          cat > ${config.boot.loader.efi.efiSysMountPoint}/loader/entries/memtest86.conf <<MEMEOF
+          title   Memtest86+
+          efi     /EFI/memtest86/memtest.efi
+          MEMEOF
+        ''
+      }
+    '';
   };
 }
