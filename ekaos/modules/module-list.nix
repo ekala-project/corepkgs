@@ -11,6 +11,12 @@
   ./boot/grow-partition.nix
   ./boot/swraid.nix
   ./boot/crash-dump.nix
+  ./boot/bootspec.nix
+  ./boot/containers.nix
+  ./boot/kexec.nix
+  ./boot/plymouth.nix
+  ./boot/binfmt.nix
+  ./boot/zswap.nix
 
   # Hardware
   ./hardware/firmware.nix
