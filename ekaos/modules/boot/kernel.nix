@@ -12,6 +12,7 @@ with lib;
   options = {
     boot.kernelPackages = mkOption {
       type = types.unspecified;
+      default = pkgs.linux.pkgs;
       defaultText = "pkgs.linux.pkgs (linux 6.12)";
       example = literalExpression "pkgs.linux.v6_18.pkgs";
       description = ''
