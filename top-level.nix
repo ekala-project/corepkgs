@@ -1076,12 +1076,14 @@ with final;
   substituteAll = callPackage ./build-support/substitute-all/substitute-all.nix { };
   replaceDirectDependencies = callPackage ./build-support/replace-direct-dependencies.nix { };
 
+  devShellTools = callPackage ./build-support/dev-shell-tools { };
+
   # Docker and OCI container tools
   dockerTools = callPackage ./build-support/docker {
     writePython3 = buildPackages.writers.writePython3;
+    inherit devShellTools;
     # TODO: These dependencies need to be ported to core-pkgs:
     # - tarsum (requires docker.moby-src)
-    # - devShellTools
     # - dockerAutoLayer (from auto-layer.nix)
     # - dockerMakeLayers (from make-layers.nix, requires flatten-references-graph)
   };
