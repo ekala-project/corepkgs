@@ -1937,8 +1937,10 @@ with final;
   writers = callPackage ./build-support/writers { };
   # TODO(corepkgs): support writers fully
   gixy = null;
-  mkNugetDeps = null;
-  mkNugetSource = null;
+
+  buildDotnetModule = callPackage ./build-support/dotnet/build-dotnet-module { };
+  mkNugetDeps = null; # TODO(corepkgs): implement NuGet dependency fetcher
+  mkNugetSource = null; # TODO(corepkgs): implement NuGet source builder
 
   buildFHSEnv = buildFHSEnvBubblewrap;
   buildFHSEnvChroot = callPackage ./build-support/build-fhsenv-chroot { }; # Deprecated; use buildFHSEnv/buildFHSEnvBubblewrap
