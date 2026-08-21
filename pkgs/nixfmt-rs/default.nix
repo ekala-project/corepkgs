@@ -23,5 +23,6 @@ rustPlatform.buildRustPackage rec {
     description = "A from-scratch Rust reimplementation of nixfmt that produces byte-identical output to the Haskell original.";
     homepage = "https://github.com/Mic92/nixfmt-rs";
     license = licenses.mpl20;
+    mainProgram = "nixfmt";
   };
 }
