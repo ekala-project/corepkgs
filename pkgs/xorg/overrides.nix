@@ -30,6 +30,9 @@
   libepoxy,
   libxcrypt,
   xorg,
+  xtrans,
+  libxcvt,
+  pixman,
   libgbm,
   mesa-gl-headers,
   dri-pkgconfig-stub,
@@ -404,8 +407,8 @@ self: super: {
       let
         version = lib.getVersion attrs;
         commonBuildInputs = attrs.buildInputs ++ [
-          xorg.xtrans
-          xorg.libxcvt
+          xtrans
+          libxcvt
         ];
         commonPropagatedBuildInputs = [
           dbus
@@ -417,7 +420,7 @@ self: super: {
           libepoxy
           libunwind
           xorg.libxshmfence
-          xorg.pixman
+          pixman
           xorg.xorgproto
           zlib
         ];
@@ -617,10 +620,10 @@ self: super: {
       libdrm
       libGL
       mesa-gl-headers
-      xorg.pixman
+      pixman
       xorg.libXfont2
-      xorg.xtrans
-      xorg.libxcvt
+      xtrans
+      libxcvt
       xorg.libxshmfence
     ];
   });
@@ -677,7 +680,7 @@ self: super: {
     buildInputs = attrs.buildInputs ++ [
       xorg.libXScrnSaver
       xorg.libXv
-      xorg.pixman
+      pixman
     ];
     nativeBuildInputs = attrs.nativeBuildInputs ++ [
       autoreconfHook
