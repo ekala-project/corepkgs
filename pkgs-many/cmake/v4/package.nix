@@ -155,7 +155,7 @@ stdenv.mkDerivation (finalAttrs: {
       [
         "--no-system-libs"
       ]
-  ) # FIXME: cleanup
+  )
   ++ lib.optional withQt "--qt-gui"
   ++ lib.optionals buildDocs [
     "--sphinx-build=${sphinx}/bin/sphinx-build"

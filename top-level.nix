@@ -1653,9 +1653,8 @@ with final;
     pythonSupport = false;
     perlSupport = false;
     withpcre2 = false;
-    # FIXME(corepkgs): these are hacks to break the infinite recursion
     # Prefer plain zlib and curl without HTTP/3 to keep bootstrap cycle small.
-    # Avoid curl with HTTP/3 (nghttp3) to break the cmake→git→curl→nghttp3→cmake cycle.
+    # Avoid curl with HTTP/3 (nghttp3) to break the cmake->git->curl->nghttp3->cmake cycle.
     curl = curlMinimal;
     withZlibNg = false;
   };
