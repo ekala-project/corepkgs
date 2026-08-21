@@ -623,6 +623,11 @@ with final;
 
   json-schema-for-humans = with python3Packages; toPythonApplication json-schema-for-humans;
 
+  makeDesktopItem = callPackage ./build-support/make-desktopitem { };
+  copyDesktopItems = makeSetupHook {
+    name = "copy-desktop-items-hook";
+  } ./build-support/setup-hooks/copy-desktop-items.sh;
+
   makePkgconfigItem = callPackage ./build-support/make-pkgconfigitem { };
 
   mpi = throw "mpi: openmpi is not yet available in core-pkgs";
