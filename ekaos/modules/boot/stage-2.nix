@@ -41,11 +41,10 @@ let
     specialMount "tmpfs" "/run" "mode=0755,nosuid,nodev,size=${config.boot.runSize}" "tmpfs"
     specialMount "tmpfs" "/dev/shm" "mode=1777,nosuid,nodev,size=${config.boot.devShmSize}" "tmpfs"
 
-    # Make /nix/store a read-only bind mount if it's a regular directory
-    # (it might already be a separate filesystem)
+    # Make /nix/store a bind mount with configured options
     if [ -d /nix/store ] && ! mountpoint -q /nix/store; then
       mount --bind /nix/store /nix/store
-      mount -o remount,ro,bind /nix/store
+      mount -o remount,bind,${concatStringsSep "," config.boot.nixStoreMountOpts} /nix/store
     fi
 
     # Create essential directories
@@ -72,6 +71,9 @@ let
 
     # Start systemd as PID 1
     echo "Starting systemd..."
+    ${optionalString (config.boot.extraSystemdUnitPaths != [ ]) ''
+      export SYSTEMD_UNIT_PATH="''${SYSTEMD_UNIT_PATH:+$SYSTEMD_UNIT_PATH:}${concatStringsSep ":" config.boot.extraSystemdUnitPaths}"
+    ''}
     exec ${config.systemd.package}/lib/systemd/systemd
   '';
 
@@ -133,6 +135,30 @@ in
         Size limit for the /run tmpfs filesystem.
 
         Can be a percentage of RAM or an absolute size.
+      '';
+    };
+
+    boot.nixStoreMountOpts = mkOption {
+      type = types.listOf types.str;
+      default = [
+        "ro"
+        "nodev"
+        "nosuid"
+      ];
+      description = ''
+        Mount options for the /nix/store bind mount.
+
+        "ro" enforces immutability of the Nix store.
+        The store daemon undoes the bind mount when it needs to write.
+      '';
+    };
+
+    boot.extraSystemdUnitPaths = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = ''
+        Additional paths appended to the SYSTEMD_UNIT_PATH environment
+        variable that can contain mutable unit files.
       '';
     };
 
