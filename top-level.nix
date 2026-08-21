@@ -1942,6 +1942,8 @@ with final;
   mkNugetDeps = null; # TODO(corepkgs): implement NuGet dependency fetcher
   mkNugetSource = null; # TODO(corepkgs): implement NuGet source builder
 
+  appimageTools = callPackage ./build-support/appimage { };
+
   buildFHSEnv = buildFHSEnvBubblewrap;
   buildFHSEnvChroot = callPackage ./build-support/build-fhsenv-chroot { }; # Deprecated; use buildFHSEnv/buildFHSEnvBubblewrap
   buildFHSEnvBubblewrap = callPackage ./build-support/build-fhsenv-bubblewrap { };
