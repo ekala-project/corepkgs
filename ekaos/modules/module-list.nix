@@ -8,6 +8,9 @@
   ./boot/systemd-boot.nix
   ./boot/modprobe.nix
   ./boot/zfs.nix
+  ./boot/grow-partition.nix
+  ./boot/swraid.nix
+  ./boot/crash-dump.nix
 
   # Hardware
   ./hardware/firmware.nix
