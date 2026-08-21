@@ -158,7 +158,7 @@ stdenv.mkDerivation (finalAttrs: {
   )
   ++ lib.optional withQt "--qt-gui"
   ++ lib.optionals buildDocs [
-    "--sphinx-build=${sphinx}/bin/sphinx-build"
+    "--sphinx-build=${buildPackages.sphinx}/bin/sphinx-build"
     "--sphinx-info"
     "--sphinx-man"
   ]
