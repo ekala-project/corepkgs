@@ -2,29 +2,28 @@
   description = "Core packages flake";
 
   inputs = {
-    # For bootstrapping
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     systems.url = "github:nix-systems/default";
     treefmt-nix.url = "github:numtide/treefmt-nix";
-    lib.url = "github:ekala-project/nix-lib";
+    nix-lib.url = "github:ekala-project/nix-lib";
   };
 
   outputs =
     {
       self,
       systems,
-      nixpkgs,
+      nix-lib,
       treefmt-nix,
       ...
     }:
     let
-      forAllSystems = nixpkgs.lib.genAttrs (import systems);
+      forAllSystems = nix-lib.lib.genAttrs (import systems);
       mkTreefmt =
         pkgs:
         let
           fmt = treefmt-nix.lib.evalModule pkgs {
             projectRootFile = "flake.nix";
             programs.nixfmt.enable = true;
+            programs.nixfmt.package = pkgs.nixfmt-rs;
             programs.keep-sorted = {
               enable = true;
               includes = [
@@ -36,14 +35,14 @@
         in
         fmt.config.build.wrapper;
     in
-    {
+    rec {
       legacyPackages = forAllSystems (
         system:
         import ./. {
           inherit system;
         }
       );
-      formatter = forAllSystems (system: mkTreefmt nixpkgs.legacyPackages.${system});
+      formatter = forAllSystems (system: mkTreefmt legacyPackages.${system});
       nixConfig = {
         extra-substituters = [ "https://ekala-corepkgs.cachix.org" ];
         extra-trusted-public-keys = [

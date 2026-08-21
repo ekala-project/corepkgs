@@ -1,7 +1,7 @@
 let
   # Inherit pinning from flake.lock
   lock = builtins.fromJSON (builtins.readFile ./flake.lock);
-  libInfo = lock.nodes.lib.locked;
+  libInfo = lock.nodes.nix-lib.locked;
 in
 {
   lib = builtins.fetchTree {
