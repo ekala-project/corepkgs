@@ -75,6 +75,63 @@ with lib;
       '';
     };
 
+    boot.consoleLogLevel = mkOption {
+      type = types.int;
+      default = 4;
+      example = 7;
+      description = ''
+        The kernel console log level.
+
+        All kernel messages with a log level smaller than this
+        setting will be printed to the console.
+        0 = emergency only, 7 = debug (everything).
+      '';
+    };
+
+    boot.kernelPatches = mkOption {
+      type = types.listOf types.attrs;
+      default = [ ];
+      example = literalExpression ''
+        [
+          {
+            name = "my-patch";
+            patch = ./my-fix.patch;
+          }
+        ]
+      '';
+      description = ''
+        Additional patches to apply to the kernel.
+
+        Each element should be an attribute set with at least a
+        name and patch attribute. See the kernel build infrastructure
+        for supported attributes.
+      '';
+    };
+
+    boot.resumeDevice = mkOption {
+      type = types.str;
+      default = "";
+      example = "/dev/sda3";
+      description = ''
+        Device for resume from hibernation (suspend-to-disk).
+
+        This should be the swap partition or file used for hibernation.
+        The kernel resume parameter will be set automatically.
+      '';
+    };
+
+    boot.hardwareScan = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Whether to try to load kernel modules for all detected hardware.
+
+        Usually this does a good job of providing you with the modules
+        you need, but sometimes it can crash the system or cause other
+        nasty effects.
+      '';
+    };
+
     system.boot.loader.kernelFile = mkOption {
       type = types.str;
       internal = true;
@@ -86,7 +143,15 @@ with lib;
     };
   };
 
-  config = {
-    # Note: init parameter is added in toplevel.nix to avoid circular dependency
-  };
+  config = mkMerge [
+    # Set kernel console log level
+    (mkIf (config.boot.consoleLogLevel != 4) {
+      boot.kernelParams = [ "loglevel=${toString config.boot.consoleLogLevel}" ];
+    })
+
+    # Set resume device for hibernation
+    (mkIf (config.boot.resumeDevice != "") {
+      boot.kernelParams = [ "resume=${config.boot.resumeDevice}" ];
+    })
+  ];
 }
