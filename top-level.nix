@@ -828,8 +828,7 @@ with final;
   buildPnpmApplication = nodejs.buildPnpmApplication;
   buildYarnApplication = nodejs.buildYarnApplication;
 
-  # TODO(corepkgs): proper attrset of utilities
-  gnome = { };
+  gnome = callPackage ./pkgs/gnome { };
 
   gnuStdenv =
     if stdenv.cc.isGNU then
