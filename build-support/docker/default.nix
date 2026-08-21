@@ -13,7 +13,7 @@
 # - proot: User-space chroot (needed for enableFakechroot in streamLayeredImage)
 # - fakechroot: Another fake chroot tool (currently unused)
 # - tarsum: Docker tarsum calculator (build-support/docker/tarsum.nix, requires docker.moby-src)
-# - devShellTools: Shell environment tools (build-support/dev-shell-tools)
+# - devShellTools: Shell environment tools (build-support/dev-shell-tools) [PORTED]
 # - flatten-references-graph: Python tool for layering (pkgs/by-name/fl/flatten-references-graph)
 #
 # SIBLING PORTS (being ported separately):
@@ -50,7 +50,7 @@
   writePython3 ? buildPackages.writers.writePython3,
   zstd,
   # Optional/missing dependencies - will fail with clear messages if used but not available
-  devShellTools ? null,
+  devShellTools,
   dockerAutoLayer ? null,
   dockerMakeLayers ? null,
   fakeNss_ ? null,
@@ -75,25 +75,7 @@ let
     toList
     ;
 
-  # TODO: devShellTools missing - using fallback valueToString
-  valueToString =
-    x:
-    if builtins.isList x then
-      lib.concatMapStringsSep " " valueToString x
-    else if builtins.isPath x then
-      "${x}"
-    else if builtins.isString x then
-      x
-    else if builtins.isInt x then
-      toString x
-    else if builtins.isBool x then
-      lib.boolToString x
-    else if x == null then
-      ""
-    else if builtins.isAttrs x && x ? outPath then
-      "${x}"
-    else
-      throw "devShellTools.valueToString: cannot convert ${builtins.typeOf x} to string";
+  inherit (devShellTools) valueToString;
 
   mkDbExtraCommand =
     contents:
