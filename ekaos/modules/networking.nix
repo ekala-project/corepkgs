@@ -140,6 +140,18 @@ in
       };
     };
 
+    networking.hostId = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      example = "a8c01e01";
+      description = ''
+        The 32-bit host ID of the machine, formatted as 8 hexadecimal characters.
+
+        Required by ZFS for safe pool import. Generate with:
+          head -c4 /dev/urandom | od -A none -t x4 | tr -d ' '
+      '';
+    };
+
     networking.useDHCP = mkOption {
       type = types.bool;
       default = true;
@@ -235,6 +247,13 @@ in
       iputils
       net-tools
     ];
+
+    # Write /etc/hostid if networking.hostId is set
+    environment.etc."hostid" = mkIf (cfg.hostId != null) {
+      source = pkgs.runCommand "gen-hostid" { } ''
+        ${pkgs.coreutils}/bin/printf "$(echo ${cfg.hostId} | ${pkgs.gnused}/bin/sed 's/\(..\)/\\x\1/g')" > $out
+      '';
+    };
 
     # Set hostname during activation
     system.activationScripts.hostname = stringAfter [ "etc" ] ''
