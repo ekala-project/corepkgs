@@ -40,6 +40,13 @@
   ./config/locale.nix
   ./config/fonts.nix
   ./config/power.nix
+  ./config/xdg/mime.nix
+  ./config/xdg/icons.nix
+  ./config/xdg/autostart.nix
+  ./config/xdg/menus.nix
+  ./config/xdg/sounds.nix
+  ./config/xdg/portal.nix
+  ./config/xdg/terminal-exec.nix
   ./config/shell-environment.nix
   ./config/sysctl.nix
   ./config/nsswitch.nix
