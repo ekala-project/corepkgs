@@ -11,13 +11,13 @@
 with lib;
 
 let
-  cfgExporter = config.services.prometheus.exporters.node;
+  cfgExporter = config.services.prometheus-node-exporter;
 
 in
 
 {
   options = {
-    services.prometheus.exporters.node = {
+    services.prometheus-node-exporter = {
       enable = mkOption {
         type = types.bool;
         default = false;
@@ -27,6 +27,43 @@ in
           Exposes system metrics (CPU, memory, disk, network) for
           Prometheus scraping.
         '';
+      };
+
+      description = mkOption {
+        type = types.str;
+        default = "Prometheus Node Exporter";
+        description = "Service description.";
+      };
+
+      command = mkOption {
+        type = types.str;
+        internal = true;
+        description = "Command to run (set automatically).";
+      };
+
+      args = mkOption {
+        type = types.listOf types.str;
+        internal = true;
+        default = [ ];
+        description = "Command arguments (set automatically).";
+      };
+
+      user = mkOption {
+        type = types.str;
+        default = "node-exporter";
+        description = "User to run service as.";
+      };
+
+      restartPolicy = mkOption {
+        type = types.str;
+        default = "always";
+        description = "Restart policy.";
+      };
+
+      systemd = mkOption {
+        type = types.attrsOf types.anything;
+        default = { };
+        description = "Systemd-specific options.";
       };
 
       package = mkOption {
@@ -85,8 +122,6 @@ in
 
   config = mkIf cfgExporter.enable {
     services.prometheus-node-exporter = {
-      enable = true;
-      description = "Prometheus Node Exporter";
       command = "${cfgExporter.package}/bin/node_exporter";
       args = [
         "--web.listen-address=${cfgExporter.listenAddress}:${toString cfgExporter.port}"
@@ -94,7 +129,6 @@ in
       ++ map (c: "--collector.${c}") cfgExporter.enabledCollectors
       ++ map (c: "--no-collector.${c}") cfgExporter.disabledCollectors
       ++ cfgExporter.extraFlags;
-      user = "node-exporter";
       restartPolicy = "always";
       systemd = {
         after = [ "network.target" ];
