@@ -68,7 +68,6 @@ buildPerlPackage rec {
       glibcLocales
     ];
 
-  # TODO: TermReadKey was temporarily removed from propagatedBuildInputs to unfreeze the build
   propagatedBuildInputs =
     lib.optionals (!stdenv.hostPlatform.isMusl) [
       TextWrapI18N

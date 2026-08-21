@@ -980,7 +980,7 @@ stdenv.mkDerivation (
 
     doCheck = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
 
-    # Fails with SIGABRT otherwise FIXME: Why?
+    # Test binaries need the library path set to find the just-built (not yet installed) shared objects.
     checkPhase =
       let
         ldLibraryPathEnv = if stdenv.hostPlatform.isDarwin then "DYLD_LIBRARY_PATH" else "LD_LIBRARY_PATH";
