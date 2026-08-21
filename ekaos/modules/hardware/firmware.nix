@@ -92,7 +92,7 @@ in
       '';
     };
 
-    enableKSM = mkOption {
+    ksm.enable = mkOption {
       type = types.bool;
       default = false;
       description = ''
@@ -199,7 +199,7 @@ in
     })
 
     # KSM
-    (mkIf cfg.enableKSM {
+    (mkIf cfg.ksm.enable {
       system.activationScripts.ksm = stringAfter [ "etc" ] ''
         if [ -w /sys/kernel/mm/ksm/run ]; then
           echo 1 > /sys/kernel/mm/ksm/run
