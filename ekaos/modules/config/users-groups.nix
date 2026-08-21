@@ -57,9 +57,24 @@ let
         };
 
         shell = mkOption {
-          type = types.str;
+          type = types.either types.str types.package;
           default = "/run/current-system/sw/bin/bash";
-          description = "The user's login shell.";
+          example = literalExpression "pkgs.zsh";
+          description = ''
+            The user's login shell.
+
+            Can be a string path or a package. Packages are resolved
+            to "$${pkg}/bin/$${pkg.meta.mainProgram or pkg.pname or name}".
+          '';
+          apply =
+            v:
+            if builtins.isString v then
+              v
+            else
+              let
+                name = v.meta.mainProgram or v.pname or (builtins.parseDrvName v.name).name;
+              in
+              "${v}/bin/${name}";
         };
 
         description = mkOption {
@@ -376,9 +391,19 @@ in
     };
 
     users.defaultUserShell = mkOption {
-      type = types.str;
+      type = types.either types.str types.package;
       default = "/run/current-system/sw/bin/bash";
+      example = literalExpression "pkgs.zsh";
       description = "The default shell for user accounts.";
+      apply =
+        v:
+        if builtins.isString v then
+          v
+        else
+          let
+            name = v.meta.mainProgram or v.pname or (builtins.parseDrvName v.name).name;
+          in
+          "${v}/bin/${name}";
     };
   };
 
