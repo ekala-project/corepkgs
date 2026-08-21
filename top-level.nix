@@ -1476,8 +1476,7 @@ with final;
   # TODO(corepkgs): alias?
   patch = gnupatch;
 
-  # TODO(corepkgs): tcl package scope needs lib injected into its scope
-  tclPackages = { };
+  tclPackages = tcl.pkgs;
 
   # TODO(corepkgs): use mkManyVariants
   tk = tk-8_6;
