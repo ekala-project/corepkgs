@@ -52,6 +52,7 @@
   ./config/nsswitch.nix
   ./config/coredump.nix
   ./config/nix-daemon.nix
+  ./config/nixpkgs.nix
   ./config/user-services.nix
   ./networking.nix
   ./network-interfaces.nix
