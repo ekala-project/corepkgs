@@ -7,10 +7,12 @@
   ./boot/stage-2.nix
   ./boot/systemd-boot.nix
   ./boot/modprobe.nix
+  ./boot/zfs.nix
 
   # Hardware
   ./hardware/firmware.nix
   ./hardware/facter
+  ./hardware/cpu.nix
 
   # System modules
   ./system/toplevel.nix
@@ -60,10 +62,15 @@
   ./services/resolved.nix
   ./services/timesyncd.nix
   ./services/journald.nix
+  ./services/earlyoom.nix
+  ./services/stubs.nix
+  ./services/queued-build-hook.nix
   ./services/networking/dhcpcd.nix
   ./services/networking/sshd.nix
   ./services/networking/bind.nix
   ./services/networking/unbound.nix
+  ./services/networking/networkmanager.nix
+  ./services/networking/nginx.nix
   ./services/databases/postgresql.nix
   ./services/databases/redis.nix
 
@@ -79,6 +86,7 @@
 
   # Monitoring
   ./monitoring/prometheus-scrape.nix
+  ./services/monitoring/prometheus.nix
 
   # Miscellaneous
   ./misc/assertions.nix # Assertion checking
