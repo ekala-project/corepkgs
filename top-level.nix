@@ -1450,8 +1450,10 @@ with final;
     else
       prev.ncurses;
 
-  # TODO(corepkgs): add pkgconf-unwrapped package
-  pkgconf = throw "pkgconf: pkgconf-unwrapped is not yet available in core-pkgs; use pkg-config instead";
+  pkgconf = callPackage ./build-support/pkg-config-wrapper {
+    pkg-config = pkgconf-unwrapped;
+  };
+  pkgconf-unwrapped = callPackage ./pkgs/pkgconf { };
   pkg-config = callPackage ./build-support/pkg-config-wrapper {
     pkg-config = pkg-config-unwrapped;
   };
