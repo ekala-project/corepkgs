@@ -1957,7 +1957,7 @@ with final;
   ) { };
 
   writers = callPackage ./build-support/writers { };
-  # TODO(corepkgs): support writers fully
+  # TODO(corepkgs): gixy requires packages not yet in core-pkgs (writeNginxConfig validation)
   gixy = null;
 
   buildDotnetModule = callPackage ./build-support/dotnet/build-dotnet-module { };
