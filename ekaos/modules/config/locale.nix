@@ -57,6 +57,27 @@ in
           Per-category locale overrides. Keys are LC_* variable names.
         '';
       };
+
+      supportedLocales = mkOption {
+        type = types.listOf types.str;
+        default = [ "all" ];
+        example = [
+          "en_US.UTF-8/UTF-8"
+          "de_DE.UTF-8/UTF-8"
+        ];
+        description = ''
+          List of locales to generate. Use [ "all" ] to generate all locales.
+        '';
+      };
+
+      glibcLocales = mkOption {
+        type = types.nullOr types.package;
+        default = null;
+        description = ''
+          Override the glibc locales package. When null, the default
+          locales are built from supportedLocales.
+        '';
+      };
     };
 
     console = {
