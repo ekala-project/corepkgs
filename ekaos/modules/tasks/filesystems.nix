@@ -155,6 +155,19 @@ in
 
 {
   options = {
+    boot.specialFileSystems = mkOption {
+      type = types.attrsOf (types.submodule fsSubmodule);
+      default = { };
+      internal = true;
+      description = ''
+        Special filesystems that are mounted very early during boot.
+
+        These use the same submodule structure as fileSystems but are
+        handled separately to ensure they are available before other
+        mounts.
+      '';
+    };
+
     fileSystems = mkOption {
       type = types.attrsOf (types.submodule fsSubmodule);
       default = { };
