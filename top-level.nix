@@ -1364,8 +1364,11 @@ with final;
     name = "setup-debug-info-dirs-hook";
   } ./build-support/setup-hooks/setup-debug-info-dirs.sh;
 
-  # TODO(corepkgs): add strip-nondeterminism package
-  stripJavaArchivesHook = throw "stripJavaArchivesHook: strip-nondeterminism is not yet available in core-pkgs";
+  strip-nondeterminism = perlPackages.strip-nondeterminism;
+  stripJavaArchivesHook = makeSetupHook {
+    name = "strip-java-archives-hook";
+    propagatedBuildInputs = [ strip-nondeterminism ];
+  } ./build-support/setup-hooks/strip-java-archives.sh;
 
   updateAutotoolsGnuConfigScriptsHook = makeSetupHook {
     name = "update-autotools-gnu-config-scripts-hook";
