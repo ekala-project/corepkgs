@@ -38,6 +38,8 @@
   # Config modules
   ./config/users-groups.nix
   ./config/locale.nix
+  ./config/fonts.nix
+  ./config/power.nix
   ./config/shell-environment.nix
   ./config/sysctl.nix
   ./config/nsswitch.nix
@@ -108,4 +110,7 @@
   ./virtualisation/qemu-guest-agent.nix
   ./virtualisation/qemu-vm.nix
   ./virtualisation/podman.nix
+  ./virtualisation/docker.nix
+  ./virtualisation/libvirtd.nix
+  ./virtualisation/containers.nix
 ]
