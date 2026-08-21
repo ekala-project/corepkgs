@@ -117,7 +117,9 @@ in
     };
 
     ports = mkOption {
-      type = types.attrsOf types.anything;
+      type = types.attrsOf (
+        types.submodule (import ../../../../services/lib/types.nix { inherit lib; }).portContract
+      );
       default = { };
       description = "Port contracts for this service.";
     };
