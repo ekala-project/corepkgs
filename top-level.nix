@@ -14,8 +14,7 @@ with final;
   nixosTests = { };
   tests = { };
 
-  # TODO(corepkgs): Create ekapkg specific version
-  nix-update-script = { };
+  nix-update-script = callPackage ./pkgs/nix-update-script { };
   nix-update = null;
   nixos = null;
 
