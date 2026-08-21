@@ -43,8 +43,8 @@ let
     ) "RuntimeMaxFiles=${toString cfg.settings.runtimeMaxFiles}"}
     ${optionalString (
       cfg.settings.maxRetentionSec != null
-    ) "MaxRetentionSec=${toString cfg.settings.maxRetentionSec}"}
-    ${optionalString (cfg.settings.maxFileSec != null) "MaxFileSec=${toString cfg.settings.maxFileSec}"}
+    ) "MaxRetentionSec=${cfg.settings.maxRetentionSec}"}
+    ${optionalString (cfg.settings.maxFileSec != null) "MaxFileSec=${cfg.settings.maxFileSec}"}
     ${optionalString (cfg.settings.forwardToSyslog != null)
       "ForwardToSyslog=${if cfg.settings.forwardToSyslog then "yes" else "no"}"
     }
@@ -199,23 +199,25 @@ in
             };
 
             maxRetentionSec = mkOption {
-              type = types.nullOr types.int;
+              type = types.nullOr types.str;
               default = null;
-              example = 2592000; # 30 days
+              example = "3week";
               description = ''
-                Maximum time to store journal entries (in seconds).
+                Maximum time to store journal entries.
 
+                Accepts systemd time span syntax (e.g. "1month", "3week", "2d").
                 Older entries are deleted. If null, no time-based deletion.
               '';
             };
 
             maxFileSec = mkOption {
-              type = types.nullOr types.int;
-              default = 86400; # 1 day
-              example = 604800; # 1 week
+              type = types.nullOr types.str;
+              default = "1day";
+              example = "1week";
               description = ''
-                Maximum time to store entries in a single file (in seconds).
+                Maximum time to store entries in a single file.
 
+                Accepts systemd time span syntax (e.g. "1day", "1week").
                 After this time, a new file is created.
               '';
             };
