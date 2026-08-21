@@ -1566,8 +1566,10 @@ with final;
   };
   # We do not want to include ukify in the normal systemd attribute as it
   # relies on Python at runtime.
-  # TODO(corepkgs): needs python3Packages.pefile
-  systemdUkify = throw "systemdUkify: python3Packages.pefile is not yet available in core-pkgs";
+  systemdUkify = systemd.override {
+    pname = "systemd-ukify";
+    withUkify = true;
+  };
   udev = if lib.meta.availableOn stdenv.hostPlatform systemdLibs then systemdLibs else libudev-zero;
 
   inherit (callPackages ./pkgs/docbook-xsl { })
