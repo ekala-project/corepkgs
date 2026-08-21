@@ -63,6 +63,18 @@ with lib;
       '';
     };
 
+    boot.extraModulePackages = mkOption {
+      type = types.listOf types.package;
+      default = [ ];
+      example = literalExpression "[ config.boot.kernelPackages.nvidia_x11 ]";
+      description = ''
+        Additional kernel module packages to include.
+
+        These are merged into the kernel module search path alongside
+        the modules from the selected kernel.
+      '';
+    };
+
     system.boot.loader.kernelFile = mkOption {
       type = types.str;
       internal = true;
