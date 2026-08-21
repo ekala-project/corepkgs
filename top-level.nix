@@ -622,6 +622,7 @@ with final;
 
   json-schema-for-humans = with python3Packages; toPythonApplication json-schema-for-humans;
 
+  makeAutostartItem = callPackage ./build-support/make-startupitem { };
   makeDesktopItem = callPackage ./build-support/make-desktopitem { };
   copyDesktopItems = makeSetupHook {
     name = "copy-desktop-items-hook";
