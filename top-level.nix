@@ -112,7 +112,7 @@ with final;
   harfbuzz = callPackage ./pkgs/harfbuzz { };
   highlight = null;
   icewm = null;
-  imagemagick = null;
+  imagemagick = callPackage ./pkgs/imagemagick { };
   imlib2 = null;
   jhead = null;
   jre = null;
@@ -1833,9 +1833,31 @@ with final;
   imagemagick6Big = imagemagick6.override {
     ghostscriptSupport = true;
   };
-  # imagemagick is null; these overrides can't work until it's ported
-  imagemagick_light = imagemagick6_light;
-  imagemagickBig = imagemagick6Big;
+  imagemagick_light = imagemagick.override {
+    bzip2Support = false;
+    zlibSupport = false;
+    libX11Support = false;
+    libXtSupport = false;
+    fontconfigSupport = false;
+    freetypeSupport = false;
+    ghostscriptSupport = false;
+    libjpegSupport = false;
+    djvulibreSupport = false;
+    lcms2Support = false;
+    openexrSupport = false;
+    libpngSupport = false;
+    liblqr1Support = false;
+    librsvgSupport = false;
+    libtiffSupport = false;
+    libxml2Support = false;
+    openjpegSupport = false;
+    libwebpSupport = false;
+    libheifSupport = false;
+    libjxlSupport = false;
+  };
+  imagemagickBig = imagemagick.override {
+    ghostscriptSupport = true;
+  };
 
   inherit (texlive.schemes)
     texliveBasic
