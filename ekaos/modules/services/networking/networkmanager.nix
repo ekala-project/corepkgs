@@ -114,13 +114,58 @@ in
         description = "Additional lines appended to NetworkManager.conf.";
       };
     };
+
+    # Service interface options for the cross-platform service manager
+    services.network-manager = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Whether to enable the NetworkManager service.";
+      };
+
+      description = mkOption {
+        type = types.str;
+        default = "NetworkManager";
+        description = "Service description.";
+      };
+
+      command = mkOption {
+        type = types.str;
+        internal = true;
+        description = "Command to run (set automatically).";
+      };
+
+      args = mkOption {
+        type = types.listOf types.str;
+        internal = true;
+        default = [ ];
+        description = "Command arguments (set automatically).";
+      };
+
+      user = mkOption {
+        type = types.str;
+        default = "root";
+        description = "User to run service as.";
+      };
+
+      restartPolicy = mkOption {
+        type = types.str;
+        default = "always";
+        description = "Restart policy.";
+      };
+
+      systemd = mkOption {
+        type = types.attrsOf types.anything;
+        default = { };
+        description = "Systemd-specific options.";
+      };
+    };
   };
 
   config = mkIf cfg.enable {
     # NetworkManager service
-    services.networkmanager = {
+    services.network-manager = {
       enable = true;
-      description = "NetworkManager";
       command = "${cfg.package}/bin/NetworkManager";
       args = [
         "--no-daemon"
