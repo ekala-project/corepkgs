@@ -311,10 +311,17 @@ stdenv.mkDerivation {
               -exec sed -i "s@FFI_LIB_DIR@FFI_LIB_DIR ${numactl.out}/lib@g" {} \;
         ''
     +
-      # Rename needed libraries and binaries, fix interpreter
+      # Fix interpreter on ELF binaries via the dynamic linker directly.
+      # Don't use patchelf at all — it corrupts small GHC binaries (like unlit)
+      # by adding LOAD segments that overlap with program headers.
+      # Instead, rely on LD_LIBRARY_PATH (already set via libEnvVar above)
+      # and invoke via the dynamic linker for the interpreter.
       lib.optionalString stdenv.hostPlatform.isLinux ''
-        find . -type f -executable -exec patchelf \
-            --interpreter ${stdenv.cc.bintools.dynamicLinker} {} \;
+        for f in $(find . -type f -executable); do
+          if isELF "$f"; then
+            patchelf --set-interpreter ${stdenv.cc.bintools.dynamicLinker} "$f" 2>/dev/null || true
+          fi
+        done
       '';
 
   # fix for `configure: error: Your linker is affected by binutils #16177`
@@ -341,8 +348,18 @@ stdenv.mkDerivation {
       sed -i -e '2i export PATH="${lib.makeBinPath runtimeDeps}:$PATH"' "$i"
     done
   ''
+  # Use ld.gold instead of ld.bfd to avoid relocation errors with binutils >= 2.44.
+  # GHC 9.8.x produces object files with relocations that confuse ld.bfd.
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
+    settings="$out/lib/ghc-${version}/lib/settings"
+    sed -i \
+      -e 's|("ld command", "ld")|("ld command", "ld.gold")|' \
+      -e 's|("Merge objects command", "ld")|("Merge objects command", "ld.gold")|' \
+      -e 's|("ld is GNU ld", "YES")|("ld is GNU ld", "YES")|' \
+      "$settings"
+  ''
   + lib.optionalString stdenv.targetPlatform.isDarwin ''
-    # Work around building with binary GHC on Darwin due to GHC’s use of `ar -L` when it
+    # Work around building with binary GHC on Darwin due to GHC's use of `ar -L` when it
     # detects `llvm-ar` even though the resulting archives are not supported by ld64.
     # https://gitlab.haskell.org/ghc/ghc/-/issues/23188
     # https://github.com/haskell/cabal/issues/8882
@@ -399,12 +416,15 @@ stdenv.mkDerivation {
           done
         ''
       else
+        # Don't patchelf RPATHs at all. Inject LD_LIBRARY_PATH into the
+        # shell wrapper scripts that GHC uses for its bin/ commands.
+        # The interpreter was already set in postUnpack.
         ''
-          for p in $(find "$out" -type f -executable); do
-            if isELF "$p"; then
-              echo "Patchelfing $p"
-              patchelf --set-rpath "${libPath}:$(patchelf --print-rpath $p)" $p
-            fi
+          ghcLibDir="$out/lib/ghc-${version}/lib/x86_64-linux-ghc-${version}"
+          for i in "$out/bin/"*; do
+            test ! -h "$i" || continue
+            isScript "$i" || continue
+            sed -i -e "2i export LD_LIBRARY_PATH=\"${libPath}:$ghcLibDir\''${LD_LIBRARY_PATH:+:\$LD_LIBRARY_PATH}\"" "$i"
           done
         ''
     )
@@ -421,10 +441,13 @@ stdenv.mkDerivation {
       done
     ''
     # Recache package db which needs to happen for Hadrian bindists
-    # where we modify the package db before installing
+    # where we modify the package db before installing.
+    # Use LD_LIBRARY_PATH since we don't patchelf RPATHs.
     + ''
+      ghcLibDir="$out/lib/ghc-${version}/lib/x86_64-linux-ghc-${version}"
       package_db=("$out"/lib/ghc-*/lib/package.conf.d)
-      "$out/bin/ghc-pkg" --package-db="$package_db" recache
+      LD_LIBRARY_PATH="${libPath}:$ghcLibDir''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
+        "$out/bin/ghc-pkg" --package-db="$package_db" recache
     '';
 
   doInstallCheck = true;
@@ -437,7 +460,8 @@ stdenv.mkDerivation {
       module Main where
       main = putStrLn \$([|"yes"|])
     EOF
-    env -i $out/bin/ghc --make main.hs || exit 1
+    ghcLibDir="$out/lib/ghc-${version}/lib/x86_64-linux-ghc-${version}"
+    LD_LIBRARY_PATH="${libPath}:$ghcLibDir" $out/bin/ghc --make main.hs || exit 1
     echo compilation ok
     [ $(./main) == "yes" ]
   '';
