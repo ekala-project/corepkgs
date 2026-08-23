@@ -72,7 +72,7 @@ in
     };
   };
 
-  config =
+  config = mkIf cfg.enable (
     let
       enabledPeers = filter (f: f.enable) (attrValues cfg.peers);
 
@@ -120,9 +120,9 @@ in
         };
       };
     in
-    mkIf cfg.enable {
+    {
       environment.etc = listToAttrs (map mkEtc enabledPeers);
-      services = listToAttrs (map mkService enabledPeers);
       environment.systemPackages = [ cfg.package ];
-    };
+    }
+  );
 }
