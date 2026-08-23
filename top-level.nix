@@ -104,7 +104,7 @@ with final;
   gdal = null;
   gitstatus = null;
   graphicsmagick = null;
-  graphviz = null;
+  # graphviz: provided by pkgs-many/graphviz (default: withoutXorg)
   grpc = null;
   gtkmm3 = null;
   gts = null;

@@ -1,4 +1,11 @@
 {
+  version,
+  src-hash,
+  withXorg ? false,
+  ...
+}@variantArgs:
+
+{
   lib,
   stdenv,
   fetchFromGitLab,
@@ -19,7 +26,6 @@
   bison,
   xorg,
   python3,
-  withXorg ? false,
 
   # for passthru.tests
   exiv2,
@@ -32,13 +38,13 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "graphviz";
-  version = "12.2.1";
+  inherit version;
 
   src = fetchFromGitLab {
     owner = "graphviz";
     repo = "graphviz";
     rev = version;
-    hash = "sha256-Uxqg/7+LpSGX4lGH12uRBxukVw0IswFPfpb2EkLsaiI=";
+    hash = src-hash;
   };
 
   nativeBuildInputs = [
@@ -68,7 +74,7 @@ stdenv.mkDerivation rec {
     "--with-ltdl-lib=${libtool.lib}/lib"
     "--with-ltdl-include=${libtool}/include"
   ]
-  ++ optional (xorg == null) "--without-x";
+  ++ optional (xorg == null || !withXorg) "--without-x";
 
   enableParallelBuilding = true;
 
