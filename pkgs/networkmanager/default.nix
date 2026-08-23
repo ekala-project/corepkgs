@@ -73,7 +73,8 @@ stdenv.mkDerivation (finalAttrs: {
   outputs = [
     "out"
     "dev"
-  ] ++ lib.optionals enableDocs [
+  ]
+  ++ lib.optionals enableDocs [
     "devdoc"
     "man"
     "doc"
@@ -179,7 +180,8 @@ stdenv.mkDerivation (finalAttrs: {
     perl
     elfutils
     udevCheckHook
-  ] ++ lib.optionals enableDocs [
+  ]
+  ++ lib.optionals enableDocs [
     gtk-doc
     libxslt
     docbook-xsl-nons
@@ -194,7 +196,8 @@ stdenv.mkDerivation (finalAttrs: {
 
     substituteInPlace meson.build \
       --replace "'vala', req" "'vala', native: false, req"
-  '' + lib.optionalString withSystemd ''
+  ''
+  + lib.optionalString withSystemd ''
     substituteInPlace data/NetworkManager.service.in \
       --replace-fail /usr/bin/busctl ${systemd}/bin/busctl
   '';
