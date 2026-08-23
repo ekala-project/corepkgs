@@ -92,6 +92,7 @@
   ./services/networking/bind.nix
   ./services/networking/unbound.nix
   ./services/networking/networkmanager.nix
+  ./services/networking/dnsmasq.nix
   ./services/networking/nginx.nix
   ./services/databases/postgresql.nix
   ./services/databases/redis.nix
