@@ -29,8 +29,7 @@
   # modemmanager,
   # TODO(corepkgs): Port openresolv
   # openresolv,
-  # TODO(corepkgs): Port libndp
-  # libndp,
+  libndp,
   newt,
   # TODO(corepkgs): Port ethtool
   # ethtool,
@@ -151,8 +150,7 @@ stdenv.mkDerivation (finalAttrs: {
     libpsl
     libuuid
     polkit
-    # TODO(corepkgs): Port libndp
-    # libndp
+    libndp
     curl
     # TODO(corepkgs): Port bluez5
     # bluez5
