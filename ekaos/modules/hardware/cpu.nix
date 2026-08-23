@@ -40,16 +40,12 @@ in
 
   config = mkMerge [
     (mkIf cfgAmd.updateMicrocode {
-      # TODO: requires amd-microcode package in core-pkgs
-      hardware.firmware = [ (pkgs.amd-microcode or (throw "amd-microcode package not available")) ];
+      hardware.firmware = [ pkgs.amd-microcode ];
       boot.initrd.kernelModules = [ "microcode" ];
     })
 
     (mkIf cfgIntel.updateMicrocode {
-      # TODO: requires intel-microcode package in core-pkgs
-      hardware.firmware = [
-        (pkgs.intel-microcode or (throw "intel-microcode package not available"))
-      ];
+      hardware.firmware = [ pkgs.intel-microcode ];
       boot.initrd.kernelModules = [ "microcode" ];
     })
   ];
