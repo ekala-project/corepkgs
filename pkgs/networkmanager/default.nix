@@ -9,30 +9,25 @@
   libuuid,
   polkit,
   gnutls,
-  # TODO(corepkgs): Port ppp
-  # ppp,
+  ppp,
   dhcpcd,
   iptables,
   nftables,
+  python3,
   vala,
   libgcrypt,
-  # TODO(corepkgs): Port dnsmasq
-  # dnsmasq,
-  # TODO(corepkgs): Port bluez5
-  # bluez5,
+  dnsmasq,
+  bluez,
   readline,
   libselinux,
   audit,
   gobject-introspection,
   perl,
-  # TODO(corepkgs): Port modemmanager
-  # modemmanager,
-  # TODO(corepkgs): Port openresolv
-  # openresolv,
+  modemmanager,
+  openresolv,
   libndp,
   newt,
-  # TODO(corepkgs): Port ethtool
-  # ethtool,
+  ethtool,
   gnused,
   iputils,
   kmod,
@@ -46,10 +41,11 @@
   docbook_xml_dtd_43,
   curl,
   meson,
+  mesonEmulatorHook,
   ninja,
   libpsl,
-  # TODO(corepkgs): Port mobile-broadband-provider-info
-  # mobile-broadband-provider-info,
+  mobile-broadband-provider-info,
+  buildPackages,
   systemd,
   udev,
   udevCheckHook,
@@ -59,6 +55,7 @@
 let
   # TODO(corepkgs): Enable docs when pygobject3 is available in python3.pkgs
   enableDocs = false;
+  isNative = stdenv.buildPlatform == stdenv.hostPlatform;
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "networkmanager";
@@ -100,43 +97,36 @@ stdenv.mkDerivation (finalAttrs: {
 
     # Features
     "-Diwd=true"
-    # TODO(corepkgs): Enable when ppp is ported
-    # "-Dpppd=${ppp}/bin/pppd"
-    "-Dppp=false"
+    "-Dpppd=${ppp}/bin/pppd"
     "-Diptables=${iptables}/bin/iptables"
     "-Dnft=${nftables}/bin/nft"
-    # TODO(corepkgs): Enable when modemmanager is ported
-    "-Dmodem_manager=false"
+    "-Dmodem_manager=true"
     "-Dnmtui=true"
-    # TODO(corepkgs): Enable when dnsmasq is ported
-    # "-Ddnsmasq=${dnsmasq}/bin/dnsmasq"
+    "-Ddnsmasq=${dnsmasq}/bin/dnsmasq"
     "-Dqt=false"
     "-Dnbft=false"
 
     # Handlers
-    # TODO(corepkgs): Enable when openresolv is ported
-    # "-Dresolvconf=${openresolv}/bin/resolvconf"
+    "-Dresolvconf=${openresolv}/bin/resolvconf"
 
     # DHCP clients
     "-Ddhcpcd=${dhcpcd}/bin/dhcpcd"
 
     # Miscellaneous
-    "-Ddocs=${lib.boolToString enableDocs}"
-    "-Dman=${lib.boolToString enableDocs}"
+    "-Ddocs=${lib.boolToString (enableDocs && isNative)}"
+    "-Dman=${lib.boolToString (enableDocs && isNative)}"
     "-Dtests=no"
     "-Dcrypto=gnutls"
-    # TODO(corepkgs): Enable when mobile-broadband-provider-info is ported
-    # "-Dmobile_broadband_provider_info_database=${mobile-broadband-provider-info}/share/mobile-broadband-provider-info/serviceproviders.xml"
+    "-Dmobile_broadband_provider_info_database=${mobile-broadband-provider-info}/share/mobile-broadband-provider-info/serviceproviders.xml"
   ];
 
   patches = [
     (replaceVars ./fix-paths.patch {
       inherit
         iputils
+        ethtool
         gnused
         ;
-      # TODO(corepkgs): Port ethtool; using placeholder for now
-      ethtool = "/run/current-system/sw";
       runtimeShell = "${stdenv.shell}";
     })
 
@@ -150,12 +140,13 @@ stdenv.mkDerivation (finalAttrs: {
     libpsl
     libuuid
     polkit
+    ppp
     libndp
     curl
-    # TODO(corepkgs): Port bluez5
-    # bluez5
-    # TODO(corepkgs): Port modemmanager
-    # modemmanager
+    mobile-broadband-provider-info
+    bluez
+    dnsmasq
+    modemmanager
     readline
     newt
     jansson
@@ -177,7 +168,11 @@ stdenv.mkDerivation (finalAttrs: {
     gobject-introspection
     perl
     elfutils
+    python3
     udevCheckHook
+  ]
+  ++ lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
+    mesonEmulatorHook
   ]
   ++ lib.optionals enableDocs [
     gtk-doc
@@ -203,6 +198,11 @@ stdenv.mkDerivation (finalAttrs: {
   preBuild = lib.optionalString enableDocs ''
     mkdir -p ${placeholder "out"}/lib
     ln -s $PWD/src/libnm-client-impl/libnm.so.0 ${placeholder "out"}/lib/libnm.so.0
+  '';
+
+  postFixup = lib.optionalString (!isNative && enableDocs) ''
+    cp -r ${buildPackages.networkmanager.devdoc} $devdoc
+    cp -r ${buildPackages.networkmanager.man} $man
   '';
 
   mesonBuildType = "release";
