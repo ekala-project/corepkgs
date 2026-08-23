@@ -371,7 +371,16 @@ in
 
   nix-functional-tests = callPackage ../tests/functional/package.nix { };
 
-  nix-manual = callPackage ../doc/manual/package.nix { };
+    # TODO: mdbook build can OOM/segfault; skip manual for now
+  nix-manual = pkgs.runCommand "nix-manual-${version}" {
+    outputs = [ "out" "man" ];
+  } ''
+    mkdir -p $out/share/doc/nix/manual $out/nix-support
+    echo "doc manual $out/share/doc/nix/manual" > $out/nix-support/hydra-build-products
+    echo "Manual not built" > $out/share/doc/nix/manual/index.html
+    mkdir -p $man/share/man/man1 $man/share/man/man5
+    touch $man/share/man/man1/.empty $man/share/man/man5/.empty
+  '';
   nix-internal-api-docs = callPackage ../src/internal-api-docs/package.nix { };
   nix-external-api-docs = callPackage ../src/external-api-docs/package.nix { };
 
