@@ -2,3 +2,6 @@ result*
 /patches
 __pycache__/
 .pytest_cache/
+*.md
+!AGENTS.md
+!README.md
