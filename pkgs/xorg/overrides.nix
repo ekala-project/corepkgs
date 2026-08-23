@@ -30,8 +30,11 @@
   libepoxy,
   libxcrypt,
   xorg,
+  xorgproto,
   xtrans,
   libxcvt,
+  libxshmfence,
+  libpciaccess,
   pixman,
   libgbm,
   mesa-gl-headers,
@@ -65,6 +68,16 @@ let
     });
 in
 self: super: {
+  # Packages that were moved out of the xorg generated set to standalone
+  # top-level packages but are still needed in the xorg scope for callPackage
+  # resolution and xorg.* references in overrides.
+  inherit
+    xorgproto
+    libpciaccess
+    libxshmfence
+    libx11
+    ;
+
   wrapWithXFileSearchPathHook = callPackage (
     {
       makeBinaryWrapper,
