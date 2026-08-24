@@ -6,7 +6,7 @@
   kernelModuleMakeFlags,
   nixosTests,
   flex,
-  coccinelle,
+  coccinelle ? throw "drbd requires coccinelle",
   python3,
 }:
 

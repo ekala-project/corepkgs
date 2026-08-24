@@ -4,7 +4,7 @@
   kernel,
   kernelModuleMakeFlags,
   bash,
-  lenovo-legion,
+  lenovo-legion ? throw "lenovo-legion-module requires lenovo-legion",
 }:
 
 stdenv.mkDerivation {

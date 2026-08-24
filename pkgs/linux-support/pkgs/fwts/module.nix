@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  fwts,
+  fwts ? throw "fwts-efi-runtime requires fwts",
   kernel,
   kernelModuleMakeFlags,
 }:

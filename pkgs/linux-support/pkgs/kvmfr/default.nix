@@ -3,7 +3,7 @@
   stdenv,
   kernel,
   kernelModuleMakeFlags,
-  looking-glass-client,
+  looking-glass-client ? throw "kvmfr requires looking-glass-client",
 }:
 
 stdenv.mkDerivation {
