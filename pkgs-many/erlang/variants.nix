@@ -8,7 +8,7 @@
     hash = "sha256-7fA+raUlkNcjAmbV6NkZolty3SPxMTt/M9drjtVn5Ig=";
   };
   v28 = {
-    version = "28.3";
-    hash = "sha256-Kn6JYy7EIiBT2pTfh8S9uHCsLS9EZlv3NBFxbYmHXJA=";
+    version = "28.5.0.5";
+    hash = "sha256-dlAQcVdKYNsxY7XHMPgr25/X/1hEQP/jXUnj4IgvHIc=";
   };
 }
