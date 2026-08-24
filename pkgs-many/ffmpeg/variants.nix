@@ -16,8 +16,8 @@
   };
 
   v8 = {
-    version = "8.0";
-    src-hash = "sha256-okNZ1/m/thFAY3jK/GSV0+WZFnjrMr8uBPsOdH6Wq9E=";
+    version = "8.1.2";
+    src-hash = "sha256-wJ3c8VVo/tK84K7bKYs/UWcln4mSO+tf/w5NLNjKhiI=";
   };
 
   # Build-type variants
