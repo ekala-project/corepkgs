@@ -50,8 +50,8 @@
   };
 
   v9 = rec {
-    version = "9.3.1";
-    hash = "sha256-smbV/2uQ6tptw7IMsJDjcxMC5VOifF0+TfHw12vq/wY=";
+    version = "9.5.1";
+    hash = "sha256-uvwUG2Ga1jUP2XX8kDFW3VwVGZjMiwWOjBBEq197Ax8=";
     # Gradle 9 uses JDK 21 by default
     defaultJavaSelector = (p: p.v21);
     meta = { };
