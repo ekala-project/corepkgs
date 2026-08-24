@@ -25,8 +25,8 @@
   };
 
   v3_6 = {
-    version = "3.6.0";
-    src-hash = "sha256-tqX0S362nj+jXb8VUkQFtEg3pIHUPYHa3d4/8h/LuOk=";
+    version = "3.6.3";
+    src-hash = "sha256-JDqGZJz28j7rai/yRW4J5dd92QGKVNPZawxr3Wumx/E=";
     nix-ssl-cert-file-patch = ./3.0/nix-ssl-cert-file.patch;
     kernel-detection-patch = ./3.0/openssl-disable-kernel-detection.patch;
     use-etc-ssl-certs-patch = ./3.5/use-etc-ssl-certs.patch;
