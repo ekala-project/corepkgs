@@ -129,6 +129,7 @@ stdenv.mkDerivation (finalAttrs: rec {
     libPrefix = "tcl${release}";
     libdir = "lib/${libPrefix}";
     pkgs = callFromScope ./pkgs {
+      inherit lib;
       tcl = finalAttrs.finalPackages;
     };
     mkTclDerivation = callPackage ./mk-tcl-derivation.nix { tcl = finalAttrs.finalPackage; };
