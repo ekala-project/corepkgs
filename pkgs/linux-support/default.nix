@@ -194,7 +194,10 @@ lib.makeScope pkgs.newScope (
 
           ch9344 = callPackage ./pkgs/ch9344 { };
 
-          # chipsec removed: references non-existent nixpkgs path
+          chipsec = callPackage ./pkgs/chipsec {
+            inherit kernel;
+            withDriver = true;
+          };
 
           cryptodev = callPackage ./pkgs/cryptodev { };
 
