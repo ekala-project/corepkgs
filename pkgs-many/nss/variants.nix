@@ -1,13 +1,13 @@
 {
   esr = {
-    version = "3.112.2";
-    hash = "sha256-hK0TovR0LrVkB96BwCnhwaljDSElR85fnobzCa9+uKo=";
+    version = "3.112.5";
+    hash = "sha256-+u29CbE5IyapF5w4IeBXDiiNK7usVn30C08G5FWVC88=";
     versionRegex = "NSS_(3)_(112)(?:_(\\d+))?_RTM";
   };
 
   latest = {
-    version = "3.121";
-    hash = "sha256-zloUvwiaT/ivyhxMrEzPKHOKySgGFUzV1Kr9pEC0g3w=";
+    version = "3.127";
+    hash = "sha256-SiaKDkDTHqhTCs/pcwOAk0lgIayeMKOwGLAZr9WKS4Q=";
     versionRegex = "NSS_(\\d+)_(\\d+)(?:_(\\d+))?_RTM";
     extraMeta = {
       # NOTE: Whenever you updated this version check if the `cacert` package also
