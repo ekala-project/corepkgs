@@ -4,7 +4,7 @@
   binutils,
   busybox,
   bootstrapTools,
-  hello,
+  diffutils,
 }:
 
 derivation {
@@ -61,8 +61,8 @@ derivation {
     $CXX -v -o $out/bin/bar bar.cc
     $out/bin/bar
 
-    tar xvf ${hello.src}
-    cd hello-*
+    tar xvf ${diffutils.src}
+    cd diffutils-*
     ./configure --prefix=$out
     make
     make install

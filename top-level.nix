@@ -52,6 +52,10 @@ with final;
   closureInfo = callPackage ./build-support/closure-info.nix { };
   nix-gitignore = callPackage ./build-support/nix-gitignore { };
 
+  freshBootstrapTools = import ./stdenv/linux/make-bootstrap-tools.nix {
+    pkgs = final;
+  };
+
   # qemu-utils alias for compatibility (qemu package provides qemu-img and utilities)
   qemu-utils = qemu;
 
