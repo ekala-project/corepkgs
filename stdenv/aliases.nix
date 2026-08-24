@@ -82,9 +82,9 @@ mapAliases {
   guile_2_0 = guile.v2_0;
   guile_2_2 = guile.v2_2;
   guile_3_0 = guile.v3_0;
-  icu60 = icu.icu60;
-  icu63 = icu.icu63;
-  icu64 = icu.icu64;
+  icu60 = icu.v60;
+  icu63 = icu.v63;
+  icu64 = icu.v64;
   icu66 = icu.v66;
   icu67 = icu.v67;
   icu69 = icu.v69;
