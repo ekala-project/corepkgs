@@ -4,7 +4,7 @@
   buildPerlModule,
   fetchFromGitHub,
   fetchurl,
-  kent,
+  kent ? throw "Bio-BigFile requires kent (ucsc genome browser tools)",
   lib,
   libmysqlclient,
   libpng,
