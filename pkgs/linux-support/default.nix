@@ -194,10 +194,7 @@ lib.makeScope pkgs.newScope (
 
           ch9344 = callPackage ./pkgs/ch9344 { };
 
-          chipsec = callPackage ../pkgs/tools/security/chipsec {
-            inherit kernel;
-            withDriver = true;
-          };
+          # chipsec removed: references non-existent nixpkgs path
 
           cryptodev = callPackage ./pkgs/cryptodev { };
 
@@ -215,10 +212,7 @@ lib.makeScope pkgs.newScope (
 
           dpdk-kmods = callPackage ./pkgs/dpdk-kmods { };
 
-          ecapture = callPackage ../pkgs/by-name/ec/ecapture/package.nix {
-            withNonBTF = true;
-            inherit kernel;
-          };
+          # ecapture removed: references non-existent nixpkgs path
 
           evdi = callPackage ./pkgs/evdi { };
 
@@ -256,7 +250,7 @@ lib.makeScope pkgs.newScope (
 
           lenovo-legion-module = callPackage ./pkgs/lenovo-legion { };
 
-          linux-gpib = callPackage ../pkgs/applications/science/electronics/linux-gpib/kernel.nix { };
+          # linux-gpib removed: references non-existent nixpkgs path
 
           liquidtux = callPackage ./pkgs/liquidtux { };
 
@@ -347,9 +341,7 @@ lib.makeScope pkgs.newScope (
 
           rtw89 = if lib.versionOlder kernel.version "5.16" then callPackage ./pkgs/rtw89 { } else null;
 
-          openafs_1_8 = callPackage ../pkgs/servers/openafs/1.8/module.nix { };
-          # Current stable release; don't backport release updates!
-          openafs = openafs_1_8;
+          # openafs_1_8 and openafs removed: references non-existent nixpkgs path
 
           opensnitch-ebpf =
             if lib.versionAtLeast kernel.version "5.10" then callPackage ./pkgs/opensnitch-ebpf { } else null;
@@ -387,7 +379,7 @@ lib.makeScope pkgs.newScope (
 
           isgx = callPackage ./pkgs/isgx { };
 
-          rr-zen_workaround = callPackage ../pkgs/development/tools/analysis/rr/zen_workaround.nix { };
+          # rr-zen_workaround removed: references non-existent nixpkgs path
 
           sheep-net = callPackage ./pkgs/sheep-net { };
 
@@ -395,7 +387,7 @@ lib.makeScope pkgs.newScope (
 
           sysdig = callPackage ./pkgs/sysdig { };
 
-          systemtap = callPackage ../pkgs/development/tools/profiling/systemtap { };
+          # systemtap removed: references non-existent nixpkgs path
 
           system76 = callPackage ./pkgs/system76 { };
 
@@ -424,7 +416,7 @@ lib.makeScope pkgs.newScope (
           veikk-linux-driver = callPackage ./pkgs/veikk-linux-driver { };
           vendor-reset = callPackage ./pkgs/vendor-reset { };
 
-          vhba = callPackage ../pkgs/applications/emulators/cdemu/vhba.nix { };
+          # vhba removed: references non-existent nixpkgs path
 
           virtio_vmmci = callPackage ./pkgs/virtio_vmmci { };
 
@@ -432,9 +424,7 @@ lib.makeScope pkgs.newScope (
             virtualbox = pkgs.virtualboxHardened;
           };
 
-          virtualboxGuestAdditions =
-            callPackage ../pkgs/applications/virtualization/virtualbox/guest-additions
-              { };
+          # virtualboxGuestAdditions removed: references non-existent nixpkgs path
 
           mm-tools = callPackage ./pkgs/mm-tools { };
 
