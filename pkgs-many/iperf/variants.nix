@@ -6,8 +6,8 @@
   };
 
   v3 = {
-    version = "3.20";
-    hash = "sha256-OsxXLR7MpOCyA1nHvwEy3cgNmC7+7iDIb2cmqaYJQ4g=";
+    version = "3.21";
+    hash = "sha256-ZW5EBevWIBId587KPq9DqI956huFfQQaagsTFIAazdg=";
     isVersion2 = false;
   };
 }
