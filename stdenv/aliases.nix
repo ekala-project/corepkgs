@@ -69,7 +69,7 @@ mapAliases {
   ffmpeg_8-headless = ffmpeg.v4.headless;
   flang_20 = llvm.v20.pkgs.flang;
   flang_21 = llvm.v21.pkgs.flang;
-  flex_2_5_39 = flex.v2_5_39;
+  flex_2_5_39 = flex.v2_5;
   fuse3 = fuse;
   gmp6 = gmp.v6_3;
   gmpxx = gmp.withCxx;
