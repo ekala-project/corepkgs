@@ -25,6 +25,17 @@
     brotliSupport = true;
   };
 
+  v8_21 = rec {
+    version = "8.21.0";
+    hash = "sha256-qhtmpw6s6D3GJFCHRWRsCK5WHeUSq0A63/uTrIf8cuY=";
+    idnSupport = true;
+    pslSupport = true;
+    zstdSupport = true;
+    http3Support = true;
+    c-aresSupport = true;
+    brotliSupport = true;
+  };
+
   full = { };
 
   gnutls = {
