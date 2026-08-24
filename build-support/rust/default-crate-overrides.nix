@@ -13,7 +13,7 @@
   dbus,
   dbus-glib,
   fontconfig,
-  foundationdb,
+  foundationdb ? null,
   freetype,
   gdk-pixbuf,
   glib,
@@ -122,17 +122,11 @@
   };
 
   foundationdb-sys = attrs: {
-    buildInputs = [ foundationdb ];
-    # needed for 0.4+ release, when the FFI bindings are auto-generated
-    #
-    # patchPhase = ''
-    #   substituteInPlace ./foundationdb-sys/build.rs \
-    #     --replace /usr/local/include ${foundationdb.dev}/include
-    # '';
+    buildInputs = lib.optional (foundationdb != null) foundationdb;
   };
 
   foundationdb = attrs: {
-    buildInputs = [ foundationdb ];
+    buildInputs = lib.optional (foundationdb != null) foundationdb;
   };
 
   freetype-sys = attrs: {
