@@ -162,6 +162,7 @@ let
     // {
       # These should never be spliced under any circumstances
       inherit (pkgs)
+        lib
         pkgsBuildBuild
         pkgsBuildHost
         pkgsBuildTarget
