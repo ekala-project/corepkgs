@@ -1,7 +1,7 @@
 {
   stdenv,
   lib,
-  blackmagic-desktop-video,
+  blackmagic-desktop-video ? throw "decklink requires unfree blackmagic-desktop-video",
   kernel,
 }:
 stdenv.mkDerivation (finalAttrs: {
