@@ -3,10 +3,10 @@
 mkManyVariants {
   variants = ./variants.nix;
   aliases = {
-    r = "v4_4";
-    rLang = "v4_4";
+    r = "v4_6";
+    rLang = "v4_6";
   };
-  defaultSelector = (p: p.v4_4);
+  defaultSelector = (p: p.v4_6);
   genericBuilder = ./generic.nix;
   inherit callPackage;
 }
