@@ -1,7 +1,6 @@
 {
   lib,
   buildEnv,
-  nix-prefetch-bzr,
   nix-prefetch-cvs,
   nix-prefetch-darcs,
   nix-prefetch-git,
@@ -13,7 +12,6 @@ buildEnv {
   name = "nix-prefetch-scripts";
 
   paths = [
-    nix-prefetch-bzr
     nix-prefetch-cvs
     nix-prefetch-darcs
     nix-prefetch-git
