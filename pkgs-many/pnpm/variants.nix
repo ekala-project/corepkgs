@@ -18,12 +18,12 @@
   };
 
   v10 = {
-    version = "10.33.4";
-    hash = "sha256-jnDdxmSbGLw9iVzzqQjAKR6kw4A5rYcixH4Bja8enPw=";
+    version = "10.34.5";
+    hash = "sha256-zLXEecqxsAYhMlv+fUyaioAx56Ul1ySeJ17L7IGwjbI=";
   };
 
   v11 = {
-    version = "11.1.2";
-    hash = "sha256-v+TSssejIQVlu6YpKfnv5JPrXyRicgGhAupFFOroz4A=";
+    version = "11.22.0";
+    hash = "sha256-V6l+byOj+v/AMVOk74x3CgVSYSuGQK6+Ob/dV1TQ69w=";
   };
 }
