@@ -45,6 +45,10 @@ stdenv.mkDerivation (
       "dev"
     ];
 
+    env.NIX_CFLAGS_COMPILE = toString [
+      "-Wno-incompatible-pointer-types"
+    ];
+
     # Required when regenerated the configure script to make sure the vendored macros are found.
     autoreconfFlags = [
       "-fi"
