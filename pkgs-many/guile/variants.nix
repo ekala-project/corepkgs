@@ -18,8 +18,8 @@
   };
 
   v3_0 = {
-    version = "3.0.10";
-    src-hash = "sha256-vXFoUX/VJjM0RtT3q4FlJ5JWNAlPvTcyLhfiuNjnY4g=";
+    version = "3.0.11";
+    src-hash = "sha256-gYx50jZlen+pb7NkE3zHtBs73uDWXGF0ygN2lVlXlGA=";
     setupHook = ./setup-hook-3.0.sh;
   };
 }
