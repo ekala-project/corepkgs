@@ -21,9 +21,9 @@
     gitRelease = null;
   };
   v21 = {
-    version = "21.1.2";
+    version = "21.1.8";
     officialRelease = {
-      sha256 = "sha256-SgZdBL0ivfv6/4EqmPQ+I57qT2t6i/rqnm20+T1BsFY=";
+      sha256 = "sha256-pgd8g9Yfvp7abjCCKSmIn1smAROjqtfZaJkaUkBSKW0=";
     };
     gitRelease = null;
   };
