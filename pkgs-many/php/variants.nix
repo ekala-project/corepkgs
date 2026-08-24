@@ -6,20 +6,20 @@
   };
 
   v82 = {
-    version = "8.2.27";
+    version = "8.2.33";
     # PHP 8.2 (Active support)
-    src-hash = "sha256-PuyRKU2MCbPfgLOew21XTtmwXeTIr8sl+iFdSPnsvGs=";
+    src-hash = "sha256-+96s6bOCIENqTI/Xm5AN+Sh4FR2xReZBdQdDooO1FME=";
   };
 
   v83 = {
-    version = "8.3.15";
+    version = "8.3.33";
     # PHP 8.3 (Latest stable, active support)
-    src-hash = "sha256-PfXUVjcoP3We74/DzgPegp3tPiAMPaJ4k2poSVXS+U8=";
+    src-hash = "sha256-4pPtYgzsdGUbtKBxMXiSpHiqaED6si20XHLXfNQvlnY=";
   };
 
   v84 = {
-    version = "8.4.2";
+    version = "8.4.24";
     # PHP 8.4 (Latest)
-    src-hash = "sha256-kmNkUyEPfyF01u5t8XpYETaPVWpsLCy88BkyHjZFbgE=";
+    src-hash = "sha256-4Se+CahQb0Mnxc+nimFLANIQcUSE7CFc4AEbSgPABzE=";
   };
 }
