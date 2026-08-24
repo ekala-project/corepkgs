@@ -41,7 +41,7 @@
   seatd, # =libseat
   sqlite,
   udev,
-  webkitgtk_4_1,
+  webkitgtk_4_1 ? null,
   zlib,
   buildPackages,
   ...
@@ -241,7 +241,7 @@
 
   javascriptcore-rs-sys = attrs: {
     nativeBuildInputs = [ pkg-config ];
-    buildInputs = [ webkitgtk_4_1 ];
+    buildInputs = lib.optional (webkitgtk_4_1 != null) webkitgtk_4_1;
   };
 
   nettle-sys = attrs: {
@@ -372,7 +372,7 @@
 
   webkit2gtk-sys = attrs: {
     nativeBuildInputs = [ pkg-config ];
-    buildInputs = [ webkitgtk_4_1 ];
+    buildInputs = lib.optional (webkitgtk_4_1 != null) webkitgtk_4_1;
     extraLinkFlags = [ "-L${zlib.out}/lib" ];
   };
 
