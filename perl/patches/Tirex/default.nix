@@ -6,7 +6,7 @@
   IPCShareLite,
   JSON,
   LWP,
-  mapnik,
+  mapnik ? throw "Tirex requires mapnik",
   boost,
   nix-update-script,
   pkg-config,
