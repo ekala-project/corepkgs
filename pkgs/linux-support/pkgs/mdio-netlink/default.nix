@@ -2,7 +2,7 @@
   lib,
   stdenv,
   kernel,
-  mdio-tools,
+  mdio-tools ? throw "mdio-netlink requires mdio-tools",
 }:
 
 stdenv.mkDerivation {

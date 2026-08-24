@@ -161,7 +161,6 @@ lib.makeScope pkgs.newScope (
             "KBUILD_OUTPUT=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
           ];
           # Obsolete aliases (these packages do not depend on the kernel).
-          inherit (pkgs) odp-dpdk pktgen; # added 2018-05
           inherit (pkgs) bcc bpftrace; # added 2021-12
           inherit (pkgs) oci-seccomp-bpf-hook; # added 2022-11
           inherit (pkgs) dpdk; # added 2024-03
@@ -304,7 +303,7 @@ lib.makeScope pkgs.newScope (
 
           nxp-pn5xx = callPackage ./pkgs/nxp-pn5xx { };
 
-          openrazer = callPackage ./pkgs/openrazer/driver.nix { };
+          # openrazer removed: references non-existent path ../pkgs/development/python-modules/openrazer/common.nix
 
           ply = callPackage ./pkgs/ply { };
 
@@ -423,9 +422,7 @@ lib.makeScope pkgs.newScope (
 
           virtio_vmmci = callPackage ./pkgs/virtio_vmmci { };
 
-          virtualbox = callPackage ./pkgs/virtualbox {
-            virtualbox = pkgs.virtualboxHardened;
-          };
+          virtualbox = throw "linuxPackages.virtualbox requires virtualboxHardened which is not available";
 
           # virtualboxGuestAdditions removed: references non-existent nixpkgs path
 
@@ -501,8 +498,8 @@ lib.makeScope pkgs.newScope (
           xmm7360-pci = throw "Support for the XMM7360 WWAN card was added to the iosm kmod in mainline kernel version 5.18";
           amdgpu-pro = throw "amdgpu-pro was removed due to lack of maintenance"; # Added 2024-06-16
           kvdo = throw "kvdo was removed, because it was added to mainline in kernel version 6.9"; # Added 2024-07-08
-          system76-power = lib.warnOnInstantiate "kernelPackages.system76-power is now pkgs.system76-power" pkgs.system76-power; # Added 2024-10-16
-          system76-scheduler = lib.warnOnInstantiate "kernelPackages.system76-scheduler is now pkgs.system76-scheduler" pkgs.system76-scheduler; # Added 2024-10-16
+          system76-power = throw "linuxPackages.system76-power has been removed"; # Added 2024-10-16
+          system76-scheduler = throw "linuxPackages.system76-scheduler has been removed"; # Added 2024-10-16
           tuxedo-keyboard = self.tuxedo-drivers; # Added 2024-09-28
           phc-intel = throw "phc-intel drivers are no longer supported by any kernel >=4.17"; # added 2025-07-18
           prl-tools = throw "Parallel Tools no longer provide any kernel module, please use pkgs.prl-tools instead."; # added 2025-10-04

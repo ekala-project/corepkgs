@@ -8,7 +8,7 @@
   flex,
   bison,
   bc,
-  opensnitch,
+  opensnitch ? throw "opensnitch-ebpf requires opensnitch",
   nixosTests,
 }:
 

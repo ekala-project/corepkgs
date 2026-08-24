@@ -3,7 +3,7 @@
   stdenv,
   fetchFromGitHub,
   kernel,
-  klibc,
+  klibc ? throw "v86d requires klibc",
 }:
 
 let
