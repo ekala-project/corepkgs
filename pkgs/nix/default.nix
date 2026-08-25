@@ -28,6 +28,13 @@ let
         ;
     };
 
+  # Nix >= 2.33 requires boost >= 1.87
+  nixDependencies187 = nixDependencies.overrideScope (
+    final: prev: {
+      boost = pkgs.boost.v1_87;
+    }
+  );
+
   # Intentionally does not support overrideAttrs etc
   # Use only for tests that are about the package relation to `pkgs` and/or NixOS.
   addTestsShallowly =
@@ -182,14 +189,29 @@ lib.makeExtensible (
 
       nix_2_32 = addTests "nix_2_32" self.nixComponents_2_32.nix-everything;
 
-      nixComponents_git = nixDependencies.callPackage ./modular/packages.nix rec {
-        version = "2.33pre20251107_${lib.substring 0 8 src.rev}";
+      nixComponents_2_33 = nixDependencies187.callPackage ./modular/packages.nix rec {
+        nixDependencies = nixDependencies187;
+        version = "2.33.6";
+        otherSplices = generateSplicesForNixComponents "nixComponents_2_33";
+        src = fetchFromGitHub {
+          owner = "NixOS";
+          repo = "nix";
+          tag = version;
+          hash = "sha256-I3A0vFSFg3iI8tGBuQlAy7DzcxYcG39b06rfKOzGRvc=";
+        };
+      };
+
+      nix_2_33 = addTests "nix_2_33" self.nixComponents_2_33.nix-everything;
+
+      nixComponents_git = nixDependencies187.callPackage ./modular/packages.nix rec {
+        nixDependencies = nixDependencies187;
+        version = "2.34pre20260825_${lib.substring 0 8 src.rev}";
         otherSplices = generateSplicesForNixComponents "nixComponents_git";
         src = fetchFromGitHub {
           owner = "NixOS";
           repo = "nix";
-          rev = "479b6b73a9576452c14ca66b7f3cd4873969077e";
-          hash = "sha256-eBjgsauQXFz2yeiNoPEzgkf7uyV+S8HYCQgZhPVx/9I=";
+          rev = "3aef07e8fe2dc4b226515ecd536b3002c93577c7";
+          hash = "sha256-78tbhNekla4TxDb1FEzt6kPybcoueszGFpjqC1CuLBU=";
         };
       };
 
