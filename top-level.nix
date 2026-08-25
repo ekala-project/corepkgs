@@ -485,29 +485,15 @@ with final;
     wrapGas = true;
   };
 
+  buildXorgPackage = callPackage ./build-support/xorg { };
+
   xorg =
     let
-      # Use `lib.callPackageWith __splicedPackages` rather than plain `callPackage`
-      # so as not to have the newly bound xorg items already in scope,  which would
-      # have created a cycle.
-      overrides = lib.callPackageWith __splicedPackages ./pkgs/xorg/overrides.nix {
-        # TODO(corepkgs): support dawrin
-        # inherit (buildPackages.darwin) bootstrap_cmds;
-        udev = if stdenv.hostPlatform.isLinux then udev else null;
-        libdrm = if stdenv.hostPlatform.isLinux then libdrm else null;
-      };
-
-      # TODO(corepkgs): Move xorg's generated to a generated.nix, and move the package set
-      # logic into a default.nix
-      generatedPackages = lib.callPackageWith __splicedPackages ./pkgs/xorg { };
-
-      xorgPackages = makeScopeWithSplicing' {
-        otherSplices = generateSplicesForMkScope "xorg";
-        f = lib.extends overrides generatedPackages;
-      };
-
+      # Backward-compatibility alias set: maps legacy xorg.* attr names to top-level packages.
+      aliases = import ./pkgs/xorg { inherit lib; };
+      aliasSet = aliases __splicedPackages;
     in
-    lib.recurseIntoAttrs xorgPackages;
+    lib.recurseIntoAttrs aliasSet;
 
   dbus = callPackage ./pkgs/dbus { };
   makeDBusConf = callPackage ./pkgs/dbus/make-dbus-conf.nix { };
