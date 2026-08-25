@@ -26,7 +26,8 @@ mkMesonExecutable (finalAttrs: {
   ];
 
   mesonFlags = [
-  ];
+  ]
+  ++ lib.optional (lib.versionAtLeast version "2.35") (lib.mesonEnable "mimalloc" false);
 
   meta = {
     mainProgram = "nix";
