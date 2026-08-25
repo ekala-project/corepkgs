@@ -15,7 +15,11 @@
   cups ? null,
   fontconfig ? null,
   freetype ? null,
-  xorg ? { },
+  libx11 ? null,
+  libxext ? null,
+  libxi ? null,
+  libxrender ? null,
+  libxtst ? null,
   zlib,
   callPackage,
 }:
@@ -83,11 +87,11 @@ stdenv.mkDerivation (finalAttrs: {
     ++ lib.optionals (cups != null) [ cups ]
     ++ lib.optionals (fontconfig != null) [ fontconfig ]
     ++ lib.optionals (freetype != null) [ freetype ]
-    ++ lib.optionals (xorg.libX11 or null != null) [ xorg.libX11 ]
-    ++ lib.optionals (xorg.libXext or null != null) [ xorg.libXext ]
-    ++ lib.optionals (xorg.libXi or null != null) [ xorg.libXi ]
-    ++ lib.optionals (xorg.libXrender or null != null) [ xorg.libXrender ]
-    ++ lib.optionals (xorg.libXtst or null != null) [ xorg.libXtst ]
+    ++ lib.optionals (libx11 or null != null) [ libx11 ]
+    ++ lib.optionals (libxext or null != null) [ libxext ]
+    ++ lib.optionals (libxi or null != null) [ libxi ]
+    ++ lib.optionals (libxrender or null != null) [ libxrender ]
+    ++ lib.optionals (libxtst or null != null) [ libxtst ]
   );
 
   # Patch ELF files, but exclude jmods

@@ -43,7 +43,7 @@
   unixODBC,
   wrapGAppsHook3 ? null,
   wxGTK32 ? null,
-  xorg,
+  libx11,
   zlib,
 }:
 let
@@ -61,7 +61,7 @@ let
         libGL
         libGLU
         wxGTK32
-        xorg.libX11
+        libx11
         wrapGAppsHook3
       ];
 

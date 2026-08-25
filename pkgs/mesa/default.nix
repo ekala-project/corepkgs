@@ -42,7 +42,10 @@
   libxcb,
   libxshmfence,
   xcbutilkeysyms,
-  xorg,
+  libxext,
+  libXfixes,
+  libXrandr,
+  libXxf86vm,
   xorgproto,
   zstd,
   enablePatentEncumberedCodecs ? true,
@@ -275,11 +278,11 @@ stdenv.mkDerivation {
     libva-minimal
     libx11
     libxcb
-    xorg.libXext
-    xorg.libXfixes
-    xorg.libXrandr
+    libxext
+    libXfixes
+    libXrandr
     libxshmfence
-    xorg.libXxf86vm
+    libXxf86vm
     llvmPackages.clang
     llvmPackages.clang-unwrapped
     llvmPackages.libclc
