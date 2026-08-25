@@ -30,6 +30,7 @@
   compileSchemas ? stdenv.hostPlatform.emulatorAvailable buildPackages,
   fribidi,
   xorg,
+  libxinerama,
   libepoxy,
   libxkbcommon,
   libxml2,
@@ -185,7 +186,7 @@ stdenv.mkDerivation (finalAttrs: {
     wayland-protocols
   ]
   ++ lib.optionals xineramaSupport [
-    xorg.libXinerama
+    libxinerama
   ]
   ++ lib.optionals cupsSupport [
     cups

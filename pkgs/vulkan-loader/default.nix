@@ -8,12 +8,11 @@
   libxau,
   libxcb,
   libxdmcp,
-  xorg,
-  libxrandr ? xorg.libXrandr,
+  libXrandr ? null,
   wayland,
   vulkan-headers,
   addDriverRunpath,
-  enableX11 ? (libxrandr != null),
+  enableX11 ? (libXrandr != null),
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -41,7 +40,7 @@ stdenv.mkDerivation (finalAttrs: {
     libxau
     libxcb
     libxdmcp
-    libxrandr
+    libXrandr
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
     wayland
