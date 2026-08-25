@@ -8,6 +8,7 @@
   nix-store,
   nix-store-c,
   nix-store-test-support,
+  openssl,
   sqlite,
 
   rapidcheck,
@@ -60,6 +61,7 @@ mkMesonExecutable (finalAttrs: {
         runCommand "${finalAttrs.pname}-run"
           {
             meta.broken = !stdenv.hostPlatform.emulatorAvailable buildPackages;
+            nativeBuildInputs = lib.optional (lib.versionAtLeast version "2.34") openssl;
             buildInputs = [ writableTmpDirAsHomeHook ];
           }
           ''

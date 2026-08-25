@@ -6,6 +6,7 @@
   nix-store,
   nix-store-c,
 
+  gtest,
   rapidcheck,
 
   # Configuration Options
@@ -24,7 +25,8 @@ mkMesonLibrary (finalAttrs: {
     nix-store
     nix-store-c
     rapidcheck
-  ];
+  ]
+  ++ lib.optional (lib.versionAtLeast version "2.34") gtest;
 
   mesonFlags = [
   ];
