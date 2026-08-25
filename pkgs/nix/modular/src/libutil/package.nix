@@ -11,6 +11,7 @@
   libsodium,
   nlohmann_json,
   openssl,
+  zstd,
 
   # Configuration Options
 
@@ -37,7 +38,8 @@ mkMesonLibrary (finalAttrs: {
     boost
     libarchive
     nlohmann_json
-  ];
+  ]
+  ++ lib.optional (lib.versionAtLeast version "2.35") zstd;
 
   mesonFlags = [
     (lib.mesonEnable "cpuid" stdenv.hostPlatform.isx86_64)
