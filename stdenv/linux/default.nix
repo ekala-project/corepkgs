@@ -769,7 +769,11 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
           prevStage.patchelf
           # Many tarballs come with obsolete config.sub/config.guess that don't recognize aarch64.
           prevStage.updateAutotoolsGnuConfigScriptsHook
-        ];
+        ]
+        # Write the .note.nixos.ldcache resolution cache into every output's
+        # ELF files (read by the patched glibc, hence glibc hosts only; a musl
+        # bootstrap would pay the patchelf pass for notes no loader reads).
+        ++ lib.optionals (localSystem.libc == "glibc") [ prevStage.generateLdCacheHook ];
 
         cc = prevStage.gcc;
 
@@ -874,6 +878,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
             prevStage.updateAutotoolsGnuConfigScriptsHook
             prevStage.gnu-config
           ]
+          ++ lib.optionals (localSystem.libc == "glibc") [ prevStage.generateLdCacheHook ]
           ++ [
             gcc-unwrapped.gmp
             gcc-unwrapped.libmpc

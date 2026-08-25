@@ -67,8 +67,14 @@ lib.init bootStages
           hasCC = false;
 
           extraNativeBuildInputs =
-            old.extraNativeBuildInputs
+            # The generate-ld-cache hook is glibc-specific; drop a copy
+            # inherited from a glibc-Linux build platform's stdenv and
+            # add the hook for glibc hosts regardless of build platform.
+            lib.filter (p: (p.name or "") != "generate-ld-cache-hook") old.extraNativeBuildInputs
             ++ lib.optionals (hostPlatform.isLinux && !buildPlatform.isLinux) [ buildPackages.patchelf ]
+            ++ lib.optionals (hostPlatform.isLinux && hostPlatform.libc == "glibc") [
+              buildPackages.generateLdCacheHook
+            ]
             ++ lib.optional (
               let
                 f =
