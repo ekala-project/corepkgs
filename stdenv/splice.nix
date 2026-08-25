@@ -174,23 +174,12 @@ let
         ;
     };
 
-  splicedPackagesWithXorg =
-    splicedPackages
-    // removeAttrs splicedPackages.xorg [
-      "callPackage"
-      "newScope"
-      "overrideScope"
-      "packages"
-    ];
+  # Flatten xorg backward-compatibility aliases (e.g. libXau, libXext) into the
+  # callPackage resolution scope so that legacy CamelCase dependency names still
+  # resolve.  The xorg set now only contains aliases to top-level packages.
+  splicedPackagesWithXorg = splicedPackages // (splicedPackages.xorg or { });
 
-  packagesWithXorg =
-    pkgs
-    // removeAttrs pkgs.xorg [
-      "callPackage"
-      "newScope"
-      "overrideScope"
-      "packages"
-    ];
+  packagesWithXorg = pkgs // (pkgs.xorg or { });
 
   pkgsForCall = if actuallySplice then splicedPackagesWithXorg else packagesWithXorg;
 
@@ -200,8 +189,8 @@ in
   inherit splicePackages;
 
   # We use `callPackage' to be able to omit function arguments that can be
-  # obtained `pkgs` or `buildPackages` and their `xorg` package sets. Use
-  # `newScope' for sets of packages in `pkgs' (see e.g. `gnome' below).
+  # obtained from `pkgs` or `buildPackages`.  The xorg backward-compat aliases
+  # are also flattened in so legacy CamelCase names still resolve.
   callPackage = pkgs.newScope { };
 
   callPackages = lib.callPackagesWith pkgsForCall;
