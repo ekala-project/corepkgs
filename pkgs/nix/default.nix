@@ -125,58 +125,58 @@ lib.makeExtensible (
   (
     {
       nix_2_28 = commonMeson {
-        version = "2.28.5";
-        hash = "sha256-oIfAHxO+BCtHXJXLHBnsKkGl1Pw+Uuq1PwNxl+lZ+Oc=";
+        version = "2.28.7";
+        hash = "sha256-Fq4+7uYz6bdE1HvPqn+qZcYX1rNilVKT7YAAPLA8170=";
         self_attribute_name = "nix_2_28";
       };
 
       nixComponents_2_29 = nixDependencies.callPackage ./modular/packages.nix rec {
-        version = "2.29.2";
+        version = "2.29.4";
         otherSplices = generateSplicesForNixComponents "nixComponents_2_29";
         src = fetchFromGitHub {
           owner = "NixOS";
           repo = "nix";
           tag = version;
-          hash = "sha256-50p2sG2RFuRnlS1/Vr5et0Rt+QDgfpNE2C2WWRztnbQ=";
+          hash = "sha256-eVELGOeQg37AZLu7xnsaW9VA4fBr3x1d97I0iAoIt8A=";
         };
       };
 
       nix_2_29 = addTests "nix_2_29" self.nixComponents_2_29.nix-everything;
 
       nixComponents_2_30 = nixDependencies.callPackage ./modular/packages.nix rec {
-        version = "2.30.3";
+        version = "2.30.5";
         otherSplices = generateSplicesForNixComponents "nixComponents_2_30";
         src = fetchFromGitHub {
           owner = "NixOS";
           repo = "nix";
           tag = version;
-          hash = "sha256-kBuwzMgIE9Tmve0Rpp+q+YCsE2mw9d62M/950ViWeJ0=";
+          hash = "sha256-tGiV71RxtCNcUNX86ZwmOIghG4pLwm5nlRKd89er7Gk=";
         };
       };
 
       nix_2_30 = addTests "nix_2_30" self.nixComponents_2_30.nix-everything;
 
       nixComponents_2_31 = nixDependencies.callPackage ./modular/packages.nix rec {
-        version = "2.31.2";
+        version = "2.31.5";
         otherSplices = generateSplicesForNixComponents "nixComponents_2_31";
         src = fetchFromGitHub {
           owner = "NixOS";
           repo = "nix";
           tag = version;
-          hash = "sha256-NLGXPLjENLeKVOg3OZgHXZ+1x6sPIKq9FHH8pxbCrDI=";
+          hash = "sha256-b7fhCXxl9qKTNPQvG8T/+nOxB95kalt9/aSY+ZSRctk=";
         };
       };
 
       nix_2_31 = addTests "nix_2_31" self.nixComponents_2_31.nix-everything;
 
       nixComponents_2_32 = nixDependencies.callPackage ./modular/packages.nix rec {
-        version = "2.32.4";
+        version = "2.32.8";
         otherSplices = generateSplicesForNixComponents "nixComponents_2_32";
         src = fetchFromGitHub {
           owner = "NixOS";
           repo = "nix";
           tag = version;
-          hash = "sha256-8QYnRyGOTm3h/Dp8I6HCmQzlO7C009Odqyp28pTWgcY=";
+          hash = "sha256-vj5o3dP9QaiW025a5INgg9j9XwScFsCYr6WrBxqSvUk=";
         };
       };
 
