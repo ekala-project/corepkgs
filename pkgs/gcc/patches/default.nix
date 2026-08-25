@@ -100,6 +100,8 @@ optionals noSysDirs (
 # c++tools: Don't check --enable-default-pie.
 # --enable-default-pie breaks bootstrap gcc otherwise, because libiberty.a is not found
 ++ optional (is14 || is15) ./c++tools-dont-check-enable-default-pie.patch
+# libsanitizer: Fix build with glibc 2.42 (struct termio removed)
+++ optional (!atLeast15) ./${majorVersion}/libsanitizer-fix-with-glibc-2.42.patch
 
 ## 2. Patches relevant on specific platforms ####################################
 
