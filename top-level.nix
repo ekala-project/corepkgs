@@ -719,6 +719,7 @@ with final;
     makeSetupHook
       {
         name = "generate-ld-cache-hook";
+        __structuredAttrs = true;
       }
       (
         replaceVars ./build-support/setup-hooks/generate-ld-cache.sh {

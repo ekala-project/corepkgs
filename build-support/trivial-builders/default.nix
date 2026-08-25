@@ -744,6 +744,7 @@ rec {
       meta ? { },
       passthru ? { },
       substitutions ? { },
+      __structuredAttrs ? false,
     }:
     script:
     runCommand name
@@ -753,7 +754,7 @@ rec {
           # TODO(@Artturin:) substitutions should be inside the env attrset
           # but users are likely passing non-substitution arguments through substitutions
           # turn off __structuredAttrs to unbreak substituteAll
-          __structuredAttrs = false;
+          inherit __structuredAttrs;
           inherit meta;
           inherit depsTargetTargetPropagated;
           inherit propagatedBuildInputs;
