@@ -39,6 +39,7 @@
   libgbm,
   mesa-gl-headers,
   dri-pkgconfig-stub,
+  mkfontscale,
 }:
 
 let
@@ -107,7 +108,7 @@ self: super: {
       )
   ) { };
 
-  mkfontdir = xorg.mkfontscale;
+  mkfontdir = mkfontscale;
 
   xdpyinfo = super.xdpyinfo.overrideAttrs (attrs: {
     configureFlags = attrs.configureFlags or [ ] ++ malloc0ReturnsNullCrossFlag;
