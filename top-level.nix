@@ -715,6 +715,17 @@ with final;
   patchelf = callPackage ./pkgs/patchelf { };
   patchelfUnstable = lowPrio (callPackage ./pkgs/patchelf/unstable.nix { });
 
+  generateLdCacheHook =
+    makeSetupHook
+      {
+        name = "generate-ld-cache-hook";
+      }
+      (
+        replaceVars ./build-support/setup-hooks/generate-ld-cache.sh {
+          patchelf = "${patchelf}/bin/patchelf";
+        }
+      );
+
   # These are used when building compiler-rt / libgcc, prior to building libc.
   preLibcHeaders =
     let
