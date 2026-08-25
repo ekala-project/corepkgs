@@ -7,6 +7,7 @@
 
   nix-util,
   boost,
+  cmake, # for resolving aws-crt-cpp dep
   curl,
   aws-sdk-cpp,
   aws-crt-cpp,
@@ -29,7 +30,12 @@ mkMesonLibrary (finalAttrs: {
 
   workDir = ./.;
 
-  nativeBuildInputs = lib.optional embeddedSandboxShell unixtools.hexdump;
+  nativeBuildInputs =
+    lib.optional embeddedSandboxShell unixtools.hexdump
+    ++ lib.optionals (lib.versionAtLeast (lib.versions.majorMinor version) "2.33") [
+      cmake
+      cmake.configurePhaseHook
+    ];
 
   buildInputs = [
     boost
