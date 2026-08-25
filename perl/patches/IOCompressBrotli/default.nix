@@ -48,6 +48,6 @@ buildPerlPackage {
       artistic1
       gpl1Plus
     ];
-    maintainers = [ lib.maintainers.anthonyroussel ];
+    maintainers = [ ];
   };
 }

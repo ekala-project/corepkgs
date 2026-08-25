@@ -54,7 +54,7 @@ buildPerlPackage rec {
   meta = {
     description = "Tools for running a map tile server";
     homepage = "https://wiki.openstreetmap.org/wiki/Tirex";
-    maintainers = with lib.maintainers; [ jglukasik ];
+    maintainers = [ ];
     license = lib.licenses.gpl2Only;
   };
 }

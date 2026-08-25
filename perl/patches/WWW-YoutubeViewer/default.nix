@@ -34,7 +34,7 @@ buildPerlPackage rec {
     description = "Lightweight application for searching and streaming videos from YouTube";
     homepage = "https://github.com/trizen/youtube-viewer";
     license = lib.licenses.artistic2;
-    maintainers = with lib.maintainers; [ woffs ];
+    maintainers = [ ];
     mainProgram = "youtube-viewer";
   };
 }

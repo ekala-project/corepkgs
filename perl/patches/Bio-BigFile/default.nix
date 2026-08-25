@@ -58,6 +58,6 @@ buildPerlModule rec {
     homepage = "https://metacpan.org/dist/Bio-BigFile";
     description = "Manipulate Jim Kent's BigWig and BigBed index files for genomic features";
     license = lib.licenses.artistic2;
-    maintainers = with lib.maintainers; [ apraga ];
+    maintainers = [ ];
   };
 }
