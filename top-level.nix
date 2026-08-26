@@ -635,11 +635,7 @@ with final;
     else
       libglvnd;
 
-  # On macOS, the SDK provides the OpenGL framework in `stdenv`.
-  # Packages that use `libGLX` on macOS may need to depend on
-  # `mesa_glu` directly if this doesn’t work.
-  # TODO(corepkgs): add mesa_glu package
-  libGLU = null;
+  libGLU = mesa_glu;
 
   # `libglvnd` does not work (yet?) on macOS.
   libGLX = if stdenv.hostPlatform.isDarwin then mesa else libglvnd;
