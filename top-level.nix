@@ -1248,9 +1248,9 @@ with final;
   # libiconv, so build and use the upstream one with a compatible ABI,
   # and BSDs include libiconv in libc.
   #
-  # We also provide `libiconvReal`, which will always be a standalone libiconv,
-  # just in case you want it regardless of platform.
-  # TODO(corepkgs): use mkManyVariants
+  # libiconv is auto-imported from pkgs-many/libiconv/ via mkManyVariants
+  # Variants: libiconv.real (standalone), libiconv.darwinABICompat (Darwin ABI-compatible)
+  # Use `libiconvReal` for the standalone build regardless of platform.
   libiconv =
     if
       lib.elem stdenv.hostPlatform.libc [
@@ -1263,7 +1263,7 @@ with final;
     then
       libcIconv pkgs.libc
     else if stdenv.hostPlatform.isDarwin then
-      darwin.libiconv
+      prev.libiconv.darwinABICompat
     else
       libiconvReal;
 
@@ -1278,7 +1278,7 @@ with final;
       ln -sv ${libcDev}/include/iconv.h $out/include
     '';
 
-  libiconvReal = callPackage ./pkgs/libiconv { };
+  libiconvReal = prev.libiconv;
 
   iconv =
     if
@@ -1293,7 +1293,7 @@ with final;
     else if stdenv.hostPlatform.isFreeBSD then
       lib.getBin freebsd.iconv
     else
-      lib.getBin libiconvReal;
+      lib.getBin prev.libiconv;
 
   openssl_legacy = openssl.override {
     conf = ./pkgs-many/openssl/3.0/legacy.cnf;

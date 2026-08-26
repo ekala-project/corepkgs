@@ -1,22 +1,33 @@
 {
+  version,
+  hash,
+  enableDarwinABICompat ? false,
+  mkVariantPassthru,
+  ...
+}@variantArgs:
+
+{
   fetchurl,
   stdenv,
   lib,
   updateAutotoolsGnuConfigScriptsHook,
   enableStatic ? stdenv.hostPlatform.isStatic,
   enableShared ? !stdenv.hostPlatform.isStatic,
-  enableDarwinABICompat ? false,
 }:
 
-# assert !stdenv.hostPlatform.isLinux || stdenv.hostPlatform != stdenv.buildPlatform; # TODO: improve on cross
-
-stdenv.mkDerivation rec {
+let
+  setupHooks = [
+    ../../build-support/setup-hooks/role.bash
+    ./setup-hook.sh
+  ];
+in
+stdenv.mkDerivation {
   pname = "libiconv";
-  version = "1.18";
+  inherit version;
 
   src = fetchurl {
-    url = "mirror://gnu/libiconv/${pname}-${version}.tar.gz";
-    sha256 = "sha256-Owj19Pm064LxUacEC/1v5sb7ki7+SxZZxm6pMydpZeg=";
+    url = "mirror://gnu/libiconv/libiconv-${version}.tar.gz";
+    inherit hash;
   };
 
   enableParallelBuilding = true;
@@ -28,10 +39,7 @@ stdenv.mkDerivation rec {
   # https://github.com/NixOS/nixpkgs/pull/192630#discussion_r978985593
   hardeningDisable = lib.optional (stdenv.hostPlatform.libc == "bionic") "fortify";
 
-  setupHooks = [
-    ../../build-support/setup-hooks/role.bash
-    ./setup-hook.sh
-  ];
+  inherit setupHooks;
 
   postPatch =
     lib.optionalString
@@ -78,7 +86,9 @@ stdenv.mkDerivation rec {
   ]
   ++ lib.optional stdenv.hostPlatform.isFreeBSD "--with-pic";
 
-  passthru = { inherit setupHooks; };
+  passthru = mkVariantPassthru variantArgs // {
+    inherit setupHooks;
+  };
 
   meta = {
     description = "Iconv(3) implementation";
