@@ -234,7 +234,6 @@ with final;
   # Non-GNU/Linux OSes are currently "impure" platforms, with their libc
   # outside of the store.  Thus, GCC, GFortran, & co. must always look for files
   # in standard system directories (/usr/include, etc.)
-  # TODO(corepkgs): move into stdenv/linux.nix
   noSysDirs =
     stdenv.buildPlatform.system != "x86_64-solaris"
     && stdenv.buildPlatform.system != "x86_64-kfreebsd-gnu";
@@ -304,7 +303,7 @@ with final;
     if stdenv.hostPlatform != stdenv.buildPlatform then
       {
         stdenv = gccCrossLibcStdenv; # doesn't compile without gcc
-        # TODO(corepkgs): this is duplication of pkgs/gcc/common/libgcc.nix
+        # Separate from pkgs/gcc/common/libgcc.nix — different bootstrap stage
         libgcc = callPackage ./pkgs/glibc/libgcc-for-glibc.nix {
           gcc = gccCrossLibcStdenv.cc;
           glibc = glibc.override { libgcc = null; };
@@ -731,7 +730,6 @@ with final;
     yarnInstallHook
     ;
 
-  # TODO(corepkgs): This should be moved into unixtools
   procps = if stdenv.hostPlatform.isLinux then procps-ng else unixtools.procps;
 
   pruneLibtoolFiles = makeSetupHook {
@@ -1875,7 +1873,6 @@ with final;
       // builtins.mapAttrs (_name: args: mkNixComponents args) nixComponentsArgs
     );
 
-  # TODO(corepkgs): move into build-support
   ensureNewerSourcesHook =
     { year }:
     makeSetupHook
