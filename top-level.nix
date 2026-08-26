@@ -494,14 +494,12 @@ with final;
   dbus = callPackage ./pkgs/dbus { };
   makeDBusConf = callPackage ./pkgs/dbus/make-dbus-conf.nix { };
 
-  # TODO(corepkgs): move these fetchers into pkgs
   fetchpatch =
     callPackage ./pkgs/fetchpatch {
       # 0.3.4 would change hashes: https://github.com/NixOS/nixpkgs/issues/25154
       patchutils = __splicedPackages.patchutils_0_3_3;
     }
     // {
-      tests = pkgs.tests.fetchpatch;
       version = 1;
     };
   fetchpatch2 =
@@ -509,10 +507,8 @@ with final;
       patchutils = __splicedPackages.patchutils_0_4_2;
     }
     // {
-      tests = pkgs.tests.fetchpatch2;
       version = 2;
     };
-  # TODO(corepkgs): uppercase them?
   fetchurl =
     if stdenv.buildPlatform != stdenv.hostPlatform then
       buildPackages.fetchurl # No need to do special overrides twice,
@@ -1290,7 +1286,6 @@ with final;
     conf = ./pkgs-many/openssl/3.0/legacy.cnf;
   };
 
-  # TODO(corepkgs): move build-support hooks into pkgs
   makeWrapper = makeShellWrapper;
   makeShellWrapper = makeSetupHook {
     name = "make-shell-wrapper-hook";
@@ -1302,9 +1297,6 @@ with final;
           targetPackages.runtimeShell
         else
           throw "makeWrapper/makeShellWrapper must be in nativeBuildInputs";
-    };
-    passthru = {
-      tests = tests.makeWrapper;
     };
   } ./build-support/setup-hooks/make-wrapper.sh;
   __flattenIncludeHackHook = callPackage ./build-support/setup-hooks/flatten-include-hack { };
