@@ -951,12 +951,11 @@ with final;
         };
       });
 
-  # TODO(corepkgs): use mkManyVariants
-  inherit (callPackage ./pkgs/gcc/all.nix { inherit noSysDirs; })
-    gcc13
-    gcc14
-    gcc15
-    ;
+  # gcc-releases is auto-imported from pkgs-many/gcc-releases/ via mkManyVariants
+  # Individual versions: gcc-releases.v13, gcc-releases.v14, gcc-releases.v15
+  gcc13 = gcc-releases.v13;
+  gcc14 = gcc-releases.v14;
+  gcc15 = gcc-releases.v15;
 
   gcc_latest = gcc15;
 
