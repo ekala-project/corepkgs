@@ -676,8 +676,6 @@ with final;
     else
       callPackage ./pkgs/libunwind { };
 
-  # TODO(corepkgs): remove legacy
-  libxcrypt-legacy = libxcrypt.override { enableHashes = "all"; };
   libxcrypt = callPackage ./pkgs/libxcrypt {
     fetchurl = stdenv.fetchurlBoot;
     perl = buildPackages.perl.override {
