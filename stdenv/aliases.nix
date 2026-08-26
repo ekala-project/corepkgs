@@ -157,5 +157,8 @@ mapAliases {
   tcl-8_5 = tcl.v8_5;
   tcl-8_6 = tcl.v8_6;
   tcl-9_0 = tcl.v9_0;
+  tk-8_5 = tk.v8_5;
+  tk-8_6 = tk.v8_6;
+  tk-9_0 = tk.v9_0;
   # keep-sorted end
 }

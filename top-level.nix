@@ -1481,11 +1481,8 @@ with final;
 
   tclPackages = tcl.pkgs;
 
-  # TODO(corepkgs): use mkManyVariants
-  tk = tk-8_6;
-  tk-9_0 = callPackage ./pkgs/tk/9.0.nix { tcl = tcl-9_0; };
-  tk-8_6 = callPackage ./pkgs/tk/8.6.nix { };
-  tk-8_5 = callPackage ./pkgs/tk/8.5.nix { tcl = tcl-8_5; };
+  # tk is auto-imported from pkgs-many/tk/ via mkManyVariants
+  # tk defaults to v8_6. Variants: tk.v8_5, tk.v8_6, tk.v9_0
 
   gpm-ncurses = gpm.override { withNcurses = true; };
 
