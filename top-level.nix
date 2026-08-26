@@ -100,7 +100,7 @@ with final;
   fltk = null;
   fluxbox = null;
   fop = null;
-  gd = null;
+  gd = callPackage ./pkgs/gd { };
   gdal = null;
   gitstatus = null;
   graphicsmagick = null;
@@ -798,10 +798,7 @@ with final;
     go = buildPackages.go_1_24;
   };
 
-  # TODO(corepkgs): Enable texlive for R PDF docs once texlive-bin deps (gd, potrace) are ported
-  R = callPackage ./pkgs/R {
-    texliveSmall = null;
-  };
+  R = callPackage ./pkgs/R { };
 
   buildRPackage = callPackage ./build-support/r { };
 
