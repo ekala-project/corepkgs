@@ -15,11 +15,11 @@
   cups ? null,
   fontconfig ? null,
   freetype ? null,
-  libx11 ? null,
-  libxext ? null,
-  libxi ? null,
-  libxrender ? null,
-  libxtst ? null,
+  libx11,
+  libxext,
+  libXi,
+  libxrender,
+  libXtst,
   zlib,
   callPackage,
 }:
@@ -82,16 +82,16 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux (
     [
       zlib
+      libx11
+      libxext
+      libXi
+      libxrender
+      libXtst
     ]
     ++ lib.optionals (alsa-lib != null) [ alsa-lib ]
     ++ lib.optionals (cups != null) [ cups ]
     ++ lib.optionals (fontconfig != null) [ fontconfig ]
     ++ lib.optionals (freetype != null) [ freetype ]
-    ++ lib.optionals (libx11 or null != null) [ libx11 ]
-    ++ lib.optionals (libxext or null != null) [ libxext ]
-    ++ lib.optionals (libxi or null != null) [ libxi ]
-    ++ lib.optionals (libxrender or null != null) [ libxrender ]
-    ++ lib.optionals (libxtst or null != null) [ libxtst ]
   );
 
   # Patch ELF files, but exclude jmods
