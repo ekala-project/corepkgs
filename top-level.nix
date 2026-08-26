@@ -3,10 +3,6 @@
 # require more than just passing default arguments to nix expressions
 
 final: prev:
-let
-  # TODO(corepkgs): deprecate lowPrio
-  inherit (final.lib) lowPrio;
-in
 with final;
 {
 
@@ -29,7 +25,7 @@ with final;
 
   # qemu_kvm - QEMU with only host CPU support (for vmTools)
   # This is required for vmTools to work correctly with direct kernel boot
-  qemu_kvm = lowPrio (qemu.override { hostCpuOnly = true; });
+  qemu_kvm = lib.lowPrio (qemu.override { hostCpuOnly = true; });
 
   # ekaosTest - Testing framework for ekaos systems
   ekaosTest = (callPackage ./ekaos/lib/testing { }).runTest;
@@ -248,7 +244,7 @@ with final;
   # A stdenv capable of building 32-bit binaries.
   # On x86_64-linux, it uses GCC compiled with multilib support; on i686-linux,
   # it's just the plain stdenv.
-  stdenv_32bit = lowPrio (if stdenv.hostPlatform.is32bit then stdenv else multiStdenv);
+  stdenv_32bit = lib.lowPrio (if stdenv.hostPlatform.is32bit then stdenv else multiStdenv);
 
   mkStdenvNoLibs =
     stdenv:
@@ -413,7 +409,7 @@ with final;
   binutils = wrapBintoolsWith {
     bintools = binutils-unwrapped;
   };
-  binutils_nogold = lowPrio (wrapBintoolsWith {
+  binutils_nogold = lib.lowPrio (wrapBintoolsWith {
     bintools = binutils-unwrapped.override {
       enableGold = false;
     };
@@ -699,7 +695,7 @@ with final;
   };
 
   patchelf = callPackage ./pkgs/patchelf { };
-  patchelfUnstable = lowPrio (callPackage ./pkgs/patchelf/unstable.nix { });
+  patchelfUnstable = lib.lowPrio (callPackage ./pkgs/patchelf/unstable.nix { });
 
   generateLdCacheHook =
     makeSetupHook
@@ -871,7 +867,7 @@ with final;
         libc = glibc_multi;
       };
     in
-    lowPrio (wrapCCWith {
+    lib.lowPrio (wrapCCWith {
       cc = cc.cc.override {
         stdenv = overrideCC stdenv (wrapCCWith {
           cc = cc.cc;
@@ -899,7 +895,7 @@ with final;
   clangMultiStdenv = overrideCC stdenv buildPackages.clang_multi;
   multiStdenv = if stdenv.cc.isClang then clangMultiStdenv else gccMultiStdenv;
 
-  gcc_debug = lowPrio (
+  gcc_debug = lib.lowPrio (
     wrapCC (
       gcc.cc.overrideAttrs {
         dontStrip = true;
@@ -1100,7 +1096,7 @@ with final;
   runtimeShell = "${runtimeShellPackage}${runtimeShellPackage.shellPath}";
   runtimeShellPackage = bashNonInteractive;
   bash = callPackage ./pkgs/bash/5.nix { };
-  bashNonInteractive = lowPrio (
+  bashNonInteractive = lib.lowPrio (
     callPackage ./pkgs/bash/5.nix {
       interactive = false;
     }
@@ -1455,7 +1451,7 @@ with final;
   pkg-config = callPackage ./build-support/pkg-config-wrapper {
     pkg-config = pkg-config-unwrapped;
   };
-  pkg-configUpstream = lowPrio (
+  pkg-configUpstream = lib.lowPrio (
     pkg-config.override (old: {
       pkg-config = old.pkg-config.override {
         vanilla = true;
@@ -1463,7 +1459,7 @@ with final;
     })
   );
 
-  sqlite = lowPrio (callPackage ./pkgs/sqlite { });
+  sqlite = lib.lowPrio (callPackage ./pkgs/sqlite { });
   sqlar = callPackage ./pkgs/sqlite/sqlar.nix { };
   sqlite-interactive = (sqlite.override { interactive = true; }).bin;
 
@@ -1920,8 +1916,8 @@ with final;
   clang-manpages = llvmPackages.clang-manpages;
   clang = llvmPackages.clang;
   clang-tools = llvmPackages.clang-tools;
-  clangStdenv = if stdenv.cc.isClang then stdenv else lowPrio llvmPackages.stdenv;
-  libcxxStdenv = if stdenv.hostPlatform.isDarwin then stdenv else lowPrio llvmPackages.libcxxStdenv;
+  clangStdenv = if stdenv.cc.isClang then stdenv else lib.lowPrio llvmPackages.stdenv;
+  libcxxStdenv = if stdenv.hostPlatform.isDarwin then stdenv else lib.lowPrio llvmPackages.libcxxStdenv;
 
   # LLVM is auto-imported from pkgs-many/llvm via mkManyVariants
   # llvm defaults to v21 (LLVM 21.1.2) as the LLVM library
