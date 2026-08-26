@@ -165,10 +165,10 @@ let
     )
   );
 in
-{
+rec {
   inherit buildUBoot;
 
-  ubootTools = buildUBoot {
+  tools = buildUBoot {
     defconfig = "tools-only_defconfig";
     installDir = "$out/bin";
     hardeningDisable = [ ];
@@ -214,7 +214,11 @@ in
     };
   };
 
-  ubootPythonTools = lib.recurseIntoAttrs (callPackages ./python.nix { });
+  pythonTools = lib.recurseIntoAttrs (callPackages ./python.nix { });
+
+  # Backward-compatible aliases
+  ubootTools = tools;
+  ubootPythonTools = pythonTools;
 
   ubootA20OlinuxinoLime = buildUBoot {
     defconfig = "A20-OLinuXino-Lime_defconfig";
