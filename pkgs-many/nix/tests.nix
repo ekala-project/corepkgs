@@ -56,15 +56,15 @@
   };
 }
 // lib.optionalAttrs stdenv.hostPlatform.isLinux {
-  # unfortunally nixpkgs pkgsStatic is too often broken including the dependency closure of nix
-  # nixStatic = pkgsStatic.nixVersions.${self_attribute_name};
+  # unfortunately pkgsStatic is too often broken including the dependency closure of nix
+  # nixStatic = pkgsStatic.nix.${self_attribute_name};
 
-  # Basic smoke tests that needs to pass when upgrading nix.
-  # Note that this test does only test the nixVersions.stable attribute.
+  # Basic smoke tests that need to pass when upgrading nix.
+  # Note that this test does only test the nix.stable attribute.
   misc = nixosTests.nix-misc.default;
   upgrade = nixosTests.nix-upgrade;
   simpleUefiSystemdBoot = nixosTests.installer.simpleUefiSystemdBoot;
 }
 // lib.optionalAttrs (stdenv.hostPlatform.system == "x86_64-linux") {
-  nixi686 = pkgsi686Linux.nixVersions.${self_attribute_name};
+  nixi686 = pkgsi686Linux.nix.${self_attribute_name};
 }

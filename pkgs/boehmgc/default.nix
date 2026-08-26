@@ -16,7 +16,7 @@
   #
   # If this parameter is set to `null`, the default from upstream is used, which is 4096 as of 8.2.8
   initialMarkStackSize ? null,
-  nixVersions,
+  nix,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -95,7 +95,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   enableParallelBuilding = true;
 
-  passthru.tests = nixVersions;
+  passthru.tests = nix.variants;
 
   meta = {
     homepage = "https://hboehm.info/gc/";
