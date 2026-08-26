@@ -1402,14 +1402,12 @@ with final;
   # Variants: libpng.v1_2, libpng.v1_6 (default)
   libpng12 = prev.libpng.v1_2;
 
-  # TODO(corepkgs): cleanup and move into pkgs
-  common-updater-scripts = callPackage ./common-updater/scripts.nix { };
-  genericUpdater = callPackage ./common-updater/generic-updater.nix { };
-  _experimental-update-script-combinators = callPackage ./common-updater/combinators.nix { };
-  directoryListingUpdater = callPackage ./common-updater/directory-listing-updater.nix { };
-  gitUpdater = callPackage ./common-updater/git-updater.nix { };
-  httpTwoLevelsUpdater = callPackage ./common-updater/http-two-levels-updater.nix { };
-  unstableGitUpdater = callPackage ./common-updater/unstable-updater.nix { };
+  genericUpdater = callPackage ./pkgs/common-updater-scripts/generic-updater.nix { };
+  _experimental-update-script-combinators = callPackage ./pkgs/common-updater-scripts/combinators.nix { };
+  directoryListingUpdater = callPackage ./pkgs/common-updater-scripts/directory-listing-updater.nix { };
+  gitUpdater = callPackage ./pkgs/common-updater-scripts/git-updater.nix { };
+  httpTwoLevelsUpdater = callPackage ./pkgs/common-updater-scripts/http-two-levels-updater.nix { };
+  unstableGitUpdater = callPackage ./pkgs/common-updater-scripts/unstable-updater.nix { };
 
   bzip2_1_1 = callPackage ./pkgs/bzip2/1_1.nix { };
 
