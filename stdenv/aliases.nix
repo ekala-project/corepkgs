@@ -22,6 +22,16 @@ with pkgs;
 mapAliases {
   # keep-sorted start
 
+  armTrustedFirmwareAllwinner = arm-trusted-firmware.allwinner;
+  armTrustedFirmwareAllwinnerH6 = arm-trusted-firmware.allwinnerH6;
+  armTrustedFirmwareAllwinnerH616 = arm-trusted-firmware.allwinnerH616;
+  armTrustedFirmwareQemu = arm-trusted-firmware.qemu;
+  armTrustedFirmwareRK3328 = arm-trusted-firmware.rk3328;
+  armTrustedFirmwareRK3399 = arm-trusted-firmware.rk3399;
+  armTrustedFirmwareRK3568 = arm-trusted-firmware.rk3568;
+  armTrustedFirmwareRK3588 = arm-trusted-firmware.rk3588;
+  armTrustedFirmwareS905 = arm-trusted-firmware.s905;
+  armTrustedFirmwareTools = arm-trusted-firmware.tools;
   autoconf269 = autoconf.v2_69;
   autoconf271 = autoconf.v2_71;
   automake116x = automake.v1_16;

@@ -133,7 +133,7 @@ in
 {
   inherit buildArmTrustedFirmware;
 
-  armTrustedFirmwareTools = buildArmTrustedFirmware {
+  tools = buildArmTrustedFirmware {
     # Normally, arm-trusted-firmware builds the build tools for buildPlatform
     # using CC_FOR_BUILD (or as it calls it HOSTCC). Since want to build them
     # for the hostPlatform here, we trick it by overriding the HOSTCC setting
@@ -154,25 +154,25 @@ in
     '';
   };
 
-  armTrustedFirmwareAllwinner = buildArmTrustedFirmware rec {
+  allwinner = buildArmTrustedFirmware rec {
     platform = "sun50i_a64";
     extraMeta.platforms = [ "aarch64-linux" ];
     filesToInstall = [ "build/${platform}/release/bl31.bin" ];
   };
 
-  armTrustedFirmwareAllwinnerH616 = buildArmTrustedFirmware rec {
+  allwinnerH616 = buildArmTrustedFirmware rec {
     platform = "sun50i_h616";
     extraMeta.platforms = [ "aarch64-linux" ];
     filesToInstall = [ "build/${platform}/release/bl31.bin" ];
   };
 
-  armTrustedFirmwareAllwinnerH6 = buildArmTrustedFirmware rec {
+  allwinnerH6 = buildArmTrustedFirmware rec {
     platform = "sun50i_h6";
     extraMeta.platforms = [ "aarch64-linux" ];
     filesToInstall = [ "build/${platform}/release/bl31.bin" ];
   };
 
-  armTrustedFirmwareQemu = buildArmTrustedFirmware rec {
+  qemu = buildArmTrustedFirmware rec {
     platform = "qemu";
     extraMeta.platforms = [ "aarch64-linux" ];
     filesToInstall = [
@@ -182,14 +182,14 @@ in
     ];
   };
 
-  armTrustedFirmwareRK3328 = buildArmTrustedFirmware rec {
+  rk3328 = buildArmTrustedFirmware rec {
     extraMakeFlags = [ "bl31" ];
     platform = "rk3328";
     extraMeta.platforms = [ "aarch64-linux" ];
     filesToInstall = [ "build/${platform}/release/bl31/bl31.elf" ];
   };
 
-  armTrustedFirmwareRK3399 = buildArmTrustedFirmware rec {
+  rk3399 = buildArmTrustedFirmware rec {
     extraMakeFlags = [ "bl31" ];
     platform = "rk3399";
     extraMeta.platforms = [ "aarch64-linux" ];
@@ -197,21 +197,21 @@ in
     platformCanUseHDCPBlob = true;
   };
 
-  armTrustedFirmwareRK3568 = buildArmTrustedFirmware rec {
+  rk3568 = buildArmTrustedFirmware rec {
     extraMakeFlags = [ "bl31" ];
     platform = "rk3568";
     extraMeta.platforms = [ "aarch64-linux" ];
     filesToInstall = [ "build/${platform}/release/bl31/bl31.elf" ];
   };
 
-  armTrustedFirmwareRK3588 = buildArmTrustedFirmware rec {
+  rk3588 = buildArmTrustedFirmware rec {
     extraMakeFlags = [ "bl31" ];
     platform = "rk3588";
     extraMeta.platforms = [ "aarch64-linux" ];
     filesToInstall = [ "build/${platform}/release/bl31/bl31.elf" ];
   };
 
-  armTrustedFirmwareS905 = buildArmTrustedFirmware rec {
+  s905 = buildArmTrustedFirmware rec {
     extraMakeFlags = [ "bl31" ];
     platform = "gxbb";
     extraMeta.platforms = [ "aarch64-linux" ];

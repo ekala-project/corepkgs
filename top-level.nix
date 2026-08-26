@@ -2119,18 +2119,5 @@ with final;
   uboot = callFromScope ./pkgs/uboot { };
   inherit (uboot) buildUBoot;
 
-  # TODO(corepkgs): refactor arm-trusted into passthru attrs
-  inherit (arm-trusted-firmware)
-    buildArmTrustedFirmware
-    armTrustedFirmwareTools
-    armTrustedFirmwareAllwinner
-    armTrustedFirmwareAllwinnerH616
-    armTrustedFirmwareAllwinnerH6
-    armTrustedFirmwareQemu
-    armTrustedFirmwareRK3328
-    armTrustedFirmwareRK3399
-    armTrustedFirmwareRK3568
-    armTrustedFirmwareRK3588
-    armTrustedFirmwareS905
-    ;
+  inherit (arm-trusted-firmware) buildArmTrustedFirmware;
 }
