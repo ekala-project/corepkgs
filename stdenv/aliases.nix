@@ -137,6 +137,8 @@ mapAliases {
   luajit_2_0 = lua.luajit_2_0;
   luajit_2_1 = lua.luajit_2_1;
   luajit_openresty = lua.luajit_openresty;
+  m4 = gnum4;
+  man = man-db;
   ncurses5 = ncurses.v5;
   ncurses6 = ncurses.v6;
   nimble = nim;
@@ -147,6 +149,7 @@ mapAliases {
   openjdk = java;
   openjdk11 = java.v11;
   openssl_oqs = openssl.oqs;
+  patch = gnupatch;
   perl538 = perl.v5_38;
   perl540 = perl.v5_40;
   phpExtensions = php.buildPecl;
@@ -154,6 +157,7 @@ mapAliases {
   rLang = r-lang;
   scala_2_13 = scala.v2_13;
   scala_3 = scala;
+  su = shadow;
   tcl-8_5 = tcl.v8_5;
   tcl-8_6 = tcl.v8_6;
   tcl-9_0 = tcl.v9_0;

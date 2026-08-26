@@ -1229,9 +1229,6 @@ with final;
           throw "mesonEmulatorHook may only be added to nativeBuildInputs when the target binaries can't be executed; however you are attempting to use it in a situation where ${stdenv.hostPlatform.config} can execute ${stdenv.targetPlatform.config}. Consider only adding mesonEmulatorHook according to a conditional based canExecute in your package expression."
       );
 
-  # TODO(corepkgs): alias?
-  m4 = gnum4;
-
   coreutils = callPackage ./pkgs/coreutils { };
 
   # The coreutils above is built with dependencies from
@@ -1476,9 +1473,6 @@ with final;
   gawkextlib = callPackage ./pkgs/gawk/gawkextlib.nix { };
   gawkInteractive = gawk.override { interactive = true; };
 
-  # TODO(corepkgs): alias?
-  patch = gnupatch;
-
   tclPackages = tcl.pkgs;
 
   # tk is auto-imported from pkgs-many/tk/ via mkManyVariants
@@ -1493,9 +1487,6 @@ with final;
       freebsd.libpam
     else
       openpam;
-
-  # TODO(corepkgs): alias?
-  su = shadow;
 
   systemd = callPackage ./pkgs/linux-support/pkgs/systemd {
     # break some cyclic dependencies
@@ -2050,9 +2041,6 @@ with final;
   # imlib2 is null; these overrides can't work until it's ported
   imlib2Full = null;
   imlib2-nox = null;
-  # TODO(corepkgs): alias
-  man = man-db;
-
   validatePkgConfig = makeSetupHook {
     name = "validate-pkg-config";
     propagatedBuildInputs = [
