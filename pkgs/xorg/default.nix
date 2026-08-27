@@ -63,16 +63,16 @@ self: {
   libXdamage = self.libxdamage or null;
   libXdmcp = self.libxdmcp;
   libXext = self.libxext;
-  libXfixes = self.libxfixes or null;
+  libXfixes = self.libxfixes;
   libXfont2 = self.libxfont2 or null;
   libXfont = self.libxfont1 or null;
-  libXi = self.libxi or null;
+  libXi = self.libxi;
   libXinerama = self.libxinerama or null;
   libXmu = self.libxmu;
   libXp = self.libxp or null;
   libXpm = self.libxpm;
   libXpresent = self.libxpresent or null;
-  libXrandr = self.libxrandr or null;
+  libXrandr = self.libxrandr;
   libXrender = self.libxrender;
   libXres = self.libxres or null;
   libXScrnSaver = self.libxscrnsaver or null;
@@ -82,7 +82,7 @@ self: {
   libXvMC = self.libxvmc or null;
   libXxf86dga = self.libxxf86dga or null;
   libXxf86misc = self.libxxf86misc or null;
-  libXxf86vm = self.libxxf86vm or null;
+  libXxf86vm = self.libxxf86vm;
 
   # Utilities and other packages
   twm = self."tab-window-manager" or null;
