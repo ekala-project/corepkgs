@@ -170,7 +170,6 @@ self: {
   xf86videosunffb = self."xf86-video-sunffb";
   xf86videosunleo = self."xf86-video-sunleo";
   xf86videotdfx = self."xf86-video-tdfx";
-  xf86videotga = self."xf86-video-tga";
   xf86videotrident = self."xf86-video-trident";
   xf86videov4l = self."xf86-video-v4l";
   xf86videovboxvideo = self."xf86-video-vboxvideo";
