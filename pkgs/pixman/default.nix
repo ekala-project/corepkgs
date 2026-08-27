@@ -6,18 +6,7 @@
   ninja,
   pkg-config,
   libpng,
-  glib, # just passthru
 
-  # for passthru.tests
-  cairo,
-  qemu,
-  scribus,
-  tigervnc,
-  wlroots_0_17,
-  wlroots_0_18,
-  xwayland,
-
-  gitUpdater,
   testers,
 
   __flattenIncludeHackHook,
@@ -74,22 +63,9 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     tests = {
-      inherit
-        cairo
-        qemu
-        scribus
-        tigervnc
-        wlroots_0_17
-        wlroots_0_18
-        xwayland
-        ;
       pkg-config = testers.hasPkgConfigModules {
         package = finalAttrs.finalPackage;
       };
-    };
-    updateScript = gitUpdater {
-      url = "https://gitlab.freedesktop.org/pixman/pixman.git";
-      rev-prefix = "pixman-";
     };
   };
 
