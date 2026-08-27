@@ -93,21 +93,18 @@ final: prev: with final; {
   fltk = null;
   fluxbox = null;
   fop = null;
-  gd = callPackage ./pkgs/gd { };
   gdal = null;
   gitstatus = null;
   graphicsmagick = null;
   gtkmm3 = null;
-  gts = callPackage ./pkgs/gts { };
   gunicorn = null;
-  harfbuzz = callPackage ./pkgs/harfbuzz { };
   highlight = null;
   icewm = null;
-  imagemagick = callPackage ./pkgs/imagemagick { };
   jhead = null;
   jre = null;
   knot-dns = null;
   knot-resolver_5 = null;
+  lbzip2 = null; # for conda-unpack hook
   libgeotiff = null;
   libgit2-glib = null;
   libguestfs = null;
@@ -132,14 +129,11 @@ final: prev: with final; {
   nodejs_latest = nodejs.v23;
   nwdiag = null;
   objgraph = null;
-  objprint = null;
+  objprint = null; # for pytestCheckHook
   openbox = null;
   opencv = null;
   openimageio = null;
-  # opensbi: auto-imported from pkgs/opensbi/ (RISC-V only)
   ostinato = null;
-  pango = callPackage ./pkgs/pango { };
-  # PHP - already declared above with Java
   pika = null;
   pinentry = null;
   psutils = null;
