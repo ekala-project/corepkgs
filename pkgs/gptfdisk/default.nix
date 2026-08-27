@@ -68,6 +68,5 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl2Plus;
     homepage = "https://www.rodsbooks.com/gdisk/";
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 })

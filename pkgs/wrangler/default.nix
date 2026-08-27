@@ -123,7 +123,6 @@ stdenv.mkDerivation (finalAttrs: {
       mit
       apsl20
     ];
-    maintainers = [ ];
     mainProgram = "wrangler";
     # Tunneling and other parts of wrangler, which require workerd won't run on
     # other systems where precompiled binaries are not provided, but most

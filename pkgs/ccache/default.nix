@@ -157,7 +157,6 @@ stdenv.mkDerivation (finalAttrs: {
       builtins.replaceStrings [ "." ] [ "_" ] finalAttrs.version
     }";
     license = lib.licenses.gpl3Plus;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
     mainProgram = "ccache";
   };

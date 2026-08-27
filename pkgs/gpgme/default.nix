@@ -114,6 +114,5 @@ stdenv.mkDerivation (finalAttrs: {
       "gpgme-glib"
     ];
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 })

@@ -91,6 +91,5 @@ stdenv.mkDerivation (finalAttrs: {
       "harfbuzz-gobject"
       "harfbuzz-subset"
     ];
-    maintainers = [ ];
   };
 })

@@ -26,7 +26,6 @@ with lib;
       example = literalExpression ''
         {
           timeout = 900;
-          maintainers = [ ];
         }
       '';
     };

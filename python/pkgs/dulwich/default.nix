@@ -60,6 +60,5 @@ buildPythonPackage rec {
       asl20
       gpl2Plus
     ];
-    maintainers = [ ];
   };
 }

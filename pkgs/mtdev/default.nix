@@ -17,7 +17,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Multitouch Protocol Translation Library";
     homepage = "https://bitmath.org/code/mtdev/";
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 })

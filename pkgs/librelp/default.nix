@@ -35,7 +35,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Reliable logging library";
     homepage = "https://www.librelp.com/";
     license = lib.licenses.gpl2;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 })

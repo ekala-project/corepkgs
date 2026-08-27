@@ -86,6 +86,5 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.mit;
     platforms = lib.platforms.unix ++ lib.platforms.darwin;
     mainProgram = "nim";
-    maintainers = [ ];
   };
 })

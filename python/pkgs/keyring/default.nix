@@ -68,7 +68,6 @@ buildPythonPackage rec {
     changelog = "https://github.com/jaraco/keyring/blob/${src.tag}/NEWS.rst";
     license = lib.licenses.mit;
     mainProgram = "keyring";
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 }

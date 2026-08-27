@@ -52,6 +52,5 @@ buildGoModule (finalAttrs: {
     '';
     homepage = "https://go.googlesource.com/tools";
     license = lib.licenses.bsd3;
-    maintainers = [ ];
   };
 })

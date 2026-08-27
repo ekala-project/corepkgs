@@ -47,7 +47,6 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "wayland-scanner";
     description = "C code generator for Wayland protocol XML files";
     platforms = lib.platforms.unix;
-    maintainers = [ ];
     pkgConfigModules = [ "wayland-scanner" ];
   };
 })

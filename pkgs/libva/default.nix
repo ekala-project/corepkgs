@@ -72,7 +72,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Implementation for VA-API (Video Acceleration API)";
     homepage = "https://01.org/linuxmedia/vaapi";
     license = lib.licenses.mit;
-    maintainers = [ ];
     pkgConfigModules = [
       "libva"
       "libva-drm"

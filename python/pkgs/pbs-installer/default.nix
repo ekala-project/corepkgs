@@ -37,6 +37,5 @@ buildPythonPackage rec {
     homepage = "https://github.com/frostming/pbs-installer";
     changelog = "https://github.com/frostming/pbs-installer/releases/tag/${src.tag}";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 }

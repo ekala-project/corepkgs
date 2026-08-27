@@ -62,7 +62,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://linuxwacom.github.io/";
     changelog = "https://github.com/linuxwacom/libwacom/blob/${finalAttrs.src.rev}/NEWS";
     license = lib.licenses.hpnd;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 })

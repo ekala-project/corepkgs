@@ -93,7 +93,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Integrated DNS, DHCP and TFTP server for small networks";
     homepage = "https://www.thekelleys.org.uk/dnsmasq/doc.html";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 })

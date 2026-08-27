@@ -55,6 +55,5 @@ stdenv.mkDerivation {
   meta = {
     platforms = go.meta.platforms;
     mainProgram = "tarsum";
-    maintainers = [ ];
   };
 }

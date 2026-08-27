@@ -135,7 +135,6 @@ stdenv.mkDerivation rec {
       lgpl21Plus
     ];
     description = "RPM package manager";
-    maintainers = [ ];
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
 }

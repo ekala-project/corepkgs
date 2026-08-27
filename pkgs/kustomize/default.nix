@@ -61,6 +61,5 @@ buildGoModule (finalAttrs: {
     '';
     homepage = "https://github.com/kubernetes-sigs/kustomize";
     license = lib.licenses.asl20;
-    maintainers = [ ];
   };
 })

@@ -50,6 +50,5 @@ buildGoModule (finalAttrs: {
     mainProgram = "doctl";
     homepage = "https://github.com/digitalocean/doctl";
     license = lib.licenses.asl20;
-    maintainers = [ ];
   };
 })

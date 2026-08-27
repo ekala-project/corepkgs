@@ -57,7 +57,6 @@ stdenv.mkDerivation rec {
   meta = {
     description = "Growing collection of the unix tools that nobody thought to write long ago when unix was young";
     homepage = "https://joeyh.name/code/moreutils/";
-    maintainers = [ ];
     platforms = lib.platforms.all;
     license = lib.licenses.gpl2Plus;
 

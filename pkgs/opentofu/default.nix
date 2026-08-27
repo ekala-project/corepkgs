@@ -64,7 +64,6 @@ let
       homepage = "https://opentofu.org/";
       changelog = "https://github.com/opentofu/opentofu/blob/v${version}/CHANGELOG.md";
       license = lib.licenses.mpl20;
-      maintainers = [ ];
       mainProgram = "tofu";
     };
   };

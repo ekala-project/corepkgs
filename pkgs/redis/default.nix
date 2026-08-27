@@ -124,7 +124,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.agpl3Only;
     platforms = lib.platforms.all;
     changelog = "https://github.com/redis/redis/releases/tag/${finalAttrs.version}";
-    maintainers = [ ];
     mainProgram = "redis-cli";
   };
 })

@@ -92,7 +92,6 @@ stdenv.mkDerivation (finalAttrs: {
       bsd3
       zlib
     ];
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     mainProgram = "sudo";
   };

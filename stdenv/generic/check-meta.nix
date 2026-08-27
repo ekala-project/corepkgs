@@ -23,7 +23,6 @@ let
     concatMap
     mutuallyExclusive
     optional
-    optionalString
     isAttrs
     isString
     mapAttrs
@@ -34,7 +33,6 @@ let
     toList
     isList
     elem
-    unique
     ;
 
   inherit (lib.meta)
@@ -49,16 +47,11 @@ let
 
   inherit (builtins)
     getEnv
-    trace
     ;
 
   # If we're in hydra, we can dispense with the more verbose error
   # messages and make problems easier to spot.
   inHydra = config.inHydra or false;
-  # Allow the user to opt-into additional warnings, e.g.
-  # import <corepkgs> { config = { showDerivationWarnings = [ "has-maintainers" ]; }; }
-  showWarnings = config.showDerivationWarnings;
-
   getNameWithVersion =
     attrs: attrs.name or "${attrs.pname or "«name-missing»"}-${attrs.version or "«version-missing»"}";
 
@@ -117,9 +110,6 @@ let
       any (l: !(l.free or true)) licenses;
 
   hasUnfreeLicense = attrs: attrs ? meta.license && isUnfree attrs.meta.license;
-
-  hasMaintainersOrTeams =
-    attrs: (attrs.meta.maintainers or [ ] != [ ]) || (attrs.meta.teams or [ ] != [ ]);
 
   isMarkedBroken = attrs: attrs.meta.broken or false;
 
@@ -339,8 +329,6 @@ let
           licenseType
         ];
       sourceProvenance = listOf attrs;
-      maintainers = listOf (attrsOf any); # TODO use the maintainer type from lib/tests/maintainer-module.nix
-      teams = listOf (attrsOf any); # TODO similar to maintainers, use a teams type
       priority = int;
       pkgConfigModules = listOf str;
       inherit platforms;
@@ -380,10 +368,6 @@ let
       isFcitxEngine = bool;
       isIbusEngine = bool;
       isGutenprint = bool;
-
-      # Used for the original location of the maintainer and team attributes to assist with pings.
-      maintainersPosition = any;
-      teamsPosition = any;
 
       identifiers = attrs;
     };
@@ -507,18 +491,6 @@ let
     else
       null;
 
-  # Please also update the type in /config/package-options.nix alongside this.
-  checkWarnings =
-    attrs:
-    if hasMaintainersOrTeams attrs then
-      {
-        reason = "has-maintainers";
-        errormsg = "has maintainers or teams defined in meta";
-        remediation = "";
-      }
-    else
-      null;
-
   # Helper functions and declarations to handle identifiers, extracted to reduce allocations
   hasAllCPEParts =
     cpeParts:
@@ -566,8 +538,6 @@ let
     let
       outputs = attrs.outputs or [ "out" ];
       hasOutput = out: builtins.elem out outputs;
-      maintainersPosition = builtins.unsafeGetAttrPos "maintainers" (attrs.meta or { });
-      teamsPosition = builtins.unsafeGetAttrPos "teams" (attrs.meta or { });
     in
     {
       # `name` derivation attribute includes cross-compilation cruft,
@@ -597,22 +567,11 @@ let
       ]
       ++ optional (hasOutput "man") "man";
 
-      # CI scripts look at these to determine pings. Note that we should filter nulls out of this,
-      # or nix-env complains: https://github.com/NixOS/nix/blob/2.18.8/src/nix-env/nix-env.cc#L963
-      ${if maintainersPosition == null then null else "maintainersPosition"} = maintainersPosition;
-      ${if teamsPosition == null then null else "teamsPosition"} = teamsPosition;
     }
     // attrs.meta or { }
     // {
       # Fill `meta.position` to identify the source location of the package.
       ${if pos == null then null else "position"} = pos.file + ":" + toString pos.line;
-
-      # Maintainers should be inclusive of teams.
-      # Note that there may be external consumers of this API (repology, for instance) -
-      # if you add a new maintainer or team attribute please ensure that this expectation is still met.
-      maintainers = unique (
-        attrs.meta.maintainers or [ ] ++ concatMap (team: team.members or [ ]) attrs.meta.teams or [ ]
-      );
 
       identifiers =
         let
@@ -684,27 +643,9 @@ let
     { meta, attrs }:
     let
       invalid = checkValidity attrs;
-      warning = checkWarnings attrs;
     in
     if isNull invalid then
-      if isNull warning then
-        validYes
-      else
-        let
-          msg =
-            if inHydra then
-              "Warning while evaluating ${getNameWithVersion attrs}: «${warning.reason}»: ${warning.errormsg}"
-            else
-              "Package ${getNameWithVersion attrs} in ${pos_str meta} ${warning.errormsg}, continuing anyway."
-              + (optionalString (warning.remediation != "") "\n${warning.remediation}");
-
-          handled = if elem warning.reason showWarnings then trace msg true else true;
-        in
-        warning
-        // {
-          valid = "warn";
-          handled = handled;
-        }
+      validYes
     else
       let
         msg =

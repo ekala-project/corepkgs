@@ -62,6 +62,5 @@ buildGoModule (finalAttrs: {
     description = "Modern encryption tool with small explicit keys";
     license = lib.licenses.bsd3;
     mainProgram = "age";
-    maintainers = [ ];
   };
 })

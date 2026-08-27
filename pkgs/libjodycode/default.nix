@@ -30,6 +30,5 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://codeberg.org/jbruchon/libjodycode";
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 })

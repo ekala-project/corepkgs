@@ -96,7 +96,6 @@ buildGoModule rec {
     description = "Command line utility for various operations on container images and image repositories";
     mainProgram = "skopeo";
     homepage = "https://github.com/containers/skopeo";
-    maintainers = [ ];
     license = lib.licenses.asl20;
   };
 }

@@ -31,7 +31,6 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description = "Example CMake package";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 })
 ```

@@ -38,6 +38,5 @@ stdenv.mkDerivation rec {
     homepage = "https://cgit.freedesktop.org/mesa/glu/";
     license = lib.licenses.sgi-b-20;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 }

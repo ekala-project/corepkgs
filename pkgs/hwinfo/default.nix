@@ -99,6 +99,5 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/numtide/hwinfo";
     platforms = lib.platforms.linux;
     mainProgram = "hwinfo";
-    maintainers = [ ];
   };
 })

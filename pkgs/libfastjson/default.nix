@@ -24,7 +24,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Fast json library for C";
     homepage = "https://github.com/rsyslog/libfastjson";
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

@@ -69,7 +69,6 @@ stdenv.mkDerivation rec {
     downloadPage = "https://git.infradead.org/mtd-utils.git";
     license = lib.licenses.gpl2Plus;
     homepage = "http://www.linux-mtd.infradead.org/";
-    maintainers = [ ];
     platforms = with lib.platforms; linux;
   };
 }

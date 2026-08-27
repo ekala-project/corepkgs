@@ -31,7 +31,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Smart card emulation library";
     homepage = "https://gitlab.freedesktop.org/spice/libcacard";
     license = lib.licenses.lgpl21;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

@@ -63,6 +63,5 @@ buildGoModule (finalAttrs: {
     '';
     mainProgram = "trivy";
     license = lib.licenses.asl20;
-    maintainers = [ ];
   };
 })

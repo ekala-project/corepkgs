@@ -84,6 +84,5 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://igraph.org/";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 })

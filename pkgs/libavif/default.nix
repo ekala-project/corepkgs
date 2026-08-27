@@ -61,7 +61,6 @@ stdenv.mkDerivation rec {
     description = "C implementation of the AV1 Image File Format";
     homepage = "https://github.com/AOMediaCodec/libavif";
     license = lib.licenses.bsd2;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 }

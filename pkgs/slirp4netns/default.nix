@@ -54,7 +54,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/rootless-containers/slirp4netns";
     description = "User-mode networking for unprivileged network namespaces";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     mainProgram = "slirp4netns";
   };

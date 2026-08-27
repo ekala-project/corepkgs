@@ -28,7 +28,6 @@ buildGoModule {
     description = "Fork of esbuild maintained by netlify";
     homepage = "https://github.com/netlify/esbuild";
     license = lib.licenses.mit;
-    maintainers = [ ];
     mainProgram = "esbuild";
   };
 }

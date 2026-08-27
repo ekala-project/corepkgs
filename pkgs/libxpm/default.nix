@@ -55,7 +55,6 @@ stdenv.mkDerivation (finalAttrs: {
       mit
     ];
     mainProgram = "sxpm";
-    maintainers = [ ];
     pkgConfigModules = [ "xpm" ];
     platforms = lib.platforms.unix;
   };

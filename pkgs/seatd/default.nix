@@ -55,7 +55,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Minimal seat management daemon, and a universal seat management library";
     homepage = "https://sr.ht/~kennylevinsen/seatd/";
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     mainProgram = "seatd";
   };

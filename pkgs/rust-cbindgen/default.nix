@@ -24,7 +24,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     description = "Tool for generating C bindings to Rust code";
     homepage = "https://github.com/mozilla/cbindgen";
     license = lib.licenses.mpl20;
-    maintainers = [ ];
     mainProgram = "cbindgen";
   };
 })

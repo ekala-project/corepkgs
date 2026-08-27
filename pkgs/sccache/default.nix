@@ -41,7 +41,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     mainProgram = "sccache";
     homepage = "https://github.com/mozilla/sccache";
     changelog = "https://github.com/mozilla/sccache/releases/tag/v${finalAttrs.version}";
-    maintainers = [ ];
     license = lib.licenses.asl20;
   };
 })

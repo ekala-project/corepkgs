@@ -97,6 +97,5 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/facebook/rocksdb/raw/v${finalAttrs.version}/HISTORY.md";
     license = lib.licenses.asl20;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 })

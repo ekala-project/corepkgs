@@ -78,7 +78,6 @@ buildGoModule (finalAttrs: {
     homepage = "https://github.com/opencontainers/runc";
     description = "CLI tool for spawning and running containers according to the OCI specification";
     license = lib.licenses.asl20;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     mainProgram = "runc";
   };

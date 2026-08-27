@@ -34,6 +34,5 @@ buildGoModule (finalAttrs: {
     description = "Fast way to switch between clusters and namespaces in kubectl";
     license = lib.licenses.asl20;
     homepage = "https://github.com/ahmetb/kubectx";
-    maintainers = [ ];
   };
 })

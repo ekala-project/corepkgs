@@ -64,7 +64,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.lunarg.com";
     platforms = lib.platforms.unix;
     license = lib.licenses.asl20;
-    maintainers = [ ];
     pkgConfigModules = [ "vulkan" ];
   };
 })

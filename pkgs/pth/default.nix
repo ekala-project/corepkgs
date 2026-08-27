@@ -34,6 +34,5 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.gnu.org/software/pth";
     license = lib.licenses.lgpl21Plus;
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 })

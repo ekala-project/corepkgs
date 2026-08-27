@@ -30,6 +30,5 @@ python3.pkgs.buildPythonPackage {
 
   meta = {
     description = "Python test driver for runitTests";
-    maintainers = [ ];
   };
 }

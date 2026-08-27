@@ -29,7 +29,6 @@ stdenv.mkDerivation (finalAttrs: {
 meta = {
   description = "Brief description";
   license = lib.licenses.mit;
-  maintainers = [ ];  # Always empty
   platforms = lib.platforms.linux;
 };
 ```
@@ -253,7 +252,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Example library";
     homepage = "https://github.com/example-org/example";
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

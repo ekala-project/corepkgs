@@ -257,7 +257,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     '';
     license = lib.licenses.mit;
     mainProgram = "deno";
-    maintainers = [ ];
     platforms = [
       "x86_64-linux"
       "aarch64-linux"

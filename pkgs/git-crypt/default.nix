@@ -72,7 +72,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     downloadPage = "https://github.com/AGWA/git-crypt/releases";
     license = lib.licenses.gpl3;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
     mainProgram = "git-crypt";
   };

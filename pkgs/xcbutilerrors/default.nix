@@ -42,7 +42,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "XCB utility library that gives human readable names to error, event & request codes";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxcb-errors";
     license = lib.licenses.x11;
-    maintainers = [ ];
     pkgConfigModules = [ "xcb-errors" ];
     platforms = lib.platforms.unix;
   };

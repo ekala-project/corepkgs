@@ -29,7 +29,6 @@ buildGoModule rec {
     homepage = "https://esbuild.github.io";
     changelog = "https://github.com/evanw/esbuild/blob/v${version}/CHANGELOG.md";
     license = lib.licenses.mit;
-    maintainers = [ ];
     mainProgram = "esbuild";
   };
 }

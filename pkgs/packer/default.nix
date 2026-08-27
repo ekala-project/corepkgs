@@ -35,7 +35,6 @@ buildGoModule rec {
     description = "Tool for creating identical machine images for multiple platforms from a single source configuration";
     homepage = "https://www.packer.io";
     license = lib.licenses.bsl11;
-    maintainers = [ ];
     changelog = "https://github.com/hashicorp/packer/blob/v${version}/CHANGELOG.md";
   };
 }

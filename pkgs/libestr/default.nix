@@ -17,7 +17,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://libestr.adiscon.com/";
     description = "Some essentials for string handling";
     license = lib.licenses.lgpl21;
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

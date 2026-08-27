@@ -63,6 +63,5 @@ buildPythonPackage rec {
     mainProgram = "igraph";
     homepage = "https://igraph.org/python/";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
   };
 }

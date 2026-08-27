@@ -106,6 +106,5 @@ buildPythonPackage rec {
     mainProgram = "httpx";
     homepage = "https://github.com/encode/httpx";
     license = lib.licenses.bsd3;
-    maintainers = [ ];
   };
 }

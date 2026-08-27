@@ -40,7 +40,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Set of Thai language support routines";
     license = lib.licenses.lgpl21Plus;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
     pkgConfigModules = [ "libthai" ];
   };
 })

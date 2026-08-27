@@ -32,6 +32,5 @@ replaceVarsWith {
     license = lib.licenses.mit;
     platforms = lib.platforms.linux;
     mainProgram = "nixos-enter";
-    maintainers = [ ];
   };
 }

@@ -26,6 +26,5 @@ buildPerlPackage {
       artistic1
       gpl1Plus
     ];
-    maintainers = [ ];
   };
 }

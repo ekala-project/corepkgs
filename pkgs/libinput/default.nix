@@ -88,7 +88,6 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "libinput";
     homepage = "https://www.freedesktop.org/wiki/Software/libinput/";
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     changelog = "https://gitlab.freedesktop.org/libinput/libinput/-/releases/${finalAttrs.version}";
   };

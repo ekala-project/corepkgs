@@ -76,6 +76,5 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.asl20;
     platforms = [ "x86_64-linux" ]; # Binary distribution
     mainProgram = "crystal";
-    maintainers = [ ];
   };
 })

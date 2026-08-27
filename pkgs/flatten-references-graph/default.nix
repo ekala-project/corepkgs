@@ -32,6 +32,5 @@ pythonPackages.buildPythonApplication {
   meta = {
     description = "Tool to flatten Nix store dependency graphs";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 }

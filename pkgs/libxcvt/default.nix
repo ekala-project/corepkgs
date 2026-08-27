@@ -32,7 +32,6 @@ stdenv.mkDerivation (finalAttrs: {
       hpndSellVariant
     ];
     mainProgram = "cvt";
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

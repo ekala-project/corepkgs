@@ -202,7 +202,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Powerful, open source object-relational database system";
     license = lib.licenses.postgresql;
     changelog = "https://www.postgresql.org/docs/release/${finalAttrs.version}/";
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 })

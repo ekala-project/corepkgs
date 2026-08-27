@@ -63,6 +63,5 @@ stdenv.mkDerivation (finalAttrs: {
     description = "C bindings for Google's Protocol Buffers";
     license = lib.licenses.bsd2;
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 })

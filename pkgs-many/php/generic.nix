@@ -115,6 +115,5 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.php301;
     platforms = lib.platforms.unix ++ lib.platforms.darwin;
     mainProgram = "php";
-    maintainers = [ ];
   };
 })

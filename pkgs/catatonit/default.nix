@@ -44,7 +44,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Container init that is so simple it's effectively brain-dead";
     homepage = "https://github.com/openSUSE/catatonit";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     mainProgram = "catatonit";
   };

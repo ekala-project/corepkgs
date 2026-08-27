@@ -53,7 +53,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Open-source alternative to the OpenGL Utility Toolkit (GLUT) library";
     homepage = "https://freeglut.sourceforge.net/";
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

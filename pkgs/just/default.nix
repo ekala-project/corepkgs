@@ -110,7 +110,6 @@ rustPlatform.buildRustPackage {
     changelog = "https://github.com/casey/just/blob/${version}/CHANGELOG.md";
     description = "Handy way to save and run project-specific commands";
     license = lib.licenses.cc0;
-    maintainers = [ ];
     mainProgram = "just";
   };
 }

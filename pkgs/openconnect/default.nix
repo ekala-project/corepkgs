@@ -57,7 +57,6 @@ stdenv.mkDerivation {
     description = "VPN Client for Cisco's AnyConnect SSL VPN";
     homepage = "https://www.infradead.org/openconnect/";
     license = lib.licenses.lgpl21Only;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
     mainProgram = "openconnect";
   };

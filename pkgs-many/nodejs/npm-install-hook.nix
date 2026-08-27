@@ -13,6 +13,5 @@ makeSetupHook {
 
   meta = {
     description = "Setup hook for npm package installation";
-    maintainers = [ ];
   };
 } ./npm-install-hook.sh

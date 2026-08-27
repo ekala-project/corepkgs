@@ -33,7 +33,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Lightweight signal-safe logging library";
     mainProgram = "stdlogctl";
     license = lib.licenses.bsd2;
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

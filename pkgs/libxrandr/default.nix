@@ -67,7 +67,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxrandr";
     license = lib.licenses.mit;
     pkgConfigModules = [ "xrandr" ];
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

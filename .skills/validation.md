@@ -123,7 +123,7 @@ nix fmt pkgs/$PACKAGE/default.nix
 - [ ] Built binary/library works
 - [ ] All dependencies verified with `nix-instantiate`
 - [ ] `nix fmt` run on all edited files
-- [ ] `meta.maintainers = [ ]`
+- [ ] No `meta.maintainers` or `meta.teams`
 - [ ] TODO comments for missing dependencies
 
 ## Advanced Validation

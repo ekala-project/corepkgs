@@ -57,6 +57,5 @@ stdenv.mkDerivation {
     mainProgram = "jshon";
     license = lib.licenses.free;
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 }

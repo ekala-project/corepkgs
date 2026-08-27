@@ -36,7 +36,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Standard X key constants and conversion to/from keycodes";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxcb-keysyms";
     license = lib.licenses.x11;
-    maintainers = [ ];
     pkgConfigModules = [ "xcb-keysyms" ];
     platforms = lib.platforms.unix;
   };

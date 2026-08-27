@@ -132,7 +132,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://apr.apache.org/";
     description = "Companion library to APR, the Apache Portable Runtime";
     mainProgram = "apu-1-config";
-    maintainers = [ ];
     platforms = lib.platforms.unix;
     license = lib.licenses.asl20;
   };

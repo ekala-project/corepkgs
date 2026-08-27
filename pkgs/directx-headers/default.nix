@@ -30,7 +30,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Official D3D12 headers from Microsoft";
     homepage = "https://github.com/microsoft/DirectX-Headers";
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

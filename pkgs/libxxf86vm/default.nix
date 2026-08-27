@@ -60,7 +60,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxxf86vm";
     license = lib.licenses.mit;
     pkgConfigModules = [ "xxf86vm" ];
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

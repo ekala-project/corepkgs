@@ -51,7 +51,6 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/hanslub42/rlwrap/raw/refs/tags/v${finalAttrs.version}/NEWS";
     license = licenses.gpl2Plus;
     platforms = platforms.unix;
-    maintainers = [ ];
     mainProgram = "rlwrap";
   };
 })

@@ -75,21 +75,6 @@ in
       '';
     };
 
-    showDerivationWarnings = mkOption {
-      type = types.listOf (types.enum [ "has-maintainers" ]);
-      default = [ "has-maintainers" ];
-      description = ''
-        Which warnings to display for potentially dangerous
-        or deprecated values passed into `stdenv.mkDerivation`.
-
-        A list of warnings can be found in
-        [/pkgs/stdenv/generic/check-meta.nix](https://github.com/NixOS/nixpkgs/blob/master/pkgs/stdenv/generic/check-meta.nix).
-
-        This is not a stable interface; warnings may be added, changed
-        or removed without prior notice.
-      '';
-    };
-
     checkMeta = mkOption {
       type = types.bool;
       default = false;

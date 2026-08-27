@@ -49,7 +49,6 @@ stdenv.mkDerivation (finalAttrs: {
       file types and the ability to rebind keys.
     '';
     license = lib.licenses.gpl3Plus;
-    maintainers = [ ];
     platforms = lib.platforms.all;
     mainProgram = "nano";
   };

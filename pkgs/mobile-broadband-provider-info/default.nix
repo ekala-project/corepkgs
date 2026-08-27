@@ -31,7 +31,6 @@ stdenv.mkDerivation rec {
     description = "Mobile broadband service provider database";
     homepage = "https://gitlab.gnome.org/GNOME/mobile-broadband-provider-info";
     license = lib.licenses.publicDomain;
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 }

@@ -63,7 +63,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "HTTP client library based on APR";
     homepage = "https://serf.apache.org/";
     license = lib.licenses.asl20;
-    maintainers = [ ];
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
 })

@@ -66,7 +66,6 @@ buildGoModule (finalAttrs: {
     description = "Debugger for the Go programming language";
     homepage = "https://github.com/go-delve/delve";
     changelog = "https://github.com/go-delve/delve/blob/v${finalAttrs.version}/CHANGELOG.md";
-    maintainers = [ ];
     license = lib.licenses.mit;
     mainProgram = "dlv";
   };

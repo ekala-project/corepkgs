@@ -81,6 +81,5 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "exiv2";
     platforms = lib.platforms.all;
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
   };
 })

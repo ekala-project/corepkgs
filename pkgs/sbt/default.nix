@@ -59,7 +59,6 @@ stdenv.mkDerivation (finalAttrs: {
       binaryNativeCode
     ];
     description = "Build tool for Scala, Java and more";
-    maintainers = [ ];
     platforms = lib.platforms.unix;
     mainProgram = "sbt";
   };

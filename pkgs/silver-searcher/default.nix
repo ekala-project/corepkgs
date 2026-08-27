@@ -47,7 +47,6 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     homepage = "https://github.com/ggreer/the_silver_searcher/";
     description = "Code-searching tool similar to ack, but faster";
-    maintainers = [ ];
     mainProgram = "ag";
     platforms = lib.platforms.all;
     license = lib.licenses.asl20;

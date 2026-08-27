@@ -90,8 +90,6 @@ in
   jailbreak ? false,
   license ? null,
   enableParallelBuilding ? true,
-  maintainers ? null,
-  teams ? null,
   changelog ? null,
   mainProgram ? null,
   doCoverage ? false,
@@ -798,8 +796,6 @@ lib.fix (
       ${if (args ? broken) then "broken" else null} = broken;
       ${if (args ? description) then "description" else null} = description;
       ${if (args ? license) then "license" else null} = license;
-      ${if (args ? maintainers) then "maintainers" else null} = maintainers;
-      ${if (args ? teams) then "teams" else null} = teams;
       ${if (args ? hydraPlatforms) then "hydraPlatforms" else null} = hydraPlatforms;
       ${if (args ? badPlatforms) then "badPlatforms" else null} = badPlatforms;
       ${if (args ? changelog) then "changelog" else null} = changelog;

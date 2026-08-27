@@ -73,23 +73,6 @@ let
     // optionalMetaString "changelog"
     // optionalMetaString "downloadPage"
     // (if meta ? license then { license = serializeLicenses meta.license; } else { })
-    // (
-      if meta ? maintainers && builtins.isList meta.maintainers then
-        {
-          maintainers = map (
-            m:
-            if builtins.isAttrs m then
-              { }
-              // lib.optionalAttrs (m ? email) { inherit (m) email; }
-              // lib.optionalAttrs (m ? github) { inherit (m) github; }
-              // lib.optionalAttrs (m ? name) { inherit (m) name; }
-            else
-              { }
-          ) meta.maintainers;
-        }
-      else
-        { }
-    )
     // (if meta ? broken then { inherit (meta) broken; } else { })
     // (if meta ? unfree then { inherit (meta) unfree; } else { })
     // (if meta ? insecure then { inherit (meta) insecure; } else { });

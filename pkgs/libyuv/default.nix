@@ -48,7 +48,6 @@ stdenv.mkDerivation {
     description = "Open source project that includes YUV scaling and conversion functionality";
     mainProgram = "yuvconvert";
     platforms = lib.platforms.unix;
-    maintainers = [ ];
     license = lib.licenses.bsd3;
   };
 }

@@ -80,7 +80,6 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
     '';
     license = lib.licenses.gpl2Only;
     homepage = "https://github.com/chipsec/chipsec";
-    maintainers = [ ];
     platforms = if withDriver then [ "x86_64-linux" ] else with lib.platforms; linux ++ darwin;
     mainProgram = "chipsec_main";
   };
