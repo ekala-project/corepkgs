@@ -136,7 +136,7 @@ self: {
   xf86inputjoystick = self."xf86-input-joystick";
   xf86inputkeyboard = self."xf86-input-keyboard" or null;
   xf86inputlibinput = self."xf86-input-libinput";
-  xf86inputmouse = self."xf86-input-mouse";
+  xf86inputmouse = self."xf86-input-mouse" or null;
   xf86inputsynaptics = self."xf86-input-synaptics";
   xf86inputvmmouse = self."xf86-input-vmmouse";
   xf86inputvoid = self."xf86-input-void";
