@@ -31,11 +31,7 @@ lib.lowPrio (
         targetPackages.libc or pkgs.libc
       else
         null;
-    threadsCross =
-      if !lib.systems.equals stdenv.targetPlatform stdenv.buildPlatform then
-        targetPackages.threads or pkgs.threads
-      else
-        { };
+    threadsCross = { };
     isl = if stdenv.hostPlatform.isDarwin then null else isl;
     stdenv =
       if

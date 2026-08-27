@@ -989,9 +989,7 @@ with final;
       # want the C++ library to be explicitly chosen by the caller, and null by
       # default.
       libcxx ? null,
-      extraPackages ? lib.optional (
-        cc.isGNU or false && stdenv.targetPlatform.isMinGW
-      ) targetPackages.threads.package,
+      extraPackages ? [ ],
       nixSupport ? { },
       ...
     }@extraArgs:
@@ -1372,16 +1370,6 @@ with final;
   texinfo6 = texinfo.v6;
   texinfo7 = texinfo.v7;
   texinfoInteractive = texinfo.interactive;
-
-  # TODO(corepkgs): remove hack
-  threads =
-    lib.optionalAttrs (stdenv.hostPlatform.isMinGW && !(stdenv.hostPlatform.useLLVM or false))
-      {
-        # other possible values: win32 or posix
-        model = "mcf";
-        # For win32 or posix set this to null
-        package = windows.mcfgthreads;
-      };
 
   # On non-GNU systems we need GNU Gettext for libintl.
   libintl = if stdenv.hostPlatform.libc != "glibc" then gettext else null;
