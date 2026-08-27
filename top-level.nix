@@ -653,9 +653,6 @@ final: prev: with final; {
     enableDarwinSandbox = false;
   };
 
-  patchelf = callPackage ./pkgs/patchelf { };
-  patchelfUnstable = lib.lowPrio (callPackage ./pkgs/patchelf/unstable.nix { });
-
   generateLdCacheHook =
     makeSetupHook
       {
