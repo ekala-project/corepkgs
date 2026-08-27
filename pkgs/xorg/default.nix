@@ -158,7 +158,6 @@ self: {
   xf86videonouveau = self."xf86-video-nouveau";
   xf86videonv = self."xf86-video-nv";
   xf86videoomap = self."xf86-video-omap";
-  xf86videoopenchrome = self."xf86-video-openchrome";
   xf86videoqxl = self."xf86-video-qxl";
   xf86videor128 = self."xf86-video-r128";
   xf86videos3virge = self."xf86-video-s3virge";
