@@ -50,21 +50,18 @@ stdenv.mkDerivation (finalAttrs: {
   # Disabled because the tests can time-out.
   doCheck = false;
 
-  meta =
-    with lib;
-    {
-      description = "Embeddable HTTP server library";
+  meta = {
+    description = "Embeddable HTTP server library";
 
-      longDescription = ''
-        GNU libmicrohttpd is a small C library that is supposed to make
-        it easy to run an HTTP server as part of another application.
-      '';
+    longDescription = ''
+      GNU libmicrohttpd is a small C library that is supposed to make
+      it easy to run an HTTP server as part of another application.
+    '';
 
-      license = lib.licenses.lgpl2Plus;
+    license = lib.licenses.lgpl2Plus;
 
-      homepage = "https://www.gnu.org/software/libmicrohttpd/";
+    homepage = "https://www.gnu.org/software/libmicrohttpd/";
 
-      platforms = lib.platforms.unix;
-    }
-    // meta;
+    platforms = lib.platforms.unix;
+  };
 })
