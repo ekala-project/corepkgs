@@ -2,11 +2,11 @@
   "nodes": {
     "nix-lib": {
       "locked": {
-        "lastModified": 1787285077,
-        "narHash": "sha256-hXdu8U9asnE5025tXPivAwMPkx89r9gbT0y0Pk85fbA=",
+        "lastModified": 1787401631,
+        "narHash": "sha256-Qko+hdbdmfUT+wSTlcc7TOAMHGhyMI9sdRlKzcyzDqk=",
         "owner": "ekala-project",
         "repo": "nix-lib",
-        "rev": "59626ce31395ca81d0cd4183d8f786c1960bed94",
+        "rev": "a52fa865318d189e15ecc37ed1d26815309e4e4e",
         "type": "github"
       },
       "original": {
