@@ -86,7 +86,6 @@ final: prev: with final; {
   epoll-shim = null; # for non-linux compat
   epubcheck = null;
   ettercap = null;
-  exiv2 = null;
   fcitx5 = null;
   fd = null;
   feh = null;
