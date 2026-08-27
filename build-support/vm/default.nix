@@ -27,14 +27,13 @@
 
   # ----------------------------
   # The following  arguments form the "interface" of `pkgs.vmTools`.
-  # Note that `img` is a real package, but is set to this default in `all-packages.nix`.
   # ----------------------------
   customQemu ? null,
   # Note: 6.18 is required for vmTools (6.12 has issues with direct kernel boot)
   # Override kernel with preferBuiltin=true to ensure DRM and framebuffer drivers
   # are built-in rather than modules (required for vmTools direct kernel boot)
   kernel ? (linux.v6_18.override { preferBuiltin = true; }),
-  img ? stdenv.hostPlatform.linux-kernel.target,
+  img ? kernel.target,
   storeDir ? builtins.storeDir,
   rootModules ? [
     "virtio_pci"

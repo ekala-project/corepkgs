@@ -136,7 +136,7 @@ with lib;
     system.boot.loader.kernelFile = mkOption {
       type = types.str;
       internal = true;
-      default = pkgs.stdenv.hostPlatform.linux-kernel.target or "bzImage";
+      default = config.boot.kernelPackages.kernel.target;
       description = ''
         Name of the kernel file in the kernel package.
         Usually "bzImage" for x86_64, "Image" for ARM.
