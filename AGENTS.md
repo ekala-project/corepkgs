@@ -57,6 +57,13 @@ pkgs-many/python/default.nix
 
 The variants are automatically available in the package scope (e.g., `pkgs.python39`, `pkgs.python310`).
 
+## Commit Message Conventions
+
+- **New packages:** `<pkg>: init at <version>` (e.g., `libavif: init at 1.4.2`)
+- **Version updates:** `<pkg>: <old version> -> <new version>` (e.g., `libxpm: 3.5.18 -> 3.5.19`)
+- **ekaos modules:** `ekaos/<module>: init | <succinct message>` (e.g., `ekaos/nginx: init`, `ekaos/networking: add firewall options`)
+- **Do not** add AI attribution (e.g., `Co-Authored-By`) to commit messages
+
 ## Packaging Conventions
 
 ### Meta Attributes
