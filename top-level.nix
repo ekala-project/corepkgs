@@ -160,7 +160,6 @@ final: prev: with final; {
   pygame-ce = null;
   quart = null;
   rich = null;
-  rocksdb = null;
   rsyslog = null;
   sage = null;
   samba = null;
