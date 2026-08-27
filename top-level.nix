@@ -128,7 +128,6 @@ final: prev: with final; {
   mpd = null;
   mscgen = null;
   multipath-tools = null;
-  mysql80 = null;
   neovim = null;
   nmap = null;
   nodejs_latest = nodejs.v23;
