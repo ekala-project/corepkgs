@@ -89,12 +89,12 @@ self: {
   utilmacros = self."util-macros" or null;
   xcbproto = self."xcb-proto";
   xcbutilcursor = self."libxcb-cursor" or null;
-  xcbutilerrors = self."libxcb-errors" or null;
-  xcbutilimage = self."libxcb-image" or null;
+  xcbutilerrors = self.xcbutilerrors;
+  xcbutilimage = self.xcbutilimage;
   xcbutilkeysyms = self.xcbutilkeysyms;
-  xcbutil = self."libxcb-util" or null;
-  xcbutilrenderutil = self."libxcb-render-util" or null;
-  xcbutilwm = self."libxcb-wm" or null;
+  xcbutil = self.xcbutil;
+  xcbutilrenderutil = self.xcbutilrenderutil;
+  xcbutilwm = self.xcbutilwm;
   xkeyboardconfig = self."xkeyboard-config";
   xcursorthemes = self."xcursor-themes" or null;
   xorgcffiles = self."xorg-cf-files" or null;
