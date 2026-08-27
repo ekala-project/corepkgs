@@ -56,6 +56,16 @@ final: prev: with final; {
   # nv-codec-headers version aliases for ffmpeg
   nv-codec-headers-12 = nv-codec-headers.override { majorVersion = "12"; };
 
+  # fftw precision variants; the package builds one precision per derivation
+  fftwSinglePrec = fftw.override { precision = "single"; };
+  fftwFloat = fftwSinglePrec; # the configure option is just an alias
+  fftwLongDouble = fftw.override { precision = "long-double"; };
+  # quad precision needs libquadmath, which comes from gcc
+  fftwQuad = fftw.override {
+    precision = "quad-precision";
+    stdenv = gccStdenv;
+  };
+
   # keep-sorted start
 
   aafigure = null;
@@ -89,6 +99,7 @@ final: prev: with final; {
   fcitx5 = null;
   fd = null;
   feh = null;
+  fftwMpi = null; # needs mpi
   firefox = null;
   fltk = null;
   fluxbox = null;
