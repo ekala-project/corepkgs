@@ -150,7 +150,6 @@ final: prev: with final; {
   pika = null;
   pinentry = null;
   poppler = null;
-  postgresql = null;
   psutils = null;
   pydantic = null;
   pygame-ce = null;
