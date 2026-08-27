@@ -69,7 +69,6 @@ final: prev: with final; {
   blockdiag = null;
   breathe = null;
   chameleon = null;
-  chrony = null;
   coeurl = null;
   cppzmq = null;
   cunit = null;
