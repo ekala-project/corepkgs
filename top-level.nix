@@ -183,7 +183,6 @@ final: prev: with final; {
   tracee = null;
   trustme = null;
   ttfautohint = null;
-  unixODBC = null;
   uwsgi = null;
   vips = null;
   vlc = null;
