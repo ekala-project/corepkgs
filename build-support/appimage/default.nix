@@ -1,150 +1,244 @@
 {
   lib,
-  buildFHSEnvBubblewrap,
+  bash,
+  binutils-unwrapped,
   coreutils,
-  file,
-  findutils,
   gawk,
+  libarchive,
+  squashfs-tools,
+  buildFHSEnv,
+  replaceVarsWith,
+  runtimeShell,
   runCommand,
-  squashfsTools,
-  stdenv,
 }:
 
-let
-  extractType1 =
-    {
-      name ? "appimage-type1",
+rec {
+  appimage-exec = replaceVarsWith {
+    src = ./appimage-exec.sh;
+    isExecutable = true;
+    dir = "bin";
+    replacements = {
+      inherit runtimeShell;
+      path = lib.makeBinPath [
+        bash
+        binutils-unwrapped
+        coreutils
+        gawk
+        libarchive
+        squashfs-tools
+      ];
+    };
+  };
+
+  extract =
+    args@{
+      pname,
+      version,
+      name ? null,
+      postExtract ? "",
       src,
+      ...
     }:
-    runCommand "${name}-extracted"
+    assert
+      name == null
+      || throw "The `name` argument is deprecated. Use `pname` and `version` instead to construct the name.";
+    runCommand "${pname}-${version}-extracted"
       {
-        nativeBuildInputs = [
-          coreutils
-          file
-          findutils
-          gawk
-        ];
-        inherit src;
+        nativeBuildInputs = [ appimage-exec ];
+        strictDeps = true;
       }
       ''
-        # Type 1 AppImages are ISO 9660 with an ELF header
-        # Find the offset of the embedded filesystem
-        offset=$(${lib.getExe' coreutils "od"} -A d -t x1 -j 8 -N 4 "$src" | \
-          head -1 | awk '{for(i=2;i<=NF;i++) printf "%s", $i; print ""}' | \
-          awk '{print strtonum("0x" $0)}')
-
-        if [ -z "$offset" ] || [ "$offset" -eq 0 ]; then
-          # Fallback: try unsquashfs on the whole file
-          offset=0
-        fi
-
-        mkdir -p $out
-        tail -c +$((offset + 1)) "$src" > /tmp/payload.squashfs
-        ${lib.getExe' squashfsTools "unsquashfs"} -d $out /tmp/payload.squashfs
+        appimage-exec.sh -x $out ${src}
+        ${postExtract}
       '';
 
-  extractType2 =
-    {
-      name ? "appimage-type2",
-      src,
-    }:
-    runCommand "${name}-extracted"
-      {
-        nativeBuildInputs = [ squashfsTools ];
-        inherit src;
-      }
-      ''
-        # Type 2 AppImages have a runtime + squashfs appended
-        # The runtime knows its own size, so we find where squashfs starts
-        offset=$(grep -aobm1 'hsqs' "$src" | head -1 | cut -d: -f1)
-        if [ -z "$offset" ]; then
-          echo "Could not find squashfs magic in AppImage" >&2
-          exit 1
-        fi
-        mkdir -p $out
-        ${lib.getExe' squashfsTools "unsquashfs"} -d $out -o "$offset" "$src"
-      '';
+  # for compatibility, deprecated
+  extractType1 = lib.warn "'appimageTools.extractType1' is deprecated, use 'appimageTools.extract' instead" extract;
+  extractType2 = lib.warn "'appimageTools.extractType2' is deprecated, use 'appimageTools.extract' instead" extract;
+  wrapType1 = lib.warn "'appimageTools.wrapType1' is deprecated, use 'appimageTools.wrapType2' instead" wrapType2;
 
-  wrapType1 =
-    {
-      name ? "appimage-wrapped",
-      src,
-      extraPkgs ? _: [ ],
-      extraBwrapArgs ? [ ],
-      ...
-    }@args:
-    wrapAppImage (
-      {
-        inherit name;
-        appimage = extractType1 {
-          inherit name src;
-        };
-        inherit extraPkgs extraBwrapArgs;
-      }
-      // removeAttrs args [
-        "name"
-        "src"
-        "extraPkgs"
-        "extraBwrapArgs"
-      ]
-    );
+  wrapAppImage = lib.extendMkDerivation {
+    constructDrv = buildFHSEnv;
+    excludeDrvArgNames = [ "extraPkgs" ];
+    extendDrvArgs =
+      finalAttrs:
+      prev@{
+        contents ? prev.src,
+        extraPkgs ? pkgs: [ ],
+        meta ? { },
+        ...
+      }:
+      defaultFhsEnvArgs
+      // {
+        targetPkgs = pkgs: [ appimage-exec ] ++ defaultFhsEnvArgs.targetPkgs pkgs ++ extraPkgs pkgs;
 
-  wrapType2 =
-    {
-      name ? "appimage-wrapped",
-      src,
-      extraPkgs ? _: [ ],
-      extraBwrapArgs ? [ ],
-      ...
-    }@args:
-    wrapAppImage (
-      {
-        inherit name;
-        appimage = extractType2 {
-          inherit name src;
-        };
-        inherit extraPkgs extraBwrapArgs;
-      }
-      // removeAttrs args [
-        "name"
-        "src"
-        "extraPkgs"
-        "extraBwrapArgs"
-      ]
-    );
+        runScript = "appimage-exec.sh -w ${finalAttrs.contents or prev.src} --";
 
-  wrapAppImage =
-    {
-      name ? "appimage-wrapped",
-      appimage,
-      extraPkgs ? _: [ ],
-      extraBwrapArgs ? [ ],
-      meta ? { },
-      ...
-    }@args:
-    buildFHSEnvBubblewrap (
-      {
-        inherit name;
-        targetPkgs = pkgs: [ appimage ] ++ extraPkgs pkgs;
-        runScript = "${appimage}/AppRun";
-        extraBwrapArgs = [ "--chdir ${appimage}" ] ++ extraBwrapArgs;
-        inherit meta;
-      }
-      // removeAttrs args [
-        "name"
-        "appimage"
-        "extraPkgs"
-        "extraBwrapArgs"
-        "meta"
-      ]
-    );
-in
-{
-  inherit
-    extractType1
-    extractType2
-    wrapType1
-    wrapType2
-    wrapAppImage
-    ;
+        meta = {
+          sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
+        }
+        // meta;
+      };
+  };
+
+  wrapType2 = lib.extendMkDerivation {
+    constructDrv = wrapAppImage;
+    extendDrvArgs = finalAttrs: args: {
+      contents = extract (
+        lib.filterAttrs (
+          key: value:
+          builtins.elem key [
+            "pname"
+            "version"
+            "src"
+          ]
+        ) finalAttrs
+      );
+
+      # passthru src to make nix-update work
+      # hack to keep the origin position (unsafeGetAttrPos)
+      passthru =
+        lib.pipe finalAttrs [
+          lib.attrNames
+          (lib.remove "src")
+          (removeAttrs finalAttrs)
+        ]
+        // args.passthru or { };
+    };
+  };
+
+  defaultFhsEnvArgs = {
+    # Most of the packages were taken from the Steam chroot
+    targetPkgs =
+      pkgs: with pkgs; [
+        bashInteractive
+        which
+        perl
+        iana-etc
+        krb5
+
+        # libraries not on the upstream include list, but nevertheless expected
+        # by at least one appimage
+        libsecret # For bitwarden, appimage is x86_64 only
+
+        # TODO(corepkgs): port gtk3
+        # TODO(corepkgs): port zenity
+        # TODO(corepkgs): port xrandr
+        # TODO(corepkgs): port xdg-user-dirs (flutter desktop apps)
+        # TODO(corepkgs): port xdg-utils
+        # TODO(corepkgs): port gsettings-desktop-schemas
+        # TODO(corepkgs): port hicolor-icon-theme (silences a gtk warning)
+      ];
+
+    # list of libraries expected in an appimage environment:
+    # https://github.com/AppImage/pkg2appimage/blob/master/excludelist
+    multiPkgs =
+      pkgs: with pkgs; [
+        desktop-file-utils
+        libxrandr
+        libxext
+        libx11
+        libxfixes
+        libGL
+
+        libdrm
+        xkeyboard-config
+        libpciaccess
+
+        glib
+        bzip2
+        zlib
+        gdk-pixbuf
+
+        libxrender
+        libxxf86vm
+        libxi
+        libsm
+        libice
+        freetype
+        curlWithGnuTls
+        nspr
+        nss
+        fontconfig
+        cairo
+        pango
+        expat
+        dbus
+        cups
+        libcap
+        libusb1
+        udev
+        dbus-glib
+
+        libxt
+        libxmu
+        libxcb
+        libGLU
+        libuuid
+        libogg
+        libvorbis
+        openssl
+        onetbb
+        wayland
+        libgbm
+        libxkbcommon
+        vulkan-loader
+
+        libglut
+        libjpeg
+        libpng12
+        libthai
+        libtiff
+        pixman
+        libcaca
+        libgcrypt
+        libvpx
+        libxft
+        alsa-lib
+
+        harfbuzz
+        e2fsprogs
+        libgpg-error
+        keyutils.lib
+        fribidi
+        p11-kit
+
+        gmp
+
+        # libraries not on the upstream include list, but nevertheless expected
+        # by at least one appimage
+        libtool.lib # for Synfigstudio
+        pciutils # for FreeCAD
+        brotli # TwitchDropsMiner
+
+        # TODO(corepkgs): port libxcomposite
+        # TODO(corepkgs): port libxtst
+        # TODO(corepkgs): port gst_all_1 (gstreamer, gst-plugins-base, gst-plugins-ugly)
+        # TODO(corepkgs): port libxinerama
+        # TODO(corepkgs): port libxdamage
+        # TODO(corepkgs): port libxcursor
+        # TODO(corepkgs): port libxscrnsaver
+        # TODO(corepkgs): port SDL2, SDL2_image, SDL2_ttf, SDL2_mixer
+        # TODO(corepkgs): port atk
+        # TODO(corepkgs): port at-spi2-atk
+        # TODO(corepkgs): port at-spi2-core
+        # TODO(corepkgs): port libudev0-shim
+        # TODO(corepkgs): port libxcb-util, libxcb-wm, libxcb-image,
+        #                 libxcb-keysyms, libxcb-render-util
+        # TODO(corepkgs): port glew_1_10
+        # TODO(corepkgs): port libidn
+        # TODO(corepkgs): port flac
+        # TODO(corepkgs): port libpulseaudio
+        # TODO(corepkgs): port libsamplerate
+        # TODO(corepkgs): port libmikmod
+        # TODO(corepkgs): port libtheora
+        # TODO(corepkgs): port speex
+        # TODO(corepkgs): port libcanberra
+        # TODO(corepkgs): port librsvg
+        # TODO(corepkgs): port libvdpau
+        # TODO(corepkgs): port libjack2
+        # TODO(corepkgs): port pipewire (immersed-vr wayland support)
+        # TODO(corepkgs): port libmpg123 (Slippi launcher)
+      ];
+  };
 }
