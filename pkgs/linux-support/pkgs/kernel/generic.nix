@@ -31,7 +31,16 @@ let
       version,
 
       # Allows overriding the default defconfig
-      defconfig ? null,
+      # TODO: Reconsider some of these defaults?
+      defconfig ?
+        if stdenv.hostPlatform.isAarch32 && stdenv.hostPlatform.parsed.cpu.version or null == "5" then
+          "multi_v5_defconfig"
+        else if stdenv.hostPlatform.isAarch32 && stdenv.hostPlatform.parsed.cpu.version or null == "6" then
+          "bcm2835_defconfig"
+        else if stdenv.hostPlatform.isPower64 then
+          if stdenv.hostPlatform.isLittleEndian then "powernv_defconfig" else "ppc64_defconfig"
+        else
+          "defconfig",
 
       # Legacy overrides to the intermediate kernel config, as string
       extraConfig ? "",
@@ -65,11 +74,7 @@ let
       # symbolic name and `patch' is the actual patch.  The patch may
       # optionally be compressed with gzip or bzip2.
       kernelPatches ? [ ],
-      ignoreConfigErrors ?
-        !lib.elem stdenv.hostPlatform.linux-kernel.name or "" [
-          "aarch64-multiplatform"
-          "pc"
-        ],
+      ignoreConfigErrors ? !(stdenv.hostPlatform.isx86 || stdenv.hostPlatform.isAarch64),
       extraMeta ? { },
       extraPassthru ? { },
 
@@ -78,9 +83,10 @@ let
       isLibre ? false,
       isHardened ? false,
 
-      # easy overrides to stdenv.hostPlatform.linux-kernel members
-      autoModules ? stdenv.hostPlatform.linux-kernel.autoModules or true,
-      preferBuiltin ? stdenv.hostPlatform.linux-kernel.preferBuiltin or false,
+      autoModules ? true,
+      # TODO: Remove this default?
+      preferBuiltin ?
+        stdenv.hostPlatform.isAarch || stdenv.hostPlatform.isRiscV || stdenv.hostPlatform.isLoongArch64,
       kernelArch ? stdenv.hostPlatform.linuxArch,
       kernelTests ? { },
 
@@ -117,9 +123,7 @@ let
       intermediateNixConfig =
         configfile.moduleStructuredConfig.intermediateNixConfig
         # extra config in legacy string format
-        + extraConfig
-        # need the 'or ""' at the end in case enableCommonConfig = true and extraConfig is not present
-        + lib.optionalString enableCommonConfig stdenv.hostPlatform.linux-kernel.extraConfig or "";
+        + extraConfig;
 
       structuredConfigFromPatches = map (
         {
@@ -188,8 +192,7 @@ let
         RUST_LIB_SRC = lib.optionalString withRust rustPlatform.rustLibSrc;
 
         # e.g. "defconfig"
-        kernelBaseConfig =
-          if defconfig != null then defconfig else stdenv.hostPlatform.linux-kernel.baseConfig or "defconfig";
+        kernelBaseConfig = defconfig;
 
         makeFlags = import ./common-flags.nix {
           inherit
