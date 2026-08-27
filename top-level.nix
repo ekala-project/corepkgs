@@ -98,8 +98,6 @@ final: prev: with final; {
   gdal = null;
   gitstatus = null;
   graphicsmagick = null;
-  # graphviz: provided by pkgs-many/graphviz (default: withoutXorg)
-  grpc = null;
   gtkmm3 = null;
   gts = callPackage ./pkgs/gts { };
   gunicorn = null;
