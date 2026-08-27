@@ -114,7 +114,6 @@ final: prev: with final; {
   libnatspec = null;
   libnghttp2 = nghttp2;
   libotr = null;
-  libsoup_3 = null;
   libsysprof-capture = null;
   libvirt = null;
   lilypond = null;
