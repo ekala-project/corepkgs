@@ -116,7 +116,6 @@ final: prev: with final; {
   libgeotiff = null;
   libgit2-glib = null;
   libguestfs = null;
-  libjxl = null;
   libnatspec = null;
   libnghttp2 = nghttp2;
   libotr = null;
