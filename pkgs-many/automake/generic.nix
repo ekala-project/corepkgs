@@ -49,7 +49,7 @@ stdenv.mkDerivation (finalAttrs: {
   dontPatchShebangs = true;
 
   meta = {
-    branch = lib.versions.majorMinorVersion lib.branch;
+    branch = lib.versions.majorMinor version;
     homepage = "https://www.gnu.org/software/automake/";
     description = "GNU standard-compliant makefile generator";
     license = lib.licenses.gpl2Plus;
