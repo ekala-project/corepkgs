@@ -129,7 +129,6 @@ final: prev: with final; {
   mscgen = null;
   multipath-tools = null;
   neovim = null;
-  nmap = null;
   nodejs_latest = nodejs.v23;
   nwdiag = null;
   objgraph = null;
