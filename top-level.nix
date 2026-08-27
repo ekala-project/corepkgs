@@ -12,14 +12,13 @@ with final;
   nix-update = null;
   nixos = null;
 
-  # These deps aren't needed for building, but only for passthru.tests
-  # TODO(corepkgs): get rid of this asserts when packages become available
   qt5 = null;
   libsForQt5 = null;
   qt6 = null;
+  ocamlPackages = null;
+
   haskell = callPackage ./haskell { inherit config; };
   haskellPackages = haskell.packages.ghc984Binary;
-  ocamlPackages = null;
 
   # qemu_kvm - QEMU with only host CPU support (for vmTools)
   # This is required for vmTools to work correctly with direct kernel boot
