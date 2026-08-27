@@ -134,7 +134,7 @@ self: {
   # xf86 driver aliases (camelCase → hyphenated top-level)
   xf86inputevdev = self."xf86-input-evdev";
   xf86inputjoystick = self."xf86-input-joystick";
-  xf86inputkeyboard = self."xf86-input-keyboard";
+  xf86inputkeyboard = self."xf86-input-keyboard" or null;
   xf86inputlibinput = self."xf86-input-libinput";
   xf86inputmouse = self."xf86-input-mouse";
   xf86inputsynaptics = self."xf86-input-synaptics";
