@@ -1,7 +1,6 @@
 {
   lib,
   stdenv,
-  python,
   buildPythonPackage,
   pythonOlder,
   fetchPypi,
@@ -9,10 +8,6 @@
   babel,
   markupsafe,
   pytestCheckHook,
-  sphinxHook,
-  pallets-sphinx-themes,
-  sphinxcontrib-log-cabinet,
-  sphinx-issues,
 
   # Reverse dependency
   sage,
@@ -53,33 +48,6 @@ buildPythonPackage rec {
   doCheck = !stdenv.hostPlatform.is32bit;
 
   nativeCheckInputs = [ pytestCheckHook ] ++ optional-dependencies.i18n;
-
-  passthru.doc = stdenv.mkDerivation {
-    # Forge look and feel of multi-output derivation as best as we can.
-    #
-    # Using 'outputs = [ "doc" ];' breaks a lot of assumptions.
-    name = "${pname}-${version}-doc";
-    inherit src pname version;
-
-    patches = [
-      # Fix import of "sphinxcontrib-log-cabinet"
-      ./patches/import-order.patch
-    ];
-
-    postInstallSphinx = ''
-      mv $out/share/doc/* $out/share/doc/python$pythonVersion-$pname-$version
-    '';
-
-    nativeBuildInputs = [
-      sphinxHook
-      sphinxcontrib-log-cabinet
-      pallets-sphinx-themes
-      sphinx-issues
-    ];
-
-    inherit (python) pythonVersion;
-    inherit meta;
-  };
 
   passthru.tests = {
     inherit sage;
