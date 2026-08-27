@@ -205,5 +205,6 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = lib.platforms.unix;
     license = lib.licenses.asl20;
     mainProgram = "magick";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "imagemagick" finalAttrs.version;
   };
 })

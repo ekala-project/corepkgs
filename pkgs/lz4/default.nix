@@ -76,5 +76,6 @@ stdenv.mkDerivation (finalAttrs: {
     ];
     platforms = lib.platforms.all;
     mainProgram = "lz4";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "lz4_project" finalAttrs.version;
   };
 })

@@ -46,5 +46,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
     mainProgram = "catatonit";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "catatonit_project" finalAttrs.version;
   };
 })

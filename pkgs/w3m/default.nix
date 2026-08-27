@@ -135,5 +135,6 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = lib.platforms.unix;
     license = lib.licenses.mit;
     mainProgram = "w3m";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "tats" finalAttrs.version;
   };
 })

@@ -70,5 +70,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.lgpl2Plus;
     platforms = lib.platforms.linux;
     mainProgram = "bwrap";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "projectatomic" finalAttrs.version;
   };
 })

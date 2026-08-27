@@ -106,5 +106,6 @@ stdenv.mkDerivation (finalAttrs: {
       publicDomain # tzdata
     ];
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "iana" finalAttrs.version;
   };
 })

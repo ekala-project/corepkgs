@@ -105,5 +105,6 @@ stdenv'.mkDerivation rec {
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix;
     mainProgram = "flex";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "westes" version;
   };
 }

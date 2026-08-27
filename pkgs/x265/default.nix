@@ -144,5 +144,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.x265.org";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "multicorewareinc" finalAttrs.version;
   };
 })

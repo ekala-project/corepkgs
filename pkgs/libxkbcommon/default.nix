@@ -100,5 +100,6 @@ stdenv.mkDerivation (finalAttrs: {
       "xkbcommon-x11"
       "xkbregistry"
     ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "xkbcommon" finalAttrs.version;
   };
 })

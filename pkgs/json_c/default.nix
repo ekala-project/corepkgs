@@ -47,5 +47,9 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/json-c/json-c/blob/${finalAttrs.src.rev}/ChangeLog";
     platforms = lib.platforms.unix;
     license = lib.licenses.mit;
+    identifiers.cpeParts = {
+      vendor = "json-c_project";
+      product = "json-c";
+    };
   };
 })

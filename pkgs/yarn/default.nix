@@ -41,5 +41,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     license = lib.licenses.bsd2;
     platforms = lib.platforms.all;
     mainProgram = "yarn";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "yarnpkg" finalAttrs.version;
   };
 })

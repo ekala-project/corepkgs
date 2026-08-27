@@ -25,4 +25,5 @@ buildXorgPackage (finalAttrs: {
     "i686-linux"
     "x86_64-linux"
   ];
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

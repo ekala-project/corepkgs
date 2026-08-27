@@ -75,5 +75,6 @@ stdenv.mkDerivation rec {
     description = "Linux Netlink interface library suite";
     license = lib.licenses.lgpl21;
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "infradead" version;
   };
 }

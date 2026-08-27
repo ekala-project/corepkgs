@@ -123,5 +123,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://subversion.apache.org/";
     mainProgram = "svn";
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "apache" finalAttrs.version;
   };
 })

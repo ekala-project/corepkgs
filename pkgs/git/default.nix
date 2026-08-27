@@ -558,5 +558,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     platforms = lib.platforms.all;
     mainProgram = "git";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "git-scm" finalAttrs.version;
   };
 })

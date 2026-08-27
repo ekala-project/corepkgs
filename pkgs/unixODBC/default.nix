@@ -31,5 +31,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.unixodbc.org/";
     license = lib.licenses.lgpl2;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "unixodbc" finalAttrs.version;
   };
 })

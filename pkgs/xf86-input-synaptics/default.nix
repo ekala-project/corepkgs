@@ -37,5 +37,6 @@ buildXorgPackage (finalAttrs: {
   ];
   meta = {
     pkgConfigModules = [ "xorg-synaptics" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
   };
 })

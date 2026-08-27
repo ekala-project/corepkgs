@@ -106,5 +106,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.freedesktop.org/wiki/Software/ModemManager/";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "freedesktop" version;
   };
 }

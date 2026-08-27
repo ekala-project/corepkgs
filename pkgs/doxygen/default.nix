@@ -91,5 +91,6 @@ stdenv.mkDerivation (finalAttrs: {
       files.
     '';
     platforms = if qt6 != null then lib.platforms.linux else lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "doxygen" finalAttrs.version;
   };
 })

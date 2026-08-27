@@ -57,5 +57,6 @@ stdenv.mkDerivation (finalAttrs: {
       lib.licenses.bsd2
     ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "ntp" finalAttrs.version;
   };
 })

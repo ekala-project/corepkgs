@@ -49,4 +49,5 @@ buildXorgPackage (finalAttrs: {
     export NIX_CFLAGS_LINK="$NIX_CFLAGS_LINK -lXau -lXdmcp"
   '';
   meta.mainProgram = "xdpyinfo";
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

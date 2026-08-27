@@ -163,6 +163,7 @@ stdenv'.mkDerivation (finalAttrs: {
           || stdenv.hostPlatform.isWasi
         )
       );
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "xmlsoft" finalAttrs.version;
   }
   // extraMeta;
 })

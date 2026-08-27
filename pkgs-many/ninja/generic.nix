@@ -134,5 +134,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://ninja-build.org/";
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "ninja-build" finalAttrs.version;
   };
 })

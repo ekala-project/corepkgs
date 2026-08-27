@@ -54,4 +54,5 @@ buildXorgPackage (finalAttrs: {
     "ac_cv_file__dev_random=true"
   ];
   meta.mainProgram = "xdm";
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

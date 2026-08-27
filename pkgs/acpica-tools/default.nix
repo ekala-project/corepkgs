@@ -61,5 +61,9 @@ stdenv.mkDerivation (finalAttrs: {
       bsd3
     ];
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
+    identifiers.cpeParts = {
+      vendor = "intel";
+      product = "acpi_component_architecture";
+    };
   };
 })

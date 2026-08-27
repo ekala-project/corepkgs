@@ -1074,6 +1074,7 @@ stdenv.mkDerivation (
       # See https://github.com/NixOS/nixpkgs/pull/295344#issuecomment-1992263658
       broken = stdenv.hostPlatform.isMinGW && stdenv.hostPlatform.is64bit;
       mainProgram = "ffmpeg";
+      identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "ffmpeg" finalAttrs.version;
     };
   }
   // lib.optionalAttrs withCudaLLVM {

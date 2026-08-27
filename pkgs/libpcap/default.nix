@@ -100,5 +100,6 @@ stdenv.mkDerivation rec {
     mainProgram = "pcap-config";
     platforms = lib.platforms.unix;
     license = lib.licenses.bsd3;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "tcpdump" version;
   };
 }

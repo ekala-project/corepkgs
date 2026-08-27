@@ -72,5 +72,6 @@ buildGoModule (finalAttrs: {
     changelog = "https://github.com/derailed/k9s/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.asl20;
     mainProgram = "k9s";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "derailed" finalAttrs.version;
   };
 })

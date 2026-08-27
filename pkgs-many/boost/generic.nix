@@ -423,5 +423,6 @@ stdenv.mkDerivation {
     # a very cryptic error message.
     badPlatforms = [ lib.systems.inspect.patterns.isMips64n32 ];
     broken = enableNumpy && lib.versionAtLeast python.pkgs.numpy.version "2";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "boost" version;
   };
 }

@@ -65,5 +65,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://google.github.io/snappy/";
     license = lib.licenses.bsd3;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "google" finalAttrs.version;
   };
 })

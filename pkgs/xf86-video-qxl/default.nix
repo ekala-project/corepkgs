@@ -27,4 +27,5 @@ buildXorgPackage (finalAttrs: {
     xorg-server
     spice-protocol
   ];
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

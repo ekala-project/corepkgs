@@ -109,5 +109,6 @@ stdenv.mkDerivation rec {
     description = "Collection of utilities for controlling TCP/IP networking and traffic control in Linux";
     platforms = lib.platforms.linux;
     license = lib.licenses.gpl2Only;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "iproute2_project" version;
   };
 }

@@ -106,5 +106,6 @@ stdenv.mkDerivation {
     mainProgram = "iconv";
     # This library is not needed on GNU platforms.
     hydraPlatforms = with lib.platforms; cygwin ++ darwin ++ freebsd;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
   };
 }

@@ -63,5 +63,6 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     # https://github.com/awslabs/aws-c-common/issues/1175
     badPlatforms = lib.platforms.bigEndian;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" version;
   };
 }

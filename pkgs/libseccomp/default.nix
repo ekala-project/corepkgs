@@ -77,5 +77,6 @@ stdenv.mkDerivation (finalAttrs: rec {
       "sparc-linux"
       "sparc64-linux"
     ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libseccomp_project" finalAttrs.version;
   };
 })

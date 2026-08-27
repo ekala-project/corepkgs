@@ -202,5 +202,6 @@ stdenv.mkDerivation (finalAttrs: {
       "powerpc64-linux"
     ];
     mainProgram = "go";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "golang" finalAttrs.version;
   };
 })

@@ -22,4 +22,5 @@ buildXorgPackage (finalAttrs: {
     xorg-server
   ];
   env.NIX_CFLAGS_COMPILE = toString [ "-Wno-error=format-overflow" ];
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

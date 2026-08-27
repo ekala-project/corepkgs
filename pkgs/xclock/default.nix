@@ -36,4 +36,5 @@ buildXorgPackage (finalAttrs: {
     libxt
   ];
   meta.mainProgram = "xclock";
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

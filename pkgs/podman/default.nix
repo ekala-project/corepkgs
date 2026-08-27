@@ -185,5 +185,6 @@ buildGoModule (finalAttrs: {
     changelog = "https://github.com/containers/podman/blob/v${finalAttrs.version}/RELEASE_NOTES.md";
     license = lib.licenses.asl20;
     mainProgram = "podman";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "podman_project" finalAttrs.version;
   };
 })

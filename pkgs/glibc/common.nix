@@ -359,6 +359,7 @@ stdenv.mkDerivation (
           license = lib.licenses.lgpl2Plus;
 
           platforms = lib.platforms.linux;
+          identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
         }
         // (args.meta or { });
     }

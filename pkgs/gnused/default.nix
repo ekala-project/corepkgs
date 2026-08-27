@@ -58,5 +58,9 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.unix;
     mainProgram = "sed";
+    identifiers.cpeParts = {
+      vendor = "gnu";
+      product = "sed";
+    };
   };
 }

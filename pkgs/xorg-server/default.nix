@@ -231,5 +231,9 @@ buildXorgPackage (finalAttrs: {
   meta = {
     mainProgram = "X";
     pkgConfigModules = [ "xorg-server" ];
+    identifiers.cpeParts = {
+      vendor = "x.org";
+      product = "xorg-server";
+    };
   };
 })

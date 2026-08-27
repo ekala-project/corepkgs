@@ -136,5 +136,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     mainProgram = "wget";
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" finalAttrs.version;
   };
 })

@@ -159,5 +159,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
     mainProgram = "pnpm";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "pnpm" version;
   };
 })

@@ -154,6 +154,10 @@ let
             homepage = "https://www.denx.de/wiki/U-Boot/";
             description = "Boot loader for embedded systems";
             license = lib.licenses.gpl2Plus;
+            identifiers.cpeParts = {
+              vendor = "denx";
+              product = "u-boot";
+            };
 
           }
           // extraMeta;

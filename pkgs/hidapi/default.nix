@@ -52,5 +52,6 @@ stdenv.mkDerivation (finalAttrs: {
         "hidapi-libusb"
       ];
     platforms = lib.platforms.unix ++ lib.platforms.windows;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "signal11" finalAttrs.version;
   };
 })

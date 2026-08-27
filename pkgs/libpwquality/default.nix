@@ -103,5 +103,6 @@ stdenv.mkDerivation rec {
       gpl2Plus
     ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libpwquality_project" version;
   };
 }

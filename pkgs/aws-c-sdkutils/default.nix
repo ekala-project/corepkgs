@@ -42,5 +42,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/awslabs/aws-c-sdkutils";
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" version;
   };
 }

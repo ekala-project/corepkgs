@@ -81,5 +81,6 @@ stdenv.mkDerivation rec {
     description = "Dynamic image creation library";
     license = lib.licenses.free; # some custom license
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libgd" version;
   };
 }

@@ -122,6 +122,10 @@ stdenv.mkDerivation (
         else
           lib.licenses.${license};
       platforms = lib.platforms.unix;
+      identifiers.cpeParts = {
+        vendor = "oracle";
+        product = "berkeley_db";
+      };
     };
   }
   // drvArgs

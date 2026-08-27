@@ -59,5 +59,6 @@ stdenv.mkDerivation rec {
       bsd2
     ];
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "kernel" version;
   };
 }

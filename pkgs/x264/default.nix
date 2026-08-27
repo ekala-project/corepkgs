@@ -60,5 +60,6 @@ stdenv.mkDerivation {
     homepage = "http://www.videolan.org/developers/x264.html";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix ++ lib.platforms.windows;
+    identifiers.cpeParts.vendor = "videolan";
   };
 }

@@ -76,5 +76,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.asl20;
     platforms = lib.platforms.linux;
     mainProgram = "conmon";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "conmon_project" finalAttrs.version;
   };
 })

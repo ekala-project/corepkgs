@@ -56,5 +56,6 @@ stdenv.mkDerivation (finalAttrs: {
     ];
     platforms = lib.platforms.linux;
     mainProgram = "passt";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "passt_project" finalAttrs.version;
   };
 })

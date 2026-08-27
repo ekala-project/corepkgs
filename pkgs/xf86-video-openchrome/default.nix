@@ -41,4 +41,5 @@ buildXorgPackage (finalAttrs: {
       sha256 = "0xqawg9zzwb7x5vaf3in60isbkl3zfjq0wcnfi45s3hiii943sxz";
     })
   ];
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

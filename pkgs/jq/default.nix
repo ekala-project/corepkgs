@@ -127,5 +127,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
     mainProgram = "jq";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "jqlang" finalAttrs.version;
   };
 })

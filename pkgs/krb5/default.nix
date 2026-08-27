@@ -173,6 +173,10 @@ stdenv.mkDerivation rec {
     homepage = "http://web.mit.edu/kerberos/";
     license = lib.licenses.mit;
     platforms = lib.platforms.unix ++ lib.platforms.windows;
+    identifiers.cpeParts = {
+      vendor = "mit";
+      product = "kerberos_5";
+    };
   };
 
   passthru = {

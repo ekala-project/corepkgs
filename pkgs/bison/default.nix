@@ -101,5 +101,6 @@ stdenv.mkDerivation rec {
       to use Bison.
     '';
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
   };
 }

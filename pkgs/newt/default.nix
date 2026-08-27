@@ -96,5 +96,6 @@ stdenv.mkDerivation rec {
     changelog = "https://pagure.io/newt/blob/master/f/CHANGES";
     license = lib.licenses.lgpl2;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "fedoraproject" version;
   };
 }

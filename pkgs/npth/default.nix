@@ -37,5 +37,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "http://www.gnupg.org";
     license = lib.licenses.lgpl3;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnupg" finalAttrs.version;
   };
 })

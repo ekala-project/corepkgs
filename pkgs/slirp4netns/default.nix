@@ -56,5 +56,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
     mainProgram = "slirp4netns";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "slirp4netns_project" finalAttrs.version;
   };
 })

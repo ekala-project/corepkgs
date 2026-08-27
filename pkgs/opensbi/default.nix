@@ -45,5 +45,6 @@ stdenv.mkDerivation rec {
       "riscv64-linux"
       "riscv32-linux"
     ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "opensbi_project" version;
   };
 }

@@ -139,5 +139,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
     # Hangs when run via Rosetta 2 on Apple Silicon
     hydraPlatforms = lib.lists.remove "x86_64-darwin" lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "oven" finalAttrs.version;
   };
 })

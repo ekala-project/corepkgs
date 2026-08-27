@@ -39,5 +39,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "http://www.oberhumer.com/opensource/lzo";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "oberhumer" finalAttrs.version;
   };
 })

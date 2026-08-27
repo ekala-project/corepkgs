@@ -126,5 +126,6 @@ stdenv.mkDerivation rec {
       gpl2Plus
     ]; # GPLv2+ for tools
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "kernel" version;
   };
 }

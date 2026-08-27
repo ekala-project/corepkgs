@@ -134,5 +134,6 @@ stdenv.mkDerivation rec {
     homepage = "https://sites.google.com/site/fullycapable";
     platforms = lib.platforms.linux;
     license = lib.licenses.bsd3;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libcap_project" version;
   };
 }

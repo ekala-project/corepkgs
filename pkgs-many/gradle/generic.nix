@@ -241,6 +241,7 @@ let
       ];
       license = lib.licenses.asl20;
       mainProgram = "gradle";
+      identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gradle" version;
     }
     // meta;
   });

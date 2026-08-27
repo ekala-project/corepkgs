@@ -77,5 +77,6 @@ stdenv.mkDerivation (finalAttrs: {
     ];
     pkgConfigModules = [ "xt" ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
   };
 })

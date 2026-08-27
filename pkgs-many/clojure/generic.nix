@@ -80,5 +80,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.epl10;
     platforms = lib.platforms.unix ++ lib.platforms.darwin;
     mainProgram = "clojure";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "clojure" version;
   };
 })

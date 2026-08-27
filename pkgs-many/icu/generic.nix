@@ -107,6 +107,10 @@ let
         "icu-uc"
       ];
       platforms = lib.platforms.all;
+      identifiers.cpeParts = {
+        vendor = "icu-project";
+        product = "international_components_for_unicode";
+      };
     };
   };
 

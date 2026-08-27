@@ -63,5 +63,6 @@ buildGoModule (finalAttrs: {
     '';
     mainProgram = "trivy";
     license = lib.licenses.asl20;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "aquasecurity" finalAttrs.version;
   };
 })

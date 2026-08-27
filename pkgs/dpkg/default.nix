@@ -144,5 +144,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix;
     mainProgram = "dpkg";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "debian" finalAttrs.version;
   };
 })

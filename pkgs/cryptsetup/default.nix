@@ -101,5 +101,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl2Plus;
     mainProgram = "cryptsetup";
     platforms = with lib.platforms; linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "cryptsetup_project" finalAttrs.version;
   };
 })

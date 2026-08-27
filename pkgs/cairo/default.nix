@@ -161,6 +161,7 @@ stdenv.mkDerivation (
       ]
       ++ lib.optional gobjectSupport "cairo-gobject";
       platforms = lib.platforms.all;
+      identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "cairographics" finalAttrs.version;
     };
   }
 )

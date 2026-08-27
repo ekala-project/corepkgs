@@ -40,5 +40,6 @@ stdenv.mkDerivation rec {
     homepage = "https://netfilter.org/projects/libnetfilter_conntrack/";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "netfilter" version;
   };
 }

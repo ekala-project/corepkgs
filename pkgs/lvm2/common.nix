@@ -237,5 +237,6 @@ stdenv.mkDerivation rec {
       bsd2
       lgpl21
     ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "sourceware" version;
   };
 }

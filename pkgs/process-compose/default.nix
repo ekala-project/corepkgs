@@ -63,5 +63,6 @@ buildGo126Module (finalAttrs: {
     changelog = "https://github.com/F1bonacc1/process-compose/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.asl20;
     mainProgram = "process-compose";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "process-compose_project" finalAttrs.version;
   };
 })

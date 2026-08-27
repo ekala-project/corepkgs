@@ -153,5 +153,6 @@ stdenv.mkDerivation rec {
     mainProgram = "sqlite3";
     platforms = lib.platforms.unix ++ lib.platforms.windows;
     pkgConfigModules = [ "sqlite3" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "sqlite" version;
   };
 }

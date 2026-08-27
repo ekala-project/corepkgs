@@ -111,5 +111,6 @@ rustPlatform.buildRustPackage {
     description = "Handy way to save and run project-specific commands";
     license = lib.licenses.cc0;
     mainProgram = "just";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "just_project" version;
   };
 }

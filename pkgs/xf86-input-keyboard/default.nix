@@ -20,4 +20,5 @@ buildXorgPackage (finalAttrs: {
     xorg-server
   ];
   meta.platforms = lib.platforms.freebsd ++ lib.platforms.netbsd ++ lib.platforms.openbsd;
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

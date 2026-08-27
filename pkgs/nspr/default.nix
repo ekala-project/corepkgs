@@ -52,5 +52,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Netscape Portable Runtime, a platform-neutral API for system-level and libc-like functions";
     platforms = lib.platforms.all;
     license = lib.licenses.mpl20;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "mozilla" finalAttrs.version;
   };
 })

@@ -160,5 +160,9 @@ stdenv.mkDerivation rec {
     description = "JPEG XL image format reference implementation";
     license = lib.licenses.bsd3;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = {
+      vendor = "libjxl_project";
+      product = "libjxl";
+    };
   };
 }

@@ -33,5 +33,6 @@ buildXorgPackage (finalAttrs: {
   configureFlags = [ "--with-sdkdir=${placeholder "dev"}/include/xorg" ];
   meta = {
     pkgConfigModules = [ "xorg-evdev" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
   };
 })

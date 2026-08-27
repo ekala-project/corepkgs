@@ -64,5 +64,6 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = lib.platforms.unix;
     # See architectures defined in src/local-elf.h.
     badPlatforms = lib.platforms.microblaze;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "freedesktop" finalAttrs.version;
   };
 })

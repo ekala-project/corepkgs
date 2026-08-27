@@ -77,5 +77,6 @@ stdenv.mkDerivation (finalAttrs: {
       "xaw7"
     ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
   };
 })

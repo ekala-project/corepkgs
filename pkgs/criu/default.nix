@@ -150,5 +150,6 @@ stdenv.mkDerivation (finalAttrs: {
       "armv7l-linux"
       "loongarch64-linux"
     ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "criu" finalAttrs.version;
   };
 })

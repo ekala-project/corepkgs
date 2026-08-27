@@ -72,5 +72,6 @@ stdenv.mkDerivation (finalAttrs: {
     pkgConfigModules = [ "libmagic" ];
     platforms = lib.platforms.all;
     mainProgram = "file";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "file_project" finalAttrs.version;
   };
 })

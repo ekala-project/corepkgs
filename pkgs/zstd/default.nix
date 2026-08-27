@@ -155,5 +155,9 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "zstd";
     platforms = lib.platforms.all;
     pkgConfigModules = [ "libzstd" ];
+    identifiers.cpeParts = {
+      vendor = "facebook";
+      product = "zstandard";
+    };
   };
 })

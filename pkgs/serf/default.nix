@@ -64,5 +64,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://serf.apache.org/";
     license = lib.licenses.asl20;
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "apache" finalAttrs.version;
   };
 })

@@ -85,5 +85,6 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "apr-1-config";
     platforms = lib.platforms.all;
     license = lib.licenses.asl20;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "apache" finalAttrs.version;
   };
 })

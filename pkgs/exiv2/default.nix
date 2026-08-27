@@ -81,5 +81,6 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "exiv2";
     platforms = lib.platforms.all;
     license = lib.licenses.gpl2Plus;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "exiv2" finalAttrs.version;
   };
 })

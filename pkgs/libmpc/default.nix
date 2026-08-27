@@ -46,5 +46,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.multiprecision.org/mpc/";
     license = lib.licenses.lgpl2Plus;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "multiprecision" finalAttrs.version;
   };
 })

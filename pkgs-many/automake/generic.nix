@@ -59,5 +59,6 @@ stdenv.mkDerivation (finalAttrs: {
       Standards.  Automake requires the use of Autoconf.
     '';
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
   };
 })

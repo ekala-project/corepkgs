@@ -20,4 +20,5 @@ buildXorgPackage (finalAttrs: {
     libxkbfile
   ];
   meta.mainProgram = "xkbevd";
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

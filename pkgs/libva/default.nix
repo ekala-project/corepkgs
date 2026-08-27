@@ -82,5 +82,6 @@ stdenv.mkDerivation (finalAttrs: {
       "libva-x11"
     ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "intel" finalAttrs.version;
   };
 })

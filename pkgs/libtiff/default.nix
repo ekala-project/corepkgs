@@ -131,5 +131,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.libtiff;
     platforms = lib.platforms.unix ++ lib.platforms.windows;
     pkgConfigModules = [ "libtiff-4" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libtiff" finalAttrs.version;
   };
 })

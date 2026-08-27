@@ -47,5 +47,6 @@ stdenv.mkDerivation rec {
     mainProgram = "ksba-config";
     platforms = lib.platforms.all;
     license = lib.licenses.lgpl3;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnupg" version;
   };
 }

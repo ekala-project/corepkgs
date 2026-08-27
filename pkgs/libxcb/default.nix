@@ -101,5 +101,6 @@ stdenv.mkDerivation (finalAttrs: {
       "xcb-xvmc"
     ];
     platforms = lib.platforms.unix ++ lib.platforms.windows;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
   };
 })

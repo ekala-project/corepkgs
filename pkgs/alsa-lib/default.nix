@@ -61,5 +61,6 @@ stdenv.mkDerivation (finalAttrs: {
       "alsa-topology"
     ];
     platforms = with lib.platforms; linux ++ freebsd;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "alsa-project" finalAttrs.version;
   };
 })

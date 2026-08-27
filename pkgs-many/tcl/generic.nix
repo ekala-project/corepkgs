@@ -122,6 +122,7 @@ stdenv.mkDerivation (finalAttrs: rec {
     license = lib.licenses.tcltk;
     platforms = lib.platforms.all;
 
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "tcl" finalAttrs.version;
   };
 
   passthru = rec {

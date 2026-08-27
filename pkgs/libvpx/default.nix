@@ -159,5 +159,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.webmproject.org/";
     license = lib.licenses.bsd3;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "webmproject" finalAttrs.version;
   };
 })

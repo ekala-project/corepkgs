@@ -251,5 +251,6 @@ stdenv.mkDerivation rec {
     license = lib.licenses.agpl3Plus;
     platforms = lib.platforms.all;
     mainProgram = "gs";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "artifex" version;
   };
 }

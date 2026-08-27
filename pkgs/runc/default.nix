@@ -80,5 +80,6 @@ buildGoModule (finalAttrs: {
     license = lib.licenses.asl20;
     platforms = lib.platforms.linux;
     mainProgram = "runc";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "linuxfoundation" finalAttrs.version;
   };
 })

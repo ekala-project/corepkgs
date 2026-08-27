@@ -217,5 +217,6 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = lib.platforms.all;
     mainProgram = "cmake";
     broken = (withQt && stdenv.hostPlatform.isDarwin);
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "cmake" finalAttrs.version;
   };
 })

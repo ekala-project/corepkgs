@@ -34,5 +34,6 @@ stdenv.mkDerivation rec {
     description = "High-performance event loop/event model with lots of features";
     platforms = lib.platforms.all;
     license = lib.licenses.bsd2; # or GPL2+
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libev_project" version;
   };
 }

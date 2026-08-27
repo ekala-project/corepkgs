@@ -53,5 +53,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.libssh2.org";
     platforms = lib.platforms.all;
     license = with lib.licenses; [ bsd3 ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libssh2" version;
   };
 }

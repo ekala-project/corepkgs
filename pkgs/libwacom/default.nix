@@ -63,5 +63,6 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/linuxwacom/libwacom/blob/${finalAttrs.src.rev}/NEWS";
     license = lib.licenses.hpnd;
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "linuxwacom" finalAttrs.version;
   };
 })

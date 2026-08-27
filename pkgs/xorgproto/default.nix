@@ -130,5 +130,6 @@ stdenv.mkDerivation (finalAttrs: {
       "xwaylandproto"
     ];
     platforms = lib.platforms.unix ++ lib.platforms.windows;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
   };
 })

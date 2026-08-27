@@ -57,5 +57,9 @@ stdenv.mkDerivation rec {
     ];
     mainProgram = "argon2";
     platforms = lib.platforms.all;
+    identifiers.cpeParts = {
+      vendor = "argon2_project";
+      product = "argon2";
+    };
   };
 }

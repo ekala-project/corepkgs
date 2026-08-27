@@ -167,5 +167,6 @@ stdenv.mkDerivation rec {
       lgpl3Plus
       gpl3Plus
     ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "elfutils_project" version;
   };
 }

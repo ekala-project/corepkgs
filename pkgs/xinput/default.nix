@@ -28,4 +28,5 @@ buildXorgPackage (finalAttrs: {
     libXrandr
   ];
   meta.mainProgram = "xinput";
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

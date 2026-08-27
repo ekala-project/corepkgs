@@ -83,6 +83,7 @@ stdenv.mkDerivation (
       license = lib.licenses.bsdOriginal;
       pkgConfigModules = [ "bzip2" ];
       platforms = lib.platforms.all;
+      identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "bzip" finalAttrs.version;
     };
   }
 )

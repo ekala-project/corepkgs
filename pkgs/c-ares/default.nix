@@ -64,5 +64,9 @@ stdenv.mkDerivation rec {
     changelog = "https://c-ares.org/changelog.html#${lib.replaceStrings [ "." ] [ "_" ] version}";
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = {
+      vendor = "c-ares_project";
+      product = "c-ares";
+    };
   };
 }

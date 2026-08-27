@@ -76,5 +76,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Library for talking to WWAN modems and devices which speak the Mobile Interface Broadband Model (MBIM) protocol";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "freedesktop" finalAttrs.version;
   };
 })

@@ -48,5 +48,6 @@ stdenv.mkDerivation rec {
     description = "Command line option parsing library";
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "popt_project" version;
   };
 }

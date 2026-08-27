@@ -82,5 +82,6 @@ stdenv.mkDerivation (finalAttrs: {
       on the same computer as the Chronyd instance it is controlling or a
       different computer.
     '';
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "tuxfamily" finalAttrs.version;
   };
 })

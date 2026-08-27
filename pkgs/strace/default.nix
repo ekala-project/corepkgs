@@ -60,5 +60,6 @@ stdenv.mkDerivation (finalAttrs: {
     ]; # gpl2Plus is for the test suite
     platforms = lib.platforms.linux;
     mainProgram = "strace";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "strace_project" finalAttrs.version;
   };
 })

@@ -64,5 +64,6 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://dev.gnupg.org/source/libassuan/browse/master/NEWS;libassuan-${finalAttrs.version}";
     license = lib.licenses.lgpl2Plus;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnupg" finalAttrs.version;
   };
 })

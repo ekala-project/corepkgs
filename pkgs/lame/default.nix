@@ -48,5 +48,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.lgpl2;
     platforms = lib.platforms.all;
     mainProgram = "lame";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "lame_project" finalAttrs.version;
   };
 })

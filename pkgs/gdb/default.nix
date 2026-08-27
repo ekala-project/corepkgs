@@ -217,5 +217,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.gnu.org/software/gdb/";
     license = lib.licenses.gpl3Plus;
     platforms = with lib.platforms; linux ++ cygwin ++ freebsd ++ darwin;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
   };
 }

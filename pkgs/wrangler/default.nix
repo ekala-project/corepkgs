@@ -129,5 +129,6 @@ stdenv.mkDerivation (finalAttrs: {
     # commands are will still work everywhere.
     # Potential improvements: build workerd from source instead.
     inherit (nodejs.meta) platforms;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "cloudflare" finalAttrs.version;
   };
 })

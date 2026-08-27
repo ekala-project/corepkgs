@@ -48,5 +48,6 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = lib.platforms.linux;
     inherit (finalAttrs.src.meta) homepage;
     mainProgram = "fuse-overlayfs";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "fuse-overlayfs_project" finalAttrs.version;
   };
 })

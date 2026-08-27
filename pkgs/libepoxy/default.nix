@@ -88,5 +88,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
     pkgConfigModules = [ "epoxy" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libepoxy_project" finalAttrs.version;
   };
 })

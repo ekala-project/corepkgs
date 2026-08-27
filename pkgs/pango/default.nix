@@ -99,5 +99,6 @@ stdenv.mkDerivation (finalAttrs: {
       "pangoft2"
       "pangoot"
     ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnome" finalAttrs.version;
   };
 })

@@ -38,4 +38,5 @@ buildXorgPackage (finalAttrs: {
     libxt
   ];
   meta.mainProgram = "xfd";
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

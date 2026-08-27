@@ -50,5 +50,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.bsd3;
     platforms = lib.platforms.unix;
     mainProgram = "tcpdump";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "tcpdump" finalAttrs.version;
   };
 })

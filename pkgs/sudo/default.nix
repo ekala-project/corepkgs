@@ -94,5 +94,6 @@ stdenv.mkDerivation (finalAttrs: {
     ];
     platforms = lib.platforms.linux;
     mainProgram = "sudo";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "sudo_project" finalAttrs.version;
   };
 })

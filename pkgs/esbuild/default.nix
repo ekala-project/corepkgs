@@ -30,5 +30,6 @@ buildGoModule rec {
     changelog = "https://github.com/evanw/esbuild/blob/v${version}/CHANGELOG.md";
     license = lib.licenses.mit;
     mainProgram = "esbuild";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "evanw" version;
   };
 }

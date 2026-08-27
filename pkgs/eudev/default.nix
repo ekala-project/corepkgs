@@ -90,5 +90,6 @@ stdenv.mkDerivation (finalAttrs: {
       "udev"
     ];
     inherit (kmod.meta) platforms;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gentoo" finalAttrs.version;
   };
 })

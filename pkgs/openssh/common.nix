@@ -257,6 +257,7 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix ++ lib.platforms.windows;
     mainProgram = "ssh";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "openbsd" version;
   }
   // extraMeta;
 })

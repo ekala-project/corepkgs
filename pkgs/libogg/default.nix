@@ -34,5 +34,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://xiph.org/ogg/";
     license = lib.licenses.bsd3;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "xiph.org" finalAttrs.version;
   };
 })

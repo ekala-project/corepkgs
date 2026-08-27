@@ -90,5 +90,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.mit;
     platforms = lib.platforms.linux;
     changelog = "https://gitlab.freedesktop.org/libinput/libinput/-/releases/${finalAttrs.version}";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "freedesktop" finalAttrs.version;
   };
 })

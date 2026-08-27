@@ -179,5 +179,9 @@ stdenv.mkDerivation {
 
     platforms = lib.platforms.unix;
     license = lib.licenses.asl20;
+    identifiers.cpeParts = {
+      vendor = "erlang";
+      product = "erlang%2fotp";
+    };
   };
 }

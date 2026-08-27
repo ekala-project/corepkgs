@@ -140,5 +140,6 @@ buildGo126Module (finalAttrs: {
     '';
     license = with lib.licenses; [ asl20 ];
     mainProgram = "grype";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "anchore" finalAttrs.version;
   };
 })

@@ -309,5 +309,6 @@ stdenv.mkDerivation (finalAttrs: {
     broken = stdenv.hostPlatform.isStatic && (brotliSupport || computedGssSupport);
     pkgConfigModules = [ "libcurl" ];
     mainProgram = "curl";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "haxx" finalAttrs.version;
   };
 })

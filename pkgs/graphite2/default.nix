@@ -90,5 +90,9 @@ stdenv.mkDerivation (finalAttrs: {
     pkgConfigModules = [ "graphite2" ];
     mainProgram = "gr2fonttest";
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = {
+      vendor = "sil";
+      product = "graphite2";
+    };
   };
 })

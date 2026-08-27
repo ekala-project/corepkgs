@@ -45,5 +45,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://gitlab.freedesktop.org/slirp/libslirp";
     license = lib.licenses.bsd3;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libslirp_project" finalAttrs.version;
   };
 })

@@ -104,5 +104,9 @@ stdenv.mkDerivation rec {
     mainProgram = "tar";
     platforms = lib.platforms.all;
     priority = 10;
+    identifiers.cpeParts = {
+      vendor = "gnu";
+      product = "tar";
+    };
   };
 }

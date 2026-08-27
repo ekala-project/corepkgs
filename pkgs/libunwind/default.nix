@@ -96,5 +96,6 @@ stdenv.mkDerivation (finalAttrs: {
       "x86_64-solaris"
     ];
     license = lib.licenses.mit;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "nongnu" finalAttrs.version;
   };
 })

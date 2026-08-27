@@ -62,5 +62,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/AOMediaCodec/libavif";
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "aomedia" version;
   };
 }

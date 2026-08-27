@@ -203,5 +203,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://protobuf.dev/";
 
     mainProgram = "protoc";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "google" finalAttrs.version;
   };
 })

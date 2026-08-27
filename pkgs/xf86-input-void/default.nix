@@ -21,4 +21,5 @@ buildXorgPackage (finalAttrs: {
     xorgproto
   ];
   meta.broken = stdenv.hostPlatform.isDarwin;
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

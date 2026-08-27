@@ -139,6 +139,7 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.bsd3;
     platforms = lib.platforms.all;
     inherit (acl.meta) badPlatforms;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libarchive" finalAttrs.version;
   };
 
   passthru.tests = {

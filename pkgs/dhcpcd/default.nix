@@ -58,5 +58,6 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = lib.platforms.linux;
     license = lib.licenses.bsd2;
     mainProgram = "dhcpcd";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "dhcpcd_project" finalAttrs.version;
   };
 })

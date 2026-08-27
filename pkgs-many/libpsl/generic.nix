@@ -131,5 +131,6 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "psl";
     platforms = lib.platforms.unix ++ lib.platforms.windows;
     pkgConfigModules = [ "libpsl" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "rockdaboot" finalAttrs.version;
   };
 })

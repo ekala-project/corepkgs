@@ -119,5 +119,6 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "julia";
     # Building Julia from source takes significant time
     timeout = 7200; # 2 hours
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "julialang" finalAttrs.version;
   };
 })

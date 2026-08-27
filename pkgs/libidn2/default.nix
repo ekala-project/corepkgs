@@ -77,5 +77,6 @@ stdenv.mkDerivation rec {
       gpl3Plus
     ];
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
   };
 }

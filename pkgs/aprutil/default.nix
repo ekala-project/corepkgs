@@ -134,5 +134,9 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "apu-1-config";
     platforms = lib.platforms.unix;
     license = lib.licenses.asl20;
+    identifiers.cpeParts = {
+      vendor = "apache";
+      product = "apr-util";
+    };
   };
 })

@@ -50,5 +50,6 @@ buildGoModule (finalAttrs: {
     mainProgram = "doctl";
     homepage = "https://github.com/digitalocean/doctl";
     license = lib.licenses.asl20;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "digitalocean" finalAttrs.version;
   };
 })

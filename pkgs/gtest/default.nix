@@ -62,5 +62,9 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/google/googletest";
     license = lib.licenses.bsd3;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = {
+      vendor = "google";
+      product = "googletest";
+    };
   };
 }

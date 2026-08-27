@@ -161,5 +161,9 @@ stdenv.mkDerivation (finalAttrs: {
       "aarch64-darwin"
     ];
     mainProgram = "java";
+    identifiers.cpeParts = {
+      vendor = "oracle";
+      product = "openjdk";
+    };
   };
 })

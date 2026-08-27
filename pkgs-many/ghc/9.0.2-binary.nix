@@ -523,5 +523,9 @@ stdenv.mkDerivation {
     # `pkgsMusl`.
     platforms = builtins.attrNames ghcBinDists.${distSetName};
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
+    identifiers.cpeParts = {
+      vendor = "haskell";
+      product = "ghc";
+    };
   };
 }

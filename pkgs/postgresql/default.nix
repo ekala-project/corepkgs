@@ -203,5 +203,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.postgresql;
     changelog = "https://www.postgresql.org/docs/release/${finalAttrs.version}/";
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "postgresql" finalAttrs.version;
   };
 })

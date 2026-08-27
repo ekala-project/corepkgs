@@ -67,5 +67,6 @@ stdenv.mkDerivation {
     license = lib.licenses.gpl2Plus;
     homepage = "https://www.lysator.liu.se/~nisse/nettle/";
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "nettle_project" version;
   };
 }

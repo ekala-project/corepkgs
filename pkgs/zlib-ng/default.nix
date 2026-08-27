@@ -54,5 +54,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/zlib-ng/zlib-ng";
     license = lib.licenses.zlib;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "zlib-ng_project" version;
   };
 }

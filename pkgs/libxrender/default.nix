@@ -59,5 +59,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.hpndSellVariant;
     pkgConfigModules = [ "xrender" ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
   };
 })

@@ -63,4 +63,5 @@ buildXorgPackage (finalAttrs: {
   '';
 
   meta.mainProgram = "xinit";
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

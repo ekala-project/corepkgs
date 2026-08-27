@@ -28,4 +28,5 @@ buildXorgPackage (finalAttrs: {
     xorg-server
   ];
   configureFlags = [ "--with-xorg-conf-dir=$(out)/share/X11/xorg.conf.d" ];
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

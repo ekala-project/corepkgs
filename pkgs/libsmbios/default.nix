@@ -70,5 +70,6 @@ stdenv.mkDerivation (finalAttrs: {
       "i686-linux"
       "x86_64-linux"
     ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "dell" finalAttrs.version;
   };
 })

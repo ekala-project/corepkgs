@@ -212,5 +212,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Network configuration and management tool";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnome" finalAttrs.version;
   };
 })

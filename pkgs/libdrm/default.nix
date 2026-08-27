@@ -75,5 +75,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     license = lib.licenses.mit;
     platforms = lib.platforms.linux ++ lib.platforms.freebsd ++ lib.platforms.openbsd;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "freedesktop" finalAttrs.version;
   };
 })

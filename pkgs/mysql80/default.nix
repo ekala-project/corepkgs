@@ -110,6 +110,10 @@ let
       description = "World's most popular open source database";
       license = lib.licenses.gpl2;
       platforms = lib.platforms.unix;
+      identifiers.cpeParts = {
+        vendor = "oracle";
+        product = "mysql";
+      };
     };
   };
   client = stdenv.mkDerivation (

@@ -196,5 +196,9 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl2Plus;
     pkgConfigModules = [ "libR" ];
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = {
+      vendor = "r-project";
+      product = "r";
+    };
   };
 })

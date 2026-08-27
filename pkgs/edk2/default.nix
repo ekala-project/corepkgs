@@ -127,6 +127,7 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/tianocore/edk2/releases/tag/edk2-stable${finalAttrs.version}";
     license = lib.licenses.bsd2;
     platforms = with lib.platforms; aarch64 ++ arm ++ i686 ++ x86_64 ++ loongarch64 ++ riscv64;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "tianocore" finalAttrs.version;
   };
 
   passthru = {

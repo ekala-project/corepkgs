@@ -129,5 +129,9 @@ stdenv.mkDerivation (finalAttrs: {
     pkgConfigModules = [ "libpcsclite" ];
     platforms = lib.platforms.unix;
     broken = !(polkitSupport -> dbusSupport) || !(systemdSupport -> dbusSupport);
+    identifiers.cpeParts = {
+      vendor = "muscle";
+      product = "pcsc-lite";
+    };
   };
 })

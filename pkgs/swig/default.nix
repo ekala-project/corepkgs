@@ -59,5 +59,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl3Plus;
     mainProgram = "swig";
     platforms = with lib.platforms; linux ++ darwin;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "swig" finalAttrs.version;
   };
 })

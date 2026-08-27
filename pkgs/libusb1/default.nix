@@ -79,5 +79,9 @@ stdenv.mkDerivation rec {
     '';
     platforms = lib.platforms.all;
     license = lib.licenses.lgpl21Plus;
+    identifiers.cpeParts = {
+      vendor = "libusb";
+      product = "libusb";
+    };
   };
 }

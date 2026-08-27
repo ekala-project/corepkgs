@@ -36,5 +36,6 @@ buildGoModule rec {
     homepage = "https://www.packer.io";
     license = lib.licenses.bsl11;
     changelog = "https://github.com/hashicorp/packer/blob/v${version}/CHANGELOG.md";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "hashicorp" version;
   };
 }

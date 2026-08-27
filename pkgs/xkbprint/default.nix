@@ -22,4 +22,5 @@ buildXorgPackage (finalAttrs: {
     xorgproto
   ];
   meta.mainProgram = "xkbprint";
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

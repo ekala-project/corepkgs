@@ -204,6 +204,7 @@ python3.pkgs.buildPythonApplication rec {
     '';
     license = lib.licenses.asl20;
     inherit (python3.meta) platforms;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "mesonbuild" version;
   };
 }
 # TODO: a more Nixpkgs-tailoired test suite

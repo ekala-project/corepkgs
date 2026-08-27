@@ -35,4 +35,5 @@ buildXorgPackage (finalAttrs: {
   ];
   # fixes `implicit declaration of function 'wfbScreenInit'; did you mean 'fbScreenInit'?
   NIX_CFLAGS_COMPILE = "-Wno-error=implicit-function-declaration";
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

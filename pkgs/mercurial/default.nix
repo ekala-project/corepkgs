@@ -125,6 +125,7 @@ let
       license = lib.licenses.gpl2Plus;
       platforms = lib.platforms.unix;
       mainProgram = "hg";
+      identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "mercurial_project" version;
     };
   };
 

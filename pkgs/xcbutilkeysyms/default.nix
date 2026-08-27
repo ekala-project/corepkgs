@@ -38,5 +38,9 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.x11;
     pkgConfigModules = [ "xcb-keysyms" ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = {
+      vendor = "x.org";
+      product = "xcb-util-keysyms";
+    };
   };
 })

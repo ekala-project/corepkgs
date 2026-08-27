@@ -138,5 +138,6 @@ matchedTcl.mkTclDerivation {
     platforms = lib.platforms.all;
     broken =
       stdenv.hostPlatform.isDarwin && lib.elem (lib.versions.majorMinor matchedTcl.version) [ "8.5" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "tcl" version;
   };
 }

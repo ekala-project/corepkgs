@@ -71,5 +71,6 @@ stdenv.mkDerivation (finalAttrs: {
 
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "fmt_project" finalAttrs.version;
   };
 })

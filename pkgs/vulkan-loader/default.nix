@@ -65,5 +65,6 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = lib.platforms.unix;
     license = lib.licenses.asl20;
     pkgConfigModules = [ "vulkan" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "khronos" finalAttrs.version;
   };
 })

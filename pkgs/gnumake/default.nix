@@ -88,5 +88,9 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3Plus;
     mainProgram = "make";
     platforms = lib.platforms.all;
+    identifiers.cpeParts = {
+      vendor = "gnu";
+      product = "make";
+    };
   };
 }

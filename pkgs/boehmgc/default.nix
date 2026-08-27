@@ -119,5 +119,9 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/bdwgc/bdwgc/blob/v${finalAttrs.version}/ChangeLog";
     license = lib.licenses.boehmGC;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = {
+      vendor = "boehmgc_project";
+      product = "boehmgc";
+    };
   };
 })

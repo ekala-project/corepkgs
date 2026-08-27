@@ -147,5 +147,6 @@ stdenv.mkDerivation rec {
     ];
 
     outputsToInstall = [ "bin" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "fuse_project" version;
   };
 }

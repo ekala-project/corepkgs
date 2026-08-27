@@ -62,5 +62,6 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix ++ lib.platforms.windows;
     license = lib.licenses.mit;
     branch = "5.2";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "giflib_project" version;
   };
 }

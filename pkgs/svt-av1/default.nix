@@ -36,5 +36,9 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.bsd3;
     mainProgram = "SvtAv1EncApp";
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = {
+      vendor = "alliance_for_open_media";
+      product = "svt-av1";
+    };
   };
 })

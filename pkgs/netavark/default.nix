@@ -47,5 +47,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     homepage = "https://github.com/containers/netavark";
     license = lib.licenses.asl20;
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "netavark_project" finalAttrs.version;
   };
 })

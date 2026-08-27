@@ -91,5 +91,9 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = {
+      vendor = "kernel";
+      product = "btrfs-progs";
+    };
   };
 })

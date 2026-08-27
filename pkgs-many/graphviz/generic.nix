@@ -114,5 +114,6 @@ stdenv.mkDerivation rec {
     description = "Graph visualization tools";
     license = lib.licenses.epl10;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "graphviz" version;
   };
 }

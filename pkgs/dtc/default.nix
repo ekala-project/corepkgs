@@ -118,5 +118,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl2Plus; # dtc itself is GPLv2, libfdt is dual GPL/BSD
     platforms = lib.platforms.unix;
     mainProgram = "dtc";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "kernel" finalAttrs.version;
   };
 })

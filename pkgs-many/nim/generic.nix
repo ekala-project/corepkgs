@@ -86,5 +86,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.mit;
     platforms = lib.platforms.unix ++ lib.platforms.darwin;
     mainProgram = "nim";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "nim-lang" version;
   };
 })

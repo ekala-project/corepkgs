@@ -455,6 +455,7 @@ stdenv.mkDerivation (finalAttrs: {
       "openssl"
     ];
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "openssl" finalAttrs.version;
   }
   // extraMeta;
 })

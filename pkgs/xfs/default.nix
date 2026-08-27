@@ -22,4 +22,5 @@ buildXorgPackage (finalAttrs: {
     xtrans
   ];
   meta.mainProgram = "xfs";
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

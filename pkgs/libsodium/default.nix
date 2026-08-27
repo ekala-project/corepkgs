@@ -48,5 +48,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.isc;
     pkgConfigModules = [ "libsodium" ];
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libsodium_project" finalAttrs.version;
   };
 })

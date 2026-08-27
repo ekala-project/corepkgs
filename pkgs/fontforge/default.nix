@@ -110,5 +110,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://fontforge.github.io";
     platforms = lib.platforms.all;
     license = lib.licenses.bsd3;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "fontforge" finalAttrs.version;
   };
 })

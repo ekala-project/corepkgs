@@ -56,5 +56,6 @@ stdenv.mkDerivation rec {
     license = lib.licenses.asl20;
     mainProgram = "s3";
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" version;
   };
 }

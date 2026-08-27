@@ -73,5 +73,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.bsd3;
     homepage = "https://github.com/google/re2";
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "google" finalAttrs.version;
   };
 })

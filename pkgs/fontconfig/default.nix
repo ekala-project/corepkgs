@@ -128,5 +128,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.bsd2; # custom but very bsd-like
     platforms = lib.platforms.all;
     pkgConfigModules = [ "fontconfig" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "fontconfig_project" finalAttrs.version;
   };
 })

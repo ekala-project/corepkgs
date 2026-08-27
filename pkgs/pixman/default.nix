@@ -75,5 +75,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
     pkgConfigModules = [ "pixman-1" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "pixman" finalAttrs.version;
   };
 })

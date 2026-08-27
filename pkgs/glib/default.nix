@@ -386,5 +386,6 @@ stdenv.mkDerivation (finalAttrs: {
       system used in GNOME, the main loop implementation, and a large
       set of utility functions for strings and common data structures.
     '';
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnome" finalAttrs.version;
   };
 })

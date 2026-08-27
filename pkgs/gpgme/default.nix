@@ -114,5 +114,6 @@ stdenv.mkDerivation (finalAttrs: {
       "gpgme-glib"
     ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnupg" finalAttrs.version;
   };
 })

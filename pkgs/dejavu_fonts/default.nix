@@ -26,6 +26,7 @@ let
     # See http://dejavu-fonts.org/wiki/License for details
     license = lib.licenses.free;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "dejavu_fonts_project" version;
   };
 
   full-ttf = stdenv.mkDerivation {

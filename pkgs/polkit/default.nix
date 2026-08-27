@@ -208,5 +208,6 @@ stdenv.mkDerivation rec {
       # mandatory libpolkit-gobject shared library
       lib.systems.inspect.platformPatterns.isStatic
     ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "polkit_project" version;
   };
 }

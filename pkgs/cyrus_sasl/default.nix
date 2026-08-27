@@ -90,5 +90,6 @@ stdenv.mkDerivation rec {
     description = "Library for adding authentication support to connection-based protocols";
     platforms = lib.platforms.unix;
     license = lib.licenses.bsdOriginal;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "cmu" version;
   };
 }

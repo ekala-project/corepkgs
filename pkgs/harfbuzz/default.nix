@@ -91,5 +91,6 @@ stdenv.mkDerivation (finalAttrs: {
       "harfbuzz-gobject"
       "harfbuzz-subset"
     ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "harfbuzz_project" finalAttrs.version;
   };
 })

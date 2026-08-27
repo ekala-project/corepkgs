@@ -56,5 +56,6 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     license = with lib.licenses; [ gpl2Only ];
     mainProgram = "socat";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "socat_project" version;
   };
 }

@@ -80,5 +80,9 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = lib.platforms.all;
     license = lib.licenses.mit; # expat version
     pkgConfigModules = [ "expat" ];
+    identifiers.cpeParts = {
+      vendor = "libexpat_project";
+      product = "libexpat";
+    };
   };
 })

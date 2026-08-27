@@ -43,5 +43,9 @@ stdenv.mkDerivation rec {
     pkgConfigModules = [
       "libxxhash"
     ];
+    identifiers.cpeParts = {
+      vendor = "xxhash_project";
+      product = "xxhash";
+    };
   };
 }

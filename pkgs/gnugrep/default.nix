@@ -110,6 +110,10 @@ stdenv.mkDerivation {
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.all;
     mainProgram = "grep";
+    identifiers.cpeParts = {
+      vendor = "gnu";
+      product = "grep";
+    };
   };
 
   passthru = {

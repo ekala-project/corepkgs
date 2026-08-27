@@ -57,5 +57,6 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "sxpm";
     pkgConfigModules = [ "xpm" ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
   };
 })

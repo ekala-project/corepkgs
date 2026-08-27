@@ -94,5 +94,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.thekelleys.org.uk/dnsmasq/doc.html";
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "thekelleys" finalAttrs.version;
   };
 })

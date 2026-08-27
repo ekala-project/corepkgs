@@ -97,5 +97,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     license = lib.licenses.mpl20;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "isc" finalAttrs.version;
   };
 })

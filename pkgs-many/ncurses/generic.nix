@@ -293,6 +293,7 @@ stdenv.mkDerivation (finalAttrs: {
       in
       base ++ lib.optionals unicodeSupport (map (p: p + "w") base);
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" finalAttrs.version;
   };
 
   passthru = {

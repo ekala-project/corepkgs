@@ -37,5 +37,9 @@ stdenv.mkDerivation (finalAttrs: {
       "xcb-util"
     ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = {
+      vendor = "x.org";
+      product = "xcb-util";
+    };
   };
 })

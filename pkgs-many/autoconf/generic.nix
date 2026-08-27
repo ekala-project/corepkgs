@@ -99,6 +99,7 @@ stdenv.mkDerivation (finalAttrs: {
     license = if packageOlder "2.71" then lib.licenses.gpl2Plus else lib.licenses.gpl3Plus;
 
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
   };
 
   passthru = mkVariantPassthru variantArgs // {

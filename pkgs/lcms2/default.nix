@@ -33,5 +33,9 @@ stdenv.mkDerivation rec {
     homepage = "http://www.littlecms.com/";
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = {
+      vendor = "littlecms";
+      product = "little_cms_color_engine";
+    };
   };
 }

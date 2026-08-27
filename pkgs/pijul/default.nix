@@ -53,5 +53,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     homepage = "https://pijul.org";
     license = lib.licenses.gpl2Plus;
     mainProgram = "pijul";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "pijul" finalAttrs.version;
   };
 })

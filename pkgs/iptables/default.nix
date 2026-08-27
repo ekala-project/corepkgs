@@ -103,5 +103,6 @@ stdenv.mkDerivation rec {
     mainProgram = "iptables";
     license = lib.licenses.gpl2Plus;
     downloadPage = "https://www.netfilter.org/projects/iptables/files/";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "netfilter" version;
   };
 }

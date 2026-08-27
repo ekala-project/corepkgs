@@ -40,5 +40,6 @@ buildNpmPackage' {
     description = "MongoDB Shell";
     license = lib.licenses.asl20;
     mainProgram = "mongosh";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "mongodb" version;
   };
 }

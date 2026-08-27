@@ -58,5 +58,6 @@ stdenv.mkDerivation rec {
     ";
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "opendnssec" version;
   };
 }

@@ -243,5 +243,6 @@ stdenv.mkDerivation (finalAttrs: {
       "uuid"
     ];
     priority = 6; # lower priority than coreutils ("kill") and shadow ("login" etc.) packages
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "kernel" finalAttrs.version;
   };
 })

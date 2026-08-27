@@ -131,5 +131,6 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/libical/libical/raw/v${finalAttrs.version}/ReleaseNotes.txt";
     license = lib.licenses.mpl20;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libical_project" finalAttrs.version;
   };
 })

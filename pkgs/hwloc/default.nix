@@ -98,5 +98,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.bsd3;
     homepage = "https://www.open-mpi.org/projects/hwloc/";
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "open-mpi" finalAttrs.version;
   };
 })

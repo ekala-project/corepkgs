@@ -63,5 +63,9 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl2Only;
     mainProgram = "wg";
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = {
+      vendor = "wireguard";
+      product = "wireguard";
+    };
   };
 })

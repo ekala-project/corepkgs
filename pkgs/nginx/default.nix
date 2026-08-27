@@ -141,5 +141,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://nginx.org";
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "f5" finalAttrs.version;
   };
 })

@@ -26,5 +26,6 @@ buildXorgPackage (finalAttrs: {
   meta = {
     pkgConfigModules = [ "xkbcomp" ];
     mainProgram = "xkbcomp";
+    identifiers.cpeParts.vendor = "x.org";
   };
 })

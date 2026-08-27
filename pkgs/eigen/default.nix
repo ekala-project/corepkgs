@@ -46,5 +46,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "C++ template library for linear algebra: vectors, matrices, and related algorithms";
     license = lib.licenses.lgpl3Plus;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "eigen" finalAttrs.version;
   };
 })

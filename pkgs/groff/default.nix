@@ -175,5 +175,6 @@ stdenv.mkDerivation (finalAttrs: {
       "out"
       "perl"
     ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" finalAttrs.version;
   };
 })

@@ -81,5 +81,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     ];
     mainProgram = "rg";
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "ripgrep_project" finalAttrs.version;
   };
 })

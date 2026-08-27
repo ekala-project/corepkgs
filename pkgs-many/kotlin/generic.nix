@@ -69,5 +69,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix ++ lib.platforms.darwin;
     mainProgram = "kotlinc";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "jetbrains" version;
   };
 })

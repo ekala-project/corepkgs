@@ -63,5 +63,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://libssh.org";
     license = lib.licenses.lgpl2Plus;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libssh" finalAttrs.version;
   };
 })

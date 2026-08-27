@@ -133,5 +133,6 @@ stdenv.mkDerivation rec {
     # News articles with changes summary can be found here: https://nghttp2.org/blog/archives/
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "nghttp2" version;
   };
 }

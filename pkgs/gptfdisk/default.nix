@@ -68,5 +68,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl2Plus;
     homepage = "https://www.rodsbooks.com/gdisk/";
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gptfdisk_project" finalAttrs.version;
   };
 })

@@ -53,5 +53,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.isc;
     pkgConfigModules = [ "yajl" ];
     platforms = with lib.platforms; linux ++ darwin;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "lloyd" finalAttrs.version;
   };
 })

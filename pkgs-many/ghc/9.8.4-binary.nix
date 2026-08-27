@@ -497,5 +497,9 @@ stdenv.mkDerivation {
     platforms = builtins.attrNames ghcBinDists.${distSetName};
     broken = !(import ./common-have-ncg.nix { inherit lib stdenv version; });
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
+    identifiers.cpeParts = {
+      vendor = "haskell";
+      product = "ghc";
+    };
   };
 }

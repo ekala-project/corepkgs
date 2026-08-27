@@ -136,5 +136,6 @@ stdenv.mkDerivation (finalAttrs: {
     ]
     ++ lib.optionals (!minimal) [ "poppler-cpp" ]
     ++ lib.optionals introspectionSupport [ "poppler-glib" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "freedesktop" finalAttrs.version;
   };
 })

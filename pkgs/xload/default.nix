@@ -32,4 +32,5 @@ buildXorgPackage (finalAttrs: {
     libxt
   ];
   meta.mainProgram = "xload";
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

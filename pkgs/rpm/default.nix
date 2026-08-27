@@ -136,5 +136,6 @@ stdenv.mkDerivation rec {
     ];
     description = "RPM package manager";
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "rpm" version;
   };
 }

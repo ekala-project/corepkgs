@@ -43,5 +43,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/awslabs/aws-c-cal";
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" finalAttrs.version;
   };
 })

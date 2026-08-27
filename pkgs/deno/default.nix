@@ -263,5 +263,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
       "x86_64-darwin"
       "aarch64-darwin"
     ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "deno" finalAttrs.version;
   };
 })

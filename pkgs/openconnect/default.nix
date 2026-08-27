@@ -59,5 +59,6 @@ stdenv.mkDerivation {
     license = lib.licenses.lgpl21Only;
     platforms = lib.platforms.unix;
     mainProgram = "openconnect";
+    identifiers.cpeParts.vendor = "infradead";
   };
 }

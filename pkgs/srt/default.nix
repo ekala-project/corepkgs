@@ -35,5 +35,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/Haivision/srt";
     license = lib.licenses.mpl20;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "haivision" finalAttrs.version;
   };
 })

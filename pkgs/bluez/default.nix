@@ -203,5 +203,6 @@ stdenv.mkDerivation (finalAttrs: {
       license
       platforms
       ;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "bluez" finalAttrs.version;
   };
 })

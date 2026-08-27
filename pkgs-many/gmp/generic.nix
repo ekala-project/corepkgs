@@ -115,5 +115,6 @@ stdenv.mkDerivation (finalAttrs: {
       asymptotically faster algorithms.
     '';
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gmplib" finalAttrs.version;
   };
 })

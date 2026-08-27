@@ -232,5 +232,6 @@ stdenv.mkDerivation rec {
     homepage = "https://gnutls.org/";
     license = lib.licenses.lgpl21Plus;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
   };
 }

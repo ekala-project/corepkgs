@@ -33,5 +33,6 @@ stdenv.mkDerivation (finalAttrs: {
     ];
     mainProgram = "cvt";
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
   };
 })

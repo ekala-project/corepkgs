@@ -141,5 +141,6 @@ stdenv.mkDerivation (finalAttrs: {
       mit # lib/et, lib/ss
     ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "e2fsprogs_project" finalAttrs.version;
   };
 })

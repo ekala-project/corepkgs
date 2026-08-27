@@ -56,5 +56,6 @@ stdenv.mkDerivation (finalAttrs: {
       mpl11
     ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "zziplib_project" finalAttrs.version;
   };
 })

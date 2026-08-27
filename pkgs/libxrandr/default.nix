@@ -68,5 +68,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.mit;
     pkgConfigModules = [ "xrandr" ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
   };
 })

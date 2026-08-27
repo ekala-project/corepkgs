@@ -77,5 +77,6 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/cracklib/cracklib/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.lgpl21;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "cracklib_project" finalAttrs.version;
   };
 })

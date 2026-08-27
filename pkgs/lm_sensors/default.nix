@@ -77,5 +77,9 @@ stdenv.mkDerivation {
     ];
     platforms = lib.platforms.linux;
     mainProgram = "sensors";
+    identifiers.cpeParts = {
+      vendor = "lm-sensors_project";
+      product = "lm-sensors";
+    };
   };
 }

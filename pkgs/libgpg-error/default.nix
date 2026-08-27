@@ -92,6 +92,7 @@ stdenv.mkDerivation (
       '';
       license = lib.licenses.lgpl2Plus;
       platforms = lib.platforms.all;
+      identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnupg" finalAttrs.version;
     };
   }
   // genPosixLockObjOnlyAttrs'

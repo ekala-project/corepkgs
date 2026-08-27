@@ -51,5 +51,9 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.all;
     mainProgram = "nano";
+    identifiers.cpeParts = {
+      vendor = "gnu";
+      product = "nano";
+    };
   };
 })

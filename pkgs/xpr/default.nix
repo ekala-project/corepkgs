@@ -22,4 +22,5 @@ buildXorgPackage (finalAttrs: {
     xorgproto
   ];
   meta.mainProgram = "xpr";
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

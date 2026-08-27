@@ -121,6 +121,10 @@ stdenv.mkDerivation rec {
     description = "Suite containing authentication-related tools such as passwd and su";
     license = lib.licenses.bsd3;
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = {
+      vendor = "shadow-maint";
+      product = "shadow-utils";
+    };
   };
 
   passthru = {

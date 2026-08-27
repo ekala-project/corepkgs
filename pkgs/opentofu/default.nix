@@ -65,6 +65,7 @@ let
       changelog = "https://github.com/opentofu/opentofu/blob/v${version}/CHANGELOG.md";
       license = lib.licenses.mpl20;
       mainProgram = "tofu";
+      identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "opentofu" version;
     };
   };
 in

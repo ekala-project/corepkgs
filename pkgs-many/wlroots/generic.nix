@@ -133,6 +133,7 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://gitlab.freedesktop.org/wlroots/wlroots/-/tags/${version}";
     license = lib.licenses.mit;
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "wlroots_project" version;
     pkgConfigModules = [
       (
         if lib.versionOlder finalAttrs.version "0.18" then

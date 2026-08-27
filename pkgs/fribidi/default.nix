@@ -44,5 +44,6 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "fribidi";
     license = lib.licenses.lgpl21;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "fribidi_project" finalAttrs.version;
   };
 })

@@ -93,5 +93,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.bsd2;
     platforms = lib.platforms.all;
     outputsToInstall = [ "bin" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "aomedia" finalAttrs.version;
   };
 })

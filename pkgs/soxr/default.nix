@@ -41,5 +41,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://soxr.sourceforge.net";
     license = lib.licenses.lgpl21Plus;
     platforms = lib.platforms.unix ++ lib.platforms.windows;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "soxr_project" finalAttrs.version;
   };
 })

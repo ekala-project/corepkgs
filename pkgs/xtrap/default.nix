@@ -21,4 +21,5 @@ buildXorgPackage (finalAttrs: {
     libxt
     libxtrap
   ];
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

@@ -83,5 +83,6 @@ buildGo126Module (finalAttrs: {
     homepage = "https://gitlab.com/gitlab-org/cli";
     changelog = "https://gitlab.com/gitlab-org/cli/-/releases/v${finalAttrs.version}";
     mainProgram = "glab";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gitlab" finalAttrs.version;
   };
 })

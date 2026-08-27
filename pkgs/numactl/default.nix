@@ -42,5 +42,6 @@ stdenv.mkDerivation rec {
       lgpl21
     ]; # libnuma is lgpl21
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "numactl_project" version;
   };
 }

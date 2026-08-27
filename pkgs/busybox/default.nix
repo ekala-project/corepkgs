@@ -235,5 +235,6 @@ stdenv.mkDerivation rec {
     mainProgram = "busybox";
     platforms = lib.platforms.linux;
     priority = 15; # below systemd (halt, init, poweroff, reboot) and coreutils
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "busybox" version;
   };
 }

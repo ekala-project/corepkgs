@@ -120,5 +120,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.mpl20;
     platforms = lib.platforms.all;
     pkgConfigModules = [ "libzmq" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "zeromq" finalAttrs.version;
   };
 })

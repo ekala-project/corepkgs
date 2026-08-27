@@ -28,5 +28,6 @@ stdenv.mkDerivation (finalAttrs: {
       lgpl21
     ]; # library is lgpl21
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "kernel" finalAttrs.version;
   };
 })

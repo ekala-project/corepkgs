@@ -52,5 +52,9 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://opus-codec.org/";
     license = lib.licenses.bsd3;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = {
+      vendor = "xiph.org";
+      product = "opus";
+    };
   };
 })

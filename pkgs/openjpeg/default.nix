@@ -55,5 +55,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.openjpeg.org/";
     license = lib.licenses.bsd2;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "uclouvain" version;
   };
 }

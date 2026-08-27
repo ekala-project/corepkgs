@@ -20,4 +20,5 @@ buildXorgPackage (finalAttrs: {
     xorgproto
   ];
   meta.broken = true;
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

@@ -35,5 +35,6 @@ stdenv.mkDerivation rec {
     homepage = "https://trousers.sourceforge.net/";
     license = lib.licenses.bsd3;
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "trousers_project" version;
   };
 }

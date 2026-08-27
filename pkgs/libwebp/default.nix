@@ -113,5 +113,6 @@ stdenv.mkDerivation rec {
     ++ lib.optionals libwebpmuxSupport [
       "libwebpmux"
     ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "webmproject" version;
   };
 }

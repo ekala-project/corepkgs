@@ -108,5 +108,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = removeAttrs libsepol.meta [ "outputsToInstall" ] // {
     description = "SELinux core library";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "selinuxproject" finalAttrs.version;
   };
 })

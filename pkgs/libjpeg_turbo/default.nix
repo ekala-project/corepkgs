@@ -120,5 +120,9 @@ stdenv.mkDerivation (finalAttrs: {
       "libturbojpeg"
     ];
     platforms = lib.platforms.all;
+    identifiers.cpeParts = {
+      vendor = "libjpeg-turbo";
+      product = "libjpeg-turbo";
+    };
   };
 })

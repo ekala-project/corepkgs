@@ -73,5 +73,6 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/gabime/spdlog/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "spdlog_project" finalAttrs.version;
   };
 })

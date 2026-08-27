@@ -70,5 +70,6 @@ buildGoModule (finalAttrs: {
     changelog = "https://github.com/getsops/sops/blob/v${finalAttrs.version}/CHANGELOG.md";
     mainProgram = "sops";
     license = lib.licenses.mpl20;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "mozilla" finalAttrs.version;
   };
 })

@@ -185,5 +185,6 @@ stdenv.mkDerivation rec {
     description = "Standards-based printing system for UNIX";
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "openprinting" version;
   };
 }

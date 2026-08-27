@@ -240,6 +240,7 @@ stdenv.mkDerivation rec {
     changelog = "https://github.com/nss-dev/nss/blob/master/doc/rst/releases/nss_${underscoreVersion}.rst";
     license = lib.licenses.mpl20;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "mozilla" version;
   }
   // extraMeta;
 }

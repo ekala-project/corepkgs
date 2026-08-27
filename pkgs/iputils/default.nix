@@ -100,5 +100,6 @@ stdenv.mkDerivation rec {
       bsd3
     ];
     platforms = lib.platforms.linux;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "iputils_project" version;
   };
 }

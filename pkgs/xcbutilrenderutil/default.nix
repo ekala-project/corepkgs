@@ -41,5 +41,9 @@ stdenv.mkDerivation (finalAttrs: {
     ];
     pkgConfigModules = [ "xcb-renderutil" ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = {
+      vendor = "x.org";
+      product = "xcb-util-renderutil";
+    };
   };
 })

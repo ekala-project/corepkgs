@@ -87,5 +87,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = if isVersion2 then lib.licenses.mit else lib.licenses.bsd3;
     mainProgram = if isVersion2 then "iperf2" else "iperf3";
     priority = if isVersion2 then 10 else lib.meta.defaultPriority;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "iperf_project" finalAttrs.version;
   };
 })

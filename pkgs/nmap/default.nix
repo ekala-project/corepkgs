@@ -58,5 +58,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.all;
     mainProgram = "nmap";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "nmap" finalAttrs.version;
   };
 })

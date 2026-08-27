@@ -94,5 +94,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
     pkgConfigModules = [ "libffi" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "sourceware" finalAttrs.version;
   };
 })

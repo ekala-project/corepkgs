@@ -91,5 +91,6 @@ stdenv.mkDerivation (finalAttrs: {
       "libpng${lib.replaceStrings [ "." ] [ "" ] branch}"
     ];
     platforms = if packageAtLeast "1.6" then lib.platforms.all else lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libpng" finalAttrs.version;
   };
 })

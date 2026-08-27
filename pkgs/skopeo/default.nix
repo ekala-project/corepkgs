@@ -97,5 +97,6 @@ buildGoModule rec {
     mainProgram = "skopeo";
     homepage = "https://github.com/containers/skopeo";
     license = lib.licenses.asl20;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "skopeo_project" version;
   };
 }

@@ -162,5 +162,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.zlib;
     platforms = lib.platforms.all;
     pkgConfigModules = [ "zlib" ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "zlib" finalAttrs.version;
   };
 })

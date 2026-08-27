@@ -24,5 +24,6 @@ buildXorgPackage (finalAttrs: {
   meta = {
     pkgConfigModules = [ "xorg-joystick" ];
     broken = stdenv.hostPlatform.isDarwin;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
   };
 })

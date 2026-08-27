@@ -50,5 +50,6 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://code.videolan.org/videolan/dav1d/-/tags/${finalAttrs.version}";
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix ++ lib.platforms.windows;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "videolan" finalAttrs.version;
   };
 })

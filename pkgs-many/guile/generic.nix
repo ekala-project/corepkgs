@@ -306,6 +306,7 @@ builder (
       '';
       license = lib.licenses.lgpl3Plus;
       platforms = lib.platforms.all;
+      identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
     };
   }
   // lib.optionalAttrs (packageAtLeast "2.0" && packageOlder "2.2" && !stdenv.hostPlatform.isLinux) {

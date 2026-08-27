@@ -29,4 +29,5 @@ buildXorgPackage (finalAttrs: {
     libpciaccess
     xorg-server
   ];
+  meta.identifiers.cpeParts.vendor = "x.org";
 })

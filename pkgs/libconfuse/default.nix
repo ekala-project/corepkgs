@@ -62,5 +62,6 @@ stdenv.mkDerivation rec {
     '';
     license = lib.licenses.isc;
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libconfuse_project" version;
   };
 }

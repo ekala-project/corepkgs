@@ -68,6 +68,9 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/abseil/abseil-cpp/releases/tag/${finalAttrs.version}";
     license = lib.licenses.asl20;
     platforms = lib.platforms.all;
-
+    identifiers.cpeParts = {
+      vendor = "google";
+      product = "abseil";
+    };
   };
 })

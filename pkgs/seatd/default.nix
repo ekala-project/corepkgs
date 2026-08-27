@@ -57,5 +57,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.mit;
     platforms = lib.platforms.linux;
     mainProgram = "seatd";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "seatd_project" finalAttrs.version;
   };
 })

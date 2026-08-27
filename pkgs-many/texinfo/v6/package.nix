@@ -163,5 +163,6 @@ stdenv.mkDerivation {
       well-integrated with GNU Emacs.
     '';
     mainProgram = "texi2any";
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
   };
 }

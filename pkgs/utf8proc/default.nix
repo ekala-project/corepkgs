@@ -33,5 +33,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://juliastrings.github.io/utf8proc/";
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "utf8proc_project" finalAttrs.version;
   };
 })

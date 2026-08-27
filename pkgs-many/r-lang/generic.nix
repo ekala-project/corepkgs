@@ -94,5 +94,9 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix ++ lib.platforms.darwin;
     mainProgram = "R";
+    identifiers.cpeParts = {
+      vendor = "r-project";
+      product = "r";
+    };
   };
 })

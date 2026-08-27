@@ -143,5 +143,6 @@ stdenv.mkDerivation (finalAttrs: {
       "wayland-egl-backend"
       "wayland-server"
     ];
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "wayland" finalAttrs.version;
   };
 })

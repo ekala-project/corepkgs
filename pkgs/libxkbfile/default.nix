@@ -55,5 +55,6 @@ stdenv.mkDerivation (finalAttrs: {
     ];
     pkgConfigModules = [ "xkbfile" ];
     platforms = lib.platforms.unix;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
   };
 })

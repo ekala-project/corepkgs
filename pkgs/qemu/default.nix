@@ -444,6 +444,7 @@ stdenv.mkDerivation (finalAttrs: {
       description = "Generic and open source machine emulator and virtualizer";
       license = lib.licenses.gpl2Plus;
       platforms = lib.platforms.unix;
+      identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "qemu" finalAttrs.version;
     }
     # toolsOnly: Does not have qemu-kvm and there's no main support tool
     # userOnly: There's one qemu-<arch> for every architecture

@@ -24,4 +24,5 @@ buildXorgPackage (finalAttrs: {
   ];
   configureFlags = [ "--with-cpp=${mcpp}/bin/mcpp" ];
   meta.mainProgram = "xrdb";
+  meta.identifiers.cpeParts.vendor = "x.org";
 })
