@@ -96,6 +96,28 @@ in
       '';
     };
 
+    handleEvalIssue = mkOption {
+      type = types.nullOr (types.functionTo (types.functionTo types.unspecified));
+      description = ''
+        A hook deciding what to do when `check-meta` refuses a package.
+
+        It is passed the reason (`"unknown-meta"`, `"broken"`, `"unfree"`,
+        `"unsupported"`, ...) and the rendered message, and whatever it
+        returns is forced in place of the default `throw`. This lets a caller
+        distinguish a malformed `meta`, which is always a mistake, from a
+        package correctly declining to evaluate on this system.
+
+        Left unset, every rejection throws.
+      '';
+      default = null;
+      example = literalExpression ''
+        {
+          handleEvalIssue =
+            reason: msg: if reason == "unknown-meta" then abort msg else throw msg;
+        }
+      '';
+    };
+
     rewriteURL = mkOption {
       type = types.functionTo (types.nullOr types.str);
       description = ''

@@ -1,49 +1,60 @@
-# Evaluates every top-level attribute of the package set and reports the ones
-# that fail to evaluate.
+# Evaluates every top-level attribute of the package set.
 #
-# Broken and unfree packages are allowed through so they are not reported:
-# refusing to evaluate those is intended behaviour, not breakage. Platform
-# support is *not* forced, because a package that is unsupported here may
-# reference attributes that only exist on its own platform; those are
-# recognised instead by `meta.available` being false. What is left is a genuine
-# bug -- a missing dependency, a typo, or an invalid `meta` attribute.
+# Aliases are disabled. They are compatibility shims that resolve to a package
+# already covered under its canonical name, so evaluating them only repeats
+# work -- and a shim for something this repo does not package should not make
+# the job fail.
 #
-# Attributes that intentionally `throw` because the package has not been ported
-# yet are listed in `./unavailable.nix` and skipped.
+# `handleEvalIssue` decides which `check-meta` rejections are bugs:
+#
+#   * `unknown-meta` and `broken-outputs` mean the `meta` itself is malformed,
+#     which is always a mistake, so they `abort` and name the package.
+#   * Everything else -- broken, unfree, unsupported, insecure -- is a package
+#     correctly refusing to evaluate here. Those `throw`, and are ignored.
+#
+# What is left cannot be caught by `tryEval` and so fails the job with Nix's
+# own message and source location: a missing `callPackage` argument (an
+# `abort`), a missing attribute, or a type error. Those are the real bugs.
 #
 # Usage:
-#   nix-instantiate --eval --strict --json ci/eval.nix
+#   nix-instantiate --eval --strict ci/eval.nix
 
 let
   pkgs = import ../. {
     config = {
-      allowBroken = true;
-      allowUnfree = true;
+      allowAliases = false;
       checkMeta = true;
+
+      handleEvalIssue =
+        reason: msg:
+        if
+          builtins.elem reason [
+            "unknown-meta"
+            "broken-outputs"
+          ]
+        then
+          abort msg
+        else
+          throw msg;
     };
   };
 
   inherit (pkgs) lib;
 
-  unavailable = import ./unavailable.nix;
-
-  # `tryEval` catches `throw` and failed assertions but not `abort`, which is
-  # what `callPackageWith` raises for a missing argument. Those abort the whole
-  # evaluation, failing this job with the offending argument named -- which is
-  # the behaviour we want.
+  # Forcing `drvPath` runs `check-meta` and resolves every dependency of the
+  # package, which is the point of this job.
   probe =
     name:
     let
       value = builtins.tryEval pkgs.${name};
-      result = builtins.tryEval (
-        if lib.isDerivation value.value then builtins.seq value.value.drvPath null else null
-      );
-      # A package that is not available on this system is expected to refuse to
-      # evaluate; anything else that fails is a bug.
-      expected = !(value.success && (value.value.meta.available or true));
     in
-    if result.success || expected then null else name;
+    builtins.tryEval (
+      if value.success && lib.isDerivation value.value then
+        builtins.seq value.value.drvPath null
+      else
+        null
+    );
 
-  names = builtins.filter (name: !(builtins.elem name unavailable)) (builtins.attrNames pkgs);
+  names = builtins.attrNames pkgs;
 in
-builtins.filter (name: name != null) (map probe names)
+builtins.deepSeq (map probe names) (builtins.length names)
