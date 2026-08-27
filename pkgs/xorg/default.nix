@@ -150,7 +150,6 @@ self: {
   xf86videodummy = self."xf86-video-dummy";
   xf86videofbdev = self."xf86-video-fbdev";
   xf86videogeode = self."xf86-video-geode";
-  xf86videoglint = self."xf86-video-glint";
   xf86videoi128 = self."xf86-video-i128";
   xf86videoi740 = self."xf86-video-i740";
   xf86videointel = self."xf86-video-intel";
