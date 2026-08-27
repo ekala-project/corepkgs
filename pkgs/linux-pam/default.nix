@@ -12,7 +12,6 @@
   libxcrypt,
   bash,
   bashNonInteractive,
-  nixosTests,
   meson,
   pkg-config,
   systemdLibs,
@@ -123,15 +122,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   passthru = {
-    tests = {
-      inherit (nixosTests)
-        pam-oath-login
-        pam-u2f
-        pam-lastlog
-        shadow
-        sssd-ldap
-        ;
-    };
     updateScript = nix-update-script { };
   };
 

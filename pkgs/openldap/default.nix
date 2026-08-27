@@ -16,8 +16,6 @@
   withModules ? !stdenv.hostPlatform.isStatic,
   withSystemd ? lib.meta.availableOn stdenv.hostPlatform systemdMinimal,
 
-  # passthru
-  nixosTests,
 }:
 
 stdenv.mkDerivation rec {
@@ -151,11 +149,6 @@ stdenv.mkDerivation rec {
     done
     chmod +x "$out"/lib/*.{so,dylib}
   '';
-
-  passthru.tests = {
-    inherit (nixosTests) openldap;
-    kerberosWithLdap = nixosTests.kerberos.ldap;
-  };
 
   meta = {
     homepage = "https://www.openldap.org/";

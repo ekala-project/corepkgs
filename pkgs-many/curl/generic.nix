@@ -31,7 +31,6 @@
   fetchurl,
   pkg-config,
   perl,
-  nixosTests,
   autoreconfHook,
   brotli,
   c-aresMinimal,
@@ -294,10 +293,6 @@ stdenv.mkDerivation (finalAttrs: {
         ocaml-curly = useThisCurl ocamlPackages.curly;
         pycurl = useThisCurl python3.pkgs.pycurl;
         php-curl = useThisCurl phpExtensions.curl;
-        # error: attribute 'override' missing
-        # Additional checking with support http3 protocol.
-        # nginx-http3 = useThisCurl nixosTests.nginx-http3;
-        nginx-http3 = nixosTests.nginx-http3;
         pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
         pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
         static = pkgsStatic.curl;

@@ -6,7 +6,6 @@
   kernel,
   kernelModuleMakeFlags,
   bluez,
-  nixosTests,
   nix-update-script,
 }:
 
@@ -47,10 +46,6 @@ stdenv.mkDerivation (finalAttrs: {
   buildFlags = [ "modules" ];
   installFlags = [ "INSTALL_MOD_PATH=${placeholder "out"}" ];
   installTargets = [ "modules_install" ];
-
-  passthru.tests = {
-    xpadneo = nixosTests.xpadneo;
-  };
 
   passthru.updateScript = nix-update-script { };
 

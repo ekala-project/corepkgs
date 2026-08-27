@@ -20,7 +20,6 @@
   pkgs,
   pkgsi686Linux,
   pkgsStatic,
-  nixosTests,
   config,
   generateSplicesForMkScope,
   nixDependencies,
@@ -104,7 +103,6 @@ let
             pkgs
             pkgsi686Linux
             pkgsStatic
-            nixosTests
             ;
           inherit (pkg) version src;
           nix = pkg;

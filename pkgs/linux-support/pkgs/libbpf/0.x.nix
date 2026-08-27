@@ -5,7 +5,6 @@
   stdenv,
   zlib,
   lib,
-  nixosTests,
 }:
 
 # update bot does not seem to limit updates here to 0.8.x despite
@@ -35,10 +34,6 @@ stdenv.mkDerivation rec {
     "PREFIX=$(out)"
     "-C src"
   ];
-
-  passthru.tests = {
-    bpf = nixosTests.bpf;
-  };
 
   postInstall = ''
     # install linux's libbpf-compatible linux/btf.h

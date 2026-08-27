@@ -14,7 +14,6 @@
   lua,
   makeWrapper,
   netperf,
-  nixosTests,
   python3Packages,
   readline,
   replaceVars,
@@ -120,10 +119,6 @@ python3Packages.buildPythonApplication rec {
     "out"
     "man"
   ];
-
-  passthru.tests = {
-    bpf = nixosTests.bpf;
-  };
 
   meta = {
     description = "Dynamic Tracing Tools for Linux";

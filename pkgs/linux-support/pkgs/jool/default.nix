@@ -5,7 +5,6 @@
   fetchpatch,
   kernel,
   kernelModuleMakeFlags,
-  nixosTests,
 }:
 
 let
@@ -37,10 +36,6 @@ stdenv.mkDerivation {
   ];
 
   installTargets = "modules_install";
-
-  passthru.tests = {
-    inherit (nixosTests) jool;
-  };
 
   meta = {
     homepage = "https://www.jool.mx/";

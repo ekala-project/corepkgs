@@ -43,7 +43,6 @@
   withpcre2 ? true,
   withZlibNg ? true,
   sendEmailSupport ? perlSupport,
-  nixosTests,
   withLibsecret ? false,
   pkg-config,
   glib,
@@ -543,7 +542,6 @@ stdenv.mkDerivation (finalAttrs: {
       withInstallCheck = finalAttrs.finalPackage.overrideAttrs (_: {
         doInstallCheck = true;
       });
-      buildbot-integration = nixosTests.buildbot;
     }
     // tests.fetchgit;
     updateScript = ./update.sh;

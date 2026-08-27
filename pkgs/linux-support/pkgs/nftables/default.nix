@@ -21,7 +21,6 @@
   libedit,
   withXtables ? true,
   iptables,
-  nixosTests,
   gitUpdater,
   ncurses,
 }:
@@ -76,11 +75,6 @@ stdenv.mkDerivation rec {
   ++ lib.optional withXtables "--with-xtables";
 
   enableParallelBuilding = true;
-
-  passthru.tests = {
-    inherit (nixosTests) firewall-nftables;
-    nat = { inherit (nixosTests.nat.nftables) firewall standalone; };
-  };
 
   passthru.updateScript = gitUpdater {
     url = "https://git.netfilter.org/nftables";

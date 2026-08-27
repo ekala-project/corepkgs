@@ -10,7 +10,6 @@
   protobuf,
   libseccomp,
   nix-update-script,
-  nixosTests,
   fetchpatch,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -71,7 +70,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "--skip=json::tests::test_with_dir"
   ];
 
-  passthru.tests.basic = nixosTests.scx;
   passthru.updateScript = nix-update-script { };
 
   meta = {

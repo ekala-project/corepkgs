@@ -5,7 +5,6 @@
   buildPackages,
   linuxHeaders,
   perl,
-  nixosTests,
 }:
 
 let
@@ -58,11 +57,6 @@ stdenv.mkDerivation rec {
       ln -sv $file $out/lib/klibc/include
     done
   '';
-
-  passthru.tests = {
-    # uses klibc's ipconfig
-    inherit (nixosTests) initrd-network-ssh;
-  };
 
   meta = {
     description = "Minimalistic libc subset for initramfs usage";

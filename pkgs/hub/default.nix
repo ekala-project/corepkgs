@@ -8,7 +8,6 @@
   installShellFiles,
   makeWrapper,
   unixtools,
-  nixosTests,
 }:
 
 buildGoModule (finalAttrs: {
@@ -70,8 +69,6 @@ buildGoModule (finalAttrs: {
   nativeCheckInputs = [
     git
   ];
-
-  passthru.tests = { inherit (nixosTests) hub; };
 
   meta = {
     description = "Command-line wrapper for git that makes you better at GitHub";

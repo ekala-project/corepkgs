@@ -21,7 +21,6 @@
   fetchFromGitLab,
   perl,
   shortenPerlShebang,
-  nixosTests,
 }:
 
 self:
@@ -22495,7 +22494,6 @@ with self;
     makeMakerFlags = [ "MP_AP_DESTDIR=$out" ];
     buildInputs = [ pkgs.apacheHttpd ];
     doCheck = false; # would try to start Apache HTTP server
-    passthru.tests = nixosTests.mod_perl;
     meta = {
       description = "Embed a Perl interpreter in the Apache/2.x HTTP server";
       license = with lib.licenses; [ asl20 ];

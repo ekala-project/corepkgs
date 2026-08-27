@@ -8,7 +8,6 @@
 
   # for passthru.tests
   knot-dns,
-  nixosTests,
   systemd,
   tracee,
 }:
@@ -38,7 +37,6 @@ stdenv.mkDerivation rec {
 
   passthru.tests = {
     inherit knot-dns tracee;
-    bpf = nixosTests.bpf;
     systemd = systemd.override { withLibBPF = true; };
   };
 

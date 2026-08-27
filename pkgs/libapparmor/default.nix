@@ -27,7 +27,6 @@
 
   # passthru
   nix-update-script,
-  nixosTests,
   callPackage,
 }:
 stdenv.mkDerivation (finalAttrs: {
@@ -94,7 +93,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     updateScript = nix-update-script { };
-    tests.nixos = nixosTests.apparmor;
     apparmorRulesFromClosure = callPackage ./apparmorRulesFromClosure.nix { };
   };
 

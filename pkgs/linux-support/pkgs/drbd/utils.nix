@@ -9,7 +9,6 @@
   flex,
   kmod,
   libxslt,
-  nixosTests,
   perl,
   perlPackages,
   systemd,
@@ -113,8 +112,6 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   doInstallCheck = true;
-
-  passthru.tests.drbd = nixosTests.drbd;
 
   meta = {
     homepage = "https://linbit.com/drbd/";

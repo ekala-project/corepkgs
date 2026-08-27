@@ -7,7 +7,6 @@
   # for passthru.tests
   git,
   libguestfs,
-  nixosTests,
   rpm,
 }:
 
@@ -39,7 +38,6 @@ stdenv.mkDerivation rec {
   passthru.tests = {
     inherit libguestfs rpm;
     git = git.tests.withInstallCheck;
-    initrd = nixosTests.systemd-initrd-simple;
   };
 
   meta = {

@@ -4,7 +4,6 @@
   fetchFromGitHub,
   kernel,
   kernelModuleMakeFlags,
-  nixosTests,
 }:
 
 let
@@ -31,8 +30,6 @@ stdenv.mkDerivation {
   ];
 
   passthru = {
-    tests.apfs = nixosTests.apfs;
-
     inherit tag;
     updateScript = ./update.sh;
   };

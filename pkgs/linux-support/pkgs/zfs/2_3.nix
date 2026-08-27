@@ -1,7 +1,6 @@
 {
   callPackage,
   lib,
-  nixosTests,
   stdenv,
   fetchpatch,
   ...
@@ -26,12 +25,7 @@ callPackage ./generic.nix args {
     })
   ];
 
-  tests = {
-    inherit (nixosTests.zfs) series_2_3;
-  }
-  // lib.optionalAttrs stdenv.isx86_64 {
-    inherit (nixosTests.zfs) installer;
-  };
+  tests = { };
 
   hash = "sha256-zTDdoQWbguKeWjQH5+FOTDhxfs3e7UPFnUX8ZugHQy4=";
 }

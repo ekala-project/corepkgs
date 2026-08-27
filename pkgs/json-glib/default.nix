@@ -7,7 +7,6 @@
   meson,
   mesonEmulatorHook,
   ninja,
-  nixosTests,
   pkg-config,
   gettext,
   withIntrospection ?
@@ -93,7 +92,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     tests = {
-      installedTests = nixosTests.installed-tests.json-glib;
       unittests = runUnitTests finalAttrs.finalPackage;
     };
 

@@ -4,7 +4,6 @@
   fetchurl,
   kernel,
   kernelModuleMakeFlags,
-  nixosTests,
 }:
 
 let
@@ -31,10 +30,6 @@ stdenv.mkDerivation rec {
     sed -i -e "s,INSTALL_MOD_DIR=,INSTALL_MOD_PATH=$out INSTALL_MOD_DIR=," \
       -e /depmod/d Makefile
   '';
-
-  passthru.tests = {
-    systemd-networkd-batadv = nixosTests.systemd-networkd-batadv;
-  };
 
   meta = {
     homepage = "https://www.open-mesh.org/projects/batman-adv/wiki/Wiki";

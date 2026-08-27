@@ -9,7 +9,6 @@
   file,
   git,
   makeWrapper,
-  nixosTests,
   protobuf,
   python3,
   ocaml,
@@ -256,10 +255,6 @@ stdenv.mkDerivation rec {
       --replace-fail "/bin/kill" \
                      "${coreutils}/bin/kill"
   '';
-
-  passthru.tests = {
-    service = nixosTests.aesmd;
-  };
 
   meta = {
     description = "Intel SGX Architectural Enclave Service Manager";

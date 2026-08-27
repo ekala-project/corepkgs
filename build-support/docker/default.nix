@@ -154,7 +154,6 @@ rec {
       ;
   };
 
-  # Tests removed - nixosTests not available in core-pkgs
   tests = { };
 
   pullImage =

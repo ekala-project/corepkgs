@@ -14,7 +14,6 @@
   # for passthru.tests
   bind,
   curl,
-  nixosTests,
   openssh,
   postgresql,
   python3,
@@ -179,7 +178,6 @@ stdenv.mkDerivation rec {
   passthru = {
     implementation = "krb5";
     tests = {
-      inherit (nixosTests) kerberos;
       inherit (python3.pkgs) requests-credssp;
       bind = bind.override { enableGSSAPI = true; };
       curl = curl.override { gssSupport = true; };

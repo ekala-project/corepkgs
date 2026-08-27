@@ -9,7 +9,6 @@
   bison,
   bc,
   opensnitch ? throw "opensnitch-ebpf requires opensnitch",
-  nixosTests,
 }:
 
 stdenv.mkDerivation rec {
@@ -58,10 +57,6 @@ stdenv.mkDerivation rec {
       llvm-strip --strip-debug $file
     done
   '';
-
-  passthru.tests = {
-    inherit (nixosTests) opensnitch;
-  };
 
   meta = {
     description = "eBPF process monitor module for OpenSnitch";

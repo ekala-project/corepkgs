@@ -6,7 +6,6 @@
   lua,
   jemalloc,
   pkg-config,
-  nixosTests,
   tcl,
   which,
   ps,
@@ -115,7 +114,6 @@ stdenv.mkDerivation (finalAttrs: {
   versionCheckProgram = "${placeholder "out"}/bin/redis-server";
 
   passthru = {
-    tests.redis = nixosTests.redis;
     serverBin = "redis-server";
     updateScript = nix-update-script { };
   };

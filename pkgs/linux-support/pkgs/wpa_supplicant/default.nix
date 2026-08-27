@@ -6,7 +6,6 @@
   openssl,
   pkg-config,
   libnl,
-  nixosTests,
   wpa_supplicant_gui,
   dbusSupport ? !stdenv.hostPlatform.isStatic,
   dbus,
@@ -165,7 +164,6 @@ stdenv.mkDerivation rec {
   '';
 
   passthru.tests = {
-    inherit (nixosTests) wpa_supplicant;
     inherit wpa_supplicant_gui; # inherits the src+version updates
   };
 

@@ -4,7 +4,6 @@
   fetchurl,
   kernel,
   kernelModuleMakeFlags,
-  nixosTests,
   flex,
   coccinelle ? throw "drbd requires coccinelle",
   python3,
@@ -44,8 +43,6 @@ stdenv.mkDerivation (finalAttrs: {
     patchShebangs .
     substituteInPlace Makefile --replace 'SHELL=/bin/bash' 'SHELL=${builtins.getEnv "SHELL"}'
   '';
-
-  passthru.tests.drbd-driver = nixosTests.drbd-driver;
 
   meta = {
     homepage = "https://github.com/LINBIT/drbd";

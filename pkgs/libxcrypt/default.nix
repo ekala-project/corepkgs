@@ -5,7 +5,6 @@
   perl,
   # Update the enabled crypt scheme ids in passthru when the enabled hashes change
   enableHashes ? "strong",
-  nixosTests,
   runCommand,
   python3,
   runUnitTests,
@@ -60,8 +59,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     tests = {
-      inherit (nixosTests) login shadow;
-
       passthruMatches = runCommand "libxcrypt-test-passthru-matches" { } ''
         ${python3.interpreter} "${./check_passthru_matches.py}" ${
           lib.escapeShellArgs (

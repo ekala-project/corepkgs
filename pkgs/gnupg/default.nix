@@ -29,7 +29,6 @@
   pinentry,
   withTpm2Tss ? !stdenv.hostPlatform.isDarwin && !enableMinimal,
   tpm2-tss,
-  nixosTests,
 }:
 
 assert guiSupport -> !enableMinimal;
@@ -191,8 +190,6 @@ stdenv.mkDerivation rec {
     openssh
   ];
   doCheck = !enableMinimal;
-
-  passthru.tests = nixosTests.gnupg;
 
   meta = {
     homepage = "https://gnupg.org";

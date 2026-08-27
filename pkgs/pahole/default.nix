@@ -10,7 +10,6 @@
   argp-standalone,
   musl-obstack,
 
-  nixosTests,
 }:
 
 stdenv.mkDerivation rec {
@@ -41,10 +40,6 @@ stdenv.mkDerivation rec {
     "-DCMAKE_INSTALL_LIBDIR=lib"
     "-DLIBBPF_EMBEDDED=OFF"
   ];
-
-  passthru.tests = {
-    inherit (nixosTests) bpf;
-  };
 
   meta = {
     homepage = "https://git.kernel.org/pub/scm/devel/pahole/pahole.git/";

@@ -7,7 +7,6 @@
   bc,
   lib,
   buildPackages,
-  nixosTests ? null,
   writeScript,
 }:
 
@@ -132,12 +131,6 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   passthru = {
-    # exercise a channel blocker
-    tests = lib.optionalAttrs (nixosTests != null) {
-      systemdBootExtraEntries = nixosTests.systemd-boot.extraEntries;
-      uefiUsb = nixosTests.boot.uefiCdrom;
-    };
-
     updateScript = writeScript "update-edk2" ''
       #!/usr/bin/env nix-shell
       #!nix-shell -i bash -p common-updater-scripts coreutils gnused

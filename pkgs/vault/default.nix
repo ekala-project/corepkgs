@@ -4,7 +4,6 @@
   fetchFromGitHub,
   buildGoModule,
   installShellFiles,
-  nixosTests,
   makeWrapper,
   gawk,
   glibc,
@@ -61,15 +60,6 @@ buildGoModule rec {
         ]
       }
   '';
-
-  passthru.tests = {
-    inherit (nixosTests)
-      vault
-      vault-postgresql
-      vault-dev
-      vault-agent
-      ;
-  };
 
   meta = {
     homepage = "https://www.vaultproject.io/";

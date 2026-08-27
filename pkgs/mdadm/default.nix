@@ -9,7 +9,6 @@
   udev,
   udevCheckHook,
   gitUpdater,
-  nixosTests,
 }:
 
 stdenv.mkDerivation rec {
@@ -79,10 +78,6 @@ stdenv.mkDerivation rec {
   '';
 
   passthru = {
-    tests = {
-      inherit (nixosTests) systemd-initrd-swraid;
-      installer-swraid = nixosTests.installer.swraid;
-    };
     updateScript = gitUpdater {
       url = "https://git.kernel.org/pub/scm/utils/mdadm/mdadm.git";
       rev-prefix = "mdadm-";

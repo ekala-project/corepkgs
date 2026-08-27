@@ -2,7 +2,6 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  nixosTests,
   autoreconfHook,
   bison,
   flex,
@@ -126,6 +125,5 @@ stdenv.mkDerivation rec {
 
   passthru = {
     shellPath = "/bin/nologin";
-    tests = { inherit (nixosTests) shadow; };
   };
 }

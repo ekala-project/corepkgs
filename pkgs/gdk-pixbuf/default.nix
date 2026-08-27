@@ -1,7 +1,6 @@
 {
   stdenv,
   fetchurl,
-  nixosTests,
   fixDarwinDylibNames,
   meson,
   ninja,
@@ -161,7 +160,6 @@ stdenv.mkDerivation (finalAttrs: {
     };
 
     tests = {
-      installedTests = nixosTests.installed-tests.gdk-pixbuf;
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
     };
 

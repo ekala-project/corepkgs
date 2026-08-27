@@ -5,7 +5,6 @@
   kernel,
   kernelModuleMakeFlags,
   kmod,
-  nixosTests,
 }:
 
 stdenv.mkDerivation {
@@ -37,8 +36,6 @@ stdenv.mkDerivation {
   makeFlags = kernelModuleMakeFlags ++ [
     "KERNELDIR=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
   ];
-
-  passthru.tests = { inherit (nixosTests) fanout; };
 
   meta = {
     description = "Kernel-based publish-subscribe system";

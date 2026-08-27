@@ -52,9 +52,6 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
-  # Tests removed - nixosTests not available in core-pkgs
-  passthru.tests = { };
-
   meta = {
     platforms = go.meta.platforms;
     mainProgram = "tarsum";

@@ -2,7 +2,6 @@
   lib,
   stdenv,
   fetchgit,
-  nixosTests,
   autoreconfHook,
   pkg-config,
   flex,
@@ -127,7 +126,6 @@ stdenv.mkDerivation (finalAttrs: {
           systemString = if stdenv.buildPlatform.isAarch64 then "gnu64" else "aarch64-multiplatform";
         in
         pkgsCross.${systemString}.kbd;
-      inherit (nixosTests) keymap kbd-setfont-decompress kbd-update-search-paths-patch;
     };
   };
 

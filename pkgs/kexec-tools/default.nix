@@ -4,7 +4,6 @@
   buildPackages,
   fetchurl,
   fetchpatch,
-  nixosTests,
   gitUpdater,
   zlib,
   zstd,
@@ -55,7 +54,6 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   passthru = {
-    tests.kexec = nixosTests.kexec;
     updateScript = gitUpdater {
       url = "https://git.kernel.org/pub/scm/utils/kernel/kexec/kexec-tools.git";
       rev-prefix = "v";

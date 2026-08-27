@@ -1,6 +1,5 @@
 {
   stdenv,
-  nixosTests ? null,
   lib,
   edk2,
   util-linux,
@@ -262,11 +261,6 @@ edk2.mkDerivation projectDscPath (finalAttrs: {
       variablesMs =
         assert msVarsTemplate;
         "${prefix}_VARS.ms.fd";
-      # This will test the EFI firmware for the host platform as part of the NixOS Tests setup.
-      tests = lib.optionalAttrs (nixosTests != null) {
-        basic-systemd-boot = nixosTests.systemd-boot.basic;
-        secureBoot-systemd-boot = nixosTests.systemd-boot.secureBoot;
-      };
       inherit secureBoot systemManagementModeRequired;
     };
 

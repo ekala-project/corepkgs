@@ -22,7 +22,6 @@
   # Tests
   python3,
   which,
-  nixosTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -137,8 +136,6 @@ stdenv.mkDerivation (finalAttrs: {
     "out"
     "man"
   ];
-
-  passthru.tests = { inherit (nixosTests) systemd-cryptenroll; };
 
   meta = {
     description = "Libtpms-based TPM emulator";

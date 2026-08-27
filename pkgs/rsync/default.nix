@@ -18,7 +18,6 @@
   xxHash,
   enableZstd ? true,
   zstd,
-  nixosTests,
   runUnitTests,
 }:
 
@@ -80,7 +79,6 @@ stdenv.mkDerivation (finalAttrs: {
   enableParallelBuilding = true;
 
   passthru.tests = {
-    inherit (nixosTests) rsyncd;
     unittests = runUnitTests finalAttrs.finalPackage;
   };
 

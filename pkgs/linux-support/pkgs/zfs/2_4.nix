@@ -1,7 +1,6 @@
 {
   callPackage,
   lib,
-  nixosTests,
   stdenv,
   fetchpatch,
   ...
@@ -18,12 +17,7 @@ callPackage ./generic.nix args {
   # this package should point to the latest release.
   version = "2.4.0";
 
-  tests = {
-    inherit (nixosTests.zfs) series_2_4;
-  }
-  // lib.optionalAttrs stdenv.isx86_64 {
-    inherit (nixosTests.zfs) installer;
-  };
+  tests = { };
 
   hash = "sha256-v78Tn1Im9h8Sjd4XACYesPOD+hlUR3Cmg8XjcJXOuwM=";
 }

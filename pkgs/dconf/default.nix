@@ -16,7 +16,6 @@
   gtk-doc,
   docbook-xsl-nons,
   docbook_xml_dtd_42,
-  nixosTests,
   buildPackages,
   gobject-introspection,
   withIntrospection ?
@@ -88,7 +87,6 @@ stdenv.mkDerivation (finalAttrs: {
     updateScript = gnome.updateScript {
       packageName = "dconf";
     };
-    tests = { inherit (nixosTests) dconf; };
   };
 
   meta = {

@@ -23,7 +23,6 @@
   # passthru
   nix-update-script,
   testers,
-  nixosTests,
   pkgsStatic ? { }, # CI has allowVariants = false, in which case pkgsMusl would not be passed. So, instead add a default here.
   pkgsMusl ? { },
 }:
@@ -155,7 +154,6 @@ stdenv.mkDerivation (finalAttrs: {
       static = pkgsStatic.audit or null;
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
       pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
-      audit = nixosTests.audit;
       # Broken on a hardened kernel
       package = finalAttrs.finalPackage.overrideAttrs (previousAttrs: {
         pname = previousAttrs.pname + "-test";

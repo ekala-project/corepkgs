@@ -6,8 +6,6 @@ final: prev:
 with final;
 {
 
-  # TODO(corepkgs): support NixOS tests
-  nixosTests = { };
   tests = { };
 
   nix-update-script = callPackage ./pkgs/nix-update-script { };

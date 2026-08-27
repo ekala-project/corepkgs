@@ -34,7 +34,6 @@
   libfido2,
   libxcrypt,
   hostname,
-  nixosTests,
   withSecurityKey ? !stdenv.hostPlatform.isStatic,
   withFIDO ? stdenv.hostPlatform.isUnix && !stdenv.hostPlatform.isMusl && withSecurityKey,
   withPAM ? stdenv.hostPlatform.isLinux && !stdenv.hostPlatform.isStatic,
@@ -243,25 +242,12 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     inherit withKerberos;
-    tests =
-      let
-        withThisSsh =
-          test:
-          test.extendNixOS {
-            module = {
-              services.openssh.package = lib.mkForce finalAttrs.finalPackage;
-            };
-          };
-      in
-      {
-        borgbackup-integration = withThisSsh nixosTests.borgbackup;
-        nixosTest = withThisSsh nixosTests.openssh;
-        initrd-network-openssh = withThisSsh nixosTests.initrd-network-ssh;
-        openssh = finalAttrs.finalPackage.overrideAttrs (previousAttrs: {
-          pname = previousAttrs.pname + "-test";
-          doCheck = true;
-        });
-      };
+    tests = {
+      openssh = finalAttrs.finalPackage.overrideAttrs (previousAttrs: {
+        pname = previousAttrs.pname + "-test";
+        doCheck = true;
+      });
+    };
   };
 
   meta = {

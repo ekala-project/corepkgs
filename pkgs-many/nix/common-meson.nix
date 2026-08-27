@@ -46,7 +46,6 @@ assert (hash == null) -> (src != null);
   mdbook,
   mdbook-linkcheck,
   nlohmann_json,
-  nixosTests,
   openssl,
   perl,
   python3,
@@ -244,7 +243,6 @@ stdenv.mkDerivation (finalAttrs: {
         pkgs
         pkgsi686Linux
         pkgsStatic
-        nixosTests
         self_attribute_name
         ;
       nix = finalAttrs.finalPackage;

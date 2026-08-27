@@ -26,7 +26,6 @@
   mdadm,
   enableMultipath ? false,
   multipath-tools,
-  nixosTests,
   buildFHSEnv,
 }:
 
@@ -222,9 +221,6 @@ stdenv.mkDerivation rec {
   };
 
   passthru.tests = {
-    installer = nixosTests.installer.lvm;
-    lvm2 = lib.recurseIntoAttrs nixosTests.lvm2;
-
     # https://github.com/NixOS/nixpkgs/issues/369732
     lvm2-fhs-env = buildFHSEnv {
       name = "lvm2-fhs-env-test";

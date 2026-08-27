@@ -55,7 +55,6 @@
   testers,
   versionCheckHook,
   nix-update-script,
-  nixosTests,
   withSudo ? false,
 }:
 
@@ -221,7 +220,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     tests = {
-      inherit (nixosTests) sssd-ldap sssd-legacy-config;
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
     };
     updateScript = nix-update-script { };

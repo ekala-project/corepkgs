@@ -2,7 +2,6 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  nixosTests,
   autoreconfHook,
   pkg-config,
   libnl,
@@ -43,10 +42,6 @@ stdenv.mkDerivation {
   prePatch = ''
     sed -e 's%^XTABLES_SO_DIR = .*%XTABLES_SO_DIR = '"$out"'/lib/xtables%g' -i src/usr/iptables/Makefile
   '';
-
-  passthru.tests = {
-    inherit (nixosTests) jool;
-  };
 
   meta = {
     homepage = "https://www.jool.mx/";

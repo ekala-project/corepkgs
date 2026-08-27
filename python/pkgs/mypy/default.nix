@@ -29,7 +29,6 @@
   filelock,
   pytest-xdist,
   pytestCheckHook,
-  nixosTests,
 }:
 
 buildPythonPackage rec {
@@ -151,11 +150,6 @@ buildPythonPackage rec {
     # https://github.com/python/mypy/issues/15221
     "mypyc/test/test_run.py"
   ];
-
-  passthru.tests = {
-    # Failing typing checks on the test-driver result in channel blockers.
-    inherit (nixosTests) nixos-test-driver;
-  };
 
   meta = {
     description = "Optional static typing for Python";

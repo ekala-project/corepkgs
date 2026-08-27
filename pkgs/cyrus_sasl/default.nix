@@ -15,7 +15,6 @@
   enableLdap ? false,
   buildPackages,
   pruneLibtoolFiles,
-  nixosTests,
 }:
 
 stdenv.mkDerivation rec {
@@ -85,10 +84,6 @@ stdenv.mkDerivation rec {
   installFlags = lib.optionals stdenv.hostPlatform.isDarwin [
     "framedir=$(out)/Library/Frameworks/SASL2.framework"
   ];
-
-  passthru.tests = {
-    inherit (nixosTests) parsedmarc postfix;
-  };
 
   meta = {
     homepage = "https://www.cyrusimap.org/sasl";

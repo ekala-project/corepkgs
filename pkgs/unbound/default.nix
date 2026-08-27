@@ -16,7 +16,6 @@
   makeWrapper,
   symlinkJoin,
   bison,
-  nixosTests,
   #
   # By default unbound will not be built with systemd support. Unbound is a very
   # common dependency. The transitive dependency closure of systemd also
@@ -213,8 +212,6 @@ stdenv.mkDerivation (finalAttrs: {
     tests = {
       unittests = runUnitTests finalAttrs.finalPackage;
       inherit gnutls;
-      nixos-test = nixosTests.unbound;
-      nixos-test-exporter = nixosTests.prometheus-exporters.unbound;
     };
   };
 
