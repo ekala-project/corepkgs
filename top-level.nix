@@ -174,8 +174,9 @@ final: prev: with final; {
   werkzeug = null;
   wezterm = null;
   wireshark = null;
-  wlroots_0_17 = null;
-  wlroots_0_18 = null;
+  wlroots_0_17 = null; # incompatible with current libinput
+  wlroots_0_18 = wlroots.v0_18;
+  wlroots_0_19 = wlroots.v0_19;
   xattr = null;
   xwayland = null;
   yallback = null;
