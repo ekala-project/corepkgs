@@ -66,7 +66,6 @@ stdenv.mkDerivation (finalAttrs: {
       osl21
       gpl2Plus
     ];
-    maintainers = [ ];
     platforms = [
       "i686-linux"
       "x86_64-linux"

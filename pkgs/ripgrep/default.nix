@@ -79,7 +79,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
       unlicense # or
       mit
     ];
-    maintainers = [ ];
     mainProgram = "rg";
     platforms = lib.platforms.all;
   };

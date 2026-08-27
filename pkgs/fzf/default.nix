@@ -84,7 +84,6 @@ buildGoModule (finalAttrs: {
     description = "Command-line fuzzy finder written in Go";
     homepage = "https://github.com/junegunn/fzf";
     license = lib.licenses.mit;
-    maintainers = [ ];
     mainProgram = "fzf";
     platforms = lib.platforms.unix;
   };

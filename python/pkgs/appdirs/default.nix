@@ -27,6 +27,5 @@ buildPythonPackage rec {
     homepage = "https://github.com/ActiveState/appdirs";
     changelog = "https://github.com/ActiveState/appdirs/releases/tag/${version}";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 }

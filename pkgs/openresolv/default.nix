@@ -41,7 +41,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Program to manage /etc/resolv.conf";
     homepage = "https://roy.marples.name/projects/openresolv";
     license = lib.licenses.bsd2;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

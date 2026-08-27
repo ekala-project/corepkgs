@@ -92,7 +92,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.pango.org/";
     license = lib.licenses.lgpl2Plus;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
     pkgConfigModules = [
       "pango"
       "pangocairo"

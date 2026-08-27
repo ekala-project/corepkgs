@@ -60,7 +60,6 @@ stdenv.mkDerivation (finalAttrs: {
       gpl2Only
       bsd3
     ];
-    maintainers = [ ];
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
 })

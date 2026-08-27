@@ -36,7 +36,6 @@ let
       description = "Backport of CPython tarfile module";
       homepage = "https://github.com/jaraco/backports.tarfile";
       license = lib.licenses.mit;
-      maintainers = [ ];
     };
   };
 in

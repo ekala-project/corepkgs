@@ -68,14 +68,15 @@ The variants are automatically available in the package scope (e.g., `pkgs.pytho
 
 ### Meta Attributes
 
-**Always set `meta.maintainers` to an empty list. Remove `meta.teams` if present:**
+**Never set `meta.maintainers` or `meta.teams`:**
+
+This repo is curated as a set, so packages carry neither. Neither is a recognised
+`meta` key, so setting one fails `check-meta`; simply omit them.
 
 ```nix
 meta = {
   description = "Example package";
   license = lib.licenses.mit;
-  maintainers = [ ];  # Always empty
-  # teams = ...;  # Remove entirely
   platforms = lib.platforms.linux;
 };
 ```
@@ -191,7 +192,7 @@ When porting a package from nixpkgs:
 
 1. **Check dependencies first** - use `nix-instantiate -A <dep>` to verify all dependencies exist
 2. **Copy the package files** to the appropriate directory (`pkgs/` or `pkgs-many/`)
-3. **Remove/clear `meta.maintainers`** field and **remove `meta.teams`** if present
+3. **Remove `meta.maintainers` and `meta.teams`** fields
 4. **Remove update scripts** (e.g., `updateScript = gnome.updateScript { ... }`)
 5. **Add TODO comments** for missing dependencies
 6. **Validate** and **format** the files
@@ -204,7 +205,7 @@ Before submitting changes, ensure:
 
 - [ ] All dependencies verified with `nix-instantiate -A <dep>`
 - [ ] Package in correct directory (`pkgs/` or `pkgs-many/`)
-- [ ] `meta.maintainers = [ ];` (empty list), `meta.teams` removed
+- [ ] No `meta.maintainers` or `meta.teams`
 - [ ] `nix-instantiate -A <package>` succeeds
 - [ ] `nix-build -A <package>` succeeds
 - [ ] `nix fmt <file>` run on all edited files

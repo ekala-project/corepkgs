@@ -149,7 +149,6 @@ buildPythonPackage rec {
     homepage = "https://python-poetry.org/";
     description = "Python dependency management and packaging made easy";
     license = lib.licenses.mit;
-    maintainers = [ ];
     mainProgram = "poetry";
   };
 }

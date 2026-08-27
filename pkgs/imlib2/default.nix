@@ -86,6 +86,5 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.imlib2;
     pkgConfigModules = [ "imlib2" ];
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 })

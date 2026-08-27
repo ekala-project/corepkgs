@@ -181,7 +181,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Tool for programming graphics intended to replace Metapost";
     homepage = "https://asymptote.sourceforge.io/";
     license = lib.licenses.gpl3Plus;
-    maintainers = [ ];
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
 })

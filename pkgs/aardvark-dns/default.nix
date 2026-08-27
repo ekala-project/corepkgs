@@ -32,6 +32,5 @@ rustPlatform.buildRustPackage (finalAttrs: {
     license = lib.licenses.asl20;
     platforms = lib.platforms.linux;
     mainProgram = "aardvark-dns";
-    maintainers = [ ];
   };
 })

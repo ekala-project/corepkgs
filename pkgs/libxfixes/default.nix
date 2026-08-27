@@ -57,7 +57,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxfixes";
     license = lib.licenses.mit;
     pkgConfigModules = [ "xfixes" ];
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

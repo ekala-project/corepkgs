@@ -131,7 +131,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://netpbm.sourceforge.net/";
     description = "Toolkit for manipulation of graphic images";
     license = lib.licenses.free;
-    maintainers = [ ];
     platforms = with lib.platforms; linux ++ darwin;
   };
 })

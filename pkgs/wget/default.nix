@@ -135,7 +135,6 @@ stdenv.mkDerivation (finalAttrs: {
       scripts, cron jobs, terminals without X-Windows support, etc.
     '';
     mainProgram = "wget";
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

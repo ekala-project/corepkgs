@@ -67,6 +67,5 @@ buildGoModule rec {
     changelog = "https://github.com/hashicorp/vault/blob/v${version}/CHANGELOG.md";
     license = lib.licenses.bsl11;
     mainProgram = "vault";
-    maintainers = [ ];
   };
 }

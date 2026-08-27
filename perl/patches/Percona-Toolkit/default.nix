@@ -67,6 +67,5 @@ buildPerlPackage {
     homepage = "https://www.percona.com/software/database-tools/percona-toolkit";
     changelog = "https://docs.percona.com/percona-toolkit/release_notes.html";
     license = lib.licenses.gpl2Only;
-    maintainers = [ ];
   };
 }

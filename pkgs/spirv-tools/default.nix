@@ -51,6 +51,5 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/KhronosGroup/SPIRV-Tools";
     license = lib.licenses.asl20;
     platforms = with lib.platforms; unix ++ windows;
-    maintainers = [ ];
   };
 })

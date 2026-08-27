@@ -31,6 +31,5 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/martinblech/xmltodict";
     changelog = "https://github.com/martinblech/xmltodict/blob/${finalAttrs.src.tag}/CHANGELOG.md";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 })

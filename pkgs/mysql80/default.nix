@@ -109,7 +109,6 @@ let
       homepage = "https://www.mysql.com/";
       description = "World's most popular open source database";
       license = lib.licenses.gpl2;
-      maintainers = [ ];
       platforms = lib.platforms.unix;
     };
   };

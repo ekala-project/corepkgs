@@ -117,7 +117,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.mit;
     platforms = lib.platforms.linux;
     mainProgram = "julia";
-    maintainers = [ ];
     # Building Julia from source takes significant time
     timeout = 7200; # 2 hours
   };

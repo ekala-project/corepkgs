@@ -80,7 +80,6 @@ stdenv.mkDerivation rec {
     homepage = "http://caca.zoy.org/wiki/libcaca";
     description = "Graphics library that outputs text instead of pixels";
     license = lib.licenses.wtfpl;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 }

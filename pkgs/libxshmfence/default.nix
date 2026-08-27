@@ -30,7 +30,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Shared memory 'SyncFence' synchronization primitive library";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxshmfence";
     license = lib.licenses.hpndSellVariant;
-    maintainers = [ ];
     pkgConfigModules = [ "xshmfence" ];
     platforms = lib.platforms.unix;
   };

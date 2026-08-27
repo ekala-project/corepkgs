@@ -10,9 +10,5 @@ lib.extend (
     trivial = super.trivial // {
       oldestSupportedReleaseIsAtLeast = _: true;
     };
-
-    # This repo is curated as a set, references to a particular maintainer is
-    # likely an error
-    maintainers = { };
   }
 )

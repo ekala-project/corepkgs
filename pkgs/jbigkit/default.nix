@@ -92,7 +92,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Software implementation of the JBIG1 data compression standard";
     homepage = "http://www.cl.cam.ac.uk/~mgk25/jbigkit/";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

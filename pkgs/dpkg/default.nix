@@ -143,7 +143,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://wiki.debian.org/Teams/Dpkg";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
     mainProgram = "dpkg";
   };
 })

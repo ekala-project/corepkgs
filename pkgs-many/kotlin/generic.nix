@@ -69,6 +69,5 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix ++ lib.platforms.darwin;
     mainProgram = "kotlinc";
-    maintainers = [ ];
   };
 })

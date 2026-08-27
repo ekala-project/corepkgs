@@ -59,7 +59,6 @@ stdenv.mkDerivation (finalAttrs: {
       gpl2Plus
     ]; # gpl2Plus is for the test suite
     platforms = lib.platforms.linux;
-    maintainers = [ ];
     mainProgram = "strace";
   };
 })

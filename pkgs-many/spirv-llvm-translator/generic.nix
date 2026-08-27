@@ -92,6 +92,5 @@ stdenv.mkDerivation {
     mainProgram = "llvm-spirv";
     license = lib.licenses.ncsa;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 }

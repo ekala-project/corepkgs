@@ -70,6 +70,5 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.efficios.com/babeltrace";
     license = lib.licenses.mit;
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 })

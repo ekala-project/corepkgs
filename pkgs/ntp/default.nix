@@ -56,7 +56,6 @@ stdenv.mkDerivation (finalAttrs: {
       lib.licenses.ntp
       lib.licenses.bsd2
     ];
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

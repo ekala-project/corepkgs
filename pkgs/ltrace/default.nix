@@ -79,6 +79,5 @@ stdenv.mkDerivation {
     homepage = "https://www.ltrace.org/";
     platforms = lib.platforms.linux;
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
   };
 }

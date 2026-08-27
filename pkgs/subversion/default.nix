@@ -122,7 +122,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.asl20;
     homepage = "https://subversion.apache.org/";
     mainProgram = "svn";
-    maintainers = [ ];
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
 })

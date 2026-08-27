@@ -37,7 +37,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://gflags.github.io/gflags/";
     changelog = "https://github.com/gflags/gflags/blob/${finalAttrs.src.tag}/ChangeLog.txt";
     license = lib.licenses.bsd3;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 })

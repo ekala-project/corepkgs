@@ -132,7 +132,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       lgpl21Only # javascriptcore and webkit
     ];
     mainProgram = "bun";
-    maintainers = [ ];
     platforms = builtins.attrNames finalAttrs.passthru.sources;
     # Broken for Musl at 2024-01-13, tracking issue:
     # https://github.com/NixOS/nixpkgs/issues/280716

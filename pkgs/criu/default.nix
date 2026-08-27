@@ -150,6 +150,5 @@ stdenv.mkDerivation (finalAttrs: {
       "armv7l-linux"
       "loongarch64-linux"
     ];
-    maintainers = [ ];
   };
 })

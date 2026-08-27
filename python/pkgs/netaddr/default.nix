@@ -44,6 +44,5 @@ buildPythonPackage (finalAttrs: {
     downloadPage = "https://github.com/netaddr/netaddr/releases";
     changelog = "https://github.com/netaddr/netaddr/blob/${finalAttrs.version}/CHANGELOG";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 })

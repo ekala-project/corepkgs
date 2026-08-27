@@ -42,7 +42,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "XCB port of Xlib's XImage and XShmImage functions.";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxcb-image";
     license = lib.licenses.x11;
-    maintainers = [ ];
     pkgConfigModules = [ "xcb-image" ];
     platforms = lib.platforms.unix;
   };

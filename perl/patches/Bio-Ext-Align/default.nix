@@ -52,6 +52,5 @@ buildPerlPackage rec {
       Part of BioPerl Extensions (BioPerl-Ext) distribution, a collection of Bioperl C-compiled extensions.
     '';
     license = lib.licenses.artistic1;
-    maintainers = [ ];
   };
 }

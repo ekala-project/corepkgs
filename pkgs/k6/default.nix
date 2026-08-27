@@ -41,6 +41,5 @@ buildGoModule (finalAttrs: {
     homepage = "https://k6.io/";
     changelog = "https://github.com/grafana/k6/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.agpl3Plus;
-    maintainers = [ ];
   };
 })

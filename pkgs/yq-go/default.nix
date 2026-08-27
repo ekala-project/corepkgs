@@ -58,6 +58,5 @@ buildGoModule (finalAttrs: {
     changelog = "https://github.com/mikefarah/yq/raw/${finalAttrs.src.tag}/release_notes.txt";
     mainProgram = "yq";
     license = [ lib.licenses.mit ];
-    maintainers = [ ];
   };
 })

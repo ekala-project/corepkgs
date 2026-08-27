@@ -66,7 +66,6 @@ stdenv.mkDerivation (finalAttrs: {
       SELinux.
     '';
     license = lib.licenses.isc;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     mainProgram = "crond";
   };

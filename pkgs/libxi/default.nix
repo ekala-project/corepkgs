@@ -65,7 +65,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxi";
     license = lib.licenses.mit;
     pkgConfigModules = [ "xi" ];
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

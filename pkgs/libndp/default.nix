@@ -32,7 +32,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "http://libndp.org/";
     description = "Library for Neighbor Discovery Protocol";
     license = lib.licenses.lgpl21;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 })

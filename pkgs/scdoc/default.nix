@@ -32,7 +32,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://git.sr.ht/~sircmpwn/scdoc";
     license = lib.licenses.mit;
     mainProgram = "scdoc";
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 })

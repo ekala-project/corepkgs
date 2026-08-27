@@ -32,6 +32,5 @@ buildPythonPackage rec {
     description = "Pure-Python, bring-your-own-I/O implementation of HTTP/1.1";
     homepage = "https://github.com/python-hyper/h11";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 }

@@ -193,9 +193,7 @@ let
     parameter for packageSet', defining the target platform for cross builds,
     and triggering the build of the host derivation.
   */
-  mapTestOnCross = _mapTestOnHelper (addMetaAttrs {
-    maintainers = [ ];
-  });
+  mapTestOnCross = _mapTestOnHelper (addMetaAttrs { });
 
   # Recursive for packages and apply a function to them
   recursiveMapPackages =

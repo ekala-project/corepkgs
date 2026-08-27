@@ -47,7 +47,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.liblognorm.com/";
     license = lib.licenses.lgpl21;
     mainProgram = "lognormalizer";
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 })

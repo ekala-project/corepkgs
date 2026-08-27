@@ -67,6 +67,5 @@ buildGo126Module (finalAttrs: {
       It also provides building blocks and describe customizations for a CI/CD pipeline.
     '';
     license = lib.licenses.asl20;
-    maintainers = [ ];
   };
 })

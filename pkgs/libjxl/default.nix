@@ -159,7 +159,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/libjxl/libjxl";
     description = "JPEG XL image format reference implementation";
     license = lib.licenses.bsd3;
-    maintainers = [ ];
     platforms = lib.platforms.all;
   };
 }

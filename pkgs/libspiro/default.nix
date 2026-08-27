@@ -26,7 +26,6 @@ stdenv.mkDerivation rec {
     description = "Library that simplifies the drawing of beautiful curves";
     homepage = "https://github.com/fontforge/libspiro";
     license = lib.licenses.gpl3Plus;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 }

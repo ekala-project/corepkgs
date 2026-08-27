@@ -43,6 +43,5 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.bsd2;
     homepage = "https://github.com/wfeldt/libx86emu";
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 })

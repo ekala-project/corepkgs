@@ -98,6 +98,5 @@ buildPythonPackage (finalAttrs: {
       bsd3
       psfl
     ];
-    maintainers = [ ];
   };
 })

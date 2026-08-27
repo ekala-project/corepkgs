@@ -161,6 +161,5 @@ stdenv.mkDerivation (finalAttrs: {
       "aarch64-darwin"
     ];
     mainProgram = "java";
-    maintainers = [ ];
   };
 })

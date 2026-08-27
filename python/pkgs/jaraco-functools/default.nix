@@ -49,6 +49,5 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/jaraco/jaraco.functools";
     changelog = "https://github.com/jaraco/jaraco.functools/blob/v${finalAttrs.version}/NEWS.rst";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 })

@@ -443,8 +443,6 @@ stdenv.mkDerivation (finalAttrs: {
       homepage = "https://www.qemu.org/";
       description = "Generic and open source machine emulator and virtualizer";
       license = lib.licenses.gpl2Plus;
-      maintainers = [ ];
-      teams = lib.optionals xenSupport xen.meta.teams;
       platforms = lib.platforms.unix;
     }
     # toolsOnly: Does not have qemu-kvm and there's no main support tool

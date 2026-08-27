@@ -69,7 +69,6 @@ buildGoModule (finalAttrs: {
     description = "Simple and flexible tool for managing secrets";
     changelog = "https://github.com/getsops/sops/blob/v${finalAttrs.version}/CHANGELOG.md";
     mainProgram = "sops";
-    maintainers = [ ];
     license = lib.licenses.mpl20;
   };
 })

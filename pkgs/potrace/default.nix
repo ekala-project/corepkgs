@@ -27,6 +27,5 @@ stdenv.mkDerivation rec {
     homepage = "https://potrace.sourceforge.net/";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 }

@@ -39,6 +39,5 @@ buildPythonPackage rec {
     homepage = "https://github.com/jaraco/jaraco.context";
     changelog = "https://github.com/jaraco/jaraco.context/blob/${src.tag}/CHANGES.rst";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 }

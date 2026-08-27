@@ -40,6 +40,5 @@ buildPythonPackage rec {
     description = "Poetry plugin to export the dependencies to various formats";
     license = lib.licenses.mit;
     homepage = "https://github.com/python-poetry/poetry-plugin-export";
-    maintainers = [ ];
   };
 }

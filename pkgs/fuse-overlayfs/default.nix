@@ -45,7 +45,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "FUSE implementation for overlayfs";
     longDescription = "An implementation of overlay+shiftfs in FUSE for rootless containers.";
     license = lib.licenses.gpl3;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
     inherit (finalAttrs.src.meta) homepage;
     mainProgram = "fuse-overlayfs";

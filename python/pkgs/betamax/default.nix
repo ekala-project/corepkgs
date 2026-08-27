@@ -42,6 +42,5 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://betamax.readthedocs.org/";
     changelog = "https://github.com/betamaxpy/betamax/blob/${finalAttrs.version}/HISTORY.rst";
     license = lib.licenses.asl20;
-    maintainers = [ ];
   };
 })

@@ -49,6 +49,5 @@ buildPythonPackage rec {
     description = "HTTP/2 State-Machine based protocol implementation";
     homepage = "https://github.com/python-hyper/h2";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 }

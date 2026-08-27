@@ -36,6 +36,5 @@ buildPythonPackage (finalAttrs: {
     description = "Python bindings to FreeDesktop.org Secret Service API";
     homepage = "https://github.com/mitya57/secretstorage";
     license = lib.licenses.bsd3;
-    maintainers = [ ];
   };
 })

@@ -30,7 +30,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "XCB utility libraries";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxcb-util";
     license = lib.licenses.x11;
-    maintainers = [ ];
     pkgConfigModules = [
       "xcb-atom"
       "xcb-aux"

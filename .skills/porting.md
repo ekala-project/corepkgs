@@ -32,8 +32,7 @@ cp -r /path/to/nixpkgs/pkgs/development/languages/python pkgs-many/python/
 
 **Remove:**
 ```nix
-# Remove maintainers
-meta.maintainers = [ ];  # Set to empty
+# Remove maintainers/teams — both default to [ ]
 
 # Remove update scripts
 passthru = {
@@ -122,7 +121,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Unprivileged sandboxing tool";
     homepage = "https://github.com/containers/bubblewrap";
     license = lib.licenses.lgpl2Plus;
-    maintainers = [ ];  # Cleaned
     platforms = lib.platforms.linux;
   };
 })
@@ -170,7 +168,6 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description = "RPM Package Manager";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
   };
 })
 ```
@@ -217,7 +214,7 @@ configure: error: libfoo is required
 
 - [ ] Dependencies checked with `nix-instantiate`
 - [ ] Missing deps documented with TODO
-- [ ] `meta.maintainers = [ ]`
+- [ ] No `meta.maintainers` or `meta.teams`
 - [ ] Update scripts removed
 - [ ] Tests configured appropriately
 - [ ] `nix-instantiate -A <package>` succeeds

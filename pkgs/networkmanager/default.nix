@@ -211,7 +211,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://networkmanager.dev";
     description = "Network configuration and management tool";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 })

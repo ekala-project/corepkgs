@@ -53,6 +53,5 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/KhronosGroup/glslang";
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 })

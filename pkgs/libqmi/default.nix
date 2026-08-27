@@ -107,7 +107,6 @@ stdenv.mkDerivation (finalAttrs: {
       lgpl2Plus
       gpl2Plus
     ];
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 })

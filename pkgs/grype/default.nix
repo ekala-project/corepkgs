@@ -139,7 +139,6 @@ buildGo126Module (finalAttrs: {
       container image or filesystem to find known vulnerabilities.
     '';
     license = with lib.licenses; [ asl20 ];
-    maintainers = [ ];
     mainProgram = "grype";
   };
 })

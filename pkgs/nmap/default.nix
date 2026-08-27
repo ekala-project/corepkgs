@@ -58,6 +58,5 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.all;
     mainProgram = "nmap";
-    maintainers = [ ];
   };
 })

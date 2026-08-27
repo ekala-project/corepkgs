@@ -55,6 +55,5 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/akheron/jansson";
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
-    maintainers = [ ];
   };
 })

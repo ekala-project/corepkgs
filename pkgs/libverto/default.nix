@@ -35,7 +35,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/latchset/libverto";
     description = "Asynchronous event loop abstraction library";
     license = lib.licenses.mit;
-    maintainers = [ ];
     platforms = lib.platforms.unix;
   };
 }

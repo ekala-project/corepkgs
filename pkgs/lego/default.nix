@@ -32,6 +32,5 @@ buildGoModule (finalAttrs: {
     homepage = "https://go-acme.github.io/lego/";
     license = lib.licenses.mit;
     mainProgram = "lego";
-    maintainers = [ ];
   };
 })

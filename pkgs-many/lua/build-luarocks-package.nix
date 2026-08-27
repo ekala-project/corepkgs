@@ -243,8 +243,6 @@ let
 
         meta = {
           platforms = lua.meta.platforms;
-          # add extra maintainer(s) to every package
-          maintainers = (attrs.meta.maintainers or [ ]) ++ [ ];
           broken = disabled;
         }
         // attrs.meta or { };

@@ -35,7 +35,6 @@ stdenv.mkDerivation (finalAttrs: {
       mitOpenGroup
       hpndSellVariant
     ];
-    maintainers = [ ];
     mainProgram = "mkfontscale";
     platforms = lib.platforms.unix;
   };

@@ -136,6 +136,5 @@ buildGoModule (finalAttrs: {
     sourceProvenance = [ lib.sourceTypes.fromSource ];
     license = lib.licenses.asl20;
     mainProgram = "pulumi";
-    maintainers = [ ];
   };
 })

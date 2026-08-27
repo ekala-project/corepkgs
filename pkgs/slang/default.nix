@@ -106,7 +106,6 @@ stdenv.mkDerivation rec {
     '';
     homepage = "http://www.jedsoft.org/slang/";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     mainProgram = "slsh";
     platforms = lib.platforms.unix;
   };

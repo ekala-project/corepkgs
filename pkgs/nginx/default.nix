@@ -141,6 +141,5 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://nginx.org";
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 })

@@ -52,7 +52,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     description = "Distributed version control system";
     homepage = "https://pijul.org";
     license = lib.licenses.gpl2Plus;
-    maintainers = [ ];
     mainProgram = "pijul";
   };
 })

@@ -82,7 +82,6 @@ buildGo126Module (finalAttrs: {
     license = lib.licenses.mit;
     homepage = "https://gitlab.com/gitlab-org/cli";
     changelog = "https://gitlab.com/gitlab-org/cli/-/releases/v${finalAttrs.version}";
-    maintainers = [ ];
     mainProgram = "glab";
   };
 })

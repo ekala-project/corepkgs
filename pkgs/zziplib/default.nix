@@ -56,6 +56,5 @@ stdenv.mkDerivation (finalAttrs: {
       mpl11
     ];
     platforms = lib.platforms.unix;
-    maintainers = [ ];
   };
 })

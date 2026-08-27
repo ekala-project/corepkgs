@@ -1073,7 +1073,6 @@ stdenv.mkDerivation (
       platforms = lib.platforms.all;
       # See https://github.com/NixOS/nixpkgs/pull/295344#issuecomment-1992263658
       broken = stdenv.hostPlatform.isMinGW && stdenv.hostPlatform.is64bit;
-      maintainers = [ ];
       mainProgram = "ffmpeg";
     };
   }

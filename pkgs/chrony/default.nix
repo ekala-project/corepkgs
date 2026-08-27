@@ -68,7 +68,6 @@ stdenv.mkDerivation (finalAttrs: {
         netbsd
         illumos
       ];
-    maintainers = [ ];
     longDescription = ''
       Chronyd is a daemon which runs in background on the system. It obtains
       measurements via the network of the system clock's offset relative to

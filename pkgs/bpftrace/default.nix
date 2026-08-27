@@ -89,7 +89,6 @@ stdenv.mkDerivation rec {
     changelog = "https://github.com/bpftrace/bpftrace/releases/tag/v${version}";
     mainProgram = "bpftrace";
     license = lib.licenses.asl20;
-    maintainers = [ ];
     platforms = lib.platforms.linux;
   };
 }

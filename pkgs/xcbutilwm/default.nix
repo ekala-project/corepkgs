@@ -40,7 +40,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "XCB client and window-manager helpers for ICCCM & EWMH.";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxcb-wm";
     license = lib.licenses.x11;
-    maintainers = [ ];
     pkgConfigModules = [
       "xcb-ewmh"
       "xcb-icccm"

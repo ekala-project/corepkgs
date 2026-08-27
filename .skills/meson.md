@@ -35,7 +35,6 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description = "Example Meson package";
     license = lib.licenses.mit;
-    maintainers = [ ];
   };
 })
 ```

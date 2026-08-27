@@ -56,6 +56,5 @@ buildGoModule (finalAttrs: {
     license = lib.licenses.gpl3Plus;
     mainProgram = "nixos-facter";
     platforms = lib.platforms.linux;
-    maintainers = [ ];
   };
 })
