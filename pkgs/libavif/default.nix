@@ -10,6 +10,7 @@
   libjpeg,
   libwebp,
   dav1d,
+  libyuv,
 }:
 
 stdenv.mkDerivation rec {
@@ -44,6 +45,7 @@ stdenv.mkDerivation rec {
   propagatedBuildInputs = [
     dav1d
     libaom
+    libyuv
   ];
 
   cmakeFlags = [
@@ -52,7 +54,7 @@ stdenv.mkDerivation rec {
     "-DAVIF_CODEC_DAV1D=SYSTEM"
     "-DAVIF_BUILD_APPS=OFF"
     "-DAVIF_BUILD_GDK_PIXBUF=OFF"
-    "-DAVIF_LIBYUV=OFF"
+    "-DAVIF_LIBYUV=SYSTEM"
   ];
 
   meta = {
