@@ -25,8 +25,6 @@
   tomli-w ? null,
   werkzeug ? null,
 
-  # coupled downstream dependencies
-  pip-tools,
 }:
 
 let
@@ -114,7 +112,6 @@ let
     '';
 
     passthru.tests = {
-      inherit pip-tools;
       pytest = self.overridePythonAttrs { doCheck = true; };
     };
 
