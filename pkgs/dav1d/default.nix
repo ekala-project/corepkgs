@@ -6,7 +6,7 @@
   ninja,
   nasm,
   pkg-config,
-  xxHash,
+  xxhash,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -34,7 +34,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
-    xxHash
+    xxhash
   ];
 
   mesonFlags = [

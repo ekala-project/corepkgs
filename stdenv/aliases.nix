@@ -240,5 +240,6 @@ mapAliases {
   ubootUtilite = uboot.ubootUtilite;
   ubootVisionFive2 = uboot.ubootVisionFive2;
   ubootWandboard = uboot.ubootWandboard;
+  xxHash = xxhash;
   # keep-sorted end
 }
