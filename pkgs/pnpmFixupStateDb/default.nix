@@ -26,7 +26,6 @@ nodejs.buildNpmPackage {
   meta = {
     license = lib.licenses.mit;
     mainProgram = "pnpm-fixup-state-db";
-    inherit (pnpm.meta) maintainers;
     description = "Fixup pnpm v11-store index.db to remove impurities";
   };
 }
