@@ -20,7 +20,6 @@ with lib;
 
         Common attributes:
         - timeout: Maximum test duration in seconds
-        - maintainers: List of maintainers
         - platforms: Supported platforms
       '';
       example = literalExpression ''
