@@ -1996,9 +1996,6 @@ final: prev: with final; {
   rust_1_91 = callPackage ./pkgs/rust/1_91.nix { };
   rust = rust_1_91;
 
-  mrustc-minicargo = callPackage ./pkgs/mrustc/minicargo.nix { };
-  mrustc-bootstrap = callPackage ./pkgs/mrustc/bootstrap.nix { };
-
   rustPackages_1_91 = rust_1_91.packages.stable;
   rustPackages = rustPackages_1_91;
 
