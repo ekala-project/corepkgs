@@ -155,7 +155,6 @@ self: {
   xf86videointel = self."xf86-video-intel";
   xf86videomga = self."xf86-video-mga";
   xf86videoneomagic = self."xf86-video-neomagic";
-  xf86videonewport = self."xf86-video-newport";
   xf86videonouveau = self."xf86-video-nouveau";
   xf86videonv = self."xf86-video-nv";
   xf86videoomap = self."xf86-video-omap";
