@@ -132,7 +132,6 @@ final: prev: with final; {
   neovim = null;
   nmap = null;
   nodejs_latest = nodejs.v23;
-  ntp = null;
   nwdiag = null;
   objgraph = null;
   objprint = null;
