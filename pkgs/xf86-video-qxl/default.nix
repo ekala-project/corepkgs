@@ -1,31 +1,53 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
   libdrm,
-  udev,
   libpciaccess,
-  xorg-server,
   spice-protocol,
+  udev,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-qxl";
   version = "0.1.6";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-qxl-0.1.6.tar.xz";
-    sha256 = "0pwncx60r1xxk8kpp9a46ga5h7k7hjqf14726v0gra27vdc9blra";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-qxl";
+    tag = "xf86-video-qxl-${finalAttrs.version}";
+    hash = "sha256-g7NvAjmvPjyqUTXnZREDDs18O2e9Zl5hZeAza2a/1Jw=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libdrm
-    udev
     libpciaccess
-    xorg-server
     spice-protocol
+    udev
   ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "Xorg video driver for the QXL virtual GPU";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-qxl";
+    license = lib.licenses.mit;
+    platforms = lib.platforms.unix;
+    broken = stdenv.hostPlatform.isAarch64;
+  };
 })

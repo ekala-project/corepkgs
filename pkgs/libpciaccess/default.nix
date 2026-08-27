@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
   pkg-config,
   meson,
   ninja,
@@ -14,9 +14,13 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "libpciaccess";
   version = "0.18.1";
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libpciaccess-${finalAttrs.version}.tar.xz";
-    hash = "sha256-SvQ0RLOK21VF0O0cLORtlgjMR7McI4f8UYFlZ2Wm+nY=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libpciaccess";
+    tag = "libpciaccess-${finalAttrs.version}";
+    hash = "sha256-gyzRsF0SDb89aF0vmCY2OAg15i1BtwjR2MTJy4kbsbo=";
   };
 
   strictDeps = true;

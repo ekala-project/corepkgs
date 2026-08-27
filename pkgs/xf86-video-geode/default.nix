@@ -1,26 +1,51 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
   libpciaccess,
-  xorg-server,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-geode";
-  version = "2.18.1";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-geode-2.18.1.tar.xz";
-    sha256 = "0a8c6g3ndzf76rrrm3dwzmndcdy4y2qfai4324sdkmi8k9szicjr";
+  version = "2.18.2";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-geode";
+    tag = "xf86-video-geode-${finalAttrs.version}";
+    hash = "sha256-G0w6Ft172ar5dwR3NAu+8vuvJqWKaknmpbdThpPR+kY=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libpciaccess
-    xorg-server
   ];
-  meta.broken = true;
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "AMD Geode GX and LX graphics driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-geode";
+    license = with lib.licenses; [
+      x11
+      x11BsdClause
+    ];
+    platforms = lib.platforms.unix;
+    badPlatforms = lib.platforms.aarch64;
+  };
 })

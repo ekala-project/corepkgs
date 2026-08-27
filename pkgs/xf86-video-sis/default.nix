@@ -1,27 +1,53 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
   libdrm,
   libpciaccess,
-  xorg-server,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-sis";
   version = "0.12.0";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-sis-0.12.0.tar.gz";
-    sha256 = "00j7i2r81496w27rf4nq9gc66n6nizp3fi7nnywrxs81j1j3pk4v";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-sis";
+    tag = "xf86-video-sis-${finalAttrs.version}";
+    hash = "sha256-C9OG/vWFIVXgRRAzn3AqE2ApABZOKT94CuIxgnOapjs=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libdrm
     libpciaccess
-    xorg-server
   ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "SiS and XGI video driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-sis";
+    license = with lib.licenses; [
+      bsd3
+      hpndSellVariant
+      mit
+    ];
+    platforms = lib.platforms.unix;
+    broken = stdenv.hostPlatform.isAarch64;
+  };
 })

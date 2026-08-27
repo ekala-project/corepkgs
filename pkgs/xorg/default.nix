@@ -1,15 +1,19 @@
 # Backward-compatibility aliases for the xorg package scope.
 # All packages have been moved to the top level as standalone packages.
 #
-# This file provides legacy attribute names (camelCase and compressed names)
-# that map to the new top-level hyphenated package names.
+# This file provides the legacy attribute names (camelCase and compressed
+# names) that map to the new top-level names. The set mirrors the mapping
+# nixpkgs kept when it deprecated `pkgs.xorg`; aliases whose package is not
+# packaged here resolve to `null` rather than a missing-attribute error.
 {
   lib,
 }:
 
 self: {
-
-  # Fonts (legacy camelCase → hyphenated top-level)
+  appres = self.appres or null;
+  bdftopcf = self.bdftopcf or null;
+  bitmap = self.bitmap or null;
+  editres = self.editres or null;
   encodings = self."font-encodings" or null;
   fontadobe100dpi = self."font-adobe-100dpi" or null;
   fontadobe75dpi = self."font-adobe-75dpi" or null;
@@ -44,31 +48,40 @@ self: {
   fontscreencyrillic = self."font-screen-cyrillic" or null;
   fontsonymisc = self."font-sony-misc" or null;
   fontsunmisc = self."font-sun-misc" or null;
-  fontutil = self."font-util" or null;
+  fonttosfnt = self.fonttosfnt or null;
+  fontutil = self."font-util";
   fontwinitzkicyrillic = self."font-winitzki-cyrillic" or null;
   fontxfree86type1 = self."font-xfree86-type1" or null;
-
-  # Libraries (legacy CamelCase → lowercase top-level)
+  gccmakedep = self.gccmakedep or null;
+  iceauth = self.iceauth or null;
+  ico = self.ico or null;
+  imake = self.imake or null;
   libAppleWM = self.libapplewm or null;
+  libdmx = self.libdmx or null;
+  libfontenc = self.libfontenc;
   libFS = self.libfs or null;
-  libfontenc = self.libfontenc or null;
   libICE = self.libice;
+  libpciaccess = self.libpciaccess;
   libpthreadstubs = self."libpthread-stubs";
   libSM = self.libsm;
   libWindowsWM = self.libwindowswm or null;
   libX11 = self.libx11;
   libXau = self.libxau;
   libXaw = self.libxaw;
+  libxcb = self.libxcb;
   libXcomposite = self.libxcomposite or null;
   libXcursor = self.libxcursor or null;
+  libxcvt = self.libxcvt;
   libXdamage = self.libxdamage or null;
   libXdmcp = self.libxdmcp;
   libXext = self.libxext;
   libXfixes = self.libxfixes;
-  libXfont2 = self.libxfont_2 or null;
-  libXfont = self.libxfont_1 or null;
+  libXfont = self.libxfont_1;
+  libXfont2 = self.libxfont_2;
+  libXft = self.libxft;
   libXi = self.libxi;
-  libXinerama = self.libxinerama or null;
+  libXinerama = self.libxinerama;
+  libxkbfile = self.libxkbfile;
   libXmu = self.libxmu;
   libXp = self.libxp or null;
   libXpm = self.libxpm;
@@ -77,62 +90,54 @@ self: {
   libXrender = self.libxrender;
   libXres = self.libxres or null;
   libXScrnSaver = self.libxscrnsaver or null;
+  libxshmfence = self.libxshmfence;
   libXt = self.libxt;
-  libXtst = self.libxtst or null;
-  libXv = self.libxv or null;
+  libXtst = self.libxtst;
+  libXv = self.libxv;
   libXvMC = self.libxvmc or null;
   libXxf86dga = self.libxxf86dga or null;
   libXxf86misc = self.libxxf86misc or null;
   libXxf86vm = self.libxxf86vm;
-
-  # Utilities and other packages
-  twm = self."tab-window-manager" or null;
-  utilmacros = self."util-macros" or null;
-  xauth = self.xauth or null;
-  xcbproto = self."xcb-proto";
-  xcbutilcursor = self."libxcb-cursor" or null;
-  xcbutilerrors = self.xcbutilerrors;
-  xcbutilimage = self.xcbutilimage;
-  xcbutilkeysyms = self.xcbutilkeysyms;
-  xcbutil = self.xcbutil;
-  xcbutilrenderutil = self.xcbutilrenderutil;
-  xcbutilwm = self.xcbutilwm;
-  xkeyboardconfig = self."xkeyboard-config";
-  xcursorthemes = self."xcursor-themes" or null;
-  xorgcffiles = self."xorg-cf-files" or null;
-  xorgdocs = self."xorg-docs" or null;
-  xorgsgmldoctools = self."xorg-sgml-doctools" or null;
-
-  # Packages that were in the generated callPackage set, now top-level
-  inherit (self)
-    xorgproto
-    libpciaccess
-    libxshmfence
-    libx11
-    ;
-  xorgserver = self."xorg-server";
-  inherit (self)
-    xclock
-    xdm
-    xdpyinfo
-    xfd
-    xfs
-    xinput
-    xkbcomp
-    xkbevd
-    xkbprint
-    xload
-    xpr
-    xrdb
-    xwd
-    ;
-  inherit (self) libxtrap;
-  libXTrap = self.libxtrap;
-  inherit (self) xtrap xvfb;
+  listres = self.listres or null;
+  lndir = self.lndir;
+  luit = self.luit or null;
+  makedepend = self.makedepend or null;
   mkfontdir = self.mkfontscale;
-  inherit (self) wrapWithXFileSearchPathHook;
-
-  # xf86 driver aliases (camelCase → hyphenated top-level)
+  mkfontscale = self.mkfontscale;
+  oclock = self.oclock or null;
+  pixman = self.pixman;
+  sessreg = self.sessreg or null;
+  setxkbmap = self.setxkbmap or null;
+  smproxy = self.smproxy or null;
+  transset = self.transset or null;
+  twm = self."tab-window-manager" or null;
+  utilmacros = self."util-macros";
+  viewres = self.viewres or null;
+  wrapWithXFileSearchPathHook = self.wrapWithXFileSearchPathHook;
+  x11perf = self.x11perf or null;
+  xauth = self.xauth;
+  xbacklight = self.xbacklight or null;
+  xbitmaps = self.xbitmaps or null;
+  xcalc = self.xcalc or null;
+  xcbproto = self."xcb-proto";
+  xcbutil = self."libxcb-util" or null;
+  xcbutilcursor = self."libxcb-cursor" or null;
+  xcbutilerrors = self."libxcb-errors" or null;
+  xcbutilimage = self."libxcb-image" or null;
+  xcbutilkeysyms = self."libxcb-keysyms" or null;
+  xcbutilrenderutil = self."libxcb-render-util" or null;
+  xcbutilwm = self."libxcb-wm" or null;
+  xclock = self.xclock;
+  xcmsdb = self.xcmsdb or null;
+  xcompmgr = self.xcompmgr or null;
+  xconsole = self.xconsole or null;
+  xcursorgen = self.xcursorgen or null;
+  xcursorthemes = self."xcursor-themes" or null;
+  xdm = self.xdm;
+  xdpyinfo = self.xdpyinfo or null;
+  xdriinfo = self.xdriinfo or null;
+  xev = self.xev or null;
+  xeyes = self.xeyes or null;
   xf86inputevdev = self."xf86-input-evdev";
   xf86inputjoystick = self."xf86-input-joystick";
   xf86inputkeyboard = self."xf86-input-keyboard" or null;
@@ -153,12 +158,13 @@ self: {
   xf86videogeode = self."xf86-video-geode";
   xf86videoi128 = self."xf86-video-i128";
   xf86videoi740 = self."xf86-video-i740";
-  xf86videointel = self."xf86-video-intel";
+  xf86videointel = self."xf86-video-intel" or null;
   xf86videomga = self."xf86-video-mga";
   xf86videoneomagic = self."xf86-video-neomagic";
   xf86videonouveau = self."xf86-video-nouveau";
   xf86videonv = self."xf86-video-nv";
   xf86videoomap = self."xf86-video-omap";
+  xf86videoopenchrome = self."xf86-video-openchrome" or null;
   xf86videoqxl = self."xf86-video-qxl";
   xf86videor128 = self."xf86-video-r128";
   xf86videos3virge = self."xf86-video-s3virge";
@@ -172,8 +178,52 @@ self: {
   xf86videotdfx = self."xf86-video-tdfx";
   xf86videotrident = self."xf86-video-trident";
   xf86videov4l = self."xf86-video-v4l";
-  xf86videovboxvideo = self."xf86-video-vboxvideo";
+  xf86videovboxvideo = self."xf86-video-vbox" or null;
   xf86videovesa = self."xf86-video-vesa";
   xf86videovmware = self."xf86-video-vmware";
   xf86videovoodoo = self."xf86-video-voodoo";
+  xfd = self.xfd;
+  xfontsel = self.xfontsel or null;
+  xfs = self.xfs;
+  xfsinfo = self.xfsinfo or null;
+  xgamma = self.xgamma or null;
+  xgc = self.xgc or null;
+  xhost = self.xhost or null;
+  xinit = self.xinit or null;
+  xinput = self.xinput;
+  xkbcomp = self.xkbcomp;
+  xkbevd = self.xkbevd;
+  xkbprint = self.xkbprint;
+  xkbutils = self.xkbutils or null;
+  xkeyboardconfig = self."xkeyboard-config";
+  xkeyboardconfig_custom = self."xkeyboard-config_custom" or null;
+  xkill = self.xkill or null;
+  xload = self.xload;
+  xlsatoms = self.xlsatoms or null;
+  xlsclients = self.xlsclients or null;
+  xlsfonts = self.xlsfonts or null;
+  xmag = self.xmag or null;
+  xmessage = self.xmessage or null;
+  xmodmap = self.xmodmap or null;
+  xmore = self.xmore or null;
+  xorgcffiles = self."xorg-cf-files" or null;
+  xorgdocs = self."xorg-docs" or null;
+  xorgproto = self.xorgproto;
+  xorgserver = self."xorg-server";
+  xorgsgmldoctools = self."xorg-sgml-doctools" or null;
+  xpr = self.xpr;
+  xprop = self.xprop or null;
+  xrandr = self.xrandr or null;
+  xrdb = self.xrdb;
+  xrefresh = self.xrefresh or null;
+  xset = self.xset or null;
+  xsetroot = self.xsetroot or null;
+  xsm = self.xsm or null;
+  xstdcmap = self.xstdcmap or null;
+  xtrans = self.xtrans;
+  xvfb = self.xvfb;
+  xvinfo = self.xvinfo or null;
+  xwd = self.xwd;
+  xwininfo = self.xwininfo or null;
+  xwud = self.xwud or null;
 }

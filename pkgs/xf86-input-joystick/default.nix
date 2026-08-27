@@ -1,29 +1,55 @@
 {
   lib,
-  buildXorgPackage,
   stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
   xorgproto,
   xorg-server,
+  testers,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-input-joystick";
   version = "1.6.4";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-input-joystick-1.6.4.tar.xz";
-    sha256 = "1lnc6cvrg81chb2hj3jphgx7crr4ab8wn60mn8f9nsdwza2w8plh";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-input-joystick";
+    tag = "xf86-input-joystick-${finalAttrs.version}";
+    hash = "sha256-JxSnhWx5V3/pdlu3mwRNrgicdfaUK5nIwBK3reqchQs=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # xorg-server defines autoconf macros that we need
+  ];
+
   buildInputs = [
+    util-macros # unused dependency but the build fails if pkg-config can't find it
     xorgproto
     xorg-server
   ];
+
   configureFlags = [ "--with-sdkdir=${placeholder "out"}/include/xorg" ];
+
+  passthru = {
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  };
+
   meta = {
+    description = "Joystick input driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-input-joystick";
+    license = lib.licenses.hpndSellVariant;
     pkgConfigModules = [ "xorg-joystick" ];
+    platforms = lib.platforms.unix;
     broken = stdenv.hostPlatform.isDarwin;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version; # no darwin driver
   };
 })

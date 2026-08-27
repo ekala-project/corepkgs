@@ -1,7 +1,9 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
   python3,
   libpthread-stubs,
@@ -9,13 +11,7 @@
   libxdmcp,
   xcb-proto,
   windows,
-  writeScript,
   testers,
-
-  # for passthru.tests
-  libx11,
-  cairo,
-  mesa,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxcb";
@@ -28,16 +24,22 @@ stdenv.mkDerivation (finalAttrs: {
     "doc"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libxcb-${finalAttrs.version}.tar.xz";
-    hash = "sha256-WZ6/mZZxD+pxYi5uGE86itW0PQ5fqMTkBxI8iKWabVU=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxcb";
+    tag = "libxcb-${finalAttrs.version}";
+    hash = "sha256-obu3+tLMCjAmWsW+/7y7lZKTDniLtjVQwvdGJi36e4c=";
   };
 
   strictDeps = true;
 
   nativeBuildInputs = [
+    autoreconfHook
     pkg-config
     python3
+    util-macros
   ];
 
   buildInputs = [
@@ -51,18 +53,7 @@ stdenv.mkDerivation (finalAttrs: {
   propagatedBuildInputs = lib.optional stdenv.hostPlatform.isMinGW windows.pthreads;
 
   passthru = {
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-      version="$(list-directory-versions --pname ${finalAttrs.pname} \
-        --url https://xorg.freedesktop.org/releases/individual/lib/ \
-        | sort -V | tail -n1)"
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
-    tests = {
-      pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
-      inherit libx11 cairo mesa;
-    };
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 
   env = lib.optionalAttrs stdenv.hostPlatform.isMinGW {

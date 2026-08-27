@@ -1,7 +1,9 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
   m4,
   python3,
@@ -18,17 +20,23 @@ stdenv.mkDerivation (finalAttrs: {
     "dev"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/xcb/xcb-util-errors-${finalAttrs.version}.tar.xz";
-    hash = "sha256-VijIe5hCWa2Se6zYpClYMZw2vfSwZYh4A8nYIPuA81c=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxcb-errors";
+    tag = "xcb-util-errors-${finalAttrs.version}";
+    hash = "sha256-HbfjryhbiGJGkzN0k5GIAjc1uABXWBYyaXIjIqT+cwE=";
   };
 
   strictDeps = true;
 
   nativeBuildInputs = [
-    pkg-config
+    autoreconfHook
     m4
+    pkg-config
     python3
+    util-macros
   ];
 
   buildInputs = [

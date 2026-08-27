@@ -1,7 +1,9 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
   xorgproto,
   libx11,
@@ -9,7 +11,6 @@
   libxmu,
   libxpm,
   libxt,
-  writeScript,
   testers,
 }:
 stdenv.mkDerivation (finalAttrs: {
@@ -22,14 +23,22 @@ stdenv.mkDerivation (finalAttrs: {
     "devdoc"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libXaw-${finalAttrs.version}.tar.xz";
-    hash = "sha256-cx1XK1THCPgeGXpq+oAWkY4uBt/TAl4GbKZCpbjDnI8=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxaw";
+    tag = "libXaw-${finalAttrs.version}";
+    hash = "sha256-aEClL5IvT5Ltn684g08lJrDqtSYOgXzmheUGnNsAVZY=";
   };
 
   strictDeps = true;
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
 
   buildInputs = [
     xorgproto
@@ -52,14 +61,6 @@ stdenv.mkDerivation (finalAttrs: {
     lib.optionalString stdenv.hostPlatform.isStatic "rm $out/lib/*.so*";
 
   passthru = {
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-      version="$(list-directory-versions --pname libxaw \
-        --url https://xorg.freedesktop.org/releases/individual/lib/ \
-        | sort -V | tail -n1)"
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 

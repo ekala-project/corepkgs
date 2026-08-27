@@ -1,58 +1,83 @@
 {
   lib,
-  buildXorgPackage,
   stdenv,
+  fetchFromGitLab,
   pkg-config,
-  fetchurl,
+  util-macros,
+  autoreconfHook,
+  wrapWithXFileSearchPathHook,
   libx11,
   libxau,
   libxaw,
+  libxcrypt,
   libxdmcp,
   libxext,
   libxft,
-  libXinerama,
+  libxinerama,
   libxmu,
   libxpm,
-  xorgproto,
   libxrender,
   libxt,
-  wrapWithXFileSearchPathHook,
-  libxcrypt,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xdm";
   version = "1.1.17";
-  src = fetchurl {
-    url = "mirror://xorg/individual/app/xdm-1.1.17.tar.xz";
-    sha256 = "0spbxjxxrnfxf8gqncd7bry3z7dvr74ba987cx9iq0qsj7qax54l";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    owner = "xorg";
+    repo = "app/xdm";
+    tag = "xdm-${finalAttrs.version}";
+    hash = "sha256-PhMctvL+Vp9uNmTtowMHzkoekieVCgNZCfUZ1XpjpyY=";
   };
+
+  strictDeps = true;
+
   nativeBuildInputs = [
     pkg-config
+    util-macros
+    autoreconfHook
     wrapWithXFileSearchPathHook
   ];
+
   buildInputs = [
     libx11
     libxau
     libxaw
+    libxcrypt
     libxdmcp
     libxext
     libxft
-    libXinerama
+    libxinerama
     libxmu
     libxpm
-    xorgproto
     libxrender
     libxt
-    libxcrypt
   ];
+
   configureFlags = [
     "ac_cv_path_RAWCPP=${stdenv.cc.targetPrefix}cpp"
   ]
+  # checking for /dev/urandom... configure: error: cannot check for file existence when cross compiling
   ++ lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
     "ac_cv_file__dev_urandom=true"
     "ac_cv_file__dev_random=true"
   ];
-  meta.mainProgram = "xdm";
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  installFlags = [ "appdefaultdir=$(out)/share/X11/app-defaults" ];
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "X Display Manager with support for XDMCP, host chooser";
+    homepage = "https://gitlab.freedesktop.org/xorg/app/xdm";
+    license = with lib.licenses; [
+      mit
+      mitOpenGroup
+      x11
+      bsd3ClauseTso
+      bsd2
+    ];
+    mainProgram = "xdm";
+    platforms = lib.platforms.unix;
+  };
 })

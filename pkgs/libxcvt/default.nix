@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
   pkg-config,
   meson,
   ninja,
@@ -10,9 +10,13 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "libxcvt";
   version = "0.1.3";
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libxcvt-${finalAttrs.version}.tar.xz";
-    hash = "sha256-qSmZiodn3n36NtbaR1HNvu807WMHFPL0p2ezUfJELgE=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxcvt";
+    tag = "libxcvt-${finalAttrs.version}";
+    hash = "sha256-zi33uydI/XCKk8PZuRlaHyXFOEX4FkAyzSgB19wXKjE=";
   };
 
   strictDeps = true;

@@ -1,17 +1,18 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
   libx11,
   xorgproto,
   libxau,
-  writeScript,
   testers,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxext";
-  version = "1.3.6";
+  version = "1.3.7";
 
   outputs = [
     "out"
@@ -20,14 +21,22 @@ stdenv.mkDerivation (finalAttrs: {
     "doc"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libXext-${finalAttrs.version}.tar.xz";
-    hash = "sha256-7bWfojmU5AX9xbQAr99YIK5hYLlPNePcPaRFehbol1M=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxext";
+    tag = "libXext-${finalAttrs.version}";
+    hash = "sha256-9Swa4BB8QUKAiSmINeYU5vuIVpJq2Yez0dB4oHTFEEI=";
   };
 
   strictDeps = true;
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
 
   buildInputs = [
     libx11
@@ -43,14 +52,6 @@ stdenv.mkDerivation (finalAttrs: {
   ) "--enable-malloc0returnsnull";
 
   passthru = {
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-      version="$(list-directory-versions --pname libXext \
-        --url https://xorg.freedesktop.org/releases/individual/lib/ \
-        | sort -V | tail -n1)"
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 

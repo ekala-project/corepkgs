@@ -1,39 +1,57 @@
 {
   lib,
-  buildXorgPackage,
-  buildPackages,
-  pkg-config,
-  fetchurl,
+  stdenv,
+  fetchFromGitLab,
   autoreconfHook,
+  pkg-config,
+  util-macros,
+  xorg-server,
   xorgproto,
   libdrm,
-  udev,
   libpciaccess,
-  xorg-server,
-  util-macros ? null,
+  udev,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-nouveau";
-  version = "3ee7cbca8f9144a3bb5be7f71ce70558f548d268";
-  src = fetchurl {
-    url = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-nouveau/-/archive/3ee7cbca8f9144a3bb5be7f71ce70558f548d268/xf86-video-nouveau-3ee7cbca8f9144a3bb5be7f71ce70558f548d268.tar.bz2";
-    sha256 = "0rhs3z274jdzd82pcsl25xn8hmw6i4cxs2kwfnphpfhxbbkiq7wl";
+  version = "1.0.18";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-nouveau";
+    tag = "xf86-video-nouveau-${finalAttrs.version}";
+    hash = "sha256-gsrq32h0EKesivMoNbe1Thlc7FfubmS6zdwQmMxHsOk=";
   };
+
+  strictDeps = true;
+
   nativeBuildInputs = [
-    pkg-config
     autoreconfHook
+    pkg-config
     util-macros
-    xorg-server # for xorg-server.m4 macros
+    xorg-server # for some autoconf macros
   ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libdrm
-    udev
     libpciaccess
-    xorg-server
+    udev
   ];
-  # fixes `implicit declaration of function 'wfbScreenInit'; did you mean 'fbScreenInit'?
-  NIX_CFLAGS_COMPILE = "-Wno-error=implicit-function-declaration";
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "Xorg X server driver for NVIDIA video cards";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-nouveau";
+    license = with lib.licenses; [
+      mit
+      hpndSellVariant
+      # possibly unfree code according to the manpage in the repo
+      # https://gitlab.freedesktop.org/xorg/driver/xf86-video-nouveau/-/merge_requests/17
+      # unfree
+    ];
+    platforms = lib.platforms.unix;
+  };
 })

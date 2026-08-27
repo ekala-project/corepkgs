@@ -1,38 +1,60 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
   libdrm,
-  udev,
   libpciaccess,
   libx11,
   libxext,
-  xorg-server,
+  udev,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-vmware";
   version = "13.4.0";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-vmware-13.4.0.tar.xz";
-    sha256 = "06mq7spifsrpbwq9b8kn2cn61xq6mpkq6lvh4qi6xk2yxpjixlxf";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-vmware";
+    tag = "xf86-video-vmware-${finalAttrs.version}";
+    hash = "sha256-aC/LsAvrVtG+2SrMaB7ROJTUIleZTcLydmt5cQf0dHc=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libdrm
-    udev
     libpciaccess
     libx11
     libxext
-    xorg-server
+    udev
   ];
-  env.NIX_CFLAGS_COMPILE = toString [ "-Wno-error=address" ];
-  meta.platforms = [
-    "i686-linux"
-    "x86_64-linux"
-  ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  env.NIX_CFLAGS_COMPILE = "-Wno-error=address"; # gcc12
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "VMware guest video driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-vmware";
+    license = with lib.licenses; [
+      x11
+      mit
+    ];
+    platforms = lib.intersectLists lib.platforms.linux lib.platforms.x86;
+  };
 })

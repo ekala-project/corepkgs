@@ -1,33 +1,34 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
-  writeScript,
   testers,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "xtrans";
   version = "1.6.0";
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/xtrans-${finalAttrs.version}.tar.xz";
-    hash = "sha256-+q/qFmvyRRoXPZ1ZM1KUDsZAQUXF0dpcITQjzk01npI=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxtrans";
+    tag = "xtrans-${finalAttrs.version}";
+    hash = "sha256-+V7qrITaYqqC6wFo28jhM3oxpACk1GoEYgK0FRRQJqY=";
   };
 
   strictDeps = true;
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
 
   passthru = {
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-      version="$(list-directory-versions --pname ${finalAttrs.pname} \
-        --url https://xorg.freedesktop.org/releases/individual/lib/ \
-        | sort -V | tail -n1)"
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 

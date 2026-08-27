@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
   fetchpatch,
   pkg-config,
   python3,
@@ -14,9 +14,13 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "xorgproto";
   version = "2024.1";
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/proto/xorgproto-${finalAttrs.version}.tar.xz";
-    hash = "sha256-NyIl/UCBW4QjVH9diQxd68cuiLkQiPv7ExWMIElcy1k=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "proto";
+    repo = "xorgproto";
+    tag = "xorgproto-${finalAttrs.version}";
+    hash = "sha256-qqYU6/+wd6LL0y4osSFQ6w0fDv1S/JP6EEdashvkJrM=";
   };
 
   patches = [

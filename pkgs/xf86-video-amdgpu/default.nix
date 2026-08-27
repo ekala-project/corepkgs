@@ -1,32 +1,59 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  meson,
+  ninja,
   pkg-config,
-  fetchurl,
-  xorgproto,
+  libdrm,
   libgbm,
   libGL,
-  libdrm,
   udev,
+  xorgproto,
   xorg-server,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-amdgpu";
-  version = "23.0.0";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-amdgpu-23.0.0.tar.xz";
-    sha256 = "0qf0kjh6pww5abxmqa4c9sfa2qq1hq4p8qcgqpfd1kpkcvmg012g";
+  version = "25.0.0";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-amdgpu";
+    tag = "xf86-video-amdgpu-${finalAttrs.version}";
+    hash = "sha256-7dLoKxBbE98FjADTYjjwj6OafJdecAkOCMRcYUYuYV4=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  # fixes https://github.com/NixOS/nixpkgs/issues/483585 aka https://gitlab.freedesktop.org/xorg/driver/xf86-video-amdgpu/-/issues/8
+  hardeningDisable = [ "bindnow" ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    meson
+    ninja
+    pkg-config
+  ];
+
   buildInputs = [
-    xorgproto
+    libdrm
     libgbm
     libGL
-    libdrm
     udev
+    xorgproto
     xorg-server
   ];
-  configureFlags = [ "--with-xorg-conf-dir=$(out)/share/X11/xorg.conf.d" ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "Xorg driver for AMD Radeon GPUs using the amdgpu kernel driver";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-amdgpu";
+    license = with lib.licenses; [
+      hpndSellVariant
+      mit
+      x11
+    ];
+    platforms = lib.platforms.linux;
+  };
 })

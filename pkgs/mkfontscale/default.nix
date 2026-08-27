@@ -1,25 +1,34 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
   libfontenc,
   freetype,
   xorgproto,
   zlib,
 }:
-
 stdenv.mkDerivation (finalAttrs: {
   pname = "mkfontscale";
   version = "1.2.4";
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/app/mkfontscale-${finalAttrs.version}.tar.xz";
-    hash = "sha256-oBSSoXqbbA7j+S7leIUOMFMVufKY2l8AahzUtR2wGl4=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "app";
+    repo = "mkfontscale";
+    tag = "mkfontscale-${finalAttrs.version}";
+    hash = "sha256-R5IB2KuQzp4hRZtGkRdHvf3kSpFLDvLdOVB77Pld7rc=";
   };
 
   strictDeps = true;
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
   buildInputs = [
     libfontenc
     freetype

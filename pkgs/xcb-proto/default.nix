@@ -1,41 +1,37 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
   python3,
   testers,
-  writeScript,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "xcb-proto";
   version = "1.17.0";
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/proto/xcb-proto-${finalAttrs.version}.tar.xz";
-    hash = "sha256-LBus0hEPR5n3TebrtxS5TPb4D7ESMWsSGUgP0iViFIw=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "proto";
+    repo = "xcbproto";
+    tag = "xcb-proto-${finalAttrs.version}";
+    hash = "sha256-5YSX8Z6wDYe7D5+QClgF/BlL+U94ojhra5kXhSjdM1k=";
   };
 
   strictDeps = true;
 
   nativeBuildInputs = [
+    autoreconfHook
     pkg-config
     python3
+    util-macros
   ];
 
   passthru = {
-    tests = {
-      pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
-      pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
-    };
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-      version="$(list-directory-versions --pname ${finalAttrs.pname} \
-        --url https://xorg.freedesktop.org/releases/individual/proto/ \
-        | sort -V | tail -n1)"
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 
   meta = {

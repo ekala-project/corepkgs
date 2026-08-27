@@ -1,7 +1,9 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
   xorgproto,
   xtrans,
@@ -17,29 +19,36 @@ stdenv.mkDerivation (finalAttrs: {
     "doc"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libICE-${finalAttrs.version}.tar.xz";
-    hash = "sha256-l05O1BQiXrPHFphd+XCfTajSKmeiiQBmvG38ia0phiU=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libice";
+    tag = "libICE-${finalAttrs.version}";
+    hash = "sha256-AYldp7v3x2Um0Ln75E06544l1ftTzR6m5gGenuLkp6U=";
   };
 
-  nativeBuildInputs = [ pkg-config ];
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
 
   buildInputs = [
     xorgproto
     xtrans
   ];
 
-  propagatedBuildInputs = [
-    xorgproto
-  ];
+  passthru = {
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  };
 
   meta = {
-    description = "X Inter-Client Exchange library";
+    description = "Inter-Client Exchange Library";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libice";
-    license = with lib.licenses; [
-      mit
-      x11
-    ];
+    license = lib.licenses.mitOpenGroup;
     pkgConfigModules = [ "ice" ];
     platforms = lib.platforms.unix;
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;

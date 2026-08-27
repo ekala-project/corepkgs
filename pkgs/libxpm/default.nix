@@ -1,16 +1,19 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
   gettext,
   xorgproto,
   libx11,
   libxext,
   libxt,
+  ncompress,
   gzip,
+  testers,
 }:
-
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxpm";
   version = "3.5.19";
@@ -21,16 +24,22 @@ stdenv.mkDerivation (finalAttrs: {
     "out"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libXpm-${finalAttrs.version}.tar.xz";
-    hash = "sha256-rTV21okiGjncco8ODcAsp7tqDXJMmnf9G/oemvg76QA=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxpm";
+    tag = "libXpm-${finalAttrs.version}";
+    hash = "sha256-074Fyv6MwJDQZpmhQ1K+J8jQ4xxhOQGmTQgKDHqqQh0=";
   };
 
   strictDeps = true;
 
   nativeBuildInputs = [
-    pkg-config
+    autoreconfHook
     gettext
+    pkg-config
+    util-macros
   ];
 
   buildInputs = [
@@ -40,11 +49,18 @@ stdenv.mkDerivation (finalAttrs: {
     libxt
   ];
 
-  propagatedBuildInputs = [ libx11 ];
+  propagatedBuildInputs = [
+    libx11
+  ];
 
   env = {
+    XPM_PATH_COMPRESS = lib.makeBinPath [ ncompress ];
     XPM_PATH_GZIP = lib.makeBinPath [ gzip ];
     XPM_PATH_UNCOMPRESS = lib.makeBinPath [ gzip ];
+  };
+
+  passthru = {
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 
   meta = {

@@ -1,28 +1,55 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorgproto,
   libx11,
   libxmu,
-  xorgproto,
   mcpp,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xrdb";
-  version = "1.2.2";
-  src = fetchurl {
-    url = "mirror://xorg/individual/app/xrdb-1.2.2.tar.xz";
-    sha256 = "1x1ka0zbcw66a06jvsy92bvnsj9vxbvnq1hbn1az4f0v4fmzrx9i";
+  version = "1.2.3";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "app";
+    repo = "xrdb";
+    tag = "xrdb-${finalAttrs.version}";
+    hash = "sha256-dD9gYceg9RDfTIXBtMT/QFjoByu0cH/imBKAmSMM+7A=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
+
   buildInputs = [
+    xorgproto
     libx11
     libxmu
-    xorgproto
   ];
-  configureFlags = [ "--with-cpp=${mcpp}/bin/mcpp" ];
-  meta.mainProgram = "xrdb";
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  # replace gcc with mcpp as preprocessor to reduce the closure size
+  # see https://github.com/NixOS/nixpkgs/issues/9480
+  configureFlags = [ "--with-cpp=${lib.getExe mcpp}" ];
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "X resource database utility";
+    homepage = "https://gitlab.freedesktop.org/xorg/app/xrdb";
+    license = with lib.licenses; [
+      hpndDec
+      mitOpenGroup
+    ];
+    mainProgram = "xrdb";
+    platforms = lib.platforms.unix;
+  };
 })

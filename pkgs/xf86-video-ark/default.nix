@@ -1,26 +1,48 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
   libpciaccess,
-  xorg-server,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-ark";
   version = "0.7.6";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-ark-0.7.6.tar.xz";
-    sha256 = "0p88blr3zgy47jc4aqivc6ypj4zq9pad1cl70wwz9xig29w9xk2s";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-ark";
+    tag = "xf86-video-ark-${finalAttrs.version}";
+    hash = "sha256-IE35hEZVsfxjwrNxV/xtw8bdox9pwlO/Ra8vkcK19pM=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libpciaccess
-    xorg-server
   ];
-  meta.broken = true;
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "ARK Logic video driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-ark";
+    license = lib.licenses.hpndSellVariant;
+    platforms = lib.platforms.unix;
+    badPlatforms = lib.platforms.aarch64;
+  };
 })

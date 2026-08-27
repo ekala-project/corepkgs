@@ -1,31 +1,63 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  bison,
   libx11,
   libxkbfile,
   xorgproto,
   xkeyboard-config,
+  testers,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xkbcomp";
-  version = "1.4.7";
-  src = fetchurl {
-    url = "mirror://xorg/individual/app/xkbcomp-1.4.7.tar.xz";
-    sha256 = "0xqzz209m9i43jbyrf2lh4xdbyhzzzn9mis2f2c32kplwla82a0a";
+  version = "1.5.0";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "app";
+    repo = "xkbcomp";
+    tag = "xkbcomp-${finalAttrs.version}";
+    hash = "sha256-nkyBjIOX9Qr0K+R0JcvJ7egI0a8Zh/tyhZvG7E+VlZU=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    bison
+  ];
+
   buildInputs = [
+    util-macros # unused dependency but the build fails if pkg-config can't find it
     libx11
     libxkbfile
     xorgproto
   ];
+
   configureFlags = [ "--with-xkb-config-root=${xkeyboard-config}/share/X11/xkb" ];
+
+  passthru = {
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  };
+
   meta = {
-    pkgConfigModules = [ "xkbcomp" ];
+    description = "XKB keyboard description compiler";
+    homepage = "https://gitlab.freedesktop.org/xorg/app/xkbcomp";
+    license = with lib.licenses; [
+      hpnd
+      mitOpenGroup
+      hpndDec
+    ];
     mainProgram = "xkbcomp";
     identifiers.cpeParts.vendor = "x.org";
+    pkgConfigModules = [ "xkbcomp" ];
+    platforms = lib.platforms.unix;
   };
 })

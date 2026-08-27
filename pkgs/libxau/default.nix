@@ -1,10 +1,11 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
   xorgproto,
-  writeScript,
   testers,
 }:
 stdenv.mkDerivation (finalAttrs: {
@@ -16,24 +17,24 @@ stdenv.mkDerivation (finalAttrs: {
     "dev"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libXau-${finalAttrs.version}.tar.xz";
-    hash = "sha256-dNDk36PTmtiTnpm9o39ZZ6ulKCEQdoKEZNJ3fUd/wPs=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxau";
+    tag = "libXau-${finalAttrs.version}";
+    hash = "sha256-zSj0btY9hz/OWTpzqVP+cHWDqKrBL4UkexOwp8B+OXU=";
   };
 
   strictDeps = true;
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
   propagatedBuildInputs = [ xorgproto ];
 
   passthru = {
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-      version="$(list-directory-versions --pname libXau \
-        --url https://xorg.freedesktop.org/releases/individual/lib/ \
-        | sort -V | tail -n1)"
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 

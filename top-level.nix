@@ -2,7 +2,24 @@
 # This mainly serves as a way to define attrs at the top-level of pkgs which
 # require more than just passing default arguments to nix expressions
 
-final: prev: with final; {
+final: prev:
+let
+  gstAll1 = final.lib.genAttrs [
+    "gst-devtools"
+    "gst-editing-services"
+    "gst-libav"
+    "gst-plugins-bad"
+    "gst-plugins-base"
+    "gst-plugins-good"
+    "gst-plugins-rs"
+    "gst-plugins-ugly"
+    "gst-rtsp-server"
+    "gstreamer"
+    "gstreamermm"
+  ] (_: null);
+in
+with final;
+{
 
   tests = { };
 
@@ -66,24 +83,32 @@ final: prev: with final; {
     stdenv = gccStdenv;
   };
 
-  # keep-sorted start
-
   aafigure = null;
   actdiag = null;
   aria2 = null;
   arrow-cpp = null;
+  at-spi2-atk = null; # gtk3
+  atk = null; # gtk2, gtk3, defaultGemConfig, defaultCrateOverrides
   awsebcli = null;
   azmq = null;
+  gsasl = null; # cursed cull option
   babel = null;
   bear = null;
   blockdiag = null;
   breathe = null;
+  libidn = null; # defaultGemConfig
+  capnproto = null; # defaultCrateOverrides
+  cargo-c = null; # rustls-ffi
   chameleon = null;
   coeurl = null;
   cppzmq = null;
   cunit = null;
   curlpp = null;
   czmq = null;
+  cvs = null; # nix-prefetch-cvs
+  nix-prefetch-cvs = null;
+  darcs = null; # nix-prefetch-darcs
+  nix-prefetch-darcs = null;
   dblatex = null;
   dblatexFull = null;
   diffoscopeMinimal = null;
@@ -105,12 +130,18 @@ final: prev: with final; {
   fluxbox = null;
   fop = null;
   gdal = null;
+  gimp = null; # libheif tests
   gitstatus = null;
+  graphene = null; # gtk4, defaultCrateOverrides
   graphicsmagick = null;
+  gst_all_1 = gstAll1; # gtk4, libde265 tests
+  gsettings-desktop-schemas = null;
   gtkmm3 = null;
   gunicorn = null;
   highlight = null;
   icewm = null;
+  imv = null; # libheif tests
+  isocodes = null; # gtk3, gtk4
   jhead = null;
   jre = null;
   knot-dns = null;
@@ -119,12 +150,18 @@ final: prev: with final; {
   libgeotiff = null;
   libgit2-glib = null;
   libguestfs = null;
+  liblqr1 = null; # imagemagick, imagemagick6
   libnatspec = null;
   libnghttp2 = nghttp2;
+  libraqm = null; # imagemagick
+  libraw = null; # imagemagick
   libotr = null;
+  libpq = null; # defaultGemConfig, defaultCrateOverrides, gawkextlib pgsql extension
+  librsvg = null; # gtk4, ffmpeg, imagemagick, djvulibre, nvidia-x11 settings, wrapGAppsHook
   libsysprof-capture = null;
   libvirt = null;
   lilypond = null;
+  lmdb = null; # gawkextlib lmdb extension
   lingua = null;
   lynx = null;
   mashumaro = null;
@@ -134,14 +171,17 @@ final: prev: with final; {
   mkdocs = null;
   mosquitto = null;
   mpd = null;
+  mpi = null; # fftwMpi
   mscgen = null;
   multipath-tools = null;
   neovim = null;
   nodejs_latest = nodejs.v23;
   nwdiag = null;
+  nixos-icons = null; # imagemagick tests
   objgraph = null;
   objprint = null; # for pytestCheckHook
   openbox = null;
+  openexr = null; # imagemagick, imagemagick6
   opencv = null;
   openimageio = null;
   ostinato = null;
@@ -151,13 +191,18 @@ final: prev: with final; {
   pydantic = null;
   pygame-ce = null;
   quart = null;
+  rapidjson = null; # gawkextlib json extension
+  rav1e = null; # libheif AV1 encoding; libaom still provides it
+  rdkafka = null; # defaultCrateOverrides
   rich = null;
   sage = null;
   samba = null;
+  sassc = null; # gtk3, gtk4
   sbclPackages = null;
   scribus = null;
   seqdiag = null;
   setproctitle = null;
+  shaderc = null; # ffmpeg, gtk4
   spamassassin = null;
   squid = null;
   subversionClient = null;
@@ -171,6 +216,7 @@ final: prev: with final; {
   tor = null;
   tornado = null;
   tracee = null;
+  tre = null; # gawkextlib aregex extension
   trustme = null;
   ttfautohint = null;
   uwsgi = null;
@@ -187,7 +233,6 @@ final: prev: with final; {
   yamllint = null;
   yara = null;
   zmqpp = null;
-  # keep-sorted end
 
   yq = with python3Packages; toPythonApplication yq;
 
@@ -458,8 +503,6 @@ final: prev: with final; {
     wrapGas = true;
   };
 
-  buildXorgPackage = callPackage ./build-support/xorg { };
-
   xorg =
     let
       # Backward-compatibility alias set: maps legacy xorg.* attr names to top-level packages.
@@ -588,8 +631,6 @@ final: prev: with final; {
   } ./build-support/setup-hooks/copy-desktop-items.sh;
 
   makePkgconfigItem = callPackage ./build-support/make-pkgconfigitem { };
-
-  mpi = throw "mpi: openmpi is not yet available in core-pkgs";
 
   # Default libGL implementation.
   #
@@ -1949,6 +1990,7 @@ final: prev: with final; {
     libXtSupport = false;
     fontconfigSupport = false;
     freetypeSupport = false;
+    libraqmSupport = false;
     ghostscriptSupport = false;
     libjpegSupport = false;
     djvulibreSupport = false;

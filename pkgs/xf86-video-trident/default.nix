@@ -1,25 +1,50 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
   libpciaccess,
-  xorg-server,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-trident";
   version = "1.4.0";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-trident-1.4.0.tar.xz";
-    sha256 = "16qqn1brz50mwcy42zi1wsw9af56qadsaaiwm9hn1p6plyf22xkz";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-trident";
+    tag = "xf86-video-trident-${finalAttrs.version}";
+    hash = "sha256-xTBktn813s8Dy3gPScEHVlWMzSRx7oIymbFUpkvYAhE=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libpciaccess
-    xorg-server
   ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "Trident video driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-trident";
+    license = with lib.licenses; [
+      hpndSellVariant
+      mit
+    ];
+    platforms = lib.platforms.unix;
+    badPlatforms = lib.platforms.aarch64;
+  };
 })

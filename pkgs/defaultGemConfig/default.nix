@@ -87,7 +87,7 @@
   taglib ? null,
   libopus ? null,
   linux-pam,
-  libidn ? null,
+  libidn,
   protobuf,
   fribidi ? null,
   harfbuzz,

@@ -1,239 +1,250 @@
 {
   lib,
-  buildXorgPackage,
-  buildPackages,
   stdenv,
+  fetchFromGitLab,
+
+  # build system
+  meson,
+  ninja,
   pkg-config,
-  fetchurl,
-  fetchpatch,
-  # Core X deps
-  xorgproto,
-  openssl,
+
+  # deps
+  dbus,
+  dri-pkgconfig-stub,
+  font-util,
+  libdrm,
+  libepoxy,
+  libgbm,
+  libGL,
+  libGLU,
+  libpciaccess,
+  libtirpc,
+  libunwind,
   libx11,
   libxau,
   libxcb,
-  xcbutil,
-  xcbutilwm,
   xcbutilimage,
   xcbutilkeysyms,
   xcbutilrenderutil,
-  libxdmcp,
-  libXfixes,
-  libxkbfile,
-  # Override deps
-  xtrans,
+  xcbutil,
+  xcbutilwm,
   libxcvt,
-  dbus,
-  libGL,
-  libGLU,
+  libxdmcp,
   libxext,
-  libXfont2 ? null,
-  libepoxy,
-  libunwind,
+  libxfixes,
+  libxfont_1,
+  libxfont_2,
+  libxkbfile,
   libxshmfence,
-  pixman,
-  zlib,
-  libdrm,
-  libgbm,
+  mesa,
   mesa-gl-headers,
-  dri-pkgconfig-stub,
+  openssl,
+  pixman,
   udev,
-  libpciaccess,
-  # xkb
   xkbcomp,
   xkeyboard-config,
-  # Darwin
-  autoreconfHook,
-  automake,
-  autoconf,
-  mesa,
-  bootstrap_cmds ? null,
-  # clangStdenv,  # TODO(corepkgs): support darwin
+  xorgproto,
+  xtrans,
+  zlib,
+
+  # darwin specific deps
+  darwin,
+  util-macros,
+  # TODO(corepkgs): port libapplewm; only used on Darwin, which is unsupported here
+  libapplewm ? null,
+  testers,
 }:
-
-let
-  isDarwin = stdenv.hostPlatform.isDarwin;
-in
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xorg-server";
-  version = "21.1.20";
-  src = fetchurl {
-    url = "mirror://xorg/individual/xserver/xorg-server-21.1.20.tar.xz";
-    sha256 = "sha256-dpW8YYJLOoG2utL3iwVADKAVAD3kAtGzIhFxBbcC6Tc=";
-  };
+  # `xvfb` inherits `version` and `src` from here, leading to many rebuilds. If
+  # necessary, these can be moved out of lockstep in order to merge updates
+  # quickly.
+  version = "21.1.24";
 
   outputs = [
     "out"
     "dev"
   ];
 
-  postPatch = ''
-    for i in dri3/*.c
-    do
-      sed -i -e "s|#include <drm_fourcc.h>|#include <libdrm/drm_fourcc.h>|" $i
-    done
-  '';
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    owner = "xorg";
+    repo = "xserver";
+    tag = "xorg-server-${finalAttrs.version}";
+    hash = "sha256-y88/jAZDyQ+wg5MzbDMcbFzALSfzn9JxEBpTWxiCD8U=";
+  };
 
-  nativeBuildInputs = [ pkg-config ];
+  patches = lib.optionals stdenv.hostPlatform.isDarwin [
+    ./darwin/bundle_main.patch
+    ./darwin/find-cpp.patch
+    ./darwin/stub.patch
+  ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    meson
+    ninja
+    pkg-config
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    darwin.bootstrap_cmds
+    util-macros
+  ];
 
   buildInputs = [
-    xorgproto
-    openssl
+    font-util
     libx11
     libxau
     libxcb
-    xcbutil
-    xcbutilwm
     xcbutilimage
     xcbutilkeysyms
     xcbutilrenderutil
-    libxdmcp
-    libXfixes
-    libxkbfile
-    xtrans
+    xcbutil
+    xcbutilwm
     libxcvt
+    libxdmcp
+    libxfixes
+    libxkbfile
+    mesa-gl-headers
+    openssl
+    xorgproto
+    xtrans
   ]
-  ++ lib.optional (libdrm != null) libdrm.dev
-  ++ lib.optionals (!isDarwin) [
+  ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [
+    dri-pkgconfig-stub
     libdrm
     libgbm
-    mesa-gl-headers
-    dri-pkgconfig-stub
   ]
-  ++ lib.optionals isDarwin [
-    bootstrap_cmds
-    automake
-    autoconf
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    libtirpc
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    darwin.bootstrap_cmds
     mesa
   ];
 
   propagatedBuildInputs = [
     dbus
+    libepoxy
     libGL
     libGLU
-    libxext
-    libepoxy
     libunwind
+    libxext
+    libxfont_1
+    libxfont_2
     libxshmfence
     pixman
     xorgproto
     zlib
   ]
-  ++ lib.optionals (!isDarwin) [
-    libpciaccess
+  ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [ libpciaccess ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ udev ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ libapplewm ];
+
+  mesonFlags = [
+    "-Dxephyr=true"
+    "-Dxvfb=true"
+    "-Dxnest=true"
+    "-Dxorg=true"
+
+    "-Dlog_dir=/var/log"
+    "-Ddefault_font_path="
+
+    "-Dxkb_bin_dir=${xkbcomp}/bin"
+    "-Dxkb_dir=${xkeyboard-config}/share/X11/xkb"
+    "-Dxkb_output_dir=$out/share/X11/xkb/compiled"
+
+    "-Dxcsecurity=true"
   ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [
-    udev
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    "-Dglamor=false"
+    "-Dsecure-rpc=false"
+    "-Dint10=false"
+    "-Dpciaccess=false"
+    "-Dapple-application-name=XQuartz"
+    "-Dapple-applications-dir=${placeholder "out"}/Applications"
+    "-Dbundle-id-prefix=org.nixos.xquartz"
+    "-Dsha1=CommonCrypto"
   ]
-  ++ lib.optional (libXfont2 != null) libXfont2;
+  ++ lib.optionals (!stdenv.hostPlatform.isLinux) [
+    # fixed upstream (unreleased)
+    "-Dudev=false"
+    "-Dudev_kms=false"
+  ];
 
-  depsBuildBuild = lib.optionals (!isDarwin) [ buildPackages.stdenv.cc ];
-
-  patches =
-    if (!isDarwin) then
-      [
-        ../xorg/dont-create-logdir-during-build.patch
-      ]
-    else
-      [
-        (fetchpatch {
-          url = "https://github.com/XQuartz/xorg-server/commit/e88fd6d785d5be477d5598e70d105ffb804771aa.patch";
-          sha256 = "1q0a30m1qj6ai924afz490xhack7rg4q3iig2gxsjjh98snikr1k";
-          name = "use-cppflags-not-cflags.patch";
-        })
-        (fetchpatch {
-          url = "https://github.com/XQuartz/xorg-server/commit/75ee9649bcfe937ac08e03e82fd45d9e18110ef4.patch";
-          sha256 = "1vlfylm011y00j8mig9zy6gk9bw2b4ilw2qlsc6la49zi3k0i9fg";
-          name = "use-old-mitrapezoids-and-mitriangles-routines.patch";
-        })
-        (fetchpatch {
-          url = "https://github.com/XQuartz/xorg-server/commit/c58f47415be79a6564a9b1b2a62c2bf866141e73.patch";
-          sha256 = "19sisqzw8x2ml4lfrwfvavc2jfyq2bj5xcf83z89jdxg8g1gdd1i";
-          name = "revert-fb-changes-1.patch";
-        })
-        (fetchpatch {
-          url = "https://github.com/XQuartz/xorg-server/commit/56e6f1f099d2821e5002b9b05b715e7b251c0c97.patch";
-          sha256 = "0zm9g0g1jvy79sgkvy0rjm6ywrdba2xjd1nsnjbxjccckbr6i396";
-          name = "revert-fb-changes-2.patch";
-        })
-        ../xorg/darwin/bundle_main.patch
-        ../xorg/darwin/stub.patch
-      ];
-
-  prePatch = lib.optionalString stdenv.hostPlatform.isMusl ''
-    export CFLAGS+=" -D__uid_t=uid_t -D__gid_t=gid_t"
+  postPatch = lib.optionalString stdenv.hostPlatform.isDarwin ''
+    substituteInPlace hw/xquartz/mach-startup/stub.c \
+      --subst-var-by XQUARTZ_APP "$out/Applications/XQuartz.app"
   '';
 
-  configureFlags =
-    if (!isDarwin) then
-      [
-        "--enable-kdrive"
-        "--enable-xephyr"
-        "--enable-xcsecurity"
-        "--with-default-font-path="
-        "--with-xkb-bin-directory=${xkbcomp}/bin"
-        "--with-xkb-path=${xkeyboard-config}/share/X11/xkb"
-        "--with-xkb-output=$out/share/X11/xkb/compiled"
-        "--with-log-dir=/var/log"
-        "--enable-glamor"
-        "--with-os-name=Nix"
-      ]
-      ++ lib.optionals stdenv.hostPlatform.isMusl [
-        "--disable-tls"
-      ]
-    else
-      [
-        "CPPFLAGS=-I${../xorg/darwin/dri}"
-        "--disable-libunwind"
-        "--disable-glamor"
-        "--with-default-font-path="
-        "--with-apple-application-name=XQuartz"
-        "--with-apple-applications-dir=\${out}/Applications"
-        "--with-bundle-id-prefix=org.nixos.xquartz"
-        "--with-sha1=CommonCrypto"
-        "--with-xkb-bin-directory=${xkbcomp}/bin"
-        "--with-xkb-path=${xkeyboard-config}/share/X11/xkb"
-        "--with-xkb-output=$out/share/X11/xkb/compiled"
-        "--without-dtrace"
-      ];
+  # avoid linux rebuilds
+  ${if stdenv.hostPlatform.isDarwin then "hardeningDisable" else null} = [ "strictflexarrays1" ];
 
-  env.NIX_CFLAGS_COMPILE = lib.optionalString (!isDarwin) (toString [
-    "-Wno-error=array-bounds"
-  ]);
-
-  preConfigure = lib.optionalString isDarwin ''
-    mkdir -p $out/Applications
-    export NIX_CFLAGS_COMPILE="$NIX_CFLAGS_COMPILE -Wno-error"
+  # default X install symlinks this to Xorg, we want XQuartz
+  postInstall = lib.optionalString stdenv.hostPlatform.isDarwin ''
+    ln -sf $out/bin/Xquartz $out/bin/X
   '';
-
-  postInstall =
-    if (!isDarwin) then
-      ''
-        rm -fr $out/share/X11/xkb/compiled
-        (
-          cd "$dev"
-          for f in include/xorg/*.h; do
-            sed "1i#line 1 \"${finalAttrs.pname}-${finalAttrs.version}/$f\"" -i "$f"
-          done
-        )
-      ''
-    else
-      ''
-        rm -fr $out/share/X11/xkb/compiled
-      '';
-  # TODO(corepkgs): darwin postInstall needs darwinOtherX binary merging
 
   passthru = {
-    inherit (finalAttrs) version;
+    inherit (finalAttrs) version; # needed by virtualbox guest additions
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 
   meta = {
+    description = "X server implementation by X.org";
+    longDescription = ''
+      The X server accepts requests from client applications to create windows, which are (normally
+      rectangular) "virtual screens" that the client program can draw into.
+      Windows are then composed on the actual screen by the X server (or by a separate composite
+      manager) as directed by the window manager, which usually communicates with the user via
+      graphical controls such as buttons and draggable titlebars and borders.
+
+      For a comprehensive overview of X Server and X Window System, consult the following article:
+      https://en.wikipedia.org/wiki/X_server
+    '';
+    homepage = "https://x.org/wiki";
+    license = with lib.licenses; [
+      # because the license list is huge (1848 lines) this is documented by line range
+      # https://gitlab.freedesktop.org/xorg/xserver/-/blob/f05f269f1d5bddafe71cdfb290b118820bf17fdd/COPYING
+
+      # 10-45, 148-170, 364-390, 431-454, 485-511, 512-534, 535-558, 1573-1593, 1692-1711, 1760-1779
+      mit
+
+      # 53-77, 124-147, 317-343, 455-484, 559-583, 629-654, 891-918, 1008-1034, 1056-1079,
+      # 1296-1326, 1438-1470, 1499-1522, 1523-1548
+      x11
+
+      # 78-99, 171-191, 391-430 (doubled text), 584-605, 606-628, 707-729, 730-750, 807-828,
+      # 829-853, 854-879, 880-890, 919-939, 940-962, 963-985, 986-1007, 1035-1055, 1080-1102,
+      # 1103-1125, 1126-1148, 1149-1169, 1170-1192, 1193-1215, 1216-1236, 1237-1259, 1275-1295,
+      # 1327-1359, 1360-1383, 1549-1572, 1594-1617, 1618-1638, 1639-1670, 1671-1691, 1712-1732,
+      # 1733-1756, 1795-1814
+      hpndSellVariant
+
+      mitOpenGroup # 100-123
+      hpnd # 192-214, 215-237, 344-363, 686-706, 1416-1437
+      dec3Clause # 238-267
+      x11NoPermitPersons # 268-292
+      # missing last paragraph likely due to an error
+      # https://gitlab.freedesktop.org/xorg/xserver/-/merge_requests/2097
+      sgi-b-20 # 293-316
+      bsd3 # 655-685, 1471-1498, 1815-1848 (BSD-4-Clause UC with rescinded third clause)
+      adobeDisplayPostScript # 751-782
+      ntp # 783-795
+      hpndUc # 796-806
+      isc # 1260-1274
+      icu # 1383-1415
+      # missing author/copyright notice
+      # https://gitlab.freedesktop.org/xorg/xserver/-/merge_requests/2098
+      hpndSellVariantMitDisclaimerXserver # 1780-1793
+    ];
     mainProgram = "X";
     pkgConfigModules = [ "xorg-server" ];
     identifiers.cpeParts = {
       vendor = "x.org";
       product = "xorg-server";
     };
+    platforms = lib.platforms.unix;
   };
 })

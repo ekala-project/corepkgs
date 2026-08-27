@@ -1,33 +1,59 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
+  libdrm,
   libgbm,
   libGL,
-  libdrm,
-  udev,
   libpciaccess,
-  xorg-server,
+  udev,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-ati";
   version = "22.0.0";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-ati-22.0.0.tar.xz";
-    sha256 = "0vdznwx78alhbb05paw2xd65hcsila2kqflwwnbpq8pnsdbbpj68";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-ati";
+    tag = "xf86-video-ati-${finalAttrs.version}";
+    hash = "sha256-q8+lMYS9tfO64xT7t6PYIqsARX8Dv/8uMTMeP1JCt08=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
+    libdrm
     libgbm
     libGL
-    libdrm
-    udev
     libpciaccess
-    xorg-server
+    udev
   ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "ATI/AMD Radeon video driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-ati";
+    license = with lib.licenses; [
+      mit
+      x11
+      hpndSellVariant
+    ];
+    platforms = lib.platforms.unix;
+    broken = stdenv.hostPlatform.isAarch64;
+  };
 })

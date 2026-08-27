@@ -1,42 +1,61 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
-  libxkbfile,
+  util-macros,
+  wrapWithXFileSearchPathHook,
   fontconfig,
   libxaw,
   libxft,
+  libxkbfile,
   libxmu,
-  xorgproto,
   libxrender,
   libxt,
-  gettext,
-  wrapWithXFileSearchPathHook,
+  xorgproto,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xfd";
-  version = "1.1.4";
-  src = fetchurl {
-    url = "mirror://xorg/individual/app/xfd-1.1.4.tar.xz";
-    sha256 = "1zbnj0z28dx2rm2h7pjwcz7z1jnl28gz0v9xn3hs2igxcvxhyiym";
+  version = "1.1.5";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "app";
+    repo = "xfd";
+    tag = "xfd-${finalAttrs.version}";
+    hash = "sha256-mdDnS6315po8/DafpGJDzGJTPV0HsRbSLlqSaN11d6o=";
   };
+
+  strictDeps = true;
+
   nativeBuildInputs = [
+    autoreconfHook
     pkg-config
-    gettext
+    util-macros
     wrapWithXFileSearchPathHook
   ];
+
   buildInputs = [
-    libxkbfile
     fontconfig
     libxaw
     libxft
+    libxkbfile
     libxmu
-    xorgproto
     libxrender
     libxt
+    xorgproto
   ];
-  meta.mainProgram = "xfd";
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  installFlags = [ "appdefaultdir=$out/share/X11/app-defaults" ];
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "X font display utility, using either the X11 core protocol or libxft.";
+    homepage = "https://gitlab.freedesktop.org/xorg/app/xfd";
+    license = lib.licenses.mitOpenGroup;
+    mainProgram = "xfd";
+    platforms = lib.platforms.unix;
+  };
 })
