@@ -2,9 +2,7 @@
 # This mainly serves as a way to define attrs at the top-level of pkgs which
 # require more than just passing default arguments to nix expressions
 
-final: prev:
-with final;
-{
+final: prev: with final; {
 
   tests = { };
 
@@ -104,7 +102,7 @@ with final;
   # graphviz: provided by pkgs-many/graphviz (default: withoutXorg)
   grpc = null;
   gtkmm3 = null;
-  gts = null;
+  gts = callPackage ./pkgs/gts { };
   gunicorn = null;
   harfbuzz = callPackage ./pkgs/harfbuzz { };
   highlight = null;
@@ -115,20 +113,15 @@ with final;
   jre = null;
   knot-dns = null;
   knot-resolver_5 = null;
-  libXpm = null;
-  libavif = null;
-  libcaca = null;
   libgeotiff = null;
   libgit2-glib = null;
   libguestfs = null;
   libjxl = null;
   libnatspec = null;
-  libnghttp2 = null;
+  libnghttp2 = nghttp2;
   libotr = null;
   libsoup_3 = null;
-  libspiro = null;
   libsysprof-capture = null;
-  libverto = null;
   libvirt = null;
   lilypond = null;
   lingua = null;
@@ -144,7 +137,6 @@ with final;
   multipath-tools = null;
   mysql80 = null;
   neovim = null;
-  netpbm = null;
   nmap = null;
   nodejs_latest = nodejs.v23;
   ntp = null;
@@ -155,7 +147,7 @@ with final;
   openconnect = null;
   opencv = null;
   openimageio = null;
-  opensbi = null; # RISC-V
+  # opensbi: auto-imported from pkgs/opensbi/ (RISC-V only)
   ostinato = null;
   pango = callPackage ./pkgs/pango { };
   # PHP - already declared above with Java
@@ -673,6 +665,9 @@ with final;
 
   # TODO: Remove alias
   libjpeg = libjpeg_turbo;
+
+  # Alias for packages that reference libXpm (CamelCase)
+  libXpm = libxpm;
 
   # Less secure variant of lowdown for use inside Nix builds.
   lowdown-unsandboxed = lowdown.override {
@@ -1378,8 +1373,12 @@ with final;
   libpng12 = prev.libpng.v1_2;
 
   genericUpdater = callPackage ./pkgs/common-updater-scripts/generic-updater.nix { };
-  _experimental-update-script-combinators = callPackage ./pkgs/common-updater-scripts/combinators.nix { };
-  directoryListingUpdater = callPackage ./pkgs/common-updater-scripts/directory-listing-updater.nix { };
+  _experimental-update-script-combinators =
+    callPackage ./pkgs/common-updater-scripts/combinators.nix
+      { };
+  directoryListingUpdater =
+    callPackage ./pkgs/common-updater-scripts/directory-listing-updater.nix
+      { };
   gitUpdater = callPackage ./pkgs/common-updater-scripts/git-updater.nix { };
   httpTwoLevelsUpdater = callPackage ./pkgs/common-updater-scripts/http-two-levels-updater.nix { };
   unstableGitUpdater = callPackage ./pkgs/common-updater-scripts/unstable-updater.nix { };
@@ -1879,7 +1878,8 @@ with final;
   clang = llvmPackages.clang;
   clang-tools = llvmPackages.clang-tools;
   clangStdenv = if stdenv.cc.isClang then stdenv else lib.lowPrio llvmPackages.stdenv;
-  libcxxStdenv = if stdenv.hostPlatform.isDarwin then stdenv else lib.lowPrio llvmPackages.libcxxStdenv;
+  libcxxStdenv =
+    if stdenv.hostPlatform.isDarwin then stdenv else lib.lowPrio llvmPackages.libcxxStdenv;
 
   # LLVM is auto-imported from pkgs-many/llvm via mkManyVariants
   # llvm defaults to v21 (LLVM 21.1.2) as the LLVM library
