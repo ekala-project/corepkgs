@@ -5,7 +5,7 @@
   util-macros,
   autoreconfHook,
   pkg-config,
-  m4,
+  gnum4,
   python3,
   xcb-proto,
   libxcb,
@@ -33,7 +33,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     autoreconfHook
-    m4
+    gnum4
     pkg-config
     python3
     util-macros

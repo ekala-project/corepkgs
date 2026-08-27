@@ -6,7 +6,7 @@
   python3,
   bison,
   flex,
-  fuse3,
+  fuse,
   libarchive,
   buildPackages,
 
@@ -39,7 +39,7 @@ stdenv.mkDerivation {
   ];
 
   buildInputs = [
-    fuse3
+    fuse
     libarchive
   ];
 

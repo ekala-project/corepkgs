@@ -21,13 +21,13 @@ in
   condaInstallHook = callPackage (
     {
       makePythonHook,
-      gnutar,
+      tar,
       lbzip2,
     }:
     makePythonHook {
       name = "conda-install-hook";
       propagatedBuildInputs = [
-        gnutar
+        tar
         lbzip2
       ];
       substitutions = {
@@ -330,7 +330,7 @@ in
       passthru.tests = import ./python-catch-conflicts-hook-tests.nix {
         inherit pythonOnBuildForHost runCommand;
         inherit lib;
-        inherit (pkgs) coreutils gnugrep writeShellScript;
+        inherit (pkgs) coreutils grep writeShellScript;
       };
     } ./python-catch-conflicts-hook.sh
   ) { };

@@ -7,7 +7,7 @@
   pkg-config,
   libxcb,
   xorgproto,
-  m4,
+  gnum4,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -32,7 +32,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     autoreconfHook
-    m4
+    gnum4
     pkg-config
     util-macros
   ];

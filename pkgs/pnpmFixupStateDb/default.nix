@@ -1,12 +1,12 @@
 {
   lib,
-  nodejs ? nodejs_23,
-  nodejs_23,
+  nodejs' ? nodejs.v23,
+  nodejs,
   pnpm,
   tests,
 }:
 
-nodejs.buildNpmPackage {
+nodejs'.buildNpmPackage {
   pname = "pnpm-fixup-state-db";
   version = "1.0.0";
 
@@ -15,7 +15,7 @@ nodejs.buildNpmPackage {
   npmDepsHash = "sha256-um6a4pEtPtdxHBRq9g5ZW20wIQAMjWJ3qF96XuxJg8o=";
 
   postInstall = ''
-    makeWrapper ${lib.getExe nodejs} $out/bin/pnpm-fixup-state-db \
+    makeWrapper ${lib.getExe nodejs'} $out/bin/pnpm-fixup-state-db \
       --add-flags "$out/lib/node_modules/pnpm-fixup-state-db"
   '';
 

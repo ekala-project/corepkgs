@@ -17,7 +17,7 @@
   darwin,
   lit,
   makeWrapper,
-  lua5_3,
+  lua,
   ninja,
   runCommand,
   src ? null,
@@ -82,7 +82,7 @@ stdenv.mkDerivation (
       swig
       lit
       makeWrapper
-      lua5_3
+      lua.v5_3
     ]
     ++ lib.optionals enableManpages [
       python3.pkgs.sphinx
@@ -145,7 +145,7 @@ stdenv.mkDerivation (
           echo "ERROR: python files not installed where expected!";
           return 1;
       fi
-      if [ ! -e "''${!outputLib}/lib/lua/${lua5_3.luaversion}/lldb.so" ] ; then
+      if [ ! -e "''${!outputLib}/lib/lua/${lua.v5_3.luaversion}/lldb.so" ] ; then
           echo "ERROR: lua files not installed where expected!";
           return 1;
       fi

@@ -12,7 +12,7 @@
   gawk,
   getopt,
   ghostscript_headless,
-  gnugrep,
+  grep,
   gnumake,
   gnupg,
   gnused,
@@ -142,7 +142,7 @@ lib.recursiveUpdate orig rec {
 
   #### other runtime PATH dependencies
   a2ping.extraBuildInputs = [ ghostscript_headless ];
-  bibexport.extraBuildInputs = [ gnugrep ];
+  bibexport.extraBuildInputs = [ grep ];
   checklistings.extraBuildInputs = [ coreutils ];
   cjk-gs-integrate.extraBuildInputs = [ ghostscript_headless ];
   cyrillic-bin.extraBuildInputs = [
@@ -166,7 +166,7 @@ lib.recursiveUpdate orig rec {
   ];
   latexfileversion.extraBuildInputs = [
     coreutils
-    gnugrep
+    grep
     gnused
   ];
   listings-ext.extraBuildInputs = [
@@ -214,11 +214,11 @@ lib.recursiveUpdate orig rec {
   tpic2pdftex.extraBuildInputs = [ gawk ];
   wordcount.extraBuildInputs = [
     coreutils
-    gnugrep
+    grep
   ];
   xdvi.extraBuildInputs = [
     coreutils
-    gnugrep
+    grep
   ];
   xindy.extraBuildInputs = [ gzip ];
 

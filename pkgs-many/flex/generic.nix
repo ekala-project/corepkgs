@@ -13,7 +13,7 @@
   buildPackages,
   fetchurl,
   bison,
-  m4,
+  gnum4,
   autoreconfHook,
   help2man,
   flex ? null,
@@ -76,7 +76,7 @@ stdenv'.mkDerivation rec {
 
   buildInputs = lib.optionals (packageAtLeast "2.6") [ bison ];
 
-  propagatedBuildInputs = [ m4 ];
+  propagatedBuildInputs = [ gnum4 ];
 
   preConfigure = lib.optionalString (stdenv.hostPlatform != stdenv.buildPlatform) ''
     export ac_cv_func_malloc_0_nonnull=yes

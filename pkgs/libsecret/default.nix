@@ -11,7 +11,7 @@
   python3,
   python3Packages,
   docbook-xsl-nons,
-  docbook_xml_dtd_42,
+  docbook-xml-dtd,
   libgcrypt,
   gobject-introspection,
   buildPackages,
@@ -96,7 +96,7 @@ stdenv.mkDerivation rec {
     gettext
     libxslt # for xsltproc for building man pages
     docbook-xsl-nons
-    docbook_xml_dtd_42
+    docbook-xml-dtd.v4_2
     libintl
     vala
     glib

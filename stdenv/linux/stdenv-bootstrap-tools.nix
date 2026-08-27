@@ -13,7 +13,7 @@
   findutils,
   gawk,
   gmp,
-  gnugrep,
+  grep,
   gnumake,
   gnused,
   gzip,
@@ -115,7 +115,7 @@ stdenv.mkDerivation (finalAttrs: {
     cp ${findutils.out}/bin/xargs $out/bin
     cp -d ${diffutils.out}/bin/* $out/bin
     cp -d ${gnused.out}/bin/* $out/bin
-    cp -d ${gnugrep.out}/bin/grep $out/bin
+    cp -d ${grep.out}/bin/grep $out/bin
     cp ${gawk.out}/bin/gawk $out/bin
     cp -d ${gawk.out}/bin/awk $out/bin
     cp ${tarMinimal.out}/bin/tar $out/bin
@@ -125,7 +125,7 @@ stdenv.mkDerivation (finalAttrs: {
     cp -d ${patch}/bin/* $out/bin
     cp ${patchelf}/bin/* $out/bin
 
-    cp -d ${gnugrep.pcre2.out}/lib/libpcre2*.so* $out/lib # needed by grep
+    cp -d ${grep.pcre2.out}/lib/libpcre2*.so* $out/lib # needed by grep
 
     # Copy what we need of GCC.
     cp -d ${bootGCC.out}/bin/gcc $out/bin

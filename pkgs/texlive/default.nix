@@ -22,14 +22,14 @@
   ruby,
   perl,
   tk,
-  jdk,
+  java,
   bash,
   snobol4 ? null,
   coreutils,
   findutils,
   gawk,
   getopt,
-  gnugrep,
+  grep,
   gnumake,
   gnupg,
   gnused,
@@ -84,7 +84,7 @@ let
           gawk
           getopt
           ghostscript_headless
-          gnugrep
+          grep
           gnumake
           gnupg
           gnused
@@ -170,7 +170,7 @@ let
       runCommand
       writeShellScript
       bash
-      jdk
+      java
       perl
       python3
       ruby
@@ -216,7 +216,7 @@ let
       perl
       coreutils
       gawk
-      gnugrep
+      grep
       gnused
       ;
   };

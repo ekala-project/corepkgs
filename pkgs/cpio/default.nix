@@ -45,7 +45,7 @@ stdenv.mkDerivation rec {
     description = "Program to create or extract from cpio archives";
     license = lib.licenses.gpl3;
     platforms = lib.platforms.all;
-    priority = 6; # resolves collision with gnutar's "libexec/rmt"
+    priority = 6; # resolves collision with tar's "libexec/rmt"
     mainProgram = "cpio";
   };
 }

@@ -5,7 +5,7 @@
   autoreconfHook,
   bison,
   flex,
-  docbook_xml_dtd_45,
+  docbook-xml-dtd,
   docbook-xsl-nons,
   itstool,
   libxml2,
@@ -51,7 +51,7 @@ stdenv.mkDerivation rec {
     autoreconfHook
     bison
     flex
-    docbook_xml_dtd_45
+    docbook-xml-dtd.v4_5
     docbook-xsl-nons
     itstool
     libxml2

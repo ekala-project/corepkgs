@@ -2,7 +2,7 @@
   lib,
   stdenv,
   maven,
-  jdk,
+  java,
   makeWrapper,
 }:
 
@@ -24,12 +24,12 @@ stdenv.mkDerivation (
 
     nativeBuildInputs = [
       maven
-      jdk
+      java
       makeWrapper
     ]
     ++ nativeBuildInputs;
 
-    buildInputs = [ jdk ] ++ buildInputs;
+    buildInputs = [ java ] ++ buildInputs;
 
     configurePhase =
       args.configurePhase or ''
@@ -67,7 +67,7 @@ stdenv.mkDerivation (
         ${lib.optionalString (args.mainClass or null != null) ''
             cat > $out/bin/${pname} <<EOF
           #!/bin/sh
-          exec ${jdk}/bin/java -cp $out/share/java/*.jar ${args.mainClass} "\$@"
+          exec ${java}/bin/java -cp $out/share/java/*.jar ${args.mainClass} "\$@"
           EOF
             chmod +x $out/bin/${pname}
         ''}
@@ -76,7 +76,7 @@ stdenv.mkDerivation (
       '';
 
     meta = args.meta or { } // {
-      platforms = jdk.meta.platforms;
+      platforms = java.meta.platforms;
     };
   }
 )

@@ -57,7 +57,7 @@
   curlpp,
   haskellPackages,
   ocamlPackages,
-  phpExtensions,
+  php,
   pkgsStatic,
   python3,
   tests,
@@ -292,7 +292,7 @@ stdenv.mkDerivation (finalAttrs: {
         haskell-curl = useThisCurl haskellPackages.curl;
         ocaml-curly = useThisCurl ocamlPackages.curly;
         pycurl = useThisCurl python3.pkgs.pycurl;
-        php-curl = useThisCurl phpExtensions.curl;
+        php-curl = useThisCurl php.buildPecl.curl;
         pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
         pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
         static = pkgsStatic.curl;

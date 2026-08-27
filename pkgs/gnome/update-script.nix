@@ -4,7 +4,7 @@
   common-updater-scripts,
   coreutils,
   curl,
-  gnugrep,
+  grep,
   gnused,
   jq,
   nix,
@@ -18,7 +18,7 @@
 }:
 
 let
-  grep = lib.getExe gnugrep;
+  grep = lib.getExe grep;
   sed = lib.getExe gnused;
 
   updateScript = writeShellScript "gnome-update-script" ''

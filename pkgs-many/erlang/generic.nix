@@ -34,7 +34,7 @@
   makeWrapper,
   ncurses,
   nix-update-script,
-  openjdk11,
+  java,
   openssl,
   perl,
   runtimeShell,
@@ -110,7 +110,7 @@ stdenv.mkDerivation {
   ]
   ++ optionals wxSupport wxPackages2
   ++ optionals odbcSupport [ unixODBC ]
-  ++ optionals javacSupport [ openjdk11 ]
+  ++ optionals javacSupport [ java.v11 ]
   ++ optionals enableSystemd [ systemd ];
 
   # disksup requires a shell

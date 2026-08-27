@@ -9,7 +9,7 @@
   stdenv,
   fetchurl,
   makeWrapper,
-  jdk,
+  java,
   rlwrap,
 }:
 
@@ -28,7 +28,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
-    jdk
+    java
     rlwrap
   ];
 
@@ -39,7 +39,7 @@ stdenv.mkDerivation (finalAttrs: {
     let
       binPath = lib.makeBinPath [
         rlwrap
-        jdk
+        java
       ];
     in
     ''
@@ -68,7 +68,7 @@ stdenv.mkDerivation (finalAttrs: {
     '';
 
   passthru = {
-    inherit jdk;
+    inherit java;
     majorVersion = lib.versions.major version;
     minorVersion = lib.versions.majorMinor version;
   };

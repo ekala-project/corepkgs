@@ -9,7 +9,7 @@
   stdenv,
   fetchurl,
   makeWrapper,
-  jdk,
+  java,
   unzip,
 }:
 
@@ -28,7 +28,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
-    jdk
+    java
   ];
 
   dontBuild = true;
@@ -48,8 +48,8 @@ stdenv.mkDerivation (finalAttrs: {
     for prog in $out/bin/*; do
       if [ -f "$prog" ] && [ -x "$prog" ] && [[ ! "$prog" =~ \.bat$ ]]; then
         wrapProgram "$prog" \
-          --set JAVA_HOME "${jdk}" \
-          --prefix PATH : "${jdk}/bin"
+          --set JAVA_HOME "${java}" \
+          --prefix PATH : "${java}/bin"
       fi
     done
 
@@ -57,7 +57,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   passthru = {
-    inherit jdk;
+    inherit java;
     majorVersion = lib.versions.major version;
     minorVersion = lib.versions.majorMinor version;
   };

@@ -4,7 +4,7 @@
   fetchFromGitHub,
   autoreconfHook,
   pkg-config,
-  fuse3,
+  fuse,
   testers,
 }:
 
@@ -24,7 +24,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
   ];
 
-  buildInputs = [ fuse3 ];
+  buildInputs = [ fuse ];
 
   enableParallelBuilding = true;
   strictDeps = true;

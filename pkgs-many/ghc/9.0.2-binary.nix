@@ -3,8 +3,7 @@
   stdenv,
   fetchurl,
   perl,
-  ncurses5,
-  ncurses6,
+  ncurses,
   gmp,
   libiconv,
   numactl,
@@ -66,7 +65,7 @@ let
           # which link it against `libtinfo.so.5` (ncurses 5).
           # Other bindists are linked `libtinfo.so.6` (ncurses 6).
           {
-            nixPackage = ncurses5;
+            nixPackage = ncurses.v5;
             fileToCheckFor = "libtinfo.so.5";
           }
         ];
@@ -84,7 +83,7 @@ let
             fileToCheckFor = null;
           }
           {
-            nixPackage = ncurses6;
+            nixPackage = ncurses.v6;
             fileToCheckFor = "libtinfo.so.6";
           }
           {
@@ -106,7 +105,7 @@ let
             fileToCheckFor = null;
           }
           {
-            nixPackage = ncurses6;
+            nixPackage = ncurses.v6;
             fileToCheckFor = "libtinfo.so.6";
           }
           {
@@ -128,7 +127,7 @@ let
             fileToCheckFor = null;
           }
           {
-            nixPackage = ncurses6;
+            nixPackage = ncurses.v6;
             fileToCheckFor = null;
           }
           {
@@ -151,7 +150,7 @@ let
             fileToCheckFor = null;
           }
           {
-            nixPackage = ncurses6;
+            nixPackage = ncurses.v6;
             fileToCheckFor = null;
           }
           {
@@ -177,7 +176,7 @@ let
             fileToCheckFor = null;
           }
           {
-            nixPackage = ncurses6;
+            nixPackage = ncurses.v6;
             fileToCheckFor = "libncursesw.so.6";
           }
         ];
@@ -417,7 +416,7 @@ stdenv.mkDerivation {
         # are 2 directories deep from $out/lib, so pooling symlinks there makes
         # a short rpath.
         ''
-          (cd $out/lib; ln -s ${ncurses6.out}/lib/libtinfo.so.6)
+          (cd $out/lib; ln -s ${ncurses.v6.out}/lib/libtinfo.so.6)
           (cd $out/lib; ln -s ${lib.getLib gmpUsed}/lib/libgmp.so.10)
           (cd $out/lib; ln -s ${numactl.out}/lib/libnuma.so.1)
           for p in $(find "$out/lib" -type f -name "*\.so*"); do

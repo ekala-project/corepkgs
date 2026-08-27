@@ -5,8 +5,7 @@
   fetchpatch,
   autoconf,
   automake,
-  docbook_xml_dtd_42,
-  docbook_xml_dtd_43,
+  docbook-xml-dtd,
   docbook-xsl-nons,
   gtk-doc,
   libtool,
@@ -59,10 +58,10 @@ stdenv.mkDerivation rec {
     libxslt
     pkg-config
 
-    docbook_xml_dtd_42 # for the man pages
+    docbook-xml-dtd.v4_2 # for the man pages
   ]
   ++ lib.optionals withDevdoc [
-    docbook_xml_dtd_43
+    docbook-xml-dtd.v4_3
     gtk-doc
   ];
   buildInputs = [

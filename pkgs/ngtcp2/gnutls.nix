@@ -8,7 +8,7 @@
   cunit,
   ncurses,
   knot-dns,
-  curlWithGnuTls,
+  curl,
   runUnitTests,
 }:
 
@@ -41,7 +41,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru.tests = (knot-dns.passthru.tests or { }) // {
     unittests = runUnitTests finalAttrs.finalPackage;
-    inherit curlWithGnuTls;
+    curlWithGnuTls = curl.gnutls;
   };
 
   meta = {

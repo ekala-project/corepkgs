@@ -6,7 +6,7 @@
   fetchpatch,
   meson,
   ninja,
-  m4,
+  gnum4,
   gperf,
   getent,
   acl,
@@ -25,8 +25,7 @@
   docbook5,
   docbook-xsl-nons,
   docbook-xsl-ns,
-  docbook_xml_dtd_42,
-  docbook_xml_dtd_45,
+  docbook-xml-dtd,
   udevCheckHook,
 
   # Defaulting to false because usually the rationale for using elogind is to
@@ -50,7 +49,7 @@ stdenv.mkDerivation rec {
     meson
     meson.configurePhaseHook
     ninja
-    m4
+    gnum4
     pkg-config
     gperf
     getent
@@ -60,8 +59,8 @@ stdenv.mkDerivation rec {
     docbook5
     docbook-xsl-nons
     docbook-xsl-ns
-    docbook_xml_dtd_42
-    docbook_xml_dtd_45 # needed for docbook without Internet
+    docbook-xml-dtd.v4_2
+    docbook-xml-dtd.v4_5 # needed for docbook without Internet
 
     python3Packages.python
     python3Packages.jinja2

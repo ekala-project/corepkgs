@@ -10,7 +10,7 @@
   lib,
   stdenv,
   fetchurl,
-  m4,
+  gnum4,
   perl,
   runtimeShell,
   updateAutotoolsGnuConfigScriptsHook,
@@ -62,15 +62,15 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs =
     lib.optionals (packageAtLeast "2") [
       updateAutotoolsGnuConfigScriptsHook
-      m4
+      gnum4
       file
     ]
-    ++ lib.optionals (packageOlder "2") [ m4 ];
+    ++ lib.optionals (packageOlder "2") [ gnum4 ];
 
   buildInputs = lib.optionals (packageOlder "2") [ perl ];
 
   propagatedBuildInputs = lib.optionals (packageAtLeast "2") [
-    m4
+    gnum4
     file
   ];
 

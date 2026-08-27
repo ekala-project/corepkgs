@@ -4,7 +4,7 @@
   buildPackages,
   fetchurl,
   gfortran,
-  m4,
+  gnum4,
   perl,
   which,
   python3,
@@ -46,7 +46,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     gfortran
-    m4
+    gnum4
     perl
     which
     python3

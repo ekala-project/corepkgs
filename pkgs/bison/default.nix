@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchurl,
-  m4,
+  gnum4,
   perl,
   help2man,
   bison,
@@ -42,11 +42,11 @@ stdenv.mkDerivation rec {
   strictDeps = stdenv.hostPlatform != stdenv.buildPlatform;
 
   nativeBuildInputs = [
-    m4
+    gnum4
     perl
   ]
   ++ lib.optional stdenv.hostPlatform.isSunOS help2man;
-  propagatedBuildInputs = [ m4 ];
+  propagatedBuildInputs = [ gnum4 ];
 
   enableParallelBuilding = true;
   # tests are flaky / timing sensitive on FreeBSD

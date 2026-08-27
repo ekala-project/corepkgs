@@ -6,7 +6,7 @@
   makeWrapper,
   pkg-config,
   curl,
-  gnutar,
+  tar,
   gzip,
 }:
 
@@ -36,7 +36,7 @@ rustPlatform.buildRustPackage {
   postInstall = ''
     wrapProgram "$out/bin/prefetch-npm-deps" --prefix PATH : ${
       lib.makeBinPath [
-        gnutar
+        tar
         gzip
       ]
     }

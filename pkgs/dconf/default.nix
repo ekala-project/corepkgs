@@ -15,7 +15,7 @@
   gnome,
   gtk-doc,
   docbook-xsl-nons,
-  docbook_xml_dtd_42,
+  docbook-xml-dtd,
   buildPackages,
   gobject-introspection,
   withIntrospection ?
@@ -49,7 +49,7 @@ stdenv.mkDerivation (finalAttrs: {
     libxslt
     glib
     docbook-xsl-nons
-    docbook_xml_dtd_42
+    docbook-xml-dtd.v4_2
     gtk-doc
   ]
   ++ lib.optionals (withDocs && !stdenv.buildPlatform.canExecute stdenv.hostPlatform) [

@@ -1,5 +1,5 @@
 {
-  r,
+  r-lang,
   stdenv,
   lib,
 }:
@@ -19,9 +19,9 @@ stdenv.mkDerivation (
     pname = "r-${pname}";
     inherit version src;
 
-    nativeBuildInputs = [ r ] ++ nativeBuildInputs;
+    nativeBuildInputs = [ r-lang ] ++ nativeBuildInputs;
 
-    buildInputs = [ r ] ++ buildInputs;
+    buildInputs = [ r-lang ] ++ buildInputs;
 
     configurePhase = ''
       runHook preConfigure
@@ -43,7 +43,7 @@ stdenv.mkDerivation (
     '';
 
     meta = args.meta or { } // {
-      platforms = r.meta.platforms;
+      platforms = r-lang.meta.platforms;
     };
   }
 )

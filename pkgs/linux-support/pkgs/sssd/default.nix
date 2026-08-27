@@ -51,7 +51,7 @@
   jansson,
   jose,
   docbook_xsl,
-  docbook_xml_dtd_45,
+  docbook-xml-dtd,
   testers,
   versionCheckHook,
   nix-update-script,
@@ -59,7 +59,7 @@
 }:
 
 let
-  docbookFiles = "${docbook_xsl}/share/xml/docbook-xsl/catalog.xml:${docbook_xml_dtd_45}/xml/dtd/docbook/catalog.xml";
+  docbookFiles = "${docbook_xsl}/share/xml/docbook-xsl/catalog.xml:${docbook-xml-dtd.v4_5}/xml/dtd/docbook/catalog.xml";
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "sssd";

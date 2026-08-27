@@ -15,7 +15,7 @@
   fetchFromGitHub,
   fetchpatch,
   asciidoc,
-  docbook_xml_dtd_45,
+  docbook-xml-dtd,
   docbook-xsl-nons,
   installShellFiles,
   libxslt,
@@ -50,7 +50,7 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals buildDocs [
     asciidoc
-    docbook_xml_dtd_45
+    docbook-xml-dtd.v4_5
     docbook-xsl-nons
     libxslt.bin
   ];

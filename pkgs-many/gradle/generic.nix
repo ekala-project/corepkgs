@@ -25,8 +25,7 @@
   unzip,
   coreutils,
   findutils,
-  ncurses5,
-  ncurses6,
+  ncurses,
   gnused,
   udev,
   testers,
@@ -75,8 +74,8 @@ let
 
     buildInputs = [
       stdenv.cc.cc
-      ncurses5
-      ncurses6
+      ncurses.v5
+      ncurses.v6
     ];
 
     # We only need to patchelf some libs embedded in JARs.
@@ -114,7 +113,7 @@ let
         # The wrapper also needs coreutils, xargs, and sed.
         mkdir -vp $out/bin
         makeWrapper $gradleLibexec/bin/gradlew $out/bin/gradle \
-          --set-default JAVA_HOME ${jdk} \
+          --set-default JAVA_HOME ${java} \
           --suffix PATH : ${
             lib.makeBinPath [
               coreutils
@@ -134,7 +133,7 @@ let
       in
       ''
         # get the correct jar executable for cross
-        export PATH="${buildPackages.jdk}/bin:$PATH"
+        export PATH="${buildPackages.java}/bin:$PATH"
         . ${./patching.sh}
 
         nativeVersion="$(extractVersion native-platform $gradleLibexec/lib/native-platform-*.jar)"
@@ -144,8 +143,8 @@ let
             "${lib.getLib stdenv.cc.cc}/lib64:${
               lib.makeLibraryPath [
                 stdenv.cc.cc
-                ncurses5
-                ncurses6
+                ncurses.v5
+                ncurses.v6
               ]
             }"
         done
@@ -169,8 +168,8 @@ let
         mkdir $out/nix-support
         echo ${stdenv.cc.cc} > $out/nix-support/manual-runtime-dependencies
         # Gradle will refuse to start without _both_ 5 and 6 versions of ncurses.
-        echo ${ncurses5} >> $out/nix-support/manual-runtime-dependencies
-        echo ${ncurses6} >> $out/nix-support/manual-runtime-dependencies
+        echo ${ncurses.v5} >> $out/nix-support/manual-runtime-dependencies
+        echo ${ncurses.v6} >> $out/nix-support/manual-runtime-dependencies
         ${lib.optionalString stdenv.hostPlatform.isLinux "echo ${udev} >> $out/nix-support/manual-runtime-dependencies"}
       '';
 

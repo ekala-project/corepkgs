@@ -6,7 +6,7 @@ nvidia_x11: sha256:
   fetchFromGitHub,
   fetchpatch,
   pkg-config,
-  m4,
+  gnum4,
   jansson,
   gtk2,
   dbus,
@@ -136,7 +136,7 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [
     pkg-config
-    m4
+    gnum4
     addDriverRunpath
   ]
   ++ lib.optionals withGtk3 [ wrapGAppsHook3 ];

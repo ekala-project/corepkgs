@@ -1,8 +1,7 @@
 {
   lib,
   stdenv,
-  docbook_xml_dtd_44,
-  docbook_xml_dtd_45,
+  docbook-xml-dtd,
   docbook_xsl,
   asciidoctor,
   fetchurl,
@@ -90,11 +89,11 @@ stdenv.mkDerivation rec {
                 'system("${kmod}/bin/modprobe drbd")'
     substituteInPlace documentation/ra2refentry.xsl \
       --replace "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" \
-                "${docbook_xml_dtd_44}/xml/dtd/docbook/docbookx.dtd"
+                "${docbook-xml-dtd.v4_4}/xml/dtd/docbook/docbookx.dtd"
     function patch_docbook45() {
       substituteInPlace $1 \
         --replace "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" \
-                  "${docbook_xml_dtd_45}/xml/dtd/docbook/docbookx.dtd"
+                  "${docbook-xml-dtd.v4_5}/xml/dtd/docbook/docbookx.dtd"
     }
     patch_docbook45 documentation/v9/drbd.conf.xml.in
     patch_docbook45 documentation/v9/drbdsetup.xml.in

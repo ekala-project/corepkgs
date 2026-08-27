@@ -2,7 +2,7 @@
   lib,
   stdenv,
   gradle,
-  jdk,
+  java,
   makeWrapper,
 }:
 
@@ -24,12 +24,12 @@ stdenv.mkDerivation (
 
     nativeBuildInputs = [
       gradle
-      jdk
+      java
       makeWrapper
     ]
     ++ nativeBuildInputs;
 
-    buildInputs = [ jdk ] ++ buildInputs;
+    buildInputs = [ java ] ++ buildInputs;
 
     configurePhase =
       args.configurePhase or ''
@@ -37,7 +37,7 @@ stdenv.mkDerivation (
 
         # Set up Gradle cache
         export GRADLE_USER_HOME=$TMPDIR/.gradle
-        export JAVA_HOME=${jdk}
+        export JAVA_HOME=${java}
 
         runHook postConfigure
       '';
@@ -68,7 +68,7 @@ stdenv.mkDerivation (
         ${lib.optionalString (args.mainClass or null != null) ''
             cat > $out/bin/${pname} <<EOF
           #!/bin/sh
-          exec ${jdk}/bin/java -cp $out/share/java/*.jar ${args.mainClass} "\$@"
+          exec ${java}/bin/java -cp $out/share/java/*.jar ${args.mainClass} "\$@"
           EOF
             chmod +x $out/bin/${pname}
         ''}
@@ -77,7 +77,7 @@ stdenv.mkDerivation (
       '';
 
     meta = args.meta or { } // {
-      platforms = jdk.meta.platforms;
+      platforms = java.meta.platforms;
     };
   }
 )

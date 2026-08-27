@@ -11,7 +11,7 @@
   libiconv,
   iconv,
   opensp,
-  docbook_xml_dtd_43,
+  docbook-xml-dtd,
   bash,
   makeWrapper,
 }:
@@ -82,7 +82,7 @@ stdenv.mkDerivation rec {
           ]
         } \
         --prefix XML_CATALOG_FILES "\ " \
-        "$out/share/docbook2X/dtd/catalog.xml\ $out/share/docbook2X/xslt/catalog.xml\ ${docbook_xml_dtd_43}/xml/dtd/docbook/catalog.xml"
+        "$out/share/docbook2X/dtd/catalog.xml\ $out/share/docbook2X/xslt/catalog.xml\ ${docbook-xml-dtd.v4_3}/xml/dtd/docbook/catalog.xml"
     done
 
     wrapProgram $out/bin/sgml2xml-isoent --prefix PATH : \

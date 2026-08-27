@@ -13,7 +13,7 @@
   fetchurl,
   autoreconfHook,
   docbook-xsl-nons,
-  docbook_xml_dtd_43,
+  docbook-xml-dtd,
   gtk-doc,
   lzip,
   libidn2,
@@ -48,7 +48,7 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals buildDocs [
     docbook-xsl-nons
-    docbook_xml_dtd_43
+    docbook-xml-dtd.v4_3
     gtk-doc
     libxslt
   ];

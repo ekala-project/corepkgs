@@ -19,11 +19,11 @@
   which,
   python3,
   makeWrapper,
-  docbook_xml_dtd_45,
+  docbook-xml-dtd,
   perl,
   nftables,
   libbsd,
-  gnutar,
+  tar,
   buildPackages,
 }:
 
@@ -51,7 +51,7 @@ stdenv.mkDerivation (finalAttrs: {
     docbook-xsl
     which
     makeWrapper
-    docbook_xml_dtd_45
+    docbook-xml-dtd.v4_5
     python3
     python3.pkgs.wrapPython
     perl
@@ -133,7 +133,7 @@ stdenv.mkDerivation (finalAttrs: {
       --set-default CR_IP_TOOL ${iproute2}/bin/ip \
       --prefix PATH : ${
         lib.makeBinPath [
-          gnutar
+          tar
           gzip
         ]
       }

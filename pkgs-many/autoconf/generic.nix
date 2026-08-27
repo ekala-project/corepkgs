@@ -12,7 +12,7 @@
   lib,
   stdenv,
   fetchurl,
-  m4,
+  gnum4,
   perl,
   texinfo,
   callPackage,
@@ -46,7 +46,7 @@ stdenv.mkDerivation (finalAttrs: {
   strictDeps = packageAtLeast "2.71";
 
   nativeBuildInputs = [
-    m4
+    gnum4
     perl
   ]
   ++ lib.optionals (packageAtLeast "2.71") [ texinfo ];

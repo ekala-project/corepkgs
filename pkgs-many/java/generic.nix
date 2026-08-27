@@ -143,10 +143,10 @@ stdenv.mkDerivation (finalAttrs: {
     javaVersion = majorVersion;
     ekapkgs-update.skip = true;
     buildMavenPackage = callPackage ./build-maven-package.nix {
-      jdk = finalAttrs.finalPackage;
+      java = finalAttrs.finalPackage;
     };
     buildGradlePackage = callPackage ./build-gradle-package.nix {
-      jdk = finalAttrs.finalPackage;
+      java = finalAttrs.finalPackage;
     };
   };
 

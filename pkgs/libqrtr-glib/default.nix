@@ -9,7 +9,7 @@
   gobject-introspection,
   gtk-doc,
   docbook-xsl-nons,
-  docbook_xml_dtd_43,
+  docbook-xml-dtd,
   glib,
 }:
 
@@ -45,7 +45,7 @@ stdenv.mkDerivation (finalAttrs: {
     gobject-introspection
     gtk-doc
     docbook-xsl-nons
-    docbook_xml_dtd_43
+    docbook-xml-dtd.v4_3
   ]
   ++ lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
     mesonEmulatorHook

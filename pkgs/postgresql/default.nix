@@ -24,7 +24,7 @@
   # build dependencies
   bison,
   docbook-xsl-nons,
-  docbook_xml_dtd_45,
+  docbook-xml-dtd,
   flex,
   libxslt,
   makeBinaryWrapper,
@@ -91,7 +91,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     bison
     docbook-xsl-nons
-    docbook_xml_dtd_45
+    docbook-xml-dtd.v4_5
     flex
     libxml2
     libxslt

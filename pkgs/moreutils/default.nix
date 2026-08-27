@@ -5,7 +5,7 @@
   libxml2,
   libxslt,
   docbook-xsl,
-  docbook_xml_dtd_44,
+  docbook-xml-dtd,
   makeWrapper,
   perl, # for pod2man
   cctools,
@@ -29,7 +29,7 @@ stdenv.mkDerivation rec {
     libxml2
     libxslt
     docbook-xsl
-    docbook_xml_dtd_44
+    docbook-xml-dtd.v4_4
   ];
   buildInputs = [
     (perl.withPackages (p: [
