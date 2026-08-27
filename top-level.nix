@@ -134,7 +134,6 @@ final: prev: with final; {
   objgraph = null;
   objprint = null;
   openbox = null;
-  openconnect = null;
   opencv = null;
   openimageio = null;
   # opensbi: auto-imported from pkgs/opensbi/ (RISC-V only)
