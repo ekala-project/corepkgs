@@ -183,7 +183,6 @@ final: prev: with final; {
   wlroots_0_18 = wlroots.v0_18;
   wlroots_0_19 = wlroots.v0_19;
   xattr = null;
-  xwayland = null;
   yallback = null;
   yamllint = null;
   yara = null;

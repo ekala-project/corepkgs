@@ -37,8 +37,7 @@
   libdisplay-info,
   lcms2,
   testers,
-  # TODO(corepkgs): default to true once xwayland is ported
-  enableXWayland ? false,
+  enableXWayland ? true,
   xwayland ? null,
 }:
 
