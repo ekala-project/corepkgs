@@ -142,7 +142,6 @@ final: prev: with final; {
   # PHP - already declared above with Java
   pika = null;
   pinentry = null;
-  poppler = null;
   psutils = null;
   pydantic = null;
   pygame-ce = null;
