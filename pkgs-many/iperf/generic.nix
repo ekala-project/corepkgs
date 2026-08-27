@@ -86,7 +86,6 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = lib.platforms.unix;
     license = if isVersion2 then lib.licenses.mit else lib.licenses.bsd3;
     mainProgram = if isVersion2 then "iperf2" else "iperf3";
-    # prioritize iperf3
-    priority = if isVersion2 then 10 else null;
+    priority = if isVersion2 then 10 else lib.meta.defaultPriority;
   };
 })
