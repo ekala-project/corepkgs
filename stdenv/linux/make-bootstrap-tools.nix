@@ -30,7 +30,7 @@ rec {
     singleBinary = "symlinks";
   });
 
-  tarMinimal = pkgs.gnutar.override { acl = null; };
+  tarMinimal = pkgs.tar.override { acl = null; };
 
   busyboxMinimal = pkgs.busybox.override {
     useMusl = lib.meta.availableOn stdenv.hostPlatform pkgs.musl;

@@ -17,7 +17,7 @@
   replaceVars,
   buildPackages,
   bzip2,
-  curlMinimal,
+  curl,
   expat,
   libarchive,
   libuv,
@@ -115,7 +115,7 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs =
     lib.optionals useSharedLibraries [
       bzip2
-      curlMinimal
+      curl.minimal
       expat
       libarchive
       xz

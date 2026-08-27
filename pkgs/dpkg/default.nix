@@ -3,7 +3,7 @@
   stdenv,
   fetchgit,
   perl,
-  gnutar,
+  tar,
   zlib,
   bzip2,
   xz,
@@ -45,7 +45,7 @@ stdenv.mkDerivation (finalAttrs: {
     "--disable-start-stop-daemon"
     "--with-admindir=/var/lib/dpkg"
     "PERL_LIBDIR=$(out)/${perl.libPrefix}"
-    "TAR=${gnutar}/bin/tar"
+    "TAR=${tar}/bin/tar"
   ]
   ++ lib.optional stdenv.hostPlatform.isDarwin "--disable-linker-optimisations";
 

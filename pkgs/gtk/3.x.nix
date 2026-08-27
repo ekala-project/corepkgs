@@ -6,7 +6,7 @@
   pkg-config,
   gettext,
   docbook-xsl-nons,
-  docbook_xml_dtd_43,
+  docbook-xml-dtd,
   gtk-doc,
   meson,
   mesonEmulatorHook,
@@ -120,7 +120,7 @@ stdenv.mkDerivation (finalAttrs: {
   ++ finalAttrs.setupHooks
   ++ lib.optionals withIntrospection [
     gobject-introspection
-    docbook_xml_dtd_43
+    docbook-xml-dtd.v4_3
     docbook-xsl-nons
     gtk-doc
     # For xmllint

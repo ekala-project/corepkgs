@@ -6,7 +6,7 @@
   fetchgit,
   findutils,
   getopt,
-  gnugrep,
+  grep,
   gnused,
   lib,
   libxml2,
@@ -34,7 +34,7 @@ stdenv.mkDerivation (finalAttrs: {
       --replace-fail "@XMLTO_BASH_PATH@" "${bash}/bin/bash" \
       --replace-fail "@FIND@" "${findutils}/bin/find" \
       --replace-fail "@GETOPT@" "${getopt}/bin/getopt" \
-      --replace-fail "@GREP@" "${gnugrep}/bin/grep" \
+      --replace-fail "@GREP@" "${grep}/bin/grep" \
       --replace-fail "@MKTEMP@" "$(type -P mktemp)" \
       --replace-fail "@SED@" "${gnused}/bin/sed" \
       --replace-fail "@TAIL@" "${coreutils}/bin/tail"

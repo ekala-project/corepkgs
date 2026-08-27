@@ -8,7 +8,7 @@
   asciidoc,
   libxslt,
   findXMLCatalogs,
-  docbook_xml_dtd_45,
+  docbook-xml-dtd,
   docbook-xsl,
   libmnl,
   libnftnl,
@@ -71,7 +71,7 @@ stdenv.mkDerivation rec {
     bison
     flex
     asciidoc
-    docbook_xml_dtd_45
+    docbook-xml-dtd.v4_5
     docbook-xsl
     findXMLCatalogs
     libxslt

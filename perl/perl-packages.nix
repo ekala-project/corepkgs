@@ -1093,7 +1093,7 @@ with self;
         $out/share/bash-completion/completions/clusterssh_bash_completion
       substituteInPlace $out/share/bash-completion/completions/clusterssh_bash_completion \
         --replace '/bin/true' '${pkgs.coreutils}/bin/true' \
-        --replace 'grep' '${pkgs.gnugrep}/bin/grep' \
+        --replace 'grep' '${pkgs.grep}/bin/grep' \
         --replace 'sed' '${pkgs.gnused}/bin/sed'
     '';
     meta = {

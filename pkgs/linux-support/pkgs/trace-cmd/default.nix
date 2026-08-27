@@ -6,7 +6,7 @@
   asciidoc,
   xmlto,
   docbook_xsl,
-  docbook_xml_dtd_45,
+  docbook-xml-dtd,
   libxslt,
   libtraceevent,
   libtracefs,
@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
     pkg-config
     xmlto
     docbook_xsl
-    docbook_xml_dtd_45
+    docbook-xml-dtd.v4_5
     sourceHighlight
   ];
 

@@ -27,8 +27,7 @@
   xmlto,
   python3,
   docbook-xsl-nons,
-  docbook_xml_dtd_45,
-  docbook_xml_dtd_42,
+  docbook-xml-dtd,
   testers,
   # For referencing scanner from top-level wayland build
   wayland,
@@ -98,7 +97,7 @@ stdenv.mkDerivation (finalAttrs: {
     libxslt
     xmlto
     python3
-    docbook_xml_dtd_45
+    docbook-xml-dtd.v4_5
     docbook-xsl-nons
   ];
 
@@ -110,8 +109,8 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals withDocumentation [
     docbook-xsl-nons
-    docbook_xml_dtd_45
-    docbook_xml_dtd_42
+    docbook-xml-dtd.v4_5
+    docbook-xml-dtd.v4_2
   ];
 
   passthru = mkVariantPassthru {

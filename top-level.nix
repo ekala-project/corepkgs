@@ -541,7 +541,7 @@ with final;
           cacert
           config
           ;
-        curl = buildPackages.curlMinimal.override (old: rec {
+        curl = buildPackages.curl.minimal.override (old: rec {
           # break dependency cycles
           fetchurl = stdenv.fetchurlBoot;
           zlib = buildPackages.zlib.override { fetchurl = stdenv.fetchurlBoot; };
@@ -810,10 +810,10 @@ with final;
     go = buildPackages.go.v1_26;
   };
   buildGo125Module = callPackage ./build-support/go/module.nix {
-    go = buildPackages.go_1_25;
+    go = buildPackages.go.v1_25;
   };
   buildGo124Module = callPackage ./build-support/go/module.nix {
-    go = buildPackages.go_1_24;
+    go = buildPackages.go.v1_24;
   };
 
   R = callPackage ./pkgs/R { };
@@ -1630,7 +1630,7 @@ with final;
     withpcre2 = false;
     # Prefer plain zlib and curl without HTTP/3 to keep bootstrap cycle small.
     # Avoid curl with HTTP/3 (nghttp3) to break the cmake->git->curl->nghttp3->cmake cycle.
-    curl = curlMinimal;
+    curl = curl.minimal;
     withZlibNg = false;
   };
 

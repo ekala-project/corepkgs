@@ -9,7 +9,7 @@
   audit,
   libapparmor,
   dbus,
-  docbook_xml_dtd_44,
+  docbook-xml-dtd,
   docbook-xsl-nons,
   xmlto,
   autoreconfHook,
@@ -66,7 +66,7 @@ stdenv.mkDerivation (finalAttrs: {
     autoreconfHook
     autoconf-archive
     pkg-config
-    docbook_xml_dtd_44
+    docbook-xml-dtd.v4_4
     docbook-xsl-nons
     xmlto
   ];

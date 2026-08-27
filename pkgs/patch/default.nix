@@ -4,7 +4,7 @@
   fetchurl,
   ed,
   autoreconfHook,
-  gnupatch,
+  patch,
   runCommand,
   testers,
 }:
@@ -34,17 +34,17 @@ stdenv.mkDerivation rec {
 
   passthru.tests = {
     version = testers.testVersion {
-      package = gnupatch;
+      package = patch;
       command = "patch --version";
     };
-    simple = runCommand "gnupatch-test" { } ''
+    simple = runCommand "patch-test" { } ''
       echo "hello" > file.txt
       echo "--- file.txt
       +++ file.txt
       @@ -1 +1 @@
       -hello
       +world" > patch.diff
-      ${gnupatch}/bin/patch file.txt patch.diff
+      ${patch}/bin/patch file.txt patch.diff
       test "$(cat file.txt)" = "world"
       touch $out
     '';

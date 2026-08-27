@@ -1,7 +1,7 @@
 {
   formats,
   glibcLocales,
-  jdk,
+  java,
   lib,
   stdenv,
 }:
@@ -48,9 +48,9 @@ let
 
 in
 stdenv.mkDerivation {
-  name = "pkgs.formats.javaProperties-test-${jdk.name}";
+  name = "pkgs.formats.javaProperties-test-${java.name}";
   nativeBuildInputs = [
-    jdk
+    java
     glibcLocales
   ];
   __structuredAttrs = true;

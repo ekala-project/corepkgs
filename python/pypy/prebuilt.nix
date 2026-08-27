@@ -9,12 +9,10 @@
   bzip2,
   expat,
   gdbm,
-  ncurses6,
+  ncurses,
   sqlite,
-  tcl-8_5,
-  tk-8_5,
-  tcl-8_6,
-  tk-8_6,
+  tcl,
+  tk,
   zlib,
   # For the Python package set
   packageOverrides ? (self: super: { }),
@@ -80,18 +78,18 @@ stdenv.mkDerivation {
     bzip2
     expat
     gdbm
-    ncurses6
+    ncurses.v6
     sqlite
     zlib
     stdenv.cc.cc.libgcc or null
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
-    tcl-8_5
-    tk-8_5
+    tcl.v8_5
+    tk.v8_5
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    tcl-8_6
-    tk-8_6
+    tcl.v8_6
+    tk.v8_6
   ];
 
   nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
@@ -137,12 +135,12 @@ stdenv.mkDerivation {
       install_name_tool \
         -change \
           /opt/homebrew${lib.optionalString stdenv.hostPlatform.isx86_64 "_x86_64"}/opt/tcl-tk/lib/libtcl8.6.dylib \
-          ${tcl-8_6}/lib/libtcl8.6.dylib \
+          ${tcl.v8_6}/lib/libtcl8.6.dylib \
           $out/lib/${libPrefix}/_tkinter/*.so
       install_name_tool \
         -change \
           /opt/homebrew${lib.optionalString stdenv.hostPlatform.isx86_64 "_x86_64"}/opt/tcl-tk/lib/libtk8.6.dylib \
-          ${tk-8_6}/lib/libtk8.6.dylib \
+          ${tk.v8_6}/lib/libtk8.6.dylib \
           $out/lib/${libPrefix}/_tkinter/*.so
     '';
 

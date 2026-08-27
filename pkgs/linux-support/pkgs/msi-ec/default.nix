@@ -2,9 +2,9 @@
   stdenv,
   lib,
   fetchFromGitHub,
-  linuxPackages,
+  linux,
   git,
-  kernel ? linuxPackages.kernel,
+  kernel ? linux.pkgs.kernel,
   kernelModuleMakeFlags,
 }:
 stdenv.mkDerivation {

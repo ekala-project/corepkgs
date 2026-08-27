@@ -5,7 +5,7 @@
   common-updater-scripts,
   coreutils,
   curl,
-  gnugrep,
+  grep,
   gnused,
   jq,
 }:

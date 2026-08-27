@@ -28,7 +28,7 @@
   # certificate compression - only zlib now, more possible: zstd, brotli
 
   # for passthru.tests
-  curlWithGnuTls,
+  curl,
   emacs,
   ffmpeg,
   knot-resolver_5,
@@ -199,9 +199,9 @@ stdenv.mkDerivation rec {
   };
 
   passthru.tests = {
+    curlWithGnuTls = curl.gnutls;
     inherit
       ngtcp2-gnutls
-      curlWithGnuTls
       ffmpeg
       emacs
       qemu

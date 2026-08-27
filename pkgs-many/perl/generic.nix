@@ -43,8 +43,10 @@ let
   libcInc = lib.getDev libc;
   libcLib = lib.getLib libc;
 
-  # Compute perlAttr from version (e.g., "5.38.2" -> "perl538")
-  perlAttr = "perl${lib.versions.major version}${lib.versions.minor version}";
+  # Compute the variant attribute from version (e.g. "5.38.2" -> "v5_38").
+  # Selecting the variant directly keeps this independent of the `perl538`
+  # style aliases, which are gone when `config.allowAliases` is false.
+  perlVariant = "v${lib.versions.major version}_${lib.versions.minor version}";
 
   # Common passthru function for perl interpreters
   # Adapted from the original passthruFun in pkgs/perl/default.nix
@@ -325,12 +327,15 @@ let
         mkVariantPassthru variantArgs
         // passthruFun {
           inherit self;
-          perlOnBuildForBuild = override pkgsBuildBuild.${perlAttr};
-          perlOnBuildForHost = override pkgsBuildHost.${perlAttr};
-          perlOnBuildForTarget = override pkgsBuildTarget.${perlAttr};
-          perlOnHostForHost = override pkgsHostHost.${perlAttr};
+          perlOnBuildForBuild = override pkgsBuildBuild.perl.${perlVariant};
+          perlOnBuildForHost = override pkgsBuildHost.perl.${perlVariant};
+          perlOnBuildForTarget = override pkgsBuildTarget.perl.${perlVariant};
+          perlOnHostForHost = override pkgsHostHost.perl.${perlVariant};
           perlOnTargetForTarget =
-            if lib.hasAttr perlAttr pkgsTargetTarget then (override pkgsTargetTarget.${perlAttr}) else { };
+            if lib.hasAttr perlVariant (pkgsTargetTarget.perl or { }) then
+              (override pkgsTargetTarget.perl.${perlVariant})
+            else
+              { };
         };
 
       doCheck = false; # some tests fail, expensive

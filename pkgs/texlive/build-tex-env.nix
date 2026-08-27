@@ -18,7 +18,7 @@
   # common runtime dependencies
   coreutils,
   gawk,
-  gnugrep,
+  grep,
   gnused,
   ghostscript,
 }:
@@ -457,7 +457,7 @@ lib.fix (
         buildInputs = [
           coreutils
           gawk
-          gnugrep
+          grep
           gnused
         ]
         ++ lib.optional needsGhostscript ghostscript;

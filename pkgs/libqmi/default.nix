@@ -8,7 +8,7 @@
   gi-docgen,
   gobject-introspection,
   docbook-xsl-nons,
-  docbook_xml_dtd_43,
+  docbook-xml-dtd,
   help2man,
   glib,
   python3,
@@ -60,7 +60,7 @@ stdenv.mkDerivation (finalAttrs: {
     gi-docgen
     gobject-introspection
     docbook-xsl-nons
-    docbook_xml_dtd_43
+    docbook-xml-dtd.v4_3
   ]
   ++ lib.optionals (withIntrospection && !stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
     mesonEmulatorHook

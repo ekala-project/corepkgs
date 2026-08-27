@@ -8,7 +8,7 @@
   libtasn1,
   libxslt,
   docbook-xsl-nons,
-  docbook_xml_dtd_43,
+  docbook-xml-dtd,
   gettext,
   libffi,
   libintl,
@@ -43,7 +43,7 @@ stdenv.mkDerivation rec {
     libtasn1 # asn1Parser
     libxslt # xsltproc
     docbook-xsl-nons
-    docbook_xml_dtd_43
+    docbook-xml-dtd.v4_3
     gettext
   ];
 

@@ -4,14 +4,14 @@
   fetchPypi,
   makeWrapper,
 
-  armTrustedFirmwareTools,
+  arm-trusted-firmware,
   bzip2,
   cbfstool ? null,
   gzip,
   lz4,
   lzop ? null,
   openssl,
-  ubootTools,
+  uboot,
   vboot-utils ? null,
   xilinx-bootgen ? null,
   xz,
@@ -75,7 +75,7 @@ rec {
   binman =
     let
       btools = lib.filter (x: x != null) [
-        armTrustedFirmwareTools
+        arm-trusted-firmware.tools
         bzip2
         cbfstool
         # TODO: cst
@@ -84,7 +84,7 @@ rec {
         # TODO: lzma_alone
         lzop
         openssl
-        ubootTools
+        uboot.tools
         vboot-utils
         xilinx-bootgen
         xz

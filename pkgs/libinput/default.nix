@@ -10,7 +10,7 @@
   udev,
   libwacom,
   python3,
-  lua5_4,
+  lua,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -52,7 +52,7 @@ stdenv.mkDerivation (finalAttrs: {
     libevdev
     mtdev
     libwacom
-    lua5_4
+    lua.v5_4
     (python3.withPackages (
       pp: with pp; [
         # TODO(corepkgs): Port python3Packages.libevdev

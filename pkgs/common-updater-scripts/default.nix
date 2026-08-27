@@ -5,7 +5,7 @@
   coreutils,
   diffutils,
   git,
-  gnugrep,
+  grep,
   gnused,
   jq,
   nix,
@@ -39,7 +39,7 @@ stdenv.mkDerivation {
             coreutils
             diffutils
             git
-            gnugrep
+            grep
             gnused
             jq
             nix

@@ -28,7 +28,7 @@
   pkg-config,
   bison,
   which,
-  jdk,
+  java,
   blas,
   lapack,
   curl,
@@ -95,7 +95,7 @@ stdenv.mkDerivation (finalAttrs: {
     cairo
     tcl
     tk
-    jdk
+    java
   ]
   ++ lib.optional (texliveSmall != null) (
     texliveSmall.withPackages (
@@ -139,7 +139,7 @@ stdenv.mkDerivation (finalAttrs: {
       CC=$(type -p cc)
       CXX=$(type -p c++)
       FC="${gfortran}/bin/gfortran" F77="${gfortran}/bin/gfortran"
-      JAVA_HOME="${jdk}"
+      JAVA_HOME="${java}"
       RANLIB=$(type -p ranlib)
       CURL_CONFIG="${lib.getExe' (lib.getDev curl) "curl-config"}"
       r_cv_have_curl728=yes

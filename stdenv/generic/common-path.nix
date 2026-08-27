@@ -4,9 +4,9 @@
   pkgs.findutils
   pkgs.diffutils
   pkgs.gnused
-  pkgs.gnugrep
+  pkgs.grep
   pkgs.gawk
-  pkgs.gnutar
+  pkgs.tar
   pkgs.gzip
   pkgs.bzip2.bin
   pkgs.gnumake

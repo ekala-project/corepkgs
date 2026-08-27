@@ -6,7 +6,7 @@
   libpcap,
   pkg-config,
   openssl,
-  lua5_4,
+  lua,
   pcre2,
   libssh2,
   zlib,
@@ -23,7 +23,7 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   configureFlags = [
-    (if withLua then "--with-liblua=${lua5_4}" else "--without-liblua")
+    (if withLua then "--with-liblua=${lua.v5_4}" else "--without-liblua")
     "--without-ndiff"
     "--without-zenmap"
     "--without-nping"

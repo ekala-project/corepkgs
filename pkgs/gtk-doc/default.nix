@@ -5,7 +5,7 @@
   ninja,
   pkg-config,
   python3,
-  docbook_xml_dtd_43,
+  docbook-xml-dtd,
   docbook-xsl-nons,
   libxslt,
   gettext,
@@ -56,7 +56,7 @@ python3.pkgs.buildPythonApplication rec {
   ];
 
   buildInputs = [
-    docbook_xml_dtd_43
+    docbook-xml-dtd.v4_3
     docbook-xsl-nons
     libxslt
   ]

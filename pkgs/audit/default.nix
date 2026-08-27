@@ -13,7 +13,7 @@
   installShellFiles,
   makeWrapper,
   gawk,
-  gnugrep,
+  grep,
   coreutils,
 
   enablePython ?
@@ -137,7 +137,7 @@ stdenv.mkDerivation (finalAttrs: {
       --prefix PATH : ${
         lib.makeBinPath [
           gawk
-          gnugrep
+          grep
           coreutils
         ]
       }

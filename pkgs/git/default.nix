@@ -11,7 +11,7 @@
   perlPackages,
   python3,
   gettext,
-  gnugrep,
+  grep,
   gnused,
   gawk,
   coreutils, # needed at runtime by git-filter-branch etc
@@ -23,7 +23,7 @@
   xmlto,
   docbook2x,
   docbook-xsl-nons,
-  docbook_xml_dtd_45,
+  docbook-xml-dtd,
   libxslt,
   tcl,
   tk,
@@ -147,7 +147,7 @@ stdenv.mkDerivation (finalAttrs: {
     xmlto
     docbook2x
     docbook-xsl-nons
-    docbook_xml_dtd_45
+    docbook-xml-dtd.v4_5
     libxslt
   ];
   buildInputs = [
@@ -304,15 +304,15 @@ stdenv.mkDerivation (finalAttrs: {
 
     # grep is a runtime dependency, need to patch so that it's found
     substituteInPlace $out/libexec/git-core/git-sh-setup \
-        --replace ' grep' ' ${gnugrep}/bin/grep' \
-        --replace ' egrep' ' ${gnugrep}/bin/egrep'
+        --replace ' grep' ' ${grep}/bin/grep' \
+        --replace ' egrep' ' ${grep}/bin/egrep'
 
     # Fix references to the perl, sed, awk and various coreutil binaries used by
     # shell scripts that git calls (e.g. filter-branch)
     SCRIPT="$(cat <<'EOS'
       BEGIN{
         @a=(
-          '${gnugrep}/bin/grep', '${gnused}/bin/sed', '${gawk}/bin/awk',
+          '${grep}/bin/grep', '${gnused}/bin/sed', '${gawk}/bin/awk',
           '${coreutils}/bin/cut', '${coreutils}/bin/basename', '${coreutils}/bin/dirname',
           '${coreutils}/bin/wc', '${coreutils}/bin/tr'
           ${lib.optionalString perlSupport ", '${perlPackages.perl}/bin/perl'"}

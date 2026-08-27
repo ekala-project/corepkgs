@@ -22,7 +22,7 @@ let
       libtirpc,
       nfs-utils,
       gawk,
-      gnugrep,
+      grep,
       gnused,
       systemd,
       smartmontools,
@@ -146,7 +146,7 @@ let
                  coreutils
                  gawk
                  gnused
-                 gnugrep
+                 grep
                  systemd
                ]
              }"
@@ -286,7 +286,7 @@ let
               coreutils
               gawk
               gnused
-              gnugrep
+              grep
               util-linux
               smartmon
               sysstat

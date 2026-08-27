@@ -211,7 +211,7 @@ let
               isGNU = true;
               inherit (prevStage) libc;
               inherit lib;
-              inherit (prevStage) coreutils gnugrep;
+              inherit (prevStage) coreutils grep;
               stdenvNoCC = prevStage.ccWrapperStdenv;
               fortify-headers = prevStage.fortify-headers;
               runtimeShell = prevStage.ccWrapperStdenv.shell;
@@ -247,7 +247,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
       gcc-unwrapped = null;
       binutils = null;
       coreutils = null;
-      gnugrep = null;
+      grep = null;
     }
   )
 
@@ -296,14 +296,14 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
           inherit (self)
             stdenvNoCC
             coreutils
-            gnugrep
+            grep
             libc
             ;
           bintools = bootstrapTools;
           runtimeShell = "${bootstrapTools}/bin/bash";
         };
         coreutils = bootstrapTools;
-        gnugrep = bootstrapTools;
+        grep = bootstrapTools;
       };
     }
   )
@@ -326,7 +326,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
     assert isFromBootstrapFiles prevStage.libc;
     assert isFromBootstrapFiles prevStage.gcc-unwrapped;
     assert isFromBootstrapFiles prevStage.coreutils;
-    assert isFromBootstrapFiles prevStage.gnugrep;
+    assert isFromBootstrapFiles prevStage.grep;
     stageFun prevStage {
       name = "bootstrap-stage1";
 
@@ -339,7 +339,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
           ccWrapperStdenv
           gcc-unwrapped
           coreutils
-          gnugrep
+          grep
           binutils
           ;
 
@@ -381,7 +381,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
     assert isFromBootstrapFiles prevStage.libc;
     assert isFromBootstrapFiles prevStage.gcc-unwrapped;
     assert isFromBootstrapFiles prevStage.coreutils;
-    assert isFromBootstrapFiles prevStage.gnugrep;
+    assert isFromBootstrapFiles prevStage.grep;
     assert isBuiltByBootstrapFilesCompiler prevStage.patchelf;
     stageFun prevStage {
       name = "bootstrap-stage-xgcc";
@@ -389,7 +389,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
         inherit (prevStage)
           ccWrapperStdenv
           coreutils
-          gnugrep
+          grep
           gettext
           bison
           texinfo
@@ -496,7 +496,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
     assert isFromBootstrapFiles prevStage.libc;
     assert isBuiltByBootstrapFilesCompiler prevStage.gcc-unwrapped;
     assert isFromBootstrapFiles prevStage.coreutils;
-    assert isFromBootstrapFiles prevStage.gnugrep;
+    assert isFromBootstrapFiles prevStage.grep;
     assert isBuiltByBootstrapFilesCompiler prevStage.patchelf;
     stageFun prevStage {
       name = "bootstrap-stage2";
@@ -507,7 +507,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
           gettext
           gcc-unwrapped
           coreutils
-          gnugrep
+          grep
           perl
           gnum4
           bison
@@ -601,7 +601,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
     assert isBuiltByNixpkgsCompiler prevStage.libc;
     assert isBuiltByBootstrapFilesCompiler prevStage.gcc-unwrapped;
     assert isFromBootstrapFiles prevStage.coreutils;
-    assert isFromBootstrapFiles prevStage.gnugrep;
+    assert isFromBootstrapFiles prevStage.grep;
     assert isBuiltByNixpkgsCompiler prevStage.patchelf;
     assert lib.all isBuiltByNixpkgsCompiler [
       prevStage.gmp
@@ -619,7 +619,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
             ccWrapperStdenv
             binutils
             coreutils
-            gnugrep
+            grep
             perl
             patchelf
             linuxHeaders
@@ -673,7 +673,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
     assert isBuiltByNixpkgsCompiler prevStage.libc;
     assert isBuiltByNixpkgsCompiler prevStage.gcc-unwrapped;
     assert isFromBootstrapFiles prevStage.coreutils;
-    assert isFromBootstrapFiles prevStage.gnugrep;
+    assert isFromBootstrapFiles prevStage.grep;
     assert isBuiltByNixpkgsCompiler prevStage.patchelf;
     stageFun prevStage {
       name = "bootstrap-stage4";
@@ -716,7 +716,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
           inherit (self)
             stdenvNoCC
             coreutils
-            gnugrep
+            grep
             runtimeShell
             libc
             ;
@@ -749,7 +749,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
     assert isBuiltByNixpkgsCompiler prevStage.libc;
     assert isBuiltByNixpkgsCompiler prevStage.gcc-unwrapped;
     assert isBuiltByNixpkgsCompiler prevStage.coreutils;
-    assert isBuiltByNixpkgsCompiler prevStage.gnugrep;
+    assert isBuiltByNixpkgsCompiler prevStage.grep;
     assert isBuiltByNixpkgsCompiler prevStage.patchelf;
     {
       inherit config overlays;
@@ -805,9 +805,9 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
               gmp
               gnumake
               gnused
-              gnutar
-              gnugrep
-              gnupatch
+              tar
+              grep
+              patch
               patchelf
               ed
               file
@@ -841,9 +841,9 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
               gmp
               gnumake
               gnused
-              gnutar
-              gnugrep
-              gnupatch
+              tar
+              grep
+              patch
               patchelf
               ed
               file
@@ -853,7 +853,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
             attr
             acl
             zlib
-            gnugrep.pcre2
+            grep.pcre2
             libidn2
             libunistring
           ]
@@ -899,16 +899,16 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
               findutils
               gawk
               gnused
-              gnutar
-              gnugrep
-              gnupatch
+              tar
+              grep
+              patch
               patchelf
               attr
               acl
               zlib
               libunistring
               ;
-            inherit (prevStage.gnugrep) pcre2;
+            inherit (prevStage.grep) pcre2;
             ${localSystem.libc} = prevStage.${localSystem.libc};
 
             # Hack: avoid libidn2.{bin,dev} referencing bootstrap tools.  There's a logical cycle.
@@ -944,7 +944,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
     assert isBuiltByNixpkgsCompiler prevStage.libc;
     assert isBuiltByNixpkgsCompiler prevStage.gcc-unwrapped;
     assert isBuiltByNixpkgsCompiler prevStage.coreutils;
-    assert isBuiltByNixpkgsCompiler prevStage.gnugrep;
+    assert isBuiltByNixpkgsCompiler prevStage.grep;
     assert isBuiltByNixpkgsCompiler prevStage.patchelf;
     {
       inherit (prevStage) config stdenv;

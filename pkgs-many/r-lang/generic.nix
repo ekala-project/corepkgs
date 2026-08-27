@@ -84,7 +84,7 @@ stdenv.mkDerivation (finalAttrs: {
     majorVersion = lib.versions.major version;
     minorVersion = lib.versions.majorMinor version;
     buildRPackage = callPackage ./build-r-package.nix {
-      r = finalAttrs.finalPackage;
+      r-lang = finalAttrs.finalPackage;
     };
   };
 

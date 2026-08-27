@@ -2,7 +2,7 @@
   lib,
   callPackage,
   fetchurl,
-  jdk,
+  java,
   makeWrapper,
   stdenvNoCC,
   testers,
@@ -27,9 +27,9 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     cp -r apache-maven-${finalAttrs.version}/* $out/maven
 
     makeWrapper $out/maven/bin/mvn $out/bin/mvn \
-      --set-default JAVA_HOME "${jdk}"
+      --set-default JAVA_HOME "${java}"
     makeWrapper $out/maven/bin/mvnDebug $out/bin/mvnDebug \
-      --set-default JAVA_HOME "${jdk}"
+      --set-default JAVA_HOME "${java}"
 
     runHook postInstall
   '';
@@ -85,7 +85,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     ];
     license = lib.licenses.asl20;
     mainProgram = "mvn";
-    inherit (jdk.meta) platforms;
+    inherit (java.meta) platforms;
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "apache" finalAttrs.version;
   };
 })

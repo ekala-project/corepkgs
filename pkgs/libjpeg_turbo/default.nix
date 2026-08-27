@@ -4,7 +4,7 @@
   fetchFromGitHub,
   cmake,
   nasm,
-  openjdk,
+  java,
   enableJava ? false, # whether to build the java wrapper
   enableJpeg7 ? false, # whether to build libjpeg with v7 compatibility
   enableJpeg8 ? false, # whether to build libjpeg with v8 compatibility
@@ -29,7 +29,7 @@
 }:
 
 assert !(enableJpeg7 && enableJpeg8); # pick only one or none, not both
-assert enableJava -> openjdk != null;
+assert enableJava -> java != null;
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libjpeg-turbo";
@@ -62,7 +62,7 @@ stdenv.mkDerivation (finalAttrs: {
     nasm
   ]
   ++ lib.optionals enableJava [
-    openjdk
+    java
   ];
 
   cmakeFlags = [

@@ -19,14 +19,7 @@
   which,
   python3,
   perl,
-  armTrustedFirmwareAllwinner,
-  armTrustedFirmwareAllwinnerH6,
-  armTrustedFirmwareAllwinnerH616,
-  armTrustedFirmwareRK3328,
-  armTrustedFirmwareRK3399,
-  armTrustedFirmwareRK3568,
-  armTrustedFirmwareRK3588,
-  armTrustedFirmwareS905,
+  arm-trusted-firmware,
   opensbi,
   buildPackages,
   callPackages,
@@ -269,7 +262,7 @@ rec {
   ubootBananaPim64 = buildUBoot {
     defconfig = "bananapi_m64_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareAllwinner}/bl31.bin";
+    BL31 = "${arm-trusted-firmware.allwinner}/bl31.bin";
     SCP = "/dev/null";
     filesToInstall = [ "u-boot-sunxi-with-spl.bin" ];
   };
@@ -284,7 +277,7 @@ rec {
   ubootCM3588NAS = buildUBoot {
     defconfig = "cm3588-nas-rk3588_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3588}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3588}/bl31.elf";
     ROCKCHIP_TPL = rkbin.TPL_RK3588;
     filesToInstall = [
       "u-boot.itb"
@@ -385,7 +378,7 @@ rec {
       platforms = [ "aarch64-linux" ];
       license = lib.licenses.unfreeRedistributableFirmware;
     };
-    BL31 = "${armTrustedFirmwareRK3399}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3399}/bl31.elf";
     filesToInstall = [
       "u-boot.itb"
       "idbloader.img"
@@ -399,7 +392,7 @@ rec {
   ubootNanoPCT6 = buildUBoot {
     defconfig = "nanopc-t6-rk3588_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3588}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3588}/bl31.elf";
     ROCKCHIP_TPL = rkbin.TPL_RK3588;
     filesToInstall = [
       "u-boot.itb"
@@ -480,7 +473,7 @@ rec {
           --align 0x4000 \
           --tb-fw '${firmwareBlobs}/gxb/bl30.bin' \
           --scp-fw bl301.padded.bin \
-          --soc-fw '${armTrustedFirmwareS905}/bl31.bin' \
+          --soc-fw '${arm-trusted-firmware.s905}/bl31.bin' \
           --nt-fw u-boot.bin \
           fip.bin
         cat '${firmwareBlobs}/gxb/bl2.package' fip.bin > boot_new.bin
@@ -498,7 +491,7 @@ rec {
   ubootOlimexA64Olinuxino = buildUBoot {
     defconfig = "a64-olinuxino-emmc_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareAllwinner}/bl31.bin";
+    BL31 = "${arm-trusted-firmware.allwinner}/bl31.bin";
     SCP = "/dev/null";
     filesToInstall = [ "u-boot-sunxi-with-spl.bin" ];
   };
@@ -506,7 +499,7 @@ rec {
   ubootOlimexA64Teres1 = buildUBoot {
     defconfig = "teres_i_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareAllwinner}/bl31.bin";
+    BL31 = "${arm-trusted-firmware.allwinner}/bl31.bin";
     # Using /dev/null here is upstream-specified way that disables the inclusion of crust-firmware as it's not yet packaged and without which the build will fail -- https://docs.u-boot.org/en/latest/board/allwinner/sunxi.html#building-the-crust-management-processor-firmware
     SCP = "/dev/null";
     filesToInstall = [ "u-boot-sunxi-with-spl.bin" ];
@@ -515,7 +508,7 @@ rec {
   ubootOrangePi5 = buildUBoot {
     defconfig = "orangepi-5-rk3588s_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3588}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3588}/bl31.elf";
     ROCKCHIP_TPL = rkbin.TPL_RK3588;
     filesToInstall = [
       "u-boot.itb"
@@ -528,7 +521,7 @@ rec {
   ubootOrangePi5Max = buildUBoot {
     defconfig = "orangepi-5-max-rk3588_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3588}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3588}/bl31.elf";
     ROCKCHIP_TPL = rkbin.TPL_RK3588;
     filesToInstall = [
       "u-boot.itb"
@@ -541,7 +534,7 @@ rec {
   ubootOrangePi5Plus = buildUBoot {
     defconfig = "orangepi-5-plus-rk3588_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3588}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3588}/bl31.elf";
     ROCKCHIP_TPL = rkbin.TPL_RK3588;
     filesToInstall = [
       "u-boot.itb"
@@ -560,7 +553,7 @@ rec {
   ubootOrangePiZeroPlus2H5 = buildUBoot {
     defconfig = "orangepi_zero_plus2_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareAllwinner}/bl31.bin";
+    BL31 = "${arm-trusted-firmware.allwinner}/bl31.bin";
     SCP = "/dev/null";
     filesToInstall = [ "u-boot-sunxi-with-spl.bin" ];
   };
@@ -574,7 +567,7 @@ rec {
   ubootOrangePiZero2 = buildUBoot {
     defconfig = "orangepi_zero2_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareAllwinnerH616}/bl31.bin";
+    BL31 = "${arm-trusted-firmware.allwinnerH616}/bl31.bin";
     filesToInstall = [ "u-boot-sunxi-with-spl.bin" ];
   };
 
@@ -584,14 +577,14 @@ rec {
     # According to https://linux-sunxi.org/H616 the H618 "is a minor update with a larger (1MB) L2 cache" (compared to the H616)
     # but "does require extra support in U-Boot, TF-A and sunxi-fel. Support for that has been merged in mainline releases."
     # But no extra support seems to be in TF-A.
-    BL31 = "${armTrustedFirmwareAllwinnerH616}/bl31.bin";
+    BL31 = "${arm-trusted-firmware.allwinnerH616}/bl31.bin";
     filesToInstall = [ "u-boot-sunxi-with-spl.bin" ];
   };
 
   ubootOrangePi3 = buildUBoot {
     defconfig = "orangepi_3_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareAllwinnerH6}/bl31.bin";
+    BL31 = "${arm-trusted-firmware.allwinnerH6}/bl31.bin";
     SCP = "/dev/null";
     filesToInstall = [ "u-boot-sunxi-with-spl.bin" ];
   };
@@ -618,7 +611,7 @@ rec {
   ubootPine64 = buildUBoot {
     defconfig = "pine64_plus_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareAllwinner}/bl31.bin";
+    BL31 = "${arm-trusted-firmware.allwinner}/bl31.bin";
     SCP = "/dev/null";
     filesToInstall = [ "u-boot-sunxi-with-spl.bin" ];
   };
@@ -626,7 +619,7 @@ rec {
   ubootPine64LTS = buildUBoot {
     defconfig = "pine64-lts_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareAllwinner}/bl31.bin";
+    BL31 = "${arm-trusted-firmware.allwinner}/bl31.bin";
     SCP = "/dev/null";
     filesToInstall = [ "u-boot-sunxi-with-spl.bin" ];
   };
@@ -634,7 +627,7 @@ rec {
   ubootPinebook = buildUBoot {
     defconfig = "pinebook_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareAllwinner}/bl31.bin";
+    BL31 = "${arm-trusted-firmware.allwinner}/bl31.bin";
     SCP = "/dev/null";
     filesToInstall = [ "u-boot-sunxi-with-spl.bin" ];
   };
@@ -642,7 +635,7 @@ rec {
   ubootPinebookPro = buildUBoot {
     defconfig = "pinebook-pro-rk3399_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3399}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3399}/bl31.elf";
     filesToInstall = [
       "u-boot.itb"
       "idbloader.img"
@@ -697,7 +690,7 @@ rec {
   ubootQuartz64B = buildUBoot {
     defconfig = "quartz64-b-rk3566_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3568}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3568}/bl31.elf";
     ROCKCHIP_TPL = rkbin.TPL_RK3566;
     filesToInstall = [
       "idbloader.img"
@@ -711,7 +704,7 @@ rec {
   ubootRadxaZero3W = buildUBoot {
     defconfig = "radxa-zero-3-rk3566_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3568}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3568}/bl31.elf";
     ROCKCHIP_TPL = rkbin.TPL_RK3566;
     filesToInstall = [
       "idbloader.img"
@@ -765,7 +758,7 @@ rec {
   ubootRock4CPlus = buildUBoot {
     defconfig = "rock-4c-plus-rk3399_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3399}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3399}/bl31.elf";
     filesToInstall = [
       "u-boot.itb"
       "idbloader.img"
@@ -775,7 +768,7 @@ rec {
   ubootRock5ModelB = buildUBoot {
     defconfig = "rock5b-rk3588_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3588}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3588}/bl31.elf";
     ROCKCHIP_TPL = rkbin.TPL_RK3588;
     filesToInstall = [
       "u-boot.itb"
@@ -788,7 +781,7 @@ rec {
   ubootRock64 = buildUBoot {
     defconfig = "rock64-rk3328_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3328}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3328}/bl31.elf";
     filesToInstall = [
       "u-boot.itb"
       "idbloader.img"
@@ -813,7 +806,7 @@ rec {
     '';
     defconfig = "rock64-rk3328_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3328}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3328}/bl31.elf";
     filesToInstall = [
       "u-boot.itb"
       "idbloader.img"
@@ -824,7 +817,7 @@ rec {
   ubootRockPiE = buildUBoot {
     defconfig = "rock-pi-e-rk3328_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3328}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3328}/bl31.elf";
     filesToInstall = [
       "u-boot.itb"
       "idbloader.img"
@@ -835,7 +828,7 @@ rec {
   ubootRockPro64 = buildUBoot {
     defconfig = "rockpro64-rk3399_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3399}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3399}/bl31.elf";
     filesToInstall = [
       "u-boot.itb"
       "idbloader.img"
@@ -850,7 +843,7 @@ rec {
       "u-boot.itb"
       "idbloader.img"
     ];
-    BL31 = "${armTrustedFirmwareRK3399}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3399}/bl31.elf";
   };
 
   ubootSheevaplug = buildUBoot {
@@ -865,7 +858,7 @@ rec {
   ubootSopine = buildUBoot {
     defconfig = "sopine_baseboard_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareAllwinner}/bl31.bin";
+    BL31 = "${arm-trusted-firmware.allwinner}/bl31.bin";
     SCP = "/dev/null";
     filesToInstall = [ "u-boot-sunxi-with-spl.bin" ];
   };
@@ -873,7 +866,7 @@ rec {
   ubootTuringRK1 = buildUBoot {
     defconfig = "turing-rk1-rk3588_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3588}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3588}/bl31.elf";
     ROCKCHIP_TPL = rkbin.TPL_RK3588;
     filesToInstall = [
       "u-boot.itb"
@@ -923,7 +916,7 @@ rec {
   ubootRockPi4 = buildUBoot {
     defconfig = "rock-pi-4-rk3399_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
-    BL31 = "${armTrustedFirmwareRK3399}/bl31.elf";
+    BL31 = "${arm-trusted-firmware.rk3399}/bl31.elf";
     filesToInstall = [
       "u-boot.itb"
       "idbloader.img"

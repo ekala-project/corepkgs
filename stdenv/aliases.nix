@@ -83,6 +83,9 @@ mapAliases {
   fuse3 = fuse;
   gmp6 = gmp.v6_3;
   gmpxx = gmp.withCxx;
+  gnugrep = grep;
+  gnupatch = patch;
+  gnutar = tar;
   go_1_24 = go.v1_24;
   go_1_25 = go.v1_25;
   gradle_7 = gradle.v7;
@@ -159,7 +162,6 @@ mapAliases {
   openjdk = java;
   openjdk11 = java.v11;
   openssl_oqs = openssl.oqs;
-  patch = gnupatch;
   perl538 = perl.v5_38;
   perl540 = perl.v5_40;
   phpExtensions = php.buildPecl;

@@ -3,7 +3,7 @@
   stdenv,
   fetchurl,
   perl,
-  ncurses6,
+  ncurses,
   gmp,
   libiconv,
   numactl,
@@ -60,7 +60,7 @@ let
             fileToCheckFor = null;
           }
           {
-            nixPackage = ncurses6;
+            nixPackage = ncurses.v6;
             fileToCheckFor = "libtinfo.so.6";
           }
         ];
@@ -78,7 +78,7 @@ let
             fileToCheckFor = null;
           }
           {
-            nixPackage = ncurses6;
+            nixPackage = ncurses.v6;
             fileToCheckFor = "libtinfo.so.6";
           }
         ];
@@ -96,7 +96,7 @@ let
             fileToCheckFor = null;
           }
           {
-            nixPackage = ncurses6;
+            nixPackage = ncurses.v6;
             fileToCheckFor = "libtinfo.so.6";
           }
         ];
@@ -114,7 +114,7 @@ let
             fileToCheckFor = null;
           }
           {
-            nixPackage = ncurses6;
+            nixPackage = ncurses.v6;
             fileToCheckFor = null;
           }
           {
@@ -136,7 +136,7 @@ let
             fileToCheckFor = null;
           }
           {
-            nixPackage = ncurses6;
+            nixPackage = ncurses.v6;
             fileToCheckFor = null;
           }
           {
@@ -161,7 +161,7 @@ let
             fileToCheckFor = null;
           }
           {
-            nixPackage = ncurses6;
+            nixPackage = ncurses.v6;
             fileToCheckFor = "libncursesw.so.6";
           }
         ];
@@ -179,7 +179,7 @@ let
             fileToCheckFor = null;
           }
           {
-            nixPackage = ncurses6;
+            nixPackage = ncurses.v6;
             fileToCheckFor = "libncursesw.so.6";
           }
         ];
@@ -396,11 +396,11 @@ stdenv.mkDerivation {
         + (
           if stdenv.hostPlatform.isMusl then
             ''
-              (cd $out/lib; ln -s ${ncurses6.out}/lib/libncursesw.so.6)
+              (cd $out/lib; ln -s ${ncurses.v6.out}/lib/libncursesw.so.6)
             ''
           else
             ''
-              (cd $out/lib; ln -s ${ncurses6.out}/lib/libtinfo.so.6)
+              (cd $out/lib; ln -s ${ncurses.v6.out}/lib/libtinfo.so.6)
             ''
         )
         + ''

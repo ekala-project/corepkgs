@@ -59,13 +59,13 @@ let
     coreutils
     less
     shadow
-    su
+    shadow
     gawk
     diffutils
     findutils
     gnused
-    gnugrep
-    gnutar
+    grep
+    tar
     gzip
     bzip2
     xz

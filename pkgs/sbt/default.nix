@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchurl,
-  jdk,
+  java,
   autoPatchelfHook,
   zlib,
   ncurses,
@@ -18,7 +18,7 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   postPatch = ''
-    echo -java-home ${jdk.home} >>conf/sbtopts
+    echo -java-home ${java.home} >>conf/sbtopts
   '';
 
   nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];

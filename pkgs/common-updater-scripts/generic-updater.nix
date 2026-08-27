@@ -3,7 +3,7 @@
   stdenv,
   common-updater-scripts,
   coreutils,
-  gnugrep,
+  grep,
   gnused,
   nix,
   writeScript,
@@ -27,7 +27,7 @@ let
   # where to print git commands and debugging messages
   fileForGitCommands = "update-git-commits.txt";
 
-  grep = lib.getExe gnugrep;
+  grep = lib.getExe grep;
   sed = lib.getExe gnused;
 
   # shell script to update package

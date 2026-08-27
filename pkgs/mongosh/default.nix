@@ -2,12 +2,12 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
-  nodejs_22,
+  nodejs,
 }:
 
 let
   version = "2.8.3";
-  buildNpmPackage' = buildNpmPackage.override { nodejs = nodejs_22; };
+  buildNpmPackage' = buildNpmPackage.override { nodejs = nodejs.v22; };
 in
 buildNpmPackage' {
   pname = "mongosh";

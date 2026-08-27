@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  jdk,
+  java,
   jre-generate-cacerts,
   maven,
   writers,
@@ -18,7 +18,7 @@ let
       postPatch ? null,
       pname,
       version,
-      mvnJdk ? jdk,
+      mvnJdk ? java,
       mvnHash ? "",
       mvnFetchExtraArgs ? { },
       mvnDepsParameters ? "",
@@ -74,7 +74,7 @@ let
             # handle cacert by populating a trust store on the fly
             if [[ -n "''${NIX_SSL_CERT_FILE-}" ]] && [[ "''${NIX_SSL_CERT_FILE-}" != "/no-cert-file.crt" ]];then
               echo "using ''${NIX_SSL_CERT_FILE-} as trust store"
-              ${jre-generate-cacerts} ${lib.getBin jdk}/bin/keytool $NIX_SSL_CERT_FILE
+              ${jre-generate-cacerts} ${lib.getBin java}/bin/keytool $NIX_SSL_CERT_FILE
 
               MAVEN_EXTRA_ARGS="$MAVEN_EXTRA_ARGS -Djavax.net.ssl.trustStore=cacerts -Djavax.net.ssl.trustStorePassword=changeit"
             fi

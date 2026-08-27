@@ -8,7 +8,7 @@
   libiconv,
   perl,
   runtimeShellPackage,
-  gnugrep,
+  grep,
   runCommand,
   testers,
 }:
@@ -23,7 +23,7 @@ let
 in
 
 stdenv.mkDerivation {
-  pname = "gnugrep";
+  pname = "grep";
   inherit version;
 
   src = fetchurl {
@@ -120,11 +120,11 @@ stdenv.mkDerivation {
     inherit pcre2;
     tests = {
       version = testers.testVersion {
-        package = gnugrep;
+        package = grep;
         command = "grep --version";
       };
-      simple = runCommand "gnugrep-test" { } ''
-        echo "foo bar baz" | ${gnugrep}/bin/grep -o 'bar' > $out
+      simple = runCommand "grep-test" { } ''
+        echo "foo bar baz" | ${grep}/bin/grep -o 'bar' > $out
         test "$(cat $out)" = "bar"
       '';
     };

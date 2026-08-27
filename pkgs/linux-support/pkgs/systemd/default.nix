@@ -9,7 +9,7 @@
   makeBinaryWrapper,
   ninja,
   meson,
-  m4,
+  gnum4,
   pkg-config,
   coreutils,
   gperf,
@@ -42,7 +42,7 @@
   libgpg-error,
   libidn2,
   curl,
-  gnutar,
+  tar,
   gnupg,
   zlib,
   xz,
@@ -178,8 +178,7 @@
 
   libxslt,
   docbook-xsl-nons,
-  docbook_xml_dtd_42,
-  docbook_xml_dtd_45,
+  docbook-xml-dtd,
   withLogTrace ? false,
 }:
 
@@ -335,7 +334,7 @@ stdenv.mkDerivation (finalAttrs: {
     meson
     meson.configurePhaseHook
     glibcLocales
-    m4
+    gnum4
     autoPatchelfHook
 
     intltool
@@ -343,8 +342,8 @@ stdenv.mkDerivation (finalAttrs: {
 
     libxslt
     docbook-xsl-nons
-    docbook_xml_dtd_42
-    docbook_xml_dtd_45
+    docbook-xml-dtd.v4_2
+    docbook-xml-dtd.v4_5
     bash
     (buildPackages.python3Packages.python.withPackages (
       ps:
@@ -679,7 +678,7 @@ stdenv.mkDerivation (finalAttrs: {
         }
         {
           search = "\"tar\"";
-          replacement = "\\\"${gnutar}/bin/tar\\\"";
+          replacement = "\\\"${tar}/bin/tar\\\"";
           where = [
             "src/import/export-tar.c"
             "src/import/import-common.c"
@@ -755,7 +754,7 @@ stdenv.mkDerivation (finalAttrs: {
         --replace /usr/lib/systemd/catalog/ $out/lib/systemd/catalog/
 
       substituteInPlace src/import/pull-tar.c \
-        --replace 'wait_for_terminate_and_check("tar"' 'wait_for_terminate_and_check("${gnutar}/bin/tar"'
+        --replace 'wait_for_terminate_and_check("tar"' 'wait_for_terminate_and_check("${tar}/bin/tar"'
     '';
 
   # These defines are overridden by CFLAGS and would trigger annoying

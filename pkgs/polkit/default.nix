@@ -21,7 +21,7 @@
   polkit,
   testers,
   util-linux,
-  docbook_xml_dtd_412,
+  docbook-xml-dtd,
   gtk-doc,
   coreutils,
   useSystemd ? lib.meta.availableOn stdenv.hostPlatform systemdMinimal,
@@ -88,7 +88,7 @@ stdenv.mkDerivation rec {
     # man pages
     libxslt
     docbook-xsl-nons
-    docbook_xml_dtd_412
+    docbook-xml-dtd.v4_1_2
   ]
   ++ lib.optionals withIntrospection [
     gobject-introspection

@@ -4,7 +4,7 @@
   runCommand,
   writeShellScript,
   coreutils,
-  gnugrep,
+  grep,
 }:
 let
 
@@ -56,7 +56,7 @@ let
     build: errorMsg:
     lib.overrideDerivation build (old: {
       builder = writeShellScript "test-for-failure" ''
-        export PATH=${coreutils}/bin:${gnugrep}/bin:$PATH
+        export PATH=${coreutils}/bin:${grep}/bin:$PATH
         ${old.builder} "$@" > ./log 2>&1
         status=$?
         cat ./log

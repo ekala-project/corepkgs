@@ -29,7 +29,7 @@
   isZig ? cc.isZig or false,
   isArocc ? cc.isArocc or false,
   isCcache ? cc.isCcache or false,
-  gnugrep ? null,
+  grep ? null,
   expand-response-params,
   libcxx ? null,
 
@@ -77,7 +77,7 @@
 }:
 
 assert nativeTools -> !propagateDoc && nativePrefix != "";
-assert !nativeTools -> cc != null && coreutils != null && gnugrep != null;
+assert !nativeTools -> cc != null && coreutils != null && grep != null;
 assert !(nativeLibc && noLibc);
 assert (noLibc || nativeLibc) == (libc == null);
 
@@ -970,7 +970,7 @@ stdenvNoCC.mkDerivation {
     );
     # TODO(@sternenseemann): rename env var via stdenv rebuild
     shell = getBin runtimeShell + runtimeShell.shellPath or "";
-    gnugrep_bin = optionalString (!nativeTools) gnugrep;
+    gnugrep_bin = optionalString (!nativeTools) grep;
     rm = if nativeTools then "rm" else lib.getExe' coreutils "rm";
     mktemp = if nativeTools then "mktemp" else lib.getExe' coreutils "mktemp";
     # stdenv.cc.cc should not be null and we have nothing better for now.

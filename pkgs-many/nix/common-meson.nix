@@ -40,7 +40,7 @@ assert (hash == null) -> (src != null);
   lowdown,
   lowdown-unsandboxed,
   toml11,
-  man,
+  man-db,
   meson,
   ninja,
   mdbook,
@@ -101,7 +101,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeCheckInputs = [
     git
-    man
+    man-db
   ];
 
   nativeBuildInputs = [

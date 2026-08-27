@@ -16,7 +16,7 @@
   mouseSupport ? !stdenv.hostPlatform.isDarwin,
   gpm-ncurses,
   perl,
-  man,
+  man-db,
   pkg-config,
   buildPackages,
   w3m,
@@ -55,7 +55,7 @@ stdenv.mkDerivation (finalAttrs: {
     # we must set these so that the generated files (e.g. w3mhelp.cgi) contain
     # the correct paths.
     PERL = "${perl}/bin/perl";
-    MAN = "${man}/bin/man";
+    MAN = "${man-db}/bin/man";
 
     # for w3mimgdisplay
     # see: https://bbs.archlinux.org/viewtopic.php?id=196093

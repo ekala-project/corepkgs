@@ -36,9 +36,7 @@
   gtk-doc,
   libxslt,
   docbook-xsl-nons,
-  docbook_xml_dtd_412,
-  docbook_xml_dtd_42,
-  docbook_xml_dtd_43,
+  docbook-xml-dtd,
   curl,
   meson,
   mesonEmulatorHook,
@@ -178,9 +176,9 @@ stdenv.mkDerivation (finalAttrs: {
     gtk-doc
     libxslt
     docbook-xsl-nons
-    docbook_xml_dtd_412
-    docbook_xml_dtd_42
-    docbook_xml_dtd_43
+    docbook-xml-dtd.v4_1_2
+    docbook-xml-dtd.v4_2
+    docbook-xml-dtd.v4_3
   ];
 
   postPatch = ''

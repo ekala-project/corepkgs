@@ -7,7 +7,7 @@
   libintl,
   aclSupport ? lib.meta.availableOn stdenv.hostPlatform acl,
   acl,
-  gnutar,
+  tar,
   runCommand,
   testers,
 }:
@@ -18,7 +18,7 @@
 # files.
 
 stdenv.mkDerivation rec {
-  pname = "gnutar";
+  pname = "tar";
   version = "1.35";
 
   src = fetchurl {
@@ -30,7 +30,7 @@ stdenv.mkDerivation rec {
   # https://savannah.gnu.org/bugs/index.php?64441
   patches = [ ./link-libiconv.patch ];
 
-  # gnutar tries to call into gettext between `fork` and `exec`,
+  # tar tries to call into gettext between `fork` and `exec`,
   # which is not safe on darwin.
   # see http://article.gmane.org/gmane.os.macosx.fink.devel/21882
   postPatch = lib.optionalString stdenv.hostPlatform.isDarwin ''
@@ -70,14 +70,14 @@ stdenv.mkDerivation rec {
 
   passthru.tests = {
     version = testers.testVersion {
-      package = gnutar;
+      package = tar;
       command = "tar --version";
     };
-    simple = runCommand "gnutar-test" { } ''
+    simple = runCommand "tar-test" { } ''
       echo "hello" > file.txt
-      ${gnutar}/bin/tar cf archive.tar file.txt
+      ${tar}/bin/tar cf archive.tar file.txt
       rm file.txt
-      ${gnutar}/bin/tar xf archive.tar
+      ${tar}/bin/tar xf archive.tar
       test "$(cat file.txt)" = "hello"
       touch $out
     '';

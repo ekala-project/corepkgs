@@ -10,7 +10,7 @@
   ninja,
   gtk-doc,
   docbook-xsl-nons,
-  docbook_xml_dtd_45,
+  docbook-xml-dtd,
   pkg-config,
   libffi,
   python3,
@@ -91,7 +91,7 @@ stdenv.mkDerivation (finalAttrs: {
     bison
     gtk-doc
     docbook-xsl-nons
-    docbook_xml_dtd_45
+    docbook-xml-dtd.v4_5
     # Build definition checks for the Python modules needed at runtime by importing them.
     (buildPackages.python3.withPackages pythonModules)
     finalAttrs.setupHook # move .gir files
