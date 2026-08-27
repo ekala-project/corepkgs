@@ -51,6 +51,7 @@ self: {
   # Libraries (legacy CamelCase → lowercase top-level)
   libAppleWM = self.libapplewm or null;
   libFS = self.libfs or null;
+  libfontenc = self.libfontenc or null;
   libICE = self.libice;
   libpthreadstubs = self."libpthread-stubs";
   libSM = self.libsm;
@@ -64,8 +65,8 @@ self: {
   libXdmcp = self.libxdmcp;
   libXext = self.libxext;
   libXfixes = self.libxfixes;
-  libXfont2 = self.libxfont2 or null;
-  libXfont = self.libxfont1 or null;
+  libXfont2 = self.libxfont_2 or null;
+  libXfont = self.libxfont_1 or null;
   libXi = self.libxi;
   libXinerama = self.libxinerama or null;
   libXmu = self.libxmu;
@@ -87,6 +88,7 @@ self: {
   # Utilities and other packages
   twm = self."tab-window-manager" or null;
   utilmacros = self."util-macros" or null;
+  xauth = self.xauth or null;
   xcbproto = self."xcb-proto";
   xcbutilcursor = self."libxcb-cursor" or null;
   xcbutilerrors = self.xcbutilerrors;
@@ -115,7 +117,6 @@ self: {
     xdpyinfo
     xfd
     xfs
-    xinit
     xinput
     xkbcomp
     xkbevd
