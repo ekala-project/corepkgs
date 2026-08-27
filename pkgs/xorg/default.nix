@@ -176,5 +176,4 @@ self: {
   xf86videovesa = self."xf86-video-vesa";
   xf86videovmware = self."xf86-video-vmware";
   xf86videovoodoo = self."xf86-video-voodoo";
-  xf86videowsfb = self."xf86-video-wsfb";
 }
