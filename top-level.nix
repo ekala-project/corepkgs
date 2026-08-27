@@ -105,7 +105,6 @@ final: prev: with final; {
   highlight = null;
   icewm = null;
   imagemagick = callPackage ./pkgs/imagemagick { };
-  imlib2 = null;
   jhead = null;
   jre = null;
   knot-dns = null;
@@ -1989,9 +1988,16 @@ final: prev: with final; {
     ;
   texlivePackages = lib.recurseIntoAttrs (lib.mapAttrs (_: v: v.build) texlive.pkgs);
 
-  # imlib2 is null; these overrides can't work until it's ported
-  imlib2Full = null;
-  imlib2-nox = null;
+  imlib2Full = imlib2.override {
+    webpSupport = true;
+    jxlSupport = true;
+    # TODO(corepkgs): Enable svgSupport once librsvg is ported
+    # TODO(corepkgs): Enable heifSupport once libheif is ported
+    # TODO(corepkgs): Enable psSupport once libspectre is ported
+  };
+  imlib2-nox = imlib2.override {
+    x11Support = false;
+  };
   validatePkgConfig = makeSetupHook {
     name = "validate-pkg-config";
     propagatedBuildInputs = [

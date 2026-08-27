@@ -9,34 +9,14 @@
   libpng,
   libwebp,
   libjxl,
-  libspectre,
-  # imlib2 can load images from ID3 tags.
-  libid3tag,
-  librsvg,
-  libheif,
   freetype,
   bzip2,
   pkg-config,
   x11Support ? true,
   webpSupport ? true,
-  svgSupport ? false,
-  heifSupport ? false,
   jxlSupport ? false,
-  psSupport ? false,
-
-  # for passthru.tests
-  libcaca,
-  diffoscopeMinimal,
-  feh,
-  icewm,
-  openbox,
-  fluxbox,
-  enlightenment,
   libxft,
   libxext,
-  testers,
-
-  gitUpdater,
 }:
 
 let
@@ -44,11 +24,11 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "imlib2";
-  version = "1.12.5";
+  version = "1.12.6";
 
   src = fetchurl {
     url = "mirror://sourceforge/enlightenment/imlib2-${finalAttrs.version}.tar.xz";
-    hash = "sha256-+iMV8oN5tDCm5mBbQoSwe+BqPvQi1PXhybskcUxM9t0=";
+    hash = "sha256-JQ+XUvadxSLlKagaqpOVcF9/wxL/JFPl3lmsK6HyhY8=";
   };
 
   buildInputs = [
@@ -58,17 +38,17 @@ stdenv.mkDerivation (finalAttrs: {
     libpng
     bzip2
     freetype
-    libid3tag
+    # TODO(corepkgs): Port libid3tag for ID3 tag image loading
+    # TODO(corepkgs): Port libspectre for PostScript support (psSupport)
+    # TODO(corepkgs): Port librsvg for SVG support (svgSupport)
+    # TODO(corepkgs): Port libheif for HEIF support (heifSupport)
   ]
   ++ optionals x11Support [
     libxft
     libxext
   ]
-  ++ optional heifSupport libheif
-  ++ optional svgSupport librsvg
   ++ optional webpSupport libwebp
-  ++ optional jxlSupport libjxl
-  ++ optional psSupport libspectre;
+  ++ optional jxlSupport libjxl;
 
   nativeBuildInputs = [ pkg-config ];
 
@@ -78,8 +58,10 @@ stdenv.mkDerivation (finalAttrs: {
   # with unknown directive errors
   configureFlags =
     optional stdenv.hostPlatform.isDarwin "--enable-amd64=no"
-    ++ optional (!svgSupport) "--without-svg"
-    ++ optional (!heifSupport) "--without-heif"
+    ++ [
+      "--without-svg"
+      "--without-heif"
+    ]
     ++ optional (!x11Support) "--without-x";
 
   outputs = [
@@ -88,28 +70,9 @@ stdenv.mkDerivation (finalAttrs: {
     "dev"
   ];
 
-  passthru = {
-    tests = {
-      inherit
-        libcaca
-        diffoscopeMinimal
-        feh
-        icewm
-        openbox
-        fluxbox
-        enlightenment
-        ;
-      pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
-    };
-    updateScript = gitUpdater {
-      # No nicer place to find latest release.
-      url = "https://git.enlightenment.org/old/legacy-imlib2.git";
-      rev-prefix = "v";
-    };
-  };
-
   meta = {
     description = "Image manipulation library";
+
     longDescription = ''
       This is the Imlib 2 library - a library that does image file loading and
       saving as well as rendering, manipulation, arbitrary polygon support, etc.
@@ -117,10 +80,12 @@ stdenv.mkDerivation (finalAttrs: {
       intelligent about doing them, so writing naive programs can be done
       easily, without sacrificing speed.
     '';
+
     homepage = "https://docs.enlightenment.org/api/imlib2/html";
     changelog = "https://git.enlightenment.org/old/legacy-imlib2/raw/tag/v${finalAttrs.version}/ChangeLog";
     license = lib.licenses.imlib2;
     pkgConfigModules = [ "imlib2" ];
     platforms = lib.platforms.unix;
+    maintainers = [ ];
   };
 })
