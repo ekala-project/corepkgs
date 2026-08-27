@@ -6,7 +6,7 @@ if test -n "$dir"; then
     mkdir -p $out/$dir
 fi
 
-substitutionsList=($replacements)
+substitutionsList=()
 
 if [[ -v substitutions ]]; then
     eval "substitutionsList+=($substitutions)"
