@@ -20,12 +20,12 @@
   curl,
   boost,
   fftw,
+  libtirpc,
 
   # optional deps — null when not available
   gsl ? null,
   glm ? null,
   libsigsegv ? null,
-  libtirpc ? null,
   imagemagick ? null,
   libGL ? null,
   libGLU ? null,
