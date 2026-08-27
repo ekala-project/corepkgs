@@ -10,6 +10,11 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "libxcb-util";
   version = "0.4.1";
 
+  outputs = [
+    "out"
+    "dev"
+  ];
+
   src = fetchurl {
     url = "mirror://xorg/individual/xcb/xcb-util-${finalAttrs.version}.tar.xz";
     hash = "sha256-Wr47u9jlTw+j7JRSkbfo+oz9PMzENxj4dYQw+UEm5RI=";
