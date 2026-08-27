@@ -1,17 +1,19 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
-  xorgproto,
   libice,
   libuuid,
+  xorgproto,
   xtrans,
   testers,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "libsm";
-  version = "1.2.5";
+  version = "1.2.6";
 
   outputs = [
     "out"
@@ -19,31 +21,45 @@ stdenv.mkDerivation (finalAttrs: {
     "doc"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libSM-${finalAttrs.version}.tar.xz";
-    hash = "sha256-KvnhLaXvZw3Dp7zhiVycDxv7DLnmTo20D8wz+IO9ILw=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libsm";
+    tag = "libSM-${finalAttrs.version}";
+    hash = "sha256-NbXte3S8DPAblOSUXX0/w3Ex8bSJR+e7AdzPpBNploE=";
   };
 
-  nativeBuildInputs = [ pkg-config ];
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
 
   buildInputs = [
-    xorgproto
     libice
     libuuid
+    xorgproto
     xtrans
   ];
 
   propagatedBuildInputs = [
-    xorgproto
+    # needs to be propagated because of header file dependencies
     libice
   ];
+
+  passthru = {
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  };
 
   meta = {
     description = "X Session Management Library";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libsm";
     license = with lib.licenses; [
       mit
-      x11
+      mitOpenGroup
     ];
     pkgConfigModules = [ "sm" ];
     platforms = lib.platforms.unix;

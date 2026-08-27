@@ -1,7 +1,9 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
   libxcb,
   xorgproto,
@@ -16,14 +18,22 @@ stdenv.mkDerivation (finalAttrs: {
     "dev"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/xcb/xcb-util-keysyms-${finalAttrs.version}.tar.xz";
-    hash = "sha256-fCYKUpRBKu1CnfHaL4r9O9B7fLo/7HcvuhWmE6bVxjg=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxcb-keysyms";
+    tag = "xcb-util-keysyms-${finalAttrs.version}";
+    hash = "sha256-Dw6b9L8s8yo9VhS5ZqXVm+eeqL9kLemFRQMWag011ss=";
   };
 
   strictDeps = true;
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
 
   buildInputs = [
     libxcb

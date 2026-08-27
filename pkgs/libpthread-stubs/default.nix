@@ -1,35 +1,32 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   testers,
-  writeScript,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libpthread-stubs";
   version = "0.5";
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libpthread-stubs-${finalAttrs.version}.tar.xz";
-    hash = "sha256-WdpWbezOunwqeXCkoDtI2ZBfEmL/lEEKZJIk4z0kQrw=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "pthread-stubs";
+    tag = "libpthread-stubs-${finalAttrs.version}";
+    hash = "sha256-VvqHHqZn3bx+Ok95QXhSQFvswQfygMPx5WomuuWJTzQ=";
   };
 
+  nativeBuildInputs = [
+    autoreconfHook
+    util-macros
+  ];
+
   passthru = {
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-
-      version="$(list-directory-versions --pname ${finalAttrs.pname} \
-        --url https://xorg.freedesktop.org/releases/individual/lib/ \
-        | sort -V | tail -n1)"
-
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
-    tests = {
-      pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
-      pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
-    };
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 
   meta = {

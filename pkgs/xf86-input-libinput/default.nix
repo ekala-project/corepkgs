@@ -1,33 +1,65 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
   xorgproto,
-  libinput ? null,
+  libinput,
   xorg-server,
+  testers,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-input-libinput";
   version = "1.5.0";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-input-libinput-1.5.0.tar.xz";
-    sha256 = "1rl06l0gdqmc4v08mya93m74ana76b7s3fzkmq8ylm3535gw6915";
+
+  outputs = [
+    "out"
+    "dev"
+  ];
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-input-libinput";
+    tag = "xf86-input-libinput-${finalAttrs.version}";
+    hash = "sha256-yZi5h3k6cwunucLhmH/wNchA0M11U3KBwrRuY/oATh8=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
+
   buildInputs = [
     xorgproto
     libinput
     xorg-server
   ];
-  outputs = [
-    "out"
-    "dev"
+
+  configureFlags = [
+    "--with-sdkdir=${placeholder "dev"}/include/xorg"
   ];
-  configureFlags = [ "--with-sdkdir=${placeholder "dev"}/include/xorg" ];
+
+  passthru = {
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  };
+
   meta = {
+    description = "libinput-based input driver for the Xorg X server";
+    longDescription = ''
+      This is an X driver based on libinput. It is a thin wrapper around libinput, so while it does
+      provide all features that libinput supports it does little beyond.
+    '';
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-input-libinput";
+    license = lib.licenses.mit;
     pkgConfigModules = [ "xorg-libinput" ];
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
+    platforms = lib.platforms.unix;
   };
 })

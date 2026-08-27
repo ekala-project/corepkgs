@@ -1,26 +1,51 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
   libpciaccess,
-  xorg-server,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-i128";
   version = "1.4.1";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-i128-1.4.1.tar.xz";
-    sha256 = "0imwmkam09wpp3z3iaw9i4hysxicrrax7i3p0l2glgp3zw9var3h";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-i128";
+    tag = "xf86-video-i128-${finalAttrs.version}";
+    hash = "sha256-2yjzaJV5DIATEmByIZJXZyZ781lTUNzfafCmIlBSBRg=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libpciaccess
-    xorg-server
   ];
-  meta.broken = true;
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "Number Nine I128 video driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-i128";
+    license = with lib.licenses; [
+      hpndSellVariant
+      mit
+    ];
+    platforms = lib.platforms.unix;
+    broken = stdenv.hostPlatform.isAarch64;
+  };
 })

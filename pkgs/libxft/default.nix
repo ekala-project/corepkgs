@@ -1,14 +1,15 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
   fontconfig,
   freetype,
   libx11,
   libxrender,
   xorgproto,
-  writeScript,
   testers,
 }:
 stdenv.mkDerivation (finalAttrs: {
@@ -20,14 +21,22 @@ stdenv.mkDerivation (finalAttrs: {
     "dev"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libXft-${finalAttrs.version}.tar.xz";
-    hash = "sha256-YKJbeJRe1pMmNbO7GJmlF9Md90VuaYZ/+6J/if85dvU=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxft";
+    tag = "libXft-${finalAttrs.version}";
+    hash = "sha256-zLPFvLE+OGmaOAxoKVOlKfC9KDYbIvwlpBBhuky5bZ0=";
   };
 
   strictDeps = true;
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
 
   buildInputs = [
     fontconfig
@@ -50,21 +59,13 @@ stdenv.mkDerivation (finalAttrs: {
   ) "--enable-malloc0returnsnull";
 
   passthru = {
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-      version="$(list-directory-versions --pname libXft \
-        --url https://xorg.freedesktop.org/releases/individual/lib/ \
-        | sort -V | tail -n1)"
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 
   meta = {
     description = "X FreeType library";
     longDescription = ''
-      libXft is the client side font rendering library, using libfreetype, libx11, and the
+      libxft is the client side font rendering library, using libfreetype, libx11, and the
       X Render extension to display anti-aliased text.
     '';
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxft";

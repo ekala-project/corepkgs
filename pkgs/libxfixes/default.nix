@@ -1,61 +1,56 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
-  libx11,
   xorgproto,
-  writeScript,
+  libx11,
   testers,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxfixes";
-  version = "6.0.1";
+  version = "6.0.2";
 
   outputs = [
     "out"
     "dev"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libXfixes-${finalAttrs.version}.tar.xz";
-    hash = "sha256-tpX5PNJJlCGrAtInREWOZQzMiMHUyBMNYCACE6vALVg=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxfixes";
+    tag = "libXfixes-${finalAttrs.version}";
+    hash = "sha256-gMrTjwFLeFK7sRHUv1rFYzNR2sMxODocnL2G+dEOjaU=";
   };
 
   strictDeps = true;
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
 
   buildInputs = [
-    libx11
-    xorgproto
-  ];
-
-  propagatedBuildInputs = [
     xorgproto
     libx11
   ];
-
-  configureFlags = lib.optional (
-    stdenv.hostPlatform != stdenv.buildPlatform
-  ) "--enable-malloc0returnsnull";
 
   passthru = {
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-      version="$(list-directory-versions --pname libXfixes \
-        --url https://xorg.freedesktop.org/releases/individual/lib/ \
-        | sort -V | tail -n1)"
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 
   meta = {
-    description = "Xlib-based library for the X Fixes Extension";
+    description = "Xlib-based library for the XFIXES Extension";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxfixes";
-    license = lib.licenses.mit;
+    license = with lib.licenses; [
+      hpndSellVariant
+      mit
+    ];
     pkgConfigModules = [ "xfixes" ];
     platforms = lib.platforms.unix;
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;

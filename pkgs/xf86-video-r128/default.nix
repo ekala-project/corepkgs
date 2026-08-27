@@ -1,27 +1,51 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
   libdrm,
   libpciaccess,
-  xorg-server,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-r128";
   version = "6.13.0";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-r128-6.13.0.tar.xz";
-    sha256 = "0igpfgls5nx4sz8a7yppr42qi37prqmxsy08zqbxbv81q9dfs2zj";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-r128";
+    tag = "xf86-video-r128-${finalAttrs.version}";
+    hash = "sha256-f75PQ3pmWtyqeEfrMQpO31U0QOydlmQ49gJuvneRoso=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libdrm
     libpciaccess
-    xorg-server
   ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "ATI Rage 128 video driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-r128";
+    license = with lib.licenses; [
+      mit
+      hpndSellVariant
+    ];
+    platforms = lib.platforms.unix;
+  };
 })

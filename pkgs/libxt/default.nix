@@ -1,13 +1,14 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   buildPackages,
   pkg-config,
   xorgproto,
   libx11,
   libsm,
-  writeScript,
   testers,
 }:
 stdenv.mkDerivation (finalAttrs: {
@@ -21,16 +22,24 @@ stdenv.mkDerivation (finalAttrs: {
     "devdoc"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libXt-${finalAttrs.version}.tar.xz";
-    hash = "sha256-4Kd0szMk9NTAWxmepFBQ+HIGWG2BZV+L7026Q02TEog=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxt";
+    tag = "libXt-${finalAttrs.version}";
+    hash = "sha256-uwi03NEdDweYDmHijGRc3ARiyvB6X2cypHKGBiKA1sY=";
   };
 
   strictDeps = true;
 
   depsBuildBuild = [ buildPackages.stdenv.cc ];
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
 
   buildInputs = [
     xorgproto
@@ -54,14 +63,6 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   passthru = {
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-      version="$(list-directory-versions --pname libXt \
-        --url https://xorg.freedesktop.org/releases/individual/lib/ \
-        | sort -V | tail -n1)"
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 

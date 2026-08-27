@@ -1,25 +1,49 @@
 {
   lib,
-  buildXorgPackage,
   stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
-  xorgproto,
+  util-macros,
   xorg-server,
+  xorgproto,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-sunffb";
   version = "1.2.3";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-sunffb-1.2.3.tar.xz";
-    sha256 = "0pf4ddh09ww7sxpzs5gr9pxh3gdwkg3f54067cp802nkw1n8vypi";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-sunffb";
+    tag = "xf86-video-sunffb-${finalAttrs.version}";
+    hash = "sha256-wuzODH7iRBxWHzVE8v/npy1/BwS3r08GduMEDdtJd9E=";
   };
-  nativeBuildInputs = [ pkg-config ];
-  buildInputs = [
-    xorgproto
-    xorg-server
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
   ];
-  meta.broken = stdenv.hostPlatform.isDarwin;
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  buildInputs = [
+    xorg-server
+    xorgproto
+  ];
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "Sun FFB video driver for the Xorg X server";
+    longDescription = ''
+      This driver supports Sun Creator, Creator 3D and Elite 3D video cards, which are UPA bus
+      devices for UltraSPARC workstations.
+    '';
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-sunffb";
+    license = lib.licenses.mit;
+    platforms = lib.platforms.unix;
+  };
 })

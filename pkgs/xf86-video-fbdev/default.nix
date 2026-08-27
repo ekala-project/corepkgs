@@ -1,25 +1,46 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
   libpciaccess,
-  xorg-server,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-fbdev";
   version = "0.5.1";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-fbdev-0.5.1.tar.xz";
-    sha256 = "11zk8whari4m99ad3w30xwcjkgya4xbcpmg8710q14phkbxw0aww";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-fbdev";
+    tag = "xf86-video-fbdev-${finalAttrs.version}";
+    hash = "sha256-JlSTosvQCiNeWbveYdj4+Ulgd/guc37xYUMaAhyS7K8=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libpciaccess
-    xorg-server
   ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "Framebuffer device video driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-fbdev";
+    license = lib.licenses.x11;
+    platforms = lib.platforms.unix;
+  };
 })

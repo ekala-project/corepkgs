@@ -1,26 +1,49 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
   libdrm,
-  xorg-server,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-omap";
   version = "0.4.5";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-omap-0.4.5.tar.bz2";
-    sha256 = "0nmbrx6913dc724y8wj2p6vqfbj5zdjfmsl037v627jj0whx9rwk";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-omap";
+    tag = "xf86-video-omap-${finalAttrs.version}";
+    hash = "sha256-5IffoBuSqSs0bQVCJHva/465KK0njrJyvG51dZX/rnM=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libdrm
-    xorg-server
   ];
+
   env.NIX_CFLAGS_COMPILE = toString [ "-Wno-error=format-overflow" ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "Open-source X.org graphics driver for TI OMAP graphics";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-omap";
+    license = lib.licenses.mit;
+    # libdrm_omap is only available on linux
+    platforms = lib.platforms.linux;
+  };
 })

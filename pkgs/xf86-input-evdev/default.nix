@@ -1,23 +1,44 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
   xorgproto,
-  libevdev ? null,
+  libevdev,
   udev,
-  mtdev ? null,
+  mtdev,
   xorg-server,
+  testers,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-input-evdev";
   version = "2.11.0";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-input-evdev-2.11.0.tar.xz";
-    sha256 = "058k0xdf4hkn8lz5gx4c08mgbzvv58haz7a32axndhscjgg2403k";
+
+  # to get rid of xorg-server.dev; man is tiny
+  outputs = [
+    "out"
+    "dev"
+  ];
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-input-evdev";
+    tag = "xf86-input-evdev-${finalAttrs.version}";
+    hash = "sha256-tXB50laCJcLoBbwM/hE+qEiHzmN7Q+r8uu6NPlRmpTM=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
+
   buildInputs = [
     xorgproto
     libevdev
@@ -25,14 +46,24 @@ buildXorgPackage (finalAttrs: {
     mtdev
     xorg-server
   ];
-  outputs = [
-    "out"
-    "dev"
+
+  configureFlags = [
+    "--with-sdkdir=${placeholder "dev"}/include/xorg"
   ];
-  preBuild = "sed -e '/motion_history_proc/d; /history_size/d;' -i src/*.c";
-  configureFlags = [ "--with-sdkdir=${placeholder "dev"}/include/xorg" ];
+
+  passthru = {
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  };
+
   meta = {
+    description = "Generic Linux input driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-input-evdev";
+    license = with lib.licenses; [
+      hpndSellVariant
+      mit
+    ];
     pkgConfigModules = [ "xorg-evdev" ];
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
+    platforms = lib.platforms.unix;
   };
 })

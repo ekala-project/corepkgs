@@ -1,42 +1,69 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
-  xorgproto,
-  libevdev ? null,
-  libx11,
-  libXi,
+  util-macros,
   xorg-server,
-  libXtst,
+  xorgproto,
+  libevdev,
+  libx11,
+  libxi,
+  libxtst,
+  testers,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-input-synaptics";
   version = "1.10.0";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-input-synaptics-1.10.0.tar.xz";
-    sha256 = "1hmm3g6ab4bs4hm6kmv508fdc8kr2blzb1vsz1lhipcf0vdnmhp0";
-  };
-  nativeBuildInputs = [ pkg-config ];
-  buildInputs = [
-    xorgproto
-    libevdev
-    libx11
-    libXi
-    xorg-server
-    libXtst
-  ];
+
   outputs = [
     "out"
     "dev"
   ];
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-input-synaptics";
+    tag = "xf86-input-synaptics-${finalAttrs.version}";
+    hash = "sha256-IHkUxphSV6JOlTzIgXGl5hWb6OphJ9Lyzp/YS2phVQs=";
+  };
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server
+  ];
+
+  buildInputs = [
+    xorg-server
+    xorgproto
+    libevdev
+    libx11
+    libxi
+    libxtst
+  ];
+
   configureFlags = [
     "--with-sdkdir=${placeholder "dev"}/include/xorg"
     "--with-xorg-conf-dir=${placeholder "out"}/share/X11/xorg.conf.d"
   ];
+
+  passthru = {
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  };
+
   meta = {
+    description = "Synaptics touchpad driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-input-synaptics";
+    license = lib.licenses.mit;
     pkgConfigModules = [ "xorg-synaptics" ];
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;
+    platforms = lib.platforms.unix;
   };
 })

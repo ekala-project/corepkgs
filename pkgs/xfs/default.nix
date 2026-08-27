@@ -1,26 +1,53 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
-  libXfont2,
+  libxfont_2,
   xorgproto,
   xtrans,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xfs";
   version = "1.2.2";
-  src = fetchurl {
-    url = "mirror://xorg/individual/app/xfs-1.2.2.tar.xz";
-    sha256 = "1k4f15nrgmqkvsn48hnl1j4giwxpmcpdrnq0bq7b6hg265ix82xp";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "app";
+    repo = "xfs";
+    tag = "xfs-${finalAttrs.version}";
+    hash = "sha256-t9x40XKkwUj2YxxHi4LIHqIZeiF6VDgmXiD4aaSg9c8=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
+
   buildInputs = [
-    libXfont2
+    libxfont_2
     xorgproto
     xtrans
   ];
-  meta.mainProgram = "xfs";
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "X Font Server, for X11 core protocol fonts";
+    homepage = "https://gitlab.freedesktop.org/xorg/app/xfs";
+    license = with lib.licenses; [
+      mitOpenGroup
+      hpndSellVariant
+      x11
+      hpnd
+    ];
+    mainProgram = "xfs";
+    platforms = lib.platforms.unix;
+    broken = stdenv.hostPlatform.isStatic;
+  };
 })

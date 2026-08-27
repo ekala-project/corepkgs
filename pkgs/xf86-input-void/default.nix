@@ -1,25 +1,53 @@
 {
   lib,
-  buildXorgPackage,
   stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
   xorg-server,
   xorgproto,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-input-void";
   version = "1.4.2";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-input-void-1.4.2.tar.xz";
-    sha256 = "11bqy2djgb82c1g8ylpfwp3wjw4x83afi8mqyn5fvqp03kidh4d2";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-input-void";
+    tag = "xf86-input-void-${finalAttrs.version}";
+    hash = "sha256-R2c+FUBJQ9GfMcZ9NKSgT0lfOkqiCKrA+lFVu8l6e10=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
+
   buildInputs = [
     xorg-server
     xorgproto
   ];
-  meta.broken = stdenv.hostPlatform.isDarwin;
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "Null input driver for the Xorg X server";
+    longDescription = ''
+      This is a null input driver for the Xorg X server.
+      It doesn't connect to any physical device, and it never delivers any events.
+      It functions as both a pointer and keyboard device, and may be used as the X server's core
+      pointer and/or core keyboard.
+    '';
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-input-void";
+    license = with lib.licenses; [
+      hpndSellVariant
+      mit
+    ];
+    platforms = lib.platforms.unix;
+  };
 })

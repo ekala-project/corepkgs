@@ -1,25 +1,47 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
   libpciaccess,
-  xorg-server,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-ast";
-  version = "1.2.0";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-ast-1.2.0.tar.xz";
-    sha256 = "14sx6dm0nmbf1fs8cazmak0aqjpjpv9wv7v09w86ff04m7f4gal6";
+  version = "1.2.1";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-ast";
+    tag = "xf86-video-ast-${finalAttrs.version}";
+    hash = "sha256-Xz9ZvngAsEb/9+YOGOkJQIbFzofKw+2V6sST8Ry2tvo=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libpciaccess
-    xorg-server
   ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "ASpeed Technologies graphics driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-ast";
+    license = lib.licenses.hpndSellVariant;
+    platforms = lib.platforms.unix;
+    broken = stdenv.hostPlatform.isAarch64;
+  };
 })

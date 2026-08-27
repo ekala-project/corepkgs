@@ -1,25 +1,49 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
   libpciaccess,
-  xorg-server,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-sisusb";
   version = "0.9.7";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-sisusb-0.9.7.tar.bz2";
-    sha256 = "090lfs3hjz3cjd016v5dybmcsigj6ffvjdhdsqv13k90p4b08h7l";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-sisusb";
+    tag = "xf86-video-sisusb-${finalAttrs.version}";
+    hash = "sha256-Z4q1ChH+u5u+NOsrwTnBVF2iJbvkd/stffdCRK73DS8=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libpciaccess
-    xorg-server
   ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "SiS Net2280-based USB video driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-sisusb";
+    license = with lib.licenses; [
+      bsd3
+      hpndSellVariant
+    ];
+    platforms = lib.platforms.unix;
+  };
 })

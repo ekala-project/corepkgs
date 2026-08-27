@@ -1,31 +1,40 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
   libx11,
   libxext,
   xorgproto,
-  writeScript,
   testers,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxxf86vm";
-  version = "1.1.5";
+  version = "1.1.7";
 
   outputs = [
     "out"
     "dev"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libXxf86vm-${finalAttrs.version}.tar.xz";
-    hash = "sha256-JH/vSLPg5+ZxKeQfHniejQBrpH26HAzc5oS5twP4iOc=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxxf86vm";
+    tag = "libXxf86vm-${finalAttrs.version}";
+    hash = "sha256-6H5gMg93bHgq/gpI7fcamGFh3NJJsA4NpPnUlJSMIzg=";
   };
 
   strictDeps = true;
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
 
   buildInputs = [
     libx11
@@ -33,32 +42,18 @@ stdenv.mkDerivation (finalAttrs: {
     xorgproto
   ];
 
-  propagatedBuildInputs = [
-    xorgproto
-    libx11
-    libxext
-  ];
-
   configureFlags = lib.optional (
     stdenv.hostPlatform != stdenv.buildPlatform
   ) "--enable-malloc0returnsnull";
 
   passthru = {
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-      version="$(list-directory-versions --pname libXxf86vm \
-        --url https://xorg.freedesktop.org/releases/individual/lib/ \
-        | sort -V | tail -n1)"
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 
   meta = {
-    description = "Xlib-based library for the XFree86-VidMode X extension";
+    description = "Extension library for the XFree86-VidMode X extension";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxxf86vm";
-    license = lib.licenses.mit;
+    license = lib.licenses.x11;
     pkgConfigModules = [ "xxf86vm" ];
     platforms = lib.platforms.unix;
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;

@@ -1,24 +1,55 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
+  bison,
   pkg-config,
-  fetchurl,
+  util-macros,
   libx11,
   libxkbfile,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xkbevd";
   version = "1.1.6";
-  src = fetchurl {
-    url = "mirror://xorg/individual/app/xkbevd-1.1.6.tar.xz";
-    sha256 = "0gh73dsf4ic683k9zn2nj9bpff6dmv3gzcb3zx186mpq9kw03d6r";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "app";
+    repo = "xkbevd";
+    tag = "xkbevd-${finalAttrs.version}";
+    hash = "sha256-n/detXvtRvysc5pjFc0Q27yLC2QsNUBo9AIXYkUG4PQ=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    bison
+    pkg-config
+    util-macros
+  ];
+
   buildInputs = [
+    util-macros # unused dependency but the build fails if pkg-config can't find it
     libx11
     libxkbfile
   ];
-  meta.mainProgram = "xkbevd";
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "XKB event daemon";
+    longDescription = ''
+      The xkbevd event daemon listens for specified XKB events and executes requested commands if
+      they occur. The configuration file consists of a list of event specification/action pairs
+      and/or variable definitions.
+      This command is very raw and is therefore only partially implemented; it is a rough prototype
+      for developers, not a general purpose tool for end users.
+    '';
+    homepage = "https://gitlab.freedesktop.org/xorg/app/xkbevd";
+    license = lib.licenses.hpnd;
+    mainProgram = "xkbevd";
+    platforms = lib.platforms.unix;
+  };
 })

@@ -1,27 +1,51 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
-  xorgproto,
-  libdrm,
-  libpciaccess,
+  util-macros,
   xorg-server,
+  xorgproto,
+  libpciaccess,
+  libdrm,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-savage";
   version = "2.4.1";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-savage-2.4.1.tar.xz";
-    sha256 = "1bqhgldb6yahpgav7g7cyc4kl5pm3mgkq8w2qncj36311hb92hb7";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-savage";
+    tag = "xf86-video-savage-${finalAttrs.version}";
+    hash = "sha256-MimTtOPSVQ0uEREYNJDqwDOF2RaNxv/pWmhxcqVfSqA=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libdrm
     libpciaccess
-    xorg-server
   ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "S3 Savage video driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-savage";
+    license = with lib.licenses; [
+      x11
+      mit
+    ];
+    platforms = lib.platforms.unix;
+  };
 })

@@ -1,24 +1,20 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   buildPackages,
   pkg-config,
   xorgproto,
   libpthread-stubs,
   libxcb,
   xtrans,
-  writeScript,
   testers,
-
-  # for passthru.tests
-  cairo,
-  mesa,
-  libxext,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "libx11";
-  version = "1.8.12";
+  version = "1.8.13";
 
   outputs = [
     "out"
@@ -26,16 +22,24 @@ stdenv.mkDerivation (finalAttrs: {
     "man"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libX11-${finalAttrs.version}.tar.xz";
-    hash = "sha256-+gJvm7AST01sgI+a70BXqtZeezXY/0OVHO8Kvga7mpo=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libx11";
+    tag = "libX11-${finalAttrs.version}";
+    hash = "sha256-9vKn4IB2hiYKwpjzKPR2X8uLxXZLguaLPw2Wq9B7NFE=";
   };
 
   strictDeps = true;
 
   depsBuildBuild = [ buildPackages.stdenv.cc ];
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
 
   buildInputs = [
     xorgproto
@@ -60,18 +64,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   passthru = {
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-      version="$(list-directory-versions --pname libX11 \
-        --url https://xorg.freedesktop.org/releases/individual/lib/ \
-        | sort -V | tail -n1)"
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
-    tests = {
-      pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
-      inherit cairo mesa libxext;
-    };
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 
   meta = {

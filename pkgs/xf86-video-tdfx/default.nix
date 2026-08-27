@@ -1,27 +1,53 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
   libdrm,
   libpciaccess,
-  xorg-server,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-tdfx";
   version = "1.5.0";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-tdfx-1.5.0.tar.bz2";
-    sha256 = "0qc5wzwf1n65si9rc37bh224pzahh7gp67vfimbxs0b9yvhq0i9g";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-tdfx";
+    tag = "xf86-video-tdfx-${finalAttrs.version}";
+    hash = "sha256-95LFAPBT4nTuTLx83wsdOCwLOLed39WtP5FXPqiO/LI=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libdrm
     libpciaccess
-    xorg-server
   ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "3Dfx video driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-tdfx";
+    license = lib.licenses.mit;
+    platforms = lib.platforms.unix;
+    broken =
+      # configure: error: cannot check for file existence when cross compiling
+      (stdenv.hostPlatform != stdenv.buildPlatform)
+      # broken due to missing I/O Port syscalls
+      || stdenv.hostPlatform.isAarch64;
+  };
 })

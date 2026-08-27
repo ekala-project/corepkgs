@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
   meson,
   ninja,
   pkg-config,
@@ -16,12 +16,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "pixman";
   version = "0.46.4";
 
-  src = fetchurl {
-    urls = [
-      "mirror://xorg/individual/lib/pixman-${finalAttrs.version}.tar.gz"
-      "https://cairographics.org/releases/pixman-${finalAttrs.version}.tar.gz"
-    ];
-    hash = "sha256-0JxE68O9W+5wIcefki/o+y+1f3Mg9V6X/5kU0jRqWRw=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    owner = "pixman";
+    repo = "pixman";
+    tag = "pixman-${finalAttrs.version}";
+    hash = "sha256-SiXzRtCuAkbg4LBFc3USTRwj9qsAtLyfzaDMed8h7Cc=";
   };
 
   # Raise test timeout, 120s can be slightly exceeded on slower hardware

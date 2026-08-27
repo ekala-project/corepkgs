@@ -1,25 +1,49 @@
 {
   lib,
-  buildXorgPackage,
   stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
-  xorgproto,
+  util-macros,
   xorg-server,
+  xorgproto,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-suncg6";
   version = "1.1.3";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-suncg6-1.1.3.tar.xz";
-    sha256 = "16c3g5m0f5y9nx2x6w9jdzbs9yr6xhq31j37dcffxbsskmfxq57w";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-suncg6";
+    tag = "xf86-video-suncg6-${finalAttrs.version}";
+    hash = "sha256-M9O0BNrKAFdiEgpZstH8KHRVIMEy5dI3y8rP+MSzLCY=";
   };
-  nativeBuildInputs = [ pkg-config ];
-  buildInputs = [
-    xorgproto
-    xorg-server
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
   ];
-  meta.broken = stdenv.hostPlatform.isDarwin;
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  buildInputs = [
+    xorg-server
+    xorgproto
+  ];
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "Sun GX/Turbo GX video driver for the Xorg X server";
+    longDescription = ''
+      This driver supports the Sun GX, GXplus, TurboGX, and TurboGXplus Color Frame Buffers. These
+      Sbus cards were supported in the sun4c, sun4m, sun4d, and sun4u platforms.
+    '';
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-suncg6";
+    license = lib.licenses.hpndSellVariant;
+    platforms = lib.platforms.unix;
+  };
 })

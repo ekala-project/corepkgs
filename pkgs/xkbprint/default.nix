@@ -1,26 +1,50 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
   libx11,
   libxkbfile,
   xorgproto,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xkbprint";
-  version = "1.0.7";
-  src = fetchurl {
-    url = "mirror://xorg/individual/app/xkbprint-1.0.7.tar.xz";
-    sha256 = "1k2rm8lvc2klcdz2s3mymb9a2ahgwqwkgg67v3phv7ij6304jkqw";
+  version = "1.0.8";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "app";
+    repo = "xkbprint";
+    tag = "xkbprint-${finalAttrs.version}";
+    hash = "sha256-ul/gMblKljyUYA2EK1X3FRRKbJ6I0x9Y31Bmi4QdDoo=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
+
   buildInputs = [
     libx11
     libxkbfile
     xorgproto
   ];
-  meta.mainProgram = "xkbprint";
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "Generates a PostScript image of an XKB keyboard description.";
+    homepage = "https://gitlab.freedesktop.org/xorg/app/xkbprint";
+    license = with lib.licenses; [
+      hpnd
+      hpndDec
+    ];
+    mainProgram = "xkbprint";
+    platforms = lib.platforms.unix;
+  };
 })

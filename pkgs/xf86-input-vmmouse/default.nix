@@ -1,34 +1,56 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
+  xorg-server,
   xorgproto,
   udev,
-  xorg-server,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-input-vmmouse";
   version = "13.2.0";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-input-vmmouse-13.2.0.tar.xz";
-    sha256 = "1f1rlgp1rpsan8k4ax3pzhl1hgmfn135r31m80pjxw5q19c7gw2n";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-input-vmmouse";
+    tag = "xf86-input-vmmouse-${finalAttrs.version}";
+    hash = "sha256-SasWsIzq9s8i3dabRwKGZ0NSuFqnUu4WCWYTu/ZZpS8=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # xorg-server defines autoconf macros that we need
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     udev
-    xorg-server
   ];
+
   configureFlags = [
     "--sysconfdir=${placeholder "out"}/etc"
     "--with-xorg-conf-dir=${placeholder "out"}/share/X11/xorg.conf.d"
     "--with-udev-rules-dir=${placeholder "out"}/lib/udev/rules.d"
   ];
-  meta.platforms = [
-    "i686-linux"
-    "x86_64-linux"
-  ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "VMware guest mouse driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-input-vmmouse";
+    license = with lib.licenses; [
+      hpndSellVariant
+      x11
+    ];
+    platforms = lib.intersectLists lib.platforms.linux lib.platforms.x86;
+  };
 })

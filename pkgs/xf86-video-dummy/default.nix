@@ -1,25 +1,46 @@
 {
   lib,
-  buildXorgPackage,
   stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
   xorgproto,
   xorg-server,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-dummy";
   version = "0.4.1";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-dummy-0.4.1.tar.xz";
-    sha256 = "1byzsdcnlnzvkcqrzaajzc3nzm7y7ydrk9bjr4x9lx8gznkj069m";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-dummy";
+    tag = "xf86-video-dummy-${finalAttrs.version}";
+    hash = "sha256-lEqA716pg1mjTLEkHLITXJMZY9Vj8VByEs49ONNxpHs=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
     xorgproto
     xorg-server
   ];
-  meta.broken = stdenv.hostPlatform.isDarwin;
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "Virtual/offscreen frame buffer driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-dummy";
+    # dummy driver was imported from XFree86 which was under the x11 license
+    license = lib.licenses.x11;
+    platforms = lib.platforms.unix;
+  };
 })

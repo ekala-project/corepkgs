@@ -1,71 +1,63 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
+  xorgproto,
   libx11,
   libxext,
   libxrender,
-  libxfixes,
-  xorgproto,
-  writeScript,
   testers,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxrandr";
-  version = "1.5.4";
+  version = "1.5.5";
 
   outputs = [
     "out"
     "dev"
-    "man"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libXrandr-${finalAttrs.version}.tar.xz";
-    hash = "sha256-GtWwZTdfSoWRWqYGEcxkB8BgSSohTX+dryFL51LDtNM=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxrandr";
+    tag = "libXrandr-${finalAttrs.version}";
+    hash = "sha256-+FtiICqAh539SE60ZZeOzdpKhTxA1M8JxRkwccua8d0=";
   };
 
   strictDeps = true;
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
 
   buildInputs = [
+    xorgproto
     libx11
     libxext
     libxrender
-    libxfixes
-    xorgproto
   ];
 
-  propagatedBuildInputs = [
-    xorgproto
-    libx11
-    libxext
-    libxrender
-    libxfixes
-  ];
+  propagatedBuildInputs = [ libxrender ];
 
   configureFlags = lib.optional (
     stdenv.hostPlatform != stdenv.buildPlatform
   ) "--enable-malloc0returnsnull";
 
   passthru = {
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-      version="$(list-directory-versions --pname libXrandr \
-        --url https://xorg.freedesktop.org/releases/individual/lib/ \
-        | sort -V | tail -n1)"
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 
   meta = {
-    description = "Xlib library for the X Resize, Rotate, and Reflect Extension";
+    description = "Xlib Resize, Rotate and Reflection (RandR) extension library";
     homepage = "https://gitlab.freedesktop.org/xorg/lib/libxrandr";
-    license = lib.licenses.mit;
+    license = lib.licenses.hpndSellVariant;
     pkgConfigModules = [ "xrandr" ];
     platforms = lib.platforms.unix;
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "x.org" finalAttrs.version;

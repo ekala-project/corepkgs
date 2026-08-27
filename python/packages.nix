@@ -49,4 +49,8 @@ self: super: with self; {
   numpy_2 = callPackage ./pkgs/numpy/2.nix { };
   numpy_1 = callPackage ./pkgs/numpy/1.nix { };
   numpy = self.numpy_2;
+
+  # Not packaged here; kept as a placeholder so consumers that only reference
+  # it from `passthru.tests` still evaluate.
+  pillow-heif = null; # libheif tests
 }

@@ -1,25 +1,49 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
   xorgproto,
-  libpciaccess,
   xorg-server,
+  libpciaccess,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xf86-video-nv";
-  version = "2.1.23";
-  src = fetchurl {
-    url = "mirror://xorg/individual/driver/xf86-video-nv-2.1.23.tar.xz";
-    sha256 = "1jlap6xjn4pfwg9ab8fxm5mwf4dqfywp70bgc0071m7k66jbv3f6";
+  version = "2.1.24";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "driver";
+    repo = "xf86-video-nv";
+    tag = "xf86-video-nv-${finalAttrs.version}";
+    hash = "sha256-JEEDB3x8AD5pKHvHAfwQ263Lw2Ex61LcY3tHailCydo=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+    xorg-server # for some autoconf macros
+  ];
+
   buildInputs = [
+    xorg-server
     xorgproto
     libpciaccess
-    xorg-server
   ];
-  meta.identifiers.cpeParts.vendor = "x.org";
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "Minimal NVIDIA video driver for the Xorg X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-nv";
+    license = with lib.licenses; [
+      mit
+      hpndSellVariant
+    ];
+    platforms = lib.platforms.unix;
+  };
 })

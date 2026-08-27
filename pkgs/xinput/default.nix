@@ -1,32 +1,56 @@
 {
   lib,
-  buildXorgPackage,
+  stdenv,
+  fetchFromGitLab,
+  autoreconfHook,
   pkg-config,
-  fetchurl,
+  util-macros,
   xorgproto,
   libx11,
   libxext,
-  libXi,
-  libXinerama,
-  libXrandr,
+  libxi,
+  libxinerama,
+  libxrandr,
 }:
-
-buildXorgPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xinput";
   version = "1.6.4";
-  src = fetchurl {
-    url = "mirror://xorg/individual/app/xinput-1.6.4.tar.xz";
-    sha256 = "1j2pf28c54apr56v1fmvprp657n6x4sdrv8f24rx3138cl6x015d";
+
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "app";
+    repo = "xinput";
+    tag = "xinput-${finalAttrs.version}";
+    hash = "sha256-EsSytLzwAHMwseW4pD/c+/J1MaCWPsE7RPoMIwT96yk=";
   };
-  nativeBuildInputs = [ pkg-config ];
+
+  strictDeps = true;
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
+
   buildInputs = [
     xorgproto
     libx11
     libxext
-    libXi
-    libXinerama
-    libXrandr
+    libxi
+    libxinerama
+    libxrandr
   ];
-  meta.mainProgram = "xinput";
-  meta.identifiers.cpeParts.vendor = "x.org";
+
+  meta = {
+    identifiers.cpeParts.vendor = "x.org";
+    description = "Utility to configure and test XInput devices";
+    homepage = "https://gitlab.freedesktop.org/xorg/app/xinput";
+    license = with lib.licenses; [
+      hpndSellVariant
+      mit
+    ];
+    mainProgram = "xinput";
+    platforms = lib.platforms.unix;
+  };
 })

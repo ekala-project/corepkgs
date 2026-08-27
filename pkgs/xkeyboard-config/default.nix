@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
   pkg-config,
   meson,
   ninja,
@@ -15,9 +15,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "xkeyboard-config";
   version = "2.46";
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/data/xkeyboard-config/xkeyboard-config-${finalAttrs.version}.tar.xz";
-    hash = "sha256-EMWCGPtg0I+x97MDBN6zukdhMZWqigioHxlyd1zMNkA=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    owner = "xkeyboard-config";
+    repo = "xkeyboard-config";
+    tag = "xkeyboard-config-${finalAttrs.version}";
+    hash = "sha256-XEM5V3m6gIgodAfpGGb3gRij7Sc64dcyD2xRtjWEQyc=";
   };
 
   strictDeps = true;

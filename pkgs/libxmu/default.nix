@@ -1,18 +1,19 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  util-macros,
+  autoreconfHook,
   pkg-config,
   xorgproto,
   libx11,
   libxext,
   libxt,
-  writeScript,
   testers,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxmu";
-  version = "1.2.1";
+  version = "1.3.1";
 
   outputs = [
     "out"
@@ -20,14 +21,22 @@ stdenv.mkDerivation (finalAttrs: {
     "doc"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libXmu-${finalAttrs.version}.tar.xz";
-    hash = "sha256-/LJ3kySKOeX8xbnErsQMwHNLPKdqrD19HCZOf34U6LI=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxmu";
+    tag = "libXmu-${finalAttrs.version}";
+    hash = "sha256-D6a9GDvlayUtG/lhNmHeQz9tY13y8QOcQBz8sBeSs6o=";
   };
 
   strictDeps = true;
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+    util-macros
+  ];
 
   buildInputs = [
     xorgproto
@@ -45,14 +54,6 @@ stdenv.mkDerivation (finalAttrs: {
   buildFlags = [ "BITMAP_DEFINES='-DBITMAPDIR=\"/no-such-path\"'" ];
 
   passthru = {
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-      version="$(list-directory-versions --pname libxmu \
-        --url https://xorg.freedesktop.org/releases/individual/lib/ \
-        | sort -V | tail -n1)"
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 

@@ -1,30 +1,39 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  fetchFromGitLab,
+  meson,
+  ninja,
   pkg-config,
   xorgproto,
   libx11,
-  writeScript,
   testers,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxkbfile";
-  version = "1.1.3";
+  version = "1.2.0";
 
   outputs = [
     "out"
     "dev"
   ];
 
-  src = fetchurl {
-    url = "mirror://xorg/individual/lib/libxkbfile-${finalAttrs.version}.tar.xz";
-    hash = "sha256-qbY+6pl6u57mqLT7tRWDHIQfRxr4RaCd5EOygAOHS+w=";
+  src = fetchFromGitLab {
+    domain = "gitlab.freedesktop.org";
+    group = "xorg";
+    owner = "lib";
+    repo = "libxkbfile";
+    tag = "libxkbfile-${finalAttrs.version}";
+    hash = "sha256-qOlvaD6s7ogGxMuf6lKgoE60JVcvrM04rl4OxlSKP04=";
   };
 
   strictDeps = true;
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    meson
+    ninja
+    pkg-config
+  ];
 
   buildInputs = [
     xorgproto
@@ -32,14 +41,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   passthru = {
-    updateScript = writeScript "update-${finalAttrs.pname}" ''
-      #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts
-      version="$(list-directory-versions --pname ${finalAttrs.pname} \
-        --url https://xorg.freedesktop.org/releases/individual/lib/ \
-        | sort -V | tail -n1)"
-      update-source-version ${finalAttrs.pname} "$version"
-    '';
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
   };
 
