@@ -83,6 +83,9 @@ let
 
     # Write version information
     echo -n "${config.system.ekaos.version}" > $out/ekaos-version
+
+    # Embed package manifest for SBOM generation
+    cp ${config.system.build.packageManifest} $out/package-manifest.json
     echo -n "systemd ${toString config.systemd.package.interfaceVersion}" > $out/init-interface-version
     echo -n "${pkgs.stdenv.hostPlatform.system}" > $out/system
 

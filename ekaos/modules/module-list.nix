@@ -25,6 +25,7 @@
 
   # System modules
   ./system/toplevel.nix
+  ./system/package-manifest.nix
   ./system/activation.nix
   ./system/etc.nix
   ./system/logind.nix
