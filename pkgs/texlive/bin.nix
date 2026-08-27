@@ -45,7 +45,7 @@
   clisp ? null,
   biber ? null,
   woff2 ? null,
-  xxHash,
+  xxhash,
   makeWrapper,
   shortenPerlShebang,
   useFixedHashes,
@@ -596,7 +596,7 @@ rec {
       ttfautohint
       woff2
       potrace
-      xxHash
+      xxhash
       mupdf-headless
     ];
 
