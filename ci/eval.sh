@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Fails if any top-level attribute of the package set fails to evaluate.
+# Fails if any package in the repository fails to evaluate.
 #
 # See ci/eval.nix for what counts as a failure.
 
@@ -27,4 +27,4 @@ if grep -q '^warning:' "$stderr"; then
   exit 1
 fi
 
-echo "All $count top-level attributes evaluate."
+echo "All $count packages evaluate (top-level attributes plus pkgs-many variants)."
