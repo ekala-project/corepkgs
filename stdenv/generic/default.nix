@@ -215,10 +215,11 @@ let
       # commands and extglob affects the Bash parser, we enable extglob always.
       shellDryRun = "${stdenv.shell} -n -O extglob";
 
-      tests = {
-        succeedOnFailure = import ../tests/succeedOnFailure.nix { inherit stdenv; };
-      };
-      passthru.tests = lib.warn "Use `stdenv.tests` instead. `passthru` is a `mkDerivation` detail." stdenv.tests;
+      # TODO(corepkgs): port stdenv/tests/.
+      # tests = {
+      #   succeedOnFailure = import ../tests/succeedOnFailure.nix { inherit stdenv; };
+      # };
+      # passthru.tests = lib.warn "Use `stdenv.tests` instead. `passthru` is a `mkDerivation` detail." stdenv.tests;
     }
 
     # Propagate any extra attributes.  For instance, we use this to
