@@ -1,20 +1,24 @@
-# Evaluates every top-level attribute of the package set.
+# Evaluates every package in the repository: each top-level attribute, plus
+# every variant of each `pkgs-many` package.
 #
-# Aliases are disabled. They are compatibility shims that resolve to a package
-# already covered under its canonical name, so evaluating them only repeats
-# work -- and a shim for something this repo does not package should not make
-# the job fail.
+# Variants live one level down (`cmake.v4`), so enumerating attribute names
+# alone reaches only the default one. Their names come from the `variants`
+# passthru rather than `pkgs-many/*/variants.nix`: `top-level.nix` may replace
+# an auto-called package with one that has no variants at all -- on glibc
+# `libiconv` becomes a plain `runCommand` -- and only the passthru knows that.
 #
-# `handleEvalIssue` decides which `check-meta` rejections are bugs:
+# Aliases are disabled. They are shims for a package already covered under its
+# canonical name, so evaluating them only repeats work.
 #
-#   * `unknown-meta` and `broken-outputs` mean the `meta` itself is malformed,
-#     which is always a mistake, so they `abort` and name the package.
-#   * Everything else -- broken, unfree, unsupported, insecure -- is a package
-#     correctly refusing to evaluate here. Those `throw`, and are ignored.
+# `handleEvalIssue` decides which `check-meta` rejections are bugs.
+# `unknown-meta` and `broken-outputs` mean the `meta` itself is malformed, so
+# they `abort` and name the package. Everything else -- broken, unfree,
+# unsupported, insecure -- is a package correctly refusing to evaluate here,
+# and `throw`s.
 #
 # What is left cannot be caught by `tryEval` and so fails the job with Nix's
-# own message and source location: a missing `callPackage` argument (an
-# `abort`), a missing attribute, or a type error. Those are the real bugs.
+# own message and source location: a missing `callPackage` argument, a missing
+# attribute, or a type error. Those are the real bugs.
 #
 # Usage:
 #   nix-instantiate --eval --strict ci/eval.nix
@@ -41,12 +45,13 @@ let
 
   inherit (pkgs) lib;
 
-  # Forcing `drvPath` runs `check-meta` and resolves every dependency of the
-  # package, which is the point of this job.
+  # Forcing `drvPath` runs `check-meta` and resolves every dependency, which is
+  # the point of this job. `package` arrives unforced, so a lookup that throws
+  # is caught here too.
   probe =
-    name:
+    package:
     let
-      value = builtins.tryEval pkgs.${name};
+      value = builtins.tryEval package;
     in
     builtins.tryEval (
       if value.success && lib.isDerivation value.value then
@@ -55,6 +60,18 @@ let
         null
     );
 
+  # A package `top-level.nix` has replaced carries no `variants` passthru, and
+  # so contributes nothing.
+  variantsOf =
+    name:
+    let
+      variants = builtins.tryEval (builtins.attrValues (pkgs.${name}.variants or { }));
+    in
+    if variants.success then variants.value else [ ];
+
   names = builtins.attrNames pkgs;
+  manyVariantNames = builtins.attrNames (builtins.readDir ../pkgs-many);
+
+  targets = map (name: pkgs.${name}) names ++ lib.concatMap variantsOf manyVariantNames;
 in
-builtins.deepSeq (map probe names) (builtins.length names)
+builtins.deepSeq (map probe targets) (builtins.length targets)
