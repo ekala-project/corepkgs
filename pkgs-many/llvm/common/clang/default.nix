@@ -175,13 +175,16 @@ stdenv.mkDerivation (
       cp bin/clang-pseudo-gen $dev/bin
     '';
 
-    env =
-      lib.optionalAttrs (stdenv.buildPlatform != stdenv.hostPlatform && !stdenv.hostPlatform.useLLVM)
-        {
-          # The following warning is triggered with (at least) gcc >=
-          # 12, but appears to occur only for cross compiles.
-          NIX_CFLAGS_COMPILE = "-Wno-maybe-uninitialized";
-        };
+    env = lib.optionalAttrs (!stdenv.hostPlatform.useLLVM) {
+      # GCC >= 12 triggers -Wmaybe-uninitialized warnings.
+      # GCC 14 ICEs (segfault in ggc_set_mark) on CGDebugInfo.cpp at -O3;
+      # -O2 avoids the crash.
+      # GCC 14 also generates >4 GB .debug_info sections for clang's
+      # template-heavy TUs, overflowing 32-bit DWARF relocations;
+      # -gsplit-dwarf keeps per-TU debug info in .dwo files, sidestepping
+      # the limit while still producing usable debuginfo.
+      NIX_CFLAGS_COMPILE = "-Wno-maybe-uninitialized -O2 -gsplit-dwarf";
+    };
 
     passthru = {
       inherit libllvm;
