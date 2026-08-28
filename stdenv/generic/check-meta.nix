@@ -613,9 +613,25 @@ let
                   cpe = makeCPE guessedParts;
                 }
               ) possibleCPEPartsFuns;
+          # PURL (Package URL) for repository-specific identification.
+          # Format: pkg:nix/corepkgs/<pname>@<version>
+          purl =
+            let
+              userPurl = attrs.meta.identifiers.purl or null;
+              pname = attrs.pname or null;
+              version = attrs.version or null;
+            in
+            if userPurl != null then
+              userPurl
+            else if pname != null && version != null then
+              "pkg:nix/ekapkgs/${pname}@${version}"
+            else
+              null;
+
           v1 = {
             inherit cpeParts possibleCPEs;
             ${if cpe != null then "cpe" else null} = cpe;
+            ${if purl != null then "purl" else null} = purl;
           };
         in
         v1
