@@ -152,7 +152,6 @@ with final;
   libguestfs = null;
   liblqr1 = null; # imagemagick, imagemagick6
   libnatspec = null;
-  libnghttp2 = nghttp2;
   libraqm = null; # imagemagick
   libraw = null; # imagemagick
   libotr = null;
