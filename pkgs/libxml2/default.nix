@@ -44,7 +44,7 @@ let
       ];
       freezeUpdateScript = true;
       extraMeta = {
-
+        changelog = "https://gitlab.gnome.org/GNOME/libxml2/-/releases/v${packages.libxml2_13.version}";
       };
     };
     libxml2 = callPackage ./common.nix {
@@ -57,7 +57,7 @@ let
         hash = "sha256-FUfYMq5xT2i88JdIw9OtSofraUL3yjsyOVund+mfJKQ=";
       };
       extraMeta = {
-
+        changelog = "https://gitlab.gnome.org/GNOME/libxml2/-/releases/v${packages.libxml2.version}";
       };
     };
   };

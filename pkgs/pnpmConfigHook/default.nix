@@ -4,6 +4,7 @@
 # It extracts the pnpm store from pnpmDeps and configures pnpm to use it.
 
 {
+  lib,
   stdenvNoCC,
   makeSetupHook,
   writableTmpDirAsHomeHook,
@@ -19,5 +20,10 @@ makeSetupHook {
   substitutions = {
     npmArch = stdenvNoCC.targetPlatform.node.arch;
     npmPlatform = stdenvNoCC.targetPlatform.node.platform;
+  };
+  meta = {
+    description = "Configuration hook for pnpm-based Node.js packages";
+    license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 } ./pnpm-config-hook.sh

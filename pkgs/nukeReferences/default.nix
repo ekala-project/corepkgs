@@ -37,5 +37,10 @@ stdenvNoCC.mkDerivation {
     ) signingUtils;
   };
 
-  meta.mainProgram = "nuke-refs";
+  meta = {
+    description = "Tool to remove all Nix store references from files";
+    license = lib.licenses.mit;
+    platforms = lib.platforms.all;
+    mainProgram = "nuke-refs";
+  };
 }

@@ -90,6 +90,7 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   meta = {
+    description = "Low-level configuration system for GNOME";
     homepage = "https://gitlab.gnome.org/GNOME/dconf";
     license = lib.licenses.lgpl21Plus;
     platforms = lib.platforms.unix;

@@ -40,6 +40,7 @@ stdenv.mkDerivation {
     description = ''
       A sendmail wrapper that calls the system sendmail. Do not install as system-wide sendmail!
     '';
+    license = lib.licenses.mit;
     platforms = lib.platforms.unix;
     mainProgram = "sendmail";
   };

@@ -52,4 +52,10 @@ stdenv.mkDerivation {
     makeWrapperArgs+=( --prefix PATH : "${lib.makeBinPath [ nix ]}" )
     wrapPythonPrograms
   '';
+
+  meta = {
+    description = "Common scripts for automatically updating package sources";
+    license = lib.licenses.mit;
+    platforms = lib.platforms.all;
+  };
 }

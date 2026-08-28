@@ -90,6 +90,7 @@ stdenv.mkDerivation rec {
   '';
 
   meta = {
+    description = "Tools to convert DocBook documents to man pages and Texinfo";
     longDescription = ''
       docbook2X is a software package that converts DocBook documents
       into the traditional Unix man page format and the GNU Texinfo

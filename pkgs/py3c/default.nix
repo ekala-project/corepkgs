@@ -33,5 +33,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/encukou/py3c";
     description = "Python 2/3 compatibility layer for C extensions";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

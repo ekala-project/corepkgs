@@ -28,9 +28,6 @@ in
       # cannot be made SUID in Nix.
       ./ssh-keysign-8.5.patch
     ];
-    extraMeta = {
-
-    };
   };
 
   openssh_hpn = common rec {
@@ -71,9 +68,6 @@ in
     extraNativeBuildInputs = [ autoreconfHook ];
 
     extraConfigureFlags = [ "--with-hpn" ];
-    extraMeta = {
-
-    };
   };
 
   openssh_gssapi = common rec {

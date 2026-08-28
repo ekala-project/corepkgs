@@ -45,6 +45,7 @@ stdenv.mkDerivation rec {
     description = "Library for software emulation of a Trusted Platform Module (TPM 1.2 and TPM 2.0)";
     homepage = "https://github.com/stefanberger/libtpms";
     license = lib.licenses.bsd3;
+    platforms = lib.platforms.linux;
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libtpms_project" version;
   };
 }

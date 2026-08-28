@@ -25,5 +25,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Machine-readable components of the Khronos SPIR-V Registry";
     homepage = "https://github.com/KhronosGroup/SPIRV-Headers";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

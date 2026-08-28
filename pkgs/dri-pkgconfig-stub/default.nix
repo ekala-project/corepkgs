@@ -18,5 +18,9 @@ writeTextFile {
 
   destination = "/lib/pkgconfig/dri.pc";
 
-  meta.badPlatforms = lib.platforms.darwin;
+  meta = {
+    description = "Pkg-config stub for DRI driver paths";
+    license = lib.licenses.mit;
+    badPlatforms = lib.platforms.darwin;
+  };
 }

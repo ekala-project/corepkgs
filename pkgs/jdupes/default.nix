@@ -46,6 +46,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Powerful duplicate file finder and an enhanced fork of 'fdupes'";
     homepage = "https://codeberg.org/jbruchon/jdupes";
     license = lib.licenses.mit;
+    platforms = lib.platforms.unix;
     mainProgram = "jdupes";
   };
 })

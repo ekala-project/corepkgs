@@ -131,6 +131,7 @@ else
     meta = {
       platforms = lib.platforms.unix;
       description = "LD_PRELOAD library to intercept and rewrite the paths in glibc calls";
+      license = lib.licenses.mit;
       longDescription = ''
         libredirect is an LD_PRELOAD library to intercept and rewrite the paths in
         glibc calls based on the value of $NIX_REDIRECTS, a colon-separated list

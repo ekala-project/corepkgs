@@ -31,6 +31,7 @@ stdenvNoCC.mkDerivation rec {
   meta = {
     description = "Xorg's lndir utility, but in simple script form";
     license = lib.licenses.gpl3Plus;
+    platforms = lib.platforms.unix;
     mainProgram = "lndir";
   };
 }

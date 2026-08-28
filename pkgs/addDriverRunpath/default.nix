@@ -17,5 +17,9 @@ makeSetupHook {
     driverLink = "/run/opengl-driver" + lib.optionalString stdenv.hostPlatform.isi686 "-32";
   };
 
-  meta.license = lib.licenses.mit;
+  meta = {
+    description = "Setup hook for adding driver runpath to binaries";
+    license = lib.licenses.mit;
+    platforms = lib.platforms.all;
+  };
 } ./setup-hook.sh

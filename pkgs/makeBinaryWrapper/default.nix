@@ -30,4 +30,10 @@ makeSetupHook {
 
     tests = tests.makeBinaryWrapper;
   };
+
+  meta = {
+    description = "Setup hook for creating binary wrappers";
+    license = lib.licenses.mit;
+    platforms = lib.platforms.all;
+  };
 } ./make-binary-wrapper.sh

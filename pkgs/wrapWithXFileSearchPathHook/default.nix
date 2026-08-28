@@ -1,4 +1,5 @@
 {
+  lib,
   makeBinaryWrapper,
   makeSetupHook,
   writeScript,
@@ -8,6 +9,11 @@ makeSetupHook
   {
     name = "wrapWithXFileSearchPathHook";
     propagatedBuildInputs = [ makeBinaryWrapper ];
+    meta = {
+      description = "Setup hook for wrapping programs with X file search paths";
+      license = lib.licenses.mit;
+      platforms = lib.platforms.all;
+    };
   }
   (
     writeScript "wrapWithXFileSearchPathHook.sh" ''

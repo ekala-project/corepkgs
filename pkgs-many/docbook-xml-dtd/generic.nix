@@ -56,6 +56,8 @@ stdenv.mkDerivation {
   '';
 
   meta = {
+    description = "DocBook XML document type definitions";
+    license = lib.licenses.mit;
     branch = version;
     platforms = lib.platforms.unix;
   };

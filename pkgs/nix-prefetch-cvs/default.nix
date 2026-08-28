@@ -32,6 +32,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     description = "Script used to obtain source hashes for fetchcvs";
+    license = lib.licenses.lgpl21Plus;
     platforms = lib.platforms.unix;
     mainProgram = "nix-prefetch-cvs";
   };

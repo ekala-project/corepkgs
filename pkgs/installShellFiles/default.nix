@@ -13,4 +13,9 @@ makeSetupHook {
       directory = ./tests;
     };
   };
+  meta = {
+    description = "Setup hook for installing shell completion files and man pages";
+    license = lib.licenses.mit;
+    platforms = lib.platforms.all;
+  };
 } ./setup-hook.sh

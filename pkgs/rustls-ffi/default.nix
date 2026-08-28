@@ -70,6 +70,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "C-to-rustls bindings";
     homepage = "https://github.com/rustls/rustls-ffi/";
     pkgConfigModules = [ "rustls" ];
+    platforms = lib.platforms.unix;
     license = with lib.licenses; [
       mit
       asl20

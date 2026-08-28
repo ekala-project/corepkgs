@@ -54,6 +54,7 @@ stdenv.mkDerivation rec {
   meta = {
     description = "Quick-n-dirty BSD licensed clone of the GNU libc backtrace facility";
     license = lib.licenses.bsd2;
+    platforms = lib.platforms.unix;
     homepage = "https://www.freshports.org/devel/libexecinfo";
   };
 }

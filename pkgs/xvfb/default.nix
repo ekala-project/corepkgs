@@ -42,4 +42,13 @@ xorg-server.overrideAttrs (old: {
       libxshmfence
     ]
     ++ lib.optional (libXfont2 != null) libXfont2;
+
+  meta = {
+    description = "Virtual framebuffer X server";
+    homepage = "https://gitlab.freedesktop.org/xorg/xserver";
+    license = lib.licenses.mit;
+    platforms = lib.platforms.unix;
+    mainProgram = "Xvfb";
+    identifiers.cpeParts.vendor = "x.org";
+  };
 })

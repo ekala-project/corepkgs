@@ -17,5 +17,9 @@ makeSetupHook {
     hostNode = "${nodejs}/bin/node";
     jq = "${jq}/bin/jq";
   };
-  meta.license = lib.licenses.mit;
+  meta = {
+    description = "Setup hook for installing Node.js executables";
+    license = lib.licenses.mit;
+    platforms = lib.platforms.all;
+  };
 } ./hook.sh
