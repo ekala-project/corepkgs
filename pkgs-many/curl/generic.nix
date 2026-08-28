@@ -49,7 +49,7 @@
   libssh2,
   wolfssl,
   rustls-ffi,
-  zlib,
+  zlib-ng-compat,
   zstd,
 
   # for passthru.tests
@@ -66,6 +66,17 @@
 }@args:
 
 let
+  inherit (stdenv) isCross;
+  inherit (stdenv.hostPlatform)
+    isLinux
+    isDarwin
+    isStatic
+    isWindows
+    isMusl
+    isOpenBSD
+    isSunOS
+    isCygwin
+    ;
   # Compute conditional defaults that depend on other parameters
   computedOpensslSupport = if opensslSupport != null then opensslSupport else zlibSupport;
   computedGssSupport =
@@ -73,25 +84,19 @@ let
       gssSupport
     else
       (
-        with stdenv.hostPlatform;
-        (
-          !isWindows
-          &&
-            # disable gss because of: undefined reference to `k5_bcmp'
-            # a very sad story re static: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=439039
-            !isStatic
-          &&
-            # the "mig" tool does not configure its compiler correctly. This could be
-            # fixed in mig, but losing gss support on cross compilation to darwin is
-            # not worth the effort.
-            !(isDarwin && (stdenv.buildPlatform != stdenv.hostPlatform))
-        )
+        !isWindows
+        &&
+          # disable gss because of: undefined reference to `k5_bcmp'
+          # a very sad story re static: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=439039
+          !isStatic
+        &&
+          # the "mig" tool does not configure its compiler correctly. This could be
+          # fixed in mig, but losing gss support on cross compilation to darwin is
+          # not worth the effort.
+          !(isDarwin && isCross)
       );
   computedScpSupport =
-    if scpSupport != null then
-      scpSupport
-    else
-      (zlibSupport && !stdenv.hostPlatform.isSunOS && !stdenv.hostPlatform.isCygwin);
+    if scpSupport != null then scpSupport else (zlibSupport && !isSunOS && !isCygwin);
 in
 
 # Note: this package is used for bootstrapping fetchurl, and thus
@@ -137,13 +142,13 @@ stdenv.mkDerivation (finalAttrs: {
     "man"
     "devdoc"
   ];
-  separateDebugInfo = stdenv.hostPlatform.isLinux;
+  separateDebugInfo = isLinux;
 
   enableParallelBuilding = true;
 
   strictDeps = true;
 
-  env = lib.optionalAttrs (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isStatic) {
+  env = lib.optionalAttrs (isDarwin && isStatic) {
     # Not having this causes curl's `configure` script to fail with static builds on Darwin because
     # some of curl's propagated inputs need libiconv.
     NIX_LDFLAGS = "-liconv";
@@ -153,7 +158,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
     perl
   ]
-  ++ lib.optionals stdenv.hostPlatform.isOpenBSD [ autoreconfHook ];
+  ++ lib.optionals isOpenBSD [ autoreconfHook ];
 
   nativeCheckInputs = [
     # See https://github.com/curl/curl/pull/16928
@@ -182,7 +187,7 @@ stdenv.mkDerivation (finalAttrs: {
     ++ lib.optional computedScpSupport libssh2
     ++ lib.optional wolfsslSupport wolfssl
     ++ lib.optional rustlsSupport rustls-ffi
-    ++ lib.optional zlibSupport zlib
+    ++ lib.optional zlibSupport zlib-ng-compat
     ++ lib.optional zstdSupport zstd;
 
   # for the second line see https://curl.haxx.se/mail/tracker-2014-03/0087.html
@@ -216,8 +221,8 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optional computedGssSupport "--with-gssapi=${lib.getDev libkrb5}"
   # For the 'urandom', maybe it should be a cross-system option
-  ++ lib.optional (stdenv.hostPlatform != stdenv.buildPlatform) "--with-random=/dev/urandom"
-  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+  ++ lib.optional isCross "--with-random=/dev/urandom"
+  ++ lib.optionals isDarwin [
     # Disable default CA bundle, use NIX_SSL_CERT_FILE or fallback to nss-cacert from the default profile.
     # Without this curl might detect /etc/ssl/cert.pem at build time on macOS, causing curl to ignore NIX_SSL_CERT_FILE.
     "--without-ca-bundle"
@@ -226,10 +231,10 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals (!gnutlsSupport && !computedOpensslSupport && !wolfsslSupport && !rustlsSupport) [
     "--without-ssl"
   ]
-  ++ lib.optionals (rustlsSupport && !stdenv.hostPlatform.isDarwin) [
+  ++ lib.optionals (rustlsSupport && !isDarwin) [
     "--with-ca-bundle=/etc/ssl/certs/ca-certificates.crt"
   ]
-  ++ lib.optionals (gnutlsSupport && !stdenv.hostPlatform.isDarwin) [
+  ++ lib.optionals (gnutlsSupport && !isDarwin) [
     "--with-ca-path=/etc/ssl/certs"
   ];
 
@@ -243,12 +248,12 @@ stdenv.mkDerivation (finalAttrs: {
   preCheck = ''
     patchShebangs tests/
   ''
-  + lib.optionalString stdenv.hostPlatform.isDarwin ''
+  + lib.optionalString isDarwin ''
     # bad interaction with sandbox if enabled?
     rm tests/data/test1453
     rm tests/data/test1086
   ''
-  + lib.optionalString stdenv.hostPlatform.isMusl ''
+  + lib.optionalString isMusl ''
     # different resolving behaviour?
     rm tests/data/test1592
   '';
@@ -306,7 +311,7 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.curl;
     platforms = lib.platforms.all;
     # Fails to link against static brotli or gss
-    broken = stdenv.hostPlatform.isStatic && (brotliSupport || computedGssSupport);
+    broken = isStatic && (brotliSupport || computedGssSupport);
     pkgConfigModules = [ "libcurl" ];
     mainProgram = "curl";
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "haxx" finalAttrs.version;

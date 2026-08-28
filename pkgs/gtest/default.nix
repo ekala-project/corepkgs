@@ -45,7 +45,7 @@ stdenv.mkDerivation rec {
   ];
 
   nativeBuildInputs = [
-    cmake
+    cmake.minimal
     cmake.configurePhaseHook
     ninja
   ];
