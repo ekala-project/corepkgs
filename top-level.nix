@@ -1608,9 +1608,9 @@ with final;
 
   # The full-featured Git.
   gitFull = git.override {
-    svnSupport = stdenv.buildPlatform == stdenv.hostPlatform && subversionClient != null;
+    svnSupport = !stdenv.isCross && subversionClient != null;
     guiSupport = true;
-    sendEmailSupport = stdenv.buildPlatform == stdenv.hostPlatform;
+    sendEmailSupport = !stdenv.isCross;
     withSsh = true;
     withLibsecret = !stdenv.hostPlatform.isDarwin;
   };
