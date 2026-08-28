@@ -8,14 +8,14 @@
   withZlibCompat ? false,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "zlib-ng";
   version = "2.3.3";
 
   src = fetchFromGitHub {
     owner = "zlib-ng";
     repo = "zlib-ng";
-    rev = version;
+    tag = finalAttrs.version;
     hash = "sha256-6GlHCnx9dQtmViPnvHnMS+l9Z+g6M8ynrSxLhLtmAKU=";
   };
 
@@ -54,6 +54,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/zlib-ng/zlib-ng";
     license = lib.licenses.zlib;
     platforms = lib.platforms.all;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "zlib-ng_project" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "zlib-ng_project" finalAttrs.version;
   };
-}
+})

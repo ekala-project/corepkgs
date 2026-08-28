@@ -511,7 +511,8 @@ with final;
     in
     lib.recurseIntoAttrs aliasSet;
 
-  dbus = callPackage ./pkgs/dbus { };
+  zlib-ng-compat = zlib-ng.override { withZlibCompat = true; };
+
   makeDBusConf = callPackage ./pkgs/dbus/make-dbus-conf.nix { };
 
   fetchpatch =
