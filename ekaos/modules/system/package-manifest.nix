@@ -37,7 +37,15 @@ let
       );
       storePath = builtins.unsafeDiscardStringContext (toString pkg);
       outputPaths = tryOr { } (
-        mapAttrs (_: v: builtins.unsafeDiscardStringContext (toString v)) (pkg.outputs or { })
+        let
+          raw = pkg.outputs or { };
+        in
+        if builtins.isList raw then
+          listToAttrs (
+            map (name: nameValuePair name (builtins.unsafeDiscardStringContext (toString pkg.${name}))) raw
+          )
+        else
+          mapAttrs (_: v: builtins.unsafeDiscardStringContext (toString v)) raw
       );
       licenses =
         let
@@ -102,45 +110,70 @@ let
     };
 
   # Collect service packages from enabled services that have a .package option.
+  # Uses tryEval because accessing options on disabled services may throw
+  # (e.g., internal options like `command` that have no default value).
+  tryGetServicePkg =
+    name: svc:
+    let
+      result = builtins.tryEval (
+        builtins.isAttrs svc
+        && (svc.enable or false)
+        && (svc ? package)
+        && (builtins.isAttrs (svc.package or null) || lib.isDerivation (svc.package or null))
+      );
+    in
+    if result.success && result.value then
+      [
+        {
+          pkg = svc.package;
+          source = "services.${name}";
+        }
+      ]
+    else
+      [ ];
+
+  tryGetSubServicePkg =
+    name: subName: subSvc:
+    let
+      result = builtins.tryEval (
+        builtins.isAttrs subSvc
+        && (subSvc.enable or false)
+        && (subSvc ? package)
+        && (builtins.isAttrs (subSvc.package or null) || lib.isDerivation (subSvc.package or null))
+      );
+    in
+    if result.success && result.value then
+      [
+        {
+          pkg = subSvc.package;
+          source = "services.${name}.${subName}";
+        }
+      ]
+    else
+      [ ];
+
   servicePackages =
     let
       svcs = config.services or { };
       collected = concatLists (
         mapAttrsToList (
           name: svc:
-          if
-            builtins.isAttrs svc
-            && (svc.enable or false)
-            && (svc ? package)
-            && builtins.isAttrs (svc.package or null) or lib.isDerivation (svc.package or null)
-          then
-            [
-              {
-                pkg = svc.package;
-                source = "services.${name}";
-              }
-            ]
+          let
+            direct = tryGetServicePkg name svc;
+          in
+          if direct != [ ] then
+            direct
           else if builtins.isAttrs svc then
             # Check one level of nesting (e.g., services.networking.nginx)
-            concatLists (
-              mapAttrsToList (
-                subName: subSvc:
-                if
-                  builtins.isAttrs subSvc
-                  && (subSvc.enable or false)
-                  && (subSvc ? package)
-                  && (builtins.isAttrs (subSvc.package or null) || lib.isDerivation (subSvc.package or null))
-                then
-                  [
-                    {
-                      pkg = subSvc.package;
-                      source = "services.${name}.${subName}";
-                    }
-                  ]
-                else
-                  [ ]
-              ) (filterAttrs (_: v: builtins.isAttrs v) svc)
-            )
+            let
+              subResult = builtins.tryEval (filterAttrs (_: v: builtins.isAttrs v) svc);
+            in
+            if subResult.success then
+              concatLists (
+                mapAttrsToList (subName: subSvc: tryGetSubServicePkg name subName subSvc) subResult.value
+              )
+            else
+              [ ]
           else
             [ ]
         ) svcs

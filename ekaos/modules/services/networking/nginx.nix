@@ -414,7 +414,7 @@ in
       group = "nginx";
       description = "Nginx web server";
       isSystemUser = true;
-      home = "/var/lib/nginx";
+      homeDirectory = "/var/lib/nginx";
     };
 
     users.groups.nginx = {

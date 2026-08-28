@@ -480,7 +480,7 @@ in
               group = "nixbld";
               description = "Nix build user ${toString n}";
               isSystemUser = true;
-              home = "/var/empty";
+              homeDirectory = "/var/empty";
               shell = "/run/current-system/sw/bin/nologin";
             }
           ) cfg.nrBuildUsers

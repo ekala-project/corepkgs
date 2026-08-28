@@ -31,7 +31,7 @@
         # Create a test user
         users.users.alice = {
           isNormalUser = true;
-          home = "/home/alice";
+          homeDirectory = "/home/alice";
           description = "Alice Test User";
           initialPassword = "testpass";
           extraGroups = [
@@ -43,7 +43,7 @@
         # Create another test user
         users.users.bob = {
           isNormalUser = true;
-          home = "/home/bob";
+          homeDirectory = "/home/bob";
           description = "Bob Test User";
           hashedPassword = "!"; # Locked account
         };

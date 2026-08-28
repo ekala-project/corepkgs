@@ -327,7 +327,7 @@ in
     # Create redis user and group
     users.users.${cfg.user} = {
       isSystemUser = true;
-      home = cfg.dataDir;
+      homeDirectory = cfg.dataDir;
       group = cfg.user;
       description = "Redis server user";
     };

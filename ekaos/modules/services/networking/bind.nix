@@ -106,8 +106,9 @@ in
     };
 
     command = mkOption {
-      type = types.str;
+      type = types.nullOr types.str;
       internal = true;
+      default = null;
       description = "Command to run (set automatically).";
     };
 

@@ -272,7 +272,7 @@ in
     # Create postgres user and group
     users.users.${cfg.user} = {
       isSystemUser = true;
-      home = cfg.dataDir;
+      homeDirectory = cfg.dataDir;
       group = cfg.user;
       description = "PostgreSQL server user";
     };

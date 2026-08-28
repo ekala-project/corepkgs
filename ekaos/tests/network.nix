@@ -58,7 +58,7 @@
         # Create test users
         users.users.alice = {
           isNormalUser = true;
-          home = "/home/alice";
+          homeDirectory = "/home/alice";
           description = "Alice Test User";
           initialPassword = "alicepass";
           extraGroups = [ "wheel" ];
@@ -69,7 +69,7 @@
 
         users.users.bob = {
           isNormalUser = true;
-          home = "/home/bob";
+          homeDirectory = "/home/bob";
           description = "Bob Test User";
           initialPassword = "bobpass";
         };

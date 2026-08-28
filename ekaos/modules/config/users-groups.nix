@@ -44,7 +44,7 @@ let
           description = "The user's auxiliary groups.";
         };
 
-        home = mkOption {
+        homeDirectory = mkOption {
           type = types.str;
           default = if config.isSystemUser then "/var/empty" else "/home/${config.name}";
           description = "The user's home directory.";
@@ -167,7 +167,7 @@ let
       name = "root";
       uid = 0;
       group = "root";
-      home = "/root";
+      homeDirectory = "/root";
       shell = "/run/current-system/sw/bin/bash";
       description = "System administrator";
     }
@@ -175,7 +175,7 @@ let
       name = "nobody";
       uid = 65534;
       group = "nogroup";
-      home = "/var/empty";
+      homeDirectory = "/var/empty";
       shell = "/run/current-system/sw/bin/nologin";
       description = "Unprivileged account";
       isSystemUser = true;
@@ -261,7 +261,7 @@ let
     let
       uid = if user.uid != null then toString user.uid else "1000";
       gid = toString (findFirst (g: g.name == user.group) { gid = 100; } allGroups).gid;
-      home = user.home or "/var/empty";
+      home = user.homeDirectory or "/var/empty";
       shell = user.shell or "/run/current-system/sw/bin/bash";
       description = user.description or "";
     in
@@ -309,10 +309,10 @@ let
       gid = toString (findFirst (g: g.name == user.group) { gid = 100; } allGroups).gid;
     in
     optionalString (user.createHome or false) ''
-      if [ ! -d "${user.home}" ]; then
-        mkdir -p "${user.home}"
-        chown ${uid}:${gid} "${user.home}"
-        chmod 0700 "${user.home}"
+      if [ ! -d "${user.homeDirectory}" ]; then
+        mkdir -p "${user.homeDirectory}"
+        chown ${uid}:${gid} "${user.homeDirectory}"
+        chmod 0700 "${user.homeDirectory}"
       fi
     ''
   ) allUsers;
@@ -326,15 +326,15 @@ let
       gid = toString (findFirst (g: g.name == user.group) { gid = 100; } allGroups).gid;
     in
     optionalString (keys != [ ]) ''
-      if [ ! -d "${user.home}/.ssh" ]; then
-        mkdir -p "${user.home}/.ssh"
-        chmod 0700 "${user.home}/.ssh"
+      if [ ! -d "${user.homeDirectory}/.ssh" ]; then
+        mkdir -p "${user.homeDirectory}/.ssh"
+        chmod 0700 "${user.homeDirectory}/.ssh"
       fi
-      cat > "${user.home}/.ssh/authorized_keys" <<'EOF'
+      cat > "${user.homeDirectory}/.ssh/authorized_keys" <<'EOF'
       ${concatStringsSep "\n" keys}
       EOF
-      chmod 0600 "${user.home}/.ssh/authorized_keys"
-      chown -R ${uid}:${gid} "${user.home}/.ssh"
+      chmod 0600 "${user.homeDirectory}/.ssh/authorized_keys"
+      chown -R ${uid}:${gid} "${user.homeDirectory}/.ssh"
     ''
   ) allUsers;
 
@@ -354,7 +354,7 @@ in
         {
           alice = {
             isNormalUser = true;
-            home = "/home/alice";
+            homeDirectory = "/home/alice";
             description = "Alice User";
             extraGroups = [ "wheel" ];
             hashedPassword = "$6$rounds=656000$...";
