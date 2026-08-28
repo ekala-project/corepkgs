@@ -51,7 +51,6 @@
   withSsh ? false,
   sysctl,
   deterministic-host-uname, # trick Makefile into targeting the host platform when cross-compiling
-  doInstallCheck ? !stdenv.hostPlatform.isDarwin, # extremely slow on darwin
   tests,
 }:
 
@@ -123,7 +122,7 @@ stdenv.mkDerivation (finalAttrs: {
     substituteInPlace contrib/credential/libsecret/Makefile \
         --replace-fail 'pkg-config' "$PKG_CONFIG"
   ''
-  + lib.optionalString doInstallCheck ''
+  + lib.optionalString finalAttrs.doInstallCheck ''
     # ensure we are using the correct shell when executing the test scripts
     patchShebangs t/*.sh
   ''
@@ -427,9 +426,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   ## InstallCheck
 
-  # TODO(corepkgs): move to passthru.tests
-  doCheck = false;
-  doInstallCheck = false;
+  doCheck = false; # same as installCheck
+  doInstallCheck = false; # in passthru
 
   installCheckTarget = "test";
 
