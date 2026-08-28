@@ -1,15 +1,39 @@
 {
   lib,
-  buildPackages ? {
-    inherit stdenvNoCC;
-  },
-  stdenvNoCC,
-  curl, # Note that `curl' may be `null', in case of the native stdenvNoCC.
-  cacert ? null,
+  buildPackages,
+  stdenv,
+  cacert,
   config,
 }:
 
 let
+  # Fetching always runs on the build platform, so everything here comes from
+  # `buildPackages`; natively that is this same package set.
+  inherit (buildPackages) stdenvNoCC;
+
+  # curl's own dependencies would otherwise be fetched by the `fetchurl` this
+  # file defines. Swapping `fetchurl` for `fetchurlBoot` across a whole scope
+  # breaks that cycle once, rather than once per dependency. `minimal` carries
+  # what a fetcher actually uses -- HTTPS, zlib and http2 -- and nothing else:
+  # no scp, gss, brotli, zstd, idn, psl or http3.
+  curl =
+    (buildPackages.appendOverlays [
+      (_: super: {
+        # TODO(corepkgs): recheck if this adds bloat after minimal bootstrap
+        fetchurl = stdenv.fetchurlBoot;
+        # Plain zlib, not zlib-ng: zlib-ng takes its source from
+        # `fetchFromGitHub`, which is built on the `fetchurl` being defined
+        # here, so a zlib-ng curl cannot exist before `fetchurl` does.
+        zlib-ng-compat = super.zlib;
+        # curl only needs libnghttp2; the app would drag in c-ares, libev and
+        # openssl, and the tests cunit and tzdata.
+        nghttp2 = super.nghttp2.override {
+          enableApp = false;
+          enableTests = false;
+        };
+      })
+    ]).curl.minimal;
+
   inherit (config) hashedMirrors rewriteURL;
   mirrors = import ./mirrors.nix // {
     inherit hashedMirrors;
@@ -59,7 +83,7 @@ lib.extendMkDerivation {
     # Passed via passthru
     "url"
 
-    # Additional stdenv.mkDerivation arguments from derived fetchers.
+    # Additional stdenvNoCC.mkDerivation arguments from derived fetchers.
     "derivationArgs"
 
     # Hash attributes will be map to the corresponding outputHash*
@@ -83,7 +107,8 @@ lib.extendMkDerivation {
       # If you wish to pass arguments with spaces, use `curlOptsList`
       curlOpts ? "",
 
-      # Additional curl options needed for the download to succeed.
+      # As `curlOpts`, but each element is passed to curl as one argument, so
+      # options whose values contain spaces survive.
       curlOptsList ? [ ],
 
       # Name of the file when pname + version is unspecified.
@@ -259,7 +284,7 @@ lib.extendMkDerivation {
       urls = urls_;
 
       # If set, prefer the content-addressable mirrors
-      # (http://tarballs.nixos.org) over the original URLs.
+      # (https://tarballs.nixos.org) over the original URLs.
       preferHashedMirrors = false;
 
       # New-style output content requirements.

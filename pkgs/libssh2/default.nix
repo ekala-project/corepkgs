@@ -45,7 +45,7 @@ stdenv.mkDerivation rec {
       mc
       vlc
       ;
-    curl = (curl.override { scpSupport = true; }).tests.withCheck;
+    curl = curl.tests.withCheck;
   };
 
   meta = {
