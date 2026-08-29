@@ -139,6 +139,7 @@ with final;
   gtkmm3 = null;
   gunicorn = null;
   highlight = null;
+  ibusMinimal = null; # sdl3 `ibusSupport`; only its headers' constants are read
   icewm = null;
   imv = null; # libheif tests
   isocodes = null; # gtk3, gtk4
@@ -147,15 +148,19 @@ with final;
   knot-dns = null;
   knot-resolver_5 = null;
   lbzip2 = null; # for conda-unpack hook
+  libayatana-appindicator = null; # sdl3 `traySupport`
+  libdecor = null; # sdl3 `libdecorSupport`, xwayland
   libgeotiff = null;
   libgit2-glib = null;
   libguestfs = null;
+  libjack2 = null; # sdl3 `jackSupport`, ffmpeg, qemu
   liblqr1 = null; # imagemagick, imagemagick6
   libnatspec = null;
   libraqm = null; # imagemagick
   libraw = null; # imagemagick
   libotr = null;
   libpq = null; # defaultGemConfig, defaultCrateOverrides, gawkextlib pgsql extension
+  libpulseaudio = null; # sdl3 `pulseaudioSupport`, ffmpeg, qemu
   librsvg = null; # gtk4, ffmpeg, imagemagick, djvulibre, nvidia-x11 settings, wrapGAppsHook
   libsysprof-capture = null;
   libvirt = null;
@@ -184,6 +189,7 @@ with final;
   opencv = null;
   openimageio = null;
   ostinato = null;
+  pipewire = null; # sdl3 `pipewireSupport`, qemu, alsa-lib; needs gstreamer, libsndfile, lilv
   pika = null;
   pinentry = null;
   psutils = null;
@@ -202,6 +208,7 @@ with final;
   seqdiag = null;
   setproctitle = null;
   shaderc = null; # ffmpeg, gtk4
+  sndio = null; # sdl3 `sndioSupport`, off on every platform
   spamassassin = null;
   squid = null;
   subversionClient = null;
