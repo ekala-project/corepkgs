@@ -1,3 +1,8 @@
+---
+name: porting
+description: Port a package from nixpkgs into corepkgs. Use when adding a package that already exists upstream — covers checking dependencies before copying, stripping nixpkgs-only attributes, adding TODOs for missing features, and wiring it into top-level.nix.
+---
+
 # Porting from nixpkgs
 
 ## Workflow

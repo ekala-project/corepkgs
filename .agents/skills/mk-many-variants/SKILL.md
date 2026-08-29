@@ -1,3 +1,8 @@
+---
+name: mk-many-variants
+description: Work with multi-version packages under pkgs-many (guile, go, erlang, perl, openssl, ...). Use when adding or changing a package that ships several versions side by side — covers the default.nix/variants.nix/generic.nix three-file pattern, the packageOlder/packageAtLeast version helpers, and mkVariantPassthru.
+---
+
 # mkManyVariants - Multi-Version Package Management
 
 This skill helps you work with the `mkManyVariants` pattern used in this codebase for managing packages that need to support multiple versions (e.g., guile, go, erlang, perl, openssl).

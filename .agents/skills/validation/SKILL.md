@@ -1,3 +1,8 @@
+---
+name: validation
+description: Validate a package change before committing. Use after editing any Nix expression — covers the evaluation, build, and format checks, reading common eval and build errors, and the full pre-commit checklist.
+---
+
 # Package Validation
 
 All package changes must pass three validation steps:
