@@ -69,9 +69,23 @@ let
     in
     if variants.success then variants.value else [ ];
 
+  # Forced through `tryEval` because an attribute that throws is not a
+  # placeholder: it still has to reach `probe`, which is what decides whether
+  # the throw is a package correctly refusing to evaluate or a real bug.
+  isPlaceholder =
+    value:
+    let
+      forced = builtins.tryEval value;
+    in
+    forced.success && forced.value == null;
+
   names = builtins.attrNames pkgs;
   manyVariantNames = builtins.attrNames (builtins.readDir ../pkgs-many);
 
-  targets = map (name: pkgs.${name}) names ++ lib.concatMap variantsOf manyVariantNames;
+  candidates = map (name: pkgs.${name}) names ++ lib.concatMap variantsOf manyVariantNames;
+  targets = builtins.filter (value: !isPlaceholder value) candidates;
 in
-builtins.deepSeq (map probe targets) (builtins.length targets)
+builtins.deepSeq (map probe targets) {
+  evaluated = builtins.length targets;
+  placeholders = builtins.length candidates - builtins.length targets;
+}
