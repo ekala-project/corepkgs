@@ -57,7 +57,7 @@
   nvidiaSupport ? false,
   libXNVCtrl ? null,
   pulseSupport ? config.pulseaudio or false,
-  libpulseaudio ? null,
+  libpulseaudio,
 
   curlSupport ? true,
   curl ? null,
