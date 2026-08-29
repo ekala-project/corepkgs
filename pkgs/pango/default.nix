@@ -74,8 +74,6 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.mesonEnable "xft" x11Support)
   ];
 
-  mesonBuildType = "release";
-
   env.FONTCONFIG_FILE = makeFontsConf {
     fontDirectories = [ dejavu_fonts ];
   };

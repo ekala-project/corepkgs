@@ -72,8 +72,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   propagatedBuildInputs = lib.optional withGraphite2 graphite2 ++ lib.optional withIcu icu;
 
-  mesonBuildType = "release";
-
   passthru.tests = {
     pkg-config = testers.hasPkgConfigModules {
       package = finalAttrs.finalPackage;

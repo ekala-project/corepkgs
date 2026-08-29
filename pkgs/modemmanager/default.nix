@@ -99,8 +99,6 @@ stdenv.mkDerivation rec {
       tools/test-modemmanager-service.py
   '';
 
-  mesonBuildType = "release";
-
   meta = {
     description = "WWAN modem manager, part of NetworkManager";
     homepage = "https://www.freedesktop.org/wiki/Software/ModemManager/";

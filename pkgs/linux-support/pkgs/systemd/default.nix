@@ -415,8 +415,6 @@ stdenv.mkDerivation (finalAttrs: {
     }
   );
 
-  mesonBuildType = "release";
-
   mesonFlags = [
     # Options
 

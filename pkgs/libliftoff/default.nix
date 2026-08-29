@@ -29,8 +29,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [ libdrm ];
 
-  mesonBuildType = "release";
-
   meta = {
     description = "Lightweight KMS plane library";
     homepage = "https://gitlab.freedesktop.org/emersion/libliftoff";

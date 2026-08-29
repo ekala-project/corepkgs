@@ -73,7 +73,6 @@ stdenv.mkDerivation (finalAttrs: {
     hwdata
   ];
 
-  mesonBuildType = "release";
   mesonAutoFeatures = "auto";
 
   propagatedBuildInputs = [
