@@ -2,7 +2,6 @@
   buildPerlPackage,
   imagemagick,
   lib,
-  version,
 }:
 
 buildPerlPackage rec {
