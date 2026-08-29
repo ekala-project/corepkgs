@@ -97,5 +97,4 @@ with self;
   makeFullPerlPath = deps: makePerlPath (lib.misc.closePropagation deps);
 
   PerlMagick = throw "Use ImageMagick instead";
-  version = self.Version;
 }
