@@ -41,14 +41,14 @@
   alsaSupport ? lib.hasSuffix "linux" stdenv.hostPlatform.system && !nixosTestRunner && !minimal,
   pulseSupport ?
     !stdenv.hostPlatform.isDarwin && !nixosTestRunner && !minimal && libpulseaudio != null,
-  libpulseaudio ? null,
+  libpulseaudio,
   pipewireSupport ? !stdenv.hostPlatform.isDarwin && !nixosTestRunner && !minimal && pipewire != null,
-  pipewire ? null,
+  pipewire,
   sdlSupport ? !stdenv.hostPlatform.isDarwin && !nixosTestRunner && !minimal,
-  SDL2 ? null,
+  sdl2-compat,
   SDL2_image ? null,
   jackSupport ? !stdenv.hostPlatform.isDarwin && !nixosTestRunner && !minimal && libjack2 != null,
-  libjack2 ? null,
+  libjack2,
   gtkSupport ?
     !stdenv.hostPlatform.isDarwin && !xenSupport && !nixosTestRunner && !minimal && vte != null,
   gtk3,
@@ -207,7 +207,7 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals pulseSupport [ libpulseaudio ]
   ++ lib.optionals pipewireSupport [ pipewire ]
   ++ lib.optionals sdlSupport [
-    SDL2
+    sdl2-compat
     SDL2_image
   ]
   ++ lib.optionals jackSupport [ libjack2 ]
