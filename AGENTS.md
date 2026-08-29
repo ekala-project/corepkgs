@@ -5,19 +5,17 @@ This document provides high-level guidelines for AI agents working with the core
 **Quick access to detailed guides:**
 - [`.agents/skills/cmake/SKILL.md`](.agents/skills/cmake/SKILL.md) - CMake build system
 - [`.agents/skills/meson/SKILL.md`](.agents/skills/meson/SKILL.md) - Meson build system
-- [`.agents/skills/packaging/SKILL.md`](.agents/skills/packaging/SKILL.md) - Packaging conventions
-- [`.agents/skills/validation/SKILL.md`](.agents/skills/validation/SKILL.md) - Validation and testing
-- [`.agents/skills/porting/SKILL.md`](.agents/skills/porting/SKILL.md) - Porting from nixpkgs
+- [`.agents/skills/packaging/SKILL.md`](.agents/skills/packaging/SKILL.md) - Packaging conventions, including dependency management, cross-compilation, and passthru attributes
+- [`.agents/skills/validation/SKILL.md`](.agents/skills/validation/SKILL.md) - Validation and testing, including troubleshooting and advanced validation
+- [`.agents/skills/porting/SKILL.md`](.agents/skills/porting/SKILL.md) - Porting from nixpkgs, including complete examples and best practices
 - [`.agents/skills/mk-many-variants/SKILL.md`](.agents/skills/mk-many-variants/SKILL.md) - Multi-version packages in pkgs-many
 - [`docs/common-issues/`](docs/common-issues/README.md) - Fixing build failures after version updates
 
 ## Package Organization
 
-### Automatic Package Scope Registration
-
 Packages in `pkgs/` and `pkgs-many/` are automatically added to the `pkgs.*` package scope based on their directory name.
 
-#### `pkgs/` Directory
+### `pkgs/` Directory
 
 Individual packages are placed in `pkgs/<package-name>/default.nix`. The package is automatically available as `pkgs.<package-name>` without requiring an explicit entry in `top-level.nix`.
 
@@ -46,14 +44,14 @@ libxslt = callPackage ./pkgs/libxslt {
 };
 ```
 
-#### `pkgs-many/` Directory
+### `pkgs-many/` Directory
 
 Packages that produce multiple variants should use the `mkManyVariants` paradigm and be placed in `pkgs-many/`.
 
 **Example structure:**
 ```
 # Uses mkManyVariants to create python39, python310, python311, etc.
-pkgs-many/python/default.nix  
+pkgs-many/python/default.nix
 ```
 
 The variants are automatically available in the package scope (e.g., `pkgs.python39`, `pkgs.python310`).
@@ -86,7 +84,6 @@ meta = {
 
 ### Testing
 
-**Key points:**
 - `doCheck = false;` is the default - don't set it explicitly
 - Prefer `passthru.tests` for unit tests
 - Only enable `doCheck = true;` for critical packages
@@ -107,52 +104,7 @@ Include `meson.configurePhaseHook` and `ninja` in nativeBuildInputs, specify `me
 
 **Detailed guide:** See [`.agents/skills/meson/SKILL.md`](.agents/skills/meson/SKILL.md) for complete Meson documentation.
 
-
-## Validation Requirements
-
-All added or edited package attributes **must** pass three validation steps:
-
-### 1. Evaluation Check
-
-```bash
-nix-instantiate -A <package-name>
-```
-
-Verifies the Nix expression evaluates correctly.
-
-### 2. Build Check
-
-```bash
-nix-build -A <package-name>
-```
-
-Verifies the package builds successfully.
-
-### 3. Format Check
-
-```bash
-nix fmt <path-to-file>
-```
-
-Ensures code follows formatting standards.
-
-**Detailed guide:** See [`.agents/skills/validation/SKILL.md`](.agents/skills/validation/SKILL.md) for complete validation procedures, troubleshooting, and advanced validation techniques.
-
-## Fixing Build Failures After Version Updates
-
-See [`docs/common-issues/`](docs/common-issues/README.md) for detailed guides on fixing build failures. The most frequent patterns:
-
-- **Obsolete patches** — Remove `fetchpatch`/`fetchurl` entries that are already applied upstream. Also clean up unused imports. See [obsolete-patches.md](docs/common-issues/obsolete-patches.md).
-- **Python build system changes** — Upstream switches from `setuptools` to `hatchling`, pins incompatible tool versions, or adds unavailable dependencies. See [python-packages.md](docs/common-issues/python-packages.md).
-- **Compiler `-Werror` failures** — Suppress specific warnings with `env.NIX_CFLAGS_COMPILE`. See [compiler-errors.md](docs/common-issues/compiler-errors.md).
-- **CMake install paths** — Major version bumps may need explicit `-DCMAKE_INSTALL_INCLUDEDIR`/`-DCMAKE_INSTALL_LIBDIR` flags. See [cmake-packages.md](docs/common-issues/cmake-packages.md).
-- **Rust/Go hash mismatches** — Update `cargoHash`/`vendorHash`, or patch `go.mod` version pins. See [rust-packages.md](docs/common-issues/rust-packages.md).
-- **Transitive dependency failures** — "Build failed due to failed dependency" means a *different* package is broken. Fix that one first. See [dependency-failures.md](docs/common-issues/dependency-failures.md).
-- **mkManyVariants packages** — Version and hash live in `variants.nix`, not `default.nix`.
-
-## Common Patterns
-
-### Checking if Dependencies Exist
+## Checking if Dependencies Exist
 
 Before porting a package, verify that all required dependencies are available in core-pkgs.
 
@@ -172,47 +124,48 @@ for dep in acl lzo cmocka libuuid util-linux zlib zstd; do
 done
 ```
 
-**Output:**
-```
-acl: ✓ available
-lzo: ✓ available
-cmocka: ✓ available
-libuuid: ✓ available
-util-linux: ✓ available
-zlib: ✓ available
-zstd: ✓ available
-```
-
 **Important:** Do NOT search `top-level.nix` with grep to check for dependencies. Packages in `pkgs/` and `pkgs-many/` are automatically registered and may not appear in `top-level.nix`. Always use `nix-instantiate` to verify availability.
 
-**NOTE:** For non derivation attrs, use `nix-instantiate --eval -A <dep>` which can evaluate to non derivations
+## Validation
 
-### Porting from nixpkgs
+All added or edited package attributes **must** pass three steps:
 
-When porting a package from nixpkgs:
+1. **Evaluate** — `nix-instantiate -A <package-name>` verifies the Nix expression evaluates correctly. For non-derivation attrs use `nix-instantiate --eval -A <attr>`.
+2. **Build** — `nix-build -A <package-name>` verifies the package builds successfully.
+3. **Format** — `nix fmt <path-to-file>` ensures code follows formatting standards.
 
-1. **Check dependencies first** - use `nix-instantiate -A <dep>` to verify all dependencies exist
-2. **Copy the package files** to the appropriate directory (`pkgs/` or `pkgs-many/`)
-3. **Remove `meta.maintainers` and `meta.teams`** fields
-4. **Remove update scripts** (e.g., `updateScript = gnome.updateScript { ... }`)
-5. **Add TODO comments** for missing dependencies
-6. **Validate** and **format** the files
-
-**Detailed guide:** See [`.agents/skills/porting/SKILL.md`](.agents/skills/porting/SKILL.md) for complete porting workflow, examples, and troubleshooting.
-
-## Validation Checklist
-
-Before submitting changes, ensure:
+Before submitting changes, also confirm:
 
 - [ ] All dependencies verified with `nix-instantiate -A <dep>`
 - [ ] Package in correct directory (`pkgs/` or `pkgs-many/`)
 - [ ] No `meta.maintainers` or `meta.teams`
-- [ ] `nix-instantiate -A <package>` succeeds
-- [ ] `nix-build -A <package>` succeeds
-- [ ] `nix fmt <file>` run on all edited files
 - [ ] TODO comments added for missing dependencies
 
-**Complete checklist:** See [`.agents/skills/validation/SKILL.md`](.agents/skills/validation/SKILL.md#validation-checklist) for the full validation checklist.
+**Detailed guide:** See [`.agents/skills/validation/SKILL.md`](.agents/skills/validation/SKILL.md) for complete validation procedures, troubleshooting, advanced validation techniques, and the [full checklist](.agents/skills/validation/SKILL.md#validation-checklist).
+
+## Porting from nixpkgs
+
+When porting a package from nixpkgs:
+
+1. **Check dependencies first** - see [Checking if Dependencies Exist](#checking-if-dependencies-exist)
+2. **Copy the package files** to the appropriate directory (`pkgs/` or `pkgs-many/`)
+3. **Strip nixpkgs-only fields** - `meta.maintainers`, `meta.teams`, and update scripts (e.g., `updateScript = gnome.updateScript { ... }`)
+4. **Add TODO comments** for missing dependencies
+5. **Validate** and **format** the files - see [Validation](#validation)
+
+**Detailed guide:** See [`.agents/skills/porting/SKILL.md`](.agents/skills/porting/SKILL.md) for complete porting workflow, examples, and troubleshooting.
+
+## Fixing Build Failures After Version Updates
+
+See [`docs/common-issues/`](docs/common-issues/README.md) for detailed guides on fixing build failures. The most frequent patterns:
+
+- **Obsolete patches** — Remove `fetchpatch`/`fetchurl` entries that are already applied upstream. Also clean up unused imports. See [obsolete-patches.md](docs/common-issues/obsolete-patches.md).
+- **Python build system changes** — Upstream switches from `setuptools` to `hatchling`, pins incompatible tool versions, or adds unavailable dependencies. See [python-packages.md](docs/common-issues/python-packages.md).
+- **Compiler `-Werror` failures** — Suppress specific warnings with `env.NIX_CFLAGS_COMPILE`. See [compiler-errors.md](docs/common-issues/compiler-errors.md).
+- **CMake install paths** — Major version bumps may need explicit `-DCMAKE_INSTALL_INCLUDEDIR`/`-DCMAKE_INSTALL_LIBDIR` flags. See [cmake-packages.md](docs/common-issues/cmake-packages.md).
+- **Rust/Go hash mismatches** — Update `cargoHash`/`vendorHash`, or patch `go.mod` version pins. See [rust-packages.md](docs/common-issues/rust-packages.md).
+- **Transitive dependency failures** — "Build failed due to failed dependency" means a *different* package is broken. Fix that one first. See [dependency-failures.md](docs/common-issues/dependency-failures.md).
+- **mkManyVariants packages** — Version and hash live in `variants.nix`, not `default.nix`.
 
 ## ekaos Reusable Modules
 
@@ -239,13 +192,3 @@ services.myservice = {
   };
 };
 ```
-
-## Additional Resources
-
-For detailed information on specific topics:
-
-- **Build systems:** [`.agents/skills/cmake/SKILL.md`](.agents/skills/cmake/SKILL.md) and [`.agents/skills/meson/SKILL.md`](.agents/skills/meson/SKILL.md)
-- **Packaging:** [`.agents/skills/packaging/SKILL.md`](.agents/skills/packaging/SKILL.md) - includes dependency management, cross-compilation, and passthru attributes
-- **Validation:** [`.agents/skills/validation/SKILL.md`](.agents/skills/validation/SKILL.md) - includes troubleshooting and advanced validation
-- **Porting:** [`.agents/skills/porting/SKILL.md`](.agents/skills/porting/SKILL.md) - includes complete examples and best practices
-- **All skills:** [`.agents/skills/README.md`](.agents/skills/README.md) - index of all available skill guides
