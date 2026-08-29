@@ -170,7 +170,7 @@ class TestCLI:
         output_dir = tmp_path / "output"
         
         # Run script with --dry-run
-        script_path = Path(__file__).parent.parent / "script.py"
+        script_path = Path(__file__).parent.parent / "sync.py"
         
         result = subprocess.run(
             [
@@ -199,7 +199,7 @@ class TestCLI:
         output_dir = tmp_path / "output"
         output_dir.mkdir()
         
-        script_path = Path(__file__).parent.parent / "script.py"
+        script_path = Path(__file__).parent.parent / "sync.py"
         
         result = subprocess.run(
             [
@@ -222,7 +222,7 @@ class TestCLI:
 
     def test_missing_corepkgs_error(self, tmp_path):
         """Test error when corepkgs directory doesn't exist."""
-        script_path = Path(__file__).parent.parent / "script.py"
+        script_path = Path(__file__).parent.parent / "sync.py"
         
         result = subprocess.run(
             [
@@ -240,7 +240,7 @@ class TestCLI:
 
     def test_missing_nixpkgs_error(self, mock_corepkgs, tmp_path):
         """Test error when nixpkgs directory doesn't exist."""
-        script_path = Path(__file__).parent.parent / "script.py"
+        script_path = Path(__file__).parent.parent / "sync.py"
         
         result = subprocess.run(
             [

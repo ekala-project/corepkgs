@@ -2,7 +2,7 @@
 # Generate a Repology-compatible packages.json metadata dump.
 #
 # Usage:
-#   ./maintainers/scripts/repology/generate.sh [--compress] [--output DIR]
+#   ./scripts/repology/generate.sh [--compress] [--output DIR]
 #
 # Options:
 #   --compress    Also produce a brotli-compressed .json.br file
