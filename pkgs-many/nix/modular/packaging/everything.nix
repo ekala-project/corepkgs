@@ -90,6 +90,30 @@ let
     ];
   };
 
+  /**
+    The unit and functional test derivations for this package, exposed through
+    `passthru.tests` and reused as `checkInputs` for when `doCheck` is overridden.
+  */
+  componentTests = {
+    util = nix-util-tests.tests.run;
+    store = nix-store-tests.tests.run;
+    expr = nix-expr-tests.tests.run;
+    fetchers = nix-fetchers-tests.tests.run;
+    flake = nix-flake-tests.tests.run;
+    functional = nix-functional-tests;
+  }
+  //
+    lib.optionalAttrs
+      (
+        nix-perl-bindings != null
+        && !stdenv.hostPlatform.isStatic
+        && stdenv.buildPlatform.canExecute stdenv.hostPlatform
+      )
+      {
+        # Perl currently fails in static build
+        perl-bindings = nix-perl-bindings;
+      };
+
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "nix";
@@ -122,42 +146,19 @@ stdenv.mkDerivation (finalAttrs: {
   dontBuild = true;
 
   /**
-    `doCheck` controles whether tests are added as build gate for the combined package.
-    This includes both the unit tests and the functional tests, but not the
-    integration tests that run in CI (the flake's `hydraJobs` and some of the `checks`).
-  */
-  doCheck = true;
-
-  /**
     `fixupPhase` currently doesn't understand that a symlink output isn't writable.
 
     We don't compile or link anything in this derivation, so fixups aren't needed.
   */
   dontFixup = true;
 
-  checkInputs = [
-    # Make sure the unit tests have passed
-    nix-util-tests.tests.run
-    nix-store-tests.tests.run
-    nix-expr-tests.tests.run
-    nix-fetchers-tests.tests.run
-    nix-flake-tests.tests.run
-
-    # Make sure the functional tests have passed
-    nix-functional-tests
-  ]
-  ++
-    lib.optionals
-      (
-        nix-perl-bindings != null
-        && !stdenv.hostPlatform.isStatic
-        && stdenv.buildPlatform.canExecute stdenv.hostPlatform
-      )
-      [
-        # Perl currently fails in static build
-        # TODO: Split out tests into a separate derivation?
-        nix-perl-bindings
-      ];
+  /**
+    Tests do not gate this build: `doCheck` is `false` across the package set.
+    Build them individually from `passthru.tests`, or set `doCheck = true` to make
+    the unit and functional tests block the build again. Either way this excludes
+    the integration tests that run in CI (the flake's `hydraJobs` and some `checks`).
+  */
+  checkInputs = lib.attrValues componentTests;
 
   nativeBuildInputs = [
     lndir
@@ -220,7 +221,7 @@ stdenv.mkDerivation (finalAttrs: {
       Extra tests that test this package, but do not run as part of the build.
       See <https://nixos.org/manual/nixpkgs/stable/index.html#var-passthru-tests>
     */
-    tests = {
+    tests = componentTests // {
       pkg-config = testers.hasPkgConfigModules {
         package = finalAttrs.finalPackage;
       };
