@@ -21,6 +21,8 @@ with pkgs;
 # These largely reflect Nixpkgs aliases
 mapAliases {
   # keep-sorted start
+  SDL = sdl12-compat;
+  SDL2 = sdl2-compat;
   armTrustedFirmwareAllwinner = arm-trusted-firmware.allwinner;
   armTrustedFirmwareAllwinnerH6 = arm-trusted-firmware.allwinnerH6;
   armTrustedFirmwareAllwinnerH616 = arm-trusted-firmware.allwinnerH616;
