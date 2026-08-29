@@ -114,7 +114,7 @@ mapAliases {
   jdk11 = java.v11;
   jdk17 = java.v17;
   jdk21 = java;
-  libnghttp2 = nghttp2.lib;
+  libnghttp2 = nghttp2;
   kotlinc = kotlin;
   libtool2 = libtool.v2_5;
   libtool_1_5 = libtool.v1_5;

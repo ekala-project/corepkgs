@@ -17,7 +17,7 @@
   python3,
   gi-docgen,
   brotli,
-  libnghttp2,
+  nghttp2,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -58,7 +58,7 @@ stdenv.mkDerivation (finalAttrs: {
     libpsl
     glib.out
     brotli
-    libnghttp2
+    nghttp2
   ];
 
   propagatedBuildInputs = [
@@ -79,9 +79,6 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.mesonEnable "introspection" withIntrospection)
     (lib.mesonEnable "vapi" withIntrospection)
   ];
-
-  # TODO: For some reason the pkg-config setup hook does not pick this up.
-  env.PKG_CONFIG_PATH = "${libnghttp2.dev}/lib/pkgconfig";
 
   separateDebugInfo = true;
 
