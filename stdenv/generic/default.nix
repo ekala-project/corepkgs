@@ -24,7 +24,7 @@ let
 
       # The `fetchurl' to use for downloading curl and its dependencies
       # (see top-level.nix).
-      fetchurlBoot,
+      fetchurl-bootstrap,
 
       setupScript ? ./setup.sh,
 
@@ -204,7 +204,7 @@ let
 
       isCross = hostPlatform != buildPlatform;
 
-      inherit fetchurlBoot;
+      inherit fetchurl-bootstrap;
 
       inherit overrides;
 

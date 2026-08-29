@@ -11,24 +11,24 @@ let
   inherit (buildPackages) stdenvNoCC;
 
   # curl's own dependencies would otherwise be fetched by the `fetchurl` this
-  # file defines. Rebuilding just those against `fetchurlBoot` breaks the cycle
+  # file defines. Rebuilding just those against `fetchurl-bootstrap` breaks the cycle
   # inside this package set; `appendOverlays` would build a second one.
-  inherit (stdenvNoCC) fetchurlBoot;
+  inherit (stdenvNoCC) fetchurl-bootstrap;
 
-  perlBoot = buildPackages.perl.override { fetchurl = fetchurlBoot; };
+  perl-bootstrap = buildPackages.perl.override { fetchurl = fetchurl-bootstrap; };
 
   # Only the wrapped tool is in scope, so the rebuild has to reach through it
   # to the unwrapped package that actually has a source.
-  pkgConfigBoot = buildPackages.pkg-config.override (old: {
-    pkg-config = old.pkg-config.override { fetchurl = fetchurlBoot; };
+  pkg-config-bootstrap = buildPackages.pkg-config.override (old: {
+    pkg-config = old.pkg-config.override { fetchurl = fetchurl-bootstrap; };
   });
 
   curl = buildPackages.curl.minimal.override {
-    fetchurl = fetchurlBoot;
-    perl = perlBoot;
+    fetchurl = fetchurl-bootstrap;
+    perl = perl-bootstrap;
     # Only the wrapped tool is in scope, so the rebuild has to reach through it
     # to the unwrapped package that actually has a source.
-    pkg-config = pkgConfigBoot;
+    pkg-config = pkg-config-bootstrap;
     # Plain zlib, not zlib-ng: zlib-ng takes its source from
     # `fetchFromGitHub`, which is built on the `fetchurl` being defined
     # here, so a zlib-ng curl cannot exist before `fetchurl` does.
@@ -36,18 +36,18 @@ let
     # curl only needs libnghttp2; the app would drag in c-ares, libev and
     # openssl, and the tests cunit and tzdata.
     nghttp2 = buildPackages.nghttp2.override {
-      fetchurl = fetchurlBoot;
+      fetchurl = fetchurl-bootstrap;
       enableApp = false;
       enableTests = false;
-      pkg-config = pkgConfigBoot;
+      pkg-config = pkg-config-bootstrap;
     };
     openssl = buildPackages.openssl.override {
-      fetchurl = fetchurlBoot;
-      perl = perlBoot;
+      fetchurl = fetchurl-bootstrap;
+      perl = perl-bootstrap;
       # openssl reaches for `buildPackages.perl` directly, which would be the
       # un-rebuilt one and so reintroduce the cycle.
       buildPackages = buildPackages // {
-        perl = perlBoot;
+        perl = perl-bootstrap;
       };
     };
   };
