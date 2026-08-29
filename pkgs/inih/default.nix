@@ -27,6 +27,7 @@ stdenv.mkDerivation (finalAttrs: {
     runHook preConfigure
     meson setup build \
       --prefix=$out \
+      --buildtype=release \
       -Ddefault_library=shared \
       -Ddistro_install=true
     runHook postConfigure
