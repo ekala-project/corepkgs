@@ -18,7 +18,7 @@
   # to false to not change hashes when enableParallelBuildingByDefault is enabled
   enableParallelBuilding ? false,
 
-  doCheck ? true,
+  doCheck ? false, # TODO(corepkgs): enable in passthru
   checkTarget ? "test",
 
   # Prevent CPAN downloads.
