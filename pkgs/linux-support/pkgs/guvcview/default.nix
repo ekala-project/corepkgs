@@ -7,7 +7,7 @@
   intltool,
   pkg-config,
   portaudio,
-  SDL2,
+  sdl2-compat,
   ffmpeg,
   udev,
   libusb1,
@@ -45,7 +45,7 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals useQt [ wrapQtAppsHook ];
 
   buildInputs = [
-    SDL2
+    sdl2-compat
     alsa-lib
     ffmpeg
     libusb1
