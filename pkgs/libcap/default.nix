@@ -12,9 +12,8 @@
   go,
   withGo ? lib.meta.availableOn stdenv.buildPlatform go && stdenv.hostPlatform.go.GOARCH != null,
 
-  # passthru.tests, don't force them to be available in corepkgs
+  # for passthru.tests
   bind,
-  chrony,
   libgcrypt,
   libvirt,
   ntp,
@@ -115,7 +114,6 @@ stdenv.mkDerivation rec {
   passthru.tests = {
     inherit
       bind
-      chrony
       libgcrypt
       libvirt
       ntp
