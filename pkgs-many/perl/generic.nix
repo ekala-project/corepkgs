@@ -67,15 +67,16 @@ let
           # - adds spliced package sets to the package set
           (
             {
-              stdenv,
-              pkgs,
               perl,
               callPackage,
               makeScopeWithSplicing',
             }:
             let
+              # One directory per package under perl/pkgs, auto-called from this
+              # scope so each expression declares its dependencies as arguments.
+              autoCalledOverlay = lib.packageSets.mkAutoCalledPackageDir ../../perl/pkgs;
+
               perlPackagesFun = callPackage ../../perl/perl-packages.nix {
-                inherit stdenv pkgs;
                 perl = self;
               };
 
@@ -89,7 +90,7 @@ let
             in
             makeScopeWithSplicing' {
               inherit otherSplices;
-              f = perlPackagesFun;
+              f = lib.extends autoCalledOverlay perlPackagesFun;
             }
           )
           {
