@@ -9,13 +9,11 @@ import re
 import shutil
 import subprocess
 import sys
-import tempfile
 from collections import defaultdict
 from pathlib import Path
 from typing import Optional
 
 PATCHES_DIR = "patches"
-IGNORED_PATCHES_DIR = "maintainers/scripts/sync-with-nixpkgs/ignored-patches"
 
 # =============================================================================
 # PATCH CONTENT TRANSFORMATIONS AND FILTERS
@@ -371,81 +369,6 @@ def apply_pattern_aliases(nixpkgs_content: str, corepkgs_content: str) -> str:
     return result
 
 
-def load_ignored_patch(patch_path: str, ignored_patches_dir: Path) -> Optional[str]:
-    """
-    Load an ignored patch file if it exists.
-
-    Args:
-        patch_path: The relative patch path (e.g., "patches/pkgs/curl.patch")
-        ignored_patches_dir: Directory containing ignored patches
-
-    Returns:
-        Patch content if exists, None otherwise
-    """
-    # Extract the patch filename from the full path
-    # e.g., "patches/pkgs/curl.patch" -> "pkgs/curl.patch"
-    if patch_path.startswith(f"{PATCHES_DIR}/"):
-        rel_patch_path = patch_path[len(f"{PATCHES_DIR}/") :]
-    else:
-        rel_patch_path = patch_path
-
-    ignored_patch_file = ignored_patches_dir / rel_patch_path
-
-    if ignored_patch_file.exists() and ignored_patch_file.is_file():
-        try:
-            with open(ignored_patch_file, "r", encoding="utf-8") as f:
-                return f.read()
-        except (IOError, OSError):
-            return None
-
-    return None
-
-
-def apply_patch_to_content(
-    content: str, patch_content: str, file_path: str
-) -> Optional[str]:
-    """
-    Apply a patch to file content using patch command.
-
-    Args:
-        content: Original file content
-        patch_content: Unified diff patch content
-        file_path: Relative file path that the patch expects
-
-    Returns:
-        Patched content if successful, None if patch fails
-    """
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp_path = Path(tmpdir)
-
-        # Create the directory structure for the file
-        full_file_path = tmp_path / file_path
-        full_file_path.parent.mkdir(parents=True, exist_ok=True)
-
-        # Write original content to temp file
-        full_file_path.write_text(content, encoding="utf-8")
-
-        # Apply patch using patch command
-        # Use -p1 to strip "a/" and "b/" prefixes
-        # Use --no-backup-if-mismatch to avoid creating .orig files
-        result = subprocess.run(
-            ["patch", "-p1", "--no-backup-if-mismatch", file_path],
-            input=patch_content,
-            cwd=tmp_path,
-            capture_output=True,
-            text=True,
-        )
-
-        if result.returncode != 0:
-            return None
-
-        # Read patched content
-        try:
-            return full_file_path.read_text(encoding="utf-8")
-        except (IOError, OSError):
-            return None
-
-
 def should_ignore_change(line: str) -> bool:
     """
     Check if a changed line should be ignored based on IGNORE_CHANGE_PATTERNS.
@@ -768,67 +691,27 @@ def group_files_by_patch(files: list[str]) -> dict[str, list[str]]:
 
 def generate_combined_patch(
     file_pairs: list[tuple[str, Path, Path, str]],
-    patch_path: Optional[str] = None,
-    ignored_patches_dir: Optional[Path] = None,
 ) -> Optional[str]:
     """
     Generate a combined patch for multiple file pairs.
 
-    If an ignored patch exists for this patch_path, it will be applied to corepkgs
-    content first, then generate the diff against nixpkgs. This shows the delta
-    between the ignored patch and current nixpkgs state.
-
     Each tuple contains: (corepkgs_rel_path, corepkgs_file, nixpkgs_file, nixpkgs_rel_path)
     """
-    ignored_patch = None
-    if ignored_patches_dir and patch_path:
-        ignored_patch = load_ignored_patch(patch_path, ignored_patches_dir)
-
     patches = []
 
     for corepkgs_rel_path, corepkgs_file, nixpkgs_file, nixpkgs_rel_path in file_pairs:
-        # Read original corepkgs content
+        # Skip pairs whose corepkgs file cannot be read
         try:
-            with open(corepkgs_file, "r", encoding="utf-8", errors="replace") as f:
-                corepkgs_content = f.read()
+            with open(corepkgs_file, "r", encoding="utf-8", errors="replace"):
+                pass
         except (IOError, OSError):
             continue
 
-        # If there's an ignored patch, apply it to corepkgs content first
-        if ignored_patch:
-            patched_content = apply_patch_to_content(
-                corepkgs_content, ignored_patch, corepkgs_rel_path
-            )
-            if patched_content is not None:
-                # Write patched content to temp file and use that as corepkgs file
-                with tempfile.NamedTemporaryFile(
-                    mode="w", encoding="utf-8", delete=False, suffix=".nix"
-                ) as tmp:
-                    tmp.write(patched_content)
-                    tmp_path = Path(tmp.name)
-
-                try:
-                    patch = generate_patch(
-                        tmp_path, nixpkgs_file, corepkgs_rel_path, nixpkgs_rel_path
-                    )
-                    if patch:
-                        patches.append(patch)
-                finally:
-                    tmp_path.unlink()
-            else:
-                # Patch failed to apply, fall back to regular diff
-                patch = generate_patch(
-                    corepkgs_file, nixpkgs_file, corepkgs_rel_path, nixpkgs_rel_path
-                )
-                if patch:
-                    patches.append(patch)
-        else:
-            # No ignored patch, generate regular diff
-            patch = generate_patch(
-                corepkgs_file, nixpkgs_file, corepkgs_rel_path, nixpkgs_rel_path
-            )
-            if patch:
-                patches.append(patch)
+        patch = generate_patch(
+            corepkgs_file, nixpkgs_file, corepkgs_rel_path, nixpkgs_rel_path
+        )
+        if patch:
+            patches.append(patch)
 
     if not patches:
         return None
@@ -860,12 +743,6 @@ def main():
         help=f"Output directory for patches (default: <corepkgs>/{PATCHES_DIR})",
     )
     parser.add_argument(
-        "--ignored-patches",
-        type=Path,
-        default=None,
-        help=f"Directory containing patches to ignore (default: <corepkgs>/{IGNORED_PATCHES_DIR})",
-    )
-    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Don't write patches, just report what would be done",
@@ -882,11 +759,6 @@ def main():
     corepkgs_root = args.corepkgs.resolve()
     nixpkgs_root = args.nixpkgs.resolve()
     output_dir = args.output.resolve() if args.output else corepkgs_root / PATCHES_DIR
-    ignored_patches_dir = (
-        args.ignored_patches.resolve()
-        if args.ignored_patches
-        else corepkgs_root / IGNORED_PATCHES_DIR
-    )
 
     # Delete patches directory before generating new patches
     if output_dir.exists():
@@ -956,9 +828,7 @@ def main():
             continue
 
         # Generate combined patch
-        patch_content = generate_combined_patch(
-            file_pairs, patch_path, ignored_patches_dir
-        )
+        patch_content = generate_combined_patch(file_pairs)
 
         if patch_content is None:
             patches_skipped += 1
