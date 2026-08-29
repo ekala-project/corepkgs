@@ -22,10 +22,6 @@ let
       config,
       disallowedRequisites ? [ ],
 
-      # The `fetchurl' to use for downloading curl and its dependencies
-      # (see top-level.nix).
-      fetchurl-bootstrap,
-
       setupScript ? ./setup.sh,
 
       extraNativeBuildInputs ? [ ],
@@ -203,8 +199,6 @@ let
       mkDerivation = mkDerivationFromStdenv stdenv;
 
       isCross = hostPlatform != buildPlatform;
-
-      inherit fetchurl-bootstrap;
 
       inherit overrides;
 
