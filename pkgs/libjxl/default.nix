@@ -65,19 +65,16 @@ stdenv.mkDerivation rec {
   buildInputs = [
     lcms2
     giflib
-    # TODO(corepkgs): Port gperftools for libtcmalloc support
     gtest
     libjpeg
     libpng
     libwebp
     gdk-pixbuf
-    # TODO(corepkgs): Port openexr for OpenEXR support
     zlib
   ];
 
   propagatedBuildInputs = [
     brotli
-    # TODO(corepkgs): Port libhwy; using vendored highway from third_party for now
   ];
 
   cmakeFlags = [

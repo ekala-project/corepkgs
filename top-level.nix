@@ -127,6 +127,7 @@ with final;
   fop = null;
   gdal = null;
   gitstatus = null;
+  gperftools = null; # libjxl `tcmalloc` support
   graphene = null; # gtk4, defaultCrateOverrides
   graphicsmagick = null;
   gst_all_1 = gstAll1; # gtk4, libde265 tests
@@ -148,6 +149,7 @@ with final;
   libgeotiff = null;
   libgit2-glib = null;
   libguestfs = null;
+  libhwy = null; # libjxl; vendored highway from third_party is used instead
   libjack2 = null; # sdl3 `jackSupport`, ffmpeg, qemu
   liblqr1 = null; # imagemagick, imagemagick6
   libnatspec = null;
@@ -180,7 +182,7 @@ with final;
   objgraph = null;
   objprint = null; # for pytestCheckHook
   openbox = null;
-  openexr = null; # imagemagick, imagemagick6
+  openexr = null; # imagemagick, imagemagick6, libjxl
   opencv = null;
   openimageio = null;
   ostinato = null;
