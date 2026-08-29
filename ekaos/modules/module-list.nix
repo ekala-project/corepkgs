@@ -76,7 +76,6 @@
 
   # Program modules
   ./programs/git.nix
-  ./programs/tmux.nix
 
   # Service modules
   ./services/dbus.nix

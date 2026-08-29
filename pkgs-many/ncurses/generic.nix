@@ -21,7 +21,6 @@
   binlore,
 
   # for passthru.tests
-  tmux,
   htop,
   gdb,
 }:
@@ -302,7 +301,7 @@ stdenv.mkDerivation (finalAttrs: {
     tests = {
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
       pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
-      inherit tmux htop gdb;
+      inherit htop gdb;
     };
   };
 })
