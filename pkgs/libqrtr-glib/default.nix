@@ -55,8 +55,6 @@ stdenv.mkDerivation (finalAttrs: {
     glib
   ];
 
-  mesonBuildType = "release";
-
   meta = {
     homepage = "https://gitlab.freedesktop.org/mobile-broadband/libqrtr-glib";
     description = "Qualcomm IPC Router protocol helper library";

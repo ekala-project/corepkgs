@@ -54,8 +54,6 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.mesonEnable "tests" false)
   ];
 
-  mesonBuildType = "release";
-
   meta = {
     description = "Library that provides GObject bindings for libudev";
     homepage = "https://gitlab.gnome.org/GNOME/libgudev";

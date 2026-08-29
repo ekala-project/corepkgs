@@ -98,8 +98,6 @@ stdenv.mkDerivation (finalAttrs: {
       build-aux/qmi-codegen/qmi-codegen
   '';
 
-  mesonBuildType = "release";
-
   meta = {
     homepage = "https://www.freedesktop.org/wiki/Software/libqmi/";
     description = "Modem protocol helper library";

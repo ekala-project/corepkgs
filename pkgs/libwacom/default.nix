@@ -48,8 +48,6 @@ stdenv.mkDerivation (finalAttrs: {
     libgudev
   ];
 
-  mesonBuildType = "release";
-
   mesonFlags = [
     (lib.mesonEnable "tests" false)
     (lib.mesonOption "sysconfdir" "/etc")

@@ -25,8 +25,6 @@ stdenv.mkDerivation rec {
     ninja
   ];
 
-  mesonBuildType = "release";
-
   meta = {
     description = "Mobile broadband service provider database";
     homepage = "https://gitlab.gnome.org/GNOME/mobile-broadband-provider-info";

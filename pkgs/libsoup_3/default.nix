@@ -65,8 +65,6 @@ stdenv.mkDerivation (finalAttrs: {
     glib
   ];
 
-  mesonBuildType = "release";
-
   mesonFlags = [
     "-Dtls_check=false"
     "-Dgssapi=disabled"

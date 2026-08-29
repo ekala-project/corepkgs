@@ -69,8 +69,6 @@ stdenv.mkDerivation (finalAttrs: {
       build-aux/mbim-codegen/mbim-codegen
   '';
 
-  mesonBuildType = "release";
-
   meta = {
     homepage = "https://www.freedesktop.org/wiki/Software/libmbim/";
     description = "Library for talking to WWAN modems and devices which speak the Mobile Interface Broadband Model (MBIM) protocol";

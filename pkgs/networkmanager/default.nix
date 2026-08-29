@@ -203,8 +203,6 @@ stdenv.mkDerivation (finalAttrs: {
     cp -r ${buildPackages.networkmanager.man} $man
   '';
 
-  mesonBuildType = "release";
-
   meta = {
     homepage = "https://networkmanager.dev";
     description = "Network configuration and management tool";

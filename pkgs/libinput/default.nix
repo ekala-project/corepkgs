@@ -69,8 +69,6 @@ stdenv.mkDerivation (finalAttrs: {
     udev
   ];
 
-  mesonBuildType = "release";
-
   mesonFlags = [
     (lib.mesonBool "documentation" false)
     (lib.mesonBool "debug-gui" false)

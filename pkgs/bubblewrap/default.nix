@@ -29,8 +29,6 @@ stdenv.mkDerivation (finalAttrs: {
     "dev"
   ];
 
-  mesonBuildType = "release";
-
   env.NIX_CFLAGS_COMPILE = "-Wno-error=format-overflow";
 
   postPatch = ''

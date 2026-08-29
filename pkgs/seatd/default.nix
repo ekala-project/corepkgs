@@ -43,8 +43,6 @@ stdenv.mkDerivation (finalAttrs: {
     systemdLibs
   ];
 
-  mesonBuildType = "release";
-
   mesonFlags = [
     "-Dlibseat-logind=systemd"
     "-Dlibseat-builtin=enabled"
