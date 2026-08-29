@@ -14,10 +14,6 @@
   ],
   src ? null,
 
-  # enabling or disabling does nothing for perl packages so set it explicitly
-  # to false to not change hashes when enableParallelBuildingByDefault is enabled
-  enableParallelBuilding ? false,
-
   doCheck ? false, # TODO(corepkgs): enable in passthru
   checkTarget ? "test",
 
@@ -71,14 +67,17 @@
           nativeBuildInputs
           ++ (if !(stdenv.buildPlatform.canExecute stdenv.hostPlatform) then [ perl.mini ] else [ perl ]);
 
+        # enabling or disabling does nothing for perl packages
+        enableParallelBuilding = true;
+
         inherit
           outputs
           src
           doCheck
           checkTarget
-          enableParallelBuilding
           postPatch
           ;
+
         env = {
           inherit
             PERL_AUTOINSTALL
