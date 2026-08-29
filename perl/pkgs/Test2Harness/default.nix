@@ -22,15 +22,19 @@ buildPerlPackage rec {
     hash = "sha256-SXO3mx7tUwVxXuc9itySNtp5XH1AkNg7FQ6hMc1ltBQ=";
   };
 
-  checkPhase = ''
-    patchShebangs ./t ./scripts/yath
-    export AUTOMATED_TESTING=1
-    ./scripts/yath test -j $NIX_BUILD_CORES
+  preCheck = ''
+    # The t/integration/preload.t test is broken on riscv64
+    # https://github.com/Test-More/Test2-Harness/issues/290
+    rm t/integration/preload.t
   '';
 
-  # The t/integration/preload.t test is broken on riscv64
-  # https://github.com/Test-More/Test2-Harness/issues/290
-  doCheck = !stdenv.hostPlatform.isRiscV;
+  checkPhase = ''
+    runHook preCheck
+
+    ./scripts/yath test -j $NIX_BUILD_CORES
+
+    runHook postCheck
+  '';
 
   propagatedBuildInputs = [
     DataUUID
