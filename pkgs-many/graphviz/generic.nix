@@ -29,7 +29,6 @@
 
   # for passthru.tests
   exiv2,
-  fltk,
   graphicsmagick,
 }:
 
@@ -104,7 +103,6 @@ stdenv.mkDerivation rec {
       ;
     inherit
       exiv2
-      fltk
       graphicsmagick
       ;
   };

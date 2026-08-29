@@ -1,5 +1,4 @@
 {
-  # v0_17 removed: incompatible with libinput >= 1.27 (missing LIBINPUT_SWITCH_KEYPAD_SLIDE)
   v0_18 = {
     version = "0.18.3";
     src-hash = "sha256-D8RapSeH+5JpTtq+OU8PyVZubLhjcebbCBPuSO5Q7kU=";
