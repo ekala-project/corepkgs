@@ -1060,6 +1060,17 @@ let
           }
         );
 
+        # Convert this derivation to a development shell, preserving its
+        # build environment (compiler, flags, phases, env vars).
+        # Accepts either an attrset or a function (stdenv -> attrset).
+        toDevShell =
+          let
+            originalArgs = removeAttrs derivationArg (fixedOutputRelatedAttrs ++ outputCheckAttrs);
+            toShell = import ./to-dev-shell.nix lib originalArgs;
+            shellFunc = f: if builtins.isFunction f then f stdenv else f;
+          in
+          f: derivation (toShell (shellFunc f));
+
         inherit passthru overrideAttrs;
         inherit meta;
       }
