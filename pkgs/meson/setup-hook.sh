@@ -1,6 +1,11 @@
 # shellcheck shell=bash disable=SC2206
 
 mesonConfigurePhase() {
+    # Default to an optimized build, unlike upstream's `plain`. Set before
+    # `preConfigure` so hooks that branch on the build type (e.g. to enable LTO)
+    # observe the same value meson is configured with.
+    : ${mesonBuildType:=release}
+
     runHook preConfigure
 
     : ${mesonBuildDir:=build}
@@ -23,7 +28,7 @@ mesonConfigurePhase() {
         "--localedir=${!outputLib}/share/locale"
         "-Dauto_features=${mesonAutoFeatures:-enabled}"
         "-Dwrap_mode=${mesonWrapMode:-nodownload}"
-        "--buildtype=${mesonBuildType:-plain}"
+        "--buildtype=$mesonBuildType"
     )
 
     # --no-undefined is universally a bad idea on freebsd because environ is in the csu
