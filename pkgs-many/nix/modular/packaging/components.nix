@@ -107,10 +107,14 @@ let
     };
 
   mesonLayer = finalAttrs: prevAttrs: {
-    preConfigure =
-      prevAttrs.preConfigure or ""
-      +
-        lib.optionalString
+    # LTO only pays off for an optimizing build type, so both are decided here rather than
+    # in a shell hook: overriding `mesonBuildType` flips LTO along with it.
+    # More on build types here: https://mesonbuild.com/Builtin-options.html#details-for-buildtype.
+    mesonBuildType = prevAttrs.mesonBuildType or "release";
+    mesonFlags =
+      prevAttrs.mesonFlags or [ ]
+      ++
+        lib.optional
           (
             !stdenv.hostPlatform.isWindows
             # build failure
@@ -118,12 +122,15 @@ let
             # LTO breaks exception handling on x86-64-darwin.
             && stdenv.system != "x86_64-darwin"
           )
-          ''
-            case "$mesonBuildType" in
-            release|minsize) appendToVar mesonFlags "-Db_lto=true"  ;;
-            *)               appendToVar mesonFlags "-Db_lto=false" ;;
-            esac
-          '';
+          (
+            lib.mesonBool "b_lto" (
+              lib.elem finalAttrs.mesonBuildType [
+                "release"
+                "minsize"
+              ]
+            )
+          );
+          
     nativeBuildInputs = [
       meson
       meson.configurePhaseHook
