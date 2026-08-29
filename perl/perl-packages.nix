@@ -54,7 +54,7 @@ with self;
       };
     });
 
-  buildPerlPackage = callPackage ./buildPerlPackage.nix { };
+  buildPerlPackage = callPackage ./buildPerlPackage { };
 
   # Helper functions for packages that use Module::Build to build.
   buildPerlModule =
