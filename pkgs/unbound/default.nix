@@ -45,7 +45,7 @@
   withDynlibModule ? false,
   withLto ? !stdenv.hostPlatform.isStatic && !stdenv.hostPlatform.isMinGW,
   withMakeWrapper ? !stdenv.hostPlatform.isMinGW,
-  libnghttp2,
+  nghttp2,
 
   # for passthru.updateScript
   nix-update-script,
@@ -54,7 +54,7 @@
   runUnitTests,
 }:
 
-assert withDoH -> libnghttp2 != null;
+assert withDoH -> nghttp2 != null;
 assert withDNSTAP -> protobufc != null;
 
 stdenv.mkDerivation (finalAttrs: {
@@ -91,7 +91,7 @@ stdenv.mkDerivation (finalAttrs: {
     libevent
   ]
   ++ lib.optionals withSystemd [ systemd ]
-  ++ lib.optionals withDoH [ libnghttp2 ]
+  ++ lib.optionals withDoH [ nghttp2 ]
   ++ lib.optionals withPythonModule [ python ];
 
   enableParallelBuilding = true;
@@ -120,7 +120,7 @@ stdenv.mkDerivation (finalAttrs: {
     "--with-dynlibmodule"
   ]
   ++ lib.optionals withDoH [
-    "--with-libnghttp2=${libnghttp2.dev}"
+    "--with-libnghttp2=${nghttp2.dev}"
   ]
   ++ lib.optionals withECS [
     "--enable-subnet"
