@@ -43,9 +43,17 @@
 # TODO(corepkgs): support finalAttrs and dont hardcode version in urls
 (
   let
+    fromCpan = lib.hasPrefix "mirror://cpan/" (attrs.src.url or "");
+
     defaultMeta = {
-      homepage = "https://metacpan.org/dist/${attrs.pname}";
       inherit (perl.meta) platforms;
+    }
+    // lib.optionalAttrs fromCpan {
+      homepage = "https://metacpan.org/dist/${attrs.pname}";
+      license = with lib.licenses; [
+        artistic1
+        gpl1Plus
+      ];
     };
 
     package = stdenv.mkDerivation (
