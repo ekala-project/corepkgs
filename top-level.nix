@@ -1381,7 +1381,6 @@ with final;
   readline = callPackage ./pkgs/readline/8.3.nix { };
 
   util-linuxMinimal = util-linux.override {
-    fetchurl = fetchurl-bootstrap;
     cryptsetupSupport = false;
     nlsSupport = false;
     ncursesSupport = false;
