@@ -2,18 +2,19 @@
 # Wrapper script to generate a frozen release overlay from pkgs-many/ packages
 #
 # Usage:
-#   ./scripts/freeze-release.sh [RELEASE_NAME] [OUTPUT_PATH]
+#   ./scripts/freeze-release/freeze-release.sh [RELEASE_NAME] [OUTPUT_PATH]
 #
 # Examples:
-#   ./scripts/freeze-release.sh "stable-2026.1"
-#   ./scripts/freeze-release.sh "stable-2026.1" "./overlays/frozen-2026.1.nix"
-#   ./scripts/freeze-release.sh  # Uses defaults
+#   ./scripts/freeze-release/freeze-release.sh "stable-2026.1"
+#   ./scripts/freeze-release/freeze-release.sh "stable-2026.1" "./overlays/frozen-2026.1.nix"
+#   ./scripts/freeze-release/freeze-release.sh  # Uses defaults
 
 set -euo pipefail
 
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CORE_PKGS_ROOT="$(dirname "$SCRIPT_DIR")"
+# This script lives in scripts/freeze-release/, so go up two levels to reach repo root.
+CORE_PKGS_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # Default values
 RELEASE_NAME="${1:-stable-$(date +%Y.%m)}"

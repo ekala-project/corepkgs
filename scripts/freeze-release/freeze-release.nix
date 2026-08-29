@@ -1,7 +1,7 @@
 # Script to generate a frozen release overlay from pkgs-many/ packages
 #
 # Usage:
-#   nix-build scripts/freeze-release.nix --argstr releaseName "stable-2026.1" --argstr outputPath "./overlays/frozen-2026.1.nix"
+#   nix-build scripts/freeze-release/freeze-release.nix --argstr releaseName "stable-2026.1" --argstr outputPath "./overlays/frozen-2026.1.nix"
 #
 # This script:
 # 1. Enumerates all packages in pkgs-many/
@@ -11,7 +11,7 @@
 {
   releaseName ? "stable-unknown",
   outputPath ? "./overlays/frozen-release.nix",
-  corePkgsPath ? ./..,
+  corePkgsPath ? ./../..,
   gitCommit ? "unknown",
   timestamp ? "unknown",
 }:

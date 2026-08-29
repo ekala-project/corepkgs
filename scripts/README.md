@@ -9,7 +9,7 @@ shebang and is meant to be run from the repository root:
 
 | Script | Purpose |
 | --- | --- |
-| [`freeze-release.sh`](#freeze-release) | Pin every `pkgs-many/` package to its default variant as an overlay |
+| [`freeze-release/freeze-release.sh`](#freeze-release) | Pin every `pkgs-many/` package to its default variant as an overlay |
 | [`import-from-nixpkgs.py`](#import-from-nixpkgs) | Copy package directories out of a nixpkgs checkout |
 | [`sync-with-nixpkgs/sync.py`](#sync-with-nixpkgs) | Generate per-file patches between corepkgs and nixpkgs |
 | [`repology/generate.sh`](#repology) | Produce a Repology-compatible `packages.json` metadata dump |
@@ -23,8 +23,8 @@ Creates "stable releases" by generating a Nix overlay that pins each package in
 versions of software don't change over time, providing a stable baseline for
 deployments.
 
-- `freeze-release.sh` - shell wrapper for easy usage
-- `freeze-release.nix` - core Nix script that does the actual work
+- `freeze-release/freeze-release.sh` - shell wrapper for easy usage
+- `freeze-release/freeze-release.nix` - core Nix script that does the actual work
 
 Requires Nix, Git (for commit metadata), and Bash.
 
@@ -32,19 +32,19 @@ Requires Nix, Git (for commit metadata), and Bash.
 
 ```bash
 # Generate a frozen release with default settings
-./scripts/freeze-release.sh
+./scripts/freeze-release/freeze-release.sh
 
 # Specify a custom release name
-./scripts/freeze-release.sh "stable-2026.1"
+./scripts/freeze-release/freeze-release.sh "stable-2026.1"
 
 # Specify both release name and output path
-./scripts/freeze-release.sh "stable-2026.1" "./overlays/stable-2026.1.nix"
+./scripts/freeze-release/freeze-release.sh "stable-2026.1" "./overlays/stable-2026.1.nix"
 ```
 
 You can also call the Nix script directly for more control:
 
 ```bash
-nix-build scripts/freeze-release.nix \
+nix-build scripts/freeze-release/freeze-release.nix \
   --argstr releaseName "stable-2026.1" \
   --argstr outputPath "./overlays/stable-2026.1.nix" \
   --argstr corePkgsPath "/path/to/core-pkgs" \
@@ -117,7 +117,7 @@ nix-instantiate --eval -E '(import ./. { overlays = [ (import ./overlays/stable-
 
 1. **Create a new frozen release** when establishing a new stable baseline:
    ```bash
-   ./scripts/freeze-release.sh "stable-2026.Q2" "./overlays/stable-2026-q2.nix"
+   ./scripts/freeze-release/freeze-release.sh "stable-2026.Q2" "./overlays/stable-2026-q2.nix"
    ```
 2. **Commit the overlay** to version control
 3. **Use it** in production environments to ensure version stability
