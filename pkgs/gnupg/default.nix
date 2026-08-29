@@ -13,7 +13,6 @@
   libiconv,
   libksba,
   npth,
-  adns,
   bzip2,
   gnutls,
   libusb1,
@@ -64,7 +63,6 @@ stdenv.mkDerivation rec {
     npth
   ]
   ++ lib.optionals (!enableMinimal) [
-    adns
     bzip2
     gnutls
     libusb1
