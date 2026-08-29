@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitLab,
+  font-util,
   util-macros,
   autoreconfHook,
   pkg-config,
@@ -26,6 +27,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     autoreconfHook
+    font-util
     pkg-config
     util-macros
   ];

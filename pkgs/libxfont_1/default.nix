@@ -32,16 +32,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   strictDeps = true;
 
-  # No configure script in the git tree.
   nativeBuildInputs = [
     autoreconfHook
     pkg-config
     util-macros
+    xtrans
   ];
 
   buildInputs = [
     libfontenc
-    xorgproto
     freetype
     xtrans
     zlib
