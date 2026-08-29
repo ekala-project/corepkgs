@@ -130,7 +130,7 @@ let
               ]
             )
           );
-          
+
     nativeBuildInputs = [
       meson
       meson.configurePhaseHook

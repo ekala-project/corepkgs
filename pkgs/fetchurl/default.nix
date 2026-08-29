@@ -1,7 +1,6 @@
 {
   lib,
   buildPackages,
-  stdenv,
   cacert,
   config,
 }:
@@ -12,27 +11,46 @@ let
   inherit (buildPackages) stdenvNoCC;
 
   # curl's own dependencies would otherwise be fetched by the `fetchurl` this
-  # file defines. Swapping `fetchurl` for `fetchurlBoot` across a whole scope
-  # breaks that cycle once, rather than once per dependency. `minimal` carries
-  # what a fetcher actually uses -- HTTPS, zlib and http2 -- and nothing else:
-  # no scp, gss, brotli, zstd, idn, psl or http3.
-  curl =
-    (buildPackages.appendOverlays [
-      (_: super: {
-        # TODO(corepkgs): recheck if this adds bloat after minimal bootstrap
-        fetchurl = stdenv.fetchurlBoot;
-        # Plain zlib, not zlib-ng: zlib-ng takes its source from
-        # `fetchFromGitHub`, which is built on the `fetchurl` being defined
-        # here, so a zlib-ng curl cannot exist before `fetchurl` does.
-        zlib-ng-compat = super.zlib;
-        # curl only needs libnghttp2; the app would drag in c-ares, libev and
-        # openssl, and the tests cunit and tzdata.
-        nghttp2 = super.nghttp2.override {
-          enableApp = false;
-          enableTests = false;
-        };
-      })
-    ]).curl.minimal;
+  # file defines. Rebuilding just those against `fetchurlBoot` breaks the cycle
+  # inside this package set; `appendOverlays` would build a second one.
+  inherit (stdenvNoCC) fetchurlBoot;
+
+  perlBoot = buildPackages.perl.override { fetchurl = fetchurlBoot; };
+
+  # Only the wrapped tool is in scope, so the rebuild has to reach through it
+  # to the unwrapped package that actually has a source.
+  pkgConfigBoot = buildPackages.pkg-config.override (old: {
+    pkg-config = old.pkg-config.override { fetchurl = fetchurlBoot; };
+  });
+
+  curl = buildPackages.curl.minimal.override {
+    fetchurl = fetchurlBoot;
+    perl = perlBoot;
+    # Only the wrapped tool is in scope, so the rebuild has to reach through it
+    # to the unwrapped package that actually has a source.
+    pkg-config = pkgConfigBoot;
+    # Plain zlib, not zlib-ng: zlib-ng takes its source from
+    # `fetchFromGitHub`, which is built on the `fetchurl` being defined
+    # here, so a zlib-ng curl cannot exist before `fetchurl` does.
+    zlib-ng-compat = buildPackages.zlib;
+    # curl only needs libnghttp2; the app would drag in c-ares, libev and
+    # openssl, and the tests cunit and tzdata.
+    nghttp2 = buildPackages.nghttp2.override {
+      fetchurl = fetchurlBoot;
+      enableApp = false;
+      enableTests = false;
+      pkg-config = pkgConfigBoot;
+    };
+    openssl = buildPackages.openssl.override {
+      fetchurl = fetchurlBoot;
+      perl = perlBoot;
+      # openssl reaches for `buildPackages.perl` directly, which would be the
+      # un-rebuilt one and so reintroduce the cycle.
+      buildPackages = buildPackages // {
+        perl = perlBoot;
+      };
+    };
+  };
 
   inherit (config) hashedMirrors rewriteURL;
   mirrors = import ./mirrors.nix // {
