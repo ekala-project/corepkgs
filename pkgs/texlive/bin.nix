@@ -25,7 +25,6 @@
   libxext,
   libXext ? libxext,
   perl,
-  perlPackages,
   python3Packages,
   pkg-config,
   cmake,
