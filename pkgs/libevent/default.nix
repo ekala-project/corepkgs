@@ -8,7 +8,6 @@
   sslSupport ? true,
   openssl,
   fetchpatch,
-  tmux,
   unbound,
 
   static ? stdenv.hostPlatform.isStatic,
@@ -74,7 +73,7 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   passthru.tests = {
-    inherit tmux unbound;
+    inherit unbound;
   };
 
   meta = {
