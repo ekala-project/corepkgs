@@ -1,67 +1,125 @@
 ---
 name: porting
-description: Port a package from nixpkgs into corepkgs. Use when adding a package that already exists upstream — covers checking dependencies before copying, stripping nixpkgs-only attributes, adding TODOs for missing features, and wiring it into top-level.nix.
+description: Port a package from nixpkgs into corepkgs. Use when adding a package that already exists upstream — covers importing it with scripts/import-from-nixpkgs.py, checking dependencies first, stripping nixpkgs-only attributes, recording TODOs for missing features, and wiring it into top-level.nix.
 ---
 
 # Porting from nixpkgs
 
 ## Workflow
 
-### 1. Check Dependencies
+### 1. Check dependencies exist
 
-**Before copying files**, verify all dependencies exist:
+Do this **before** importing anything: a package whose dependencies are missing
+cannot be evaluated, and it is cheaper to find out now than after editing.
 
 ```bash
-# Check multiple dependencies
 for dep in acl lzo cmocka libuuid util-linux zlib zstd; do
-  echo -n "$dep: "
-  nix-instantiate -A $dep >/dev/null 2>&1 && echo "✓" || echo "✗"
+  printf '%s: ' "$dep"
+  nix-instantiate -A "$dep" >/dev/null 2>&1 && echo "✓" || echo "✗"
 done
 ```
 
-**If missing:**
-- Port the dependency first, OR
-- Add TODO comment and disable feature
+Do **not** grep `top-level.nix` to check for a dependency. Packages in `pkgs/`
+and `pkgs-many/` are registered automatically and often have no entry there. For
+attributes that are not derivations, use `nix-instantiate --eval -A <attr>`.
 
-### 2. Copy Package Files
+If a dependency is missing, either port it first or add a TODO and disable the
+feature that needs it (step 4).
+
+### 2. Import the package
+
+`scripts/import-from-nixpkgs.py` copies the package directory across and applies
+the corepkgs naming convention.
 
 ```bash
-# Single package -> pkgs/
-cp -r /path/to/nixpkgs/pkgs/development/libraries/libxslt pkgs/libxslt/
+# pkgs/by-name/cu/curl -> pkgs/curl
+./scripts/import-from-nixpkgs.py --name curl
 
-# Package with variants -> pkgs-many/
-cp -r /path/to/nixpkgs/pkgs/development/languages/python pkgs-many/python/
+# several at once
+./scripts/import-from-nixpkgs.py --name libfoo libbar libbaz
+
+# pkgs/development/python-modules/httpx -> python/pkgs/httpx
+./scripts/import-from-nixpkgs.py --name httpx --python
+
+# nixpkgs checkout is somewhere other than ../nixpkgs
+./scripts/import-from-nixpkgs.py --name curl --nixpkgs-root ~/src/nixpkgs
+
+# replace a package that was already imported
+./scripts/import-from-nixpkgs.py --name curl --force
 ```
 
-### 3. Clean Up
+| Source in nixpkgs | Destination | Flag |
+| --- | --- | --- |
+| `pkgs/by-name/<xx>/<name>` | `pkgs/<name>` | *(default)* |
+| `pkgs/development/python-modules/<name>` | `python/pkgs/<name>` | `--python` |
 
-**Remove:**
+`<xx>` is the lowercase two-letter prefix of the attribute name, so `SDL2_gfx`
+is found under `sd/` and `R` under `r/`.
+
+The script:
+
+- copies the whole directory, preserving symlinks, so patch files come along
+- renames `package.nix` to `default.nix`, and leaves both alone if both exist
+- refuses to overwrite an existing destination unless given `--force`
+
+It makes **no edits to the expression itself** — every cleanup in step 3 is
+still manual.
+
+**Packages outside `by-name`.** A handful still live under the old
+`pkgs/development/...` trees, which the script does not know about. Copy those
+by hand and rename `package.nix` yourself:
+
+```bash
+cp -r ../nixpkgs/pkgs/development/libraries/foo pkgs/foo
+```
+
+**Packages with multiple versions** belong in `pkgs-many/` and need to be
+restructured into the `default.nix` / `variants.nix` / `generic.nix` layout
+rather than copied — see the `mk-many-variants` skill.
+
+### 3. Strip nixpkgs-only attributes
+
 ```nix
-# Remove maintainers/teams — both default to [ ]
+meta = {
+  # maintainers = ...;  DELETE — not a recognised meta key here, fails check-meta
+  # teams = ...;        DELETE — likewise
+};
 
-# Remove update scripts
 passthru = {
-  # updateScript = gnome.updateScript { ... };  # DELETE
-  tests = { ... };  # Keep tests
+  # updateScript = gnome.updateScript { ... };  DELETE
+  tests = { ... }; # KEEP
 };
 ```
 
-**Adjust testing:**
+Also drop `doCheck = false;` if the expression sets it — that is already the
+default across the package set. To keep a test suite, move it to
+`passthru.tests` instead:
+
 ```nix
-# doCheck = false is default - don't set it
-# Or use passthru.tests instead
 passthru.tests = {
   unittests = runUnitTests finalAttrs.finalPackage;
 };
 ```
 
-### 4. Add TODO Comments
+Build-system hooks are explicit here, so an imported expression usually needs
+one added: `cmake.configurePhaseHook`, or `meson.configurePhaseHook` plus
+`ninja`. See the `cmake` and `meson` skills.
+
+### 4. Record what you disabled
+
+Every feature turned off for a missing dependency gets a TODO naming the
+dependency, so the package can be completed later without re-deriving why:
 
 ```nix
 buildInputs = [
   zlib
   # TODO(corepkgs): Port openssl for TLS support
   # TODO(corepkgs): Port libxml2 for XML processing
+];
+
+configureFlags = [
+  "--without-selinux"
+  "--without-cap"
 ];
 ```
 
@@ -71,19 +129,18 @@ buildInputs = [
 nix-instantiate -A example
 nix-build -A example
 ./result/bin/example --version
-nix fmt pkgs/example/default.nix
 ```
 
-### 6. Add to top-level.nix (If Needed)
+Run `./ci/eval.sh` before committing to confirm nothing else in the set broke.
+See the `validation` skill for the full procedure and error triage.
 
-**Only if:**
-- Inputs deviate from defaults
-- Need to override arguments
-- Need additional configuration
+### 6. Add to top-level.nix only if needed
 
-Otherwise packages in `pkgs/` and `pkgs-many/` are auto-registered.
+Packages in `pkgs/` and `pkgs-many/` are auto-registered by directory name. Add
+an explicit entry **only** when the inputs deviate from what the expression
+declares, or you need to override arguments or pass extra configuration.
 
-## Example: Simple Package
+## Example: straightforward package
 
 ```nix
 {
@@ -120,8 +177,6 @@ stdenv.mkDerivation (finalAttrs: {
     libseccomp
   ];
 
-  mesonBuildType = "release";
-
   meta = {
     description = "Unprivileged sandboxing tool";
     homepage = "https://github.com/containers/bubblewrap";
@@ -131,7 +186,7 @@ stdenv.mkDerivation (finalAttrs: {
 })
 ```
 
-## Example: Missing Dependencies
+## Example: features disabled for missing dependencies
 
 ```nix
 {
@@ -177,53 +232,30 @@ stdenv.mkDerivation (finalAttrs: {
 })
 ```
 
-## Package Variants (pkgs-many)
+## Common issues
 
-For packages with multiple versions:
+**`Source path does not exist`** — the package is not in `by-name` (copy it by
+hand), the name is not the attribute name, or `--nixpkgs-root` points at the
+wrong checkout.
 
-```nix
-# pkgs-many/python/default.nix
-mkManyVariants {
-  variants = {
-    python39 = { version = "3.9.18"; };
-    python310 = { version = "3.10.13"; };
-    python311 = { version = "3.11.7"; };
-  };
-  # ...
-}
-```
+**`error: attribute 'somelib' missing`** — a dependency was never ported. Port
+it, or drop the argument and disable the feature with a TODO.
 
-Creates `pkgs.python39`, `pkgs.python310`, etc.
+**`configure: error: libfoo is required`** — the build system wants a dependency
+you removed. Disable it explicitly, e.g. `configureFlags = [ "--without-foo" ];`.
 
-## Common Issues
+**Nothing configures / no `Makefile` found** — the build-system hook was not
+carried over. Add `cmake.configurePhaseHook` or `meson.configurePhaseHook`.
 
-**Evaluation fails - missing dependency:**
-```
-error: attribute 'somelib' missing
-```
-→ Port dependency or add TODO and disable.
-
-**Build fails - feature requires missing dep:**
-```
-configure: error: libfoo is required
-```
-→ Disable with `configureFlags = [ "--without-foo" ];`
-
-**Tests fail:**
-→ Tests are disabled by default in core-pkgs.
-
-**Update script errors:**
-→ Remove `updateScript` from `passthru`.
+**`check-meta` rejects the package** — `meta.maintainers` or `meta.teams`
+survived the cleanup.
 
 ## Checklist
 
-- [ ] Dependencies checked with `nix-instantiate`
-- [ ] Missing deps documented with TODO
-- [ ] No `meta.maintainers` or `meta.teams`
-- [ ] Update scripts removed
-- [ ] Tests configured appropriately
-- [ ] `nix-instantiate -A <package>` succeeds
-- [ ] `nix-build -A <package>` succeeds
-- [ ] `nix fmt` run on all files
-- [ ] License preserved accurately
-- [ ] Security patches preserved
+- [ ] Dependencies checked with `nix-instantiate -A <dep>`
+- [ ] Imported with `./scripts/import-from-nixpkgs.py` (or copied and renamed by hand)
+- [ ] `meta.maintainers`, `meta.teams`, and `updateScript` removed
+- [ ] Build-system configure hook added
+- [ ] Missing dependencies recorded as `TODO(corepkgs)` comments
+- [ ] License and any security patches preserved
+- [ ] Validated per the `validation` skill, and `./ci/eval.sh` passes
