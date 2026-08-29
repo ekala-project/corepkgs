@@ -4,5 +4,6 @@ __pycache__/
 .pytest_cache/
 *.md
 !AGENTS.md
+!CLAUDE.md
 !README.md
 !SKILL.md
