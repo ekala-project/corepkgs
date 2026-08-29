@@ -191,10 +191,6 @@ let
         shell = "${bootstrapTools}/bin/bash";
         initialPath = [ bootstrapTools ];
 
-        fetchurl-bootstrap = import ../../pkgs/fetchurl/bootstrap.nix {
-          inherit system;
-        };
-
         cc =
           if prevStage.gcc-unwrapped == null then
             null
@@ -226,7 +222,7 @@ let
                 }
               );
 
-        overrides = self: super: (overrides self super) // { fetchurl = thisStdenv.fetchurl-bootstrap; };
+        overrides = self: super: (overrides self super) // { fetchurl = super.fetchurl-bootstrap; };
       };
 
     in
@@ -778,8 +774,6 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
         cc = prevStage.gcc;
 
         shell = cc.shell;
-
-        inherit (prevStage.stdenv) fetchurl-bootstrap;
 
         extraAttrs = {
           inherit bootstrapTools;

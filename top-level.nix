@@ -23,6 +23,11 @@ with final;
 
   tests = { };
 
+  # Nix's builtin fetcher
+  fetchurl-bootstrap = import ./pkgs/fetchurl/bootstrap.nix {
+    inherit (stdenv.buildPlatform) system;
+  };
+
   nix-update-script = callPackage ./pkgs/nix-update-script { };
   nix-update = null;
   nixos = null;
@@ -691,10 +696,10 @@ with final;
       callPackage ./pkgs/libunwind { };
 
   libxcrypt = callPackage ./pkgs/libxcrypt {
-    fetchurl = stdenv.fetchurl-bootstrap;
+    fetchurl = fetchurl-bootstrap;
     perl = buildPackages.perl.override {
       enableCrypt = false;
-      fetchurl = stdenv.fetchurl-bootstrap;
+      fetchurl = fetchurl-bootstrap;
     };
   };
 
@@ -1376,7 +1381,7 @@ with final;
   readline = callPackage ./pkgs/readline/8.3.nix { };
 
   util-linuxMinimal = util-linux.override {
-    fetchurl = stdenv.fetchurl-bootstrap;
+    fetchurl = fetchurl-bootstrap;
     cryptsetupSupport = false;
     nlsSupport = false;
     ncursesSupport = false;

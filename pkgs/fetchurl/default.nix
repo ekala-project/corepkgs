@@ -3,6 +3,7 @@
   buildPackages,
   cacert,
   config,
+  fetchurl-bootstrap,
 }:
 
 let
@@ -13,8 +14,6 @@ let
   # curl's own dependencies would otherwise be fetched by the `fetchurl` this
   # file defines. Rebuilding just those against `fetchurl-bootstrap` breaks the cycle
   # inside this package set; `appendOverlays` would build a second one.
-  inherit (stdenvNoCC) fetchurl-bootstrap;
-
   perl-bootstrap = buildPackages.perl.override { fetchurl = fetchurl-bootstrap; };
 
   # Only the wrapped tool is in scope, so the rebuild has to reach through it
