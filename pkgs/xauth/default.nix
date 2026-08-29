@@ -10,6 +10,7 @@
   libxext,
   libxmu,
   xorgproto,
+  xtrans,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "xauth";
@@ -30,6 +31,7 @@ stdenv.mkDerivation (finalAttrs: {
     autoreconfHook
     pkg-config
     util-macros
+    xtrans
   ];
 
   buildInputs = [

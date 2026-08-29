@@ -43,7 +43,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
-    xorgproto
     libpthread-stubs
     libxcb
     xtrans
