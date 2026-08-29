@@ -89,7 +89,6 @@ IGNORE_NEW = [
 # Should not be checked for patches or new files at all
 IGNORE_DIRS = [
     # keep-sorted start
-    ".ekaci",
     ".github",
     "config",
     "docs",
