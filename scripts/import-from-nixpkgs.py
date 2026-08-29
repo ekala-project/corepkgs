@@ -54,7 +54,9 @@ def resolve_paths(args: argparse.Namespace, name: str) -> tuple[Path, Path]:
         src = nixpkgs_root / "pkgs" / "development" / "python-modules" / name
         dest = repo_root / "python" / "pkgs" / name
     else:
-        prefix = name[:2]
+        # by-name shards use the lowercase 2-letter prefix of the attribute name,
+        # so `SDL2_gfx` lives under `sd` and `R` under `r`.
+        prefix = name[:2].lower()
         src = nixpkgs_root / "pkgs" / "by-name" / prefix / name
         dest = repo_root / "pkgs" / name
 
