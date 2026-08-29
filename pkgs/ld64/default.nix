@@ -122,11 +122,6 @@ stdenv.mkDerivation (finalAttrs: {
   # ld built with this fails to link glib's gio on x86_64 darwin
   hardeningDisable = [ "libcxxhardeningfast" ];
 
-  # Pinned rather than left to the default: ld64 cannot be built as a debug build because of UB
-  # in its iteration implementations, which trigger libc++ debug assertions due to trying to take
-  # the address of the first element of an empty vector.
-  mesonBuildType = "release";
-
   mesonFlags = [
     (lib.mesonOption "b_ndebug" "if-release")
     (lib.mesonOption "default_library" (if stdenv.hostPlatform.isStatic then "static" else "shared"))
@@ -138,6 +133,8 @@ stdenv.mkDerivation (finalAttrs: {
   # ld64 has a test suite, but many of the tests fail (even with ld from Xcode). Instead
   # of running the test suite, rebuild ld64 using itself to link itself as a check.
   # LTO is enabled only to confirm that it is set up and working properly in nixpkgs.
+  # The rebuild has to be a release build: ld64 has UB in its iteration implementations that
+  # trips libc++ debug assertions by taking the address of the first element of an empty vector.
   installCheckPhase = ''
     runHook preInstallCheck
 
@@ -145,7 +142,7 @@ stdenv.mkDerivation (finalAttrs: {
 
     export NIX_CFLAGS_COMPILE+=" --ld-path=$out/bin/ld"
     export NIX_CFLAGS_LINK+=" -L$SDKROOT/usr/lib"
-    meson setup build-install-check --buildtype=$mesonBuildType ${
+    meson setup build-install-check --buildtype=release ${
       lib.escapeShellArgs [
         (lib.mesonBool "b_lto" true)
         (lib.mesonOption "libllvm_path" llvmPath)
