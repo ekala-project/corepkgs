@@ -21,7 +21,6 @@ with pkgs;
 # These largely reflect Nixpkgs aliases
 mapAliases {
   # keep-sorted start
-
   armTrustedFirmwareAllwinner = arm-trusted-firmware.allwinner;
   armTrustedFirmwareAllwinnerH6 = arm-trusted-firmware.allwinnerH6;
   armTrustedFirmwareAllwinnerH616 = arm-trusted-firmware.allwinnerH616;
@@ -114,8 +113,9 @@ mapAliases {
   jdk11 = java.v11;
   jdk17 = java.v17;
   jdk21 = java;
-  libnghttp2 = nghttp2;
   kotlinc = kotlin;
+  libmysqlclient = mariadb-connector-c;
+  libnghttp2 = nghttp2;
   libtool2 = libtool.v2_5;
   libtool_1_5 = libtool.v1_5;
   linuxPackages = linux.pkgs;
@@ -163,6 +163,7 @@ mapAliases {
   openjdk = java;
   openjdk11 = java.v11;
   openssl_oqs = openssl.oqs;
+  patchelfUnstable = throw "patchelfUnstable was removed because it was older than patchelf and unneeded, use patchelf instead";
   perl538 = perl.v5_38;
   perl540 = perl.v5_40;
   phpExtensions = php.buildPecl;
