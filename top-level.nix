@@ -691,10 +691,10 @@ with final;
       callPackage ./pkgs/libunwind { };
 
   libxcrypt = callPackage ./pkgs/libxcrypt {
-    fetchurl = stdenv.fetchurlBoot;
+    fetchurl = stdenv.fetchurl-bootstrap;
     perl = buildPackages.perl.override {
       enableCrypt = false;
-      fetchurl = stdenv.fetchurlBoot;
+      fetchurl = stdenv.fetchurl-bootstrap;
     };
   };
 
@@ -1376,7 +1376,7 @@ with final;
   readline = callPackage ./pkgs/readline/8.3.nix { };
 
   util-linuxMinimal = util-linux.override {
-    fetchurl = stdenv.fetchurlBoot;
+    fetchurl = stdenv.fetchurl-bootstrap;
     cryptsetupSupport = false;
     nlsSupport = false;
     ncursesSupport = false;
