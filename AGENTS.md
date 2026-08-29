@@ -100,7 +100,8 @@ Include `cmake.configurePhaseHook` in nativeBuildInputs.
 
 **Meson packages:**
 
-Include `meson.configurePhaseHook` and `ninja` in nativeBuildInputs, specify `mesonBuildType`.
+Include `meson.configurePhaseHook` and `ninja` in nativeBuildInputs. `mesonBuildType` defaults
+to `release`; set it only when a package requires a different build type.
 
 **Detailed guide:** See [`.agents/skills/meson/SKILL.md`](.agents/skills/meson/SKILL.md) for complete Meson documentation.
 
