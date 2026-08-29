@@ -42,8 +42,8 @@ def parse_args() -> argparse.Namespace:
 
 
 def resolve_paths(args: argparse.Namespace, name: str) -> tuple[Path, Path]:
-    # This script lives in maintainers/scripts/, so go up two levels to reach repo root.
-    repo_root = Path(__file__).resolve().parents[2]
+    # This script lives in scripts/, so go up one level to reach repo root.
+    repo_root = Path(__file__).resolve().parents[1]
     nixpkgs_root = (
         args.nixpkgs_root.resolve()
         if args.nixpkgs_root

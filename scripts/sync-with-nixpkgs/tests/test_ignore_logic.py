@@ -17,10 +17,10 @@ class TestShouldSkipPath:
         assert script_module.should_skip_path("docs/README.md") is True
         assert script_module.should_skip_path("docs/guide/intro.md") is True
 
-    def test_ignore_dirs_maintainers(self, script_module):
-        """Test that maintainers directory is ignored."""
-        assert script_module.should_skip_path("maintainers") is True
-        assert script_module.should_skip_path("maintainers/scripts/test.py") is True
+    def test_ignore_dirs_scripts(self, script_module):
+        """Test that scripts directory is ignored."""
+        assert script_module.should_skip_path("scripts") is True
+        assert script_module.should_skip_path("scripts/sync-with-nixpkgs/test.py") is True
 
     def test_ignore_dirs_pkgs_many(self, script_module):
         """Test that pkgs-many directory is ignored."""

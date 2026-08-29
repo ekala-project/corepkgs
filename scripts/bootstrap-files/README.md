@@ -12,16 +12,16 @@ stdenv. They consist of two artifacts per target:
 
 ```bash
 # Build and upload for the current platform:
-./upload-bootstrap.bash
+./upload-bootstrap.sh
 
 # Build for specific targets:
-./upload-bootstrap.bash --targets=x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu
+./upload-bootstrap.sh --targets=x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu
 
 # Dry run (build only, inspect artifacts, no upload):
-./upload-bootstrap.bash --dry-run
+./upload-bootstrap.sh --dry-run
 
 # Custom release tag:
-./upload-bootstrap.bash --tag=bootstrap-2026-08-24
+./upload-bootstrap.sh --tag=bootstrap-2026-08-24
 ```
 
 The script will:
@@ -42,7 +42,7 @@ After running, commit and push the updated `.nix` files.
 
 1. Ensure the target can build `freshBootstrapTools.build` (may require
    `pkgsCross` support for cross-built targets).
-2. Add the target triple to the appropriate list in `upload-bootstrap.bash`
+2. Add the target triple to the appropriate list in `upload-bootstrap.sh`
    (`NATIVE_TARGETS` or `CROSS_TARGETS`).
-3. Run `./upload-bootstrap.bash --targets=<new-target>`.
+3. Run `./upload-bootstrap.sh --targets=<new-target>`.
 4. The script will create the `.nix` file automatically.

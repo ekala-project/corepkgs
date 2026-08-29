@@ -7,7 +7,7 @@
 #   nix-instantiate --eval --strict --json \
 #     --arg system '"x86_64-linux"' \
 #     --arg attrName '"fzf"' \
-#     maintainers/scripts/repology/packages-info.nix
+#     scripts/repology/packages-info.nix
 #
 # Returns: { "pname": "...", "version": "...", "meta": { ... } }
 # or null if the package cannot be evaluated.

@@ -13,8 +13,8 @@ sys.path.insert(0, str(SCRIPT_DIR))
 @pytest.fixture
 def script_module():
     """Import and return the script module for testing."""
-    import script
-    return script
+    import sync
+    return sync
 
 
 @pytest.fixture
