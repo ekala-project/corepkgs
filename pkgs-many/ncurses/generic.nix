@@ -21,7 +21,6 @@
   binlore,
 
   # for passthru.tests
-  htop,
   gdb,
 }:
 
@@ -301,7 +300,7 @@ stdenv.mkDerivation (finalAttrs: {
     tests = {
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
       pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
-      inherit htop gdb;
+      inherit gdb;
     };
   };
 })

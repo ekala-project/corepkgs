@@ -15,7 +15,6 @@
   # passthru.tests, don't force them to be available in corepkgs
   bind,
   chrony,
-  htop,
   libgcrypt,
   libvirt,
   ntp,
@@ -117,7 +116,6 @@ stdenv.mkDerivation rec {
     inherit
       bind
       chrony
-      htop
       libgcrypt
       libvirt
       ntp
