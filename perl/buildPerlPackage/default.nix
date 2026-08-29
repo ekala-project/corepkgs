@@ -33,6 +33,9 @@
   # https://metacpan.org/pod/release/XSAWYERX/perl-5.26.0/pod/perldelta.pod#Removal-of-the-current-directory-%28%22.%22%29-from-@INC
   PERL_USE_UNSAFE_INC ? "1",
 
+  # Skip tests that need the network; the build sandbox has none.
+  NO_NETWORK_TESTING ? "1",
+
   env ? { },
 
   postPatch ? "patchShebangs .",
@@ -81,6 +84,7 @@
             PERL_AUTOINSTALL
             AUTOMATED_TESTING
             PERL_USE_UNSAFE_INC
+            NO_NETWORK_TESTING
             ;
           fullperl = perl.__spliced.buildHost or perl;
         }
