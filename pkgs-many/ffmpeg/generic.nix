@@ -125,7 +125,7 @@
   withRtmp ? false, # RTMP[E] support via librtmp
   withRubberband ? withFullDeps && withGPL && !stdenv.hostPlatform.isFreeBSD, # Rubberband filter
   withSamba ? withFullDeps && !stdenv.hostPlatform.isDarwin && withGPLv3, # Samba protocol
-  withSdl2 ? withSmallDeps && SDL2 != null,
+  withSdl2 ? withSmallDeps && sdl2-compat != null,
   withShaderc ? withFullDeps && !stdenv.hostPlatform.isDarwin && packageAtLeast "5.0",
   withShine ? withFullDeps, # Fixed-point MP3 encoding
   withSnappy ? withFullDeps, # Snappy compression, needed for hap encoding
@@ -283,7 +283,7 @@
   libGLU ? null,
   libiconv ? null,
   libilbc ? null,
-  libjack2 ? null,
+  libjack2,
   libjxl ? null,
   liblc3 ? null,
   libmodplug ? null,
@@ -292,7 +292,7 @@
   libopus ? null,
   libplacebo ? null,
   libplacebo_5 ? null,
-  libpulseaudio ? null,
+  libpulseaudio,
   libraw1394 ? null,
   librist ? null,
   librsvg ? null,
@@ -329,7 +329,7 @@
   rubberband ? null,
   twolame ? null,
   samba ? null,
-  SDL2 ? null,
+  sdl2-compat,
   shaderc ? null,
   shine ? null,
   snappy ? null,
@@ -922,7 +922,7 @@ stdenv.mkDerivation (
       ++ optionals withRtmp [ rtmpdump ]
       ++ optionals withRubberband [ rubberband ]
       ++ optionals withSamba [ samba ]
-      ++ optionals withSdl2 [ SDL2 ]
+      ++ optionals withSdl2 [ sdl2-compat ]
       ++ optionals withShaderc [ shaderc ]
       ++ optionals withShine [ shine ]
       ++ optionals withSnappy [ snappy ]
