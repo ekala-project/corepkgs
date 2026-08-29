@@ -1,3 +1,8 @@
+---
+name: meson
+description: Package a Meson/Ninja project for corepkgs. Use when a source tree has a meson.build — covers mesonFlags, auto features, cross-compilation, and diagnosing Meson setup failures.
+---
+
 # Meson Build System
 
 ## Minimal Example

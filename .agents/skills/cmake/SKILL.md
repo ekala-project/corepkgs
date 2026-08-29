@@ -1,3 +1,8 @@
+---
+name: cmake
+description: Package a CMake-based project for corepkgs. Use when a source tree has a CMakeLists.txt — covers the minimal derivation, cmakeFlags, cross-compilation, and diagnosing CMake configure failures.
+---
+
 # CMake Build System
 
 ## Minimal Example

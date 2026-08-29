@@ -1,3 +1,8 @@
+---
+name: packaging
+description: corepkgs packaging conventions. Use when writing or reviewing any pkgs/<name>/default.nix — covers the finalAttrs pattern, meta attributes, where each kind of dependency belongs, fetchers, patching, install phases, multiple outputs, and passthru.
+---
+
 # Packaging Conventions
 
 ## Package Structure

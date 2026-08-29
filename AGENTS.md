@@ -1,13 +1,14 @@
 # Agent Guide for core-pkgs
 
-This document provides high-level guidelines for AI agents working with the core-pkgs repository. For detailed information on specific topics, see the `.skills/` directory.
+This document provides high-level guidelines for AI agents working with the core-pkgs repository. For detailed information on specific topics, see the `.agents/skills/` directory.
 
 **Quick access to detailed guides:**
-- [`.skills/cmake.md`](.skills/cmake.md) - CMake build system
-- [`.skills/meson.md`](.skills/meson.md) - Meson build system
-- [`.skills/packaging.md`](.skills/packaging.md) - Packaging conventions
-- [`.skills/validation.md`](.skills/validation.md) - Validation and testing
-- [`.skills/porting.md`](.skills/porting.md) - Porting from nixpkgs
+- [`.agents/skills/cmake/SKILL.md`](.agents/skills/cmake/SKILL.md) - CMake build system
+- [`.agents/skills/meson/SKILL.md`](.agents/skills/meson/SKILL.md) - Meson build system
+- [`.agents/skills/packaging/SKILL.md`](.agents/skills/packaging/SKILL.md) - Packaging conventions
+- [`.agents/skills/validation/SKILL.md`](.agents/skills/validation/SKILL.md) - Validation and testing
+- [`.agents/skills/porting/SKILL.md`](.agents/skills/porting/SKILL.md) - Porting from nixpkgs
+- [`.agents/skills/mk-many-variants/SKILL.md`](.agents/skills/mk-many-variants/SKILL.md) - Multi-version packages in pkgs-many
 - [`docs/common-issues/`](docs/common-issues/README.md) - Fixing build failures after version updates
 
 ## Package Organization
@@ -81,7 +82,7 @@ meta = {
 };
 ```
 
-**Detailed guide:** See [`.skills/packaging.md`](.skills/packaging.md) for complete meta attribute documentation.
+**Detailed guide:** See [`.agents/skills/packaging/SKILL.md`](.agents/skills/packaging/SKILL.md) for complete meta attribute documentation.
 
 ### Testing
 
@@ -90,7 +91,7 @@ meta = {
 - Prefer `passthru.tests` for unit tests
 - Only enable `doCheck = true;` for critical packages
 
-**Detailed guide:** See [`.skills/packaging.md`](.skills/packaging.md#testing) for testing patterns.
+**Detailed guide:** See [`.agents/skills/packaging/SKILL.md`](.agents/skills/packaging/SKILL.md#testing) for testing patterns.
 
 ### Build Systems
 
@@ -98,13 +99,13 @@ meta = {
 
 Include `cmake.configurePhaseHook` in nativeBuildInputs.
 
-**Detailed guide:** See [`.skills/cmake.md`](.skills/cmake.md) for complete CMake documentation.
+**Detailed guide:** See [`.agents/skills/cmake/SKILL.md`](.agents/skills/cmake/SKILL.md) for complete CMake documentation.
 
 **Meson packages:**
 
 Include `meson.configurePhaseHook` and `ninja` in nativeBuildInputs, specify `mesonBuildType`.
 
-**Detailed guide:** See [`.skills/meson.md`](.skills/meson.md) for complete Meson documentation.
+**Detailed guide:** See [`.agents/skills/meson/SKILL.md`](.agents/skills/meson/SKILL.md) for complete Meson documentation.
 
 
 ## Validation Requirements
@@ -135,7 +136,7 @@ nix fmt <path-to-file>
 
 Ensures code follows formatting standards.
 
-**Detailed guide:** See [`.skills/validation.md`](.skills/validation.md) for complete validation procedures, troubleshooting, and advanced validation techniques.
+**Detailed guide:** See [`.agents/skills/validation/SKILL.md`](.agents/skills/validation/SKILL.md) for complete validation procedures, troubleshooting, and advanced validation techniques.
 
 ## Fixing Build Failures After Version Updates
 
@@ -197,7 +198,7 @@ When porting a package from nixpkgs:
 5. **Add TODO comments** for missing dependencies
 6. **Validate** and **format** the files
 
-**Detailed guide:** See [`.skills/porting.md`](.skills/porting.md) for complete porting workflow, examples, and troubleshooting.
+**Detailed guide:** See [`.agents/skills/porting/SKILL.md`](.agents/skills/porting/SKILL.md) for complete porting workflow, examples, and troubleshooting.
 
 ## Validation Checklist
 
@@ -211,7 +212,7 @@ Before submitting changes, ensure:
 - [ ] `nix fmt <file>` run on all edited files
 - [ ] TODO comments added for missing dependencies
 
-**Complete checklist:** See [`.skills/validation.md`](.skills/validation.md#validation-checklist) for the full validation checklist.
+**Complete checklist:** See [`.agents/skills/validation/SKILL.md`](.agents/skills/validation/SKILL.md#validation-checklist) for the full validation checklist.
 
 ## ekaos Reusable Modules
 
@@ -243,8 +244,8 @@ services.myservice = {
 
 For detailed information on specific topics:
 
-- **Build systems:** [`.skills/cmake.md`](.skills/cmake.md) and [`.skills/meson.md`](.skills/meson.md)
-- **Packaging:** [`.skills/packaging.md`](.skills/packaging.md) - includes dependency management, cross-compilation, and passthru attributes
-- **Validation:** [`.skills/validation.md`](.skills/validation.md) - includes troubleshooting and advanced validation
-- **Porting:** [`.skills/porting.md`](.skills/porting.md) - includes complete examples and best practices
-- **All skills:** [`.skills/README.md`](.skills/README.md) - index of all available skill guides
+- **Build systems:** [`.agents/skills/cmake/SKILL.md`](.agents/skills/cmake/SKILL.md) and [`.agents/skills/meson/SKILL.md`](.agents/skills/meson/SKILL.md)
+- **Packaging:** [`.agents/skills/packaging/SKILL.md`](.agents/skills/packaging/SKILL.md) - includes dependency management, cross-compilation, and passthru attributes
+- **Validation:** [`.agents/skills/validation/SKILL.md`](.agents/skills/validation/SKILL.md) - includes troubleshooting and advanced validation
+- **Porting:** [`.agents/skills/porting/SKILL.md`](.agents/skills/porting/SKILL.md) - includes complete examples and best practices
+- **All skills:** [`.agents/skills/README.md`](.agents/skills/README.md) - index of all available skill guides

@@ -5,3 +5,4 @@ __pycache__/
 *.md
 !AGENTS.md
 !README.md
+!SKILL.md
