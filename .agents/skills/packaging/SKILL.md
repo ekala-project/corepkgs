@@ -17,7 +17,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "example";
     repo = "example";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-...";
   };
 
@@ -108,7 +108,7 @@ buildInputs = [ zlib ];             # Host libraries
 src = fetchFromGitHub {
   owner = "example";
   repo = "example";
-  rev = "v${finalAttrs.version}";
+  tag = "v${finalAttrs.version}";
   hash = "sha256-...";
 };
 ```
@@ -119,7 +119,7 @@ src = fetchFromGitLab {
   domain = "gitlab.com";
   owner = "example";
   repo = "example";
-  rev = finalAttrs.version;
+  tag = finalAttrs.version;
   hash = "sha256-...";
 };
 ```
@@ -234,7 +234,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "example-org";
     repo = "example";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-...";
   };
 
