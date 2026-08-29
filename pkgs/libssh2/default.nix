@@ -11,7 +11,6 @@
   curl,
   libgit2,
   mc,
-  vlc,
 }:
 
 stdenv.mkDerivation rec {
@@ -43,7 +42,6 @@ stdenv.mkDerivation rec {
       aria2
       libgit2
       mc
-      vlc
       ;
     curl = curl.tests.withCheck;
   };

@@ -246,6 +246,9 @@ mapAliases {
   ubootUtilite = uboot.ubootUtilite;
   ubootVisionFive2 = uboot.ubootVisionFive2;
   ubootWandboard = uboot.ubootWandboard;
+  wlroots_0_17 = throw "wlroots_0_17 hase been removed because its incompatible with libinput >= 1.27";
+  wlroots_0_18 = wlroots.v0_18;
+  wlroots_0_19 = wlroots.v0_19;
   xxHash = xxhash;
   # keep-sorted end
 }

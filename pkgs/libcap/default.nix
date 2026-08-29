@@ -21,7 +21,6 @@
   ntp,
   qemu,
   squid,
-  tor,
   uwsgi,
 }:
 
@@ -124,7 +123,6 @@ stdenv.mkDerivation rec {
       ntp
       qemu
       squid
-      tor
       uwsgi
       ;
   };

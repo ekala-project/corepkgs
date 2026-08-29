@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p ripgrep common-updater-scripts
+#!nix-shell -i bash -p common-updater-scripts
 
 set -xeu -o pipefail
 

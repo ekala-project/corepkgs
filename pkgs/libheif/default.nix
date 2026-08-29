@@ -14,7 +14,6 @@
   gdk-pixbuf,
 
   # for passthru.tests
-  gimp,
   imagemagick,
   imlib2Full,
   imv,
@@ -75,7 +74,6 @@ stdenv.mkDerivation rec {
 
   passthru.tests = {
     inherit
-      gimp
       imagemagick
       imlib2Full
       imv

@@ -31,11 +31,6 @@
   version,
   sha256,
   patches ? [ ],
-  fd,
-  ripgrep,
-  wezterm,
-  firefox,
-  thunderbird,
   # This only builds std for target and reuses the rustc from build.
   fastCross,
   lndir,
@@ -436,10 +431,6 @@ stdenv.mkDerivation (finalAttrs: {
     llvm = llvmShared;
     inherit llvmPackages;
     inherit (rustc) targetPlatforms targetPlatformsWithHostTools badTargetPlatforms;
-    tests = {
-      inherit fd ripgrep wezterm;
-    }
-    // lib.optionalAttrs stdenv.hostPlatform.isLinux { inherit firefox thunderbird; };
   };
 
   meta = {
