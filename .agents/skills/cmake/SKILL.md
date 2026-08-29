@@ -22,7 +22,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "example";
     repo = "example";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
 
@@ -30,8 +30,6 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
     cmake.configurePhaseHook  # Required
   ];
-
-  cmakeBuildType = "Release";
 
   meta = {
     description = "Example CMake package";
@@ -43,11 +41,6 @@ stdenv.mkDerivation (finalAttrs: {
 ## Essential Requirements
 
 **Always include** `cmake.configurePhaseHook` in `nativeBuildInputs`.
-
-**Specify build type:**
-```nix
-cmakeBuildType = "Release";  # or Debug, RelWithDebInfo, MinSizeRel
-```
 
 ## Common Patterns
 

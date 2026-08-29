@@ -24,7 +24,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "example";
     repo = "example";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
 
@@ -34,8 +34,6 @@ stdenv.mkDerivation (finalAttrs: {
     ninja                      # Required
     pkg-config
   ];
-
-  mesonBuildType = "release";
 
   meta = {
     description = "Example Meson package";
@@ -50,11 +48,6 @@ stdenv.mkDerivation (finalAttrs: {
 - `meson.configurePhaseHook` - Sets up configure phase
 - `ninja` - Required (Meson generates Ninja files)
 - `pkg-config` - Usually needed for dependencies
-
-**Specify build type:**
-```nix
-mesonBuildType = "release";  # or debug, debugoptimized, minsize
-```
 
 ## Common Patterns
 
@@ -86,12 +79,6 @@ mesonFlags = [
 ```
 
 **Feature options:** Use `enabled`/`disabled`/`auto`.
-
-### Auto Features
-
-```nix
-mesonAutoFeatures = "auto";  # or enabled, disabled
-```
 
 ### Cross-Compilation
 
