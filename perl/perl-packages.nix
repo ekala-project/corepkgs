@@ -542,9 +542,9 @@ with self;
 
     installPhase = "./Build install --prefix $out";
 
-    SDL_INST_DIR = lib.getDev pkgs.SDL;
+    SDL_INST_DIR = lib.getDev pkgs.sdl12-compat;
     buildInputs = [
-      pkgs.SDL
+      pkgs.sdl12-compat
       ArchiveExtract
       ArchiveZip
       TextPatch
@@ -30364,7 +30364,7 @@ with self;
     ];
     preCheck = "rm t/core_audiospec.t";
     buildInputs = [
-      pkgs.SDL
+      pkgs.sdl12-compat
       pkgs.SDL_gfx
       pkgs.SDL_mixer
       pkgs.SDL_image
