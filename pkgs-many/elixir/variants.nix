@@ -11,12 +11,11 @@
 
   v1_18 = {
     version = "1.20.3";
-    # Elixir 1.18 (Latest, Compatible with OTP 25-27)
-    # NOTE: Requires Erlang 27 (incompatible with Erlang 28 due to reference escaping issues)
+    # Elixir 1.18+ requires OTP 27+
     src-hash = "sha256-/yKolLEwYxRD2xoZO06MtHYvaXEoVm5D2oSP0Ww3d70=";
-    minimumOTPVersion = "25";
+    minimumOTPVersion = "27";
     # The default erlang (v27) is actually OTP 29, which is incompatible.
-    # Pin to erlang v26 (OTP 26) which is within the supported range.
-    erlangVariant = "v26";
+    # Pin to erlang v28 (OTP 28) which satisfies the OTP 27+ requirement.
+    erlangVariant = "v28";
   };
 }
