@@ -108,7 +108,6 @@ with final;
   breathe = null;
   libidn = null; # defaultGemConfig
   capnproto = null; # defaultCrateOverrides
-  cargo-c = null; # rustls-ffi
   celt = null; # ffmpeg
   chameleon = null;
   chromaprint = null; # ffmpeg
