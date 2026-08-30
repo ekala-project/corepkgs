@@ -527,5 +527,7 @@ stdenv.mkDerivation {
       vendor = "haskell";
       product = "ghc";
     };
+    # GHC 9.0.2 prebuilt binaries segfault with newer glibc during ghc-pkg recache
+    broken = stdenv.hostPlatform.isLinux;
   };
 }
