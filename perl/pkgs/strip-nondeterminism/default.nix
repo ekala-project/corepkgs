@@ -10,6 +10,7 @@ buildPerlPackage {
   version = "1.14.0";
 
   src = fetchFromGitLab {
+    domain = "salsa.debian.org";
     owner = "reproducible-builds";
     repo = "strip-nondeterminism";
     tag = "1.14.0";
