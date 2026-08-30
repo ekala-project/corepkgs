@@ -20,6 +20,7 @@
     ./laptop.nix
     ./networking.nix
     ./system.nix
+    ./thermal.nix
     ./virtualisation.nix
   ];
 
