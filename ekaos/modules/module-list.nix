@@ -104,6 +104,7 @@
 
   ./services/hardware/thermald.nix
   ./services/hardware/fwupd.nix
+  ./services/hardware/fprintd.nix
 
   ./services/security/vault.nix
 
