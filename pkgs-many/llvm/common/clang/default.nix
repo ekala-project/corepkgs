@@ -84,7 +84,7 @@ stdenv.mkDerivation (
     ++ lib.optionals enableManpages [
       # TODO(corepkgs): add myst-parser and enable manpages
       # python3.pkgs.myst-parser
-      # python3.pkgs.sphinx
+      python3.pkgs.sphinx
     ]
     ++ lib.optional stdenv.hostPlatform.isDarwin fixDarwinDylibNames;
 
