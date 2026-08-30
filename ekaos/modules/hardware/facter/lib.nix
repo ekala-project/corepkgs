@@ -31,6 +31,48 @@ let
   # Deduplicate a list of strings
   stringSet = list: builtins.attrNames (builtins.groupBy lib.id list);
 
+  # Query if a facter report contains a GPU with the given PCI vendor ID
+  hasGpuVendor =
+    vendorId:
+    {
+      hardware ? { },
+      ...
+    }:
+    builtins.any (
+      {
+        vendor ? { },
+        ...
+      }:
+      (vendor.value or 0) == vendorId
+    ) (hardware.graphics_card or [ ]);
+
+  # Check if facter report indicates a portable/laptop chassis via SMBIOS
+  # SMBIOS chassis types: 8=Portable, 9=Laptop, 10=Notebook,
+  # 14=Sub Notebook, 30=Tablet, 31=Convertible, 32=Detachable
+  isPortableChassis =
+    {
+      smbios ? { },
+      ...
+    }:
+    let
+      portableTypes = [
+        8
+        9
+        10
+        14
+        30
+        31
+        32
+      ];
+    in
+    builtins.any (
+      {
+        chassis_type ? { },
+        ...
+      }:
+      builtins.elem (chassis_type.value or 0) portableTypes
+    ) (smbios.chassis or [ ]);
+
   # Convert number to zero-padded 4-digit hex string (for USB device IDs)
   toZeroPaddedHex =
     n:
@@ -50,6 +92,8 @@ in
 {
   inherit
     hasCpu
+    hasGpuVendor
+    isPortableChassis
     collectDrivers
     stringSet
     toZeroPaddedHex
@@ -57,4 +101,9 @@ in
 
   hasAmdCpu = hasCpu "AuthenticAMD";
   hasIntelCpu = hasCpu "GenuineIntel";
+
+  # PCI vendor IDs: AMD/ATI=0x1002, Intel=0x8086, NVIDIA=0x10de
+  hasAmdGpu = hasGpuVendor 4098;
+  hasIntelGpu = hasGpuVendor 32902;
+  hasNvidiaGpu = hasGpuVendor 4318;
 }
