@@ -1,9 +1,7 @@
 {
   lib,
   stdenv,
-  fetchFromGitLab,
-  util-macros,
-  autoreconfHook,
+  fetchurl,
   pkg-config,
   libxcb,
   xorgproto,
@@ -19,22 +17,16 @@ stdenv.mkDerivation (finalAttrs: {
     "dev"
   ];
 
-  src = fetchFromGitLab {
-    domain = "gitlab.freedesktop.org";
-    group = "xorg";
-    owner = "lib";
-    repo = "libxcb-wm";
-    tag = "xcb-util-wm-${finalAttrs.version}";
-    hash = "sha256-MKgArUOmwRRcMqLcVyNeZo3Z3BSNS4/9sc/w5nnFKZQ=";
+  src = fetchurl {
+    url = "mirror://xorg/individual/xcb/xcb-util-wm-${finalAttrs.version}.tar.xz";
+    hash = "sha256-YsNOIdBiZGh/rqftv2NjLJ8E1V5yEUqkpXu5Xk+Iigs=";
   };
 
   strictDeps = true;
 
   nativeBuildInputs = [
-    autoreconfHook
     gnum4
     pkg-config
-    util-macros
   ];
 
   buildInputs = [

@@ -1,9 +1,7 @@
 {
   lib,
   stdenv,
-  fetchFromGitLab,
-  util-macros,
-  autoreconfHook,
+  fetchurl,
   pkg-config,
   gnum4,
   xorgproto,
@@ -20,22 +18,16 @@ stdenv.mkDerivation (finalAttrs: {
     "dev"
   ];
 
-  src = fetchFromGitLab {
-    domain = "gitlab.freedesktop.org";
-    group = "xorg";
-    owner = "lib";
-    repo = "libxcb-image";
-    tag = "xcb-util-image-${finalAttrs.version}";
-    hash = "sha256-k6+wSHKnWSkZK6gm2lYCsnTRz43OLMdO8iVRoEhtRwQ=";
+  src = fetchurl {
+    url = "mirror://xorg/individual/xcb/xcb-util-image-${finalAttrs.version}.tar.xz";
+    hash = "sha256-zK2O5drbEnH9RyetFNm9d6ZOUFYIdmxOmCZ9mu3kDT0=";
   };
 
   strictDeps = true;
 
   nativeBuildInputs = [
-    autoreconfHook
     gnum4
     pkg-config
-    util-macros
   ];
 
   buildInputs = [
