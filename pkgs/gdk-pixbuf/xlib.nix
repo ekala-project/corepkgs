@@ -32,6 +32,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     meson
+    meson.configurePhaseHook
     ninja
     pkg-config
     docbook-xsl-nons

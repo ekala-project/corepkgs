@@ -105,6 +105,7 @@ stdenv.mkDerivation (finalAttrs: {
     gobject-introspection
     makeWrapper
     meson
+    meson.configurePhaseHook
     ninja
     pkg-config
     python3

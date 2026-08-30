@@ -25,6 +25,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     meson
+    meson.configurePhaseHook
     python3
     ninja
   ];

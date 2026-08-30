@@ -107,10 +107,10 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     bison
     cmake
-    cmake.configurePhaseHook
     flex
     jq
     meson
+    meson.configurePhaseHook
     ninja
     pkg-config
     rsync
@@ -267,7 +267,9 @@ stdenv.mkDerivation (finalAttrs: {
     # Gets stuck in functional-tests in cross-trunk jobset and doesn't timeout
     # https://hydra.nixos.org/build/298175022
     # probably https://github.com/NixOS/nix/issues/13042
-    broken = stdenv.hostPlatform.system == "i686-linux" && stdenv.buildPlatform != stdenv.hostPlatform;
+    broken =
+      (stdenv.hostPlatform.system == "i686-linux" && stdenv.buildPlatform != stdenv.hostPlatform)
+      || lib.versionOlder version "2.29"; # nix < 2.29 is incompatible with current meson
     outputsToInstall = [ "out" ] ++ lib.optional enableDocumentation "man";
     mainProgram = "nix";
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "nixos" version;

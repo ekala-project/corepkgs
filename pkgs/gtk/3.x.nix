@@ -111,6 +111,7 @@ stdenv.mkDerivation (finalAttrs: {
     gettext
     makeWrapper
     meson
+    meson.configurePhaseHook
     ninja
     pkg-config
     python3

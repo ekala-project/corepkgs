@@ -156,7 +156,6 @@ stdenv.mkDerivation {
 
   patches = [
     ./opencl.patch
-    ./musl.patch
   ];
 
   postPatch = ''
@@ -309,6 +308,7 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [
     meson
+    meson.configurePhaseHook
     pkg-config
     ninja
     intltool

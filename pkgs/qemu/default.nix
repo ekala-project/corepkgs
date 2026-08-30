@@ -162,6 +162,7 @@ stdenv.mkDerivation (finalAttrs: {
     flex
     bison
     meson
+    meson.configurePhaseHook
     ninja
     perl
 

@@ -58,6 +58,7 @@ buildPythonApplication rec {
     gobject-introspection # need for gtk namespace to be available
     hicolor-icon-theme # needed for postinstall script
     meson
+    meson.configurePhaseHook
     ninja
     pkg-config
     wrapGAppsHook3
