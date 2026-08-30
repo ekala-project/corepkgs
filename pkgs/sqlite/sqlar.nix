@@ -4,7 +4,7 @@
   fetchurl,
   fuse,
   zlib,
-  withFuse ? true,
+  withFuse ? false, # TODO: fuse2 is not available in core-pkgs
 }:
 
 stdenv.mkDerivation {

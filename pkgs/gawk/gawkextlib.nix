@@ -109,6 +109,7 @@ let
       inherit gawkextlib;
       name = "aregex";
       extraBuildInputs = [ tre ];
+      broken = true; # TODO: tre is not available in core-pkgs
     };
     csv = buildExtension {
       inherit gawkextlib;
@@ -144,6 +145,7 @@ let
       inherit gawkextlib;
       name = "json";
       extraBuildInputs = [ rapidjson ];
+      broken = true; # TODO: rapidjson is not available in core-pkgs
     };
     lmdb = buildExtension {
       inherit gawkextlib;
@@ -157,6 +159,7 @@ let
       #  mdb_env_open(env, /dev/null)
       #! Operation not supported by device
       doCheck = !stdenv.hostPlatform.isDarwin;
+      broken = true; # TODO: lmdb is not available in core-pkgs
     };
     mbs = buildExtension {
       inherit gawkextlib;
@@ -181,6 +184,7 @@ let
       inherit gawkextlib;
       name = "pgsql";
       extraBuildInputs = [ libpq ];
+      broken = true; # TODO: libpq is not available in core-pkgs
     };
     redis = buildExtension {
       inherit gawkextlib;

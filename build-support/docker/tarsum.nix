@@ -53,6 +53,7 @@ stdenv.mkDerivation {
   '';
 
   meta = {
+    broken = docker == null;
     platforms = go.meta.platforms;
     mainProgram = "tarsum";
   };
