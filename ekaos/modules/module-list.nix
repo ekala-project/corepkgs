@@ -102,6 +102,8 @@
   ./services/databases/postgresql.nix
   ./services/databases/redis.nix
 
+  ./services/hardware/thermald.nix
+
   ./services/security/vault.nix
 
   # Service management
