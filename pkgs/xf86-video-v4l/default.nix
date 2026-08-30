@@ -3,6 +3,7 @@
   stdenv,
   fetchFromGitLab,
   autoreconfHook,
+  libtool,
   pkg-config,
   util-macros,
   xorg-server,
@@ -25,6 +26,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     autoreconfHook
+    libtool
     pkg-config
     util-macros
     xorg-server # for some autoconf macros
