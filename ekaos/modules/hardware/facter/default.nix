@@ -22,6 +22,7 @@
     ./networking.nix
     ./system.nix
     ./thermal.nix
+    ./trackpoint.nix
     ./virtualisation.nix
   ];
 
