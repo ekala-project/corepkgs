@@ -22,6 +22,7 @@
   ./hardware/firmware.nix
   ./hardware/facter
   ./hardware/cpu.nix
+  ./hardware/trackpoint.nix
 
   # System modules
   ./system/toplevel.nix
