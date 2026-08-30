@@ -14,6 +14,7 @@
     ./cpu.nix
     ./disk.nix
     ./firmware.nix
+    ./fwupd.nix
     ./gpu.nix
     ./graphics.nix
     ./keyboard.nix
