@@ -12,6 +12,7 @@
   libxcrypt,
   fixDarwinDylibNames,
   autoreconfHook,
+  libtool,
   enableLdap ? false,
   buildPackages,
   pruneLibtoolFiles,
@@ -51,6 +52,7 @@ stdenv.mkDerivation rec {
   depsBuildBuild = [ buildPackages.stdenv.cc ];
   nativeBuildInputs = [
     autoreconfHook
+    libtool
     pruneLibtoolFiles
   ]
   ++ lib.optional stdenv.hostPlatform.isDarwin fixDarwinDylibNames;
@@ -78,7 +80,10 @@ stdenv.mkDerivation rec {
   ];
 
   env = lib.optionalAttrs stdenv.cc.isGNU {
-    NIX_CFLAGS_COMPILE = "-Wno-error=implicit-function-declaration";
+    NIX_CFLAGS_COMPILE = toString [
+      "-Wno-error=implicit-function-declaration"
+      "-std=gnu17"
+    ];
   };
 
   installFlags = lib.optionals stdenv.hostPlatform.isDarwin [

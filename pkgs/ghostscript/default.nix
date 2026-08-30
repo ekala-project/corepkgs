@@ -179,6 +179,11 @@ stdenv.mkDerivation rec {
     "--enable-cups"
   ];
 
+  env.NIX_CFLAGS_COMPILE = toString [
+    "-Wno-error=maybe-uninitialized"
+    "-std=gnu17"
+  ];
+
   # make check does nothing useful
   doCheck = false;
 
