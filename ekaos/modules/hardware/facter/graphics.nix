@@ -26,5 +26,8 @@ in
 
   config = lib.mkIf (config.hardware.facter.enable && cfg.enable) {
     boot.initrd.kernelModules = config.hardware.facter.detected.boot.graphics.kernelModules;
+    # Fallback: enable graphics when monitors are detected,
+    # even if the GPU vendor is not AMD/Intel/NVIDIA
+    hardware.graphics.enable = lib.mkDefault true;
   };
 }
