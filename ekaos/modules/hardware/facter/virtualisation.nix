@@ -56,6 +56,10 @@ in
         (lib.mkIf (hasCPUFeature "svm") [ "kvm-amd" ])
       ];
 
+    # KSM deduplicates identical memory pages — valuable for KVM hosts
+    # running multiple VMs with similar guest OS images
+    hardware.ksm.enable = lib.mkIf cfg.none.enable (lib.mkDefault true);
+
     # Virtio modules for QEMU/KVM guests
     boot.initrd = {
       kernelModules = lib.optionals cfg.qemu.enable [
