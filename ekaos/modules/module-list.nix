@@ -103,6 +103,7 @@
   ./services/databases/redis.nix
 
   ./services/hardware/thermald.nix
+  ./services/hardware/fwupd.nix
 
   ./services/security/vault.nix
 
