@@ -10,6 +10,7 @@
   imports = [
     ./boot.nix
     ./bluetooth.nix
+    ./bluetooth-stack.nix
     ./cpu.nix
     ./disk.nix
     ./firmware.nix
