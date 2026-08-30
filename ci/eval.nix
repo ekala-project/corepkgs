@@ -24,66 +24,8 @@
 #   nix-instantiate --eval --strict ci/eval.nix
 
 let
-  pkgs = import ../. {
-    config = {
-      allowAliases = false;
-      checkMeta = true;
-
-      handleEvalIssue =
-        reason: msg:
-        if
-          builtins.elem reason [
-            "unknown-meta"
-            "broken-outputs"
-          ]
-        then
-          abort msg
-        else
-          throw msg;
-    };
-  };
-
-  inherit (pkgs) lib;
-
-  # Forcing `drvPath` runs `check-meta` and resolves every dependency, which is
-  # the point of this job. `package` arrives unforced, so a lookup that throws
-  # is caught here too.
-  probe =
-    package:
-    let
-      value = builtins.tryEval package;
-    in
-    builtins.tryEval (
-      if value.success && lib.isDerivation value.value then
-        builtins.seq value.value.drvPath null
-      else
-        null
-    );
-
-  # A package `top-level.nix` has replaced carries no `variants` passthru, and
-  # so contributes nothing.
-  variantsOf =
-    name:
-    let
-      variants = builtins.tryEval (builtins.attrValues (pkgs.${name}.variants or { }));
-    in
-    if variants.success then variants.value else [ ];
-
-  # Forced through `tryEval` because an attribute that throws is not a
-  # placeholder: it still has to reach `probe`, which is what decides whether
-  # the throw is a package correctly refusing to evaluate or a real bug.
-  isPlaceholder =
-    value:
-    let
-      forced = builtins.tryEval value;
-    in
-    forced.success && forced.value == null;
-
-  names = builtins.attrNames pkgs;
-  manyVariantNames = builtins.attrNames (builtins.readDir ../pkgs-many);
-
-  candidates = map (name: pkgs.${name}) names ++ lib.concatMap variantsOf manyVariantNames;
-  targets = builtins.filter (value: !isPlaceholder value) candidates;
+  packages = import ./packages.nix;
+  inherit (packages) probe targets candidates;
 in
 builtins.deepSeq (map probe targets) {
   evaluated = builtins.length targets;
