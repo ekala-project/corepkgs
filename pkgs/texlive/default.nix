@@ -37,7 +37,7 @@
   html-tidy ? null,
   ncurses,
   zip,
-  libfaketime ? null,
+  libfaketime,
   asymptote ? null,
   biber-ms ? null,
   makeFontsConf,
