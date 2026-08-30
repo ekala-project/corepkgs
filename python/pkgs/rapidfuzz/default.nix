@@ -3,7 +3,6 @@
   stdenv,
   buildPythonPackage,
   fetchFromGitHub,
-  fetchpatch,
   cmake,
   cython,
   ninja,
@@ -25,15 +24,6 @@ buildPythonPackage rec {
     hash = "sha256-wF7eeSD6GQfN0EOwDvrgjMqN5u2wxXFlktQS7nIKgkU=";
   };
 
-  patches = [
-    # https://github.com/rapidfuzz/RapidFuzz/pull/463
-    (fetchpatch {
-      name = "support-taskflow-3.11.0.patch";
-      url = "https://github.com/rapidfuzz/RapidFuzz/commit/0ef2a4980c41b852283e6db7a747a1632307c75e.patch";
-      hash = "sha256-xb+J3PXwD51lZqIJcTzPJWrT/oqrIXxh1cLp91DhIPg=";
-    })
-  ];
-
   build-system = [
     cmake
     cython
@@ -45,6 +35,16 @@ buildPythonPackage rec {
     rapidfuzz-cpp
     taskflow
   ];
+
+  # Taskflow 4.1's TaskflowConfigVersion.cmake uses SameMinorVersion
+  # compatibility, so find_package(Taskflow 4.0.0) fails against 4.1.x.
+  # Insert a version-matched find_package call so CMake finds the system copy.
+  postPatch = ''
+    substituteInPlace CMakeLists.txt \
+      --replace-fail \
+        'find_package(Taskflow 4.0.0 QUIET)' \
+        'find_package(Taskflow ${taskflow.version} QUIET)'
+  '';
 
   env.RAPIDFUZZ_BUILD_EXTENSION = 1;
 
