@@ -4119,12 +4119,6 @@
     license = [ "artistic2" ];
     version = "4.0-1";
   };
-  biber-ms.binfiles = [
-    "biber-ms"
-  ];
-  biber.binfiles = [
-    "biber"
-  ];
   bibexport = {
     revision = 50677;
     shortdesc = "Extract a BibTeX file based on a .aux file";
