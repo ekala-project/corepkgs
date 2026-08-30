@@ -576,8 +576,9 @@ rec {
 
     configureFlags = [
       "--disable-manpage" # man pages are provided by the doc container
-      "--with-ttfautohint"
-    ];
+    ]
+    ++ lib.optional (ttfautohint != null) "--with-ttfautohint"
+    ++ lib.optional (ttfautohint == null) "--without-ttfautohint";
 
     # PDF handling requires mutool (from mupdf) since Ghostscript 10.01
     postPatch = ''
@@ -592,12 +593,12 @@ rec {
       ghostscript
       zlib
       freetype
-      ttfautohint
       woff2
       potrace
       xxhash
       mupdf-headless
-    ];
+    ]
+    ++ lib.optional (ttfautohint != null) ttfautohint;
 
     enableParallelBuilding = true;
   };
