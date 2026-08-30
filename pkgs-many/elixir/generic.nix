@@ -2,6 +2,7 @@
   version,
   src-hash,
   minimumOTPVersion,
+  erlangVariant ? null,
   ...
 }:
 
@@ -16,6 +17,13 @@
   bash,
 }:
 
+let
+  # Select a compatible Erlang/OTP version.
+  # When erlangVariant is set, pick that specific variant from the erlang
+  # package set (e.g. "v26" -> erlang.v26) instead of using the default,
+  # which may be a newer OTP release than this Elixir version supports.
+  compatibleErlang = if erlangVariant != null then erlang.${erlangVariant} else erlang;
+in
 stdenv.mkDerivation (finalAttrs: {
   pname = "elixir";
   inherit version;
@@ -30,7 +38,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
-    erlang
+    compatibleErlang
   ];
 
   env = {
@@ -65,7 +73,7 @@ stdenv.mkDerivation (finalAttrs: {
       wrapProgram $f \
         --prefix PATH ":" "${
           lib.makeBinPath [
-            erlang
+            compatibleErlang
             coreutils
             curl
             bash
@@ -78,7 +86,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   passthru = {
-    inherit erlang;
+    erlang = compatibleErlang;
     majorVersion = lib.versions.major version;
     minorVersion = lib.versions.majorMinor version;
   };
