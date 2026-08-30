@@ -67,7 +67,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   mesonFlags = [
     "--sysconfdir=/etc"
-    (lib.mesonBool "gtk_doc" withDocs)
+    (lib.mesonBool "gtk_doc" false)
     (lib.mesonBool "vapi" withIntrospection)
   ];
 
