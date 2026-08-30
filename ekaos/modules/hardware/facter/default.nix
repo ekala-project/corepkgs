@@ -13,6 +13,7 @@
     ./cpu.nix
     ./disk.nix
     ./firmware.nix
+    ./gpu.nix
     ./graphics.nix
     ./keyboard.nix
     ./networking.nix
