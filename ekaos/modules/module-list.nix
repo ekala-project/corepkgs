@@ -23,6 +23,7 @@
   ./hardware/facter
   ./hardware/cpu.nix
   ./hardware/trackpoint.nix
+  ./hardware/sensor/iio.nix
 
   # System modules
   ./system/toplevel.nix
