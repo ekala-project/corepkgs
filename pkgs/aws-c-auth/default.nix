@@ -17,6 +17,12 @@ stdenv.mkDerivation rec {
   pname = "aws-c-auth";
   version = "0.10.4";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-auth";
