@@ -19,6 +19,12 @@ stdenv.mkDerivation rec {
   # nixpkgs-update: no auto update
   version = "0.13.5";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-s3";
