@@ -1446,8 +1446,6 @@ with final;
   httpTwoLevelsUpdater = callPackage ./pkgs/common-updater-scripts/http-two-levels-updater.nix { };
   unstableGitUpdater = callPackage ./pkgs/common-updater-scripts/unstable-updater.nix { };
 
-  bzip2_1_1 = callPackage ./pkgs/bzip2/1_1.nix { };
-
   # Use Apple’s fork of libffi by default, which provides APIs and trampoline functionality that is not yet
   # merged upstream. This is needed by some packages (such as cffi).
   #
