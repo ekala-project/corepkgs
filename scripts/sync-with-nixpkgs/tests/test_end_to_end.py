@@ -34,9 +34,9 @@ class TestSurvey:
         assert "extra.nix" in result.patches["pkgs/curl.patch"]
 
     def test_unmapped_file_is_reported_not_diffed(self, trees):
-        trees.local("ekaos/thing.nix", "x\n")
+        trees.local("unclaimed/thing.nix", "x\n")
         result = survey.run(trees.root, trees.upstream)
-        assert result.unmapped == ["ekaos/thing.nix"]
+        assert result.unmapped == ["unclaimed/thing.nix"]
         assert result.patches == {}
 
     def test_file_absent_upstream_is_reported_as_missing(self, trees):
@@ -148,10 +148,10 @@ class TestBaselineWorkflow:
 
 class TestReports:
     def test_unmapped_paths_are_written_out(self, trees):
-        trees.local("ekaos/thing.nix", "x\n")
+        trees.local("unclaimed/thing.nix", "x\n")
         _generate(trees)
         report = _patches(trees) / config.REPORTS_DIR / "unmapped-paths.txt"
-        assert "ekaos/thing.nix" in report.read_text(encoding="utf-8")
+        assert "unclaimed/thing.nix" in report.read_text(encoding="utf-8")
 
     def test_no_report_is_written_when_nothing_to_say(self, trees):
         trees.both(
