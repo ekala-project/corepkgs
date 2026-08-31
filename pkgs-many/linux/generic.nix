@@ -35,6 +35,9 @@ let
     rt_6_6 = wrapKernel (
       linux-support.buildRtKernel ./../../pkgs/linux-support/kernel/linux-rt-6.6.nix
     );
+    rt_6_12 = wrapKernel (
+      linux-support.buildRtKernel ./../../pkgs/linux-support/kernel/linux-rt-6.12.nix
+    );
 
     # Raspberry Pi kernels
     rpi1 = wrapKernel (linux-support.buildRpiKernel 1);

@@ -10,7 +10,7 @@
 }@args:
 
 let
-  version = "5.15.216-rt98"; # updated by ./update-rt.sh
+  version = "6.12.100-rt20"; # updated by ./update-rt.sh
   branch = lib.versions.majorMinor version;
   kversion = builtins.elemAt (lib.splitString "-" version) 0;
 in
@@ -28,8 +28,8 @@ buildLinux (
         lib.replaceStrings [ "-" ] [ ".0-" ] version;
 
     src = fetchurl {
-      url = "mirror://kernel/linux/kernel/v5.x/linux-${kversion}.tar.xz";
-      hash = "sha256-Ca/7IAWuo/RO7D8+q0wZROAHBzVep8p/orprNKgmBe0=";
+      url = "mirror://kernel/linux/kernel/v6.x/linux-${kversion}.tar.xz";
+      hash = "sha256-Z/lzUzQGSS6Gd0usvO+uUNUNXDTL9wPEfsUmpe/c7pA=";
     };
 
     kernelPatches =
@@ -38,7 +38,7 @@ buildLinux (
           name = "rt";
           patch = fetchurl {
             url = "mirror://kernel/linux/kernel/projects/rt/${branch}/older/patch-${version}.patch.xz";
-            hash = "sha256-zlXDtcQKj9lRg9o5/QZnWTesYf5QcQdBAXPAhJ2v5EU=";
+            hash = "sha256-X84OQrBuAYi29a4yJH+dFm8uo9b5TBF3OlcUfa18uWE=";
           };
         };
       in
@@ -57,11 +57,11 @@ buildLinux (
       }
       // structuredExtraConfig;
 
-    isLTS = true;
-
     extraMeta = extraMeta // {
       inherit branch;
     };
+
+    isLTS = true;
   }
   // argsOverride
 )
