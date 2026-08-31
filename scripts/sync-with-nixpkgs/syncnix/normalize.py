@@ -9,6 +9,9 @@ import re
 
 from . import config
 
+Vocabulary = list[tuple[re.Pattern[str], str]]
+"""Compiled `(pattern, replacement)` rewrites applied to nixpkgs content."""
+
 _BINDING = re.compile(
     r"^(?P<indent>\s*)(?:meta\.)?(?P<name>" + "|".join(config.DROPPED_META_BINDINGS) + r")\s*="
 )
@@ -21,10 +24,15 @@ def rewrite_paths(text: str) -> str:
     return text
 
 
-def rename_vocabulary(text: str) -> str:
-    """Rename attributes that corepkgs spells differently from nixpkgs."""
-    for pattern, replacement in config.VOCABULARY:
-        text = re.sub(pattern, replacement, text)
+def rename_vocabulary(text: str, vocabulary: Vocabulary) -> str:
+    """Rename attributes that corepkgs spells differently from nixpkgs.
+
+    The vocabulary is passed in rather than imported so this stays pure and can
+    be tested without an alias file on disk. See `syncnix.aliases` for how it is
+    built.
+    """
+    for pattern, replacement in vocabulary:
+        text = pattern.sub(replacement, text)
     return text
 
 
@@ -79,6 +87,6 @@ def drop_meta_bindings(text: str) -> str:
     return "\n".join(kept)
 
 
-def upstream(text: str) -> str:
+def upstream(text: str, vocabulary: Vocabulary) -> str:
     """Full normalisation applied to nixpkgs content before diffing."""
-    return drop_meta_bindings(rename_vocabulary(rewrite_paths(text)))
+    return drop_meta_bindings(rename_vocabulary(rewrite_paths(text), vocabulary))

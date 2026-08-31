@@ -47,9 +47,15 @@ def _terminate(line: str) -> str:
     return line + "\n\\ No newline at end of file\n"
 
 
-def compare(path: str, upstream_path: str, local_text: str, upstream_text: str) -> Comparison:
+def compare(
+    path: str,
+    upstream_path: str,
+    local_text: str,
+    upstream_text: str,
+    vocabulary: normalize.Vocabulary,
+) -> Comparison:
     """Diff one file pair, normalising only the upstream side."""
-    normalized = normalize.upstream(upstream_text)
+    normalized = normalize.upstream(upstream_text, vocabulary)
     if normalized == local_text:
         return Comparison(path=path, upstream_path=upstream_path)
 
