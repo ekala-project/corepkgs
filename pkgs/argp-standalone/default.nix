@@ -11,6 +11,11 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "argp-standalone";
   version = "1.5.0";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+
   src = fetchFromGitHub {
     owner = "argp-standalone";
     repo = "argp-standalone";
