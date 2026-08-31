@@ -11,6 +11,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "doctest";
   version = "2.5.3";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "doctest";
     repo = "doctest";
