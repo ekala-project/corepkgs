@@ -17,6 +17,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "nlohmann_json";
   version = "3.12.0";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "nlohmann";
     repo = "json";
