@@ -15,6 +15,11 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "wayland-protocols";
   version = "1.45";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+
   doCheck =
     stdenv.hostPlatform == stdenv.buildPlatform
     &&
