@@ -25,7 +25,7 @@
   fetchFromGitHub,
   gawk,
   gnum4,
-  gnused,
+  sed,
   lib,
   libGL,
   libGLU,
@@ -75,7 +75,7 @@ let
 
   runtimePath = lib.makeBinPath [
     gawk
-    gnused
+    sed
   ];
 in
 stdenv.mkDerivation {

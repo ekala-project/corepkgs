@@ -8,7 +8,7 @@
   # avoid guile depend on bootstrap to prevent dependency cycles
   inBootstrap ? false,
   pkg-config,
-  gnumake,
+  make,
   runCommand,
   testers,
 }:
@@ -18,7 +18,7 @@ let
 in
 
 stdenv.mkDerivation rec {
-  pname = "gnumake";
+  pname = "make";
   version = "4.4.1";
 
   src = fetchurl {
@@ -56,20 +56,20 @@ stdenv.mkDerivation rec {
 
   passthru.tests = {
     version = testers.testVersion {
-      package = gnumake;
+      package = make;
       command = "make --version";
     };
-    simple = runCommand "gnumake-test" { } ''
+    simple = runCommand "make-test" { } ''
       cat > Makefile <<'EOF'
       all:
       	@echo "hello"
       EOF
-      result=$(${gnumake}/bin/make -f Makefile)
+      result=$(${make}/bin/make -f Makefile)
       test "$result" = "hello"
       touch $out
     '';
     # make sure that the override doesn't break bootstrapping
-    gnumakeWithGuile = gnumake.override { guileSupport = true; };
+    gnumakeWithGuile = make.override { guileSupport = true; };
   };
 
   meta = {

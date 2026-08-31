@@ -3,13 +3,13 @@
   pkgs.coreutils
   pkgs.findutils
   pkgs.diffutils
-  pkgs.gnused
+  pkgs.sed
   pkgs.grep
   pkgs.gawk
   pkgs.tar
   pkgs.gzip
   pkgs.bzip2.bin
-  pkgs.gnumake
+  pkgs.make
   pkgs.bashNonInteractive
   pkgs.patch
   pkgs.xz.bin

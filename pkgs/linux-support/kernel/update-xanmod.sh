@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -I nixpkgs=./. -i bash -p bash nix-prefetch curl jq gawk gnused nixfmt
+#!nix-shell -I nixpkgs=./. -i bash -p bash nix-prefetch curl jq gawk sed nixfmt
 
 set -euo pipefail
 

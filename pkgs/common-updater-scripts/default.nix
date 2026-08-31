@@ -6,7 +6,7 @@
   diffutils,
   git,
   grep,
-  gnused,
+  sed,
   jq,
   nix,
   python3Packages,
@@ -40,7 +40,7 @@ stdenv.mkDerivation {
             diffutils
             git
             grep
-            gnused
+            sed
             jq
             nix
           ]

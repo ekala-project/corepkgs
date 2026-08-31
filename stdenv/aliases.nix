@@ -85,7 +85,9 @@ mapAliases {
   gmp6 = gmp.v6_3;
   gmpxx = gmp.withCxx;
   gnugrep = grep;
+  gnumake = make;
   gnupatch = patch;
+  gnused = sed;
   gnutar = tar;
   go_1_24 = go.v1_24;
   go_1_25 = go.v1_25;

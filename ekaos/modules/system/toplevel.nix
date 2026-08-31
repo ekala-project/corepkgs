@@ -383,7 +383,7 @@ in
         systemd
         bash
         gnugrep
-        gnused
+        sed
         gawk
         findutils
         diffutils

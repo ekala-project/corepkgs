@@ -6,7 +6,7 @@
   fetchpatch,
   getopt,
   libcap,
-  gnused,
+  sed,
   autoreconfHook,
   po4a,
 }:
@@ -36,7 +36,7 @@ stdenv.mkDerivation (finalAttrs: {
   prePatch = ''
     sed -i \
       -e 's@getopt@${getopt}/bin/getopt@g' \
-      -e 's@sed@${gnused}/bin/sed@g' \
+      -e 's@sed@${sed}/bin/sed@g' \
       -e 's@kill@${coreutils}/bin/kill@g' \
       -e 's@/bin/ls@${coreutils}/bin/ls@g' \
       -e 's@cut@${coreutils}/bin/cut@g' \

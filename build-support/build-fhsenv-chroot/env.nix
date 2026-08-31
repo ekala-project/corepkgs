@@ -63,7 +63,7 @@ let
     gawk
     diffutils
     findutils
-    gnused
+    sed
     grep
     tar
     gzip

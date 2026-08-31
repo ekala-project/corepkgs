@@ -4,7 +4,7 @@
   makeWrapper,
   bash,
   coreutils,
-  gnused,
+  sed,
   findutils,
   gawk,
   gitMinimal,
@@ -29,7 +29,7 @@ stdenv.mkDerivation (finalAttrs: {
         gitMinimal
         git-lfs
         coreutils
-        gnused
+        sed
       ]
     } --set HOME /homeless-shelter
   '';

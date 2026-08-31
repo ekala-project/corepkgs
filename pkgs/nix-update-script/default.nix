@@ -6,7 +6,7 @@
   coreutils,
   curl,
   grep,
-  gnused,
+  sed,
   jq,
 }:
 

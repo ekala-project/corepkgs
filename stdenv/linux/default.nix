@@ -695,7 +695,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
 
         # To allow users' overrides inhibit dependencies too heavy for
         # bootstrap, like guile: https://github.com/NixOS/nixpkgs/issues/181188
-        gnumake = super.gnumake.override { inBootstrap = true; };
+        make = super.make.override { inBootstrap = true; };
 
         gcc = lib.makeOverridable (import ../../build-support/cc-wrapper) {
           nativeTools = false;
@@ -793,8 +793,8 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
               findutils
               gawk
               gmp
-              gnumake
-              gnused
+              make
+              sed
               tar
               grep
               patch
@@ -829,8 +829,8 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
               findutils
               gawk
               gmp
-              gnumake
-              gnused
+              make
+              sed
               tar
               grep
               patch
@@ -888,7 +888,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
               diffutils
               findutils
               gawk
-              gnused
+              sed
               tar
               grep
               patch
@@ -913,7 +913,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
                 ;
             };
 
-            gnumake = super.gnumake.override { inBootstrap = false; };
+            make = super.make.override { inBootstrap = false; };
           }
           // lib.optionalAttrs (super.stdenv.targetPlatform == localSystem) {
             # Need to get rid of these when cross-compiling.

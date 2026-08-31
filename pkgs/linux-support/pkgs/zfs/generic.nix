@@ -23,7 +23,7 @@ let
       nfs-utils,
       gawk,
       grep,
-      gnused,
+      sed,
       systemd,
       smartmontools,
       enableMail ? false,
@@ -145,7 +145,7 @@ let
                makeBinPath [
                  coreutils
                  gawk
-                 gnused
+                 sed
                  grep
                  systemd
                ]
@@ -285,7 +285,7 @@ let
             makeBinPath [
               coreutils
               gawk
-              gnused
+              sed
               grep
               util-linux
               smartmon

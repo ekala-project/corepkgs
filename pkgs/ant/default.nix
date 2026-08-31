@@ -91,7 +91,7 @@ stdenv.mkDerivation (finalAttrs: {
       Apache Ant is a Java-based build tool.  In theory, it is kind of like
       Make, but without Make's wrinkles.
 
-      Why another build tool when there is already make, gnumake, nmake, jam,
+      Why another build tool when there is already make, make, nmake, jam,
       and others? Because all those tools have limitations that Ant's
       original author couldn't live with when developing software across
       multiple platforms.  Make-like tools are inherently shell-based -- they
