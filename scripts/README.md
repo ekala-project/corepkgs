@@ -10,8 +10,7 @@ shebang and is meant to be run from the repository root:
 | Script | Purpose |
 | --- | --- |
 | [`freeze-release/freeze-release.sh`](#freeze-release) | Pin every `pkgs-many/` package to its default variant as an overlay |
-| [`import-from-nixpkgs.py`](#import-from-nixpkgs) | Copy package directories out of a nixpkgs checkout |
-| [`sync-with-nixpkgs/sync.py`](#sync-with-nixpkgs) | Generate per-file patches between corepkgs and nixpkgs |
+| [`sync-with-nixpkgs/sync.py`](#sync-with-nixpkgs) | Report how corepkgs diverges from a nixpkgs checkout |
 | [`repology/generate.sh`](#repology) | Produce a Repology-compatible `packages.json` metadata dump |
 | [`bootstrap-files/upload-bootstrap.sh`](bootstrap-files/README.md) | Upload stdenv bootstrap tarballs |
 | `ci-jobs.nix` | Job-set entry point (`import ../. { }`) |
@@ -139,46 +138,6 @@ version is compatible.
 
 To improve the script, extend the regex in `parseDefaultSelector` to handle more
 `defaultSelector` formats.
-
-## import-from-nixpkgs
-
-Copies one or more package directories from nixpkgs into corepkgs, handling
-directory structure differences and file renames.
-
-### Usage
-
-```bash
-# Import a package from pkgs/by-name/<xx>/<name> to pkgs/<name>
-./scripts/import-from-nixpkgs.py --name <package-name>
-
-# Import multiple packages
-./scripts/import-from-nixpkgs.py --name <package1> <package2> <package3>
-
-# Import a Python package from pkgs/development/python-modules/<name> to python/pkgs/<name>
-./scripts/import-from-nixpkgs.py --name <package-name> --python
-
-# Override nixpkgs root path (default: ../nixpkgs relative to the script)
-./scripts/import-from-nixpkgs.py --name <package-name> --nixpkgs-root /path/to/nixpkgs
-
-# Overwrite existing destination directory
-./scripts/import-from-nixpkgs.py --name <package-name> --force
-```
-
-### Options
-
-- `--name`: package name(s) to import (required, accepts multiple)
-- `--python`: import from the Python modules directory instead of by-name
-- `--nixpkgs-root`: override path to the nixpkgs checkout (default: `../nixpkgs`)
-- `--force`: overwrite the destination if it already exists
-
-### Features
-
-- Automatically resolves source and destination paths based on package name
-- Handles `pkgs/by-name/<prefix>/<name>` structure for regular packages
-- Supports Python module imports from `pkgs/development/python-modules`
-- Renames `package.nix` to `default.nix` when present
-- Preserves symlinks during copy operations
-- Validates source paths exist before copying
 
 ## sync-with-nixpkgs
 

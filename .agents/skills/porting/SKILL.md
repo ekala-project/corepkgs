@@ -1,6 +1,6 @@
 ---
 name: porting
-description: Port a package from nixpkgs into corepkgs. Use when adding a package that already exists upstream — covers importing it with scripts/import-from-nixpkgs.py, checking dependencies first, stripping nixpkgs-only attributes, recording TODOs for missing features, and wiring it into top-level.nix.
+description: Port a package from nixpkgs into corepkgs. Use when adding a package that already exists upstream — covers copying it across, checking dependencies first, stripping nixpkgs-only attributes, recording TODOs for missing features, and wiring it into top-level.nix.
 ---
 
 # Porting from nixpkgs
@@ -26,52 +26,32 @@ attributes that are not derivations, use `nix-instantiate --eval -A <attr>`.
 If a dependency is missing, either port it first or add a TODO and disable the
 feature that needs it (step 4).
 
-### 2. Import the package
+### 2. Copy the package across
 
-`scripts/import-from-nixpkgs.py` copies the package directory across and applies
-the corepkgs naming convention.
+Copy the whole directory so patch files and other assets come along, then rename
+the entry point to the corepkgs convention.
 
 ```bash
 # pkgs/by-name/cu/curl -> pkgs/curl
-./scripts/import-from-nixpkgs.py --name curl
-
-# several at once
-./scripts/import-from-nixpkgs.py --name libfoo libbar libbaz
+cp -r ../nixpkgs/pkgs/by-name/cu/curl pkgs/curl
+mv pkgs/curl/package.nix pkgs/curl/default.nix
 
 # pkgs/development/python-modules/httpx -> python/pkgs/httpx
-./scripts/import-from-nixpkgs.py --name httpx --python
-
-# nixpkgs checkout is somewhere other than ../nixpkgs
-./scripts/import-from-nixpkgs.py --name curl --nixpkgs-root ~/src/nixpkgs
-
-# replace a package that was already imported
-./scripts/import-from-nixpkgs.py --name curl --force
+cp -r ../nixpkgs/pkgs/development/python-modules/httpx python/pkgs/httpx
 ```
 
-| Source in nixpkgs | Destination | Flag |
-| --- | --- | --- |
-| `pkgs/by-name/<xx>/<name>` | `pkgs/<name>` | *(default)* |
-| `pkgs/development/python-modules/<name>` | `python/pkgs/<name>` | `--python` |
+| Source in nixpkgs | Destination |
+| --- | --- |
+| `pkgs/by-name/<xx>/<name>` | `pkgs/<name>` |
+| `pkgs/development/python-modules/<name>` | `python/pkgs/<name>` |
+| `pkgs/development/...` (older layout) | `pkgs/<name>` |
 
 `<xx>` is the lowercase two-letter prefix of the attribute name, so `SDL2_gfx`
-is found under `sd/` and `R` under `r/`.
+is found under `sd/` and `R` under `r/`. Only `by-name` packages have a
+`package.nix` to rename; the older trees already use `default.nix`.
 
-The script:
-
-- copies the whole directory, preserving symlinks, so patch files come along
-- renames `package.nix` to `default.nix`, and leaves both alone if both exist
-- refuses to overwrite an existing destination unless given `--force`
-
-It makes **no edits to the expression itself** — every cleanup in step 3 is
-still manual.
-
-**Packages outside `by-name`.** A handful still live under the old
-`pkgs/development/...` trees, which the script does not know about. Copy those
-by hand and rename `package.nix` yourself:
-
-```bash
-cp -r ../nixpkgs/pkgs/development/libraries/foo pkgs/foo
-```
+Copying makes **no edits to the expression itself** — every cleanup in step 3 is
+manual.
 
 **Packages with multiple versions** belong in `pkgs-many/` and need to be
 restructured into the `default.nix` / `variants.nix` / `generic.nix` layout
@@ -253,7 +233,7 @@ survived the cleanup.
 ## Checklist
 
 - [ ] Dependencies checked with `nix-instantiate -A <dep>`
-- [ ] Imported with `./scripts/import-from-nixpkgs.py` (or copied and renamed by hand)
+- [ ] Copied across and `package.nix` renamed to `default.nix`
 - [ ] `meta.maintainers`, `meta.teams`, and `updateScript` removed
 - [ ] Build-system configure hook added
 - [ ] Missing dependencies recorded as `TODO(corepkgs)` comments
