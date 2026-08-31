@@ -13,6 +13,12 @@ stdenv.mkDerivation rec {
   pname = "gbenchmark";
   version = "1.9.5";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "google";
     repo = "benchmark";
