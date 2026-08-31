@@ -11,6 +11,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "rapidfuzz-cpp";
   version = "3.3.3";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "rapidfuzz";
     repo = "rapidfuzz-cpp";
