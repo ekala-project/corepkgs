@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-from . import diffing, paths
+from . import aliases, diffing, normalize, paths
 
 
 @dataclass
@@ -68,7 +68,11 @@ def _read(path: Path) -> Optional[str]:
 
 
 def _compare_one(
-    path: str, corepkgs_root: Path, nixpkgs_root: Path, survey: Survey
+    path: str,
+    corepkgs_root: Path,
+    nixpkgs_root: Path,
+    survey: Survey,
+    vocabulary: normalize.Vocabulary,
 ) -> Optional[diffing.Comparison]:
     """Compare a single file, recording why it was skipped when it was."""
     upstream_path = paths.resolve(path)
@@ -94,16 +98,17 @@ def _compare_one(
             survey.opaque_differs.append(path)
         return diffing.compare_opaque(path, upstream_path, differs)
 
-    return diffing.compare(path, upstream_path, local_text, upstream_text)
+    return diffing.compare(path, upstream_path, local_text, upstream_text, vocabulary)
 
 
 def run(corepkgs_root: Path, nixpkgs_root: Path) -> Survey:
     """Compare both trees and build one patch per target."""
     survey = Survey()
     grouped: dict[str, list[diffing.Comparison]] = defaultdict(list)
+    vocabulary = aliases.load(corepkgs_root)
 
     for path in collect(corepkgs_root):
-        comparison = _compare_one(path, corepkgs_root, nixpkgs_root, survey)
+        comparison = _compare_one(path, corepkgs_root, nixpkgs_root, survey, vocabulary)
         if comparison is None:
             continue
         if comparison.diff is None and not comparison.opaque:

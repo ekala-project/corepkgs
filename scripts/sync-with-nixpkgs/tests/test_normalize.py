@@ -1,4 +1,10 @@
+import re
+
 from syncnix import normalize
+
+
+def vocab(*pairs):
+    return [(re.compile(p), r) for p, r in pairs]
 
 
 class TestDropMetaBindings:
@@ -58,16 +64,22 @@ class TestRewritePaths:
 
 class TestRenameVocabulary:
     def test_renames_whole_words_only(self):
-        assert normalize.rename_vocabulary("libX11") == "libx11"
-        assert normalize.rename_vocabulary("libX11Extra") == "libX11Extra"
+        v = vocab((r"\blibX11\b", "libx11"))
+        assert normalize.rename_vocabulary("libX11", v) == "libx11"
+        assert normalize.rename_vocabulary("libX11Extra", v) == "libX11Extra"
 
     def test_rename_is_unconditional(self):
         # The old implementation only renamed when the target file already used
         # the corepkgs spelling, which made output depend on unrelated content.
-        assert normalize.rename_vocabulary("cmakeMinimal") == "cmake.minimal"
+        v = vocab((r"\bcmakeMinimal\b", "cmake.minimal"))
+        assert normalize.rename_vocabulary("cmakeMinimal", v) == "cmake.minimal"
+
+    def test_empty_vocabulary_is_a_no_op(self):
+        assert normalize.rename_vocabulary("libX11", []) == "libX11"
 
 
 class TestUpstream:
     def test_applies_every_stage(self):
         text = "  maintainers = [ x ];\n  src = ../os-specific/linux/f.nix;\n  d = libX11;\n"
-        assert normalize.upstream(text) == "  src = ./f.nix;\n  d = libx11;\n"
+        v = vocab((r"\blibX11\b", "libx11"))
+        assert normalize.upstream(text, v) == "  src = ./f.nix;\n  d = libx11;\n"

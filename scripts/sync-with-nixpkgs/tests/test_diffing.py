@@ -23,24 +23,26 @@ class TestCompare:
     def test_identical_after_normalisation_yields_no_diff(self):
         local = "{\n  license = mit;\n}\n"
         upstream = "{\n  maintainers = [ x ];\n  license = mit;\n}\n"
-        assert diffing.compare("f.nix", "u.nix", local, upstream).diff is None
+        assert diffing.compare("f.nix", "u.nix", local, upstream, []).diff is None
 
     def test_real_difference_produces_a_diff(self):
-        result = diffing.compare("f.nix", "u.nix", "version = \"1\";\n", "version = \"2\";\n")
+        result = diffing.compare(
+            "f.nix", "u.nix", "version = \"1\";\n", "version = \"2\";\n", []
+        )
         assert result.diff is not None
         assert "-version = \"1\";" in result.diff
         assert "+version = \"2\";" in result.diff
 
     def test_headers_use_the_corepkgs_path(self):
         result = diffing.compare("pkgs/curl/default.nix", "pkgs/by-name/cu/curl/package.nix",
-                                 "a\n", "b\n")
+                                 "a\n", "b\n", [])
         assert "--- a/pkgs/curl/default.nix" in result.diff
         assert "+++ b/pkgs/curl/default.nix" in result.diff
 
     def test_upstream_only_noise_never_appears_as_an_addition(self):
         local = "{\n  license = mit;\n}\n"
         upstream = "{\n  teams = [ lib.teams.gnome ];\n  license = asl20;\n}\n"
-        diff = diffing.compare("f.nix", "u.nix", local, upstream).diff
+        diff = diffing.compare("f.nix", "u.nix", local, upstream, []).diff
         assert "teams" not in diff
         assert "+  license = asl20;" in diff
 
@@ -55,13 +57,13 @@ class TestAppliability:
     def test_patch_applies_cleanly(self, tmp_path):
         local = "line one\nline two\nline three\nline four\nline five\n"
         upstream = "line one\nline two\nCHANGED\nline four\nline five\n"
-        patch = diffing.compare("pkg/default.nix", "u.nix", local, upstream).diff
+        patch = diffing.compare("pkg/default.nix", "u.nix", local, upstream, []).diff
         assert _apply(tmp_path, "pkg/default.nix", local, patch) == upstream
 
     def test_patch_applies_when_upstream_noise_was_stripped(self, tmp_path):
         local = "a = 1;\nb = 2;\nc = 3;\nd = 4;\ne = 5;\n"
         upstream = "a = 1;\nb = 2;\nmaintainers = [ x ];\nc = 99;\nd = 4;\ne = 5;\n"
-        patch = diffing.compare("pkg/default.nix", "u.nix", local, upstream).diff
+        patch = diffing.compare("pkg/default.nix", "u.nix", local, upstream, []).diff
         assert _apply(tmp_path, "pkg/default.nix", local, patch) == (
             "a = 1;\nb = 2;\nc = 99;\nd = 4;\ne = 5;\n"
         )
@@ -69,7 +71,7 @@ class TestAppliability:
     def test_multiple_distant_hunks_apply(self, tmp_path):
         local = "".join(f"line {n}\n" for n in range(40))
         upstream = local.replace("line 2\n", "TOP\n").replace("line 37\n", "BOTTOM\n")
-        patch = diffing.compare("pkg/default.nix", "u.nix", local, upstream).diff
+        patch = diffing.compare("pkg/default.nix", "u.nix", local, upstream, []).diff
         assert _apply(tmp_path, "pkg/default.nix", local, patch) == upstream
 
 
@@ -97,7 +99,7 @@ class TestRender:
             "t.patch",
             [
                 diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True),
-                diffing.compare("p/default.nix", "u.nix", "a\n", "b\n"),
+                diffing.compare("p/default.nix", "u.nix", "a\n", "b\n", []),
             ],
         )
         assert rendered.index("fix.patch") < rendered.index("--- a/p/default.nix")
@@ -107,7 +109,7 @@ class TestRender:
             "t.patch",
             [
                 diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True),
-                diffing.compare("p/default.nix", "u.nix", "a\nb\nc\n", "a\nX\nc\n"),
+                diffing.compare("p/default.nix", "u.nix", "a\nb\nc\n", "a\nX\nc\n", []),
             ],
         )
         header = rendered.split("--- ")[0].splitlines()
