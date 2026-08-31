@@ -116,3 +116,49 @@ class TestRender:
         assert all(line.startswith("#") for line in header)
         # A patch carrying notes still applies.
         assert _apply(tmp_path, "p/default.nix", "a\nb\nc\n", rendered) == "a\nX\nc\n"
+
+
+class TestChangedLines:
+    def test_counts_additions_and_removals(self):
+        patch = diffing.render(
+            "t.patch", [diffing.compare("p/f.nix", "u.nix", "a\nb\nc\n", "a\nX\nc\n", [])]
+        )
+        assert diffing.changed_lines(patch) == 2
+
+    def test_ignores_the_comment_header_and_file_markers(self):
+        patch = diffing.render(
+            "t.patch",
+            [
+                diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True),
+                diffing.compare("p/f.nix", "u.nix", "a\nb\nc\n", "a\nX\nc\n", []),
+            ],
+        )
+        # Header notes and the ---/+++ pair are structure, not change.
+        assert diffing.changed_lines(patch) == 2
+
+    def test_note_only_patch_counts_nothing(self):
+        patch = diffing.render(
+            "t.patch", [diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True)]
+        )
+        assert diffing.changed_lines(patch) == 0
+
+    def test_counts_content_that_looks_like_a_file_marker(self):
+        # A removed source line of "--" renders as "---"; it is a change, not a header.
+        local = "a\n--\nc\n"
+        upstream = "a\n++\nc\n"
+        patch = diffing.render("t.patch", [diffing.compare("p/f.nix", "u.nix", local, upstream, [])])
+        assert "----" not in patch  # sanity: the removal really is a bare "---"
+        assert diffing.changed_lines(patch) == 2
+
+    def test_no_newline_marker_is_not_a_change(self):
+        patch = diffing.render(
+            "t.patch", [diffing.compare("p/f.nix", "u.nix", "a\nb\nc", "a\nb\nX", [])]
+        )
+        assert "\\ No newline at end of file" in patch
+        assert diffing.changed_lines(patch) == 2
+
+    def test_totals_across_several_hunks(self):
+        local = "".join(f"line {n}\n" for n in range(40))
+        upstream = local.replace("line 2\n", "TOP\n").replace("line 37\n", "BOTTOM\n")
+        patch = diffing.render("t.patch", [diffing.compare("p/f.nix", "u.nix", local, upstream, [])])
+        assert diffing.changed_lines(patch) == 4

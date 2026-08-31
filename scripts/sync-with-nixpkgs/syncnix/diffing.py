@@ -7,6 +7,7 @@ applies from the corepkgs root with `git apply -p1`.
 """
 
 import difflib
+import re
 from dataclasses import dataclass
 from typing import Optional
 
@@ -78,6 +79,41 @@ def compare_opaque(path: str, upstream_path: str, differs: bool) -> Comparison:
     can read, so the file is reported as a single note instead.
     """
     return Comparison(path=path, upstream_path=upstream_path, opaque=True, differs=differs)
+
+
+_HUNK = re.compile(r"^@@ -\d+(?:,(\d+))? \+\d+(?:,(\d+))? @@")
+
+
+def changed_lines(patch: str) -> int:
+    """Added and removed lines in a patch: how much there is to review.
+
+    Counting every line that starts with `+` or `-` would be wrong twice over:
+    it would swallow the `---`/`+++` file markers, and it would skip a real
+    removed line whose content happens to start with `-`. So the hunk headers
+    drive the walk instead -- they declare exactly how many lines each hunk
+    body holds, which makes the classification unambiguous.
+    """
+    total = 0
+    old = new = 0
+    for line in patch.splitlines():
+        if old <= 0 and new <= 0:
+            # Between hunks: the `#` notes and the `---`/`+++` markers live here.
+            match = _HUNK.match(line)
+            if match:
+                old = int(match[1]) if match[1] is not None else 1
+                new = int(match[2]) if match[2] is not None else 1
+            continue
+        kind = line[:1]
+        if kind == "-":
+            old -= 1
+            total += 1
+        elif kind == "+":
+            new -= 1
+            total += 1
+        elif kind != "\\":  # "\ No newline at end of file" annotates, not changes.
+            old -= 1
+            new -= 1
+    return total
 
 
 def render(target: str, comparisons: list[Comparison]) -> Optional[str]:
