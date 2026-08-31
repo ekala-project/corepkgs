@@ -11,6 +11,12 @@ stdenv.mkDerivation rec {
   pname = "aws-c-compression";
   version = "0.3.2";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-compression";
