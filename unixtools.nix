@@ -42,9 +42,9 @@ let
           priority = 10;
           platforms = platforms.${stdenv.hostPlatform.parsed.kernel.name} or platforms.all;
         };
+        inherit (provider) version pname;
         passthru = {
           inherit provider;
-          inherit (provider) version;
         }
         // lib.optionalAttrs (builtins.hasAttr "binlore" providers) {
           binlore.out = (binlore.synthesize (getBin bins.${cmd}) providers.binlore);
@@ -74,9 +74,7 @@ let
   more_compat =
     runCommand pkgs.less.name
       {
-        passthru = {
-          inherit (pkgs.less) version;
-        };
+        inherit (pkgs.less) version pname;
       }
       ''
         mkdir -p $out/bin
@@ -133,7 +131,7 @@ let
       darwin = pkgs.darwin.shell_cmds;
     };
     hostname = {
-      linux = pkgs.net-tools;
+      linux = pkgs.hostname-debian;
       darwin = pkgs.darwin.shell_cmds;
       freebsd = pkgs.freebsd.bin;
       openbsd = pkgs.openbsd.hostname;
@@ -160,6 +158,7 @@ let
     };
     logger = {
       linux = pkgs.util-linux;
+      darwin = pkgs.darwin.remote_cmds;
     };
     more = {
       linux = pkgs.util-linux;
@@ -243,15 +242,16 @@ let
     };
     wall = {
       linux = pkgs.util-linux;
+      darwin = pkgs.darwin.remote_cmds;
     };
     watch = {
       linux = pkgs.procps;
 
       # watch is the only command from procps that builds currently on
       # Darwin/FreeBSD. Unfortunately no other implementations exist currently!
-      darwin = pkgs.procps-ng { };
-      freebsd = pkgs.procps-ng { };
-      openbsd = pkgs.procps-ng { };
+      darwin = pkgs.procps-ng;
+      freebsd = pkgs.procps-ng;
+      openbsd = pkgs.procps-ng;
     };
     write = {
       linux = pkgs.util-linux;
@@ -267,8 +267,7 @@ let
   makeCompat =
     pname: paths:
     buildEnv {
-      name = "${pname}-${version}";
-      inherit paths;
+      inherit paths pname version;
     };
 
   # Compatibility derivations
