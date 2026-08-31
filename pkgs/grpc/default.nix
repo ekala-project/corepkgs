@@ -17,6 +17,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "grpc";
   version = "1.83.0";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "grpc";
     repo = "grpc";
