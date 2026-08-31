@@ -32,8 +32,7 @@ stdenv.mkDerivation (finalAttrs: {
     "out"
     "lib"
     "dev"
-  ]
-  ++ lib.optional withDocs "devdoc";
+  ];
 
   src = fetchurl {
     url = "mirror://gnome/sources/dconf/${lib.versions.majorMinor finalAttrs.version}/dconf-${finalAttrs.version}.tar.xz";
