@@ -29,6 +29,12 @@ class Survey:
     unmapped: list[str] = field(default_factory=list)
     """Files no PATH_MAPPINGS entry covers."""
 
+    local_only: int = 0
+    """Files declared to have no upstream counterpart, and indeed having none."""
+
+    stale_local_only: list[str] = field(default_factory=list)
+    """Files declared local-only that nixpkgs now carries after all."""
+
     opaque_differs: list[str] = field(default_factory=list)
     """Patch files that differ from upstream and were noted, not diffed."""
 
@@ -75,9 +81,14 @@ def _compare_one(
     vocabulary: normalize.Vocabulary,
 ) -> Optional[diffing.Comparison]:
     """Compare a single file, recording why it was skipped when it was."""
+    declared_local = paths.is_local_only(path)
+
     upstream_path = paths.resolve(path)
     if upstream_path is None:
-        survey.unmapped.append(path)
+        if declared_local:
+            survey.local_only += 1
+        else:
+            survey.unmapped.append(path)
         return None
 
     upstream_file = nixpkgs_root / upstream_path
@@ -96,14 +107,22 @@ def _compare_one(
         return diffing.compare_opaque(path, upstream_path, differs)
 
     if not upstream_file.is_file():
-        survey.missing.append(path)
+        if declared_local:
+            survey.local_only += 1
+        else:
+            survey.missing.append(path)
         return None
 
     local_text = _read(local_file)
     upstream_text = _read(upstream_file)
     if local_text is None or upstream_text is None:
-        survey.missing.append(path)
+        (survey.missing if not declared_local else survey.stale_local_only).append(path)
         return None
+
+    if declared_local:
+        # The declaration has been overtaken by upstream; compare it anyway so
+        # the divergence is visible, but say the declaration should go.
+        survey.stale_local_only.append(path)
 
     if paths.is_opaque(path):
         differs = local_text != upstream_text

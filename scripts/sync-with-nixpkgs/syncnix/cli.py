@@ -39,6 +39,10 @@ def _write_reports(reports_dir: Path, result: survey.Survey) -> None:
             "Patch files that differ from upstream; compare them by hand.",
             result.opaque_differs,
         ),
+        "stale-local-only.txt": (
+            "Declared LOCAL_ONLY but nixpkgs now has them; drop the declaration.",
+            result.stale_local_only,
+        ),
     }
     for name, (description, entries) in reports.items():
         if not entries:
@@ -88,11 +92,14 @@ def _report(buckets: dict[baseline.Status, list[str]], result: survey.Survey) ->
 
     print(f"  total divergence      : {len(result.patches)} patches, {sum(sizes.values())} lines")
 
-    if result.unmapped or result.missing or result.opaque_differs:
+    print(f"  corepkgs-only         : {result.local_only}")
+
+    if result.unmapped or result.missing or result.opaque_differs or result.stale_local_only:
         print(
             f"  unmapped {len(result.unmapped)}, "
             f"missing upstream {len(result.missing)}, "
-            f"patch files differing {len(result.opaque_differs)}"
+            f"patch files differing {len(result.opaque_differs)}, "
+            f"stale corepkgs-only {len(result.stale_local_only)}"
         )
 
 

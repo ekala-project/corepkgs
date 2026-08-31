@@ -185,6 +185,38 @@ class TestRoots:
         assert (self_patches / "keep.patch").is_file()
 
 
+class TestLocalOnly:
+    """Files corepkgs carries that nixpkgs has no counterpart for."""
+
+    def test_declared_file_is_counted_not_reported_missing(self, trees, monkeypatch):
+        monkeypatch.setattr(config, "LOCAL_ONLY", ["pkgs/only-here"])
+        trees.local("pkgs/only-here/default.nix", "x\n")
+        result = survey.run(trees.root, trees.upstream)
+        assert result.missing == []
+        assert result.local_only == 1
+
+    def test_declared_but_unmapped_file_is_still_counted(self, trees, monkeypatch):
+        monkeypatch.setattr(config, "LOCAL_ONLY", ["unclaimed"])
+        trees.local("unclaimed/thing.nix", "x\n")
+        result = survey.run(trees.root, trees.upstream)
+        assert result.unmapped == []
+        assert result.local_only == 1
+
+    def test_declaration_overtaken_by_upstream_is_reported_stale(self, trees, monkeypatch):
+        monkeypatch.setattr(config, "LOCAL_ONLY", ["pkgs/curl"])
+        trees.both("pkgs/curl/default.nix", "pkgs/by-name/cu/curl/package.nix", "a\n", "b\n")
+        result = survey.run(trees.root, trees.upstream)
+        assert result.stale_local_only == ["pkgs/curl/default.nix"]
+        # Still compared, so the divergence stays visible.
+        assert "pkgs/curl.patch" in result.patches
+
+    def test_undeclared_file_absent_upstream_is_still_missing(self, trees):
+        trees.local("pkgs/only-here/default.nix", "x\n")
+        result = survey.run(trees.root, trees.upstream)
+        assert result.missing == ["pkgs/only-here/default.nix"]
+        assert result.local_only == 0
+
+
 class TestSymlinks:
     """A symlink is its target, not the bytes at the other end."""
 

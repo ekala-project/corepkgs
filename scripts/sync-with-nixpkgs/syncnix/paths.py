@@ -28,6 +28,11 @@ def is_ignored(path: str) -> bool:
     return any(_under(path, ignored) for ignored in config.IGNORE_DIRS)
 
 
+def is_local_only(path: str) -> bool:
+    """True if `path` is declared to have no nixpkgs counterpart."""
+    return any(_under(path, declared) for declared in config.LOCAL_ONLY)
+
+
 def is_opaque(path: str) -> bool:
     """True if `path` names a file whose contents must not be diffed."""
     return path.endswith(config.OPAQUE_SUFFIXES)
