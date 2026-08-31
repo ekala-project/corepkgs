@@ -23,21 +23,11 @@ let
   # Specialty kernels — built lazily, only evaluated when accessed
   specialtyKernels = {
     # Real-time kernels
-    rt_5_10 = wrapKernel (
-      linux-support.buildRtKernel ./../../pkgs/linux-support/kernel/linux-rt-5.10.nix
-    );
-    rt_5_15 = wrapKernel (
-      linux-support.buildRtKernel ./../../pkgs/linux-support/kernel/linux-rt-5.15.nix
-    );
-    rt_6_1 = wrapKernel (
-      linux-support.buildRtKernel ./../../pkgs/linux-support/kernel/linux-rt-6.1.nix
-    );
-    rt_6_6 = wrapKernel (
-      linux-support.buildRtKernel ./../../pkgs/linux-support/kernel/linux-rt-6.6.nix
-    );
-    rt_6_12 = wrapKernel (
-      linux-support.buildRtKernel ./../../pkgs/linux-support/kernel/linux-rt-6.12.nix
-    );
+    rt_5_10 = wrapKernel (linux-support.buildRtKernel "5.10");
+    rt_5_15 = wrapKernel (linux-support.buildRtKernel "5.15");
+    rt_6_1 = wrapKernel (linux-support.buildRtKernel "6.1");
+    rt_6_6 = wrapKernel (linux-support.buildRtKernel "6.6");
+    rt_6_12 = wrapKernel (linux-support.buildRtKernel "6.12");
 
     # Raspberry Pi kernels
     rpi1 = wrapKernel (linux-support.buildRpiKernel 1);
