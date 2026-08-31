@@ -1,5 +1,6 @@
 result*
 /patches
+/.sync-accepted
 __pycache__/
 .pytest_cache/
 *.md
