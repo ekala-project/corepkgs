@@ -10,6 +10,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "srt";
   version = "1.5.5";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "Haivision";
     repo = "srt";
