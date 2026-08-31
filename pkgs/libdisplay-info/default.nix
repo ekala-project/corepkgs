@@ -13,6 +13,11 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "libdisplay-info";
   version = "0.3.0";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+
   src = fetchFromGitLab {
     domain = "gitlab.freedesktop.org";
     owner = "emersion";
