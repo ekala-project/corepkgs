@@ -13,6 +13,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "eigen";
   version = "3.4.1";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitLab {
     owner = "libeigen";
     repo = "eigen";
