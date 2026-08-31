@@ -182,50 +182,29 @@ directory structure differences and file renames.
 
 ## sync-with-nixpkgs
 
-Generates per-file patches between corepkgs and nixpkgs, handling directory
-structure differences.
-
-### Usage
+Reports how corepkgs diverges from a nixpkgs checkout, one patch per package.
+Full documentation lives in
+[`sync-with-nixpkgs/README.md`](sync-with-nixpkgs/README.md).
 
 ```bash
-# From the corepkgs root directory
-./scripts/sync-with-nixpkgs/sync.py
+# write patches and report drift against the accepted baseline
+./scripts/sync-with-nixpkgs/sync.py --nixpkgs ../nixpkgs generate
 
-# With custom paths
-./scripts/sync-with-nixpkgs/sync.py --nixpkgs /path/to/nixpkgs --corepkgs /path/to/corepkgs
+# record divergence as intentional so it stops being reported
+./scripts/sync-with-nixpkgs/sync.py --nixpkgs ../nixpkgs accept pkgs/curl.patch
 ```
 
-### Features
+- `patches/` holds every current divergence and is rewritten on each run
+- `.sync-accepted/` holds divergence you have accepted
+- both are gitignored: they are a local review aid, not repo content
+- `--strict` exits non-zero when unaccepted drift exists, for use as a check
 
-- Maps corepkgs directory structure to nixpkgs structure using PATH_MAPPINGS
-- Generates directory-level patch files for differences
-- Detects new files in monitored directories
-- Handles special cases like `pkgs/by-name` structure
-- Ignores specified directories and files
-- Applies path transformations and filters to normalize differences
-
-### Configuration
-
-The script uses several configuration constants:
-
-- `CHECK_NEW_FILES`: directories to monitor for new files and directories
-- `IGNORE_NEW`: subdirectories to ignore when checking for new files
-- `IGNORE_DIRS`: directories to ignore completely
-- `IGNORE_FILES`: files to ignore
-- `PATH_MAPPINGS`: maps corepkgs paths to nixpkgs paths
-- `PATH_TRANSFORMATIONS`: regex patterns to transform nixpkgs paths in file content
-- `PATTERN_ALIASES`: maps nixpkgs pattern names to corepkgs equivalents
-- `IGNORE_CHANGE_PATTERNS`: patterns for changes to filter out from diffs
-- `COREPKGS_SPECIFIC_PATTERNS`: patterns for corepkgs-specific lines to hide from diffs
-
-### Output
-
-- Patch files are generated in the `patches/` directory
-- An `index.txt` file lists all patches and statistics
+Only the nixpkgs side is transformed, so the diff's old side is the real file
+and every patch applies from the repository root with `git apply -p1`. `.patch`
+and `.diff` files are never diffed; a differing one is replaced by a note naming
+both paths.
 
 ### Tests
-
-The test suite uses nix-shell to provide Python and pytest:
 
 ```bash
 ./scripts/sync-with-nixpkgs/run-tests.py
