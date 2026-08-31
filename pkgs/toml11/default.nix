@@ -12,6 +12,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "toml11";
   version = "4.4.0";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "ToruNiina";
     repo = "toml11";
