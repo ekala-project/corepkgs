@@ -11,7 +11,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   src = fetchurl {
     url = "https://distfiles.ariadne.space/pkgconf/pkgconf-${finalAttrs.version}.tar.xz";
-    hash = "sha256-eAvDEjylsqHaI5sBUC3q1GPVrEy/b8eLB9qtSNYcZPo=";
+    hash = "sha256-USA9me1XP6c0S/B8pibxDHzAlOCEasSqACO9DIPCWkE=";
   };
 
   outputs = [
