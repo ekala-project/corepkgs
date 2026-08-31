@@ -14,6 +14,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "libpciaccess";
   version = "0.18.1";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitLab {
     domain = "gitlab.freedesktop.org";
     group = "xorg";
