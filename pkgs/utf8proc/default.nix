@@ -9,6 +9,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "utf8proc";
   version = "2.11.3";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "JuliaStrings";
     repo = "utf8proc";
