@@ -1,4 +1,9 @@
-{ lib, config }:
+lib:
+
+# Taken separately from `lib` so that a caller can apply `lib` once and reuse
+# the result across configs, as nixpkgs does for memoisation between
+# bootstrapping stages.
+config:
 
 let
   checkMeta = import ./check-meta.nix {
