@@ -5,18 +5,18 @@
   fetchurl,
   bash,
   coreutils,
-  gnumake,
+  make,
   tinycc,
-  gnused,
-  gnugrep,
-  gnutar,
+  sed,
+  grep,
+  tar,
   gzip,
 }:
 
 let
   inherit (import ./common.nix { inherit lib; }) meta;
-  pname = "gnused";
-  # last version that can be bootstrapped with our slightly buggy gnused-mes
+  pname = "sed";
+  # last version that can be bootstrapped with our slightly buggy sed-mes
   version = "4.2";
 
   src = fetchurl {
@@ -35,11 +35,11 @@ bash.runCommand "${pname}-${version}"
 
     nativeBuildInputs = [
       coreutils
-      gnumake
+      make
       tinycc.compiler
-      gnused
-      gnugrep
-      gnutar
+      sed
+      grep
+      tar
       gzip
     ];
 

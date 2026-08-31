@@ -3,10 +3,10 @@
   fetchurl,
   bash,
   tinycc,
-  gnumake,
+  make,
 }:
 let
-  pname = "gnugrep";
+  pname = "grep";
   version = "2.4";
 
   src = fetchurl {
@@ -20,7 +20,7 @@ bash.runCommand "${pname}-${version}"
 
     nativeBuildInputs = [
       tinycc.compiler
-      gnumake
+      make
     ];
 
     passthru.tests.get-version =

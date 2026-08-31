@@ -3,8 +3,8 @@
   fetchurl,
   kaem,
   tinycc,
-  gnumake,
-  gnupatch,
+  make,
+  patch,
 }:
 let
   inherit (import ./common.nix { inherit lib; }) meta;
@@ -78,8 +78,8 @@ kaem.runCommand "${pname}-${version}"
 
     nativeBuildInputs = [
       tinycc.compiler
-      gnumake
-      gnupatch
+      make
+      patch
     ];
   }
   ''

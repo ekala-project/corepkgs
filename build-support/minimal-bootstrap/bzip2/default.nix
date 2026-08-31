@@ -3,8 +3,8 @@
   fetchurl,
   bash,
   tinycc,
-  gnumake,
-  gnutar,
+  make,
+  tar,
   gzip,
 }:
 let
@@ -22,8 +22,8 @@ bash.runCommand "${pname}-${version}"
 
     nativeBuildInputs = [
       tinycc.compiler
-      gnumake
-      gnutar
+      make
+      tar
       gzip
     ];
 

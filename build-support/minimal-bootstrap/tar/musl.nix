@@ -6,32 +6,21 @@
   bash,
   coreutils,
   tinycc,
-  gnumakeBoot,
-  gnupatch,
-  gnused,
-  gnugrep,
-  gawk,
-  gnutar,
-  gzip,
+  make,
+  grep,
+  sed,
 }:
 let
+  # tar with musl preserves modify times, allowing make to not try
+  # rebuilding pregenerated files
   inherit (import ./common.nix { inherit lib; }) meta;
-  pname = "gnumake-musl";
-  version = "4.4.1";
+  pname = "tar-musl";
+  version = "1.12";
 
   src = fetchurl {
-    url = "mirror://gnu/make/make-${version}.tar.gz";
-    hash = "sha256-3Rb7HWe/q3mnL16DkHNcSePo5wtJRaFasfgd23hlj7M=";
+    url = "mirror://gnu/tar/tar-${version}.tar.gz";
+    hash = "sha256-xsN+iIsTbM76uQPFEUn0t71lnWnUrqISRfYQU6V6pgo=";
   };
-
-  patches = [
-    # Replaces /bin/sh with sh, see patch file for reasoning
-    ./0001-No-impure-bin-sh.patch
-    # Purity: don't look for library dependencies (of the form `-lfoo') in /lib
-    # and /usr/lib. It's a stupid feature anyway. Likewise, when searching for
-    # included Makefiles, don't look in /usr/include and friends.
-    ./0002-remove-impure-dirs.patch
-  ];
 in
 bash.runCommand "${pname}-${version}"
   {
@@ -40,45 +29,45 @@ bash.runCommand "${pname}-${version}"
     nativeBuildInputs = [
       coreutils
       tinycc.compiler
-      gnumakeBoot
-      gnupatch
-      gnused
-      gnugrep
-      gawk
-      gnutar
-      gzip
+      make
+      sed
+      grep
     ];
 
     passthru.tests.get-version =
       result:
       bash.runCommand "${pname}-get-version-${version}" { } ''
-        ${result}/bin/make --version
+        ${result}/bin/tar --version
         mkdir $out
       '';
   }
   ''
     # Unpack
-    tar xzf ${src}
-    cd make-${version}
+    ungz --file ${src} --output tar.tar
+    untar --file tar.tar
+    rm tar.tar
+    cd tar-${version}
 
-    # Defeat parallel-build automake regen race, see gnused/default.nix.
+    # untar drops mtimes and +x on autotools helpers, restore them so
+    # parallel builds don't trip into automake regeneration.
     touch Makefile.in Makefile aclocal.m4 config.h.in configure 2>/dev/null || true
     for f in */Makefile.in; do touch "$f" 2>/dev/null || true; done
     chmod +x configure config.guess config.sub install-sh missing compile \
       depcomp mkinstalldirs help2man 2>/dev/null || true
     [ -d build-aux ] && chmod +x build-aux/* 2>/dev/null || true
 
-    # Patch
-    ${lib.concatMapStringsSep "\n" (f: "patch -Np1 -i ${f}") patches}
-
     # Configure
     export CC="tcc -B ${tinycc.libs}/lib"
     export LD=tcc
+    export ac_cv_sizeof_unsigned_long=4
+    export ac_cv_sizeof_long_long=8
+    export ac_cv_header_netdb_h=no
     bash ./configure \
       --prefix=$out \
       --build=${buildPlatform.config} \
       --host=${hostPlatform.config} \
-      --disable-dependency-tracking
+      --disable-dependency-tracking \
+      --disable-nls
 
     # Build
     # NOTE: parallel build (-j) under tcc-musl is unstable; keep serial.

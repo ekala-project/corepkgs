@@ -5,13 +5,13 @@
   fetchurl,
   bash,
   coreutils,
-  gnumake,
-  gnupatch,
-  gnused,
-  gnugrep,
+  make,
+  patch,
+  sed,
+  grep,
   gawk,
   diffutils,
-  gnutar,
+  tar,
   xz,
   tinycc,
 }:
@@ -64,13 +64,13 @@ bash.runCommand "${pname}-${version}"
 
     nativeBuildInputs = [
       tinycc.compiler
-      gnumake
-      gnupatch
-      gnused
-      gnugrep
+      make
+      patch
+      sed
+      grep
       gawk
       diffutils
-      gnutar
+      tar
       xz
     ];
 

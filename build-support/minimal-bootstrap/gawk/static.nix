@@ -6,14 +6,14 @@
   bash,
   gcc,
   binutils,
-  gnupatch,
-  gnumake,
-  gnused,
-  gnugrep,
+  patch,
+  make,
+  sed,
+  grep,
   gawk,
   diffutils,
   findutils,
-  gnutar,
+  tar,
   gzip,
 }:
 let
@@ -36,14 +36,14 @@ bash.runCommand "${pname}-${version}"
     nativeBuildInputs = [
       gcc
       binutils
-      gnupatch
-      gnumake
-      gnused
-      gnugrep
+      patch
+      make
+      sed
+      grep
       gawk
       diffutils
       findutils
-      gnutar
+      tar
       gzip
     ];
 

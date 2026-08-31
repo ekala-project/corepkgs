@@ -8,15 +8,15 @@
   binutils,
   binutils-build,
   linux-headers,
-  gnumake,
-  gnused,
-  gnugrep,
+  make,
+  sed,
+  grep,
   gawk,
   diffutils,
   findutils,
   python,
   bison,
-  gnutar,
+  tar,
   xz,
 }:
 let
@@ -36,15 +36,15 @@ bash.runCommand "${pname}-${version}"
       gcc
       binutils
       binutils-build
-      gnumake
-      gnused
-      gnugrep
+      make
+      sed
+      grep
       gawk
       diffutils
       findutils
       python
       bison
-      gnutar
+      tar
       xz
     ];
 

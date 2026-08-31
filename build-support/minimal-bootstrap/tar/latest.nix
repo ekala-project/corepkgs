@@ -7,16 +7,16 @@
   gcc,
   musl,
   binutils,
-  gnumake,
-  gnused,
-  gnugrep,
+  make,
+  sed,
+  grep,
   gawk,
   gzip,
-  gnutarBoot,
+  tarBoot,
 }:
 let
   inherit (import ./common.nix { inherit lib; }) meta;
-  pname = "gnutar";
+  pname = "tar";
   version = "1.35";
 
   src = fetchurl {
@@ -32,12 +32,12 @@ bash.runCommand "${pname}-${version}"
       gcc
       musl
       binutils
-      gnumake
-      gnused
-      gnugrep
+      make
+      sed
+      grep
       gawk
       gzip
-      gnutarBoot
+      tarBoot
     ];
 
     passthru.tests.get-version =
