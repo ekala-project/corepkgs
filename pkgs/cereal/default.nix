@@ -9,6 +9,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "cereal";
   version = "1.3.2";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "USCiLab";
     repo = "cereal";
