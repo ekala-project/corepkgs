@@ -14,6 +14,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "xorgproto";
   version = "2024.1";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitLab {
     domain = "gitlab.freedesktop.org";
     group = "xorg";
@@ -43,6 +49,18 @@ stdenv.mkDerivation (finalAttrs: {
 
   # adds support for printproto needed for libXp
   mesonFlags = [ "-Dlegacy=true" ];
+
+  # xorgproto's meson.build generates .pc files with
+  # includedir=${prefix}/<absolute-includedir>. Fix the doubled prefix
+  # before _multioutDevs patches them further.
+  postInstall = ''
+    for f in "$out"/share/pkgconfig/*.pc; do
+      sed -i \
+        -e "s|^\(includedir=\).*|\1$include/include|" \
+        -e "s|\''${prefix}/\($include\)|\1|g" \
+        "$f"
+    done
+  '';
 
   passthru = {
     updateScript = writeScript "update-${finalAttrs.pname}" ''
