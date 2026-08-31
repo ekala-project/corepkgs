@@ -53,6 +53,15 @@ class TestIgnore:
         assert paths.is_ignored("scripts")
         assert paths.is_ignored("scripts/sync-with-nixpkgs/sync.py")
 
+    def test_ignores_markdown_anywhere(self):
+        assert paths.is_ignored("README.md")
+        assert paths.is_ignored("build-support/go/README.md")
+        assert paths.is_ignored("pkgs/texlive/UPGRADING.md")
+
+    def test_does_not_ignore_similar_names(self):
+        assert not paths.is_ignored("pkgs/foo/README.md.nix")
+        assert not paths.is_ignored("pkgs/md/default.nix")
+
     def test_prefix_match_requires_separator(self):
         # "config" is ignored; "configuration.nix" must not be.
         assert not paths.is_ignored("configuration.nix")
