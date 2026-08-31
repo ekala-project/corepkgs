@@ -10,6 +10,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "gflags";
   version = "2.3.0";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "gflags";
     repo = "gflags";
