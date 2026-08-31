@@ -6,13 +6,13 @@
   bash,
   coreutils,
   tinycc,
-  gnumake,
-  gnused,
-  gnugrep,
+  make,
+  sed,
+  grep,
 }:
 let
   inherit (import ./common.nix { inherit lib; }) meta;
-  pname = "gnutar";
+  pname = "tar";
   # >= 1.13 is incompatible with mes-libc
   version = "1.12";
 
@@ -28,9 +28,9 @@ bash.runCommand "${pname}-${version}"
     nativeBuildInputs = [
       coreutils
       tinycc.compiler
-      gnumake
-      gnused
-      gnugrep
+      make
+      sed
+      grep
     ];
 
     passthru.tests.get-version =
@@ -65,7 +65,7 @@ bash.runCommand "${pname}-${version}"
       --prefix=$out
 
     # Build
-    # NOTE: parallel build (-j) breaks gnutar build under tcc-mes; keep serial.
+    # NOTE: parallel build (-j) breaks tar build under tcc-mes; keep serial.
     make AR="tcc -ar"
 
     # Install

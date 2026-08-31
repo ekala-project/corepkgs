@@ -5,10 +5,10 @@
   fetchurl,
   bash,
   tinycc,
-  gnumake,
-  gnupatch,
-  gnused,
-  gnugrep,
+  make,
+  patch,
+  sed,
+  grep,
 }:
 let
   inherit (import ./common.nix { inherit lib; }) meta;
@@ -32,10 +32,10 @@ bash.runCommand "${pname}-${version}"
 
     nativeBuildInputs = [
       tinycc.compiler
-      gnumake
-      gnupatch
-      gnused
-      gnugrep
+      make
+      patch
+      sed
+      grep
     ];
 
     passthru.tests.get-version =

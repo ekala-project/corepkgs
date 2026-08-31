@@ -3,9 +3,9 @@
   fetchurl,
   bash,
   tinycc,
-  gnumake,
-  gnused,
-  gnugrep,
+  make,
+  sed,
+  grep,
 }:
 let
   pname = "gzip";
@@ -22,9 +22,9 @@ bash.runCommand "${pname}-${version}"
 
     nativeBuildInputs = [
       tinycc.compiler
-      gnumake
-      gnused
-      gnugrep
+      make
+      sed
+      grep
     ];
 
     passthru.tests.get-version =

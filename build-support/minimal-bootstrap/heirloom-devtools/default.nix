@@ -3,8 +3,8 @@
   fetchurl,
   kaem,
   tinycc,
-  gnumake,
-  gnupatch,
+  make,
+  patch,
   coreutils,
 }:
 let
@@ -39,8 +39,8 @@ kaem.runCommand "${pname}-${version}"
 
     nativeBuildInputs = [
       tinycc.compiler
-      gnumake
-      gnupatch
+      make
+      patch
       coreutils
     ];
 

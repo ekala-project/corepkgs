@@ -7,15 +7,15 @@
   gcc,
   binutils,
   linux-headers,
-  gnumake,
-  gnused,
-  gnugrep,
+  make,
+  sed,
+  grep,
   gawk,
   diffutils,
   findutils,
   python,
   bison,
-  gnutar,
+  tar,
   xz,
 }:
 let
@@ -42,15 +42,15 @@ bash.runCommand "${pname}-${version}"
     nativeBuildInputs = [
       gcc
       binutils
-      gnumake
-      gnused
-      gnugrep
+      make
+      sed
+      grep
       gawk
       diffutils
       findutils
       python
       bison
-      gnutar
+      tar
       xz
     ];
 

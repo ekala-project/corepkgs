@@ -6,67 +6,63 @@
   bash,
   gcc,
   binutils,
-  gnumake,
-  gnused,
-  gnugrep,
+  make,
+  sed,
+  grep,
   gawk,
   diffutils,
   findutils,
-  gnutar,
+  tar,
+  linux-headers,
   xz,
 }:
 let
-  pname = "gnupatch-static";
-  version = "2.8";
+  inherit (import ./common.nix { inherit lib; }) meta;
+  pname = "sed-static";
+  version = "4.10";
 
   src = fetchurl {
-    url = "mirror://gnu/patch/patch-${version}.tar.xz";
-    hash = "sha256-+Hzuae7CtPy/YKOWsDCtaqNBXxkqpffuhMrV4R9/WuM=";
+    url = "mirror://gnu/sed/sed-${version}.tar.xz";
+    hash = "sha256-uOchgrLslqNXTimYxHt6qmTMIM4ADY6awxPMB87PKMc=";
   };
 in
 bash.runCommand "${pname}-${version}"
   {
-    inherit pname version;
+    inherit pname version meta;
 
     nativeBuildInputs = [
       gcc
       binutils
-      gnumake
-      gnused
-      gnugrep
+      make
+      sed
+      grep
       gawk
       diffutils
       findutils
-      gnutar
+      tar
       xz
     ];
 
     passthru.tests.get-version =
       result:
       bash.runCommand "${pname}-get-version-${version}" { } ''
-        ${result}/bin/patch --version
+        ${result}/bin/sed --version
         mkdir $out
       '';
-
-    meta = {
-      description = "GNU Patch, a program to apply differences to files";
-      homepage = "https://www.gnu.org/software/patch";
-      license = lib.licenses.gpl3Plus;
-      mainProgram = "patch";
-      platforms = lib.platforms.unix;
-    };
   }
   ''
     # Unpack
     tar xf ${src}
-    cd patch-${version}
+    cd sed-${version}
 
     # Configure
     bash ./configure \
       --prefix=$out \
       --build=${buildPlatform.config} \
       --host=${hostPlatform.config} \
-      --disable-dependency-tracking
+      --disable-dependency-tracking \
+      --disable-nls \
+      CFLAGS="-I${linux-headers}/include"
 
     # Build
     make -j $NIX_BUILD_CORES

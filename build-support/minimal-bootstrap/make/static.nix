@@ -6,19 +6,19 @@
   bash,
   gcc,
   binutils,
-  gnumake,
-  gnupatch,
-  gnused,
-  gnugrep,
+  make,
+  patch,
+  sed,
+  grep,
   gawk,
   diffutils,
   findutils,
-  gnutar,
+  tar,
   gzip,
 }:
 let
   inherit (import ./common.nix { inherit lib; }) meta;
-  pname = "gnumake-static";
+  pname = "make-static";
   version = "4.4.1";
 
   src = fetchurl {
@@ -42,14 +42,14 @@ bash.runCommand "${pname}-${version}"
     nativeBuildInputs = [
       gcc
       binutils
-      gnumake
-      gnupatch
-      gnused
-      gnugrep
+      make
+      patch
+      sed
+      grep
       gawk
       diffutils
       findutils
-      gnutar
+      tar
       gzip
     ];
 
@@ -71,7 +71,7 @@ bash.runCommand "${pname}-${version}"
     # Configure
     #
     # Use std=gnu17 to avoid issue GCC 15.3.0 incompatibility.
-    # There is no newer release of gnumake available right now.
+    # There is no newer release of make available right now.
     bash ./configure \
       --prefix=$out \
       --build=${buildPlatform.config} \

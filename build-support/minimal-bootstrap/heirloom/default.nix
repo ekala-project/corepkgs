@@ -3,8 +3,8 @@
   fetchurl,
   bash,
   tinycc,
-  gnumake,
-  gnupatch,
+  make,
+  patch,
   heirloom-devtools,
   heirloom,
 }:
@@ -77,8 +77,8 @@ bash.runCommand "${pname}-${version}"
 
     nativeBuildInputs = [
       tinycc.compiler
-      gnumake
-      gnupatch
+      make
+      patch
       heirloom-devtools
     ];
 

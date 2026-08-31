@@ -6,13 +6,13 @@
   bash,
   gcc,
   binutils,
-  gnumake,
-  gnused,
-  gnugrep,
+  make,
+  sed,
+  grep,
   gawk,
   diffutils,
   findutils,
-  gnutar,
+  tar,
   gzip,
 }:
 let
@@ -31,13 +31,13 @@ bash.runCommand "${pname}-${version}"
     nativeBuildInputs = [
       gcc
       binutils
-      gnumake
-      gnused
-      gnugrep
+      make
+      sed
+      grep
       gawk
       diffutils
       findutils
-      gnutar
+      tar
       gzip
     ];
 

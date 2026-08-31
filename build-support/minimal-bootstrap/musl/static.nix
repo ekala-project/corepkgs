@@ -7,10 +7,10 @@
   gcc,
   binutils,
   findutils,
-  gnumake,
-  gnugrep,
-  gnused,
-  gnutar,
+  make,
+  grep,
+  sed,
+  tar,
   gzip,
   linux-headers,
   libgcc,
@@ -36,10 +36,10 @@ bash.runCommand "${pname}-${version}"
       gcc
       binutils
       findutils
-      gnumake
-      gnused
-      gnugrep
-      gnutar
+      make
+      sed
+      grep
+      tar
       gzip
     ];
 

@@ -4,8 +4,8 @@
   fetchurl,
   kaem,
   tinycc,
-  gnumake,
-  gnupatch,
+  make,
+  patch,
   coreutils,
   mescc-tools-extra,
   bash_2_05,
@@ -74,8 +74,8 @@ kaem.runCommand "${pname}-${version}"
 
     nativeBuildInputs = [
       tinycc.compiler
-      gnumake
-      gnupatch
+      make
+      patch
       coreutils
     ];
 

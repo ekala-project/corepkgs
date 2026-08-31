@@ -7,8 +7,8 @@
   gcc,
   binutils,
   findutils,
-  gnumake,
-  gnutar,
+  make,
+  tar,
   gzip,
 }:
 let
@@ -32,8 +32,8 @@ bash.runCommand "${pname}-${version}"
       gcc
       binutils
       findutils
-      gnumake
-      gnutar
+      make
+      tar
       gzip
     ];
 

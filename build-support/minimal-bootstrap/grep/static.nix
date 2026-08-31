@@ -6,54 +6,60 @@
   bash,
   gcc,
   binutils,
-  gnumake,
-  gnused,
-  gnugrep,
+  make,
+  sed,
+  grep,
   gawk,
   diffutils,
   findutils,
-  gnutar,
-  linux-headers,
+  tar,
   xz,
 }:
 let
-  inherit (import ./common.nix { inherit lib; }) meta;
-  pname = "gnused-static";
-  version = "4.10";
+  pname = "grep-static";
+  version = "3.12";
 
   src = fetchurl {
-    url = "mirror://gnu/sed/sed-${version}.tar.xz";
-    hash = "sha256-uOchgrLslqNXTimYxHt6qmTMIM4ADY6awxPMB87PKMc=";
+    url = "mirror://gnu/grep/grep-${version}.tar.xz";
+    hash = "sha256-JkmyfA6Q5jLq3NdXvgbG6aT0jZQd5R58D4P/dkCKB7k=";
   };
 in
 bash.runCommand "${pname}-${version}"
   {
-    inherit pname version meta;
+    inherit pname version;
 
     nativeBuildInputs = [
       gcc
       binutils
-      gnumake
-      gnused
-      gnugrep
+      make
+      sed
+      grep
       gawk
       diffutils
       findutils
-      gnutar
+      tar
       xz
     ];
 
     passthru.tests.get-version =
       result:
       bash.runCommand "${pname}-get-version-${version}" { } ''
-        ${result}/bin/sed --version
+        ${result}/bin/grep --version
         mkdir $out
       '';
+
+    meta = {
+      description = "GNU implementation of the Unix grep command";
+      homepage = "https://www.gnu.org/software/grep";
+      license = lib.licenses.gpl3Plus;
+      mainProgram = "grep";
+      platforms = lib.platforms.unix;
+    };
   }
   ''
     # Unpack
     tar xf ${src}
-    cd sed-${version}
+    cd grep-${version}
 
     # Configure
     bash ./configure \
@@ -61,13 +67,14 @@ bash.runCommand "${pname}-${version}"
       --build=${buildPlatform.config} \
       --host=${hostPlatform.config} \
       --disable-dependency-tracking \
-      --disable-nls \
-      CFLAGS="-I${linux-headers}/include"
+      --disable-nls
 
     # Build
     make -j $NIX_BUILD_CORES
 
     # Install
     make -j $NIX_BUILD_CORES install-strip
+
+    # Remove documentation not needed in the bootstrap chain.
     rm -rf $out/share
   ''

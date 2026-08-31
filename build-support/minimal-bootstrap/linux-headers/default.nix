@@ -5,13 +5,13 @@
   gcc,
   musl,
   binutils,
-  gnumake,
-  gnused,
-  gnugrep,
+  make,
+  sed,
+  grep,
   gawk,
   diffutils,
   findutils,
-  gnutar,
+  tar,
   xz,
 }:
 let
@@ -31,13 +31,13 @@ bash.runCommand "${pname}-${version}"
       gcc
       musl
       binutils
-      gnumake
-      gnused
-      gnugrep
+      make
+      sed
+      grep
       gawk
       diffutils
       findutils
-      gnutar
+      tar
       xz
     ];
 

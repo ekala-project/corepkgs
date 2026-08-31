@@ -6,60 +6,53 @@
   bash,
   gcc,
   binutils,
-  gnumake,
-  gnused,
-  gnugrep,
+  make,
+  sed,
+  grep,
   gawk,
   diffutils,
   findutils,
-  gnutar,
-  xz,
+  tarBoot,
+  gzip,
 }:
 let
-  pname = "gnugrep-static";
-  version = "3.12";
+  inherit (import ./common.nix { inherit lib; }) meta;
+  pname = "tar-static";
+  version = "1.35";
 
   src = fetchurl {
-    url = "mirror://gnu/grep/grep-${version}.tar.xz";
-    hash = "sha256-JkmyfA6Q5jLq3NdXvgbG6aT0jZQd5R58D4P/dkCKB7k=";
+    url = "mirror://gnu/tar/tar-${version}.tar.gz";
+    hash = "sha256-FNVeMgY+qVJuBX+/Nfyr1TN452l4fv95GcN1WwLStX4=";
   };
 in
 bash.runCommand "${pname}-${version}"
   {
-    inherit pname version;
+    inherit pname version meta;
 
     nativeBuildInputs = [
       gcc
       binutils
-      gnumake
-      gnused
-      gnugrep
+      make
+      sed
+      grep
       gawk
       diffutils
       findutils
-      gnutar
-      xz
+      tarBoot
+      gzip
     ];
 
     passthru.tests.get-version =
       result:
       bash.runCommand "${pname}-get-version-${version}" { } ''
-        ${result}/bin/grep --version
+        ${result}/bin/tar --version
         mkdir $out
       '';
-
-    meta = {
-      description = "GNU implementation of the Unix grep command";
-      homepage = "https://www.gnu.org/software/grep";
-      license = lib.licenses.gpl3Plus;
-      mainProgram = "grep";
-      platforms = lib.platforms.unix;
-    };
   }
   ''
     # Unpack
-    tar xf ${src}
-    cd grep-${version}
+    tar xzf ${src}
+    cd tar-${version}
 
     # Configure
     bash ./configure \
@@ -74,7 +67,5 @@ bash.runCommand "${pname}-${version}"
 
     # Install
     make -j $NIX_BUILD_CORES install-strip
-
-    # Remove documentation not needed in the bootstrap chain.
-    rm -rf $out/share
+    rm -rf $out/libexec $out/share
   ''

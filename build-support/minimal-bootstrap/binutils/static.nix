@@ -7,14 +7,14 @@
   gcc-buildbuild,
   gcc,
   binutils,
-  gnumake,
-  gnupatch,
-  gnused,
-  gnugrep,
+  make,
+  patch,
+  sed,
+  grep,
   gawk,
   diffutils,
   findutils,
-  gnutar,
+  tar,
   xz,
 }:
 let
@@ -71,14 +71,14 @@ bash.runCommand "${pname}-${version}"
       gcc
       gcc-buildbuild
       binutils
-      gnumake
-      gnupatch
-      gnused
-      gnugrep
+      make
+      patch
+      sed
+      grep
       gawk
       diffutils
       findutils
-      gnutar
+      tar
       xz
     ];
 

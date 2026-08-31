@@ -4,8 +4,8 @@
   bash,
   tinycc,
   musl,
-  gnupatch,
-  gnutar,
+  patch,
+  tar,
   gzip,
   buildPlatform,
 }:
@@ -47,8 +47,8 @@ let
 
         nativeBuildInputs = [
           tinycc.compiler
-          gnupatch
-          gnutar
+          patch
+          tar
           gzip
         ];
       }

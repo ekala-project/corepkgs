@@ -4,11 +4,11 @@
   hostPlatform,
   fetchurl,
   bootBash,
-  gnumake,
-  gnupatch,
-  gnused,
-  gnugrep,
-  gnutar,
+  make,
+  patch,
+  sed,
+  grep,
+  tar,
   gawk,
   gzip,
   diffutils,
@@ -39,11 +39,11 @@ bootBash.runCommand "${pname}-${version}"
     nativeBuildInputs = [
       coreutils
       tinycc.compiler
-      gnumake
-      gnupatch
-      gnused
-      gnugrep
-      gnutar
+      make
+      patch
+      sed
+      grep
+      tar
       gawk
       gzip
       diffutils

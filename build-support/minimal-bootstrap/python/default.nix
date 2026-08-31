@@ -6,14 +6,14 @@
   bash,
   gcc,
   binutils,
-  gnumake,
-  gnupatch,
-  gnused,
-  gnugrep,
+  make,
+  patch,
+  sed,
+  grep,
   gawk,
   diffutils,
   findutils,
-  gnutar,
+  tar,
   xz,
   zlib,
 }:
@@ -42,14 +42,14 @@ bash.runCommand "${pname}-${version}"
     nativeBuildInputs = [
       gcc
       binutils
-      gnumake
-      gnupatch
-      gnused
-      gnugrep
+      make
+      patch
+      sed
+      grep
       gawk
       diffutils
       findutils
-      gnutar
+      tar
       xz
     ];
 

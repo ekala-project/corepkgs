@@ -5,11 +5,11 @@
   fetchurl,
   bash,
   tinycc,
-  gnumake,
-  gnugrep,
-  gnused,
+  make,
+  grep,
+  sed,
   gawk,
-  gnutar,
+  tar,
   xz,
 }:
 let
@@ -27,11 +27,11 @@ bash.runCommand "${pname}-${version}"
 
     nativeBuildInputs = [
       tinycc.compiler
-      gnumake
-      gnused
-      gnugrep
+      make
+      sed
+      grep
       gawk
-      gnutar
+      tar
       xz
     ];
 

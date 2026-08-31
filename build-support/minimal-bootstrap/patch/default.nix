@@ -5,7 +5,7 @@
   tinycc,
 }:
 let
-  pname = "gnupatch";
+  pname = "patch";
   # 2.6.x and later use features not implemented in mes-libc (eg. quotearg.h)
   version = "2.5.9";
 

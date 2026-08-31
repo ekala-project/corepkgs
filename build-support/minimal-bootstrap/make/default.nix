@@ -3,11 +3,11 @@
   fetchurl,
   kaem,
   tinycc,
-  gnupatch,
+  patch,
 }:
 let
   inherit (import ./common.nix { inherit lib; }) meta;
-  pname = "gnumake";
+  pname = "make";
   version = "4.4.1";
 
   src = fetchurl {
@@ -161,7 +161,7 @@ kaem.runCommand "${pname}-${version}"
 
     nativeBuildInputs = [
       tinycc.compiler
-      gnupatch
+      patch
     ];
   }
   ''

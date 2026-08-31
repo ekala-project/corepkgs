@@ -4,13 +4,13 @@
   hostPlatform,
   fetchurl,
   bash,
-  gnumake,
+  make,
   tinycc,
 }:
 
 let
   inherit (import ./common.nix { inherit lib; }) meta;
-  pname = "gnused-mes";
+  pname = "sed-mes";
   # last version that can be compiled with mes-libc
   version = "4.0.9";
 
@@ -31,7 +31,7 @@ bash.runCommand "${pname}-${version}"
     inherit pname version meta;
 
     nativeBuildInputs = [
-      gnumake
+      make
       tinycc.compiler
     ];
 

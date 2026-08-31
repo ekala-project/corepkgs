@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p bash coreutils gnutar jq
+#!nix-shell -i bash -p bash coreutils tar jq
 
 # Generate a sources.json for a version of GNU mes. Creates lists of source files
 # from build-aux/configure-lib.sh.

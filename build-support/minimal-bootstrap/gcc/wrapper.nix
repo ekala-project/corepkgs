@@ -1,10 +1,10 @@
 {
   fetchurl,
   lib,
-  gnutar,
+  tar,
   xz,
   bash-build,
-  gnused,
+  sed,
   targetPlatform,
   libc,
   libgcc,
@@ -24,7 +24,7 @@ bash-build.runCommand "${pname}-${gcc-unwrapped.version}"
     inherit pname;
     version = gcc-unwrapped.version;
     meta = gcc-unwrapped.meta;
-    nativeBuildInputs = [ gnused ];
+    nativeBuildInputs = [ sed ];
     passthru.unwrapped = gcc-unwrapped;
   }
   ''

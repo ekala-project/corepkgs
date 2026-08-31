@@ -6,11 +6,11 @@
   bash,
   binutils,
   gcc,
-  gnumake,
-  gnused,
-  gnugrep,
+  make,
+  sed,
+  grep,
   gawk,
-  gnutar,
+  tar,
   gzip,
 }:
 let
@@ -29,11 +29,11 @@ bash.runCommand "${pname}-${version}"
     nativeBuildInputs = [
       binutils
       gcc
-      gnumake
-      gnused
-      gnugrep
+      make
+      sed
+      grep
       gawk
-      gnutar
+      tar
       gzip
     ];
 

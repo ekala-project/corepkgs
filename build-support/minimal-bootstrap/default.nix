@@ -43,46 +43,46 @@ lib.makeScope
           bootBash = bash_2_05;
           tinycc = tinycc-musl;
           coreutils = coreutils-musl;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-musl;
+          make = make-musl;
+          tar = tar-musl;
         };
 
         bash-static = callPackage ./bash/static.nix {
           gcc-buildbuild = gcc-latest;
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         binutils = callPackage ./binutils {
           tinycc = tinycc-musl;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-musl;
+          make = make-musl;
+          tar = tar-musl;
         };
 
         binutils-static = callPackage ./binutils/static.nix {
           gcc-buildbuild = gcc-latest;
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         bison = callPackage ./bison {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         bzip2 = callPackage ./bzip2 {
           tinycc = tinycc-musl;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-musl;
+          make = make-musl;
+          tar = tar-musl;
         };
 
         bzip2-static = callPackage ./bzip2/static.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         coreutils = callPackage ./coreutils { tinycc = tinycc-mes; };
@@ -90,76 +90,76 @@ lib.makeScope
         coreutils-musl = callPackage ./coreutils/musl.nix {
           bash = bash_2_05;
           tinycc = tinycc-musl;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-musl;
+          make = make-musl;
+          tar = tar-musl;
         };
         coreutils-static = callPackage ./coreutils/static.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         diffutils = callPackage ./diffutils {
           bash = bash_2_05;
           tinycc = tinycc-musl;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-musl;
+          make = make-musl;
+          tar = tar-musl;
         };
 
         diffutils-static = callPackage ./diffutils/static.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         findutils = callPackage ./findutils {
           tinycc = tinycc-musl;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-musl;
+          make = make-musl;
+          tar = tar-musl;
         };
 
         findutils-static = callPackage ./findutils/static.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         gawk-mes = callPackage ./gawk/mes.nix {
           bash = bash_2_05;
           tinycc = tinycc-mes;
-          gnused = gnused-mes;
+          sed = sed-mes;
         };
 
         gawk = callPackage ./gawk {
           bash = bash_2_05;
           tinycc = tinycc-musl;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-musl;
+          make = make-musl;
+          tar = tar-musl;
           bootGawk = gawk-mes;
         };
 
         gcc46 = callPackage ./gcc/4.6.nix {
           tinycc = tinycc-musl;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-musl;
+          make = make-musl;
+          tar = tar-musl;
         };
 
         gcc46-cxx = callPackage ./gcc/4.6.cxx.nix {
           gcc = gcc46;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-musl;
+          make = make-musl;
+          tar = tar-musl;
         };
 
         gcc10 = callPackage ./gcc/10.nix {
           gcc = gcc46-cxx;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         gcc-latest-unwrapped = callPackage ./gcc/latest.nix {
           gcc = gcc10;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
         gcc-latest = callPackage ./gcc/wrapper.nix {
           bash-build = bash;
@@ -170,101 +170,101 @@ lib.makeScope
           libstdcxx = gcc-latest-unwrapped;
         };
 
-        gnugrep = callPackage ./gnugrep {
+        grep = callPackage ./grep {
           bash = bash_2_05;
           tinycc = tinycc-mes;
         };
 
-        gnugrep-static = callPackage ./gnugrep/static.nix {
+        grep-static = callPackage ./grep/static.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         gnum4 = callPackage ./gnum4 {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
-        gnumake = callPackage ./gnumake { tinycc = tinycc-bootstrappable; };
+        make = callPackage ./make { tinycc = tinycc-bootstrappable; };
 
-        gnumake-musl = callPackage ./gnumake/musl.nix {
+        make-musl = callPackage ./make/musl.nix {
           bash = bash_2_05;
           tinycc = tinycc-musl;
           gawk = gawk-mes;
-          gnumakeBoot = gnumake;
+          makeBoot = make;
           # GNU Make's release tarball relies on preserved mtimes for
           # pregenerated Autotools files.
-          gnutar = gnutar-musl;
+          tar = tar-musl;
         };
 
-        gnumake-static = callPackage ./gnumake/static.nix {
+        make-static = callPackage ./make/static.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
-        gnupatch = callPackage ./gnupatch { tinycc = tinycc-mes; };
+        patch = callPackage ./patch { tinycc = tinycc-mes; };
 
-        gnupatch-static = callPackage ./gnupatch/static.nix {
+        patch-static = callPackage ./patch/static.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
-        gnused = callPackage ./gnused {
+        sed = callPackage ./sed {
           bash = bash_2_05;
           tinycc = tinycc-musl;
-          gnused = gnused-mes;
+          sed = sed-mes;
         };
 
-        gnused-mes = callPackage ./gnused/mes.nix {
+        sed-mes = callPackage ./sed/mes.nix {
           bash = bash_2_05;
           tinycc = tinycc-bootstrappable;
         };
 
-        gnused-static = callPackage ./gnused/static.nix {
+        sed-static = callPackage ./sed/static.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
-        gnutar = callPackage ./gnutar/mes.nix {
+        tar = callPackage ./tar/mes.nix {
           bash = bash_2_05;
           tinycc = tinycc-mes;
-          gnused = gnused-mes;
+          sed = sed-mes;
         };
 
         # FIXME: better package naming scheme
-        gnutar-latest = callPackage ./gnutar/latest.nix {
+        tar-latest = callPackage ./tar/latest.nix {
           gcc = gcc46;
-          gnumake = gnumake-musl;
-          gnutarBoot = gnutar-musl;
+          make = make-musl;
+          tarBoot = tar-musl;
         };
 
-        gnutar-musl = callPackage ./gnutar/musl.nix {
+        tar-musl = callPackage ./tar/musl.nix {
           bash = bash_2_05;
           tinycc = tinycc-musl;
-          gnused = gnused-mes;
+          sed = sed-mes;
         };
 
-        gnutar-static = callPackage ./gnutar/static.nix {
+        tar-static = callPackage ./tar/static.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutarBoot = gnutar-latest;
+          make = make-musl;
+          tarBoot = tar-latest;
         };
 
         gzip-static = callPackage ./gzip/static.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         gzip = callPackage ./gzip {
           bash = bash_2_05;
           tinycc = tinycc-bootstrappable;
-          gnused = gnused-mes;
+          sed = sed-mes;
         };
 
         heirloom = callPackage ./heirloom {
@@ -277,26 +277,26 @@ lib.makeScope
         libgmp = callPackage ./gcc/gmp.nix {
           gcc-buildbuild = gcc-latest;
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         libmpc = callPackage ./gcc/mpc.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         libmpfr = callPackage ./gcc/mpfr.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         linux-headers = callPackage ./linux-headers {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         ln-boot = callPackage ./ln-boot { };
@@ -308,42 +308,42 @@ lib.makeScope
         musl-tcc-intermediate = callPackage ./musl/tcc.nix {
           bash = bash_2_05;
           tinycc = tinycc-mes;
-          gnused = gnused-mes;
+          sed = sed-mes;
         };
 
         musl-tcc = callPackage ./musl/tcc.nix {
           bash = bash_2_05;
           tinycc = tinycc-musl-intermediate;
-          gnused = gnused-mes;
+          sed = sed-mes;
         };
 
         musl = callPackage ./musl {
           gcc = gcc46;
-          gnumake = gnumake-musl;
+          make = make-musl;
         };
 
         musl-headers = callPackage ./musl/headers.nix {
           gcc = gcc46;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         musl-static = callPackage ./musl/static.nix {
           libgcc = gcc-latest-unwrapped;
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
+          make = make-musl;
         };
 
         patchelf-static = callPackage ./patchelf/static.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         python = callPackage ./python {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         stage0-posix = callPackage ./stage0-posix { };
@@ -377,27 +377,27 @@ lib.makeScope
 
         gawk-static = callPackage ./gawk/static.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         xz = callPackage ./xz {
           bash = bash_2_05;
           tinycc = tinycc-musl;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-musl;
+          make = make-musl;
+          tar = tar-musl;
         };
 
         xz-static = callPackage ./xz/static.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         zlib = callPackage ./zlib {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         inherit (callPackage ./utils.nix { inherit hostPlatform; })
@@ -418,14 +418,14 @@ lib.makeScope
             echo ${findutils.tests.get-version}
             echo ${gawk.tests.get-version}
             echo ${gawk-mes.tests.get-version}
-            echo ${gnugrep.tests.get-version}
+            echo ${grep.tests.get-version}
             echo ${gnum4.tests.get-version}
-            echo ${gnumake-musl.tests.get-version}
-            echo ${gnused.tests.get-version}
-            echo ${gnused-mes.tests.get-version}
-            echo ${gnutar.tests.get-version}
-            echo ${gnutar-latest.tests.get-version}
-            echo ${gnutar-musl.tests.get-version}
+            echo ${make-musl.tests.get-version}
+            echo ${sed.tests.get-version}
+            echo ${sed-mes.tests.get-version}
+            echo ${tar.tests.get-version}
+            echo ${tar-latest.tests.get-version}
+            echo ${tar-musl.tests.get-version}
             echo ${gzip.tests.get-version}
             echo ${heirloom.tests.get-version}
             echo ${mes.compiler.tests.get-version}
@@ -446,11 +446,11 @@ lib.makeScope
             echo ${diffutils-static.tests.get-version}
             echo ${findutils-static.tests.get-version}
             echo ${gawk-static.tests.get-version}
-            echo ${gnugrep-static.tests.get-version}
-            echo ${gnumake-static.tests.get-version}
-            echo ${gnupatch-static.tests.get-version}
-            echo ${gnused-static.tests.get-version}
-            echo ${gnutar-static.tests.get-version}
+            echo ${grep-static.tests.get-version}
+            echo ${make-static.tests.get-version}
+            echo ${patch-static.tests.get-version}
+            echo ${sed-static.tests.get-version}
+            echo ${tar-static.tests.get-version}
             echo ${gzip-static.tests.get-version}
             echo ${patchelf-static.tests.get-version}
             echo ${xz-static.tests.get-version}
@@ -486,22 +486,22 @@ lib.makeScope
       // (lib.optionalAttrs (hostPlatform.libc == "glibc")) {
         gcc-glibc = callPackage ./gcc/glibc.nix {
           gcc = gcc-latest;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
 
         glibc = callPackage ./glibc {
           gcc = gcc-latest-unwrapped;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
-          gnugrep = gnugrep-static;
+          make = make-musl;
+          tar = tar-latest;
+          grep = grep-static;
         };
 
         glibc-headers = callPackage ./glibc/headers.nix {
           gcc = gcc-latest;
           binutils-build = binutils;
-          gnumake = gnumake-musl;
-          gnutar = gnutar-latest;
+          make = make-musl;
+          tar = tar-latest;
         };
       }
     )
