@@ -22,6 +22,11 @@ stdenv.mkDerivation rec {
   # so the updates need to happen separately on staging.
   version = "25.1.0";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+
   src = fetchFromGitLab {
     domain = "gitlab.freedesktop.org";
     owner = "mesa";
