@@ -11,7 +11,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from . import baseline, config, survey
+from . import baseline, config, diffing, survey
 
 
 def _roots(args: argparse.Namespace) -> tuple[Path, Path]:
@@ -62,9 +62,19 @@ def _classify(result: survey.Survey, accepted_dir: Path) -> dict[baseline.Status
 
 
 def _report(buckets: dict[baseline.Status, list[str]], result: survey.Survey) -> None:
-    """Print the drift summary, listing only what needs a human."""
+    """Print the drift summary, listing only what needs a human.
+
+    Every count is paired with the number of changed lines behind it, so a
+    single sprawling patch is not mistaken for a small one.
+    """
+    sizes = {target: diffing.changed_lines(patch) for target, patch in result.patches.items()}
+
+    def lines_in(targets: list[str]) -> int:
+        return sum(sizes.get(target, 0) for target in targets)
+
+    accepted = buckets[baseline.Status.UNCHANGED]
     print(f"  identical to upstream : {result.identical}")
-    print(f"  accepted divergence   : {len(buckets[baseline.Status.UNCHANGED])}")
+    print(f"  accepted divergence   : {len(accepted)} ({lines_in(accepted)} lines)")
 
     for status, label in (
         (baseline.Status.NEW, "new divergence"),
@@ -72,9 +82,11 @@ def _report(buckets: dict[baseline.Status, list[str]], result: survey.Survey) ->
         (baseline.Status.RESOLVED, "resolved, baseline is stale"),
     ):
         entries = buckets[status]
-        print(f"  {label:<21} : {len(entries)}")
+        print(f"  {label:<21} : {len(entries)} ({lines_in(entries)} lines)")
         for target in entries:
-            print(f"      {target}")
+            print(f"      {target} ({sizes.get(target, 0)} lines)")
+
+    print(f"  total divergence      : {len(result.patches)} patches, {sum(sizes.values())} lines")
 
     if result.unmapped or result.missing or result.opaque_differs:
         print(
