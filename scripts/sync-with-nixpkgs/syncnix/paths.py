@@ -54,7 +54,20 @@ def resolve(path: str) -> Optional[str]:
     if nixpkgs_prefix == config.BY_NAME_PREFIX and remainder:
         return _resolve_by_name(nixpkgs_prefix, remainder)
 
-    return f"{nixpkgs_prefix}/{remainder}" if remainder else nixpkgs_prefix
+    resolved = f"{nixpkgs_prefix}/{remainder}" if remainder else nixpkgs_prefix
+    return _entry_point(resolved)
+
+
+def _entry_point(path: str) -> str:
+    """Apply the by-name entry-point name to an already-resolved path.
+
+    A mapping may point straight at a by-name directory -- corepkgs' `pkgs/m4`
+    is upstream's `pkgs/by-name/gn/gnum4` -- in which case the shard is already
+    spelled out but the `default.nix` -> `package.nix` rename still applies.
+    """
+    if path.startswith(config.BY_NAME_PREFIX + "/") and path.endswith("/default.nix"):
+        return path.removesuffix("default.nix") + "package.nix"
+    return path
 
 
 def _resolve_by_name(prefix: str, remainder: str) -> Optional[str]:

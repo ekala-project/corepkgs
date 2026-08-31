@@ -29,6 +29,15 @@ class TestResolve:
     def test_directory_mapping_passes_remainder_through(self):
         assert paths.resolve("stdenv/generic/setup.sh") == "pkgs/stdenv/generic/setup.sh"
 
+    def test_mapping_straight_to_a_by_name_directory_renames_the_entry_point(self):
+        # corepkgs renamed the package, so the mapping names the upstream shard
+        # directly; the default.nix -> package.nix rename must still apply.
+        assert paths.resolve("pkgs/m4/default.nix") == "pkgs/by-name/gn/gnum4/package.nix"
+        assert paths.resolve("pkgs/make/default.nix") == "pkgs/by-name/gn/gnumake/package.nix"
+
+    def test_non_by_name_mapping_keeps_default_nix(self):
+        assert paths.resolve("pkgs/sed/default.nix") == "pkgs/tools/text/gnused/default.nix"
+
     def test_unmapped_path_returns_none(self):
         assert paths.resolve("ekaos/modules/thing.nix") is None
 
