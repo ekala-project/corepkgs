@@ -69,8 +69,9 @@ The variants are automatically available in the package scope (e.g., `pkgs.pytho
 
 **Never set `meta.maintainers` or `meta.teams`:**
 
-This repo is curated as a set, so packages carry neither. Neither is a recognised
-`meta` key, so setting one fails `check-meta`; simply omit them.
+This repo is curated as a set, so packages carry neither. `check-meta` accepts
+both keys, and `lib.teams` does not exist here, so nothing will stop you --
+simply omit them.
 
 ```nix
 meta = {

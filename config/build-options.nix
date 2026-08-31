@@ -42,6 +42,19 @@ in
       internal = true;
     };
 
+    assertions = mkOption {
+      type = types.listOf (
+        types.submodule {
+          options = {
+            assertion = mkOption { type = types.bool; };
+            message = mkOption { type = types.str; };
+          };
+        }
+      );
+      default = [ ];
+      internal = true;
+    };
+
     inHydra = mkOption {
       type = types.bool;
       default = false;
