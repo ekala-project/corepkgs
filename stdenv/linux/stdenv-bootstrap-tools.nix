@@ -14,8 +14,8 @@
   gawk,
   gmp,
   grep,
-  gnumake,
-  gnused,
+  make,
+  sed,
   gzip,
   libc,
   libmpc,
@@ -114,14 +114,14 @@ stdenv.mkDerivation (finalAttrs: {
     cp ${findutils.out}/bin/find $out/bin
     cp ${findutils.out}/bin/xargs $out/bin
     cp -d ${diffutils.out}/bin/* $out/bin
-    cp -d ${gnused.out}/bin/* $out/bin
+    cp -d ${sed.out}/bin/* $out/bin
     cp -d ${grep.out}/bin/grep $out/bin
     cp ${gawk.out}/bin/gawk $out/bin
     cp -d ${gawk.out}/bin/awk $out/bin
     cp ${tarMinimal.out}/bin/tar $out/bin
     cp ${gzip.out}/bin/.gzip-wrapped $out/bin/gzip
     cp ${bzip2.bin}/bin/bzip2 $out/bin
-    cp -d ${gnumake.out}/bin/* $out/bin
+    cp -d ${make.out}/bin/* $out/bin
     cp -d ${patch}/bin/* $out/bin
     cp ${patchelf}/bin/* $out/bin
 

@@ -30,9 +30,9 @@
   gawk,
   getopt,
   grep,
-  gnumake,
+  make,
   gnupg,
-  gnused,
+  sed,
   gzip,
   html-tidy ? null,
   ncurses,
@@ -85,9 +85,9 @@ let
           getopt
           ghostscript_headless
           grep
-          gnumake
+          make
           gnupg
-          gnused
+          sed
           gzip
           html-tidy
           ncurses
@@ -217,7 +217,7 @@ let
       coreutils
       gawk
       grep
-      gnused
+      sed
       ;
   };
 

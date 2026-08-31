@@ -41,7 +41,7 @@
   threadsCross ? { }, # for MinGW
   withoutTargetLibc ? stdenv.targetPlatform.libc == null,
   flex,
-  gnused ? null,
+  sed ? null,
   buildPackages,
   pkgsBuildTarget,
   libxcrypt,
@@ -148,7 +148,7 @@ let
       gettext
       gmp
       gnat-bootstrap
-      gnused
+      sed
       isl
       langAda
       langC
@@ -186,7 +186,7 @@ let
 in
 
 # Make sure we get GNU sed.
-assert stdenv.buildPlatform.isDarwin -> gnused != null;
+assert stdenv.buildPlatform.isDarwin -> sed != null;
 
 # The go frontend is written in c++
 assert langGo -> langCC;

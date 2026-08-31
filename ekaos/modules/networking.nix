@@ -348,7 +348,7 @@ in
     # Write /etc/hostid if networking.hostId is set
     environment.etc."hostid" = mkIf (cfg.hostId != null) {
       source = pkgs.runCommand "gen-hostid" { } ''
-        ${pkgs.coreutils}/bin/printf "$(echo ${cfg.hostId} | ${pkgs.gnused}/bin/sed 's/\(..\)/\\x\1/g')" > $out
+        ${pkgs.coreutils}/bin/printf "$(echo ${cfg.hostId} | ${pkgs.sed}/bin/sed 's/\(..\)/\\x\1/g')" > $out
       '';
     };
 

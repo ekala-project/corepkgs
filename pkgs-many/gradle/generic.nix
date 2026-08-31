@@ -26,7 +26,7 @@
   coreutils,
   findutils,
   ncurses,
-  gnused,
+  sed,
   udev,
   testers,
   runCommand,
@@ -118,7 +118,7 @@ let
             lib.makeBinPath [
               coreutils
               findutils
-              gnused
+              sed
             ]
           } \
           ${jnaFlag}

@@ -9,7 +9,7 @@
   coreutils,
   libredirect,
   glibcLocales,
-  gnused,
+  sed,
 
   interactive ? true,
   readline,
@@ -170,7 +170,7 @@ lib.warnIf (withDocs != null)
           util-linuxMinimal
           libredirect.hook
           glibcLocales
-          gnused
+          sed
         ];
 
         meta = attrs.meta // {

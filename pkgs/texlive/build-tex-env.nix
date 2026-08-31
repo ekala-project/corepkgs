@@ -19,7 +19,7 @@
   coreutils,
   gawk,
   grep,
-  gnused,
+  sed,
   ghostscript,
 }:
 
@@ -458,7 +458,7 @@ lib.fix (
           coreutils
           gawk
           grep
-          gnused
+          sed
         ]
         ++ lib.optional needsGhostscript ghostscript;
 

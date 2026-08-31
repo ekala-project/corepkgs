@@ -7,7 +7,7 @@
   findutils,
   getopt,
   grep,
-  gnused,
+  sed,
   lib,
   libxml2,
   libxslt,
@@ -36,7 +36,7 @@ stdenv.mkDerivation (finalAttrs: {
       --replace-fail "@GETOPT@" "${getopt}/bin/getopt" \
       --replace-fail "@GREP@" "${grep}/bin/grep" \
       --replace-fail "@MKTEMP@" "$(type -P mktemp)" \
-      --replace-fail "@SED@" "${gnused}/bin/sed" \
+      --replace-fail "@SED@" "${sed}/bin/sed" \
       --replace-fail "@TAIL@" "${coreutils}/bin/tail"
 
     for f in format/docbook/* xmlto.in; do

@@ -11,7 +11,7 @@
   bzip2,
   brotli,
   libpng,
-  gnumake,
+  make,
   glib,
   runUnitTests,
 
@@ -66,7 +66,7 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optional (!stdenv.hostPlatform.isWindows) makeWrapper
   # FreeType requires GNU Make, which is not part of stdenv on FreeBSD.
-  ++ lib.optional (!stdenv.hostPlatform.isLinux) gnumake;
+  ++ lib.optional (!stdenv.hostPlatform.isLinux) make;
 
   patches = [
     ./enable-table-validation.patch

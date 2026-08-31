@@ -4,7 +4,7 @@
   makeWrapper,
   bash,
   coreutils,
-  gnused,
+  sed,
   mercurial,
 }:
 stdenv.mkDerivation (finalAttrs: {
@@ -23,7 +23,7 @@ stdenv.mkDerivation (finalAttrs: {
       lib.makeBinPath [
         mercurial
         coreutils
-        gnused
+        sed
       ]
     } --set HOME /homeless-shelter
   '';

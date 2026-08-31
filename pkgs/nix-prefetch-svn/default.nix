@@ -4,7 +4,7 @@
   makeWrapper,
   bash,
   coreutils,
-  gnused,
+  sed,
   subversion,
 }:
 stdenv.mkDerivation (finalAttrs: {
@@ -23,7 +23,7 @@ stdenv.mkDerivation (finalAttrs: {
       lib.makeBinPath [
         subversion
         coreutils
-        gnused
+        sed
       ]
     } --set HOME /homeless-shelter
   '';

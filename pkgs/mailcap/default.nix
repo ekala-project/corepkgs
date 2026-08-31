@@ -6,7 +6,7 @@
   git,
   coreutils,
   gawk,
-  gnused,
+  sed,
   writeScript,
   nix-update,
 }:
@@ -39,7 +39,7 @@ stdenv.mkDerivation rec {
         git
         coreutils
         gawk
-        gnused
+        sed
         nix-update
       ]
     }:$PATH

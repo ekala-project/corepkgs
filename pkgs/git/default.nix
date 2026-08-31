@@ -12,7 +12,7 @@
   python3,
   gettext,
   grep,
-  gnused,
+  sed,
   gawk,
   coreutils, # needed at runtime by git-filter-branch etc
   openssh,
@@ -311,7 +311,7 @@ stdenv.mkDerivation (finalAttrs: {
     SCRIPT="$(cat <<'EOS'
       BEGIN{
         @a=(
-          '${grep}/bin/grep', '${gnused}/bin/sed', '${gawk}/bin/awk',
+          '${grep}/bin/grep', '${sed}/bin/sed', '${gawk}/bin/awk',
           '${coreutils}/bin/cut', '${coreutils}/bin/basename', '${coreutils}/bin/dirname',
           '${coreutils}/bin/wc', '${coreutils}/bin/tr'
           ${lib.optionalString perlSupport ", '${perlPackages.perl}/bin/perl'"}

@@ -4,13 +4,13 @@
   fetchurl,
   updateAutotoolsGnuConfigScriptsHook,
   perl,
-  gnused,
+  sed,
   runCommand,
   testers,
 }:
 
 stdenv.mkDerivation rec {
-  pname = "gnused";
+  pname = "sed";
   version = "4.9";
 
   src = fetchurl {
@@ -34,11 +34,11 @@ stdenv.mkDerivation rec {
 
   passthru.tests = {
     version = testers.testVersion {
-      package = gnused;
+      package = sed;
       command = "sed --version";
     };
-    simple = runCommand "gnused-test" { } ''
-      result=$(echo "hello world" | ${gnused}/bin/sed 's/world/nix/')
+    simple = runCommand "sed-test" { } ''
+      result=$(echo "hello world" | ${sed}/bin/sed 's/world/nix/')
       test "$result" = "hello nix"
       touch $out
     '';

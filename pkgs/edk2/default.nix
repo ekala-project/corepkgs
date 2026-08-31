@@ -133,7 +133,7 @@ stdenv.mkDerivation (finalAttrs: {
   passthru = {
     updateScript = writeScript "update-edk2" ''
       #!/usr/bin/env nix-shell
-      #!nix-shell -i bash -p common-updater-scripts coreutils gnused
+      #!nix-shell -i bash -p common-updater-scripts coreutils sed
       set -eu -o pipefail
       version="$(list-git-tags --url="${finalAttrs.srcWithVendoring.url}" |
                  sed -E --quiet 's/^edk2-stable([0-9\\.]+)$/\1/p' |

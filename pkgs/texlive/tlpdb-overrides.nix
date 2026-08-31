@@ -13,9 +13,9 @@
   getopt,
   ghostscript_headless,
   grep,
-  gnumake,
+  make,
   gnupg,
-  gnused,
+  sed,
   gzip,
   html-tidy,
   ncurses,
@@ -147,12 +147,12 @@ lib.recursiveUpdate orig rec {
   cjk-gs-integrate.extraBuildInputs = [ ghostscript_headless ];
   cyrillic-bin.extraBuildInputs = [
     coreutils
-    gnused
+    sed
   ];
   dtxgen.extraBuildInputs = [
     coreutils
     getopt
-    gnumake
+    make
     zip
   ];
   dviljk.extraBuildInputs = [ coreutils ];
@@ -162,12 +162,12 @@ lib.recursiveUpdate orig rec {
   installfont.extraBuildInputs = [
     coreutils
     getopt
-    gnused
+    sed
   ];
   latexfileversion.extraBuildInputs = [
     coreutils
     grep
-    gnused
+    sed
   ];
   listings-ext.extraBuildInputs = [
     coreutils
@@ -176,23 +176,23 @@ lib.recursiveUpdate orig rec {
   ltxfileinfo.extraBuildInputs = [
     coreutils
     getopt
-    gnused
+    sed
   ];
   ltximg.extraBuildInputs = [ ghostscript_headless ];
   luaotfload.extraBuildInputs = [ ncurses ];
   makeindex.extraBuildInputs = [
     coreutils
-    gnused
+    sed
   ];
   pagelayout.extraBuildInputs = [
-    gnused
+    sed
     ncurses
   ];
   pdfcrop.extraBuildInputs = [ ghostscript_headless ];
   pdftex.extraBuildInputs = [
     coreutils
     ghostscript_headless
-    gnused
+    sed
   ];
   pdftex-quiet.extraBuildInputs = [ coreutils ];
   pdfxup.extraBuildInputs = [
@@ -203,12 +203,12 @@ lib.recursiveUpdate orig rec {
   ps2eps.extraBuildInputs = [ ghostscript_headless ];
   pst2pdf.extraBuildInputs = [ ghostscript_headless ];
   tex4ebook.extraBuildInputs = [ html-tidy ];
-  texlive-scripts.extraBuildInputs = [ gnused ];
+  texlive-scripts.extraBuildInputs = [ sed ];
   texlive-scripts-extra.extraBuildInputs = [
     coreutils
     findutils
     ghostscript_headless
-    gnused
+    sed
   ];
   thumbpdf.extraBuildInputs = [ ghostscript_headless ];
   tpic2pdftex.extraBuildInputs = [ gawk ];
@@ -352,7 +352,7 @@ lib.recursiveUpdate orig rec {
   '';
 
   pagelayout.postFixup = ''
-    sed -i '2iPATH="${lib.makeBinPath [ gnused ]}''${PATH:+:$PATH}"' "$out"/bin/pagelayoutapi
+    sed -i '2iPATH="${lib.makeBinPath [ sed ]}''${PATH:+:$PATH}"' "$out"/bin/pagelayoutapi
     sed -i '2iPATH="${lib.makeBinPath [ ncurses ]}''${PATH:+:$PATH}"' "$out"/bin/textestvis
   '';
 
@@ -364,7 +364,7 @@ lib.recursiveUpdate orig rec {
     sed -i -e '2iPATH="${
       lib.makeBinPath [
         coreutils
-        gnused
+        sed
       ]
     }''${PATH:+:$PATH}"' \
       -e 's!^distillerpath="/usr/local/bin"$!distillerpath="${
@@ -492,11 +492,11 @@ lib.recursiveUpdate orig rec {
         ghostscript_headless
       ]
     }''${PATH:+:$PATH}"' "$out"/bin/dvi2fax
-    sed -i '2iPATH="${lib.makeBinPath [ gnused ]}''${PATH:+:$PATH}"' "$out"/bin/{kpsetool,texconfig,texconfig-sys}
+    sed -i '2iPATH="${lib.makeBinPath [ sed ]}''${PATH:+:$PATH}"' "$out"/bin/{kpsetool,texconfig,texconfig-sys}
     sed -i '2iPATH="${
       lib.makeBinPath [
         coreutils
-        gnused
+        sed
       ]
     }''${PATH:+:$PATH}"' "$out"/bin/texconfig-dialog
   '';
@@ -593,7 +593,7 @@ lib.recursiveUpdate orig rec {
     scriptsFolder = "texlive";
     extraBuildInputs = [
       coreutils
-      gnused
+      sed
       gnupg
       tl.kpathsea
       (perl.withPackages (ps: with ps; [ Tk ]))
@@ -607,7 +607,7 @@ lib.recursiveUpdate orig rec {
       sed -i '2iPATH="${
         lib.makeBinPath [
           coreutils
-          gnused
+          sed
           tl.kpathsea
         ]
       }''${PATH:+:$PATH}"' "$out"/bin/mktexlsr

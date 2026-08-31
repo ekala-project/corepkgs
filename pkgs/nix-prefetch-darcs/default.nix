@@ -4,7 +4,7 @@
   makeWrapper,
   bash,
   coreutils,
-  gnused,
+  sed,
   darcs,
   cacert,
   gawk,
@@ -29,7 +29,7 @@ stdenv.mkDerivation (finalAttrs: {
         gawk
         jq
         coreutils
-        gnused
+        sed
       ]
     } --set HOME /homeless-shelter
   '';

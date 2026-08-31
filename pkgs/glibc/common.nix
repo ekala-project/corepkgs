@@ -149,7 +149,7 @@ stdenv.mkDerivation (
     ++ lib.optional enableCETRuntimeDefault ./2.39-revert-cet-default-disable.patch;
 
     postPatch = ''
-      # Needed for glibc to build with the gnumake 3.82
+      # Needed for glibc to build with the make 3.82
       # http://comments.gmane.org/gmane.linux.lfs.support/31227
       sed -i 's/ot \$/ot:\n\ttouch $@\n$/' manual/Makefile
 

@@ -5,7 +5,7 @@
   coreutils,
   curl,
   grep,
-  gnused,
+  sed,
   jq,
   nix,
 }:
@@ -19,7 +19,7 @@
 
 let
   grep = lib.getExe grep;
-  sed = lib.getExe gnused;
+  sed = lib.getExe sed;
 
   updateScript = writeShellScript "gnome-update-script" ''
     set -euo pipefail

@@ -6,7 +6,7 @@
   makeWrapper,
   apr,
   expat,
-  gnused,
+  sed,
   testers,
   sslSupport ? true,
   openssl,
@@ -113,7 +113,7 @@ stdenv.mkDerivation (finalAttrs: {
     done
 
     # Give apr1 access to sed for runtime invocations.
-    wrapProgram $dev/bin/apu-1-config --prefix PATH : "${gnused}/bin"
+    wrapProgram $dev/bin/apu-1-config --prefix PATH : "${sed}/bin"
   '';
 
   enableParallelBuilding = true;

@@ -7,7 +7,7 @@
   groff,
   libxml2,
   libxslt,
-  gnused,
+  sed,
   libiconv,
   iconv,
   opensp,
@@ -86,7 +86,7 @@ stdenv.mkDerivation rec {
     done
 
     wrapProgram $out/bin/sgml2xml-isoent --prefix PATH : \
-      "${gnused}/bin"
+      "${sed}/bin"
   '';
 
   meta = {

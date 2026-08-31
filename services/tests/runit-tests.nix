@@ -83,7 +83,7 @@ let
       defaultDeps = with pkgs; [
         coreutils
         gnugrep
-        gnused
+        sed
         curl
         netcat
       ];

@@ -4,7 +4,7 @@
   common-updater-scripts,
   coreutils,
   grep,
-  gnused,
+  sed,
   nix,
   writeScript,
 }:
@@ -28,7 +28,7 @@ let
   fileForGitCommands = "update-git-commits.txt";
 
   grep = lib.getExe grep;
-  sed = lib.getExe gnused;
+  sed = lib.getExe sed;
 
   # shell script to update package
   updateScript = writeScript "generic-update-script.sh" ''

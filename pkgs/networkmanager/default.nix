@@ -28,7 +28,7 @@
   libndp,
   newt,
   ethtool,
-  gnused,
+  sed,
   iputils,
   kmod,
   jansson,
@@ -123,7 +123,7 @@ stdenv.mkDerivation (finalAttrs: {
       inherit
         iputils
         ethtool
-        gnused
+        sed
         ;
       runtimeShell = "${stdenv.shell}";
     })

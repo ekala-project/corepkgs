@@ -26,7 +26,7 @@
   docbook-xsl-nons,
   fop,
   epubcheck,
-  gnused,
+  sed,
   coreutils,
 
   # if true, enable all the below filters and backends
@@ -263,7 +263,7 @@ python3.pkgs.buildPythonApplication rec {
           lib.makeBinPath [
             texlive
             coreutils
-            gnused
+            sed
           ]
         }', **(dict(filter(lambda v: v[0] == 'SOURCE_DATE_EPOCH', os.environ.items()))))|" \
             -e "s|^ASCIIDOC =.*|ASCIIDOC = '$out/bin/asciidoc'|" \
