@@ -562,7 +562,10 @@ lib.extendMkDerivation {
         platforms = python.meta.platforms;
         isBuildPythonPackage = python.meta.platforms;
         # PyPI PURL for ecosystem-specific vulnerability correlation
-        identifiers.purl = "pkg:pypi/${finalAttrs.pname}@${finalAttrs.version}";
+        identifiers.purlParts = {
+          type = "pypi";
+          spec = "${finalAttrs.pname}@${finalAttrs.version}";
+        };
       }
       // meta;
       # If given use the specified checkPhase, otherwise use the setup hook.
