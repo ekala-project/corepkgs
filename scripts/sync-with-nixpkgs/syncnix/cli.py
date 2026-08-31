@@ -24,6 +24,15 @@ def _roots(args: argparse.Namespace) -> tuple[Path, Path]:
     return corepkgs_root, nixpkgs_root
 
 
+def _bump_entries(trivial: dict[str, str]) -> list[str]:
+    """Render held-back bumps as the value changes they are."""
+    entries = []
+    for target, patch in sorted(trivial.items()):
+        moves = "\n".join(f"    {sign}{content}" for sign, content in diffing.changed(patch))
+        entries.append(f"{target}\n{moves}")
+    return entries
+
+
 def _write_reports(reports_dir: Path, result: survey.Survey) -> None:
     """Write the lists that need following up, one file per category."""
     reports = {
@@ -38,6 +47,10 @@ def _write_reports(reports_dir: Path, result: survey.Survey) -> None:
         "opaque-files.txt": (
             "Patch files that differ from upstream; compare them by hand.",
             result.opaque_differs,
+        ),
+        "version-bumps.txt": (
+            "Divergence that is only a moved value; not diffed into patches/.",
+            _bump_entries(result.trivial),
         ),
         "stale-local-only.txt": (
             "Declared LOCAL_ONLY but nixpkgs now has them; drop the declaration.",
@@ -92,6 +105,8 @@ def _report(buckets: dict[baseline.Status, list[str]], result: survey.Survey) ->
 
     print(f"  total divergence      : {len(result.patches)} patches, {sum(sizes.values())} lines")
 
+    bump_lines = sum(diffing.changed_lines(patch) for patch in result.trivial.values())
+    print(f"  version bumps only    : {len(result.trivial)} ({bump_lines} lines, not diffed)")
     print(f"  corepkgs-only         : {result.local_only}")
 
     if result.unmapped or result.missing or result.opaque_differs or result.stale_local_only:

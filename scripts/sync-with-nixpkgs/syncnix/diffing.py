@@ -8,10 +8,11 @@ applies from the corepkgs root with `git apply -p1`.
 
 import difflib
 import re
+from collections import Counter
 from dataclasses import dataclass
-from typing import Optional
+from typing import Iterator, Optional
 
-from . import normalize
+from . import config, normalize
 
 HEADER_PREFIX = "#"
 
@@ -84,16 +85,15 @@ def compare_opaque(path: str, upstream_path: str, differs: bool) -> Comparison:
 _HUNK = re.compile(r"^@@ -\d+(?:,(\d+))? \+\d+(?:,(\d+))? @@")
 
 
-def changed_lines(patch: str) -> int:
-    """Added and removed lines in a patch: how much there is to review.
+def changed(patch: str) -> Iterator[tuple[str, str]]:
+    """Yield `(sign, content)` for every added or removed line in a patch.
 
-    Counting every line that starts with `+` or `-` would be wrong twice over:
+    Scanning for lines that start with `+` or `-` would be wrong twice over:
     it would swallow the `---`/`+++` file markers, and it would skip a real
     removed line whose content happens to start with `-`. So the hunk headers
     drive the walk instead -- they declare exactly how many lines each hunk
     body holds, which makes the classification unambiguous.
     """
-    total = 0
     old = new = 0
     for line in patch.splitlines():
         if old <= 0 and new <= 0:
@@ -106,14 +106,46 @@ def changed_lines(patch: str) -> int:
         kind = line[:1]
         if kind == "-":
             old -= 1
-            total += 1
+            yield ("-", line[1:])
         elif kind == "+":
             new -= 1
-            total += 1
+            yield ("+", line[1:])
         elif kind != "\\":  # "\ No newline at end of file" annotates, not changes.
             old -= 1
             new -= 1
-    return total
+
+
+def changed_lines(patch: str) -> int:
+    """How much there is to review in a patch."""
+    return sum(1 for _ in changed(patch))
+
+
+def _trivial_key(content: str) -> Optional[str]:
+    """The attribute name if this line is a trivial one, else None."""
+    for pattern in config.TRIVIAL_PATTERNS:
+        match = pattern.match(content)
+        if match:
+            return match.group("key")
+    return None
+
+
+def is_trivial(patch: str) -> bool:
+    """True when a patch says nothing but "this value moved".
+
+    Every changed line has to be a trivial one *and* the two sides have to
+    balance per attribute: `-version` against `+version`. Without that balance a
+    lone `+hash = ...` would read as trivial when it actually adds an attribute
+    corepkgs does not have -- a structural change wearing a trivial line's
+    clothes.
+    """
+    removed: Counter[str] = Counter()
+    added: Counter[str] = Counter()
+    for sign, content in changed(patch):
+        key = _trivial_key(content)
+        if key is None:
+            return False
+        (removed if sign == "-" else added)[key] += 1
+    return bool(removed) and removed == added
 
 
 def render(target: str, comparisons: list[Comparison]) -> Optional[str]:

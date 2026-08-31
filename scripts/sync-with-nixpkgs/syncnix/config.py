@@ -5,6 +5,8 @@ Keeping it separate means a reviewer can audit *what* is synced without reading
 *how* it is synced.
 """
 
+import re
+
 # Where generated patches are written, relative to the corepkgs root.
 PATCHES_DIR = "patches"
 
@@ -288,6 +290,24 @@ IGNORE_FILES = [
     "top-level.nix",
     # keep-sorted end
 ]
+
+
+TRIVIAL_PATTERNS = [
+    # keep-sorted start
+    re.compile(r'^\s*(?P<key>cargoHash|hash|npmDepsHash|outputHash|sha256|sha512|vendorHash)\s*=\s*"[^"]*";\s*(#.*)?$'),
+    re.compile(r'^\s*(?P<key>rev|tag|version)\s*=\s*"[^"]*";\s*(#.*)?$'),
+    # keep-sorted end
+]
+"""Changed lines that carry no design information, only a moved value.
+
+A patch whose every changed line matches one of these -- and whose two sides
+balance per attribute -- is a version bump, not divergence to review. It is
+counted and listed, never diffed into `patches/`.
+
+Each pattern must expose a `key` group naming the attribute, which is what
+lets `-version` be matched against `+version` rather than against `+hash`.
+Add patterns here as more trivial shapes turn up.
+"""
 
 
 LOCAL_ONLY = [

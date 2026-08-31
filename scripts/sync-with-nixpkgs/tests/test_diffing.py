@@ -162,3 +162,58 @@ class TestChangedLines:
         upstream = local.replace("line 2\n", "TOP\n").replace("line 37\n", "BOTTOM\n")
         patch = diffing.render("t.patch", [diffing.compare("p/f.nix", "u.nix", local, upstream, [])])
         assert diffing.changed_lines(patch) == 4
+
+
+def _patch(local, upstream):
+    return diffing.render("t.patch", [diffing.compare("p/f.nix", "u.nix", local, upstream, [])])
+
+
+class TestIsTrivial:
+    def test_version_bump_alone_is_trivial(self):
+        assert diffing.is_trivial(
+            _patch('{\n  version = "1.0";\n}\n', '{\n  version = "2.0";\n}\n')
+        )
+
+    def test_version_and_hash_together_are_trivial(self):
+        local = '{\n  version = "1.0";\n  hash = "sha256-a=";\n}\n'
+        upstream = '{\n  version = "2.0";\n  hash = "sha256-b=";\n}\n'
+        assert diffing.is_trivial(_patch(local, upstream))
+
+    def test_any_other_changed_line_makes_it_substantive(self):
+        local = '{\n  version = "1.0";\n  pname = "a";\n}\n'
+        upstream = '{\n  version = "2.0";\n  pname = "b";\n}\n'
+        assert not diffing.is_trivial(_patch(local, upstream))
+
+    def test_added_attribute_is_not_a_bump(self):
+        # A lone `+hash` adds an attribute corepkgs lacks; nothing moved.
+        local = '{\n  pname = "a";\n}\n'
+        upstream = '{\n  pname = "a";\n  hash = "sha256-b=";\n}\n'
+        assert not diffing.is_trivial(_patch(local, upstream))
+
+    def test_removed_attribute_is_not_a_bump(self):
+        local = '{\n  pname = "a";\n  hash = "sha256-b=";\n}\n'
+        upstream = '{\n  pname = "a";\n}\n'
+        assert not diffing.is_trivial(_patch(local, upstream))
+
+    def test_sides_must_balance_per_attribute(self):
+        # -version against +hash is two different facts, not one move.
+        local = '{\n  version = "1.0";\n  pname = "a";\n}\n'
+        upstream = '{\n  pname = "a";\n  hash = "sha256-b=";\n}\n'
+        assert not diffing.is_trivial(_patch(local, upstream))
+
+    def test_a_note_only_patch_is_not_trivial(self):
+        rendered = diffing.render(
+            "t.patch", [diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True)]
+        )
+        assert not diffing.is_trivial(rendered)
+
+    def test_trailing_comment_does_not_hide_a_bump(self):
+        local = '{\n  version = "1.0"; # pinned\n}\n'
+        upstream = '{\n  version = "2.0"; # pinned\n}\n'
+        assert diffing.is_trivial(_patch(local, upstream))
+
+
+class TestChanged:
+    def test_yields_sign_and_content_without_the_marker(self):
+        changes = list(diffing.changed(_patch("a\nb\nc\n", "a\nX\nc\n")))
+        assert changes == [("-", "b"), ("+", "X")]
