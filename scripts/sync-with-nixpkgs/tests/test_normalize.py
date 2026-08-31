@@ -83,3 +83,42 @@ class TestUpstream:
         text = "  maintainers = [ x ];\n  src = ../os-specific/linux/f.nix;\n  d = libX11;\n"
         v = vocab((r"\blibX11\b", "libx11"))
         assert normalize.upstream(text, v) == "  src = ./f.nix;\n  d = libx11;\n"
+
+
+class TestVocabularyShortcut:
+    """Skipping substitutions that cannot match must not change the result."""
+
+    def test_a_name_introduced_by_an_earlier_rename_is_still_renamed(self):
+        # The shortcut tests the text as it stands, not the original, so the
+        # second pattern must still see the "bar" the first one produced.
+        vocabulary = [
+            (re.compile(r"\bfoo\b"), "bar"),
+            (re.compile(r"\bbar\b"), "baz"),
+        ]
+        assert normalize.rename_vocabulary("foo\n", vocabulary) == "baz\n"
+
+    def test_self_referential_replacement_is_not_reapplied(self):
+        # `re.sub` never rescans its own output, and neither may the shortcut.
+        vocabulary = [(re.compile(r"\bubootPine64\b"), "uboot.ubootPine64")]
+        assert normalize.rename_vocabulary("ubootPine64\n", vocabulary) == "uboot.ubootPine64\n"
+
+    def test_word_boundaries_still_protect_prefixes(self):
+        vocabulary = [(re.compile(r"\bgnumake\b"), "make")]
+        assert normalize.rename_vocabulary("gnumakeBoot\n", vocabulary) == "gnumakeBoot\n"
+
+    def test_absent_name_leaves_text_untouched(self):
+        vocabulary = [(re.compile(r"\bfoo\b"), "bar")]
+        assert normalize.rename_vocabulary("nothing here\n", vocabulary) == "nothing here\n"
+
+
+class TestRequiredText:
+    def test_word_pattern_yields_its_literal(self):
+        assert normalize._required_text(re.compile(r"\bfoo\b")) == "foo"
+
+    def test_escaped_characters_are_unescaped(self):
+        assert normalize._required_text(re.compile(r"\bffmpeg_4\-full\b")) == "ffmpeg_4-full"
+
+    def test_a_real_regex_has_no_shortcut(self):
+        # None means "always run it"; guessing wrong here would drop a rewrite.
+        assert normalize._required_text(re.compile(r"\.\./os-specific/linux/")) is None
+        assert normalize._required_text(re.compile(r"\bfoo(bar)?\b")) is None

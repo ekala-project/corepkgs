@@ -6,6 +6,8 @@ still apply cleanly: the diff's "old" side is the real file on disk.
 """
 
 import re
+from functools import lru_cache
+from typing import Optional
 
 from . import config
 
@@ -24,14 +26,45 @@ def rewrite_paths(text: str) -> str:
     return text
 
 
+_WORD_PATTERN = re.compile(r"^\\b(.+)\\b$")
+_METACHARACTERS = frozenset(".^$*+?{}[]|()")
+
+
+@lru_cache(maxsize=None)
+def _required_text(pattern: re.Pattern[str]) -> Optional[str]:
+    """The plain substring `pattern` cannot possibly match without.
+
+    Every entry in the vocabulary is a `\\bname\\b` word match, so the name
+    itself has to be present for the pattern to fire. Returning it lets the
+    caller skip a substitution with a cheap substring test instead of running
+    the regex engine over the whole file.
+
+    None means "no shortcut available" -- a real regex, which must always run.
+    """
+    match = _WORD_PATTERN.match(pattern.pattern)
+    if match is None:
+        return None
+    literal = re.sub(r"\\(.)", r"\1", match.group(1))
+    return None if any(character in _METACHARACTERS for character in literal) else literal
+
+
 def rename_vocabulary(text: str, vocabulary: Vocabulary) -> str:
     """Rename attributes that corepkgs spells differently from nixpkgs.
 
     The vocabulary is passed in rather than imported so this stays pure and can
     be tested without an alias file on disk. See `syncnix.aliases` for how it is
     built.
+
+    Most files mention almost none of the vocabulary, so each substitution is
+    guarded by a substring test first. The test reads `text` as it stands at
+    that point in the loop, not the original, so a name introduced by an earlier
+    replacement is still seen -- `ubootRaspberryPi` becomes
+    `uboot.ubootRaspberryPi`, and the chaining behaviour is unchanged.
     """
     for pattern, replacement in vocabulary:
+        required = _required_text(pattern)
+        if required is not None and required not in text:
+            continue
         text = pattern.sub(replacement, text)
     return text
 
@@ -74,7 +107,13 @@ def drop_meta_bindings(text: str) -> str:
 
     corepkgs carries none of them, so importing them would add noise to every
     package patch and produce content this repo's `check-meta` rejects outright.
+
+    Plenty of files mention none of the three, and for those a few substring
+    scans are cheaper than splitting the file into lines and walking it.
     """
+    if not any(name in text for name in config.DROPPED_META_BINDINGS):
+        return text
+
     lines = text.split("\n")
     kept: list[str] = []
     index = 0
