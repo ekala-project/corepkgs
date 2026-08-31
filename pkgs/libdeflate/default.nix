@@ -14,6 +14,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "libdeflate";
   version = "1.25";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "ebiggers";
     repo = "libdeflate";
