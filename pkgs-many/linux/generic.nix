@@ -63,7 +63,7 @@ let
     testing =
       let
         testingKernel = linux-support.buildMainlineKernel "testing";
-        latestKernel = linux-support.buildMainlineKernel "6.18";
+        latestKernel = linux-support.buildMainlineKernel "7.2";
       in
       wrapKernel (
         if latestKernel.kernelAtLeast testingKernel.baseVersion then latestKernel else testingKernel

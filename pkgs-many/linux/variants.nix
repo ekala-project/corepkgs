@@ -27,14 +27,19 @@ in
     version = allKernels."6.12".version;
     isLTS = allKernels."6.12".lts;
   };
-  v6_17 = {
-    branch = "6.17";
-    version = allKernels."6.17".version;
-    isLTS = allKernels."6.17".lts;
-  };
   v6_18 = {
     branch = "6.18";
     version = allKernels."6.18".version;
     isLTS = allKernels."6.18".lts;
+  };
+  v7_1 = {
+    branch = "7.1";
+    version = allKernels."7.1".version;
+    isLTS = allKernels."7.1".lts;
+  };
+  v7_2 = {
+    branch = "7.2";
+    version = allKernels."7.2".version;
+    isLTS = allKernels."7.2".lts;
   };
 }
