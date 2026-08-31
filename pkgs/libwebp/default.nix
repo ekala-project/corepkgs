@@ -38,6 +38,12 @@ stdenv.mkDerivation rec {
   pname = "libwebp";
   version = "1.6.0";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "webmproject";
     repo = "libwebp";
