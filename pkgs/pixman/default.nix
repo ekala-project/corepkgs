@@ -16,6 +16,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "pixman";
   version = "0.46.4";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitLab {
     domain = "gitlab.freedesktop.org";
     owner = "pixman";
