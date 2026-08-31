@@ -11,6 +11,12 @@ stdenv.mkDerivation rec {
   pname = "libipt";
   version = "2.2";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "intel";
     repo = "libipt";
