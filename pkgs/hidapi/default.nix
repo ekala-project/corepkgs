@@ -13,6 +13,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "hidapi";
   version = "0.15.0";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "libusb";
     repo = "hidapi";
