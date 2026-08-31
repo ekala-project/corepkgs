@@ -10,6 +10,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "cmocka";
   version = "1.1.8";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchurl {
     url = "https://cmocka.org/files/${lib.versions.majorMinor finalAttrs.version}/cmocka-${finalAttrs.version}.tar.xz";
     hash = "sha256-WENbVYdm1/THKboWO9867Di+07x2batoTjUm7Qqnx4A=";
