@@ -10,6 +10,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "svt-av1";
   version = "2.3.0";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitLab {
     owner = "AOMediaCodec";
     repo = "SVT-AV1";
