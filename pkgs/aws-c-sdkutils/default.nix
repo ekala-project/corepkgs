@@ -11,6 +11,12 @@ stdenv.mkDerivation rec {
   pname = "aws-c-sdkutils";
   version = "0.2.9";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-sdkutils";
