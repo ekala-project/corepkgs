@@ -11,6 +11,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "libharu";
   version = "2.4.6";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "libharu";
     repo = "libharu";
