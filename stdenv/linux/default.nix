@@ -56,10 +56,8 @@
 {
   lib,
   localSystem,
-  crossSystem,
   config,
   overlays,
-  crossOverlays ? [ ],
 
   bootstrapFiles ?
     let
@@ -120,8 +118,6 @@
     in
     (config.replaceBootstrapFiles or lib.id) files,
 }:
-
-assert crossSystem == localSystem;
 
 let
   inherit (localSystem) system;
