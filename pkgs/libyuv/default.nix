@@ -10,6 +10,12 @@ stdenv.mkDerivation {
   pname = "libyuv";
   version = "1908"; # Defined in: include/libyuv/version.h
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchgit {
     url = "https://chromium.googlesource.com/libyuv/libyuv.git";
     rev = "b7a857659f8485ee3c6769c27a3e74b0af910746"; # upstream does not do tagged releases
