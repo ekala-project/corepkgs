@@ -28,6 +28,34 @@ with final;
     inherit (stdenv.buildPlatform) system;
   };
 
+  # The full-source bootstrap: a toolchain grown from the hex0 seed in
+  # stage0-posix rather than from a prebuilt tarball. It lives in its own scope
+  # so that a stray `callPackage` cannot reach a top-level package and quietly
+  # reintroduce the binary seed it exists to avoid; every input it is allowed to
+  # see is listed below.
+  minimal-bootstrap = lib.recurseIntoAttrs (
+    import ./build-support/minimal-bootstrap {
+      inherit lib config;
+      inherit (stdenv) buildPlatform hostPlatform;
+      fetchurl = fetchurl-bootstrap;
+      checkMeta = import ./stdenv/generic/check-meta.nix {
+        inherit lib config;
+      };
+    }
+  );
+
+  minimal-bootstrap-sources =
+    callPackage ./build-support/minimal-bootstrap/stage0-posix/bootstrap-sources.nix
+      {
+        inherit (stdenv) hostPlatform;
+      };
+
+  make-minimal-bootstrap-sources =
+    callPackage ./build-support/minimal-bootstrap/stage0-posix/make-bootstrap-sources.nix
+      {
+        inherit (stdenv) hostPlatform;
+      };
+
   nix-update-script = callPackage ./pkgs/nix-update-script { };
   nix-update = null;
   nixos = null;
