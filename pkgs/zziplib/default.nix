@@ -15,6 +15,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "zziplib";
   version = "0.13.80";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "gdraheim";
     repo = "zziplib";
