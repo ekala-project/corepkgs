@@ -97,7 +97,7 @@ in
     };
 
     handleEvalIssue = mkOption {
-      type = types.nullOr (types.functionTo (types.functionTo types.unspecified));
+      type = types.functionTo (types.functionTo types.unspecified);
       description = ''
         A hook deciding what to do when `check-meta` refuses a package.
 
@@ -109,7 +109,10 @@ in
 
         Left unset, every rejection throws.
       '';
-      default = null;
+      # `check-meta` dispatches on `config ? handleEvalIssue`, which a declared
+      # option always satisfies, so the throw has to live in the default.
+      default = _reason: msg: throw msg;
+      defaultText = literalExpression "reason: msg: throw msg";
       example = literalExpression ''
         {
           handleEvalIssue =
