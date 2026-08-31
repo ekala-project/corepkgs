@@ -22,7 +22,6 @@ let
     optional
     optionalString
     seq
-    unsafeGetAttrPos
     warn
     all
     ;
@@ -32,7 +31,6 @@ let
     elem
     isList
     toList
-    unique
     ;
 
   inherit (lib.meta)
@@ -276,9 +274,6 @@ let
         in
         either licenseType (listOf licenseType);
       sourceProvenance = listOf attrs;
-      maintainers = listOf attrs; # TODO use the maintainer type from lib/tests/maintainer-module.nix
-      nonTeamMaintainers = listOf attrs; # TODO use the maintainer type from lib/tests/maintainer-module.nix
-      teams = listOf attrs; # TODO similar to maintainers, use a teams type
       priority = int;
       pkgConfigModules = listOf str;
       inherit platforms;
@@ -312,10 +307,6 @@ let
       isFcitxEngine = bool;
       isIbusEngine = bool;
       isGutenprint = bool;
-
-      # Used for the original location of the maintainer and team attributes to assist with pings.
-      maintainersPosition = any;
-      teamsPosition = any;
 
       identifiers = attrs;
     };
@@ -463,8 +454,6 @@ let
     let
       outputs = attrs.outputs or [ "out" ];
       hasOutput = out: elem out outputs;
-      maintainersPosition = unsafeGetAttrPos "maintainers" (attrs.meta or { });
-      teamsPosition = unsafeGetAttrPos "teams" (attrs.meta or { });
     in
     {
       # `name` derivation attribute includes cross-compilation cruft,
@@ -493,28 +482,11 @@ let
         )
       ]
       ++ optional (hasOutput "man") "man";
-
-      # CI scripts look at these to determine pings. Note that we should filter nulls out of this,
-      # or nix-env complains: https://github.com/NixOS/nix/blob/2.18.8/src/nix-env/nix-env.cc#L963
-      ${if maintainersPosition == null then null else "maintainersPosition"} = maintainersPosition;
-      ${if teamsPosition == null then null else "teamsPosition"} = teamsPosition;
     }
     // attrs.meta or { }
     // {
       # Fill `meta.position` to identify the source location of the package.
       ${if pos == null then null else "position"} = pos.file + ":" + toString pos.line;
-
-      # Maintainers should be inclusive of teams.
-      # Note that there may be external consumers of this API (repology, for instance) -
-      # if you add a new maintainer or team attribute please ensure that this expectation is still met.
-      maintainers = unique (
-        attrs.meta.maintainers or [ ] ++ concatMap (team: team.members or [ ]) attrs.meta.teams or [ ]
-      );
-
-      # Needed for CI to be able to avoid requesting reviews from individual
-      # team members.
-      # Prefer nonTeamMaintainers in case meta is copied from another package
-      nonTeamMaintainers = attrs.meta.nonTeamMaintainers or attrs.meta.maintainers or [ ];
 
       identifiers =
         let

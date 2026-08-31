@@ -73,29 +73,6 @@ rec {
   };
 
   kinds = {
-    maintainerless = {
-      manualAllowed = false;
-      isUnique = false;
-      nixpkgsInternalUseAllowed = true;
-      automatic = {
-        condition =
-          # To get usable output, we want to avoid flagging "internal" derivations.
-          # Because we do not have a way to reliably decide between internal or
-          # external derivation, some heuristics are required to decide.
-          #
-          # If `outputHash` is defined, the derivation is a FOD, such as the output of a fetcher.
-          # If `description` is not defined, the derivation is probably not a package.
-          # Simply checking whether `meta` is defined is insufficient,
-          # as some fetchers and trivial builders do define meta.
-          config: attrs:
-          # Order of checks optimised for short-circuiting the common case of having maintainers
-          (attrs.meta.maintainers or [ ] == [ ])
-          && (attrs.meta.teams or [ ] == [ ])
-          && (!attrs ? outputHash)
-          && (attrs ? meta.description);
-        value.message = "This package has no declared maintainer, i.e. an empty `meta.maintainers` and `meta.teams` attribute.";
-      };
-    };
     broken = {
       manualAllowed = true;
       isUnique = false;
@@ -241,7 +218,7 @@ rec {
         '';
         example = [
           {
-            kind = "maintainerless";
+            kind = "deprecated";
             handler = "warn";
           }
           {
