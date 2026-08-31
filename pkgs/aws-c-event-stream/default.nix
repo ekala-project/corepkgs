@@ -16,6 +16,12 @@ stdenv.mkDerivation rec {
   pname = "aws-c-event-stream";
   version = "0.7.1";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-event-stream";
