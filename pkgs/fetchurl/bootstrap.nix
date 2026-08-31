@@ -9,7 +9,7 @@ in
   urls ? [ ],
   sha256 ? "",
   hash ? "",
-  name ? "bootstrap-" + baseNameOf (toString url),
+  name ? baseNameOf (toString url),
 }:
 
 # assert exactly one hash is set
