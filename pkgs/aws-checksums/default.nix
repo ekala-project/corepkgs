@@ -11,6 +11,12 @@ stdenv.mkDerivation rec {
   pname = "aws-checksums";
   version = "0.2.10";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-checksums";
