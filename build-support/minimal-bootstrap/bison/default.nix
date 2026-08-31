@@ -14,7 +14,7 @@
   findutils,
   tar,
   xz,
-  gnum4,
+  m4,
 }:
 let
   pname = "bison";
@@ -40,7 +40,7 @@ bash.runCommand "${pname}-${version}"
       findutils
       tar
       xz
-      gnum4
+      m4
     ];
 
     passthru.tests.get-version =

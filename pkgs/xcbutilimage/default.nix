@@ -3,7 +3,7 @@
   stdenv,
   fetchurl,
   pkg-config,
-  gnum4,
+  m4,
   xorgproto,
   libxcb,
   xcbutil,
@@ -26,7 +26,7 @@ stdenv.mkDerivation (finalAttrs: {
   strictDeps = true;
 
   nativeBuildInputs = [
-    gnum4
+    m4
     pkg-config
   ];
 

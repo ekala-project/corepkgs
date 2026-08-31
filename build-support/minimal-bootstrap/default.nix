@@ -181,7 +181,7 @@ lib.makeScope
           tar = tar-latest;
         };
 
-        gnum4 = callPackage ./gnum4 {
+        m4 = callPackage ./m4 {
           gcc = gcc-latest;
           make = make-musl;
           tar = tar-latest;
@@ -419,7 +419,7 @@ lib.makeScope
             echo ${gawk.tests.get-version}
             echo ${gawk-mes.tests.get-version}
             echo ${grep.tests.get-version}
-            echo ${gnum4.tests.get-version}
+            echo ${m4.tests.get-version}
             echo ${make-musl.tests.get-version}
             echo ${sed.tests.get-version}
             echo ${sed-mes.tests.get-version}

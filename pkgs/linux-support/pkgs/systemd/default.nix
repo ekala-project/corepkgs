@@ -9,7 +9,7 @@
   makeBinaryWrapper,
   ninja,
   meson,
-  gnum4,
+  m4,
   pkg-config,
   coreutils,
   gperf,
@@ -334,7 +334,7 @@ stdenv.mkDerivation (finalAttrs: {
     meson
     meson.configurePhaseHook
     glibcLocales
-    gnum4
+    m4
     autoPatchelfHook
 
     intltool

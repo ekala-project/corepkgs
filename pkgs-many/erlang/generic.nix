@@ -24,7 +24,7 @@
 {
   fetchFromGitHub,
   gawk,
-  gnum4,
+  m4,
   sed,
   lib,
   libGL,
@@ -98,7 +98,7 @@ stdenv.mkDerivation {
   nativeBuildInputs = [
     makeWrapper
     perl
-    gnum4
+    m4
     libxslt
     libxml2
   ];

@@ -4,7 +4,7 @@ nvidia_x11: sha256:
   stdenv,
   lib,
   fetchFromGitHub,
-  gnum4,
+  m4,
   glibc,
   libtirpc,
   pkg-config,
@@ -28,7 +28,7 @@ stdenv.mkDerivation {
   NIX_LDFLAGS = [ "-ltirpc" ];
 
   nativeBuildInputs = [
-    gnum4
+    m4
     pkg-config
   ];
 

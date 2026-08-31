@@ -386,7 +386,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
           bison
           texinfo
           zlib
-          gnum4
+          m4
           perl
           patchelf
           ;
@@ -501,7 +501,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
           coreutils
           grep
           perl
-          gnum4
+          m4
           bison
           texinfo
           which
@@ -615,7 +615,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
             perl
             patchelf
             linuxHeaders
-            gnum4
+            m4
             bison
             libidn2
             libunistring
@@ -677,7 +677,7 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
         # other purposes (binutils and top-level pkgs) too.
         inherit (prevStage)
           gettext
-          gnum4
+          m4
           bison
           perl
           texinfo

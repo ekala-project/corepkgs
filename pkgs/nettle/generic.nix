@@ -3,7 +3,7 @@
   stdenv,
   buildPackages,
   gmp,
-  gnum4,
+  m4,
 
   # Version specific args
   version,
@@ -22,7 +22,7 @@ stdenv.mkDerivation {
   outputBin = "dev";
 
   depsBuildBuild = [ buildPackages.stdenv.cc ];
-  nativeBuildInputs = [ gnum4 ];
+  nativeBuildInputs = [ m4 ];
   propagatedBuildInputs = [ gmp ];
 
   configureFlags =

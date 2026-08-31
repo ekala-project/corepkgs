@@ -17,7 +17,7 @@
   xz,
 }:
 let
-  pname = "gnum4";
+  pname = "m4";
   version = "1.4.21";
 
   src = fetchurl {

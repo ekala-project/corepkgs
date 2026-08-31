@@ -3,7 +3,7 @@
   stdenv,
   fetchurl,
   fetchFromGitHub,
-  gnum4,
+  m4,
   cmake,
   perl,
   writeScript,
@@ -45,7 +45,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   nativeBuildInputs = [
-    gnum4
+    m4
     cmake
     perl
   ];

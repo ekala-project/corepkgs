@@ -85,6 +85,7 @@ mapAliases {
   gmp6 = gmp.v6_3;
   gmpxx = gmp.withCxx;
   gnugrep = grep;
+  gnum4 = m4;
   gnumake = make;
   gnupatch = patch;
   gnused = sed;
@@ -155,7 +156,6 @@ mapAliases {
   luajit_2_0 = lua.luajit_2_0;
   luajit_2_1 = lua.luajit_2_1;
   luajit_openresty = lua.luajit_openresty;
-  m4 = gnum4;
   man = man-db;
   ncurses5 = ncurses.v5;
   ncurses6 = ncurses.v6;
