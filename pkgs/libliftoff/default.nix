@@ -12,6 +12,11 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "libliftoff";
   version = "0.5.0";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+
   src = fetchFromGitLab {
     domain = "gitlab.freedesktop.org";
     owner = "emersion";
