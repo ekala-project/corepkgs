@@ -19,7 +19,7 @@
   lib,
   stdenv,
   fetchurl,
-  gnum4,
+  m4,
   buildPackages,
   withStatic ? stdenv.hostPlatform.isStatic,
   runUnitTests,
@@ -51,7 +51,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   strictDeps = true;
   depsBuildBuild = [ buildPackages.stdenv.cc ];
-  nativeBuildInputs = [ gnum4 ];
+  nativeBuildInputs = [ m4 ];
 
   configureFlags = [
     "--with-pic"

@@ -18,7 +18,7 @@
   gnome,
   libselinux,
   bash,
-  gnum4,
+  m4,
   libxslt,
   docutils,
   gi-docgen,
@@ -168,7 +168,7 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals (!stdenv.hostPlatform.isWindows) [
     bash
-    gnum4 # install glib-gettextize and m4 macros for other apps to use
+    m4 # install glib-gettextize and m4 macros for other apps to use
   ]
   ++ lib.optionals (lib.meta.availableOn stdenv.hostPlatform elfutils) [
     elfutils

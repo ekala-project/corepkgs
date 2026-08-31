@@ -5,7 +5,7 @@
   pkg-config,
   libxcb,
   xorgproto,
-  gnum4,
+  m4,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -25,7 +25,7 @@ stdenv.mkDerivation (finalAttrs: {
   strictDeps = true;
 
   nativeBuildInputs = [
-    gnum4
+    m4
     pkg-config
   ];
 

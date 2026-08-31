@@ -6,7 +6,7 @@
   fetchpatch,
   meson,
   ninja,
-  gnum4,
+  m4,
   gperf,
   getent,
   acl,
@@ -49,7 +49,7 @@ stdenv.mkDerivation rec {
     meson
     meson.configurePhaseHook
     ninja
-    gnum4
+    m4
     pkg-config
     gperf
     getent

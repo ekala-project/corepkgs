@@ -26,6 +26,7 @@ PATH_MAPPINGS = {
     "build-support": "pkgs/build-support",
     "build-support/minimal-bootstrap": "pkgs/os-specific/linux/minimal-bootstrap",
     "build-support/minimal-bootstrap/grep": "pkgs/os-specific/linux/minimal-bootstrap/gnugrep",
+    "build-support/minimal-bootstrap/m4": "pkgs/os-specific/linux/minimal-bootstrap/gnum4",
     "build-support/minimal-bootstrap/make": "pkgs/os-specific/linux/minimal-bootstrap/gnumake",
     "build-support/minimal-bootstrap/patch": "pkgs/os-specific/linux/minimal-bootstrap/gnupatch",
     "build-support/minimal-bootstrap/sed": "pkgs/os-specific/linux/minimal-bootstrap/gnused",
@@ -46,6 +47,7 @@ PATH_MAPPINGS = {
     "pkgs/linux/kernel/kernel-config.nix": "nixos/modules/system/boot/kernel_config.nix",
     "pkgs/linux/pkgs": "pkgs/os-specific/linux",
     "pkgs/llvm": "pkgs/development/compilers/llvm",
+    "pkgs/m4": "pkgs/by-name/gn/gnum4",
     "pkgs/make": "pkgs/by-name/gn/gnumake",
     "pkgs/nix": "pkgs/tools/package-management/nix",
     "pkgs/openssh": "pkgs/tools/networking/openssh",
@@ -102,7 +104,6 @@ ALIAS_EXCLUSIONS = {
     "SDL",  # nixpkgs aliases it too, so both trees already write SDL
     "SDL2",  # nixpkgs aliases it too
     "clj",  # nixpkgs aliases it too
-    "m4",  # corepkgs keeps gnum4 canonical, so upstream already agrees
     "man",  # too generic: matches `bintools ? man` and `man unshare` in prose
     "ncurses5",  # nixpkgs aliases it too
     "r",  # too generic: matches `jq -r` and `-r | --relocatable`

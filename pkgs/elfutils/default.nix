@@ -6,7 +6,7 @@
   pkg-config,
   musl-fts,
   musl-obstack,
-  gnum4,
+  m4,
   zlib,
   zstd,
   bzip2,
@@ -86,7 +86,7 @@ stdenv.mkDerivation rec {
   # We need bzip2 in NativeInputs because otherwise we can't unpack the src,
   # as the host-bzip2 will be in the path.
   nativeBuildInputs = [
-    gnum4
+    m4
     bison
     flex
     gettext
