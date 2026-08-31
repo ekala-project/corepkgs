@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, config, ... }:
 
 let
   inherit (lib)
@@ -138,5 +138,27 @@ in
         }
       '';
     };
+
+    problems = (import ../stdenv/generic/problems.nix { inherit lib; }).configOptions;
+  };
+
+  config = {
+    # Collect the assertions from the problems.matchers.* submodules and
+    # propagate them into the top-level `assertions` list.
+    assertions = lib.concatMap (matcher: matcher.assertions) config.problems.matchers;
+
+    # A plain value rather than `mkDefault`, so that it merges with any
+    # user-supplied matchers instead of being overridden by them.
+    problems.matchers = [
+      {
+        kind = "broken";
+        handler = "error";
+      }
+      # Be loud and clear about package removals
+      {
+        kind = "removal";
+        handler = "warn";
+      }
+    ];
   };
 }

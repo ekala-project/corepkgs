@@ -1,5 +1,11 @@
 { lib, config }:
 
+let
+  checkMeta = import ./check-meta.nix {
+    inherit lib config;
+  };
+in
+
 stdenv:
 
 let
@@ -64,13 +70,6 @@ let
     :::
   */
   mkDerivation = fnOrAttrs: makeDerivationExtensible (toFunction fnOrAttrs);
-
-  checkMeta = import ./check-meta.nix {
-    inherit lib config;
-    # Nix itself uses the `system` field of a derivation to decide where
-    # to build it. This is a bit confusing for cross compilation.
-    inherit (stdenv) hostPlatform;
-  };
 
   # Based off lib.makeExtensible, with modifications:
   makeDerivationExtensible =
@@ -190,6 +189,11 @@ let
     extraSandboxProfile
     __extraImpureHostDeps
     ;
+
+  # Nix itself uses the `system` field of a derivation to decide where
+  # to build it. This is a bit confusing for cross compilation.
+  commonMeta = checkMeta.commonMeta hostPlatform;
+  assertValidity = checkMeta.assertValidity hostPlatform;
 
   stdenvHasCC = stdenv.hasCC;
   stdenvShell = stdenv.shell;
@@ -824,7 +828,7 @@ let
         }
       );
 
-      meta = checkMeta.commonMeta {
+      meta = commonMeta {
         inherit validity attrs pos;
         references =
           attrs.nativeBuildInputs or [ ]
@@ -832,7 +836,7 @@ let
           ++ attrs.propagatedNativeBuildInputs or [ ]
           ++ attrs.propagatedBuildInputs or [ ];
       };
-      validity = checkMeta.assertValidity { inherit meta attrs; };
+      validity = assertValidity { inherit meta attrs; };
 
       checkedEnv =
         let
