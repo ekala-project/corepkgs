@@ -9,6 +9,12 @@ stdenv.mkDerivation rec {
   pname = "catch2";
   version = "3.15.3";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "catchorg";
     repo = "Catch2";
