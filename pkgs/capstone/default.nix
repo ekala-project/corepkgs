@@ -10,6 +10,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "capstone";
   version = "6.0.0-Alpha9";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "capstone-engine";
     repo = "capstone";
