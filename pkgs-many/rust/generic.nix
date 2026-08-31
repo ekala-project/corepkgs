@@ -1,17 +1,30 @@
+# New rust versions should first go to staging.
+# Things to check after updating:
+# 1. Rustc should produce rust binaries on x86_64-linux, aarch64-linux and x86_64-darwin:
+#    i.e. nix-shell -p fd or @GrahamcOfBorg build fd on github
+#    This testing can be also done by other volunteers as part of the pull
+#    request review, in case platforms cannot be covered.
+# 2. The LLVM version used for building should match with rust upstream.
+#    Check the version number in the src/llvm-project git submodule in:
+#    https://github.com/rust-lang/rust/blob/<version-tag>/.gitmodules
+
+# First parameter set: variant args from variants.nix (injected by mkManyVariants)
 {
   rustcVersion,
   rustcSha256,
-  enableRustcDev ? true,
   bootstrapVersion,
   bootstrapHashes,
   selectRustPackage,
   rustcPatches ? [ ],
-  llvmShared,
-  llvmSharedForBuild,
-  llvmSharedForHost,
-  llvmSharedForTarget,
-  llvmPackages, # Exposed through rustc for LTO in Firefox
-}:
+  enableRustcDev ? true,
+  mkVariantPassthru,
+  packageAtLeast,
+  packageOlder,
+  packageBetween,
+  ...
+}@variantArgs:
+
+# Second parameter set: package dependencies (resolved by callPackage)
 {
   stdenv,
   lib,
@@ -20,12 +33,37 @@
   pkgsBuildBuild,
   pkgsBuildHost,
   pkgsBuildTarget,
+  pkgsHostTarget,
   pkgsTargetTarget,
   makeRustPlatform,
   wrapRustcWith,
-}:
+  llvmPackages,
+  llvm,
+  wrapCCWith,
+  overrideCC,
+}@args:
 
 let
+  llvmSharedFor =
+    pkgSet:
+    pkgSet.llvmPackages.libllvm.override (
+      {
+        enableSharedLibraries = true;
+      }
+      // lib.optionalAttrs (stdenv.targetPlatform.useLLVM or false) {
+        # Force LLVM to compile using clang + LLVM libs when targeting pkgsLLVM
+        stdenv = pkgSet.stdenv.override {
+          allowedRequisites = null;
+          cc = pkgSet.pkgsBuildHost.llvmPackages.clangUseLLVM;
+        };
+      }
+    );
+
+  llvmShared = llvmSharedFor pkgsHostTarget;
+  llvmSharedForBuild = llvmSharedFor pkgsBuildBuild;
+  llvmSharedForHost = llvmSharedFor pkgsBuildHost;
+  llvmSharedForTarget = llvmSharedFor pkgsBuildTarget;
+
   # Use `import` to make sure no packages sneak in here.
   lib' = import ../../build-support/rust/lib {
     inherit
@@ -36,35 +74,11 @@ let
       pkgsTargetTarget
       ;
   };
+
   # Allow faster cross compiler generation by reusing Build artifacts
   fastCross =
     (stdenv.buildPlatform == stdenv.hostPlatform) && (stdenv.hostPlatform != stdenv.targetPlatform);
-in
-{
-  lib = lib';
 
-  # Backwards compat before `lib` was factored out.
-  inherit (lib')
-    toTargetArch
-    toTargetOs
-    toRustTarget
-    toRustTargetSpec
-    IsNoStdTarget
-    toRustTargetForUseInEnvVars
-    envVars
-    ;
-
-  # This just contains tools for now. But it would conceivably contain
-  # libraries too, say if we picked some default/recommended versions to build
-  # by Hydra.
-  #
-  # In the end game, rustc, the rust standard library (`core`, `std`, etc.),
-  # and cargo would themselves be built with `buildRustCreate` like
-  # everything else. Tools and `build.rs` and procedural macro dependencies
-  # would be taken from `buildRustPackages` (and `bootstrapRustPackages` for
-  # anything provided prebuilt or their build-time dependencies to break
-  # cycles / purify builds). In this way, nixpkgs would be in control of all
-  # bootstrapping.
   packages = {
     prebuilt = callPackage ./bootstrap.nix {
       version = bootstrapVersion;
@@ -132,4 +146,25 @@ in
       }
     );
   };
-}
+
+  mainRustc = packages.stable.rustc;
+in
+mainRustc.overrideAttrs (oldAttrs: {
+  passthru = (oldAttrs.passthru or { }) // {
+    inherit packages;
+    pkgs = packages.stable;
+
+    lib = lib';
+
+    # Backwards compat before `lib` was factored out.
+    inherit (lib')
+      toTargetArch
+      toTargetOs
+      toRustTarget
+      toRustTargetSpec
+      IsNoStdTarget
+      toRustTargetForUseInEnvVars
+      envVars
+      ;
+  };
+})

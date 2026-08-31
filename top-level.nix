@@ -2053,11 +2053,10 @@ with final;
   wrapRustcWith = { rustc-unwrapped, ... }@args: callPackage ./build-support/rust/rustc-wrapper args;
   wrapRustc = rustc-unwrapped: wrapRustcWith { inherit rustc-unwrapped; };
 
-  rust_1_91 = callPackage ./pkgs/rust/1_91.nix { };
-  rust = rust_1_91;
-
-  rustPackages_1_91 = rust_1_91.packages.stable;
-  rustPackages = rustPackages_1_91;
+  # Rust is auto-imported from pkgs-many/rust via mkManyVariants
+  # Individual versions: rust.v1_91, rust.v1_98, etc.
+  # Package scopes: rust.pkgs, rust.v1_91.pkgs, etc.
+  rustPackages = rust.pkgs;
 
   inherit (rustPackages)
     cargo
