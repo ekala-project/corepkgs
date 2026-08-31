@@ -60,3 +60,14 @@ class TestLocalOnly:
 
         overlap = [entry for entry in config.LOCAL_ONLY if paths.is_ignored(entry)]
         assert not overlap, overlap
+
+
+class TestTrivialPatterns:
+    def test_every_pattern_names_the_attribute(self):
+        # `key` is what lets -version be matched against +version, not +hash.
+        for pattern in config.TRIVIAL_PATTERNS:
+            assert "key" in pattern.groupindex, pattern.pattern
+
+    def test_patterns_do_not_match_ordinary_bindings(self):
+        for line in ('  pname = "curl";', "  doCheck = true;", '  src = fetchurl { };'):
+            assert all(p.match(line) is None for p in config.TRIVIAL_PATTERNS), line

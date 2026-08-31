@@ -46,7 +46,28 @@ question for a person:
 - `opaque-files.txt` — patch files and symlinks that differ, compared without
   being diffed
 
-All four are empty in a healthy tree.
+All four are empty in a healthy tree. One more is not a problem report:
+
+- `version-bumps.txt` — packages whose only divergence is a moved value
+
+## Trivial divergence
+
+A patch whose every changed line matches `TRIVIAL_PATTERNS` — and whose two
+sides balance per attribute — is a version bump, not a design difference. It is
+counted and listed in `version-bumps.txt`, never written into `patches/`, and
+never treated as drift, so `--strict` stays quiet for it.
+
+The balance requirement is what keeps this honest. `-version` must be answered
+by `+version`; a lone `+hash = ...` adds an attribute corepkgs does not have,
+which is structural even though the line looks trivial.
+
+Nothing is ever filtered *out of* a diff — a patch is either held back whole or
+diffed whole. Deleting lines from a generated diff would leave context
+describing a state that never existed, and the patch would stop applying.
+
+Add patterns to `TRIVIAL_PATTERNS` in `config.py` as more shapes turn up. Each
+must expose a `key` group naming the attribute, which is what makes the
+balancing possible.
 
 ## How a patch is built
 
