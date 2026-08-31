@@ -11,6 +11,12 @@ mesonConfigurePhase() {
         flagsArray+=("--prefix=$prefix")
     fi
 
+    # If the package declares an "include" output, route headers there
+    # automatically without requiring an explicit outputInclude attribute.
+    if [ -n "${include-}" ] && [ "$outputInclude" = "$outputDev" ]; then
+        outputInclude=include
+    fi
+
     # See multiple-outputs.sh and meson’s coredata.py
     flagsArray+=(
         "--libdir=${!outputLib}/lib"

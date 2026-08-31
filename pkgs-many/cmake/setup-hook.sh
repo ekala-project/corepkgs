@@ -140,6 +140,26 @@ cmakeConfigurePhase() {
     runHook postConfigure
 }
 
+_fixCmakeIncludeDir() {
+    # When the include output is different from the main output, CMake-generated
+    # target files may contain INTERFACE_INCLUDE_DIRECTORIES entries relative to
+    # _IMPORT_PREFIX (e.g. "${_IMPORT_PREFIX}/include") that point into the main
+    # output where headers no longer exist.  Rewrite these to the absolute
+    # include output path so downstream find_package() calls work.
+    if [ "${!outputInclude}" = "${!outputDev}" ] && [ "${!outputInclude}" = "$out" ]; then
+        return
+    fi
+    local f
+    for f in $(find "${!outputLib}" "$out" -name '*.cmake' 2>/dev/null); do
+        if grep -q '${_IMPORT_PREFIX}/include' "$f" 2>/dev/null; then
+            echo "Patching CMake include path in $f to ${!outputInclude}/include"
+            sed -i "s|\\\${_IMPORT_PREFIX}/include|${!outputInclude}/include|g" "$f"
+        fi
+    done
+}
+
+postFixupHooks+=(_fixCmakeIncludeDir)
+
 addEnvHooks "$targetOffset" addCMakeParams
 
 makeCmakeFindLibs(){
