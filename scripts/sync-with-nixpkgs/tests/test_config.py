@@ -19,6 +19,11 @@ def _literal_keys(name: str) -> list[str]:
     return re.findall(r'^\s*"(.+?)":', body, re.M)
 
 
+def _literal_entries(name: str) -> list[str]:
+    body = SOURCE[SOURCE.index(f"{name} = [") : SOURCE.index("]", SOURCE.index(f"{name} = ["))]
+    return re.findall(r'^\s*"(.+?)",', body, re.M)
+
+
 class TestPathMappings:
     def test_no_duplicate_keys(self):
         keys = _literal_keys("PATH_MAPPINGS")
@@ -32,3 +37,26 @@ class TestPathMappings:
         for local, upstream in config.PATH_MAPPINGS.items():
             assert not local.endswith("/") and not upstream.endswith("/")
 
+
+class TestLocalOnly:
+    def test_no_duplicates(self):
+        entries = _literal_entries("LOCAL_ONLY")
+        duplicates = {e for e in entries if entries.count(e) > 1}
+        assert not duplicates, duplicates
+
+    def test_no_entry_is_covered_by_another(self):
+        # A declaration beneath another declaration is dead weight.
+        redundant = [
+            entry
+            for entry in config.LOCAL_ONLY
+            for other in config.LOCAL_ONLY
+            if entry != other and entry.startswith(other + "/")
+        ]
+        assert not redundant, redundant
+
+    def test_declarations_are_not_also_ignored(self):
+        # Ignoring already stops comparison; declaring on top of it says nothing.
+        from syncnix import paths
+
+        overlap = [entry for entry in config.LOCAL_ONLY if paths.is_ignored(entry)]
+        assert not overlap, overlap

@@ -29,9 +29,24 @@ Most divergence in this repo is deliberate and permanent. Accepting it is what
 makes a genuine upstream change visible instead of being buried. `--strict`
 exits non-zero when unaccepted drift exists, for use in a check.
 
-Three reports land in `patches/_reports/` when they are non-empty:
-`unmapped-paths.txt` (needs a `PATH_MAPPINGS` entry or an ignore),
-`missing-in-nixpkgs.txt` (corepkgs-only files), and `opaque-files.txt`.
+Every corepkgs file is accounted for: it pairs with a nixpkgs file, is
+ignored, or is declared in `LOCAL_ONLY` as having no upstream counterpart.
+`LOCAL_ONLY` differs from the ignore lists — those say "do not compare", it says
+"there is nothing to compare against". Keeping it explicit is what lets the
+reports mean something.
+
+Reports land in `patches/_reports/` when they are non-empty, and each one is a
+question for a person:
+
+- `unmapped-paths.txt` — no `PATH_MAPPINGS` entry covers it
+- `missing-in-nixpkgs.txt` — mapped, but upstream no longer has it; either the
+  mapping went stale or upstream removed the file
+- `stale-local-only.txt` — declared corepkgs-only, but nixpkgs has it now; drop
+  the declaration
+- `opaque-files.txt` — patch files and symlinks that differ, compared without
+  being diffed
+
+All four are empty in a healthy tree.
 
 ## How a patch is built
 

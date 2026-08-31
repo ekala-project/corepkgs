@@ -88,3 +88,19 @@ class TestPatchTarget:
 
     def test_ungrouped_path_mirrors_itself(self):
         assert paths.patch_target("stdenv/generic/setup.sh") == "stdenv/generic/setup.sh.patch"
+
+
+class TestLocalOnly:
+    def test_matches_exact_declaration(self, monkeypatch):
+        monkeypatch.setattr(paths.config, "LOCAL_ONLY", ["pkgs/foo/only.nix"])
+        assert paths.is_local_only("pkgs/foo/only.nix")
+        assert not paths.is_local_only("pkgs/foo/other.nix")
+
+    def test_matches_everything_under_a_declared_directory(self, monkeypatch):
+        monkeypatch.setattr(paths.config, "LOCAL_ONLY", ["pkgs/foo"])
+        assert paths.is_local_only("pkgs/foo")
+        assert paths.is_local_only("pkgs/foo/deep/thing.nix")
+
+    def test_requires_a_path_separator(self, monkeypatch):
+        monkeypatch.setattr(paths.config, "LOCAL_ONLY", ["pkgs/foo"])
+        assert not paths.is_local_only("pkgs/foobar/default.nix")
