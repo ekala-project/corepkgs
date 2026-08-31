@@ -171,7 +171,6 @@ PATH_MAPPINGS = {
     "python/pkgs": "pkgs/development/python-modules",
     "python/pkgs/setuptools": "pkgs/development/misc/resholve/python2-modules/setuptools",
     "python/python2": "pkgs/development/misc/resholve/python2",
-    "r": "pkgs/development/r-modules",
     "stdenv": "pkgs/stdenv",
     "stdenv/config.nix": "pkgs/top-level/config.nix",
     "stdenv/generic/meta-types.nix": "lib/meta-types.nix",
@@ -181,7 +180,6 @@ PATH_MAPPINGS = {
     "stdenv/splice.nix": "pkgs/top-level/splice.nix",
     "stdenv/stage.nix": "pkgs/top-level/stage.nix",
     "stdenv/variants.nix": "pkgs/top-level/variants.nix",
-    "systems": "lib/systems",
     "unixtools.nix": "pkgs/top-level/unixtools.nix",
     # keep-sorted end
 }
@@ -251,6 +249,7 @@ DROPPED_META_BINDINGS = (
 IGNORE_DIRS = [
     # keep-sorted start
     ".github",
+    "config",
     "ci",  # corepkgs' own evaluation jobs
     "dev-shell",  # corepkgs-only
     "docs",
@@ -261,6 +260,7 @@ IGNORE_DIRS = [
     "perl",  # too many changes, update manually
     "pkgs-many",
     "pkgs/lndir",  # our minimal implementation
+    "r",
     "scripts",
     "services",
     "stdenv/cygwin",
@@ -326,7 +326,6 @@ LOCAL_ONLY = [
     "build-support/substitute-all",
     "build-support/test-hooks",
     "build-support/testers/pkg-config",
-    "config",
     "pkgs/amd-microcode",
     "pkgs/attr",
     "pkgs/binutils/CVE-2025-5244.diff",
@@ -482,7 +481,6 @@ LOCAL_ONLY = [
     "pkgs/nukeReferences",
     "pkgs/openblas/disable-sme-sgemm-kernel.patch",
     "pkgs/openssh/fix_pkcs11_tests.patch",
-    "pkgs/opentofu/provider-path-0_15.patch",
     "pkgs/patchelf/default.nix",
     "pkgs/pkgconf",
     "pkgs/pnpmConfigHook",
