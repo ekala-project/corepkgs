@@ -11,6 +11,12 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "taskflow";
   version = "4.1.0";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "taskflow";
     repo = "taskflow";
