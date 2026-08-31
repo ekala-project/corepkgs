@@ -96,8 +96,9 @@ lib.makeScope pkgs.newScope (
       };
 
     buildRtKernel =
-      rtFile:
-      callPackage rtFile {
+      branch:
+      callPackage ./kernel/rt/generic.nix {
+        inherit branch;
         kernelPatches = [
           kernelPatches.bridge_stp_helper
           kernelPatches.request_key_helper

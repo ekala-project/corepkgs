@@ -1,0 +1,27 @@
+{
+    "6.12": {
+        "version": "6.12.100-rt20",
+        "hash": "sha256-Z/lzUzQGSS6Gd0usvO+uUNUNXDTL9wPEfsUmpe/c7pA=",
+        "patchHash": "sha256-X84OQrBuAYi29a4yJH+dFm8uo9b5TBF3OlcUfa18uWE="
+    },
+    "6.6": {
+        "version": "6.6.151-rt78",
+        "hash": "sha256-3gHlrnNBK3C860Gm+X2m0PKbZTbx8A+Lam/UDHKZafc=",
+        "patchHash": "sha256-bqySqRo8lM8V8z8zACoj/uJNx8CFpJEd/XzBNyMXvns="
+    },
+    "6.1": {
+        "version": "6.1.182-rt67",
+        "hash": "sha256-84QWu26AJKIa6GjH8pzRUpOnN1XjSEx/L0repbA8H4U=",
+        "patchHash": "sha256-w/VQBkPHEgkV9Meq2xadBTJP0KRFxkCntFBzVzKQBCI="
+    },
+    "5.15": {
+        "version": "5.15.216-rt98",
+        "hash": "sha256-Ca/7IAWuo/RO7D8+q0wZROAHBzVep8p/orprNKgmBe0=",
+        "patchHash": "sha256-zlXDtcQKj9lRg9o5/QZnWTesYf5QcQdBAXPAhJ2v5EU="
+    },
+    "5.10": {
+        "version": "5.10.264-rt160",
+        "hash": "sha256-8nVS7DJ4NRLIGRjDuPFV/tjbr4qQpaIK/cAarHFbSJ4=",
+        "patchHash": "sha256-1DZGvDqLTaaXJwGl/PazDJUJ8eDTsYfULZP3I7g+7Sc="
+    }
+}

@@ -1,7 +1,12 @@
+let
+  allKernels = builtins.fromJSON (builtins.readFile ./kernels-rt.json);
+in
+
 {
+  branch,
   lib,
-  buildLinux,
   fetchurl,
+  buildLinux,
   kernelPatches ? [ ],
   structuredExtraConfig ? { },
   extraMeta ? { },
@@ -10,12 +15,22 @@
 }@args:
 
 let
-  version = "5.15.216-rt98"; # updated by ./update-rt.sh
-  branch = lib.versions.majorMinor version;
+  thisKernel = allKernels.${branch};
+  inherit (thisKernel) version;
+
+  # The RT patch is versioned X.Y.Z-rtN; the tarball it applies to is X.Y.Z.
   kversion = builtins.elemAt (lib.splitString "-" version) 0;
+
+  rt-patch = {
+    name = "rt";
+    patch = fetchurl {
+      url = "mirror://kernel/linux/kernel/projects/rt/${branch}/older/patch-${version}.patch.xz";
+      hash = thisKernel.patchHash;
+    };
+  };
 in
 buildLinux (
-  args
+  (removeAttrs args [ "branch" ])
   // {
     inherit version;
     pname = "linux-rt";
@@ -28,21 +43,14 @@ buildLinux (
         lib.replaceStrings [ "-" ] [ ".0-" ] version;
 
     src = fetchurl {
-      url = "mirror://kernel/linux/kernel/v5.x/linux-${kversion}.tar.xz";
-      hash = "sha256-Ca/7IAWuo/RO7D8+q0wZROAHBzVep8p/orprNKgmBe0=";
+      url = "mirror://kernel/linux/kernel/v${lib.versions.major version}.x/linux-${kversion}.tar.xz";
+      inherit (thisKernel) hash;
     };
 
-    kernelPatches =
-      let
-        rt-patch = {
-          name = "rt";
-          patch = fetchurl {
-            url = "mirror://kernel/linux/kernel/projects/rt/${branch}/older/patch-${version}.patch.xz";
-            hash = "sha256-zlXDtcQKj9lRg9o5/QZnWTesYf5QcQdBAXPAhJ2v5EU=";
-          };
-        };
-      in
-      [ rt-patch ] ++ kernelPatches;
+    kernelPatches = [ rt-patch ] ++ kernelPatches;
+
+    # Every branch the RT project maintains a patch series for is an LTS kernel.
+    isLTS = true;
 
     structuredExtraConfig =
       with lib.kernel;
@@ -56,8 +64,6 @@ buildLinux (
         RT_GROUP_SCHED = lib.mkForce (option no); # Removed by sched-disable-rt-group-sched-on-rt.patch.
       }
       // structuredExtraConfig;
-
-    isLTS = true;
 
     extraMeta = extraMeta // {
       inherit branch;
