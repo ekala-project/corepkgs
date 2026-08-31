@@ -10,6 +10,11 @@ stdenv.mkDerivation rec {
   pname = "spice-protocol";
   version = "0.14.5";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+
   src = fetchurl {
     url = "https://www.spice-space.org/download/releases/${pname}-${version}.tar.xz";
     sha256 = "sha256-uvWESfbonRn0dYma1fuRlv3EbAPMUyM/TjnPKXj5z/c=";
