@@ -59,7 +59,6 @@ PATH_MAPPINGS = {
     "pkgs/xorg": "pkgs/servers/x11/xorg",
     "python": "pkgs/development/interpreters/python",
     "python/pkgs": "pkgs/development/python-modules",
-    "release.nix": "pkgs/top-level/release.nix",
     "stdenv": "pkgs/stdenv",
     "stdenv/config.nix": "pkgs/top-level/config.nix",
     "stdenv/impure.nix": "pkgs/top-level/impure.nix",
@@ -168,6 +167,7 @@ IGNORE_FILES = [
     "lib.nix",
     "pins.nix",
     "stdenv/aliases.nix",  # we have our own aliases
+    "release.nix",
     "top-level.nix",
     # keep-sorted end
 ]
