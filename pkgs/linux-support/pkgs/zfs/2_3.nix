@@ -2,7 +2,6 @@
   callPackage,
   lib,
   stdenv,
-  fetchpatch,
   ...
 }@args:
 
@@ -12,20 +11,12 @@ callPackage ./generic.nix args {
   kernelModuleAttribute = "zfs_2_3";
 
   kernelMinSupportedMajorMinor = "4.18";
-  kernelMaxSupportedMajorMinor = "6.17";
+  kernelMaxSupportedMajorMinor = "7.2";
 
   # this package should point to the latest release.
-  version = "2.3.5";
-
-  extraPatches = [
-    (fetchpatch {
-      name = "fix_llvm-21_-wuninitialized-const-pointer_warning.patch";
-      url = "https://github.com/openzfs/zfs/commit/9acedbaceec362d08a33ebfe7c4c7efcee81d094.patch";
-      hash = "sha256-bjMRuT8gsMuwCnrS5PfG9vYthRvcFaWCCfQbCTVZdpw=";
-    })
-  ];
+  version = "2.3.9";
 
   tests = { };
 
-  hash = "sha256-zTDdoQWbguKeWjQH5+FOTDhxfs3e7UPFnUX8ZugHQy4=";
+  hash = "sha256-LXyicM8neU06Z8Bq0ukZPkJ1ZfAcr2r2YojPfUVpj3k=";
 }

@@ -9,18 +9,18 @@ callPackage ./generic.nix args {
   kernelModuleAttribute = "zfs_unstable";
 
   kernelMinSupportedMajorMinor = "4.18";
-  kernelMaxSupportedMajorMinor = "6.18";
+  kernelMaxSupportedMajorMinor = "7.2";
 
   # this package should point to a version / git revision compatible with the latest kernel release
   # IMPORTANT: Always use a tagged release candidate or commits from the
   # zfs-<version>-staging branch, because this is tested by the OpenZFS
   # maintainers.
-  version = "2.4.0";
+  version = "2.4.4";
   # rev = "";
 
   tests = { };
 
-  hash = "sha256-v78Tn1Im9h8Sjd4XACYesPOD+hlUR3Cmg8XjcJXOuwM=";
+  hash = "sha256-Ps6xc3pLpemZE7fSE1RKIUb5on1fEPOlLZAknDlgZbY=";
 
   extraLongDescription = ''
     This is "unstable" ZFS, and will usually be a pre-release version of ZFS.
