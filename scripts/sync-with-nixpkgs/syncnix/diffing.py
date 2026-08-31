@@ -133,7 +133,7 @@ def render(target: str, comparisons: list[Comparison]) -> Optional[str]:
     ]
     if notes:
         header.append(HEADER_PREFIX)
-        header.append(f"{HEADER_PREFIX} Patch files, replaced by this note rather than diffed:")
+        header.append(f"{HEADER_PREFIX} Compared without diffing (patch files, symlinks):")
         for note in notes:
             header.append(f"{HEADER_PREFIX}   {note.path} <- {note.upstream_path}")
     header.append(HEADER_PREFIX)

@@ -183,3 +183,40 @@ class TestRoots:
                 ["--corepkgs", str(trees.root), "--nixpkgs", str(trees.root / "nope"), "generate"]
             )
         assert (self_patches / "keep.patch").is_file()
+
+
+class TestSymlinks:
+    """A symlink is its target, not the bytes at the other end."""
+
+    def _link(self, base, relative, target):
+        path = base / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.symlink_to(target)
+
+    def test_matching_targets_count_as_identical(self, trees):
+        self._link(trees.root, "pkgs/curl/link.sh", "../../shared/link.sh")
+        self._link(trees.upstream, "pkgs/by-name/cu/curl/link.sh", "../../shared/link.sh")
+        result = survey.run(trees.root, trees.upstream)
+        assert result.patches == {}
+        assert result.opaque_differs == []
+
+    def test_dangling_links_still_match_when_targets_agree(self, trees):
+        # Neither link resolves; they are still the same link.
+        self._link(trees.root, "pkgs/curl/link.sh", "../../../nowhere/link.sh")
+        self._link(trees.upstream, "pkgs/by-name/cu/curl/link.sh", "../../../nowhere/link.sh")
+        result = survey.run(trees.root, trees.upstream)
+        assert result.missing == []
+        assert result.patches == {}
+
+    def test_differing_targets_become_a_note_not_a_diff(self, trees):
+        self._link(trees.root, "pkgs/curl/link.sh", "../../a/link.sh")
+        self._link(trees.upstream, "pkgs/by-name/cu/curl/link.sh", "../../b/link.sh")
+        result = survey.run(trees.root, trees.upstream)
+        assert result.opaque_differs == ["pkgs/curl/link.sh"]
+        assert "@@" not in result.patches["pkgs/curl.patch"]
+
+    def test_link_against_a_regular_file_is_missing(self, trees):
+        self._link(trees.root, "pkgs/curl/link.sh", "../../a/link.sh")
+        trees.remote("pkgs/by-name/cu/curl/link.sh", "real contents\n")
+        result = survey.run(trees.root, trees.upstream)
+        assert result.missing == ["pkgs/curl/link.sh"]
