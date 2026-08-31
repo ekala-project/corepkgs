@@ -13,6 +13,11 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "libslirp";
   version = "4.9.1";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+
   src = fetchFromGitLab {
     domain = "gitlab.freedesktop.org";
     owner = "slirp";
