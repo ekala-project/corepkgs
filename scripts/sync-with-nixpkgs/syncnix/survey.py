@@ -81,11 +81,24 @@ def _compare_one(
         return None
 
     upstream_file = nixpkgs_root / upstream_path
+    local_file = corepkgs_root / path
+
+    # A symlink is defined by its target, not by what it points at: corepkgs
+    # copies the link verbatim, and one that dangles because corepkgs nests
+    # directories differently still matches upstream.
+    if local_file.is_symlink() or upstream_file.is_symlink():
+        if not (local_file.is_symlink() and upstream_file.is_symlink()):
+            survey.missing.append(path)
+            return None
+        differs = os.readlink(local_file) != os.readlink(upstream_file)
+        if differs:
+            survey.opaque_differs.append(path)
+        return diffing.compare_opaque(path, upstream_path, differs)
+
     if not upstream_file.is_file():
         survey.missing.append(path)
         return None
 
-    local_file = corepkgs_root / path
     local_text = _read(local_file)
     upstream_text = _read(upstream_file)
     if local_text is None or upstream_text is None:
