@@ -28,7 +28,7 @@
               enable = true;
               includes = [
                 "*.nix"
-                "scripts/sync-with-nixpkgs/sync.py"
+                "scripts/sync-with-nixpkgs/syncnix/config.py"
               ];
             };
           };
