@@ -17,7 +17,12 @@ def _under(path: str, prefix: str) -> bool:
 
 
 def is_ignored(path: str) -> bool:
-    """True if `path` is excluded from comparison by IGNORE_DIRS/IGNORE_FILES."""
+    """True if `path` is excluded from comparison.
+
+    Checked in increasing cost: suffix, then exact path, then directory prefix.
+    """
+    if path.endswith(config.IGNORE_SUFFIXES):
+        return True
     if path in config.IGNORE_FILES:
         return True
     return any(_under(path, ignored) for ignored in config.IGNORE_DIRS)

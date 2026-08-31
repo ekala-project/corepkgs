@@ -44,6 +44,15 @@ class TestSurvey:
         result = survey.run(trees.root, trees.upstream)
         assert result.missing == ["pkgs/only-here/default.nix"]
 
+    def test_markdown_is_never_compared(self, trees):
+        trees.both(
+            "pkgs/curl/README.md", "pkgs/by-name/cu/curl/README.md", "ours\n", "theirs\n"
+        )
+        result = survey.run(trees.root, trees.upstream)
+        assert result.patches == {}
+        assert result.unmapped == []
+        assert result.missing == []
+
     def test_ignored_tree_is_not_walked(self, trees):
         trees.local("scripts/whatever.py", "x\n")
         result = survey.run(trees.root, trees.upstream)

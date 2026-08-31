@@ -153,20 +153,20 @@ IGNORE_DIRS = [
     # keep-sorted end
 ]
 
+# Suffixes never compared, wherever they appear. Prose diverges from nixpkgs
+# freely and by design, so reviewing it as a patch is pure noise.
+IGNORE_SUFFIXES = (".md",)
+
 # Individual files never compared, matched as exact paths from the corepkgs root.
 IGNORE_FILES = [
     # keep-sorted start
     ".gitignore",
-    "AGENTS.md",
-    "CLAUDE.md",
     "LICENSE",
-    "README.md",
     "default.nix",
     "flake.lock",
     "flake.nix",
     "lib.nix",
     "pins.nix",
-    "stdenv/README.md",
     "stdenv/aliases.nix",  # we have our own aliases
     "top-level.nix",
     # keep-sorted end
