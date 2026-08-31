@@ -10,6 +10,11 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "directx-headers";
   version = "1.619.5";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+
   src = fetchFromGitHub {
     owner = "microsoft";
     repo = "DirectX-Headers";
