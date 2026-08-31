@@ -18,6 +18,12 @@ stdenv.mkDerivation (finalAttrs: {
   version = "1.1.1";
   pname = "libde265";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+  outputInclude = "include";
+
   src = fetchFromGitHub {
     owner = "strukturag";
     repo = "libde265";
