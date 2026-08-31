@@ -10,6 +10,11 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "libxcvt";
   version = "0.1.3";
 
+  outputs = [
+    "out"
+    "include"
+  ];
+
   src = fetchFromGitLab {
     domain = "gitlab.freedesktop.org";
     group = "xorg";
