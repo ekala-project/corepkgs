@@ -305,6 +305,28 @@ class TestSubstantive:
     def test_blank_lines_do_not_hide_a_real_change(self):
         assert _substantive('{\n  a = 1;\n}\n', '{\n\n  a = 2;\n\n}\n')
 
+    def test_the_long_cross_comparison_matches_isCross(self):
+        for long in (
+            "stdenv.hostPlatform != stdenv.buildPlatform",
+            "stdenv.buildPlatform != stdenv.hostPlatform",
+            "hostPlatform != buildPlatform",
+        ):
+            assert not _substantive(f"{{\n  x = {long};\n}}\n", "{\n  x = stdenv.isCross;\n}\n"), long
+
+    def test_the_long_equality_matches_negated_isCross(self):
+        for long in (
+            "stdenv.hostPlatform == stdenv.buildPlatform",
+            "stdenv.buildPlatform == stdenv.hostPlatform",
+        ):
+            assert not _substantive(f"{{\n  x = {long};\n}}\n", "{\n  x = !stdenv.isCross;\n}\n"), long
+
+    def test_the_two_senses_are_not_confused(self):
+        # != is cross, == is not-cross; collapsing them would invert a condition.
+        assert _substantive(
+            "{\n  x = stdenv.hostPlatform != stdenv.buildPlatform;\n}\n",
+            "{\n  x = !stdenv.isCross;\n}\n",
+        )
+
     def test_a_differing_patch_file_is(self):
         assert diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True).substantive
         assert not diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=False).substantive
