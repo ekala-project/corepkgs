@@ -110,6 +110,30 @@ class TestBaselineWorkflow:
         assert _generate(trees, "--strict") == 1
         assert "changed vs accepted" in capsys.readouterr().out
 
+    def test_accepted_divergence_is_not_duplicated_into_patches(self, trees):
+        # The accepted patch is already stored byte for byte under ACCEPTED_DIR.
+        self._diverge(trees)
+        _accept(trees)
+        _generate(trees)
+        assert not (_patches(trees) / "pkgs" / "curl.patch").exists()
+        assert (trees.root / config.ACCEPTED_DIR / "pkgs" / "curl.patch").is_file()
+
+    def test_drift_from_the_baseline_is_written_again(self, trees):
+        self._diverge(trees)
+        _accept(trees)
+        trees.remote("pkgs/by-name/cu/curl/package.nix", "something else\n")
+        _generate(trees)
+        # No longer matches what was accepted, so it needs reading.
+        assert (_patches(trees) / "pkgs" / "curl.patch").is_file()
+
+    def test_an_unaccepted_sibling_is_still_written(self, trees):
+        self._diverge(trees)
+        trees.both("pkgs/wget/default.nix", "pkgs/by-name/wg/wget/package.nix", "a\n", "b\n")
+        _accept(trees, "pkgs/curl.patch")
+        _generate(trees)
+        assert not (_patches(trees) / "pkgs" / "curl.patch").exists()
+        assert (_patches(trees) / "pkgs" / "wget.patch").is_file()
+
     def test_resolved_divergence_is_flagged_as_stale(self, trees, capsys):
         self._diverge(trees)
         _accept(trees)

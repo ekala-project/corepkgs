@@ -29,6 +29,11 @@ Most divergence in this repo is deliberate and permanent. Accepting it is what
 makes a genuine upstream change visible instead of being buried. `--strict`
 exits non-zero when unaccepted drift exists, for use in a check.
 
+`patches/` holds only what still wants reading. An accepted divergence is
+already stored byte for byte under `.sync-accepted/`, so writing it again would
+duplicate it and bury the patches that need attention; it reappears in
+`patches/` the moment it stops matching its baseline.
+
 Every corepkgs file is accounted for: it pairs with a nixpkgs file, is
 ignored, or is declared in `LOCAL_ONLY` as having no upstream counterpart.
 `LOCAL_ONLY` differs from the ignore lists — those say "do not compare", it says
