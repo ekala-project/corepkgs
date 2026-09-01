@@ -291,6 +291,7 @@ let
   # The complete chain of package set layers, applied from top to bottom.
   # stdenvOverrides must be last as it brings packages forward from the
   # previous bootstrapping phases which have already been overlaid.
+  # TODO: each overlay here causes eval performance, do something with it
   toFix = lib.foldl' (lib.flip lib.extends) stdenvBootstrapAndPlatforms (
     [
       stdenvAdapters

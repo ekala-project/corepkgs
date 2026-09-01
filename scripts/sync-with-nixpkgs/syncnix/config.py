@@ -194,7 +194,6 @@ ALIAS_FILES = (
 
 # Measured against every paired file: rewriting these added more diff than it removed.
 ALIAS_EXCLUSIONS = {
-    # keep-sorted start
     "SDL",  # nixpkgs aliases it too, so both trees already write SDL
     "SDL2",  # nixpkgs aliases it too
     "clj",  # nixpkgs aliases it too
@@ -203,19 +202,16 @@ ALIAS_EXCLUSIONS = {
     "r",  # too generic: matches `jq -r` and `-r | --relocatable`
     "su",  # nixpkgs aliases it too
     "xxHash",  # nixpkgs aliases it too
-    # keep-sorted end
 }
 
 # Renames no `aliases.nix` entry can express. Applied after the alias-derived ones.
 EXTRA_VOCABULARY = [
-    # keep-sorted start
     (r"\bdocbook_xsl\b", "docbook-xsl-nons"),
     (r"\bdocbook_xsl_ns\b", "docbook-xsl-ns"),
     (r"\bgnumakeBoot\b", "makeBoot"),
     (r"\bgnutarBoot\b", "tarBoot"),
     (r"\blibX11\b", "libx11"),
     (r"\bnixpkgsArgs\b", "pkgsArgs"),
-    # keep-sorted end
 ]
 
 # Dropped from incoming nixpkgs content; corepkgs carries none of them.
@@ -257,7 +253,6 @@ IGNORE_SUFFIXES = (".md",)
 
 # Individual files never compared, matched as exact paths from the corepkgs root.
 IGNORE_FILES = [
-    # keep-sorted start
     ".gitignore",
     "LICENSE",
     "flake.lock",
@@ -268,19 +263,15 @@ IGNORE_FILES = [
     "release.nix",
     "stdenv/aliases.nix",  # we have our own aliases
     "top-level.nix",
-    # keep-sorted end
 ]
 
 TRIVIAL_PATTERNS = [
-    # keep-sorted start
     re.compile(r'^\s*(?P<key>cargoHash|hash|npmDepsHash|outputHash|sha256|sha512|vendorHash)\s*=\s*"[^"]*";\s*(#.*)?$'),
     re.compile(r'^\s*(?P<key>rev|tag|version)\s*=\s*"[^"]*";\s*(#.*)?$'),
-    # keep-sorted end
 ]
 """Lines that are only a moved value. Each pattern must expose a `key` group."""
 
 NOISE_BINDINGS = (
-    # keep-sorted start
     "__structuredAttrs",
     "doCheck",
     "enableParallelBuilding",
@@ -289,24 +280,20 @@ NOISE_BINDINGS = (
     "passthru.tests",
     "strictDeps",
     "updateScript",
-    # keep-sorted end
 )
 """Bindings dropped whole, body included, however many lines they span."""
 
 NOISE_LINE_PATTERNS = [
-    # keep-sorted start
     re.compile(r"^\s*#"),
     re.compile(r"^\s*$"),
     re.compile(
         r"^\s*(?:gitUpdater|nix-update-script|nixosTests|testers|unstableGitUpdater)\s*,\s*$"
     ),
     re.compile(r"^\s*[\w.]+\.configurePhaseHook\s*$"),
-    # keep-sorted end
 ]
 """Lines that are noise wherever they appear."""
 
 NOISE_SUBSTITUTIONS = [
-    # keep-sorted start
     (re.compile(r"(?:stdenv\.)?buildPlatform[ \t]*!=[ \t]*(?:stdenv\.)?hostPlatform"), "stdenv.isCross"),
     (re.compile(r"(?:stdenv\.)?buildPlatform[ \t]*==[ \t]*(?:stdenv\.)?hostPlatform"), "!stdenv.isCross"),
     (re.compile(r"(?:stdenv\.)?hostPlatform[ \t]*!=[ \t]*(?:stdenv\.)?buildPlatform"), "stdenv.isCross"),
@@ -315,15 +302,12 @@ NOISE_SUBSTITUTIONS = [
     (re.compile(r"\bfinalAttrs\."), ""),
     (re.compile(r"\brec\s+(?=\{)"), ""),
     (re.compile(r"\}[ \t]*\)"), "}"),
-    # keep-sorted end
 ]
 """Rewrites reducing two spellings of one thing to a single form, on both sides."""
 
 EQUIVALENT_KEYS = {
-    # keep-sorted start
     "sha256": "hash",
     "tag": "rev",
-    # keep-sorted end
 }
 """Interchangeable attribute names, mapped alias -> canonical."""
 
@@ -556,10 +540,8 @@ LOCAL_ONLY = [
 
 # One patch per subdirectory beneath these, so one package reviews as one patch.
 GROUPED_DIRS = [
-    # keep-sorted start
     "build-support",
     "common-updater",
     "os-specific/linux",
     "pkgs",
-    # keep-sorted end
 ]
