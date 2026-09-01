@@ -6,7 +6,7 @@
   # Attributes passed to corepkgs. Don't build packages marked as unfree.
   pkgsArgs ? {
     config = {
-      allowAliases = true; # TODO(corepkgs): false
+      allowAliases = false;
       allowUnfree = false;
       inHydra = true;
     };
