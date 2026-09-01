@@ -5,9 +5,9 @@
   all the packages in the Nix Packages collection for some particular platform
   for some particular stage.
 
-  Default arguments are only provided for bootstrapping
-  arguments. Normal users should not import this directly but instead
-  import `pkgs/default.nix` or `default.nix`.
+  Default arguments are only provided for bootstrapping arguments. Normal
+  users should not import this directly, but instead import `pkgs/default.nix`
+  or `default.nix`.
 */
 
 {
@@ -46,15 +46,13 @@
 
   # `stdenv` without a C compiler. Passing in this helps avoid infinite
   # recursions, and may eventually replace passing in the full stdenv.
-  stdenvNoCC ? stdenv.override (
-    {
-      cc = null;
-      hasCC = false;
-    }
+  stdenvNoCC ? stdenv.override {
+    cc = null;
+    hasCC = false;
     # Darwin doesn’t need an SDK in `stdenvNoCC`.  Dropping it shrinks the closure
     # size down from ~1 GiB to ~83 MiB, which is a considerable reduction.
-    // lib.optionalAttrs stdenv.hostPlatform.isDarwin { extraBuildInputs = [ ]; }
-  ),
+    ${if stdenv.hostPlatform.isDarwin then "extraBuildInputs" else null} = [ ];
+  },
 
   # This is used because stdenv replacement and the stdenvCross do benefit from
   # the overridden configuration provided by the user, as opposed to the normal
@@ -108,21 +106,21 @@ let
     );
 
   stdenvAdapters =
-    self: super:
+    self: _:
     let
-      res = import ./adapters.nix {
+      adapters = import ./adapters.nix {
         inherit lib config;
         pkgs = self;
       };
     in
-    res
+    adapters
     // {
-      stdenvAdapters = res;
+      stdenvAdapters = adapters;
       inherit config;
     };
 
   trivialBuilders =
-    self: super:
+    self: _:
     import ../build-support/trivial-builders {
       inherit lib;
       inherit (self) config;
@@ -130,19 +128,19 @@ let
       inherit (self.pkgsBuildHost) jq shellcheck-minimal lndir;
     };
 
-  stdenvBootstappingAndPlatforms =
-    self: super:
+  stdenvBootstrapAndPlatforms =
+    self: _:
     let
       withFallback =
         thisPkgs:
         (if adjacentPackages == null then self else thisPkgs) // { recurseForDerivations = false; };
     in
     {
-      # Here are package sets of from related stages. They are all in the form
+      # Here are package sets from related stages. They are all in the form
       # `pkgs{theirHost}{theirTarget}`. For example, `pkgsBuildHost` means their
       # host platform is our build platform, and their target platform is our host
       # platform. We only care about their host/target platforms, not their build
-      # platform, because the the former two alone affect the interface of the
+      # platform, because the former two alone affect the interface of the
       # final package; the build platform is just an implementation detail that
       # should not leak.
       pkgsBuildBuild = withFallback adjacentPackages.pkgsBuildBuild;
@@ -155,7 +153,7 @@ let
       pkgsTargetTarget = withFallback adjacentPackages.pkgsTargetTarget;
 
       # Older names for package sets. Use these when only the host platform of the
-      # package set matter (i.e. use `buildPackages` where any of `pkgsBuild*`
+      # package set matters (i.e. use `buildPackages` where any of `pkgsBuild*`
       # would do, and `targetPackages` when any of `pkgsTarget*` would do (if we
       # had more than just `pkgsTargetTarget`).)
       buildPackages = self.pkgsBuildHost;
@@ -165,7 +163,7 @@ let
       inherit stdenv stdenvNoCC;
     };
 
-  splice = self: super: import ./splice.nix lib self (adjacentPackages != null);
+  splice = self: _: import ./splice.nix lib self (adjacentPackages != null);
 
   aliases = self: super: lib.optionalAttrs config.allowAliases (import ./aliases.nix lib self super);
 
@@ -195,10 +193,9 @@ let
   # attributes to refer to the original attributes (e.g. "foo =
   # ... pkgs.foo ...").
   configOverrides =
-    self: super:
-    lib.optionalAttrs allowCustomOverrides ((config.packageOverrides or (super: { })) super);
+    _: super: lib.optionalAttrs allowCustomOverrides ((config.packageOverrides or (_: { })) super);
 
-  # Convenience attributes for instantitating package sets. Each of
+  # Convenience attributes for instantiating package sets. Each of
   # these will instantiate a new version of allPackages. Currently the
   # following package sets are provided:
   #
@@ -206,13 +203,13 @@ let
   # - pkgsMusl
   # - pkgsi686Linux
   # NOTE: add new non-critical package sets to "pkgs/top-level/variants.nix"
-  otherPackageSets = self: super: {
+  otherPackageSets = self: _: {
     # This maps each entry in lib.systems.examples to its own package
     # set. Each of these will contain all packages cross compiled for
     # that target system. For instance, pkgsCross.raspberryPi.hello,
     # will refer to the "hello" package built for the ARM6-based
     # Raspberry Pi.
-    pkgsCross = lib.mapAttrs (n: crossSystem: nixpkgsFun { inherit crossSystem; }) lib.systems.examples;
+    pkgsCross = lib.mapAttrs (_: crossSystem: nixpkgsFun { inherit crossSystem; }) lib.systems.examples;
 
     # All packages built for i686 Linux.
     # Used by wine, firefox with debugging version of Flash, ...
@@ -223,26 +220,21 @@ let
       if !config.allowAliases || isSupported then
         nixpkgsFun {
           overlays = [
-            (
-              self': super':
-              {
-                pkgsi686Linux = super';
-              }
-              // lib.optionalAttrs (!isSupported) {
-                # Overrides pkgsi686Linux.stdenv.mkDerivation to produce only broken derivations,
-                # when used on a non x86_64-linux platform in CI.
-                # TODO: Remove this, once pkgsi686Linux can become a variant.
-                stdenv = super'.stdenv // {
-                  mkDerivation =
-                    args:
-                    (super'.stdenv.mkDerivation args).overrideAttrs (prevAttrs: {
-                      meta = prevAttrs.meta or { } // {
-                        broken = true;
-                      };
-                    });
-                };
-              }
-            )
+            (_: super': {
+              pkgsi686Linux = super';
+              # Overrides pkgsi686Linux.stdenv.mkDerivation to produce only broken derivations,
+              # when used on a non x86_64-linux platform in CI.
+              # TODO: Remove this, once pkgsi686Linux can become a variant.
+              ${if !isSupported then "stdenv" else null} = super'.stdenv // {
+                mkDerivation =
+                  args:
+                  (super'.stdenv.mkDerivation args).overrideAttrs (prevAttrs: {
+                    meta = prevAttrs.meta or { } // {
+                      broken = true;
+                    };
+                  });
+              };
+            })
           ]
           ++ overlays;
           ${if stdenv.hostPlatform == stdenv.buildPlatform then "localSystem" else "crossSystem"} = {
@@ -291,7 +283,7 @@ let
     # Currently uses Musl on Linux (couldn’t get static glibc to work).
     pkgsStatic = nixpkgsFun {
       overlays = [
-        (self': super': {
+        (_: super': {
           pkgsStatic = super';
         })
       ]
@@ -315,12 +307,12 @@ let
   pkgsManyVariantOverlay = lib.packageSets.mkAutoCalledManyVariantsDir ../pkgs-many;
   toplevelOverrides = import ../top-level.nix;
 
-  # The complete chain of package set builders, applied from top to bottom.
-  # stdenvOverlays must be last as it brings package forward from the
+  # The complete chain of package set layers, applied from top to bottom.
+  # stdenvOverrides must be last as it brings packages forward from the
   # previous bootstrapping phases which have already been overlaid.
-  toFix = lib.foldl' (lib.flip lib.extends) (self: { inherit lib; }) (
+  toFix = lib.foldl' (lib.flip lib.extends) (_: { inherit lib; }) (
     [
-      stdenvBootstappingAndPlatforms
+      stdenvBootstrapAndPlatforms
       stdenvAdapters
       trivialBuilders
       splice
