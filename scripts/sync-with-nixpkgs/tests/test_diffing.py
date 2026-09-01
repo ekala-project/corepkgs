@@ -168,49 +168,71 @@ def _patch(local, upstream):
     return diffing.render("t.patch", [diffing.compare("p/f.nix", "u.nix", local, upstream, [])])
 
 
-class TestIsTrivial:
-    def test_version_bump_alone_is_trivial(self):
-        assert diffing.is_trivial(
-            _patch('{\n  version = "1.0";\n}\n', '{\n  version = "2.0";\n}\n')
+def _substantive(local, upstream):
+    return diffing.compare("p/f.nix", "u.nix", local, upstream, []).substantive
+
+
+class TestSubstantive:
+    """Whether a difference survives `normalize.significant` on both sides."""
+
+    def test_version_bump_alone_is_not(self):
+        assert not _substantive('{\n  version = "1.0";\n}\n', '{\n  version = "2.0";\n}\n')
+
+    def test_version_and_hash_together_are_not(self):
+        assert not _substantive(
+            '{\n  version = "1.0";\n  hash = "sha256-a=";\n}\n',
+            '{\n  version = "2.0";\n  hash = "sha256-b=";\n}\n',
         )
-
-    def test_version_and_hash_together_are_trivial(self):
-        local = '{\n  version = "1.0";\n  hash = "sha256-a=";\n}\n'
-        upstream = '{\n  version = "2.0";\n  hash = "sha256-b=";\n}\n'
-        assert diffing.is_trivial(_patch(local, upstream))
-
-    def test_any_other_changed_line_makes_it_substantive(self):
-        local = '{\n  version = "1.0";\n  pname = "a";\n}\n'
-        upstream = '{\n  version = "2.0";\n  pname = "b";\n}\n'
-        assert not diffing.is_trivial(_patch(local, upstream))
-
-    def test_added_attribute_is_not_a_bump(self):
-        # A lone `+hash` adds an attribute corepkgs lacks; nothing moved.
-        local = '{\n  pname = "a";\n}\n'
-        upstream = '{\n  pname = "a";\n  hash = "sha256-b=";\n}\n'
-        assert not diffing.is_trivial(_patch(local, upstream))
-
-    def test_removed_attribute_is_not_a_bump(self):
-        local = '{\n  pname = "a";\n  hash = "sha256-b=";\n}\n'
-        upstream = '{\n  pname = "a";\n}\n'
-        assert not diffing.is_trivial(_patch(local, upstream))
-
-    def test_sides_must_balance_per_attribute(self):
-        # -version against +hash is two different facts, not one move.
-        local = '{\n  version = "1.0";\n  pname = "a";\n}\n'
-        upstream = '{\n  pname = "a";\n  hash = "sha256-b=";\n}\n'
-        assert not diffing.is_trivial(_patch(local, upstream))
-
-    def test_a_note_only_patch_is_not_trivial(self):
-        rendered = diffing.render(
-            "t.patch", [diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True)]
-        )
-        assert not diffing.is_trivial(rendered)
 
     def test_trailing_comment_does_not_hide_a_bump(self):
-        local = '{\n  version = "1.0"; # pinned\n}\n'
-        upstream = '{\n  version = "2.0"; # pinned\n}\n'
-        assert diffing.is_trivial(_patch(local, upstream))
+        assert not _substantive(
+            '{\n  version = "1.0"; # pinned\n}\n', '{\n  version = "2.0"; # pinned\n}\n'
+        )
+
+    def test_any_other_changed_line_is(self):
+        assert _substantive(
+            '{\n  version = "1.0";\n  pname = "a";\n}\n',
+            '{\n  version = "2.0";\n  pname = "b";\n}\n',
+        )
+
+    def test_added_attribute_is(self):
+        # Blanking a value keeps its line, so an attribute with no counterpart
+        # on the other side still shows. Nothing moved here; something appeared.
+        assert _substantive('{\n  pname = "a";\n}\n', '{\n  pname = "a";\n  hash = "sha256-b=";\n}\n')
+
+    def test_removed_attribute_is(self):
+        assert _substantive('{\n  pname = "a";\n  hash = "sha256-b=";\n}\n', '{\n  pname = "a";\n}\n')
+
+    def test_version_traded_for_hash_is(self):
+        assert _substantive(
+            '{\n  version = "1.0";\n  pname = "a";\n}\n',
+            '{\n  pname = "a";\n  hash = "sha256-b=";\n}\n',
+        )
+
+    def test_a_passthru_tests_difference_is_not(self):
+        local = '{\n  pname = "a";\n  passthru.tests = { inherit (nixosTests) podman; };\n}\n'
+        upstream = (
+            '{\n  pname = "a";\n  passthru.tests = {\n'
+            "    version = testers.testVersion {\n"
+            "      package = finalAttrs.finalPackage;\n"
+            "    };\n  };\n}\n"
+        )
+        assert not _substantive(local, upstream)
+
+    def test_a_cpe_parts_removal_is_not(self):
+        local = '{\n  meta = {\n    mainProgram = "a";\n  };\n}\n'
+        upstream = (
+            '{\n  meta = {\n    mainProgram = "a";\n'
+            '    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "a_project" v;\n  };\n}\n'
+        )
+        assert not _substantive(local, upstream)
+
+    def test_a_test_argument_rename_is_not(self):
+        assert not _substantive("{\n  lib,\n  nixosTests,\n}:\n", "{\n  lib,\n  testers,\n}:\n")
+
+    def test_a_differing_patch_file_is(self):
+        assert diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True).substantive
+        assert not diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=False).substantive
 
 
 class TestChanged:

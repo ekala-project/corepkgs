@@ -254,7 +254,7 @@ class TestSymlinks:
         assert result.missing == ["pkgs/curl/link.sh"]
 
 
-class TestTrivialDivergence:
+class TestIgnoredDivergence:
     def test_a_bump_is_held_back_from_patches(self, trees):
         trees.both(
             "pkgs/curl/default.nix",
@@ -264,7 +264,7 @@ class TestTrivialDivergence:
         )
         result = survey.run(trees.root, trees.upstream)
         assert result.patches == {}
-        assert list(result.trivial) == ["pkgs/curl.patch"]
+        assert list(result.ignored) == ["pkgs/curl.patch"]
 
     def test_a_bump_alongside_real_divergence_is_still_reviewed(self, trees):
         trees.both(
@@ -275,7 +275,7 @@ class TestTrivialDivergence:
         )
         result = survey.run(trees.root, trees.upstream)
         assert "pkgs/curl.patch" in result.patches
-        assert result.trivial == {}
+        assert result.ignored == {}
 
     def test_bumps_are_written_to_their_own_report(self, trees):
         trees.both(
@@ -285,7 +285,7 @@ class TestTrivialDivergence:
             '{\n  version = "2.0";\n}\n',
         )
         _generate(trees)
-        report = _patches(trees) / config.REPORTS_DIR / "version-bumps.txt"
+        report = _patches(trees) / config.REPORTS_DIR / "ignored-divergence.txt"
         body = report.read_text(encoding="utf-8")
         assert 'version = "1.0"' in body and 'version = "2.0"' in body
         assert not (_patches(trees) / "pkgs/curl.patch").exists()

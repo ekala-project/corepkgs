@@ -20,8 +20,8 @@ class Survey:
     patches: dict[str, str] = field(default_factory=dict)
     """Generated patch text, keyed by PATCHES_DIR-relative target."""
 
-    trivial: dict[str, str] = field(default_factory=dict)
-    """Patches held back as version bumps rather than divergence to review."""
+    ignored: dict[str, str] = field(default_factory=dict)
+    """Patches held back because nothing in them survives `significant`."""
 
     identical: int = 0
     """Files that match upstream once normalised."""
@@ -154,11 +154,12 @@ def run(corepkgs_root: Path, nixpkgs_root: Path) -> Survey:
         patch = diffing.render(target, comparisons)
         if patch is None:
             continue
-        # A bump is not divergence: hold it back so it neither lands in
-        # `patches/` nor counts as drift, but stays visible in the report.
-        if diffing.is_trivial(patch):
-            survey.trivial[target] = patch
-        else:
+        # Hold back a target when no file in it diverges in a way that survives
+        # `normalize.significant`: it neither lands in `patches/` nor counts as
+        # drift, but stays visible in the report.
+        if any(comparison.substantive for comparison in comparisons):
             survey.patches[target] = patch
+        else:
+            survey.ignored[target] = patch
 
     return survey
