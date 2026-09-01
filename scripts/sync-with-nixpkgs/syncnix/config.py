@@ -354,6 +354,10 @@ still carries them, so it applies unchanged.
 
 NOISE_SUBSTITUTIONS = [
     # keep-sorted start
+    (re.compile(r"(?:stdenv\.)?buildPlatform[ \t]*!=[ \t]*(?:stdenv\.)?hostPlatform"), "stdenv.isCross"),
+    (re.compile(r"(?:stdenv\.)?buildPlatform[ \t]*==[ \t]*(?:stdenv\.)?hostPlatform"), "!stdenv.isCross"),
+    (re.compile(r"(?:stdenv\.)?hostPlatform[ \t]*!=[ \t]*(?:stdenv\.)?buildPlatform"), "stdenv.isCross"),
+    (re.compile(r"(?:stdenv\.)?hostPlatform[ \t]*==[ \t]*(?:stdenv\.)?buildPlatform"), "!stdenv.isCross"),
     (re.compile(r"\(\s*finalAttrs\s*:\s*"), ""),
     (re.compile(r"\bfinalAttrs\."), ""),
     (re.compile(r"\brec\s+(?=\{)"), ""),
@@ -369,6 +373,10 @@ between them drags every self-reference along (`${version}` becomes
 `${finalAttrs.version}`), so a line-level rule cannot express it. Stripping the
 `rec`, the lambda header, its closing paren and the `finalAttrs.` prefixes
 leaves both forms identical, in either direction.
+
+Comparing the host and build platforms is the long way of writing
+`stdenv.isCross`, and both operand orders are in common use, so all four
+spellings collapse onto the short one.
 """
 
 
