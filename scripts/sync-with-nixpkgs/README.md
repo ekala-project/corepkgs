@@ -71,7 +71,7 @@ reviewer needs by
   `identifiers.cpeParts`, and build flags like `strictDeps` and
   `__structuredAttrs` that routinely appear on one side only)
 - dropping lines matching `NOISE_LINE_PATTERNS` (`testers`/`nixosTests`
-  arguments, `*.configurePhaseHook` entries)
+  arguments, `*.configurePhaseHook` entries, blank lines, whole-line comments)
 - renaming `EQUIVALENT_KEYS` to one spelling (`tag` → `rev`, `sha256` → `hash`),
   which is done independently of the value so that `tag = version;` and
   `rev = version;` also reduce alike
