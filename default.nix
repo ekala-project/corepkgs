@@ -55,11 +55,8 @@
   # Error on unexpected args.
 }@args:
 
-let # Rename the function arguments
-  config0 = config;
-  crossSystem0 = crossSystem;
-  localSystem0 = localSystem;
-
+let
+  inputs = { inherit localSystem crossSystem config; };
 in
 let
   pristineLib = import ./lib.nix;
@@ -93,7 +90,7 @@ let
         throwIfNot (lib.all lib.isFunction crossOverlays) "All crossOverlays passed to nixpkgs must be functions."
       );
 
-  localSystem = lib.systems.elaborate localSystem0;
+  localSystem = lib.systems.elaborate inputs.localSystem;
 
   # Condition preserves sharing which in turn affects equality.
   #
@@ -109,14 +106,14 @@ let
   # inferred from the system double in `localSystem`.
   crossSystem =
     let
-      system = lib.systems.elaborate crossSystem0;
+      system = lib.systems.elaborate inputs.crossSystem;
     in
-    if crossSystem0 == null || lib.systems.equals system localSystem then localSystem else system;
+    if inputs.crossSystem == null || lib.systems.equals system localSystem then localSystem else system;
 
   # Allow both:
   # { /* the config */ } and
   # { pkgs, ... } : { /* the config */ }
-  config1 = if lib.isFunction config0 then config0 { inherit pkgs; } else config0;
+  config1 = if lib.isFunction inputs.config then inputs.config { inherit pkgs; } else inputs.config;
 
   configEval = lib.evalModules {
     modules = [
