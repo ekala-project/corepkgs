@@ -52,8 +52,7 @@
   # list it returns.
   stdenvStages ? import ./stdenv,
 
-  # Ignore unexpected args.
-  ...
+  # Error on unexpected args.
 }@args:
 
 # If `localSystem` was explicitly passed, legacy `system` should
