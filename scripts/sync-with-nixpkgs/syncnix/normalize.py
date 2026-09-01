@@ -20,9 +20,16 @@ def _binding_matcher(names: tuple[str, ...]) -> re.Pattern[str]:
     A `meta.` or `passthru.` qualifier is optional, since the same binding is
     written either way -- `passthru.updateScript = ...` at the top level of a
     package, or a bare `updateScript = ...` inside a `passthru` block.
+
+    A dotted suffix is matched too: `identifiers.cpeParts.vendor` is part of
+    `identifiers.cpeParts`, so naming the parent covers the leaves. The dot is
+    required, so a longer name is still left alone -- `doCheckTarget` is not
+    `doCheck`.
     """
     return re.compile(
-        r"^\s*(?:meta\.|passthru\.)?(?:" + "|".join(re.escape(n) for n in names) + r")\s*="
+        r"^\s*(?:meta\.|passthru\.)?(?:"
+        + "|".join(re.escape(n) for n in names)
+        + r")(?:\.[\w'-]+)*\s*="
     )
 
 
