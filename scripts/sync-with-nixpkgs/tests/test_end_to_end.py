@@ -294,8 +294,8 @@ class TestIgnoredDivergence:
         trees.both(
             "pkgs/curl/default.nix",
             "pkgs/by-name/cu/curl/package.nix",
-            '{\n  version = "1.0";\n  doCheck = true;\n}\n',
-            '{\n  version = "2.0";\n  doCheck = false;\n}\n',
+            '{\n  version = "1.0";\n  pname = "a";\n}\n',
+            '{\n  version = "2.0";\n  pname = "b";\n}\n',
         )
         result = survey.run(trees.root, trees.upstream)
         assert "pkgs/curl.patch" in result.patches

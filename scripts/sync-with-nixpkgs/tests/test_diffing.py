@@ -327,6 +327,13 @@ class TestSubstantive:
             "{\n  x = !stdenv.isCross;\n}\n",
         )
 
+    def test_a_doCheck_difference_is_not(self):
+        assert not _substantive("{\n  doCheck = true;\n}\n", "{\n  doCheck = false;\n}\n")
+        assert not _substantive('{\n  pname = "a";\n  doCheck = false;\n}\n', '{\n  pname = "a";\n}\n')
+
+    def test_doCheckInstall_is_not_swallowed_with_it(self):
+        assert _substantive("{\n  doInstallCheck = true;\n}\n", "{\n}\n")
+
     def test_a_differing_patch_file_is(self):
         assert diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True).substantive
         assert not diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=False).substantive

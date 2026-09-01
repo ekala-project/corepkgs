@@ -313,6 +313,7 @@ Add patterns here as more trivial shapes turn up.
 NOISE_BINDINGS = (
     # keep-sorted start
     "__structuredAttrs",
+    "doCheck",
     "enableParallelBuilding",
     "enableParallelInstalling",
     "identifiers.cpeParts",
