@@ -182,6 +182,8 @@ PATH_REWRITES = [
     (r"\.\./development/perl-modules/([^/]+\.patch)", r"./patches/\1"),
     (r"\.\./development/perl-modules", "./patches"),
     (r"\.\./os-specific/linux/", "./"),
+    # corepkgs' lib is one file, nixpkgs' a directory.
+    (r"((?:\.\./)+)lib(?![\w/.-])", r"\1lib.nix"),
 ]
 
 # Read at run time, so the vocabulary cannot drift from the real aliases.
@@ -218,6 +220,7 @@ EXTRA_VOCABULARY = [
 
 # Dropped from incoming nixpkgs content; corepkgs carries none of them.
 DROPPED_META_BINDINGS = (
+    "crossMaintainers",
     "maintainers",
     "nonTeamMaintainers",
     "teams",

@@ -120,18 +120,59 @@ def drop_meta_bindings(text: str) -> str:
     return _drop_bindings(text, _BINDING)
 
 
+_EMPTIED_ATTRSET = re.compile(r"\{[ \t]*\n[ \t]*\}")
+
+_COMMENT_LINE = re.compile(r"^\s*#")
+_BLOCK_END = re.compile(r"\*/\s*$")
+_BLOCK_START = re.compile(r"^\s*/\*")
+
+
+def _drop_attached_comment(kept: list[str]) -> None:
+    """Remove the comment documenting a binding that is about to be dropped.
+
+    A comment sitting directly above a binding describes that binding, so
+    removing one without the other leaves prose about something the file no
+    longer contains. Both `#` lines and `/* ... */` blocks count.
+
+    A blank line ends the search, so a comment belonging to whatever came
+    before is left alone.
+    """
+    while kept:
+        if _COMMENT_LINE.match(kept[-1]):
+            kept.pop()
+        elif _BLOCK_END.search(kept[-1]):
+            while kept and not _BLOCK_START.match(kept.pop()):
+                pass
+        else:
+            return
+
+
 def _drop_bindings(text: str, binding: re.Pattern[str]) -> str:
-    """Remove every binding whose opening line `binding` matches, body included."""
+    """Remove every binding whose opening line `binding` matches, body included.
+
+    Removing the only binding of an attrset leaves the braces behind, still
+    spread over the two lines they occupied -- `maintainers = crossMaintainers;`
+    inside `addMetaAttrs { ... }` is one. `{ }` is how that same empty attrset is
+    written when it never had a binding, so the two are folded together; without
+    it, a dropped binding would still read as divergence.
+
+    Only done when something was actually dropped, so a file this never touches
+    is returned unchanged.
+    """
     lines = text.split("\n")
     kept: list[str] = []
     index = 0
+    dropped = False
     while index < len(lines):
         if binding.match(lines[index]):
             index = _statement_end(lines, index)
+            _drop_attached_comment(kept)
+            dropped = True
             continue
         kept.append(lines[index])
         index += 1
-    return "\n".join(kept)
+    joined = "\n".join(kept)
+    return _EMPTIED_ATTRSET.sub("{ }", joined) if dropped else joined
 
 
 _EQUIVALENT_KEY = re.compile(
@@ -179,7 +220,9 @@ def significant(text: str) -> str:
     """
     for pattern, replacement in config.NOISE_SUBSTITUTIONS:
         text = pattern.sub(replacement, text)
-    stripped = _drop_bindings(text, _NOISE_BINDING)
+    # Unconditional here, unlike in `_drop_bindings`: this runs over both sides,
+    # and the side that never had the binding has nothing to collapse of its own.
+    stripped = _EMPTIED_ATTRSET.sub("{ }", _drop_bindings(text, _NOISE_BINDING))
     return "\n".join(
         _blank_trivial(_canonical_key(line))
         for line in stripped.split("\n")
