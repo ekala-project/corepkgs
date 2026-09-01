@@ -62,7 +62,14 @@ in
   # can be used to add files in specified paths without them becoming
   # symlinks to store paths.
   prepend ? [ ],
+
+  # Deprecated; remove in 27.05.
+  makeUInitrd ? null,
+  uInitrdArch ? null,
+  uInitrdCompression ? null,
 }:
+assert lib.assertMsg (makeUInitrd == null && uInitrdArch == null && uInitrdCompression == null)
+  "makeInitrd: U‐Boot legacy image support has been removed as it is deprecated upstream and ARMv5 kernels no longer default to uImage";
 stdenvNoCC.mkDerivation (finalAttrs: {
   __structuredAttrs = true;
 
