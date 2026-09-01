@@ -126,12 +126,18 @@ def generate(args: argparse.Namespace) -> int:
     result = survey.run(corepkgs_root, nixpkgs_root)
     buckets = _classify(result, accepted_dir)
 
+    # An accepted divergence is already stored, byte for byte, under
+    # ACCEPTED_DIR. Writing it again would duplicate it and bury the patches
+    # that actually want reading, so `patches/` holds only unaccepted drift.
+    accepted = set(buckets[baseline.Status.UNCHANGED])
+    pending = {target: patch for target, patch in result.patches.items() if target not in accepted}
+
     if args.dry_run:
-        print(f"would refresh {patches_dir} with {len(result.patches)} patches")
+        print(f"would refresh {patches_dir} with {len(pending)} patches")
     else:
         if patches_dir.exists():
             shutil.rmtree(patches_dir)
-        for target, patch in result.patches.items():
+        for target, patch in pending.items():
             destination = patches_dir / target
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_text(patch, encoding="utf-8")
