@@ -17,35 +17,8 @@
 lib: pkgs: actuallySplice:
 
 let
-  # These functions are used by nixpkgs' lib.customisation but not yet available
-  # in our pinned nix-lib. Define them locally until the pin is updated.
-  mapCrossIndex =
-    f:
-    {
-      buildBuild,
-      buildHost,
-      buildTarget,
-      hostHost,
-      hostTarget,
-      targetTarget,
-    }:
-    {
-      buildBuild = f buildBuild;
-      buildHost = f buildHost;
-      buildTarget = f buildTarget;
-      hostHost = f hostHost;
-      hostTarget = f hostTarget;
-      targetTarget = f targetTarget;
-    };
-
-  renameCrossIndexFrom = prefix: x: {
-    buildBuild = x."${prefix}BuildBuild";
-    buildHost = x."${prefix}BuildHost";
-    buildTarget = x."${prefix}BuildTarget";
-    hostHost = x."${prefix}HostHost";
-    hostTarget = x."${prefix}HostTarget";
-    targetTarget = x."${prefix}TargetTarget";
-  };
+  inherit (lib.customisation) mapCrossIndex renameCrossIndexFrom;
+  inherit (lib) mapAttrs;
 
   spliceReal =
     inputs:
@@ -135,7 +108,7 @@ let
           # `__functor__` for functions instead.
           defaultValue;
     in
-    lib.mapAttrs merge mash;
+    mapAttrs merge mash;
 
   splicePackages =
     {
@@ -174,9 +147,21 @@ let
         ;
     };
 
-  # Flatten xorg backward-compatibility aliases (e.g. libXau, libXext) into the
-  # callPackage resolution scope so that legacy CamelCase dependency names still
-  # resolve.  The xorg set now only contains aliases to top-level packages.
+  # Flatten the xorg backward-compatibility aliases (`libXau`, `libXext`, ...)
+  # into the `callPackage` resolution scope, so a package still asking for a
+  # legacy CamelCase name gets one. The `xorg` set holds only aliases to
+  # top-level packages, so this adds names, never new packages.
+  #
+  # TODO(corepkgs): drop this once no package asks for a CamelCase xorg name.
+  # Upstream has no equivalent -- there `pkgsForCall` is `splicedPackages`/`pkgs`
+  # directly -- so every argument resolved through this flattening belongs to a
+  # package that has not been renamed yet. 14 such names are still requested,
+  # by mesa, xvfb, libepoxy, texlive, gdk-pixbuf, conky, nvidia-x11, java,
+  # vulkan-loader and xp-pen-drivers.
+  #
+  # Removing it before then does not fail loudly everywhere: an argument with a
+  # default silently takes it instead. `vulkan-loader` has `libXrandr ? null`
+  # guarding `enableX11`, so it would keep evaluating and quietly lose X11.
   splicedPackagesWithXorg = splicedPackages // (splicedPackages.xorg or { });
 
   packagesWithXorg = pkgs // (pkgs.xorg or { });
@@ -189,8 +174,8 @@ in
   inherit splicePackages;
 
   # We use `callPackage' to be able to omit function arguments that can be
-  # obtained from `pkgs` or `buildPackages`.  The xorg backward-compat aliases
-  # are also flattened in so legacy CamelCase names still resolve.
+  # obtained from `pkgs` or `buildPackages`.
+  # Use `newScope' for sets of packages in `pkgs' (see e.g. `gnome' below).
   callPackage = pkgs.newScope { };
 
   callPackages = lib.callPackagesWith pkgsForCall;
