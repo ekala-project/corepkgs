@@ -230,6 +230,34 @@ class TestSubstantive:
     def test_a_test_argument_rename_is_not(self):
         assert not _substantive("{\n  lib,\n  nixosTests,\n}:\n", "{\n  lib,\n  testers,\n}:\n")
 
+    REC = """stdenv.mkDerivation rec {
+  pname = "a";
+  version = "1.0";
+  postInstall = "echo ${pname}";
+  meta.mainProgram = pname;
+}
+"""
+
+    FINAL = """stdenv.mkDerivation (finalAttrs: {
+  pname = "a";
+  version = "2.0";
+  postInstall = "echo ${finalAttrs.pname}";
+  meta.mainProgram = finalAttrs.pname;
+})
+"""
+
+    def test_rec_rewritten_as_finalAttrs_is_not(self):
+        # The lambda header, its closing paren and every self-reference move
+        # together; none of it changes what gets built.
+        assert not _substantive(self.REC, self.FINAL)
+
+    def test_finalAttrs_rewritten_as_rec_is_not(self):
+        # The same in the other direction: corepkgs may be on either side.
+        assert not _substantive(self.FINAL, self.REC)
+
+    def test_a_real_change_alongside_the_rewrite_still_is(self):
+        assert _substantive(self.REC, self.FINAL.replace('pname = "a"', 'pname = "b"'))
+
     def test_a_differing_patch_file_is(self):
         assert diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True).substantive
         assert not diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=False).substantive

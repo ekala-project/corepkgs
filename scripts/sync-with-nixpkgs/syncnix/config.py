@@ -340,6 +340,26 @@ uses either build system and say nothing about that package.
 """
 
 
+NOISE_SUBSTITUTIONS = [
+    # keep-sorted start
+    (re.compile(r"\(\s*finalAttrs\s*:\s*"), ""),
+    (re.compile(r"\bfinalAttrs\."), ""),
+    (re.compile(r"\brec\s+(?=\{)"), ""),
+    (re.compile(r"\}[ \t]*\)"), "}"),
+    # keep-sorted end
+]
+"""Rewrites that reduce two spellings of the same thing to one form.
+
+Unlike the vocabulary, these are applied to *both* sides, so they can only ever
+make a difference disappear -- never build a patch. `rec { ... }` and
+`(finalAttrs: { ... })` are the same derivation written two ways, and moving
+between them drags every self-reference along (`${version}` becomes
+`${finalAttrs.version}`), so a line-level rule cannot express it. Stripping the
+`rec`, the lambda header, its closing paren and the `finalAttrs.` prefixes
+leaves both forms identical, in either direction.
+"""
+
+
 LOCAL_ONLY = [
     # keep-sorted start
     "build-support/bintools-wrapper/darwin-install_name_tool-wrapper.sh",
