@@ -110,7 +110,7 @@ let
       let
         elaboratedCrossSystem = lib.systems.elaborate inputs.crossSystem;
       in
-      if inputs.crossSystem == null || lib.systems.equals elaboratedCrossSystem elaboratedLocalSystem then
+      if lib.systems.equals elaboratedCrossSystem elaboratedLocalSystem then
         elaboratedLocalSystem
       else
         elaboratedCrossSystem;
