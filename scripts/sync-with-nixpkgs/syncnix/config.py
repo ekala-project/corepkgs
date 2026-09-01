@@ -1,25 +1,16 @@
-"""Declarative configuration for the nixpkgs sync.
-
-Nothing here executes logic; every entry is data consumed by the other modules.
-Keeping it separate means a reviewer can audit *what* is synced without reading
-*how* it is synced.
-"""
+"""Data consumed by the other modules. See README.md for how each is used."""
 
 import re
 
-# Where generated patches are written, relative to the corepkgs root.
 PATCHES_DIR = "patches"
 
-# Where accepted divergence is recorded, relative to the corepkgs root. Both
-# directories are gitignored: they are a local review aid, not repo content.
+# Gitignored, like PATCHES_DIR: a local review aid, not repo content.
 ACCEPTED_DIR = ".sync-accepted"
 
-# Reports live under the patches directory, prefixed so they never collide with
-# a generated patch path.
+# Lives under PATCHES_DIR, prefixed so it cannot collide with a patch path.
 REPORTS_DIR = "_reports"
 
-# Files whose contents are never diffed. A patch inside a patch is unreadable
-# and cannot be applied, so these are reported as a one-line note instead.
+# Noted rather than diffed: a patch inside a patch cannot be applied.
 OPAQUE_SUFFIXES = (".patch", ".diff")
 
 # corepkgs path prefix -> nixpkgs path prefix. Longest prefix wins.
@@ -183,13 +174,10 @@ PATH_MAPPINGS = {
     # keep-sorted end
 }
 
-# The nixpkgs prefix that uses the by-name layout (two-letter shard directory
-# and `package.nix` rather than `default.nix`).
+# Two-letter shard directories holding `package.nix` rather than `default.nix`.
 BY_NAME_PREFIX = "pkgs/by-name"
 
-# Relative-path rewrites applied to nixpkgs content. nixpkgs refers to files by
-# their location in its own tree; these express the same reference in corepkgs
-# terms. Applied in order, so the specific entries must precede the general one.
+# Applied to nixpkgs content in order, so specific entries precede general ones.
 PATH_REWRITES = [
     (r"\.\./development/perl-modules/generic", "./buildPerlPackage.nix"),
     (r"\.\./development/perl-modules/([^/]+\.patch)", r"./patches/\1"),
@@ -197,18 +185,13 @@ PATH_REWRITES = [
     (r"\.\./os-specific/linux/", "./"),
 ]
 
-# Alias files read at run time to build the rewrite vocabulary. corepkgs already
-# records how it spells upstream names; deriving from these means the sync tool
-# cannot drift from the aliases the package set actually defines.
+# Read at run time, so the vocabulary cannot drift from the real aliases.
 ALIAS_FILES = (
     "stdenv/aliases.nix",
     "python/aliases.nix",
 )
 
-# Aliases deliberately not used as rewrites. Most of `aliases.nix` mirrors
-# nixpkgs' own aliases, so both trees already write the same name and rewriting
-# would invent a diff rather than remove one. Measured against every paired
-# file: each of these did more harm than good.
+# Measured against every paired file: rewriting these added more diff than it removed.
 ALIAS_EXCLUSIONS = {
     # keep-sorted start
     "SDL",  # nixpkgs aliases it too, so both trees already write SDL
@@ -222,8 +205,7 @@ ALIAS_EXCLUSIONS = {
     # keep-sorted end
 }
 
-# Renames that are not package aliases, so no `aliases.nix` entry can express
-# them. Applied after the alias-derived rewrites.
+# Renames no `aliases.nix` entry can express. Applied after the alias-derived ones.
 EXTRA_VOCABULARY = [
     # keep-sorted start
     (r"\bdocbook_xsl\b", "docbook-xsl-nons"),
@@ -235,9 +217,7 @@ EXTRA_VOCABULARY = [
     # keep-sorted end
 ]
 
-# `meta` bindings dropped from incoming nixpkgs content. corepkgs is curated as
-# a set and does not carry these, so importing them would be noise in every
-# single patch.
+# Dropped from incoming nixpkgs content; corepkgs carries none of them.
 DROPPED_META_BINDINGS = (
     "maintainers",
     "nonTeamMaintainers",
@@ -270,8 +250,7 @@ IGNORE_DIRS = [
     # keep-sorted end
 ]
 
-# Suffixes never compared, wherever they appear. Prose diverges from nixpkgs
-# freely and by design, so reviewing it as a patch is pure noise.
+# Never compared: prose diverges freely and by design.
 IGNORE_SUFFIXES = (".md",)
 
 # Individual files never compared, matched as exact paths from the corepkgs root.
@@ -291,24 +270,13 @@ IGNORE_FILES = [
     # keep-sorted end
 ]
 
-
 TRIVIAL_PATTERNS = [
     # keep-sorted start
     re.compile(r'^\s*(?P<key>cargoHash|hash|npmDepsHash|outputHash|sha256|sha512|vendorHash)\s*=\s*"[^"]*";\s*(#.*)?$'),
     re.compile(r'^\s*(?P<key>rev|tag|version)\s*=\s*"[^"]*";\s*(#.*)?$'),
     # keep-sorted end
 ]
-"""Changed lines that carry no design information, only a moved value.
-
-A patch whose every changed line matches one of these -- and whose two sides
-balance per attribute -- is a version bump, not divergence to review. It is
-counted and listed, never diffed into `patches/`.
-
-Each pattern must expose a `key` group naming the attribute, which is what
-lets `-version` be matched against `+version` rather than against `+hash`.
-Add patterns here as more trivial shapes turn up.
-"""
-
+"""Lines that are only a moved value. Each pattern must expose a `key` group."""
 
 NOISE_BINDINGS = (
     # keep-sorted start
@@ -321,15 +289,7 @@ NOISE_BINDINGS = (
     "strictDeps",
     # keep-sorted end
 )
-"""Whole bindings whose divergence carries nothing for a reviewer.
-
-Unlike `TRIVIAL_PATTERNS` these span however many lines the binding occupies,
-and they need not balance: upstream gaining a `identifiers.cpeParts` corepkgs
-never had is still nothing to review. That one-sided case is why the build
-flags live here rather than among the trivial values -- they routinely appear
-on one side only, and blanking a value cannot hide a line that has no
-counterpart.
-"""
+"""Bindings dropped whole, body included, however many lines they span."""
 
 NOISE_LINE_PATTERNS = [
     # keep-sorted start
@@ -339,23 +299,7 @@ NOISE_LINE_PATTERNS = [
     re.compile(r"^\s*[\w.]+\.configurePhaseHook\s*$"),
     # keep-sorted end
 ]
-"""Single lines that are noise wherever they appear.
-
-The test-suite arguments a package takes follow from its `passthru.tests`, so
-once that binding is set aside the argument that fed it is noise too.
-
-`cmake.configurePhaseHook` and its meson counterpart are a corepkgs build
-convention with no upstream equivalent, so they diverge in every package that
-uses either build system and say nothing about that package.
-
-A comment explains the code; it is not the code. Where corepkgs and nixpkgs
-say the same thing and annotate it differently, there is nothing to review.
-
-Blank lines are here because where a file breathes is formatting, not design.
-Dropping them only ever decides whether a patch is reported; the patch itself
-still carries them, so it applies unchanged.
-"""
-
+"""Lines that are noise wherever they appear."""
 
 NOISE_SUBSTITUTIONS = [
     # keep-sorted start
@@ -369,21 +313,7 @@ NOISE_SUBSTITUTIONS = [
     (re.compile(r"\}[ \t]*\)"), "}"),
     # keep-sorted end
 ]
-"""Rewrites that reduce two spellings of the same thing to one form.
-
-Unlike the vocabulary, these are applied to *both* sides, so they can only ever
-make a difference disappear -- never build a patch. `rec { ... }` and
-`(finalAttrs: { ... })` are the same derivation written two ways, and moving
-between them drags every self-reference along (`${version}` becomes
-`${finalAttrs.version}`), so a line-level rule cannot express it. Stripping the
-`rec`, the lambda header, its closing paren and the `finalAttrs.` prefixes
-leaves both forms identical, in either direction.
-
-Comparing the host and build platforms is the long way of writing
-`stdenv.isCross`, and both operand orders are in common use, so all four
-spellings collapse onto the short one.
-"""
-
+"""Rewrites reducing two spellings of one thing to a single form, on both sides."""
 
 EQUIVALENT_KEYS = {
     # keep-sorted start
@@ -391,16 +321,7 @@ EQUIVALENT_KEYS = {
     "tag": "rev",
     # keep-sorted end
 }
-"""Attribute names that mean the same thing, mapped alias -> canonical.
-
-Applied to the lines `TRIVIAL_PATTERNS` already empties, so `rev = "v1.0"` and
-`tag = "v1.0"` reduce to one line rather than two that differ only in the name.
-Renaming in either direction reduces the same way.
-
-Only names that are genuinely interchangeable belong here: `cargoHash` and
-`vendorHash` are both hashes but hash different things, so they stay distinct.
-"""
-
+"""Interchangeable attribute names, mapped alias -> canonical."""
 
 LOCAL_ONLY = [
     # keep-sorted start
@@ -627,16 +548,9 @@ LOCAL_ONLY = [
     "python/pkgs/roman-numerals-py",
     # keep-sorted end
 ]
-"""Paths corepkgs carries that nixpkgs has no counterpart for.
+"""Paths with no nixpkgs counterpart: "nothing to compare", not "do not compare"."""
 
-Distinct from IGNORE_*: those say "do not compare", these say "there is nothing
-to compare against". Declaring them keeps `missing` meaningful -- a file turning
-up there is then real news, either a mapping gone stale or an upstream removal.
-A declaration that acquires an upstream counterpart is reported as stale.
-"""
-
-# Under these prefixes every file in a subdirectory is collected into a single
-# patch named after that subdirectory, so one package reviews as one patch.
+# One patch per subdirectory beneath these, so one package reviews as one patch.
 GROUPED_DIRS = [
     # keep-sorted start
     "build-support",
