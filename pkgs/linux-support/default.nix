@@ -203,8 +203,6 @@ lib.makeScope pkgs.newScope (
 
           cpupower = callPackage ./pkgs/cpupower { };
 
-          perf = callPackage ./pkgs/perf { };
-
           ddcci-driver = callPackage ./pkgs/ddcci { };
 
           dddvb = callPackage ./pkgs/dddvb { };

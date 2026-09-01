@@ -8,7 +8,6 @@ nvidia_x11: sha256:
   pkg-config,
   m4,
   jansson,
-  gtk2,
   dbus,
   vulkan-headers,
   gtk3,
@@ -21,7 +20,6 @@ nvidia_x11: sha256:
   libglvnd,
   wrapGAppsHook3,
   addDriverRunpath,
-  withGtk2 ? false,
   withGtk3 ? true,
 }:
 
@@ -152,7 +150,6 @@ stdenv.mkDerivation {
     dbus
     vulkan-headers
   ]
-  ++ lib.optionals (withGtk2 || lib.versionOlder nvidia_x11.settingsVersion "525.53") [ gtk2 ]
   ++ lib.optionals withGtk3 [
     gtk3
     librsvg
@@ -161,13 +158,12 @@ stdenv.mkDerivation {
   installFlags = [ "PREFIX=$(out)" ];
 
   postInstall =
-    lib.optionalString (!withGtk2) ''
-      rm -f $out/lib/libnvidia-gtk2.so.*
-    ''
-    + lib.optionalString (!withGtk3) ''
+    lib.optionalString (!withGtk3) ''
       rm -f $out/lib/libnvidia-gtk3.so.*
     ''
     + ''
+      rm -f $out/lib/libnvidia-gtk2.so.*
+
       # Install the desktop file and icon.
       # The template has substitution variables intended to be replaced resulting
       # in absolute paths. Because absolute paths break after the desktop file is
