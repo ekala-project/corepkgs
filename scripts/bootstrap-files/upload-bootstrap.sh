@@ -10,7 +10,7 @@
 #   ./upload-bootstrap.sh
 #
 #   # Build for specific targets:
-#   ./upload-bootstrap.sh --targets=x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu
+#   ./upload-bootstrap.sh --targets=aarch64-unknown-linux-gnu
 #
 #   # Build all supported targets:
 #   ./upload-bootstrap.sh --targets=all
@@ -32,14 +32,12 @@ BOOTSTRAP_FILES_DIR="$REPO_ROOT/stdenv/linux/bootstrap-files"
 
 # All supported native targets (built natively on the respective platform)
 NATIVE_TARGETS=(
-    x86_64-unknown-linux-gnu
     aarch64-unknown-linux-gnu
 )
 
 # Targets that can be cross-built from x86_64-linux
 CROSS_TARGETS=(
     aarch64-unknown-linux-musl
-    x86_64-unknown-linux-musl
     armv5tel-unknown-linux-gnueabi
     armv6l-unknown-linux-gnueabihf
     armv6l-unknown-linux-musleabihf
@@ -53,7 +51,6 @@ CROSS_TARGETS=(
     riscv64-unknown-linux-gnu
     s390x-unknown-linux-gnu
     loongarch64-unknown-linux-gnu
-    i686-unknown-linux-gnu
 )
 
 ALL_TARGETS=("${NATIVE_TARGETS[@]}" "${CROSS_TARGETS[@]}")
@@ -62,11 +59,8 @@ ALL_TARGETS=("${NATIVE_TARGETS[@]}" "${CROSS_TARGETS[@]}")
 target_to_system() {
     local target="$1"
     case "$target" in
-        x86_64-unknown-linux-*)    echo "x86_64-linux" ;;
-        i686-unknown-linux-*)      echo "x86_64-linux" ;;  # cross-built
-        aarch64-unknown-linux-gnu) echo "aarch64-linux" ;;
-        aarch64-unknown-linux-musl) echo "x86_64-linux" ;; # cross-built
-        *)                         echo "x86_64-linux" ;;   # cross-built
+        aarch64-unknown-linux-gnu) echo "aarch64-linux" ;; # native
+        *)                         echo "x86_64-linux" ;;  # cross-built
     esac
 }
 
@@ -79,8 +73,6 @@ target_to_attr() {
     # For native targets, use freshBootstrapTools directly
     # For cross targets, use pkgsCross
     case "$target" in
-        x86_64-unknown-linux-gnu)
-            echo "freshBootstrapTools.build" ;;
         aarch64-unknown-linux-gnu)
             echo "freshBootstrapTools.build" ;;
         *)
@@ -126,8 +118,12 @@ fi
 if [[ ${#TARGETS[@]} -eq 0 ]]; then
     current_system="$(nix eval --raw --impure --expr 'builtins.currentSystem')"
     case "$current_system" in
-        x86_64-linux)  TARGETS=(x86_64-unknown-linux-gnu) ;;
         aarch64-linux) TARGETS=(aarch64-unknown-linux-gnu) ;;
+        i686-linux | x86_64-linux)
+            echo "$current_system builds its toolchain from source and needs no" >&2
+            echo "bootstrap files; name a cross target with --targets=TARGET." >&2
+            exit 1
+            ;;
         *)
             echo "Cannot auto-detect target for system: $current_system" >&2
             echo "Please specify --targets=TARGET" >&2
