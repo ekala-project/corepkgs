@@ -27,7 +27,7 @@ set -euo pipefail
 
 REPO="ekala-project/corepkgs"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 BOOTSTRAP_FILES_DIR="$REPO_ROOT/stdenv/linux/bootstrap-files"
 
 # All supported native targets (built natively on the respective platform)
