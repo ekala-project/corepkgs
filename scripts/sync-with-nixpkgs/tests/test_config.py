@@ -101,3 +101,16 @@ class TestNoiseSubstitutions:
         for pattern, replacement in config.NOISE_SUBSTITUTIONS:
             assert hasattr(pattern, "sub")
             assert isinstance(replacement, str)
+
+
+class TestEquivalentKeys:
+    def test_canonical_targets_are_not_themselves_aliases(self):
+        # A -> B -> C chain would depend on iteration order.
+        for canonical in config.EQUIVALENT_KEYS.values():
+            assert canonical not in config.EQUIVALENT_KEYS
+
+    def test_every_key_is_one_the_tool_already_treats_as_trivial(self):
+        for name in list(config.EQUIVALENT_KEYS) + list(config.EQUIVALENT_KEYS.values()):
+            assert any(
+                pattern.match(f'  {name} = "x";') for pattern in config.TRIVIAL_PATTERNS
+            ), name

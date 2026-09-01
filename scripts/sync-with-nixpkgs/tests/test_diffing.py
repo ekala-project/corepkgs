@@ -258,6 +258,26 @@ class TestSubstantive:
     def test_a_real_change_alongside_the_rewrite_still_is(self):
         assert _substantive(self.REC, self.FINAL.replace('pname = "a"', 'pname = "b"'))
 
+    def test_rev_renamed_to_tag_is_not(self):
+        assert not _substantive('{\n  rev = "v1.0";\n}\n', '{\n  tag = "v1.0";\n}\n')
+        assert not _substantive('{\n  tag = "v1.0";\n}\n', '{\n  rev = "v1.0";\n}\n')
+
+    def test_rev_renamed_to_tag_with_an_unquoted_value_is_not(self):
+        # Neither value is a literal the tool would blank, so the rename has to
+        # be handled independently of the value.
+        assert not _substantive("{\n  rev = version;\n}\n", "{\n  tag = version;\n}\n")
+
+    def test_hash_renamed_to_sha256_is_not(self):
+        assert not _substantive('{\n  hash = "a";\n}\n', '{\n  sha256 = "b";\n}\n')
+        assert not _substantive("{\n  sha256 = lib.fakeHash;\n}\n", "{\n  hash = lib.fakeHash;\n}\n")
+
+    def test_hashes_of_different_things_stay_distinct(self):
+        # Both are hashes, but they hash different things.
+        assert _substantive('{\n  cargoHash = "a";\n}\n', '{\n  vendorHash = "a";\n}\n')
+
+    def test_rev_is_not_interchangeable_with_version(self):
+        assert _substantive('{\n  rev = "a";\n}\n', '{\n  version = "a";\n}\n')
+
     def test_a_differing_patch_file_is(self):
         assert diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True).substantive
         assert not diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=False).substantive
