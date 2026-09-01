@@ -1,5 +1,7 @@
 import subprocess
 
+import pytest
+
 from syncnix import diffing
 
 
@@ -164,6 +166,11 @@ class TestChangedLines:
         assert diffing.changed_lines(patch) == 4
 
 
+def nix(*lines):
+    """A minimal attribute set, one binding per line."""
+    return "{\n" + "".join(f"  {line}\n" for line in lines) + "}\n"
+
+
 def _patch(local, upstream):
     return diffing.render("t.patch", [diffing.compare("p/f.nix", "u.nix", local, upstream, [])])
 
@@ -172,65 +179,12 @@ def _substantive(local, upstream):
     return diffing.compare("p/f.nix", "u.nix", local, upstream, []).substantive
 
 
-class TestSubstantive:
-    """Whether a difference survives `normalize.significant` on both sides."""
+def _cases(*rows):
+    """Turn `(id, local, upstream)` rows into parametrize arguments."""
+    return {"argvalues": [row[1:] for row in rows], "ids": [row[0] for row in rows]}
 
-    def test_version_bump_alone_is_not(self):
-        assert not _substantive('{\n  version = "1.0";\n}\n', '{\n  version = "2.0";\n}\n')
 
-    def test_version_and_hash_together_are_not(self):
-        assert not _substantive(
-            '{\n  version = "1.0";\n  hash = "sha256-a=";\n}\n',
-            '{\n  version = "2.0";\n  hash = "sha256-b=";\n}\n',
-        )
-
-    def test_trailing_comment_does_not_hide_a_bump(self):
-        assert not _substantive(
-            '{\n  version = "1.0"; # pinned\n}\n', '{\n  version = "2.0"; # pinned\n}\n'
-        )
-
-    def test_any_other_changed_line_is(self):
-        assert _substantive(
-            '{\n  version = "1.0";\n  pname = "a";\n}\n',
-            '{\n  version = "2.0";\n  pname = "b";\n}\n',
-        )
-
-    def test_added_attribute_is(self):
-        # Blanking a value keeps its line, so an attribute with no counterpart
-        # on the other side still shows. Nothing moved here; something appeared.
-        assert _substantive('{\n  pname = "a";\n}\n', '{\n  pname = "a";\n  hash = "sha256-b=";\n}\n')
-
-    def test_removed_attribute_is(self):
-        assert _substantive('{\n  pname = "a";\n  hash = "sha256-b=";\n}\n', '{\n  pname = "a";\n}\n')
-
-    def test_version_traded_for_hash_is(self):
-        assert _substantive(
-            '{\n  version = "1.0";\n  pname = "a";\n}\n',
-            '{\n  pname = "a";\n  hash = "sha256-b=";\n}\n',
-        )
-
-    def test_a_passthru_tests_difference_is_not(self):
-        local = '{\n  pname = "a";\n  passthru.tests = { inherit (nixosTests) podman; };\n}\n'
-        upstream = (
-            '{\n  pname = "a";\n  passthru.tests = {\n'
-            "    version = testers.testVersion {\n"
-            "      package = finalAttrs.finalPackage;\n"
-            "    };\n  };\n}\n"
-        )
-        assert not _substantive(local, upstream)
-
-    def test_a_cpe_parts_removal_is_not(self):
-        local = '{\n  meta = {\n    mainProgram = "a";\n  };\n}\n'
-        upstream = (
-            '{\n  meta = {\n    mainProgram = "a";\n'
-            '    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "a_project" v;\n  };\n}\n'
-        )
-        assert not _substantive(local, upstream)
-
-    def test_a_test_argument_rename_is_not(self):
-        assert not _substantive("{\n  lib,\n  nixosTests,\n}:\n", "{\n  lib,\n  testers,\n}:\n")
-
-    REC = """stdenv.mkDerivation rec {
+REC = """stdenv.mkDerivation rec {
   pname = "a";
   version = "1.0";
   postInstall = "echo ${pname}";
@@ -238,7 +192,7 @@ class TestSubstantive:
 }
 """
 
-    FINAL = """stdenv.mkDerivation (finalAttrs: {
+FINAL = """stdenv.mkDerivation (finalAttrs: {
   pname = "a";
   version = "2.0";
   postInstall = "echo ${finalAttrs.pname}";
@@ -246,112 +200,113 @@ class TestSubstantive:
 })
 """
 
-    def test_rec_rewritten_as_finalAttrs_is_not(self):
-        # The lambda header, its closing paren and every self-reference move
-        # together; none of it changes what gets built.
-        assert not _substantive(self.REC, self.FINAL)
+PASSTHRU_TESTS = """{
+  pname = "a";
+  passthru.tests = {
+    version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+    };
+  };
+}
+"""
 
-    def test_finalAttrs_rewritten_as_rec_is_not(self):
-        # The same in the other direction: corepkgs may be on either side.
-        assert not _substantive(self.FINAL, self.REC)
+# Pairs that say the same thing two ways. None of these may reach `patches/`.
+EQUIVALENT = _cases(
+    ("version bump", nix('version = "1.0";'), nix('version = "2.0";')),
+    (
+        "version and hash together",
+        nix('version = "1.0";', 'hash = "sha256-a=";'),
+        nix('version = "2.0";', 'hash = "sha256-b=";'),
+    ),
+    ("bump behind a trailing comment", nix('version = "1.0"; # pinned'), nix('version = "2.0"; # pinned')),
+    (
+        "passthru.tests written differently",
+        nix('pname = "a";', "passthru.tests = { inherit (nixosTests) podman; };"),
+        PASSTHRU_TESTS,
+    ),
+    (
+        "identifiers.cpeParts only upstream",
+        '{\n  meta = {\n    mainProgram = "a";\n  };\n}\n',
+        '{\n  meta = {\n    mainProgram = "a";\n'
+        '    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "a_project" v;\n  };\n}\n',
+    ),
+    ("testers/nixosTests argument", "{\n  lib,\n  nixosTests,\n}:\n", "{\n  lib,\n  testers,\n}:\n"),
+    # The lambda header, its closing paren and every self-reference move together.
+    ("rec rewritten as finalAttrs", REC, FINAL),
+    ("finalAttrs rewritten as rec", FINAL, REC),
+    ("rev renamed to tag", nix('rev = "v1.0";'), nix('tag = "v1.0";')),
+    ("tag renamed to rev", nix('tag = "v1.0";'), nix('rev = "v1.0";')),
+    # Neither value is a literal the tool would blank, so the rename has to be
+    # handled independently of the value.
+    ("rev/tag with an unquoted value", nix("rev = version;"), nix("tag = version;")),
+    ("hash renamed to sha256", nix('hash = "a";'), nix('sha256 = "b";')),
+    ("sha256/hash unquoted", nix("sha256 = lib.fakeHash;"), nix("hash = lib.fakeHash;")),
+    # Build flags routinely appear on one side alone, so the whole binding goes;
+    # blanking a value cannot hide a line with no counterpart.
+    ("build flag on one side only", nix('pname = "a";'), nix('pname = "a";', "__structuredAttrs = true;")),
+    ("flipped build flag", nix("strictDeps = true;"), nix("strictDeps = false;")),
+    ("enableParallelBuilding dropped", nix("enableParallelBuilding = true;"), "{\n}\n"),
+    ("enableParallelInstalling dropped", nix("enableParallelInstalling = true;"), "{\n}\n"),
+    ("doCheck flipped", nix("doCheck = true;"), nix("doCheck = false;")),
+    ("doCheck on one side only", nix('pname = "a";', "doCheck = false;"), nix('pname = "a";')),
+    # Where a file breathes is formatting, not design.
+    ("blank line inserted", nix("a = 1;", "b = 2;"), "{\n  a = 1;\n\n  b = 2;\n}\n"),
+    ("whitespace-only line", nix("a = 1;"), "{\n  a = 1;\n   \n}\n"),
+    ("comment reworded", nix("# corepkgs wording", "a = 1;"), nix("# nixpkgs wording", "a = 1;")),
+    ("comment on one side only", nix("# explanation", "a = 1;"), nix("a = 1;")),
+    ("cross: host != build", nix("x = stdenv.hostPlatform != stdenv.buildPlatform;"), nix("x = stdenv.isCross;")),
+    ("cross: build != host", nix("x = stdenv.buildPlatform != stdenv.hostPlatform;"), nix("x = stdenv.isCross;")),
+    ("cross: destructured", nix("x = hostPlatform != buildPlatform;"), nix("x = stdenv.isCross;")),
+    ("cross: host == build", nix("x = stdenv.hostPlatform == stdenv.buildPlatform;"), nix("x = !stdenv.isCross;")),
+    ("cross: build == host", nix("x = stdenv.buildPlatform == stdenv.hostPlatform;"), nix("x = !stdenv.isCross;")),
+)
 
-    def test_a_real_change_alongside_the_rewrite_still_is(self):
-        assert _substantive(self.REC, self.FINAL.replace('pname = "a"', 'pname = "b"'))
+# Pairs that genuinely differ. Each is a way the reductions could go too far.
+DISTINCT = _cases(
+    (
+        "a real change beside a bump",
+        nix('version = "1.0";', 'pname = "a";'),
+        nix('version = "2.0";', 'pname = "b";'),
+    ),
+    # Blanking a value keeps its line, so an attribute with no counterpart on
+    # the other side still shows. Nothing moved here; something appeared.
+    ("attribute added upstream", nix('pname = "a";'), nix('pname = "a";', 'hash = "sha256-b=";')),
+    ("attribute removed upstream", nix('pname = "a";', 'hash = "sha256-b=";'), nix('pname = "a";')),
+    (
+        "version traded for hash",
+        nix('version = "1.0";', 'pname = "a";'),
+        nix('pname = "a";', 'hash = "sha256-b=";'),
+    ),
+    ("a real change beside the rec rewrite", REC, FINAL.replace('pname = "a"', 'pname = "b"')),
+    # Both are hashes, but they hash different things.
+    ("cargoHash vs vendorHash", nix('cargoHash = "a";'), nix('vendorHash = "a";')),
+    ("rev vs version", nix('rev = "a";'), nix('version = "a";')),
+    ("a longer name sharing the prefix", nix("strictDeps = true;"), nix("strictDepsFoo = true;")),
+    ("doInstallCheck is not doCheck", nix("doInstallCheck = true;"), "{\n}\n"),
+    ("blank lines do not hide a change", nix("a = 1;"), "{\n\n  a = 2;\n\n}\n"),
+    ("a comment does not hide a change", nix("# same note", "a = 1;"), nix("# same note", "a = 2;")),
+    # Only a line that *starts* with `#` is a comment, so no quote parsing is
+    # needed and a URL fragment stays part of the code.
+    ("a hash inside a string", nix('url = "https://x/a#frag";'), nix('url = "https://x/b#frag";')),
+    # != is cross, == is not-cross; collapsing them would invert a condition.
+    (
+        "the two cross senses",
+        nix("x = stdenv.hostPlatform != stdenv.buildPlatform;"),
+        nix("x = !stdenv.isCross;"),
+    ),
+)
 
-    def test_rev_renamed_to_tag_is_not(self):
-        assert not _substantive('{\n  rev = "v1.0";\n}\n', '{\n  tag = "v1.0";\n}\n')
-        assert not _substantive('{\n  tag = "v1.0";\n}\n', '{\n  rev = "v1.0";\n}\n')
 
-    def test_rev_renamed_to_tag_with_an_unquoted_value_is_not(self):
-        # Neither value is a literal the tool would blank, so the rename has to
-        # be handled independently of the value.
-        assert not _substantive("{\n  rev = version;\n}\n", "{\n  tag = version;\n}\n")
+class TestSubstantive:
+    """Whether a difference survives `normalize.significant` on both sides."""
 
-    def test_hash_renamed_to_sha256_is_not(self):
-        assert not _substantive('{\n  hash = "a";\n}\n', '{\n  sha256 = "b";\n}\n')
-        assert not _substantive("{\n  sha256 = lib.fakeHash;\n}\n", "{\n  hash = lib.fakeHash;\n}\n")
+    @pytest.mark.parametrize("local,upstream", **EQUIVALENT)
+    def test_equivalent_spellings_are_not_substantive(self, local, upstream):
+        assert not _substantive(local, upstream)
 
-    def test_hashes_of_different_things_stay_distinct(self):
-        # Both are hashes, but they hash different things.
-        assert _substantive('{\n  cargoHash = "a";\n}\n', '{\n  vendorHash = "a";\n}\n')
-
-    def test_rev_is_not_interchangeable_with_version(self):
-        assert _substantive('{\n  rev = "a";\n}\n', '{\n  version = "a";\n}\n')
-
-    def test_a_build_flag_present_on_one_side_only_is_not(self):
-        # These routinely appear on one side alone, so the whole binding goes;
-        # blanking a value cannot hide a line with no counterpart.
-        assert not _substantive(
-            '{\n  pname = "a";\n}\n', '{\n  pname = "a";\n  __structuredAttrs = true;\n}\n'
-        )
-
-    def test_a_flipped_build_flag_is_not(self):
-        assert not _substantive("{\n  strictDeps = true;\n}\n", "{\n  strictDeps = false;\n}\n")
-
-    def test_parallel_build_flags_are_not(self):
-        assert not _substantive("{\n  enableParallelBuilding = true;\n}\n", "{\n}\n")
-        assert not _substantive("{\n  enableParallelInstalling = true;\n}\n", "{\n}\n")
-
-    def test_a_longer_name_sharing_the_prefix_still_is(self):
-        assert _substantive("{\n  strictDeps = true;\n}\n", "{\n  strictDepsFoo = true;\n}\n")
-
-    def test_a_blank_line_difference_is_not(self):
-        # Where a file breathes is formatting, not design.
-        assert not _substantive('{\n  a = 1;\n  b = 2;\n}\n', '{\n  a = 1;\n\n  b = 2;\n}\n')
-
-    def test_indentation_only_whitespace_lines_count_as_blank(self):
-        assert not _substantive('{\n  a = 1;\n}\n', '{\n  a = 1;\n   \n}\n')
-
-    def test_blank_lines_do_not_hide_a_real_change(self):
-        assert _substantive('{\n  a = 1;\n}\n', '{\n\n  a = 2;\n\n}\n')
-
-    def test_the_long_cross_comparison_matches_isCross(self):
-        for long in (
-            "stdenv.hostPlatform != stdenv.buildPlatform",
-            "stdenv.buildPlatform != stdenv.hostPlatform",
-            "hostPlatform != buildPlatform",
-        ):
-            assert not _substantive(f"{{\n  x = {long};\n}}\n", "{\n  x = stdenv.isCross;\n}\n"), long
-
-    def test_the_long_equality_matches_negated_isCross(self):
-        for long in (
-            "stdenv.hostPlatform == stdenv.buildPlatform",
-            "stdenv.buildPlatform == stdenv.hostPlatform",
-        ):
-            assert not _substantive(f"{{\n  x = {long};\n}}\n", "{\n  x = !stdenv.isCross;\n}\n"), long
-
-    def test_the_two_senses_are_not_confused(self):
-        # != is cross, == is not-cross; collapsing them would invert a condition.
-        assert _substantive(
-            "{\n  x = stdenv.hostPlatform != stdenv.buildPlatform;\n}\n",
-            "{\n  x = !stdenv.isCross;\n}\n",
-        )
-
-    def test_a_doCheck_difference_is_not(self):
-        assert not _substantive("{\n  doCheck = true;\n}\n", "{\n  doCheck = false;\n}\n")
-        assert not _substantive('{\n  pname = "a";\n  doCheck = false;\n}\n', '{\n  pname = "a";\n}\n')
-
-    def test_doCheckInstall_is_not_swallowed_with_it(self):
-        assert _substantive("{\n  doInstallCheck = true;\n}\n", "{\n}\n")
-
-    def test_a_comment_only_difference_is_not(self):
-        assert not _substantive(
-            '{\n  # corepkgs says it this way\n  a = 1;\n}\n',
-            '{\n  # nixpkgs says it that way\n  a = 1;\n}\n',
-        )
-
-    def test_a_comment_present_on_one_side_only_is_not(self):
-        assert not _substantive("{\n  # explanation\n  a = 1;\n}\n", "{\n  a = 1;\n}\n")
-
-    def test_a_comment_does_not_hide_a_real_change(self):
-        assert _substantive("{\n  # same note\n  a = 1;\n}\n", "{\n  # same note\n  a = 2;\n}\n")
-
-    def test_a_hash_inside_a_string_is_not_a_comment(self):
-        # Only a line that *starts* with `#` is a comment line, so no quote
-        # parsing is needed and a URL fragment stays part of the code.
-        assert _substantive(
-            '{\n  url = "https://x/a#frag";\n}\n', '{\n  url = "https://x/b#frag";\n}\n'
-        )
+    @pytest.mark.parametrize("local,upstream", **DISTINCT)
+    def test_real_differences_are_substantive(self, local, upstream):
+        assert _substantive(local, upstream)
 
     def test_a_differing_patch_file_is(self):
         assert diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True).substantive

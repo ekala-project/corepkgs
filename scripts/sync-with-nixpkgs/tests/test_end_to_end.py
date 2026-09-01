@@ -19,15 +19,14 @@ def _patches(trees):
 
 class TestSurvey:
     def test_identical_files_produce_no_patch(self, trees):
-        trees.both(
-            "pkgs/curl/default.nix", "pkgs/by-name/cu/curl/package.nix", "same\n", "same\n"
+        trees.pair("same\n", "same\n"
         )
         result = survey.run(trees.root, trees.upstream)
         assert result.patches == {}
         assert result.identical == 1
 
     def test_differing_files_produce_one_grouped_patch(self, trees):
-        trees.both("pkgs/curl/default.nix", "pkgs/by-name/cu/curl/package.nix", "a\n", "b\n")
+        trees.pair("a\n", "b\n")
         trees.both("pkgs/curl/extra.nix", "pkgs/by-name/cu/curl/extra.nix", "c\n", "d\n")
         result = survey.run(trees.root, trees.upstream)
         assert list(result.patches) == ["pkgs/curl.patch"]
@@ -62,7 +61,7 @@ class TestSurvey:
 
 class TestOpaqueFiles:
     def test_patch_file_contents_never_reach_the_output(self, trees):
-        trees.both("pkgs/curl/default.nix", "pkgs/by-name/cu/curl/package.nix", "a\n", "b\n")
+        trees.pair("a\n", "b\n")
         trees.both(
             "pkgs/curl/fix.patch",
             "pkgs/by-name/cu/curl/fix.patch",
@@ -86,7 +85,7 @@ class TestOpaqueFiles:
 
 class TestBaselineWorkflow:
     def _diverge(self, trees):
-        trees.both("pkgs/curl/default.nix", "pkgs/by-name/cu/curl/package.nix", "a\n", "b\n")
+        trees.pair("a\n", "b\n")
 
     def test_generate_writes_patches_and_reports(self, trees, capsys):
         self._diverge(trees)
@@ -106,7 +105,7 @@ class TestBaselineWorkflow:
     def test_changed_divergence_resurfaces(self, trees, capsys):
         self._diverge(trees)
         _accept(trees)
-        trees.remote("pkgs/by-name/cu/curl/package.nix", "something else\n")
+        trees.repoint("something else\n")
         assert _generate(trees, "--strict") == 1
         assert "changed vs accepted" in capsys.readouterr().out
 
@@ -121,14 +120,14 @@ class TestBaselineWorkflow:
     def test_drift_from_the_baseline_is_written_again(self, trees):
         self._diverge(trees)
         _accept(trees)
-        trees.remote("pkgs/by-name/cu/curl/package.nix", "something else\n")
+        trees.repoint("something else\n")
         _generate(trees)
         # No longer matches what was accepted, so it needs reading.
         assert (_patches(trees) / "pkgs" / "curl.patch").is_file()
 
     def test_an_unaccepted_sibling_is_still_written(self, trees):
         self._diverge(trees)
-        trees.both("pkgs/wget/default.nix", "pkgs/by-name/wg/wget/package.nix", "a\n", "b\n")
+        trees.pair("a\n", "b\n", package="wget")
         _accept(trees, "pkgs/curl.patch")
         _generate(trees)
         assert not (_patches(trees) / "pkgs" / "curl.patch").exists()
@@ -137,7 +136,7 @@ class TestBaselineWorkflow:
     def test_resolved_divergence_is_flagged_as_stale(self, trees, capsys):
         self._diverge(trees)
         _accept(trees)
-        trees.remote("pkgs/by-name/cu/curl/package.nix", "a\n")
+        trees.repoint("a\n")
         _generate(trees)
         out = capsys.readouterr().out
         assert "resolved, baseline is stale" in out
@@ -145,14 +144,14 @@ class TestBaselineWorkflow:
 
     def test_accept_can_target_one_patch(self, trees):
         self._diverge(trees)
-        trees.both("pkgs/wget/default.nix", "pkgs/by-name/wg/wget/package.nix", "a\n", "b\n")
+        trees.pair("a\n", "b\n", package="wget")
         _accept(trees, "pkgs/curl.patch")
         assert _generate(trees, "--strict") == 1
 
     def test_accept_forgets_stale_entries(self, trees):
         self._diverge(trees)
         _accept(trees)
-        trees.remote("pkgs/by-name/cu/curl/package.nix", "a\n")
+        trees.repoint("a\n")
         _accept(trees, "pkgs/curl.patch")
         assert _generate(trees, "--strict") == 0
 
@@ -178,8 +177,7 @@ class TestReports:
         assert "unclaimed/thing.nix" in report.read_text(encoding="utf-8")
 
     def test_no_report_is_written_when_nothing_to_say(self, trees):
-        trees.both(
-            "pkgs/curl/default.nix", "pkgs/by-name/cu/curl/package.nix", "same\n", "same\n"
+        trees.pair("same\n", "same\n"
         )
         _generate(trees)
         assert not (_patches(trees) / config.REPORTS_DIR).exists()
@@ -228,7 +226,7 @@ class TestLocalOnly:
 
     def test_declaration_overtaken_by_upstream_is_reported_stale(self, trees, monkeypatch):
         monkeypatch.setattr(config, "LOCAL_ONLY", ["pkgs/curl"])
-        trees.both("pkgs/curl/default.nix", "pkgs/by-name/cu/curl/package.nix", "a\n", "b\n")
+        trees.pair("a\n", "b\n")
         result = survey.run(trees.root, trees.upstream)
         assert result.stale_local_only == ["pkgs/curl/default.nix"]
         # Still compared, so the divergence stays visible.
@@ -280,10 +278,7 @@ class TestSymlinks:
 
 class TestIgnoredDivergence:
     def test_a_bump_is_held_back_from_patches(self, trees):
-        trees.both(
-            "pkgs/curl/default.nix",
-            "pkgs/by-name/cu/curl/package.nix",
-            '{\n  version = "1.0";\n}\n',
+        trees.pair('{\n  version = "1.0";\n}\n',
             '{\n  version = "2.0";\n}\n',
         )
         result = survey.run(trees.root, trees.upstream)
@@ -291,10 +286,7 @@ class TestIgnoredDivergence:
         assert list(result.ignored) == ["pkgs/curl.patch"]
 
     def test_a_bump_alongside_real_divergence_is_still_reviewed(self, trees):
-        trees.both(
-            "pkgs/curl/default.nix",
-            "pkgs/by-name/cu/curl/package.nix",
-            '{\n  version = "1.0";\n  pname = "a";\n}\n',
+        trees.pair('{\n  version = "1.0";\n  pname = "a";\n}\n',
             '{\n  version = "2.0";\n  pname = "b";\n}\n',
         )
         result = survey.run(trees.root, trees.upstream)
@@ -302,10 +294,7 @@ class TestIgnoredDivergence:
         assert result.ignored == {}
 
     def test_bumps_are_written_to_their_own_report(self, trees):
-        trees.both(
-            "pkgs/curl/default.nix",
-            "pkgs/by-name/cu/curl/package.nix",
-            '{\n  version = "1.0";\n}\n',
+        trees.pair('{\n  version = "1.0";\n}\n',
             '{\n  version = "2.0";\n}\n',
         )
         _generate(trees)
@@ -315,10 +304,7 @@ class TestIgnoredDivergence:
         assert not (_patches(trees) / "pkgs/curl.patch").exists()
 
     def test_a_held_back_bump_is_not_drift(self, trees):
-        trees.both(
-            "pkgs/curl/default.nix",
-            "pkgs/by-name/cu/curl/package.nix",
-            '{\n  version = "1.0";\n}\n',
+        trees.pair('{\n  version = "1.0";\n}\n',
             '{\n  version = "2.0";\n}\n',
         )
         # --strict must stay quiet: a bump is news, not unaccepted divergence.

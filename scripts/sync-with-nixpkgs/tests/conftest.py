@@ -36,4 +36,23 @@ def trees(tmp_path):
             self.local(local_relative, local_text)
             self.remote(remote_relative, remote_text)
 
+        @staticmethod
+        def upstream_path(package):
+            """Where PATH_MAPPINGS expects this package to live in nixpkgs."""
+            return f"pkgs/by-name/{package[:2].lower()}/{package}/package.nix"
+
+        def pair(self, local_text, remote_text, package="curl"):
+            """A package present in both trees; returns its patch target."""
+            self.both(
+                f"pkgs/{package}/default.nix",
+                self.upstream_path(package),
+                local_text,
+                remote_text,
+            )
+            return f"pkgs/{package}.patch"
+
+        def repoint(self, text, package="curl"):
+            """Replace just the nixpkgs side of a paired package."""
+            return self.remote(self.upstream_path(package), text)
+
     return Trees()
