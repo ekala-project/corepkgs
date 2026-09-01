@@ -113,17 +113,57 @@ def drop_meta_bindings(text: str) -> str:
     """
     if not any(name in text for name in config.DROPPED_META_BINDINGS):
         return text
+    return _drop_bindings(text, _BINDING)
 
+
+def _drop_bindings(text: str, binding: re.Pattern[str]) -> str:
+    """Remove every binding whose opening line `binding` matches, body included."""
     lines = text.split("\n")
     kept: list[str] = []
     index = 0
     while index < len(lines):
-        if _BINDING.match(lines[index]):
+        if binding.match(lines[index]):
             index = _statement_end(lines, index)
             continue
         kept.append(lines[index])
         index += 1
     return "\n".join(kept)
+
+
+_NOISE_BINDING = re.compile(
+    r"^(?P<indent>\s*)(?:meta\.)?(?P<name>"
+    + "|".join(re.escape(name) for name in config.NOISE_BINDINGS)
+    + r")\s*="
+)
+
+
+def _blank_trivial(line: str) -> str:
+    """Empty out a value the tool treats as trivial, keeping the binding."""
+    for pattern in config.TRIVIAL_PATTERNS:
+        if pattern.match(line):
+            return re.sub(r'"[^"]*"', '""', line, count=1)
+    return line
+
+
+def significant(text: str) -> str:
+    """The part of a file a reviewer actually needs to see.
+
+    Noise bindings are removed whole, noise lines dropped, and trivial values
+    emptied, so that two files differing only in those ways reduce to the same
+    text. Applied to *both* sides, unlike `upstream` -- which is why it may only
+    ever decide whether a patch is worth reporting, never help build one. A
+    patch is still generated from the verbatim corepkgs file, so it applies.
+
+    Emptying a value rather than deleting the line is deliberate: a bumped
+    `hash` then reduces to the same text on both sides, while a `hash` upstream
+    added and corepkgs lacks leaves a line with no counterpart, and still shows.
+    """
+    stripped = _drop_bindings(text, _NOISE_BINDING)
+    return "\n".join(
+        _blank_trivial(line)
+        for line in stripped.split("\n")
+        if not any(pattern.match(line) for pattern in config.NOISE_LINE_PATTERNS)
+    )
 
 
 def upstream(text: str, vocabulary: Vocabulary) -> str:

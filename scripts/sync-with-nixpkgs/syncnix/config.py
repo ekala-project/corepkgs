@@ -249,8 +249,8 @@ DROPPED_META_BINDINGS = (
 IGNORE_DIRS = [
     # keep-sorted start
     ".github",
-    "config",
     "ci",  # corepkgs' own evaluation jobs
+    "config",
     "dev-shell",  # corepkgs-only
     "docs",
     "ekaos",
@@ -307,6 +307,36 @@ counted and listed, never diffed into `patches/`.
 Each pattern must expose a `key` group naming the attribute, which is what
 lets `-version` be matched against `+version` rather than against `+hash`.
 Add patterns here as more trivial shapes turn up.
+"""
+
+
+NOISE_BINDINGS = (
+    # keep-sorted start
+    "identifiers.cpeParts",
+    "passthru.tests",
+    # keep-sorted end
+)
+"""Whole bindings whose divergence carries nothing for a reviewer.
+
+Unlike `TRIVIAL_PATTERNS` these span however many lines the binding occupies,
+and they need not balance: upstream gaining a `identifiers.cpeParts` corepkgs
+never had is still nothing to review.
+"""
+
+NOISE_LINE_PATTERNS = [
+    # keep-sorted start
+    re.compile(r"^\s*(?:nixosTests|testers)\s*,\s*$"),
+    re.compile(r"^\s*[\w.]+\.configurePhaseHook\s*$"),
+    # keep-sorted end
+]
+"""Single lines that are noise wherever they appear.
+
+The test-suite arguments a package takes follow from its `passthru.tests`, so
+once that binding is set aside the argument that fed it is noise too.
+
+`cmake.configurePhaseHook` and its meson counterpart are a corepkgs build
+convention with no upstream equivalent, so they diverge in every package that
+uses either build system and say nothing about that package.
 """
 
 

@@ -36,6 +36,9 @@ class Comparison:
     differs: bool = False
     """True when an opaque file's contents differ from upstream."""
 
+    substantive: bool = False
+    """True when the difference survives `normalize.significant` on both sides."""
+
 
 def _terminate(line: str) -> str:
     """Give a diff line its trailing newline, flagging a file that lacks one.
@@ -70,7 +73,12 @@ def compare(
     body = "".join(_terminate(line) for line in diff)
     if not body:
         return Comparison(path=path, upstream_path=upstream_path)
-    return Comparison(path=path, upstream_path=upstream_path, diff=body)
+    return Comparison(
+        path=path,
+        upstream_path=upstream_path,
+        diff=body,
+        substantive=normalize.significant(local_text) != normalize.significant(normalized),
+    )
 
 
 def compare_opaque(path: str, upstream_path: str, differs: bool) -> Comparison:
@@ -79,7 +87,14 @@ def compare_opaque(path: str, upstream_path: str, differs: bool) -> Comparison:
     Diffing a patch against a patch yields output no tool can apply and no human
     can read, so the file is reported as a single note instead.
     """
-    return Comparison(path=path, upstream_path=upstream_path, opaque=True, differs=differs)
+    return Comparison(
+        path=path,
+        upstream_path=upstream_path,
+        opaque=True,
+        differs=differs,
+        # A patch file that differs always needs a person to look at it.
+        substantive=differs,
+    )
 
 
 _HUNK = re.compile(r"^@@ -\d+(?:,(\d+))? \+\d+(?:,(\d+))? @@")
@@ -118,34 +133,6 @@ def changed(patch: str) -> Iterator[tuple[str, str]]:
 def changed_lines(patch: str) -> int:
     """How much there is to review in a patch."""
     return sum(1 for _ in changed(patch))
-
-
-def _trivial_key(content: str) -> Optional[str]:
-    """The attribute name if this line is a trivial one, else None."""
-    for pattern in config.TRIVIAL_PATTERNS:
-        match = pattern.match(content)
-        if match:
-            return match.group("key")
-    return None
-
-
-def is_trivial(patch: str) -> bool:
-    """True when a patch says nothing but "this value moved".
-
-    Every changed line has to be a trivial one *and* the two sides have to
-    balance per attribute: `-version` against `+version`. Without that balance a
-    lone `+hash = ...` would read as trivial when it actually adds an attribute
-    corepkgs does not have -- a structural change wearing a trivial line's
-    clothes.
-    """
-    removed: Counter[str] = Counter()
-    added: Counter[str] = Counter()
-    for sign, content in changed(patch):
-        key = _trivial_key(content)
-        if key is None:
-            return False
-        (removed if sign == "-" else added)[key] += 1
-    return bool(removed) and removed == added
 
 
 def render(target: str, comparisons: list[Comparison]) -> Optional[str]:

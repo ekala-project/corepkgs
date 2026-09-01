@@ -48,26 +48,43 @@ question for a person:
 
 All four are empty in a healthy tree. One more is not a problem report:
 
-- `version-bumps.txt` — packages whose only divergence is a moved value
+- `ignored-divergence.txt` — divergence the tool is told not to care about
 
-## Trivial divergence
+## Ignored divergence
 
-A patch whose every changed line matches `TRIVIAL_PATTERNS` — and whose two
-sides balance per attribute — is a version bump, not a design difference. It is
-counted and listed in `version-bumps.txt`, never written into `patches/`, and
-never treated as drift, so `--strict` stays quiet for it.
+Some differences are structural noise: a version bump, a `passthru.tests` block
+corepkgs writes differently, the `cmake.configurePhaseHook` this repo adds and
+nixpkgs has no equivalent for. `normalize.significant` reduces a file to what a
+reviewer needs by
 
-The balance requirement is what keeps this honest. `-version` must be answered
-by `+version`; a lone `+hash = ...` adds an attribute corepkgs does not have,
-which is structural even though the line looks trivial.
+- removing `NOISE_BINDINGS` whole, body included (`passthru.tests`,
+  `identifiers.cpeParts`)
+- dropping lines matching `NOISE_LINE_PATTERNS` (`testers`/`nixosTests`
+  arguments, `*.configurePhaseHook` entries)
+- emptying the values `TRIVIAL_PATTERNS` names (`version`, `hash`, …)
 
-Nothing is ever filtered *out of* a diff — a patch is either held back whole or
-diffed whole. Deleting lines from a generated diff would leave context
-describing a state that never existed, and the patch would stop applying.
+When both sides reduce to the same text the patch is held back: listed in
+`ignored-divergence.txt`, never written into `patches/`, never counted as drift,
+so `--strict` stays quiet for it.
 
-Add patterns to `TRIVIAL_PATTERNS` in `config.py` as more shapes turn up. Each
-must expose a `key` group naming the attribute, which is what makes the
-balancing possible.
+Emptying a value rather than deleting its line is deliberate. A bumped `hash`
+reduces to the same text on both sides, but a `hash` that upstream has and
+corepkgs lacks leaves a line with no counterpart and still shows — nothing
+moved there, something appeared.
+
+`significant` is the one transformation applied to **both** sides, so it may
+only ever decide whether a patch is worth reporting. It never helps build one:
+patches are still generated from the verbatim corepkgs file, and nothing is
+filtered *out of* a diff. A patch is held back whole or diffed whole. Deleting
+lines from a generated diff would leave context describing a state that never
+existed, and the patch would stop applying — which is why a held-back category
+exists at all.
+
+That also means a file with one real difference is diffed in full, noise
+included. The noise is only ever a reason to skip a patch, never to edit one.
+
+Add to `NOISE_BINDINGS`, `NOISE_LINE_PATTERNS` or `TRIVIAL_PATTERNS` in
+`config.py` as more shapes turn up.
 
 ## How a patch is built
 

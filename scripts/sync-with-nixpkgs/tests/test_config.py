@@ -71,3 +71,19 @@ class TestTrivialPatterns:
     def test_patterns_do_not_match_ordinary_bindings(self):
         for line in ('  pname = "curl";', "  doCheck = true;", '  src = fetchurl { };'):
             assert all(p.match(line) is None for p in config.TRIVIAL_PATTERNS), line
+
+
+class TestNoisePatterns:
+    def test_noise_line_patterns_match_what_they_claim(self):
+        for line in ("  testers,", "  nixosTests,", "    cmake.configurePhaseHook",
+                     "    meson.configurePhaseHook"):
+            assert any(p.match(line) for p in config.NOISE_LINE_PATTERNS), line
+
+    def test_noise_line_patterns_are_anchored(self):
+        # A longer name that merely starts the same must not be swallowed.
+        for line in ("  testersFoo,", "  cmake", "  configurePhaseHook = x;"):
+            assert all(p.match(line) is None for p in config.NOISE_LINE_PATTERNS), line
+
+    def test_noise_bindings_are_dotted_paths(self):
+        for name in config.NOISE_BINDINGS:
+            assert name and " " not in name
