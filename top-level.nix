@@ -31,18 +31,12 @@ with final;
   # The full-source bootstrap: a toolchain grown from the hex0 seed in
   # stage0-posix rather than from a prebuilt tarball. It lives in its own scope
   # so that a stray `callPackage` cannot reach a top-level package and quietly
-  # reintroduce the binary seed it exists to avoid; every input it is allowed to
-  # see is listed below.
-  minimal-bootstrap = lib.recurseIntoAttrs (
-    import ./build-support/minimal-bootstrap {
-      inherit lib config;
-      inherit (stdenv) buildPlatform hostPlatform;
-      fetchurl = fetchurl-bootstrap;
-      checkMeta = import ./stdenv/generic/check-meta.nix {
-        inherit lib config;
-      };
-    }
-  );
+  # reintroduce the binary seed it exists to avoid.
+  #
+  # The scope is built in `stdenv/linux/stage0.nix` and surfaced here, rather
+  # than constructed a second time: on a system that bootstraps from source this
+  # is the very toolchain `stdenv` was grown from, not a rebuild of it.
+  inherit (stdenv.stage0) minimal-bootstrap;
 
   minimal-bootstrap-sources =
     callPackage ./build-support/minimal-bootstrap/stage0-posix/bootstrap-sources.nix
