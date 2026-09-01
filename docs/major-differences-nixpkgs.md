@@ -10,6 +10,10 @@ changes differ significantly from whath one would expct with Nixpkgs.
 - `config.gitConfig` and `config.gitConfigFile` were removed
   - Globally altering git behavior should be done at the machine level
 
+## Flake behavior
+
+- Exposes a `lib.mkFlake` utility for easily creating a flake output structure
+
 ## Package paradigms
 
 - setupHooks for build managers are now explicit and opt-in.
