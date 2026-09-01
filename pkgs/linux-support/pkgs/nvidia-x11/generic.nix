@@ -13,7 +13,6 @@
   fabricmanagerVersion ? null,
   useGLVND ? true,
   useProfiles ? true,
-  preferGtk2 ? false,
   settings32Bit ? false,
   useSettings ? true,
   usePersistenced ? true,
@@ -292,8 +291,6 @@ stdenv.mkDerivation (finalAttrs: {
           (if settings32Bit then pkgsi686Linux.callPackage else callPackage)
             (import ./settings.nix finalAttrs.finalPackage settingsSha256)
             {
-              withGtk2 = preferGtk2;
-              withGtk3 = !preferGtk2;
               fetchFromGitHub = fetchFromGithubOrNvidia;
             }
         else
