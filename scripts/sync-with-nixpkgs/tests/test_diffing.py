@@ -295,6 +295,16 @@ class TestSubstantive:
     def test_a_longer_name_sharing_the_prefix_still_is(self):
         assert _substantive("{\n  strictDeps = true;\n}\n", "{\n  strictDepsFoo = true;\n}\n")
 
+    def test_a_blank_line_difference_is_not(self):
+        # Where a file breathes is formatting, not design.
+        assert not _substantive('{\n  a = 1;\n  b = 2;\n}\n', '{\n  a = 1;\n\n  b = 2;\n}\n')
+
+    def test_indentation_only_whitespace_lines_count_as_blank(self):
+        assert not _substantive('{\n  a = 1;\n}\n', '{\n  a = 1;\n   \n}\n')
+
+    def test_blank_lines_do_not_hide_a_real_change(self):
+        assert _substantive('{\n  a = 1;\n}\n', '{\n\n  a = 2;\n\n}\n')
+
     def test_a_differing_patch_file_is(self):
         assert diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True).substantive
         assert not diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=False).substantive
