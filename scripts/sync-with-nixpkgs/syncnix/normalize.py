@@ -15,8 +15,15 @@ Vocabulary = list[tuple[re.Pattern[str], str]]
 """Compiled `(pattern, replacement)` rewrites applied to nixpkgs content."""
 
 def _binding_matcher(names: tuple[str, ...]) -> re.Pattern[str]:
-    """Match the opening line of any binding in `names`, `meta.`-qualified or not."""
-    return re.compile(r"^\s*(?:meta\.)?(?:" + "|".join(re.escape(n) for n in names) + r")\s*=")
+    """Match the opening line of any binding in `names`.
+
+    A `meta.` or `passthru.` qualifier is optional, since the same binding is
+    written either way -- `passthru.updateScript = ...` at the top level of a
+    package, or a bare `updateScript = ...` inside a `passthru` block.
+    """
+    return re.compile(
+        r"^\s*(?:meta\.|passthru\.)?(?:" + "|".join(re.escape(n) for n in names) + r")\s*="
+    )
 
 
 _BINDING = _binding_matcher(config.DROPPED_META_BINDINGS)
@@ -111,6 +118,10 @@ def drop_meta_bindings(text: str) -> str:
 
     corepkgs carries none of them, so importing them would add noise to every
     package patch and produce content this repo's `check-meta` rejects outright.
+
+    Only the nixpkgs side is rewritten here, so this is the wrong home for a
+    binding corepkgs sometimes has -- that belongs in `NOISE_BINDINGS`, which
+    is applied to both sides.
 
     Plenty of files mention none of the three, and for those a few substring
     scans are cheaper than splitting the file into lines and walking it.

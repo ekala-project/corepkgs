@@ -288,6 +288,7 @@ NOISE_BINDINGS = (
     "identifiers.cpeParts",
     "passthru.tests",
     "strictDeps",
+    "updateScript",
     # keep-sorted end
 )
 """Bindings dropped whole, body included, however many lines they span."""
@@ -296,7 +297,9 @@ NOISE_LINE_PATTERNS = [
     # keep-sorted start
     re.compile(r"^\s*#"),
     re.compile(r"^\s*$"),
-    re.compile(r"^\s*(?:nixosTests|testers)\s*,\s*$"),
+    re.compile(
+        r"^\s*(?:gitUpdater|nix-update-script|nixosTests|testers|unstableGitUpdater)\s*,\s*$"
+    ),
     re.compile(r"^\s*[\w.]+\.configurePhaseHook\s*$"),
     # keep-sorted end
 ]

@@ -249,6 +249,23 @@ EQUIVALENT = _cases(
     ("enableParallelInstalling dropped", nix("enableParallelInstalling = true;"), "{\n}\n"),
     ("doCheck flipped", nix("doCheck = true;"), nix("doCheck = false;")),
     ("doCheck on one side only", nix('pname = "a";', "doCheck = false;"), nix('pname = "a";')),
+    # An update script is dropped when porting, and its helper argument goes
+    # with it -- both spellings, and whether or not corepkgs kept one.
+    (
+        "update script added upstream",
+        nix('pname = "a";'),
+        nix('pname = "a";', "passthru.updateScript = nix-update-script { };"),
+    ),
+    (
+        "update script inside passthru",
+        nix('pname = "a";'),
+        nix('pname = "a";', "updateScript = gitUpdater { };"),
+    ),
+    (
+        "update script helper argument",
+        "{\n  lib,\n}:\n",
+        "{\n  lib,\n  nix-update-script,\n}:\n",
+    ),
     # Where a file breathes is formatting, not design.
     ("blank line inserted", nix("a = 1;", "b = 2;"), "{\n  a = 1;\n\n  b = 2;\n}\n"),
     ("whitespace-only line", nix("a = 1;"), "{\n  a = 1;\n   \n}\n"),
