@@ -88,7 +88,26 @@ let
     in
     result.success && result.value;
 
-  names = builtins.attrNames pkgs;
+  # texlive scheme environments (texliveBasic … texliveFull …) are buildEnv
+  # wrappers that pull in thousands of TeX packages.  Forcing drvPath on
+  # them re-evaluates every inner derivation (check-meta, dependency
+  # validation, etc.) even though those packages are already covered
+  # individually through `texlivePackages`.  texliveFull alone accounts for
+  # ~50 % of total eval time, so skip all scheme envs here.
+  texliveSchemes = [
+    "texliveBasic"
+    "texliveBookPub"
+    "texliveConTeXt"
+    "texliveFull"
+    "texliveGUST"
+    "texliveInfraOnly"
+    "texliveMedium"
+    "texliveMinimal"
+    "texliveSmall"
+    "texliveTeTeX"
+  ];
+
+  names = builtins.filter (n: !builtins.elem n texliveSchemes) (builtins.attrNames pkgs);
   manyVariantNames = builtins.attrNames (builtins.readDir ../pkgs-many);
 
   # Build named pairs { name; value; } for top-level attrs and variants.
