@@ -273,11 +273,7 @@ in
     stageFun prevStage {
       name = "bootstrap-stage1";
 
-      # Rebuild binutils to use from stage2 onwards.
       overrides = self: super: {
-        binutils-unwrapped = super.binutils-unwrapped.override {
-          enableGold = false;
-        };
         inherit (prevStage)
           ccWrapperStdenv
           gcc-unwrapped
@@ -340,6 +336,8 @@ in
           m4
           perl
           patchelf
+          nukeReferences
+          libxcrypt
           ;
         ${localSystem.libc} = prevStage.${localSystem.libc};
         # This stage also rebuilds binutils which will of course be used only in the next stage.
@@ -471,11 +469,9 @@ in
           bison
           texinfo
           which
+          nukeReferences
+          libxcrypt
           ;
-        dejagnu = super.dejagnu.overrideAttrs (a: {
-          doCheck = false;
-        });
-
         # Avoids infinite recursion, as this is in the build-time dependencies of libc.
         libiconv = self.libcIconv prevStage.libc;
 
@@ -586,6 +582,7 @@ in
             libidn2
             libunistring
             libxcrypt
+            nukeReferences
             ;
           # We build a special copy of libgmp which doesn't use libstdc++, because
           # xgcc++'s libstdc++ references the bootstrap-files (which is what
