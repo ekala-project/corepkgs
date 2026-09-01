@@ -10,20 +10,8 @@
   stdenv,
   nixpkgsFun,
   overlays,
-  makeMuslParsedPlatform,
 }:
-let
-  makeLLVMParsedPlatform =
-    parsed:
-    (
-      parsed
-      // {
-        abi = lib.systems.parse.abis.llvm;
-      }
-    );
-in
-self: super:
-builtins.mapAttrs (_: v: if builtins.isAttrs v then lib.dontRecurseIntoAttrs v else v) {
+self: super: {
   pkgsLLVM = nixpkgsFun {
     overlays = [
       (self': super': {
@@ -74,9 +62,9 @@ builtins.mapAttrs (_: v: if builtins.isAttrs v then lib.dontRecurseIntoAttrs v e
 
   # All packages built with the Musl libc. This will override the
   # default GNU libc on Linux systems. Non-Linux systems are not
-  # supported. 32-bit is also not supported.
+  # supported. 32-bit is also not supported, except for x86.
   pkgsMusl =
-    if stdenv.hostPlatform.isLinux && stdenv.buildPlatform.is64bit then
+    if stdenv.hostPlatform.isLinux && (stdenv.buildPlatform.is64bit || stdenv.buildPlatform.isx86) then
       nixpkgsFun {
         overlays = [
           (self': super': {
@@ -85,33 +73,13 @@ builtins.mapAttrs (_: v: if builtins.isAttrs v then lib.dontRecurseIntoAttrs v e
         ]
         ++ overlays;
         ${if stdenv.hostPlatform == stdenv.buildPlatform then "localSystem" else "crossSystem"} = {
-          config = lib.systems.parse.tripleFromSystem (makeMuslParsedPlatform stdenv.hostPlatform.parsed);
-        };
-      }
-    else
-      throw "Musl libc only supports 64-bit Linux systems.";
-
-  # x86_64-darwin packages for aarch64-darwin users to use with Rosetta for incompatible packages
-  pkgsx86_64Darwin =
-    if stdenv.hostPlatform.isDarwin then
-      nixpkgsFun {
-        overlays = [
-          (self': super': {
-            pkgsx86_64Darwin = super';
-          })
-        ]
-        ++ overlays;
-        localSystem = {
           config = lib.systems.parse.tripleFromSystem (
-            stdenv.hostPlatform.parsed
-            // {
-              cpu = lib.systems.parse.cpuTypes.x86_64;
-            }
+            lib.systems.parse.mkMuslSystem stdenv.hostPlatform.parsed
           );
         };
       }
     else
-      throw "x86_64 Darwin package set can only be used on Darwin systems.";
+      throw "Musl libc only supports 64-bit Linux systems, and i686-linux.";
 
   # Full package set with rocm on cuda off
   # Mostly useful for asserting pkgs.pkgsRocm.torchWithRocm == pkgs.torchWithRocm and similar
@@ -143,12 +111,11 @@ builtins.mapAttrs (_: v: if builtins.isAttrs v then lib.dontRecurseIntoAttrs v e
           stdenv = super'.withDefaultHardeningFlags (
             super'.stdenv.cc.defaultHardeningFlags
             ++ [
-              "strictflexarrays1"
               "shadowstack"
               "nostrictaliasing"
               "pacret"
               "glibcxxassertions"
-              "libcxxhardeningfast"
+              "libcxxhardeningextensive"
               "trivialautovarinit"
             ]
           ) super'.stdenv;

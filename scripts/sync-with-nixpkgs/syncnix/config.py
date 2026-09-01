@@ -34,6 +34,7 @@ PATH_MAPPINGS = {
     "build-support/setup-hooks/set-java-classpath.sh": "pkgs/by-name/se/setJavaClassPath/set-java-classpath.sh",
     "build-support/setup-hooks/strip-java-archives.sh": "pkgs/by-name/st/stripJavaArchivesHook/strip-java-archives.sh",
     "common-updater": "pkgs/common-updater",
+    "default.nix": "pkgs/top-level/default.nix",
     "haskell": "pkgs/development/haskell-modules",
     "pkgs": "pkgs/by-name",
     "pkgs/OVMF": "pkgs/applications/virtualization/OVMF",
@@ -164,8 +165,6 @@ PATH_MAPPINGS = {
     "stdenv": "pkgs/stdenv",
     "stdenv/config.nix": "pkgs/top-level/config.nix",
     "stdenv/generic/meta-types.nix": "lib/meta-types.nix",
-    "stdenv/impure.nix": "pkgs/top-level/impure.nix",
-    "stdenv/pure.nix": "pkgs/top-level/default.nix",
     "stdenv/release/lib.nix": "pkgs/top-level/release-lib.nix",
     "stdenv/splice.nix": "pkgs/top-level/splice.nix",
     "stdenv/stage.nix": "pkgs/top-level/stage.nix",
@@ -258,7 +257,6 @@ IGNORE_FILES = [
     # keep-sorted start
     ".gitignore",
     "LICENSE",
-    "default.nix",
     "flake.lock",
     "flake.nix",
     "haskell/hackage-packages.nix",  # generated from Hackage; diffing it is noise
