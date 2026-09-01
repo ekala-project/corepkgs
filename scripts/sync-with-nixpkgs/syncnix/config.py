@@ -332,6 +332,7 @@ counterpart.
 
 NOISE_LINE_PATTERNS = [
     # keep-sorted start
+    re.compile(r"^\s*$"),
     re.compile(r"^\s*(?:nixosTests|testers)\s*,\s*$"),
     re.compile(r"^\s*[\w.]+\.configurePhaseHook\s*$"),
     # keep-sorted end
@@ -344,6 +345,10 @@ once that binding is set aside the argument that fed it is noise too.
 `cmake.configurePhaseHook` and its meson counterpart are a corepkgs build
 convention with no upstream equivalent, so they diverge in every package that
 uses either build system and say nothing about that package.
+
+Blank lines are here because where a file breathes is formatting, not design.
+Dropping them only ever decides whether a patch is reported; the patch itself
+still carries them, so it applies unchanged.
 """
 
 
