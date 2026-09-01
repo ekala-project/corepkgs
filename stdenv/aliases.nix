@@ -171,6 +171,7 @@ mapAliases {
   perl538 = perl.v5_38;
   perl540 = perl.v5_40;
   phpExtensions = php.buildPecl;
+  qemu-utils = qemu;
   r = r-lang;
   rLang = r-lang;
   scala_2_13 = scala.v2_13;

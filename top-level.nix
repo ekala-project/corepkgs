@@ -91,9 +91,6 @@ with final;
     pkgs = final;
   };
 
-  # qemu-utils alias for compatibility (qemu package provides qemu-img and utilities)
-  qemu-utils = qemu;
-
   # igraph-c alias for C library (to avoid conflict with python3Packages.igraph)
   igraph-c = igraph;
 
@@ -704,6 +701,13 @@ with final;
   mesa_i686 = null; # TODO(corepkgs): needs pkgsi686Linux
   libgbm = callPackage ./pkgs/mesa/gbm.nix { };
   mesa-gl-headers = callPackage ./pkgs/mesa/headers.nix { };
+
+  # variant of qemu building user space emulator only - intended to be used from pkgsStatic
+  qemu-user = qemu.override {
+    userOnly = true;
+  };
+
+  wrapQemuBinfmtP = callPackage ./pkgs/qemu/binfmt-p-wrapper.nix { };
 
   libunwind =
     # Use the system unwinder in the SDK but provide a compatibility package to:
