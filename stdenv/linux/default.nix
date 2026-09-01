@@ -376,6 +376,15 @@ in
               # which will cause compilation to fail with
               # configure: error: C compiler cannot create executables
               enableDefaultPie = false;
+
+              # xgcc is a throwaway compiler — disable Graphite loop optimizations
+              # (ISL) and unnecessary runtime libraries to speed up the build.
+              isl = null;
+              langFortran = false;
+              langGo = false;
+              langJit = false;
+              langObjC = false;
+              langObjCpp = false;
             }
           )).overrideAttrs
             (a: {
@@ -409,6 +418,12 @@ in
                 # Don't assume that `gettext` was built with iconv support, since we don't have
                 # our own `glibc` yet.
                 "--disable-nls"
+                # xgcc is only used to compile glibc and a handful of C/C++
+                # packages in the next stage — skip runtime libs that are
+                # unnecessary and expensive to build.
+                "--disable-libgomp"
+                "--disable-libquadmath"
+                "--disable-libsanitizer"
               ];
 
               # This is a separate phase because gcc assembles its phase scripts
