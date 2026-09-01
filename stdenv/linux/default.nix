@@ -8,6 +8,11 @@
 # nixpkgs instances (stages) to gradually rebuild stdenv, which
 # is used to build all other packages (including the bootstrapFiles).
 #
+# On i686 and x86_64 there is no seed to start from: those platforms carry no
+# bootstrapFiles at all, and `./stage0.nix` grows the toolchain from the hex0
+# seed in stage0-posix instead. Every remaining platform still starts from a
+# tarball, so both paths below are live.
+#
 # Goals of the bootstrap process:
 # 1. final stdenv must not reference any of the bootstrap files.
 # 2. final stdenv must not contain any of the bootstrap files.
@@ -63,8 +68,6 @@
     let
       table = {
         glibc = {
-          i686-linux = import ./bootstrap-files/i686-unknown-linux-gnu.nix;
-          x86_64-linux = import ./bootstrap-files/x86_64-unknown-linux-gnu.nix;
           armv5tel-linux = import ./bootstrap-files/armv5tel-unknown-linux-gnueabi.nix;
           armv6l-linux = import ./bootstrap-files/armv6l-unknown-linux-gnueabihf.nix;
           armv7l-linux = import ./bootstrap-files/armv7l-unknown-linux-gnueabihf.nix;
@@ -90,7 +93,6 @@
         musl = {
           aarch64-linux = import ./bootstrap-files/aarch64-unknown-linux-musl.nix;
           armv6l-linux = import ./bootstrap-files/armv6l-unknown-linux-musleabihf.nix;
-          x86_64-linux = import ./bootstrap-files/x86_64-unknown-linux-musl.nix;
         };
       };
 
