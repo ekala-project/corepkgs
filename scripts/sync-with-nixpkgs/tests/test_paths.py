@@ -1,106 +1,90 @@
+import pytest
+
 from syncnix import paths
 
 
-class TestResolve:
-    def test_longest_prefix_wins(self):
+@pytest.mark.parametrize(
+    "path,expected",
+    [
         # "pkgs/gcc" must beat the generic "pkgs" -> by-name mapping.
-        assert paths.resolve("pkgs/gcc/default.nix") == (
-            "pkgs/development/compilers/gcc/default.nix"
-        )
-
-    def test_by_name_shards_and_renames_entry_point(self):
-        assert paths.resolve("pkgs/curl/default.nix") == "pkgs/by-name/cu/curl/package.nix"
-
-    def test_by_name_keeps_non_entry_files(self):
-        assert paths.resolve("pkgs/curl/fix.patch") == "pkgs/by-name/cu/curl/fix.patch"
-
-    def test_by_name_bare_package_implies_entry_point(self):
-        assert paths.resolve("pkgs/curl") == "pkgs/by-name/cu/curl/package.nix"
-
-    def test_by_name_shard_is_lowercased(self):
-        assert paths.resolve("pkgs/ZopfliPng/default.nix").startswith("pkgs/by-name/zo/")
-
-    def test_single_character_package_has_no_shard(self):
-        assert paths.resolve("pkgs/z/default.nix") is None
-
-    def test_exact_file_mapping(self):
-        assert paths.resolve("stdenv/pure.nix") == "pkgs/top-level/default.nix"
-
-    def test_directory_mapping_passes_remainder_through(self):
-        assert paths.resolve("stdenv/generic/setup.sh") == "pkgs/stdenv/generic/setup.sh"
-
-    def test_mapping_straight_to_a_by_name_directory_renames_the_entry_point(self):
-        # corepkgs renamed the package, so the mapping names the upstream shard
+        ("pkgs/gcc/default.nix", "pkgs/development/compilers/gcc/default.nix"),
+        ("pkgs/curl/default.nix", "pkgs/by-name/cu/curl/package.nix"),
+        ("pkgs/curl/fix.patch", "pkgs/by-name/cu/curl/fix.patch"),
+        ("pkgs/curl", "pkgs/by-name/cu/curl/package.nix"),
+        # corepkgs renamed these, so the mapping names the upstream shard
         # directly; the default.nix -> package.nix rename must still apply.
-        assert paths.resolve("pkgs/m4/default.nix") == "pkgs/by-name/gn/gnum4/package.nix"
-        assert paths.resolve("pkgs/make/default.nix") == "pkgs/by-name/gn/gnumake/package.nix"
-
-    def test_non_by_name_mapping_keeps_default_nix(self):
-        assert paths.resolve("pkgs/sed/default.nix") == "pkgs/tools/text/gnused/default.nix"
-
-    def test_unmapped_path_returns_none(self):
-        assert paths.resolve("ekaos/modules/thing.nix") is None
-
-
-class TestIgnore:
-    def test_ignores_exact_file(self):
-        assert paths.is_ignored("top-level.nix")
-
-    def test_does_not_ignore_same_name_deeper(self):
-        assert not paths.is_ignored("pkgs/curl/default.nix")
-
-    def test_ignores_directory_and_contents(self):
-        assert paths.is_ignored("scripts")
-        assert paths.is_ignored("scripts/sync-with-nixpkgs/sync.py")
-
-    def test_ignores_markdown_anywhere(self):
-        assert paths.is_ignored("README.md")
-        assert paths.is_ignored("build-support/go/README.md")
-        assert paths.is_ignored("pkgs/texlive/UPGRADING.md")
-
-    def test_does_not_ignore_similar_names(self):
-        assert not paths.is_ignored("pkgs/foo/README.md.nix")
-        assert not paths.is_ignored("pkgs/md/default.nix")
-
-    def test_prefix_match_requires_separator(self):
-        # "config" is ignored; "configuration.nix" must not be.
-        assert not paths.is_ignored("configuration.nix")
+        ("pkgs/m4/default.nix", "pkgs/by-name/gn/gnum4/package.nix"),
+        ("pkgs/make/default.nix", "pkgs/by-name/gn/gnumake/package.nix"),
+        ("pkgs/sed/default.nix", "pkgs/tools/text/gnused/default.nix"),
+        ("stdenv/pure.nix", "pkgs/top-level/default.nix"),
+        ("stdenv/generic/setup.sh", "pkgs/stdenv/generic/setup.sh"),
+        # A one-character name has no shard, and nothing maps ekaos.
+        ("pkgs/z/default.nix", None),
+        ("unclaimed/thing.nix", None),
+    ],
+)
+def test_resolve(path, expected):
+    assert paths.resolve(path) == expected
 
 
-class TestOpaque:
-    def test_patch_and_diff_are_opaque(self):
-        assert paths.is_opaque("pkgs/curl/fix.patch")
-        assert paths.is_opaque("pkgs/curl/fix.diff")
-
-    def test_nix_is_not_opaque(self):
-        assert not paths.is_opaque("pkgs/curl/default.nix")
+def test_by_name_shard_is_lowercased():
+    assert paths.resolve("pkgs/ZopfliPng/default.nix").startswith("pkgs/by-name/zo/")
 
 
-class TestPatchTarget:
-    def test_grouped_directory_collapses_to_subdirectory(self):
-        assert paths.patch_target("pkgs/curl/default.nix") == "pkgs/curl.patch"
-        assert paths.patch_target("pkgs/curl/fix.patch") == "pkgs/curl.patch"
+@pytest.mark.parametrize(
+    "path,ignored",
+    [
+        ("top-level.nix", True),
+        ("scripts", True),
+        ("scripts/sync-with-nixpkgs/sync.py", True),
+        ("README.md", True),
+        ("build-support/go/README.md", True),
+        ("pkgs/texlive/UPGRADING.md", True),
+        # A file sharing an ignored file's name deeper in the tree is not it.
+        ("pkgs/curl/default.nix", False),
+        ("pkgs/foo/README.md.nix", False),
+        ("pkgs/md/default.nix", False),
+        # "config" is ignored; a prefix match must still need a separator.
+        ("configuration.nix", False),
+    ],
+)
+def test_is_ignored(path, ignored):
+    assert paths.is_ignored(path) is ignored
 
-    def test_grouped_directory_groups_nested_files_together(self):
-        assert paths.patch_target("build-support/fetchgit/builder.sh") == (
-            "build-support/fetchgit.patch"
-        )
 
-    def test_ungrouped_path_mirrors_itself(self):
-        assert paths.patch_target("stdenv/generic/setup.sh") == "stdenv/generic/setup.sh.patch"
+@pytest.mark.parametrize(
+    "path,opaque",
+    [("pkgs/curl/fix.patch", True), ("pkgs/curl/fix.diff", True), ("pkgs/curl/default.nix", False)],
+)
+def test_is_opaque(path, opaque):
+    assert paths.is_opaque(path) is opaque
 
 
-class TestLocalOnly:
-    def test_matches_exact_declaration(self, monkeypatch):
-        monkeypatch.setattr(paths.config, "LOCAL_ONLY", ["pkgs/foo/only.nix"])
-        assert paths.is_local_only("pkgs/foo/only.nix")
-        assert not paths.is_local_only("pkgs/foo/other.nix")
+@pytest.mark.parametrize(
+    "path,target",
+    [
+        # Everything under a grouped directory shares one patch per package.
+        ("pkgs/curl/default.nix", "pkgs/curl.patch"),
+        ("pkgs/curl/fix.patch", "pkgs/curl.patch"),
+        ("build-support/fetchgit/builder.sh", "build-support/fetchgit.patch"),
+        ("stdenv/generic/setup.sh", "stdenv/generic/setup.sh.patch"),
+    ],
+)
+def test_patch_target(path, target):
+    assert paths.patch_target(path) == target
 
-    def test_matches_everything_under_a_declared_directory(self, monkeypatch):
-        monkeypatch.setattr(paths.config, "LOCAL_ONLY", ["pkgs/foo"])
-        assert paths.is_local_only("pkgs/foo")
-        assert paths.is_local_only("pkgs/foo/deep/thing.nix")
 
-    def test_requires_a_path_separator(self, monkeypatch):
-        monkeypatch.setattr(paths.config, "LOCAL_ONLY", ["pkgs/foo"])
-        assert not paths.is_local_only("pkgs/foobar/default.nix")
+@pytest.mark.parametrize(
+    "declared,path,expected",
+    [
+        (["pkgs/foo/only.nix"], "pkgs/foo/only.nix", True),
+        (["pkgs/foo/only.nix"], "pkgs/foo/other.nix", False),
+        (["pkgs/foo"], "pkgs/foo", True),
+        (["pkgs/foo"], "pkgs/foo/deep/thing.nix", True),
+        # A prefix match must still need a separator.
+        (["pkgs/foo"], "pkgs/foobar/default.nix", False),
+    ],
+)
+def test_is_local_only(monkeypatch, declared, path, expected):
+    monkeypatch.setattr(paths.config, "LOCAL_ONLY", declared)
+    assert paths.is_local_only(path) is expected

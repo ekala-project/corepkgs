@@ -14,9 +14,13 @@ from . import config
 Vocabulary = list[tuple[re.Pattern[str], str]]
 """Compiled `(pattern, replacement)` rewrites applied to nixpkgs content."""
 
-_BINDING = re.compile(
-    r"^(?P<indent>\s*)(?:meta\.)?(?P<name>" + "|".join(config.DROPPED_META_BINDINGS) + r")\s*="
-)
+def _binding_matcher(names: tuple[str, ...]) -> re.Pattern[str]:
+    """Match the opening line of any binding in `names`, `meta.`-qualified or not."""
+    return re.compile(r"^\s*(?:meta\.)?(?:" + "|".join(re.escape(n) for n in names) + r")\s*=")
+
+
+_BINDING = _binding_matcher(config.DROPPED_META_BINDINGS)
+_NOISE_BINDING = _binding_matcher(config.NOISE_BINDINGS)
 
 
 def rewrite_paths(text: str) -> str:
@@ -130,17 +134,8 @@ def _drop_bindings(text: str, binding: re.Pattern[str]) -> str:
     return "\n".join(kept)
 
 
-_NOISE_BINDING = re.compile(
-    r"^(?P<indent>\s*)(?:meta\.)?(?P<name>"
-    + "|".join(re.escape(name) for name in config.NOISE_BINDINGS)
-    + r")\s*="
-)
-
-
 _EQUIVALENT_KEY = re.compile(
-    r"^(?P<indent>\s*)(?P<key>"
-    + "|".join(re.escape(name) for name in config.EQUIVALENT_KEYS)
-    + r")(?=\s*=)"
+    r"^\s*(?P<key>" + "|".join(re.escape(name) for name in config.EQUIVALENT_KEYS) + r")(?=\s*=)"
 )
 
 
