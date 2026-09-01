@@ -57,6 +57,11 @@ corepkgs writes differently, the `cmake.configurePhaseHook` this repo adds and
 nixpkgs has no equivalent for. `normalize.significant` reduces a file to what a
 reviewer needs by
 
+- applying `NOISE_SUBSTITUTIONS`, which collapse two spellings of the same
+  thing into one — `rec { ... }` and `(finalAttrs: { ... })` are the same
+  derivation, and switching between them drags every self-reference with it
+  (`${version}` becomes `${finalAttrs.version}`), so no line-level rule can
+  express it
 - removing `NOISE_BINDINGS` whole, body included (`passthru.tests`,
   `identifiers.cpeParts`)
 - dropping lines matching `NOISE_LINE_PATTERNS` (`testers`/`nixosTests`

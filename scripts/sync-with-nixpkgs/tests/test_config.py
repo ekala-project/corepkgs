@@ -87,3 +87,17 @@ class TestNoisePatterns:
     def test_noise_bindings_are_dotted_paths(self):
         for name in config.NOISE_BINDINGS:
             assert name and " " not in name
+
+
+class TestNoiseSubstitutions:
+    def test_both_derivation_forms_reduce_alike(self):
+        from syncnix import normalize
+
+        rec = "mkDerivation rec {\n  x = pname;\n}\n"
+        final = "mkDerivation (finalAttrs: {\n  x = finalAttrs.pname;\n})\n"
+        assert normalize.significant(rec) == normalize.significant(final)
+
+    def test_substitutions_are_pattern_replacement_pairs(self):
+        for pattern, replacement in config.NOISE_SUBSTITUTIONS:
+            assert hasattr(pattern, "sub")
+            assert isinstance(replacement, str)

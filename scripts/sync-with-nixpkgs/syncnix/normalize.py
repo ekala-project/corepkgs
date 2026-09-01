@@ -154,10 +154,15 @@ def significant(text: str) -> str:
     ever decide whether a patch is worth reporting, never help build one. A
     patch is still generated from the verbatim corepkgs file, so it applies.
 
+    `NOISE_SUBSTITUTIONS` run first, so that `rec` and `finalAttrs` forms have
+    already collapsed into one before anything else is matched against them.
+
     Emptying a value rather than deleting the line is deliberate: a bumped
     `hash` then reduces to the same text on both sides, while a `hash` upstream
     added and corepkgs lacks leaves a line with no counterpart, and still shows.
     """
+    for pattern, replacement in config.NOISE_SUBSTITUTIONS:
+        text = pattern.sub(replacement, text)
     stripped = _drop_bindings(text, _NOISE_BINDING)
     return "\n".join(
         _blank_trivial(line)
