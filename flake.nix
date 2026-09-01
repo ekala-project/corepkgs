@@ -49,5 +49,8 @@
           "ekala-corepkgs.cachix.org-1:DcZV+vegWoEzacbSdXFXU4S7728C0eS9RfGpKeyHd6w="
         ];
       };
+      lib = nix-lib // {
+        mkFlake = import ./lib/mk-flake.nix;
+      };
     };
 }
