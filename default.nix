@@ -90,8 +90,6 @@ let
         throwIfNot (lib.all lib.isFunction crossOverlays) "All crossOverlays passed to nixpkgs must be functions."
       );
 
-  localSystem = lib.systems.elaborate inputs.localSystem;
-
   # Condition preserves sharing which in turn affects equality.
   #
   # See `lib.systems.equals` documentation for more details.
@@ -104,11 +102,15 @@ let
   #
   # Both systems are semantically equivalent as the same vendor and ABI are
   # inferred from the system double in `localSystem`.
-  crossSystem =
+  elaboratedLocalSystem = lib.systems.elaborate inputs.localSystem;
+  elaboratedCrossSystem =
     let
-      system = lib.systems.elaborate inputs.crossSystem;
+      elaboratedCrossSystem = lib.systems.elaborate inputs.crossSystem;
     in
-    if inputs.crossSystem == null || lib.systems.equals system localSystem then localSystem else system;
+    if inputs.crossSystem == null || lib.systems.equals elaboratedCrossSystem elaboratedLocalSystem then
+      elaboratedLocalSystem
+    else
+      elaboratedCrossSystem;
 
   # Allow both:
   # { /* the config */ } and
@@ -187,12 +189,12 @@ let
   stages = stdenvStages {
     inherit
       lib
-      localSystem
-      crossSystem
       config
       overlays
       crossOverlays
       ;
+    localSystem = elaboratedLocalSystem;
+    crossSystem = elaboratedCrossSystem;
   };
 
   pkgs = boot stages;
