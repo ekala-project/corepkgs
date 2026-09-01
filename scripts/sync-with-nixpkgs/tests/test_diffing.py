@@ -334,6 +334,25 @@ class TestSubstantive:
     def test_doCheckInstall_is_not_swallowed_with_it(self):
         assert _substantive("{\n  doInstallCheck = true;\n}\n", "{\n}\n")
 
+    def test_a_comment_only_difference_is_not(self):
+        assert not _substantive(
+            '{\n  # corepkgs says it this way\n  a = 1;\n}\n',
+            '{\n  # nixpkgs says it that way\n  a = 1;\n}\n',
+        )
+
+    def test_a_comment_present_on_one_side_only_is_not(self):
+        assert not _substantive("{\n  # explanation\n  a = 1;\n}\n", "{\n  a = 1;\n}\n")
+
+    def test_a_comment_does_not_hide_a_real_change(self):
+        assert _substantive("{\n  # same note\n  a = 1;\n}\n", "{\n  # same note\n  a = 2;\n}\n")
+
+    def test_a_hash_inside_a_string_is_not_a_comment(self):
+        # Only a line that *starts* with `#` is a comment line, so no quote
+        # parsing is needed and a URL fragment stays part of the code.
+        assert _substantive(
+            '{\n  url = "https://x/a#frag";\n}\n', '{\n  url = "https://x/b#frag";\n}\n'
+        )
+
     def test_a_differing_patch_file_is(self):
         assert diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True).substantive
         assert not diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=False).substantive
