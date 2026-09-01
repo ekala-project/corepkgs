@@ -104,13 +104,16 @@ let
   # inferred from the system double in `localSystem`.
   elaboratedLocalSystem = lib.systems.elaborate inputs.localSystem;
   elaboratedCrossSystem =
-    let
-      elaboratedCrossSystem = lib.systems.elaborate inputs.crossSystem;
-    in
-    if inputs.crossSystem == null || lib.systems.equals elaboratedCrossSystem elaboratedLocalSystem then
+    if inputs.crossSystem == inputs.localSystem then
       elaboratedLocalSystem
     else
-      elaboratedCrossSystem;
+      let
+        elaboratedCrossSystem = lib.systems.elaborate inputs.crossSystem;
+      in
+      if inputs.crossSystem == null || lib.systems.equals elaboratedCrossSystem elaboratedLocalSystem then
+        elaboratedLocalSystem
+      else
+        elaboratedCrossSystem;
 
   # Allow both:
   # { /* the config */ } and
