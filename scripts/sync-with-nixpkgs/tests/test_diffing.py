@@ -266,6 +266,18 @@ EQUIVALENT = _cases(
         "{\n  lib,\n}:\n",
         "{\n  lib,\n  nix-update-script,\n}:\n",
     ),
+    # Naming a binding covers its leaves: `identifiers.cpeParts.vendor` is part
+    # of `identifiers.cpeParts`, and a `passthru.tests` entry part of the tests.
+    (
+        "cpe sub-attribute on one side only",
+        nix('pname = "a";'),
+        nix('pname = "a";', 'identifiers.cpeParts.vendor = "x.org";'),
+    ),
+    (
+        "named test under passthru.tests",
+        nix('pname = "a";'),
+        nix('pname = "a";', "passthru.tests.version = testers.testVersion { };"),
+    ),
     # Where a file breathes is formatting, not design.
     ("blank line inserted", nix("a = 1;", "b = 2;"), "{\n  a = 1;\n\n  b = 2;\n}\n"),
     ("whitespace-only line", nix("a = 1;"), "{\n  a = 1;\n   \n}\n"),
@@ -288,6 +300,8 @@ DISTINCT = _cases(
     # Blanking a value keeps its line, so an attribute with no counterpart on
     # the other side still shows. Nothing moved here; something appeared.
     ("attribute added upstream", nix('pname = "a";'), nix('pname = "a";', 'hash = "sha256-b=";')),
+    # `doCheckTarget` merely starts with `doCheck`; only a dotted suffix counts.
+    ("longer name sharing a prefix", nix('pname = "a";'), nix('pname = "a";', "doCheckTarget = true;")),
     ("attribute removed upstream", nix('pname = "a";', 'hash = "sha256-b=";'), nix('pname = "a";')),
     (
         "version traded for hash",
