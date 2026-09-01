@@ -115,26 +115,22 @@ let
       else
         elaboratedCrossSystem;
 
-  # Allow both:
-  # { /* the config */ } and
-  # { pkgs, ... } : { /* the config */ }
-  config1 = if lib.isFunction inputs.config then inputs.config { inherit pkgs; } else inputs.config;
-
   configEval = lib.evalModules {
+    class = "nixpkgsConfig";
     modules = [
       ./config/build-options.nix
       ./config/package-options.nix
       ./config/overlays.nix
-      (
-        { options, ... }:
-        {
-          _file = "nixpkgs.config";
-          config = config1;
-        }
-      )
+      {
+        _file = "nixpkgs.config";
+        # Allow both:
+        # { /* the config */ } and
+        # { pkgs, ... } : { /* the config */ }
+        config =
+          if lib.isFunction inputs.config then inputs.config { inherit lib pkgs; } else inputs.config;
+      }
     ]
     ++ modules;
-    class = "nixpkgsConfig";
   };
 
   # take all the rest as-is
