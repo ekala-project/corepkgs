@@ -55,11 +55,6 @@
   # Error on unexpected args.
 }@args:
 
-# If `localSystem` was explicitly passed, legacy `system` should
-# not be passed, and vice-versa.
-assert args ? localSystem -> !(args ? system);
-assert args ? system -> !(args ? localSystem);
-
 let # Rename the function arguments
   config0 = config;
   crossSystem0 = crossSystem;
