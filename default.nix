@@ -60,17 +60,15 @@
   # Overlays applied only to the packages built for the host platform, not to
   # the native ones used to build them.
   crossOverlays ? [ ],
-
-  # A function returning the list of bootstrapping stages to fold into the
-  # final package set. `stages` below shows the arguments it is given.
-  # TODO: remove from here?
-  stdenvStages ? import ./stdenv,
 }@args:
 
 let
   inputs = { inherit localSystem crossSystem config; };
 in
 let
+  # A function returning the list of bootstrapping stages to fold into the
+  # final package set. `stages` below shows the arguments it is given.
+  stdenvStages = import ./stdenv;
   pristineLib = import ./lib.nix;
   lib =
     if __allowFileset then
