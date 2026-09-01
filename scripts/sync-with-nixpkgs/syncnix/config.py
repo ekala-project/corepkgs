@@ -312,15 +312,22 @@ Add patterns here as more trivial shapes turn up.
 
 NOISE_BINDINGS = (
     # keep-sorted start
+    "__structuredAttrs",
+    "enableParallelBuilding",
+    "enableParallelInstalling",
     "identifiers.cpeParts",
     "passthru.tests",
+    "strictDeps",
     # keep-sorted end
 )
 """Whole bindings whose divergence carries nothing for a reviewer.
 
 Unlike `TRIVIAL_PATTERNS` these span however many lines the binding occupies,
 and they need not balance: upstream gaining a `identifiers.cpeParts` corepkgs
-never had is still nothing to review.
+never had is still nothing to review. That one-sided case is why the build
+flags live here rather than among the trivial values -- they routinely appear
+on one side only, and blanking a value cannot hide a line that has no
+counterpart.
 """
 
 NOISE_LINE_PATTERNS = [

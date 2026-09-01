@@ -278,6 +278,23 @@ class TestSubstantive:
     def test_rev_is_not_interchangeable_with_version(self):
         assert _substantive('{\n  rev = "a";\n}\n', '{\n  version = "a";\n}\n')
 
+    def test_a_build_flag_present_on_one_side_only_is_not(self):
+        # These routinely appear on one side alone, so the whole binding goes;
+        # blanking a value cannot hide a line with no counterpart.
+        assert not _substantive(
+            '{\n  pname = "a";\n}\n', '{\n  pname = "a";\n  __structuredAttrs = true;\n}\n'
+        )
+
+    def test_a_flipped_build_flag_is_not(self):
+        assert not _substantive("{\n  strictDeps = true;\n}\n", "{\n  strictDeps = false;\n}\n")
+
+    def test_parallel_build_flags_are_not(self):
+        assert not _substantive("{\n  enableParallelBuilding = true;\n}\n", "{\n}\n")
+        assert not _substantive("{\n  enableParallelInstalling = true;\n}\n", "{\n}\n")
+
+    def test_a_longer_name_sharing_the_prefix_still_is(self):
+        assert _substantive("{\n  strictDeps = true;\n}\n", "{\n  strictDepsFoo = true;\n}\n")
+
     def test_a_differing_patch_file_is(self):
         assert diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=True).substantive
         assert not diffing.compare_opaque("p/fix.patch", "u/fix.patch", differs=False).substantive

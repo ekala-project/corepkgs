@@ -68,7 +68,8 @@ reviewer needs by
   (`${version}` becomes `${finalAttrs.version}`), so no line-level rule can
   express it
 - removing `NOISE_BINDINGS` whole, body included (`passthru.tests`,
-  `identifiers.cpeParts`)
+  `identifiers.cpeParts`, and build flags like `strictDeps` and
+  `__structuredAttrs` that routinely appear on one side only)
 - dropping lines matching `NOISE_LINE_PATTERNS` (`testers`/`nixosTests`
   arguments, `*.configurePhaseHook` entries)
 - renaming `EQUIVALENT_KEYS` to one spelling (`tag` → `rev`, `sha256` → `hash`),
