@@ -71,6 +71,9 @@ reviewer needs by
   `identifiers.cpeParts`)
 - dropping lines matching `NOISE_LINE_PATTERNS` (`testers`/`nixosTests`
   arguments, `*.configurePhaseHook` entries)
+- renaming `EQUIVALENT_KEYS` to one spelling (`tag` → `rev`, `sha256` → `hash`),
+  which is done independently of the value so that `tag = version;` and
+  `rev = version;` also reduce alike
 - emptying the values `TRIVIAL_PATTERNS` names (`version`, `hash`, …)
 
 When both sides reduce to the same text the patch is held back: listed in

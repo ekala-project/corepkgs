@@ -137,6 +137,27 @@ _NOISE_BINDING = re.compile(
 )
 
 
+_EQUIVALENT_KEY = re.compile(
+    r"^(?P<indent>\s*)(?P<key>"
+    + "|".join(re.escape(name) for name in config.EQUIVALENT_KEYS)
+    + r")(?=\s*=)"
+)
+
+
+def _canonical_key(line: str) -> str:
+    """Rename an attribute to the canonical spelling of what it means.
+
+    Independent of whether the value is trivial: `tag = version;` and
+    `rev = version;` name the same thing even though neither value is a
+    literal the tool would blank.
+    """
+    match = _EQUIVALENT_KEY.match(line)
+    if match is None:
+        return line
+    start, end = match.span("key")
+    return line[:start] + config.EQUIVALENT_KEYS[match.group("key")] + line[end:]
+
+
 def _blank_trivial(line: str) -> str:
     """Empty out a value the tool treats as trivial, keeping the binding."""
     for pattern in config.TRIVIAL_PATTERNS:
@@ -165,7 +186,7 @@ def significant(text: str) -> str:
         text = pattern.sub(replacement, text)
     stripped = _drop_bindings(text, _NOISE_BINDING)
     return "\n".join(
-        _blank_trivial(line)
+        _blank_trivial(_canonical_key(line))
         for line in stripped.split("\n")
         if not any(pattern.match(line) for pattern in config.NOISE_LINE_PATTERNS)
     )

@@ -360,6 +360,23 @@ leaves both forms identical, in either direction.
 """
 
 
+EQUIVALENT_KEYS = {
+    # keep-sorted start
+    "sha256": "hash",
+    "tag": "rev",
+    # keep-sorted end
+}
+"""Attribute names that mean the same thing, mapped alias -> canonical.
+
+Applied to the lines `TRIVIAL_PATTERNS` already empties, so `rev = "v1.0"` and
+`tag = "v1.0"` reduce to one line rather than two that differ only in the name.
+Renaming in either direction reduces the same way.
+
+Only names that are genuinely interchangeable belong here: `cargoHash` and
+`vendorHash` are both hashes but hash different things, so they stay distinct.
+"""
+
+
 LOCAL_ONLY = [
     # keep-sorted start
     "build-support/bintools-wrapper/darwin-install_name_tool-wrapper.sh",
