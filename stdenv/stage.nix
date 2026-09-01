@@ -178,7 +178,6 @@ let
           nixpkgsFun
           stdenv
           overlays
-          makeMuslParsedPlatform
           ;
       } self super
     );

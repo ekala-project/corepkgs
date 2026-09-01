@@ -16,8 +16,11 @@ from syncnix import paths
         ("pkgs/m4/default.nix", "pkgs/by-name/gn/gnum4/package.nix"),
         ("pkgs/make/default.nix", "pkgs/by-name/gn/gnumake/package.nix"),
         ("pkgs/sed/default.nix", "pkgs/tools/text/gnused/default.nix"),
-        ("stdenv/pure.nix", "pkgs/top-level/default.nix"),
+        # An exact file mapping beats the "stdenv" -> pkgs/stdenv directory rule.
+        ("stdenv/config.nix", "pkgs/top-level/config.nix"),
         ("stdenv/generic/setup.sh", "pkgs/stdenv/generic/setup.sh"),
+        # The root entry point is nixpkgs' package-set composer.
+        ("default.nix", "pkgs/top-level/default.nix"),
         # A one-character name has no shard, and nothing maps ekaos.
         ("pkgs/z/default.nix", None),
         ("unclaimed/thing.nix", None),
