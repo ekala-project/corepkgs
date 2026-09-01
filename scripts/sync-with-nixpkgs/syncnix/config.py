@@ -156,7 +156,6 @@ PATH_MAPPINGS = {
     "pkgs/system-sendmail": "pkgs/servers/mail/system-sendmail",
     "pkgs/systemd": "pkgs/os-specific/linux/systemd",
     "pkgs/tar": "pkgs/by-name/gn/gnutar",
-    "pkgs/texlive": "pkgs/tools/typesetting/tex/texlive",
     "pkgs/tpm2-tss": "pkgs/development/libraries/tpm2-tss",
     "pkgs/treefmt/modules/default.nix": "pkgs/by-name/tr/treefmt/modules/default.nix",
     "pkgs/uboot": "pkgs/misc/uboot",
@@ -260,6 +259,7 @@ IGNORE_DIRS = [
     "perl",  # too many changes, update manually
     "pkgs-many",
     "pkgs/lndir",  # our minimal implementation
+    "pkgs/texlive",  # generated set; upstream at pkgs/tools/typesetting/tex/texlive
     "r",
     "scripts",
     "services",
