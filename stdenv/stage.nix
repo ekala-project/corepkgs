@@ -47,6 +47,7 @@
   # `stdenv` without a C compiler. Passing in this helps avoid infinite
   # recursions, and may eventually replace passing in the full stdenv.
   stdenvNoCC ? stdenv.override {
+    name = "${stdenv.name}-no-cc";
     cc = null;
     hasCC = false;
     # Darwin doesn’t need an SDK in `stdenvNoCC`.  Dropping it shrinks the closure
@@ -59,52 +60,15 @@
   # bootstrapping stdenvs.
   allowCustomOverrides,
 
-  # Non-GNU/Linux OSes are currently "impure" platforms, with their libc
-  # outside of the store.  Thus, GCC, GFortran, & co. must always look for files
-  # in standard system directories (/usr/include, etc.)
-  noSysDirs ?
-    stdenv.buildPlatform.system != "x86_64-solaris"
-    && stdenv.buildPlatform.system != "x86_64-kfreebsd-gnu",
-
   # The configuration attribute set
   config,
 
   # A list of overlays (Additional `self: super: { .. }` customization
   # functions) to be fixed together in the produced package set
   overlays,
-}@args:
+}:
 
 let
-  # This is a function from parsed platforms (like
-  # stdenv.hostPlatform.parsed) to parsed platforms.
-  makeMuslParsedPlatform =
-    parsed:
-    # The following line guarantees that the output of this function
-    # is a well-formed platform with no missing fields.  It will be
-    # uncommented in a separate PR, in case it breaks the build.
-    #(x: lib.trivial.pipe x [ (x: removeAttrs x [ "_type" ]) lib.systems.parse.mkSystem ])
-    (
-      parsed
-      // {
-        abi =
-          {
-            gnu = lib.systems.parse.abis.musl;
-            gnueabi = lib.systems.parse.abis.musleabi;
-            gnueabihf = lib.systems.parse.abis.musleabihf;
-            gnuabin32 = lib.systems.parse.abis.muslabin32;
-            gnuabi64 = lib.systems.parse.abis.muslabi64;
-            gnuabielfv2 = lib.systems.parse.abis.musl;
-            gnuabielfv1 = lib.systems.parse.abis.musl;
-            # The following two entries ensure that this function is idempotent.
-            musleabi = lib.systems.parse.abis.musleabi;
-            musleabihf = lib.systems.parse.abis.musleabihf;
-            muslabin32 = lib.systems.parse.abis.muslabin32;
-            muslabi64 = lib.systems.parse.abis.muslabi64;
-          }
-          .${parsed.abi.name} or lib.systems.parse.abis.musl;
-      }
-    );
-
   stdenvAdapters =
     self: _:
     let
@@ -129,7 +93,7 @@ let
     };
 
   stdenvBootstrapAndPlatforms =
-    self: _:
+    self:
     let
       withFallback =
         thisPkgs:
@@ -160,25 +124,23 @@ let
       pkgs = self.pkgsHostTarget;
       targetPackages = self.pkgsTargetTarget;
 
-      inherit stdenv stdenvNoCC;
+      inherit lib stdenv stdenvNoCC;
     };
 
   splice = self: _: import ./splice.nix lib self (adjacentPackages != null);
 
-  aliases = self: super: lib.optionalAttrs config.allowAliases (import ./aliases.nix lib self super);
+  aliases = self: super: import ./aliases.nix lib self super;
 
   variants =
     self: super:
-    lib.optionalAttrs config.allowVariants (
-      import ./variants.nix {
-        inherit
-          lib
-          nixpkgsFun
-          stdenv
-          overlays
-          ;
-      } self super
-    );
+    import ./variants.nix {
+      inherit
+        lib
+        nixpkgsFun
+        stdenv
+        overlays
+        ;
+    } self super;
 
   # stdenvOverrides is used to avoid having multiple of versions
   # of certain dependencies that were used in bootstrapping the
@@ -192,8 +154,7 @@ let
   # (un-overridden) set of packages, allowing packageOverrides
   # attributes to refer to the original attributes (e.g. "foo =
   # ... pkgs.foo ...").
-  configOverrides =
-    _: super: lib.optionalAttrs allowCustomOverrides ((config.packageOverrides or (_: { })) super);
+  configOverrides = _: super: config.packageOverrides super;
 
   # Convenience attributes for instantiating package sets. Each of
   # these will instantiate a new version of allPackages. Currently the
@@ -237,13 +198,17 @@ let
             })
           ]
           ++ overlays;
-          ${if stdenv.hostPlatform == stdenv.buildPlatform then "localSystem" else "crossSystem"} = {
-            config = lib.systems.parse.tripleFromSystem (
-              stdenv.hostPlatform.parsed
-              // {
-                cpu = lib.systems.parse.cpuTypes.i686;
-              }
-            );
+          ${if stdenv.isCross then "crossSystem" else "localSystem"} = {
+            config =
+              if isSupported then
+                lib.systems.parse.tripleFromSystem (
+                  stdenv.hostPlatform.parsed
+                  // {
+                    cpu = lib.systems.parse.cpuTypes.i686;
+                  }
+                )
+              else
+                "i686-unknown-linux-gnu";
           };
         }
       else
@@ -257,10 +222,10 @@ let
         self
       else
         nixpkgsFun {
-          localSystem = lib.systems.elaborate "${stdenv.hostPlatform.parsed.cpu.name}-linux";
+          localSystem.system = "${stdenv.hostPlatform.parsed.cpu.name}-linux";
         };
 
-    # NOTE: each call to appendOverlays causes a full nixpkgs rebuild, adding ~130MB
+    # NOTE: each call to `appendOverlays` causes a full corepkgs rebuild, adding ~130MB
     #       of allocations. DO NOT USE THIS IN NIXPKGS.
     #
     # Extend the package set with zero or more overlays. This preserves
@@ -268,9 +233,12 @@ let
     # in one go when calling Nixpkgs, for performance and simplicity.
     appendOverlays =
       extraOverlays:
-      if extraOverlays == [ ] then self else nixpkgsFun { overlays = args.overlays ++ extraOverlays; };
+      if extraOverlays == [ ] then
+        self.__splicedPackages
+      else
+        nixpkgsFun { overlays = overlays ++ extraOverlays; };
 
-    # NOTE: each call to extend causes a full nixpkgs rebuild, adding ~130MB
+    # NOTE: each call to `extend` causes a full corepkgs rebuild, adding ~130MB
     #       of allocations. DO NOT USE THIS IN NIXPKGS.
     #
     # Extend the package set with a single overlay. This preserves
@@ -283,16 +251,22 @@ let
     # Currently uses Musl on Linux (couldn’t get static glibc to work).
     pkgsStatic = nixpkgsFun {
       overlays = [
-        (_: super': {
-          pkgsStatic = super';
-        })
+        (
+          _: super':
+          {
+            pkgsStatic = super';
+          }
+          // lib.optionalAttrs super'.stdenv.hostPlatform.isMusl {
+            pkgsMusl = super';
+          }
+        )
       ]
       ++ overlays;
       crossSystem = {
         isStatic = true;
         config = lib.systems.parse.tripleFromSystem (
           if stdenv.hostPlatform.isLinux then
-            makeMuslParsedPlatform stdenv.hostPlatform.parsed
+            lib.systems.parse.mkMuslSystem stdenv.hostPlatform.parsed
           else
             stdenv.hostPlatform.parsed
         );
@@ -307,12 +281,18 @@ let
   pkgsManyVariantOverlay = lib.packageSets.mkAutoCalledManyVariantsDir ../pkgs-many;
   toplevelOverrides = import ../top-level.nix;
 
+  # Layers the user can opt out of, only applied to the stage that accepts
+  # user-facing overrides.
+  customOverrides =
+    lib.optional config.allowAliases aliases
+    ++ lib.optional config.allowVariants variants
+    ++ lib.optional (config ? packageOverrides) configOverrides;
+
   # The complete chain of package set layers, applied from top to bottom.
   # stdenvOverrides must be last as it brings packages forward from the
   # previous bootstrapping phases which have already been overlaid.
-  toFix = lib.foldl' (lib.flip lib.extends) (_: { inherit lib; }) (
+  toFix = lib.foldl' (lib.flip lib.extends) stdenvBootstrapAndPlatforms (
     [
-      stdenvBootstrapAndPlatforms
       stdenvAdapters
       trivialBuilders
       splice
@@ -320,15 +300,11 @@ let
       pkgsManyVariantOverlay
       toplevelOverrides
       otherPackageSets
-      aliases
-      variants
-      configOverrides
     ]
+    ++ lib.optionals allowCustomOverrides customOverrides
     ++ config.overlays.pkgs
     ++ overlays
-    ++ [
-      stdenvOverrides
-    ]
+    ++ [ stdenvOverrides ]
   );
 
 in
