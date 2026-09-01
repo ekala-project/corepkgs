@@ -1,58 +1,70 @@
 /*
-  This function composes the Nix Packages collection. It:
+  The entry point of this package set, and the one impure file in it. It:
 
     1. Elaborates `localSystem` and `crossSystem` with defaults as needed.
 
-    2. Applies the final stage to the given `config` if it is a function
+    2. Evaluates `config`, allowing it to depend on the final package set
 
     3. Defaults to no non-standard config and no cross-compilation target
 
-    4. Uses the above to infer the default standard environment's (stdenv's)
-       stages if no stdenv's are provided
+    4. Uses the above to infer the default standard environment's (stdenv)
+       stages if none are provided
 
     5. Folds the stages to yield the final fully booted package set for the
        chosen stdenv
 
-  Use `impure.nix` to also infer the `system` based on the one on which
-  evaluation is taking place, and the configuration from environment variables
-  or dot-files.
+  `builtins.currentSystem` below is the only impurity here: everything else
+  is derived from the arguments. Pass `localSystem` (or the legacy `system`)
+  to evaluate for a platform other than the one Nix is running on.
+
+  TODO: port minfeatures
 */
 
 {
-  # The system packages will be built on. See the manual for the
-  # subtle division of labor between these two `*System`s and the three
-  # `*Platform`s.
+  # The platform packages are built on -- the "build" platform, in GNU
+  # Autotools parlance. See `lib.systems` for the division of labour between
+  # these two `*System`s and the three `*Platform`s they elaborate into.
+  # Passing it wins over `system`, which is only consulted for the default.
   localSystem ? { inherit system; },
 
-  # `system` is the legacy spelling of `localSystem`.
+  # The legacy spelling of `localSystem`, carrying a bare system double
+  # rather than an attribute set. It stays a named argument because nix's
+  # auto-call only fills formals a function declares, so an argument reachable
+  # any other way could not be set with `--argstr`.
   system ? builtins.currentSystem,
 
-  # The system packages will ultimately be run on.
+  # The platform packages will ultimately run on -- the "host" platform.
+  # Defaults to `localSystem` rather than to `null`, so a native build is the
+  # two being equal rather than the cross target being absent. Note that an
+  # explicit `crossSystem = null` is not currently accepted.
   crossSystem ? localSystem,
 
-  # Allow a configuration attribute set to be passed in as an argument.
+  # Configuration for the package set, as either an attribute set or a
+  # function of the final packages. Evaluated through `config/` as a module.
   config ? { },
 
-  # Temporary hack to let Nixpkgs forbid internal use of `lib.fileset`
-  # until <https://github.com/NixOS/nix/issues/11503> is fixed.
+  # Set to false to make `lib.fileset` abort on use, which the package set
+  # forbids internally until <https://github.com/NixOS/nix/issues/11503> is
+  # fixed.
+  # TODO: remove once that bug is fixed upstream
   __allowFileset ? true,
 
-  # Allow for users to pass modules for the evaluation of pkgs.config
-  # TODO(corepkgs): document this
+  # Extra modules folded into the `config` evaluation alongside `config/`.
+  # TODO: document this
   modules ? [ ],
 
-  # List of overlays layers used to extend Nixpkgs.
+  # Overlays extending the package set. Each is a function of the final and
+  # previous package sets, and they take part in its fixed point.
   overlays ? [ ],
 
-  # List of overlays to apply to target packages only.
+  # Overlays applied only to the packages built for the host platform, not to
+  # the native ones used to build them.
   crossOverlays ? [ ],
 
-  # A function booting the final package set for a specific standard
-  # environment. See below for the arguments given to that function, the type of
-  # list it returns.
+  # A function returning the list of bootstrapping stages to fold into the
+  # final package set. `stages` below shows the arguments it is given.
+  # TODO: remove from here?
   stdenvStages ? import ./stdenv,
-
-  # Error on unexpected args.
 }@args:
 
 let
@@ -60,7 +72,6 @@ let
 in
 let
   pristineLib = import ./lib.nix;
-
   lib =
     if __allowFileset then
       pristineLib
@@ -90,19 +101,20 @@ let
         throwIfNot (lib.all lib.isFunction crossOverlays) "All crossOverlays passed to nixpkgs must be functions."
       );
 
-  # Condition preserves sharing which in turn affects equality.
+  elaboratedLocalSystem = lib.systems.elaborate inputs.localSystem;
+
+  # A native build must come out as `elaboratedLocalSystem` itself, not an
+  # equal copy: the sharing is what later makes `hostPlatform == buildPlatform`
+  # cheap, and `lib.systems.equals` documents why that matters.
   #
-  # See `lib.systems.equals` documentation for more details.
-  #
-  # Note that it is generally not possible to compare systems as given in
-  # parameters, e.g. if systems are initialized as
+  # Two systems cannot be compared as passed, only once elaborated -- given
   #
   #   localSystem = { system = "x86_64-linux"; };
   #   crossSystem = { config = "x86_64-unknown-linux-gnu"; };
   #
-  # Both systems are semantically equivalent as the same vendor and ABI are
-  # inferred from the system double in `localSystem`.
-  elaboratedLocalSystem = lib.systems.elaborate inputs.localSystem;
+  # both name the same platform, since the vendor and ABI are inferred from the
+  # system double. Equal *arguments* do imply equal systems, though, so that
+  # case short-circuits and skips the second elaboration.
   elaboratedCrossSystem =
     if inputs.crossSystem == inputs.localSystem then
       elaboratedLocalSystem
@@ -155,13 +167,12 @@ let
   # want the provided non-native `localSystem` argument to affect the stdenv
   # chosen.
   #
-  # NB!!! This thing gets its `config` argument from `args`, i.e. it's actually
-  # `config0`. It is important to keep it to `config0` format (as opposed to the
-  # result of `evalModules`, i.e. the `config` variable above) throughout all
-  # nixpkgs evaluations since the above function `config0 -> config` implemented
-  # via `evalModules` is not idempotent. In other words, if you add `config` to
-  # `newArgs`, expect strange very hard to debug errors! (Yes, I'm speaking from
-  # experience here.)
+  # NB!!! This takes its `config` from `args`, i.e. the argument as the caller
+  # wrote it -- the same thing `inputs.config` holds, not the `config` bound
+  # above. That distinction has to survive every re-entry, because the
+  # `evalModules` step turning the one into the other is not idempotent. In
+  # other words, if you add `config` to `newArgs`, expect strange very hard to
+  # debug errors! (Yes, I'm speaking from experience here.)
   nixpkgsFun = newArgs: import ./. (args // newArgs);
 
   # Partially apply some arguments for building bootstrapping stage pkgs
