@@ -257,7 +257,9 @@ let
       MQ_IOSCHED_DEADLINE = yes;
       BFQ_GROUP_IOSCHED = yes;
       MQ_IOSCHED_KYBER = yes;
-      IOSCHED_BFQ = module;
+      # Build BFQ into the kernel so it is available immediately (no module load
+      # delay).  Zen and XanMod already do this for desktop responsiveness.
+      IOSCHED_BFQ = yes;
       # Enable CPU utilization clamping for RT tasks
       UCLAMP_TASK = yes;
       UCLAMP_TASK_GROUP = yes;
@@ -267,6 +269,11 @@ let
       # Enable Full Dynticks System.
       # NO_HZ_FULL depends on HAVE_VIRT_CPU_ACCOUNTING_GEN depends on 64BIT
       NO_HZ_FULL = lib.mkIf stdenv.hostPlatform.is64bit yes;
+      # 1000 Hz tick rate for low scheduling latency and smooth interactive
+      # response.  This matches Zen and Fedora desktop defaults.
+      # Use mkDefault so kernel variants (e.g. XanMod) can override.
+      HZ = lib.mkDefault (freeform "1000");
+      HZ_1000 = lib.mkDefault yes;
     };
 
     # Enable NUMA.
@@ -297,6 +304,14 @@ let
       WAN = yes;
       TCP_CONG_ADVANCED = yes;
       TCP_CONG_CUBIC = yes; # This is the default congestion control algorithm since 2.6.19
+      # BBR provides better throughput and lower latency on lossy networks
+      # (Wi-Fi, cellular, congested links) compared to CUBIC.
+      TCP_CONG_BBR = yes;
+      DEFAULT_BBR = yes;
+      # Use FQ-Codel as the default queueing discipline for lower latency
+      # and reduced bufferbloat.
+      NET_SCH_DEFAULT = yes;
+      DEFAULT_FQ_CODEL = yes;
       # Required by systemd per-cgroup firewalling
       CGROUP_BPF = option yes;
       CGROUP_NET_PRIO = yes; # Required by systemd
@@ -1346,8 +1361,10 @@ let
         HMM_MIRROR = yes;
         DRM_AMDGPU_USERPTR = yes;
 
-        PREEMPT = no;
-        PREEMPT_VOLUNTARY = yes;
+        # Full kernel preemption for responsive desktop/interactive use.
+        # This matches Zen, XanMod, Fedora, and Ubuntu desktop defaults.
+        PREEMPT = yes;
+        PREEMPT_VOLUNTARY = no;
 
         X86_AMD_PLATFORM_DEVICE = lib.mkIf stdenv.hostPlatform.isx86 yes;
         X86_PLATFORM_DRIVERS_DELL = lib.mkIf stdenv.hostPlatform.isx86 (whenAtLeast "5.12" yes);
