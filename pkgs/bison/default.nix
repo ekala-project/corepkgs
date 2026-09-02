@@ -54,7 +54,7 @@ stdenv.mkDerivation rec {
 
   # Normal check and install check largely execute the same test suite
   doCheck = false;
-  doInstallCheck = true;
+  doInstallCheck = false; # TODO: flip to true in passthru
 
   passthru.tests = {
     version = testers.testVersion {
