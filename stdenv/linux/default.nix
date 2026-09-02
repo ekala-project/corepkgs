@@ -585,9 +585,6 @@ in
             nukeReferences
             python3Minimal
             ;
-          # We build a special copy of libgmp which doesn't use libstdc++, because
-          # xgcc++'s libstdc++ references the bootstrap-files (which is what
-          # compiles xgcc++).
         }
         // {
           ${localSystem.libc} = prevStage.${localSystem.libc};
