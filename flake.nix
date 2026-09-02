@@ -51,6 +51,7 @@
       };
       lib = nix-lib // {
         mkFlake = import ./lib/mk-flake.nix;
+        ekaosSystem = import ./ekaos;
       };
     };
 }
