@@ -77,6 +77,11 @@
   ./security/audit.nix
   ./security/hardening.nix
 
+  # Language modules
+  ./languages/zig.nix
+  ./languages/rust.nix
+  ./languages/go.nix
+
   # Program modules
   ./programs/git.nix
 
