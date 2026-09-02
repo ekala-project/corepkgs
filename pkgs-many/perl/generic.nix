@@ -39,6 +39,10 @@ assert (enableCrypt -> (libxcrypt != null));
 
 let
   crossCompiling = !(stdenv.buildPlatform.canExecute stdenv.hostPlatform);
+
+  # ./patches/common holds the patches that are the same file for every
+  # version; ./patches/<major>.<minor> the ones rebased per release.
+  versionPatches = ./patches + "/${lib.versions.majorMinor version}";
   libc = if stdenv.cc.libc or null != null then stdenv.cc.libc else "/usr";
   libcInc = lib.getDev libc;
   libcLib = lib.getLib libc;
@@ -148,26 +152,26 @@ let
 
       patches =
         lib.optionals (lib.versionOlder version "5.42.0") [
-          ./CVE-2024-56406.patch
-          ./CVE-2025-40909.patch
+          (versionPatches + "/CVE-2024-56406.patch")
+          (versionPatches + "/CVE-2025-40909.patch")
         ]
         # Do not look in /usr etc. for dependencies.
-        ++ lib.optional ((lib.versions.majorMinor version) == "5.38") ./no-sys-dirs-5.38.0.patch
-        ++ lib.optional (lib.versionAtLeast version "5.40.0") ./no-sys-dirs-5.40.0.patch
+        ++ [ (versionPatches + "/no-sys-dirs.patch") ]
 
         # Fix compilation on platforms with only a C locale: https://github.com/Perl/perl5/pull/22569
-        ++ lib.optional (version == "5.40.0") ./fix-build-with-only-C-locale-5.40.0.patch
+        ++ lib.optional (version == "5.40.0") (versionPatches + "/fix-build-with-only-C-locale.patch")
 
-        ++ lib.optional stdenv.hostPlatform.isSunOS ./ld-shared.patch
+        ++ lib.optional stdenv.hostPlatform.isSunOS ./patches/common/ld-shared.patch
         ++ lib.optionals stdenv.hostPlatform.isDarwin [
-          ./cpp-precomp.patch
-          ./sw_vers.patch
+          ./patches/common/cpp-precomp.patch
+          (versionPatches + "/sw_vers.patch")
         ]
         # fixes build failure due to missing d_fdopendir/HAS_FDOPENDIR configure option
         # https://github.com/arsv/perl-cross/pull/159
-        ++ lib.optional (crossCompiling && (lib.versionAtLeast version "5.40.0")) ./cross-fdopendir.patch
-        ++ lib.optional (crossCompiling && (lib.versionAtLeast version "5.40.0")) ./cross540.patch
-        ++ lib.optional (crossCompiling && (lib.versionOlder version "5.40.0")) ./cross.patch;
+        ++ lib.optional (crossCompiling && (lib.versionAtLeast version "5.40.0")) (
+          versionPatches + "/cross-fdopendir.patch"
+        )
+        ++ lib.optional crossCompiling (versionPatches + "/cross.patch");
 
       # This is not done for native builds because pwd may need to come from
       # bootstrap tools when building bootstrap perl.
