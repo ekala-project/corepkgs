@@ -36,7 +36,6 @@ in
     environment.systemPackages = [ cfg.package ];
     services.dbus.packages = [ cfg.package ];
 
-    # TODO: services.udev.packages not yet available in ekaOS
-    # services.udev.packages = [ cfg.package ];
+    services.udev.packages = [ cfg.package ];
   };
 }
