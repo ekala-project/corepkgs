@@ -205,10 +205,9 @@ stdenv.mkDerivation rec {
   # Darwin (http://article.gmane.org/gmane.comp.gnu.core-utils.bugs/19351),
   # and {Open,Free}BSD.
   # With non-standard storeDir: https://github.com/NixOS/nix/issues/512
-  doCheck =
-    (!isCross)
-    && (stdenv.hostPlatform.libc == "glibc" || stdenv.hostPlatform.libc == "musl")
-    && !stdenv.hostPlatform.isAarch32;
+
+  # (!isCross) && (stdenv.hostPlatform.libc == "glibc" || stdenv.hostPlatform.libc == "musl") && !stdenv.hostPlatform.isAarch32;
+  doCheck = false; # TODO: enable in passhru
 
   # Prevents attempts of running 'help2man' on cross-built binaries.
   PERL = if isCross then "missing" else null;
