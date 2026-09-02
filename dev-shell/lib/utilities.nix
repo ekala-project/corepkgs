@@ -9,6 +9,8 @@
 }:
 
 let
+  socketPath = "${dataDir}/process-compose.sock";
+
   # Helper to create a utility script
   mkUtility =
     name: description: script:
@@ -19,6 +21,7 @@ let
       CONFIG="${processComposeConfig}"
       LOG_DIR="${logDir}"
       DATA_DIR="${dataDir}"
+      SOCKET="${socketPath}"
 
       ${script}
     '';
@@ -34,12 +37,14 @@ let
     mkdir -p "$LOG_DIR"
     mkdir -p "$DATA_DIR"
 
-    # Start process-compose
+    # Start process-compose with TUI (attaches to running instance or starts new)
     ${lib.optionalString tui ''
-      ${processCompose}/bin/process-compose -f "$CONFIG" up
+      ${processCompose}/bin/process-compose -f "$CONFIG" up \
+        --unix-socket "$SOCKET"
     ''}
     ${lib.optionalString (!tui) ''
-      ${processCompose}/bin/process-compose -f "$CONFIG" up --tui=false
+      ${processCompose}/bin/process-compose -f "$CONFIG" up --tui=false \
+        --unix-socket "$SOCKET"
     ''}
   '';
 
@@ -47,14 +52,16 @@ let
   pc-down = mkUtility "pc-down" "Stop all services" ''
     echo "Stopping services..."
 
-    ${processCompose}/bin/process-compose -f "$CONFIG" down 2>/dev/null || true
+    ${processCompose}/bin/process-compose -f "$CONFIG" down \
+      --unix-socket "$SOCKET" 2>/dev/null || true
 
     echo "Services stopped."
   '';
 
   # Show service status
   pc-status = mkUtility "pc-status" "Show service status" ''
-    ${processCompose}/bin/process-compose -f "$CONFIG" process list 2>/dev/null || {
+    ${processCompose}/bin/process-compose -f "$CONFIG" process list \
+      --unix-socket "$SOCKET" 2>/dev/null || {
       echo "No services are currently running."
       echo "Run 'pc-up' to start services."
       exit 0
@@ -96,14 +103,16 @@ let
 
     if [ $# -eq 0 ]; then
       # Restart all
-      ${processCompose}/bin/process-compose -f "$CONFIG" process restart all 2>/dev/null || {
+      ${processCompose}/bin/process-compose -f "$CONFIG" process restart all \
+        --unix-socket "$SOCKET" 2>/dev/null || {
         echo "Services are not running. Starting them..."
         exec ${pc-up}/bin/pc-up
       }
     else
       # Restart specific service
       SERVICE="$1"
-      ${processCompose}/bin/process-compose -f "$CONFIG" process restart "$SERVICE"
+      ${processCompose}/bin/process-compose -f "$CONFIG" process restart "$SERVICE" \
+        --unix-socket "$SOCKET"
     fi
   '';
 
@@ -115,7 +124,8 @@ let
     fi
 
     SERVICE="$1"
-    ${processCompose}/bin/process-compose -f "$CONFIG" process start "$SERVICE"
+    ${processCompose}/bin/process-compose -f "$CONFIG" process start "$SERVICE" \
+      --unix-socket "$SOCKET"
   '';
 
   # Stop a specific service
@@ -126,7 +136,8 @@ let
     fi
 
     SERVICE="$1"
-    ${processCompose}/bin/process-compose -f "$CONFIG" process stop "$SERVICE"
+    ${processCompose}/bin/process-compose -f "$CONFIG" process stop "$SERVICE" \
+      --unix-socket "$SOCKET"
   '';
 
   # Clean service data

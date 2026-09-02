@@ -184,6 +184,27 @@ in
         echo "================================================"
         echo ""
 
+        ${lib.optionalString (enabledServices != { }) ''
+          # Auto-start services in detached mode
+          echo "Starting services in the background..."
+          ${processComposePackage}/bin/process-compose -f "$PROCESS_COMPOSE_CONFIG" up \
+            --detached --tui=false \
+            --log-file "${processCompose.logDir}/process-compose.log" \
+            --unix-socket "${processCompose.dataDir}/process-compose.sock" \
+            2>"${processCompose.logDir}/process-compose-startup.log" || \
+            echo "WARNING: Failed to start services. Check ${processCompose.logDir}/process-compose-startup.log"
+          echo "Services started. Use 'pc-status' to check, 'pc-down' to stop."
+          echo ""
+
+          # Stop services when the shell exits
+          _pc_cleanup() {
+            ${processComposePackage}/bin/process-compose -f "$PROCESS_COMPOSE_CONFIG" down \
+              --unix-socket "${processCompose.dataDir}/process-compose.sock" \
+              2>/dev/null || true
+          }
+          trap _pc_cleanup EXIT
+        ''}
+
         # User's custom shellHook
         ${shellHook}
       '';
