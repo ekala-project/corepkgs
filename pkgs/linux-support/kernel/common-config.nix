@@ -413,9 +413,9 @@ let
       CFG80211_DEBUGFS = yes;
       MAC80211_DEBUGFS = yes;
 
-      # HAM radio
-      HAMRADIO = yes;
-      AX25 = module;
+      # HAM radio (removed by some kernel variants)
+      HAMRADIO = option yes;
+      AX25 = option module;
     }
     // lib.optionalAttrs (stdenv.hostPlatform.system == "aarch64-linux") {
       # Not enabled by default, hides modules behind it
@@ -590,7 +590,7 @@ let
             # Enable Hyper-V Synthetic DRM Driver
             DRM_HYPERV = whenAtLeast "5.14" module;
             # And disable the legacy framebuffer driver when we have the new one
-            FB_HYPERV = whenAtLeast "5.14" no;
+            FB_HYPERV = whenAtLeast "5.14" (option no);
           }
       // lib.optionalAttrs (stdenv.hostPlatform.system == "x86_64-linux") {
         # Intel GVT-g graphics virtualization supports 64-bit only
@@ -746,7 +746,7 @@ let
       NFS_FSCACHE = yes;
       NFS_SWAP = yes;
       NFS_V3_ACL = yes;
-      NFS_V4_1 = yes; # NFSv4.1 client support
+      NFS_V4_1 = option yes; # NFSv4.1 client support (merged into NFS_V4 in some variants)
       NFS_V4_2 = yes;
       NFS_V4_SECURITY_LABEL = yes;
       NFS_LOCALIO = whenAtLeast "6.12" yes;
@@ -833,13 +833,13 @@ let
       # enable temporary caching of the last request_key() result
       KEYS_REQUEST_CACHE = yes;
       # randomized slab caches
-      RANDOM_KMALLOC_CACHES = whenAtLeast "6.6" yes;
+      RANDOM_KMALLOC_CACHES = whenAtLeast "6.6" (option yes);
 
       # NIST SP800-90A DRBG modes - enabled by most distributions
       #   and required by some out-of-tree modules (ShuffleCake)
       #   This does not include the NSA-backdoored Dual-EC mode from the same NIST publication.
-      CRYPTO_DRBG_HASH = yes;
-      CRYPTO_DRBG_CTR = yes;
+      CRYPTO_DRBG_HASH = option yes;
+      CRYPTO_DRBG_CTR = option yes;
 
       # Enable KFENCE
       # See: https://docs.kernel.org/dev-tools/kfence.html
@@ -1160,7 +1160,7 @@ let
 
         ACCESSIBILITY = yes; # Accessibility support
         AUXDISPLAY = yes; # Auxiliary Display support
-        HIPPI = yes;
+        HIPPI = option yes;
         MTD_COMPLEX_MAPPINGS = yes; # needed for many devices
 
         SCSI_LOWLEVEL = yes; # enable lots of SCSI devices
@@ -1354,7 +1354,7 @@ let
         ) yes;
 
         # required for P2P DMABUF
-        DMABUF_MOVE_NOTIFY = lib.mkIf stdenv.hostPlatform.is64bit (whenAtLeast "6.6" yes);
+        DMABUF_MOVE_NOTIFY = lib.mkIf stdenv.hostPlatform.is64bit (whenAtLeast "6.6" (option yes));
         # required for P2P transfers between accelerators
         HSA_AMD_P2P = lib.mkIf stdenv.hostPlatform.is64bit (whenAtLeast "6.6" yes);
 
