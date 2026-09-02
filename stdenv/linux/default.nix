@@ -183,7 +183,14 @@ let
         buildPlatform = localSystem;
         hostPlatform = localSystem;
         targetPlatform = localSystem;
-        inherit config extraNativeBuildInputs;
+        inherit config;
+        # Every real (post-dummy) stage needs this hook so configure scripts
+        # can recognise architectures (LoongArch, RISC-V, etc.).
+        extraNativeBuildInputs =
+          extraNativeBuildInputs
+          ++ lib.optional (
+            prevStage ? updateAutotoolsGnuConfigScriptsHook
+          ) prevStage.updateAutotoolsGnuConfigScriptsHook;
         preHook = ''
           # Don't patch #!/interpreter because it leads to retained
           # dependencies on the bootstrapTools in the final stdenv.
@@ -304,9 +311,6 @@ in
           };
         });
       };
-
-      # `gettext` comes with obsolete config.sub/config.guess that don't recognize LoongArch64.
-      extraNativeBuildInputs = [ prevStage.updateAutotoolsGnuConfigScriptsHook ];
     }
   )
 
@@ -436,9 +440,6 @@ in
               '';
             });
       };
-
-      # `gettext` comes with obsolete config.sub/config.guess that don't recognize LoongArch64.
-      extraNativeBuildInputs = [ prevStage.updateAutotoolsGnuConfigScriptsHook ];
     }
   )
 
@@ -516,6 +517,7 @@ in
             dontUnpack = true;
             dontBuild = true;
             strictDeps = true;
+            __structuredAttrs = true;
             # We wouldn't need to *copy* all, but it's easier and the result is temporary anyway.
             installPhase = ''
               mkdir -p "$out"/bin
@@ -530,18 +532,15 @@ in
 
         # TODO(amjoseph): It is not yet entirely clear why this is necessary.
         # Something strange is going on with xgcc and libstdc++ on pkgsMusl.
-        patchelf = super.patchelf.overrideAttrs (
-          previousAttrs:
-          lib.optionalAttrs super.stdenv.hostPlatform.isMusl {
-            NIX_CFLAGS_COMPILE = (previousAttrs.NIX_CFLAGS_COMPILE or "") + " -static-libstdc++";
-          }
-        );
+        patchelf = super.patchelf.overrideAttrs (previousAttrs: {
+          env =
+            previousAttrs.env or { }
+            // lib.optionalAttrs super.stdenv.hostPlatform.isMusl {
+              NIX_CFLAGS_COMPILE = (previousAttrs.env.NIX_CFLAGS_COMPILE or "") + " -static-libstdc++";
+            };
+        });
 
       };
-
-      # `gettext` comes with obsolete config.sub/config.guess that don't recognize LoongArch64.
-      # `libtool` comes with obsolete config.sub/config.guess that don't recognize Risc-V.
-      extraNativeBuildInputs = [ prevStage.updateAutotoolsGnuConfigScriptsHook ];
     }
   )
 
@@ -584,6 +583,7 @@ in
             libunistring
             libxcrypt
             nukeReferences
+            python3Minimal
             ;
           # We build a special copy of libgmp which doesn't use libstdc++, because
           # xgcc++'s libstdc++ references the bootstrap-files (which is what
@@ -612,8 +612,6 @@ in
         };
       extraNativeBuildInputs = [
         prevStage.patchelf
-        # Many tarballs come with obsolete config.sub/config.guess that don't recognize aarch64.
-        prevStage.updateAutotoolsGnuConfigScriptsHook
       ];
     }
   )
@@ -649,6 +647,7 @@ in
           linuxHeaders
           libidn2
           libunistring
+          python3Minimal
           ;
         ${localSystem.libc} = prevStage.${localSystem.libc};
         # Since this is the first fresh build of binutils since stage2, our own runtimeShell will be used.
@@ -656,10 +655,6 @@ in
           # Build expand-response-params with last stage like below
           inherit (prevStage) expand-response-params;
         };
-
-        # To allow users' overrides inhibit dependencies too heavy for
-        # bootstrap, like guile: https://github.com/NixOS/nixpkgs/issues/181188
-        make = super.make.override { inBootstrap = true; };
 
         gcc = lib.makeOverridable (import ../../build-support/cc-wrapper) {
           nativeTools = false;
@@ -682,8 +677,6 @@ in
       extraNativeBuildInputs = [
         prevStage.patchelf
         prevStage.xz
-        # Many tarballs come with obsolete config.sub/config.guess that don't recognize aarch64.
-        prevStage.updateAutotoolsGnuConfigScriptsHook
       ];
     }
   )
@@ -882,8 +875,6 @@ in
                 libunistring
                 ;
             };
-
-            make = super.make.override { inBootstrap = false; };
           }
           // lib.optionalAttrs (super.stdenv.targetPlatform == localSystem) {
             # Need to get rid of these when cross-compiling.
@@ -907,9 +898,7 @@ in
     assert isBuiltByNixpkgsCompiler prevStage.grep;
     assert isBuiltByNixpkgsCompiler prevStage.patchelf;
     {
-      inherit (prevStage) config stdenv;
-      # TODO(corepkgs): is this a bug in nixpkgs?
-      inherit overlays;
+      inherit (prevStage) config overlays stdenv;
     }
   )
 ]
