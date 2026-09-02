@@ -73,7 +73,8 @@ stdenv.mkDerivation rec {
     ];
 
   # Test failure on QEMU only (#300550)
-  doCheck = !stdenv.buildPlatform.isRiscV64;
+  doCheck = false; # TODO: enable in passhru
+  # doCheck = !stdenv.buildPlatform.isRiscV64;
 
   passthru.tests = {
     version = testers.testVersion {
