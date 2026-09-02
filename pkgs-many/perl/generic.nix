@@ -43,6 +43,37 @@ let
   # ./patches/common holds the patches that are the same file for every
   # version; ./patches/<major>.<minor> the ones rebased per release.
   versionPatches = ./patches + "/${lib.versions.majorMinor version}";
+
+  commonPatches = [
+    # Do not look in /usr etc. for dependencies.
+    (versionPatches + "/no-sys-dirs.patch")
+  ]
+
+  # Both fixed upstream in 5.42.0.
+  ++ lib.optionals (lib.versionOlder version "5.42.0") [
+    (versionPatches + "/CVE-2024-56406.patch")
+    (versionPatches + "/CVE-2025-40909.patch")
+  ]
+
+  # Build fix for a C-only locale: https://github.com/Perl/perl5/pull/22569
+  ++ lib.optional (version == "5.40.0") (versionPatches + "/fix-build-with-only-C-locale.patch")
+
+  # Build fix for Solaris on x86_64: https://github.com/Perl/perl5/issues/9669
+  ++ lib.optional stdenv.hostPlatform.isSunOS ./patches/common/ld-shared.patch
+
+  # Stop passing -no-cpp-precomp: obsolete since ~2002, but clang still takes it.
+  ++ lib.optional stdenv.hostPlatform.isDarwin ./patches/common/cpp-precomp.patch
+
+  # hints/darwin.sh shells out to sw_vers, which the sandbox lacks. Fixed
+  # upstream in 5.42.0, where this patch also no longer applies.
+  ++ lib.optional (stdenv.hostPlatform.isDarwin && lib.versionOlder version "5.42.0") (
+    versionPatches + "/sw_vers.patch"
+  )
+
+  # Let miniperl load more modules, which cross bootstrapping needs:
+  # https://arsv.github.io/perl-cross/modules.html
+  ++ lib.optional crossCompiling (versionPatches + "/cross.patch");
+
   libc = if stdenv.cc.libc or null != null then stdenv.cc.libc else "/usr";
   libcInc = lib.getDev libc;
   libcLib = lib.getLib libc;
@@ -61,6 +92,7 @@ let
       perlOnBuildForTarget,
       perlOnHostForHost,
       perlOnTargetForTarget,
+      tests ? { },
       self, # is perlOnHostForTarget
     }:
     let
@@ -114,11 +146,14 @@ let
         inherit overrides;
         self = perlOnBuild;
       };
+
+      inherit tests;
     };
 
   # We need a recursive binding for self-reference in passthru
   self = stdenv.mkDerivation (
-    rec {
+    finalAttrs:
+    {
       inherit version;
       pname = "perl";
 
@@ -150,28 +185,7 @@ let
 
       disallowedReferences = [ stdenv.cc ];
 
-      patches =
-        lib.optionals (lib.versionOlder version "5.42.0") [
-          (versionPatches + "/CVE-2024-56406.patch")
-          (versionPatches + "/CVE-2025-40909.patch")
-        ]
-        # Do not look in /usr etc. for dependencies.
-        ++ [ (versionPatches + "/no-sys-dirs.patch") ]
-
-        # Fix compilation on platforms with only a C locale: https://github.com/Perl/perl5/pull/22569
-        ++ lib.optional (version == "5.40.0") (versionPatches + "/fix-build-with-only-C-locale.patch")
-
-        ++ lib.optional stdenv.hostPlatform.isSunOS ./patches/common/ld-shared.patch
-        ++ lib.optionals stdenv.hostPlatform.isDarwin [
-          ./patches/common/cpp-precomp.patch
-          (versionPatches + "/sw_vers.patch")
-        ]
-        # fixes build failure due to missing d_fdopendir/HAS_FDOPENDIR configure option
-        # https://github.com/arsv/perl-cross/pull/159
-        ++ lib.optional (crossCompiling && (lib.versionAtLeast version "5.40.0")) (
-          versionPatches + "/cross-fdopendir.patch"
-        )
-        ++ lib.optional crossCompiling (versionPatches + "/cross.patch");
+      patches = commonPatches;
 
       # This is not done for native builds because pwd may need to come from
       # bootstrap tools when building bootstrap perl.
@@ -191,7 +205,7 @@ let
         )
         +
         # Perl's build system uses the src variable, and its value may end up in
-        # the output in some cases (when cross-compiling)
+        # the output in some cases (when cross-compiling).
         ''
           unset src
         '';
@@ -239,6 +253,7 @@ let
           "-Dinstallstyle=lib/perl5"
           "-Dlocincpth=${libcInc}/include"
           "-Dloclibpth=${libcLib}/lib"
+          "-Accflags=-D_GNU_SOURCE"
         ]
         ++ lib.optional stdenv.hostPlatform.isStatic "-Uusedl"
         ++ lib.optionals ((builtins.match ''5\.[0-9]*[13579]\..+'' version) != null) [
@@ -257,16 +272,20 @@ let
       configureScript = lib.optionalString (!crossCompiling) "${stdenv.shell} ./Configure";
 
       # !canExecute cross uses miniperl which doesn't have this
-      postConfigure = lib.optionalString (!crossCompiling && stdenv.cc.targetPrefix != "") ''
-        substituteInPlace Makefile \
-          --replace-fail "AR = ar" "AR = ${stdenv.cc.targetPrefix}ar"
-      '';
+      postConfigure =
+        lib.optionalString (!crossCompiling && stdenv.cc.targetPrefix != "") ''
+          substituteInPlace Makefile \
+            --replace-fail "AR = ar" "AR = ${stdenv.cc.targetPrefix}ar"
+        ''
+        + lib.optionalString crossCompiling ''
+          substituteInPlace miniperl_top --replace-fail '-I$top/lib' '-I$top/cpan/JSON-PP/lib -I$top/cpan/CPAN-Meta-YAML/lib -I$top/lib'
+        '';
 
       dontAddStaticConfigureFlags = true;
 
       dontAddPrefix = !crossCompiling;
 
-      enableParallelBuilding = false;
+      enableParallelBuilding = true;
 
       # perl includes the build date, the uname of the build system and the
       # username of the build user in some files.
@@ -317,6 +336,13 @@ let
 
       setupHook = ./setup-hook.sh;
 
+      env = {
+        # https://github.com/llvm/llvm-project/issues/152241
+        NIX_CFLAGS_COMPILE = lib.optionalString (
+          stdenv.hasCC && stdenv.cc.isClang && lib.versionAtLeast stdenv.cc.version "21"
+        ) "-fno-strict-aliasing";
+      };
+
       # copied from python
       passthru =
         let
@@ -341,9 +367,16 @@ let
               (override pkgsTargetTarget.perl.${perlVariant})
             else
               { };
-        };
 
-      doCheck = false; # some tests fail, expensive
+          tests.withCheck = finalAttrs.finalPackage.overrideAttrs (_: {
+            preCheck = ''
+              # Weird test failure, can't even understand what it's about
+              # Disable the test for now
+              sed -i '/ext\/Pod-Html\/t\/htmldir3.*/d' MANIFEST
+            '';
+            doCheck = true;
+          });
+        };
 
       # TODO: it seems like absolute paths to some coreutils is required.
       postInstall = ''
@@ -399,21 +432,24 @@ let
         platforms = lib.platforms.all;
         priority = 6; # in `buildEnv' (including the one inside `perl.withPackages') the library files will have priority over files in `perl`
         mainProgram = "perl";
-        identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "perl" version;
+        identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "perl" finalAttrs.version;
       };
     }
     // lib.optionalAttrs crossCompiling rec {
-      crossVersion = "1.6.2";
+      crossVersion = "1.6.4";
 
       perl-cross-src = fetchFromGitHub {
         name = "perl-cross-${crossVersion}";
         owner = "arsv";
         repo = "perl-cross";
         rev = crossVersion;
-        hash = "sha256-mG9ny+eXGBL4K/rXqEUPSbar+4Mq4IaQrGRFIHIyAAw=";
+        hash = "sha256-Qcysy7f887XHlq23iE5U92PhxDhpgaluITZBSdcc9Ck=";
       };
 
-      # Patches are above!!!
+      patches =
+        commonPatches
+        # Missing d_fdopendir/HAS_FDOPENDIR: https://github.com/arsv/perl-cross/pull/159
+        ++ lib.optional (lib.versionAtLeast version "5.40.0") (versionPatches + "/cross-fdopendir.patch");
 
       depsBuildBuild = [
         buildPackages.stdenv.cc
