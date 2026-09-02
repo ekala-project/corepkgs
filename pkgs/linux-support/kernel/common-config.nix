@@ -1363,8 +1363,11 @@ let
 
         # Full kernel preemption for responsive desktop/interactive use.
         # This matches Zen, XanMod, Fedora, and Ubuntu desktop defaults.
+        # PREEMPT_VOLUNTARY is marked optional because it becomes invisible
+        # in Kconfig when PREEMPT is selected (they are a choice group), and
+        # newer kernels (7.x) may restructure the choice entirely.
         PREEMPT = yes;
-        PREEMPT_VOLUNTARY = no;
+        PREEMPT_VOLUNTARY = option no;
 
         X86_AMD_PLATFORM_DEVICE = lib.mkIf stdenv.hostPlatform.isx86 yes;
         X86_PLATFORM_DRIVERS_DELL = lib.mkIf stdenv.hostPlatform.isx86 (whenAtLeast "5.12" yes);

@@ -56,7 +56,7 @@ let
 
             # Preemption
             PREEMPT = lib.mkOverride 60 yes;
-            PREEMPT_VOLUNTARY = lib.mkOverride 60 no;
+            PREEMPT_VOLUNTARY = lib.mkOverride 60 (option no);
 
             # Google's BBRv3 TCP congestion Control
             TCP_CONG_BBR = yes;
@@ -65,6 +65,7 @@ let
             # Preemptive tickless idle kernel
             HZ = freeform "250";
             HZ_250 = yes;
+            HZ_1000 = no;
             NO_HZ = no;
             NO_HZ_FULL = lib.mkOverride 60 no;
             NO_HZ_IDLE = yes;

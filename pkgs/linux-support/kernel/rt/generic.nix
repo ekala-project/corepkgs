@@ -58,8 +58,8 @@ buildLinux (
         PREEMPT_RT = yes;
         # Fix error: unused option: PREEMPT_RT.
         EXPERT = yes; # PREEMPT_RT depends on it (in kernel/Kconfig.preempt)
-        # Fix error: option not set correctly: PREEMPT_VOLUNTARY (wanted 'y', got 'n').
-        PREEMPT_VOLUNTARY = lib.mkForce no; # PREEMPT_RT deselects it.
+        # PREEMPT_RT deselects PREEMPT_VOLUNTARY and hides it from Kconfig.
+        PREEMPT_VOLUNTARY = lib.mkForce (option no);
         # Fix error: unused option: RT_GROUP_SCHED.
         RT_GROUP_SCHED = lib.mkForce (option no); # Removed by sched-disable-rt-group-sched-on-rt.patch.
       }
