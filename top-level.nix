@@ -820,7 +820,7 @@ with final;
         env = old.env // {
           cc = old.env.cc.override {
             reproducibleBuild = false;
-            profiledCompiler = with stdenv; (!isDarwin && hostPlatform.isx86);
+            profiledCompiler = with stdenv.hostPlatform; (!isDarwin && isx86);
           };
         };
       })

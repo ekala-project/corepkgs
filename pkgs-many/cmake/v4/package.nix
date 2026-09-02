@@ -42,7 +42,7 @@
 
 let
   inherit (libsForQt5) qtbase wrapQtAppsHook;
-  useSharedLibraries = (!isMinimalBuild && !stdenv.isCygwin);
+  useSharedLibraries = (!isMinimalBuild && !stdenv.hostPlatform.isCygwin);
 in
 # Minimal, bootstrap cmake does not have toolkits
 assert isMinimalBuild -> !withNcurses && !withQt;

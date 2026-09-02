@@ -62,20 +62,20 @@
   withDav1d ? withHeadlessDeps && dav1d != null, # AV1 decoder (focused on speed and correctness)
   withDavs2 ? withFullDeps && withGPL, # AVS2 decoder
   withDc1394 ? withFullDeps && !stdenv.hostPlatform.isDarwin, # IIDC-1394 grabbing (ieee 1394)
-  withDrm ? withHeadlessDeps && (with stdenv; isLinux || isFreeBSD), # libdrm support
+  withDrm ? withHeadlessDeps && (with stdenv.hostPlatform; isLinux || isFreeBSD), # libdrm support
   withDvdnav ? withFullDeps && withGPL && packageAtLeast "7", # needed for DVD demuxing
   withDvdread ? withFullDeps && withGPL && packageAtLeast "7", # needed for DVD demuxing
   withFdkAac ? withFullDeps && (!withGPL || withUnfree), # Fraunhofer FDK AAC de/encoder
   withNvcodec ?
     withHeadlessDeps
     && (
-      with stdenv;
+      with stdenv.hostPlatform;
       !isDarwin
       && !isAarch32
-      && !hostPlatform.isLoongArch64
-      && !hostPlatform.isRiscV
-      && !(hostPlatform.isPower && hostPlatform.isBigEndian)
-      && hostPlatform == buildPlatform
+      && !isLoongArch64
+      && !isRiscV
+      && !(isPower && isBigEndian)
+      && !stdenv.isCross
     )
     && (if (packageAtLeast "6") then nv-codec-headers-12 != null else false), # dynamically linked Nvidia code (v12 headers only work with ffmpeg >= 6)
   withFlite ? withFullDeps, # Voice Synthesis
@@ -141,7 +141,7 @@
   withUavs3d ? withFullDeps, # AVS3 decoder
   withV4l2 ? withHeadlessDeps && stdenv.hostPlatform.isLinux && libv4l != null, # Video 4 Linux support
   withV4l2M2m ? withV4l2,
-  withVaapi ? withHeadlessDeps && (with stdenv; isLinux || isFreeBSD), # Vaapi hardware acceleration
+  withVaapi ? withHeadlessDeps && (with stdenv.hostPlatform; isLinux || isFreeBSD), # Vaapi hardware acceleration
   withVdpau ? withSmallDeps && !stdenv.hostPlatform.isMinGW && libvdpau != null, # Vdpau hardware acceleration
   withVidStab ? withHeadlessDeps && withGPL && vid-stab != null, # Video stabilization
   withVmaf ? withFullDeps && packageAtLeast "5", # Netflix's VMAF (Video Multi-Method Assessment Fusion)
