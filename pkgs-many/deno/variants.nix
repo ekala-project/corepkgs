@@ -16,8 +16,7 @@
   v2_9 = {
     version = "2.9.6";
     src-hash = "sha256-4X7IfQk9NJizhZKqH2EuDnSfk8axkKFyiZEv1FOfWTM=";
-    # TODO: compute cargoHash by building with lib.fakeHash
-    cargo-hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    cargo-hash = "sha256-EKRC+wqIos9O0GHaxjmb/ghyzV6oCi1qwhO2tjszWR4=";
     librusty-v8-version = "150.4.0";
     librusty-v8-hashes = {
       x86_64-linux = "sha256-WGn9twcbHyHyAKl86X0gElh34PMc2ALtmd4sU/SIsGw=";
