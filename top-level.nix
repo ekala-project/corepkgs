@@ -600,6 +600,8 @@ with final;
 
   zlib-ng-compat = zlib-ng.override { withZlibCompat = true; };
 
+  zlib-ng-utils = zlib-ng.override { withUtils = true; };
+
   makeDBusConf = callPackage ./pkgs/dbus/make-dbus-conf.nix { };
 
   fetchpatch =

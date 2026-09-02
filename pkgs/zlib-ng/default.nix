@@ -6,6 +6,7 @@
   pkg-config,
   gtest,
   runUnitTests,
+  withUtils ? false,
   withZlibCompat ? false,
 }:
 
@@ -23,7 +24,8 @@ stdenv.mkDerivation (finalAttrs: {
   outputs = [
     "out"
     "dev"
-  ];
+  ]
+  ++ lib.optional withUtils "bin";
 
   strictDeps = true;
 
@@ -44,8 +46,10 @@ stdenv.mkDerivation (finalAttrs: {
   cmakeFlags = [
     "-DCMAKE_INSTALL_PREFIX=/"
     "-DBUILD_SHARED_LIBS=ON"
-    (lib.cmakeBool "BUILD_TESTING" (finalAttrs.doCheck or false))
+    # minigzip and minideflate are defined in test/, which CMake only adds when BUILD_TESTING is on
+    (lib.cmakeBool "BUILD_TESTING" (withUtils || (finalAttrs.doCheck or false)))
   ]
+  ++ lib.optionals withUtils [ "-DINSTALL_UTILS=ON" ]
   ++ lib.optionals withZlibCompat [ "-DZLIB_COMPAT=ON" ];
 
   passthru.tests.unittests = runUnitTests finalAttrs.finalPackage;
