@@ -7,7 +7,7 @@ index 00b9da9e..8fb0c2fa 100644
  }
  
 +/* A binary patched with "patchelf --build-resolution-cache" carries a PT_NOTE
-+   (NT_NIXOS_LD_CACHE) whose descriptor packs one or more string pairs
++   (NT_EKAOS_LD_CACHE) whose descriptor packs one or more string pairs
 +
 +       <needed> '\0' <path-list> '\0'
 +
@@ -22,14 +22,14 @@ index 00b9da9e..8fb0c2fa 100644
 +   _dl_map_new_object resolve a binary's direct dependencies without
 +   walking every DT_RUNPATH directory, avoiding the storm of failing
 +   openat()/stat() syscalls that slows /nix/store startup.  The reader
-+   nevertheless assumes nothing about the writer: _dl_find_nixos_cache
++   nevertheless assumes nothing about the writer: _dl_find_ekaos_cache
 +   admits exactly the descriptors it can prove safe to walk,
-+   _dl_lookup_nixos_cache stops trusting a note whose content violates the
++   _dl_lookup_ekaos_cache stops trusting a note whose content violates the
 +   grammar, and in either case the object falls back to the stock search
 +   order.  */
 +
 +static const char *
-+_dl_find_nixos_cache (struct link_map *loader)
++_dl_find_ekaos_cache (struct link_map *loader)
 +{
 +  const ElfW(Phdr) *phdr = loader->l_phdr;
 +  const ElfW(Phdr) *pend = phdr + loader->l_phnum;
@@ -100,7 +100,7 @@ index 00b9da9e..8fb0c2fa 100644
 +             runs past the mapping.  && short-circuits, so the memcmp only
 +             runs once the 6 bytes are known to be in bounds.  */
 +          if (note->n_namesz == sizeof ELF_NOTE_NIXOS
-+              && note->n_type == NT_NIXOS_LD_CACHE
++              && note->n_type == NT_EKAOS_LD_CACHE
 +              && memcmp (note + 1, ELF_NOTE_NIXOS, sizeof ELF_NOTE_NIXOS) == 0)
 +            {
 +              const char *desc = (const char *) note + desc_off;
@@ -109,7 +109,7 @@ index 00b9da9e..8fb0c2fa 100644
 +                 path-list's terminator plus the end-of-sequence NUL).
 +                 n_descsz >= 2 makes the two byte reads below themselves
 +                 valid, and the two trailing NULs are the complete in-bounds
-+                 invariant for the walk in _dl_lookup_nixos_cache: any
++                 invariant for the walk in _dl_lookup_ekaos_cache: any
 +                 non-NUL byte then sits at index n_descsz - 3 or lower, so
 +                 every strlen there stops by index n_descsz - 2, and every
 +                 advance past a string lands at most on the final NUL, where
@@ -145,22 +145,22 @@ index 00b9da9e..8fb0c2fa 100644
 +   to the recorded path list inside the mapped note (valid for the object's
 +   lifetime, nothing is allocated); otherwise return NULL.  */
 +static const char *
-+_dl_lookup_nixos_cache (struct link_map *loader, const char *name)
++_dl_lookup_ekaos_cache (struct link_map *loader, const char *name)
 +{
 +  if (loader == NULL)
 +    return NULL;
 +
-+  if (loader->l_nixos_resolve_cache == NULL)
-+    loader->l_nixos_resolve_cache = _dl_find_nixos_cache (loader);
++  if (loader->l_ekaos_resolve_cache == NULL)
++    loader->l_ekaos_resolve_cache = _dl_find_ekaos_cache (loader);
 +
-+  if (loader->l_nixos_resolve_cache == (const char *) -1)
++  if (loader->l_ekaos_resolve_cache == (const char *) -1)
 +    return NULL;
 +
-+  /* The walk below stays within the descriptor because _dl_find_nixos_cache
++  /* The walk below stays within the descriptor because _dl_find_ekaos_cache
 +     validated that it lies within the note segment and ends in two NULs: the
 +     final NUL backstops every strlen, and the epath[0] check rejects a
 +     dangling needed-string, so entries never advances past that last NUL.  */
-+  const char *entries = loader->l_nixos_resolve_cache;
++  const char *entries = loader->l_ekaos_resolve_cache;
 +  while (entries[0] != '\0')
 +    {
 +      const char *ename = entries;
@@ -168,7 +168,7 @@ index 00b9da9e..8fb0c2fa 100644
 +      if (epath[0] == '\0')
 +        {
 +          /* Malformed cache; stop trusting it.  */
-+          loader->l_nixos_resolve_cache = (const char *) -1;
++          loader->l_ekaos_resolve_cache = (const char *) -1;
 +          return NULL;
 +        }
 +      if (strcmp (name, ename) == 0)
@@ -189,12 +189,12 @@ index 00b9da9e..8fb0c2fa 100644
 +   to unstable after open_path marks a fully-nonexistent l_runpath_dirs dead
 +   with (void *) -1, permanently disabling the note for that object.  */
 +static bool
-+_dl_nixos_cache_runpath_stable (struct link_map *loader)
++_dl_ekaos_cache_runpath_stable (struct link_map *loader)
 +{
 +  if (loader == NULL)
 +    return true;
 +
-+  if (loader->l_nixos_runpath_stable == 0)
++  if (loader->l_ekaos_runpath_stable == 0)
 +    {
 +      signed char stable = 1;
 +      if (loader->l_info[DT_RUNPATH] != NULL)
@@ -214,10 +214,10 @@ index 00b9da9e..8fb0c2fa 100644
 +                  break;
 +                }
 +        }
-+      loader->l_nixos_runpath_stable = stable;
++      loader->l_ekaos_runpath_stable = stable;
 +    }
 +
-+  return loader->l_nixos_runpath_stable > 0;
++  return loader->l_ekaos_runpath_stable > 0;
 +}
 +
  /* Map in the shared object file NAME.  */
@@ -242,8 +242,8 @@ index 00b9da9e..8fb0c2fa 100644
 +         components must be searched at execution time before any recorded
 +         later hit can be trusted.  */
 +      if (fd == -1
-+          && _dl_nixos_cache_runpath_stable (loader)
-+          && (rescache = _dl_lookup_nixos_cache (loader, name)) != NULL)
++          && _dl_ekaos_cache_runpath_stable (loader)
++          && (rescache = _dl_lookup_ekaos_cache (loader, name)) != NULL)
 +        {
 +          /* Walk the ':'-separated path list in place: it lives in the
 +             loader's mapped note, and open_verify and decompose_rpath can
@@ -328,11 +328,12 @@ diff --git a/elf/elf.h b/elf/elf.h
 index 2f29a47c..10e4ea94 100644
 --- a/elf/elf.h
 +++ b/elf/elf.h
-@@ -1303,12 +1303,24 @@ typedef struct
+@@ -1303,12 +1303,25 @@ typedef struct
  /* Note entries for freedesktop.org have this name.  */
  #define ELF_NOTE_FDO		"FDO"
  
-+/* Note entries for Nixpkgs/NixOS have this name.  */
++/* Owner of the resolution-cache note as patchelf --build-resolution-cache
++   writes it (ldCacheNoteName in patchelf.cc); keep the two in sync.  */
 +#define ELF_NOTE_NIXOS	"NixOS"
 +
  /* Defined types of notes for Solaris.  */
@@ -341,13 +342,13 @@ index 2f29a47c..10e4ea94 100644
  #define ELF_NOTE_PAGESIZE_HINT	1
  
  
-+/* Defined note types for Nixpkgs/NixOS systems.  */
++/* Defined note types for EkaOS systems.  */
 +
 +/* Linker resolution cache.  The descriptor is a sequence of NUL-terminated
 +   (needed, path-list) string pairs written by patchelf
 +   --build-resolution-cache; the loader uses it to resolve DT_NEEDED entries
 +   without searching DT_RUNPATH.  */
-+#define NT_NIXOS_LD_CACHE	0x63a86cb6
++#define NT_EKAOS_LD_CACHE	0x63a86cb6
 +
 +
  /* Defined note types for GNU systems.  */
@@ -362,16 +363,16 @@ index 41e5e54a..cef48898 100644
  
      unsigned long long int l_serial;
 +
-+    /* Cached pointer into this object's NixOS linker resolution note
-+       (NT_NIXOS_LD_CACHE), or (const char *) -1 once known to be absent.  */
-+    const char *l_nixos_resolve_cache;
++    /* Cached pointer into this object's EkaOS linker resolution note
++       (NT_EKAOS_LD_CACHE), or (const char *) -1 once known to be absent.  */
++    const char *l_ekaos_resolve_cache;
 +
 +    /* Whether this object's DT_RUNPATH contains only immutable Nix store
 +       directories, so the resolution note may replace the directory walk:
 +       0 = not yet determined, 1 = stable, -1 = unstable.  Cached because
 +       the verdict must survive open_path later marking a fully-nonexistent
 +       l_runpath_dirs dead with (void *) -1.  */
-+    signed char l_nixos_runpath_stable;
++    signed char l_ekaos_runpath_stable;
    };
  
  #include <dl-relocate-ld.h>
