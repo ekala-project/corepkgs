@@ -16,8 +16,8 @@
 }:
 
 let
-  mkLanguageModule = import ./lib.nix { inherit lib; };
-  mod = mkLanguageModule {
+  langLib = import ./lib.nix { inherit lib; };
+  mod = langLib.mkLanguageModule {
     name = "go";
     defaultPackage = pkgs: pkgs.go;
     defaultLspPackage = pkgs: pkgs.gopls or null;

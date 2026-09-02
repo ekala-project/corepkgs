@@ -16,8 +16,8 @@
 }:
 
 let
-  mkLanguageModule = import ./lib.nix { inherit lib; };
-  mod = mkLanguageModule {
+  langLib = import ./lib.nix { inherit lib; };
+  mod = langLib.mkLanguageModule {
     name = "zig";
     defaultPackage = pkgs: pkgs.zig;
     defaultLspPackage = pkgs: pkgs.zls or null;

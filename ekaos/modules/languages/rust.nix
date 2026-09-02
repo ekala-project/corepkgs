@@ -21,41 +21,11 @@
 }:
 
 let
-  mkLanguageModule = import ./lib.nix { inherit lib; };
+  langLib = import ./lib.nix { inherit lib; };
 
-  # Rust variants expose rustc as the main derivation with passthru.pkgs
-  # containing cargo, clippy, rustfmt, etc. The version resolver returns
-  # the rustc package; companion tools are accessed via passthru.
-  resolveRustVersion =
-    pkgs': version:
-    let
-      parts = lib.splitString "." version;
-      major = builtins.elemAt parts 0;
-      minor = builtins.elemAt parts 1;
-      variantName = "v${major}_${minor}";
-      variant = pkgs'.rust.${variantName} or null;
-    in
-    if variant != null then
-      variant
-    else
-      let
-        availableNames = builtins.filter (n: builtins.match "v[0-9]+_[0-9]+" n != null) (
-          builtins.attrNames pkgs'.rust
-        );
-        available = builtins.map (
-          n:
-          let
-            m = builtins.match "v([0-9]+)_([0-9]+)" n;
-          in
-          "${builtins.elemAt m 0}.${builtins.elemAt m 1}"
-        ) availableNames;
-      in
-      throw "languages.rust: version \"${version}\" is not available. Known versions: ${lib.concatStringsSep ", " available}";
-
-  mod = mkLanguageModule {
+  mod = langLib.mkLanguageModule {
     name = "rust";
     defaultPackage = pkgs': pkgs'.rust;
-    resolveVersion = resolveRustVersion;
     defaultLspPackage = pkgs': pkgs'.rust-analyzer or null;
     environmentVariables = _: {
       CARGO_HOME = "$HOME/.cargo";
