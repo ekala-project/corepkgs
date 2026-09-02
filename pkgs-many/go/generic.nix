@@ -77,8 +77,11 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals (packageOlder "1.26") [
     ./patches/1.23/go_no_vendor_checks-1.23.patch
   ]
-  ++ lib.optionals (packageAtLeast "1.26") [
+  ++ lib.optionals (packageAtLeast "1.26" && packageOlder "1.27") [
     ./patches/go_no_vendor_checks-1.26.patch
+  ]
+  ++ lib.optionals (packageAtLeast "1.27") [
+    ./patches/go_no_vendor_checks-1.27.patch
   ];
 
   inherit (stdenv.targetPlatform.go) GOOS GOARCH GOARM;

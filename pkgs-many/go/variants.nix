@@ -6,6 +6,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.23/iana-etc-1.17.patch;
     buildGoModuleSuffix = "124";
+    bootstrapGo = null;
   };
 
   v1_24_1 = {
@@ -14,6 +15,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.23/iana-etc-1.17.patch;
     buildGoModuleSuffix = "124";
+    bootstrapGo = null;
   };
 
   v1_24_2 = {
@@ -22,6 +24,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.23/iana-etc-1.17.patch;
     buildGoModuleSuffix = "124";
+    bootstrapGo = null;
   };
 
   v1_24_3 = {
@@ -30,6 +33,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.23/iana-etc-1.17.patch;
     buildGoModuleSuffix = "124";
+    bootstrapGo = null;
   };
 
   v1_24_4 = {
@@ -38,6 +42,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.23/iana-etc-1.17.patch;
     buildGoModuleSuffix = "124";
+    bootstrapGo = null;
   };
 
   v1_24_5 = {
@@ -46,6 +51,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.23/iana-etc-1.17.patch;
     buildGoModuleSuffix = "124";
+    bootstrapGo = null;
   };
 
   v1_24_6 = {
@@ -54,6 +60,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.23/iana-etc-1.17.patch;
     buildGoModuleSuffix = "124";
+    bootstrapGo = null;
   };
 
   v1_24_7 = {
@@ -62,6 +69,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.23/iana-etc-1.17.patch;
     buildGoModuleSuffix = "124";
+    bootstrapGo = null;
   };
 
   v1_24_8 = {
@@ -70,6 +78,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.23/iana-etc-1.17.patch;
     buildGoModuleSuffix = "124";
+    bootstrapGo = null;
   };
 
   v1_24_9 = {
@@ -78,6 +87,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.23/iana-etc-1.17.patch;
     buildGoModuleSuffix = "124";
+    bootstrapGo = null;
   };
 
   v1_24_10 = {
@@ -86,6 +96,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.23/iana-etc-1.17.patch;
     buildGoModuleSuffix = "124";
+    bootstrapGo = null;
   };
 
   v1_24_11 = {
@@ -94,6 +105,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.23/iana-etc-1.17.patch;
     buildGoModuleSuffix = "124";
+    bootstrapGo = null;
   };
 
   v1_24_12 = {
@@ -102,6 +114,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.23/iana-etc-1.17.patch;
     buildGoModuleSuffix = "124";
+    bootstrapGo = null;
   };
 
   v1_24_13 = {
@@ -110,6 +123,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.23/iana-etc-1.17.patch;
     buildGoModuleSuffix = "124";
+    bootstrapGo = null;
   };
 
   # Go 1.25.x
@@ -119,6 +133,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   v1_25_1 = {
@@ -127,6 +142,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   v1_25_2 = {
@@ -135,6 +151,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   v1_25_3 = {
@@ -143,6 +160,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   v1_25_4 = {
@@ -151,6 +169,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   v1_25_5 = {
@@ -159,6 +178,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   v1_25_6 = {
@@ -167,6 +187,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   v1_25_7 = {
@@ -175,6 +196,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   v1_25_8 = {
@@ -183,6 +205,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   v1_25_9 = {
@@ -191,6 +214,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   v1_25_10 = {
@@ -199,6 +223,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   v1_25_11 = {
@@ -207,6 +232,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   v1_25_12 = {
@@ -215,6 +241,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   v1_25_13 = {
@@ -223,6 +250,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   v1_25_14 = {
@@ -231,6 +259,7 @@
     bootstrap = ./bootstrap/bootstrap122.nix;
     iana-patch = ./patches/1.25/iana-etc-1.25.patch;
     buildGoModuleSuffix = "125";
+    bootstrapGo = null;
   };
 
   # Go 1.26.x
