@@ -34,18 +34,18 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     installShellFiles
-    nodejs.v23
+    nodejs
   ];
 
   buildInputs = [
     bashNonInteractive # needed for node-gyp wrapper script
   ]
-  ++ lib.optionals withNode [ nodejs.v23 ];
+  ++ lib.optionals withNode [ nodejs ];
 
   # Remove binary files from src, we don't need them, and this way we make sure
   # our distribution is free of binaryNativeCode
   postUnpack = ''
-    rm -r package/dist/reflink.*node package/dist/vendor
+    rm -rf package/dist/reflink.*node package/dist/vendor
   '';
 
   installPhase =
