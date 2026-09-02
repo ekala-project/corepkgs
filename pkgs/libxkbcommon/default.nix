@@ -47,7 +47,7 @@ stdenv.mkDerivation (finalAttrs: {
     bison
     doxygen
   ]
-  # ++ lib.optional stdenv.isLinux xorg.xvfb
+  # ++ lib.optional stdenv.hostPlatform.isLinux xorg.xvfb
   ++ lib.optional withWaylandTools wayland.scanner;
 
   buildInputs = [

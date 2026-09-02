@@ -42,7 +42,8 @@
 
 let
   inherit (libsForQt5) qtbase wrapQtAppsHook;
-  useSharedLibraries = (!isMinimalBuild && !stdenv.isCygwin);
+  inherit (stdenv.hostPlatform) isCygwin isDarwin isFreeBSD;
+  useSharedLibraries = (!isMinimalBuild && !isCygwin);
 in
 # Minimal, bootstrap cmake does not have toolkits
 assert isMinimalBuild -> (!withNcurses && !withQt);
@@ -71,13 +72,13 @@ stdenv.mkDerivation (finalAttrs: {
     # Derived from https://github.com/libuv/libuv/commit/1a5d4f08238dd532c3718e210078de1186a5920d
     ./003-libuv-application-services.diff
   ]
-  ++ lib.optional stdenv.isCygwin ./004-cygwin.diff
+  ++ lib.optional isCygwin ./004-cygwin.diff
   # Derived from https://github.com/curl/curl/commit/31f631a142d855f069242f3e0c643beec25d1b51
-  ++ lib.optional (stdenv.isDarwin && isMinimalBuild) ./005-remove-systemconfiguration-dep.diff
+  ++ lib.optional (isDarwin && isMinimalBuild) ./005-remove-systemconfiguration-dep.diff
   # On Darwin, always set CMAKE_SHARED_LIBRARY_RUNTIME_C_FLAG.
-  ++ lib.optional stdenv.isDarwin ./006-darwin-always-set-runtime-c-flag.diff
+  ++ lib.optional isDarwin ./006-darwin-always-set-runtime-c-flag.diff
   # On platforms where ps is not part of stdenv, patch the invocation of ps to use an absolute path.
-  ++ lib.optional (stdenv.isDarwin || stdenv.isFreeBSD) (
+  ++ lib.optional (isDarwin || isFreeBSD) (
     replaceVars ./007-darwin-bsd-ps-abspath.diff {
       ps = lib.getExe ps;
       sysctl = lib.getExe sysctl;
@@ -191,7 +192,7 @@ stdenv.mkDerivation (finalAttrs: {
   env.NIX_CFLAGS_COMPILE = "-Wno-unused-command-line-argument";
 
   # make install attempts to use the just-built cmake
-  preInstall = lib.optionalString (stdenv.hostPlatform != stdenv.buildPlatform) ''
+  preInstall = lib.optionalString (stdenv.isCross) ''
     sed -i 's|bin/cmake|${buildPackages.cmake.minimal}/bin/cmake|g' Makefile
   '';
 
@@ -226,6 +227,6 @@ stdenv.mkDerivation (finalAttrs: {
 
     platforms = lib.platforms.all;
     mainProgram = "cmake";
-    broken = (withQt && stdenv.isDarwin);
+    broken = (withQt && isDarwin);
   };
 })
