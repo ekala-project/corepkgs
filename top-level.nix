@@ -841,6 +841,9 @@ with final;
 
   buildGoModule = buildGo125Module;
 
+  buildGo127Module = callPackage ./build-support/go/module.nix {
+    go = buildPackages.go.v1_27;
+  };
   buildGo126Module = callPackage ./build-support/go/module.nix {
     go = buildPackages.go.v1_26;
   };
