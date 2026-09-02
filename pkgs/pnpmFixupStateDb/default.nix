@@ -1,6 +1,6 @@
 {
   lib,
-  nodejs' ? nodejs.v23,
+  nodejs' ? nodejs,
   nodejs,
   pnpm,
   tests,
