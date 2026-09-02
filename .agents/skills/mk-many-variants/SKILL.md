@@ -40,6 +40,9 @@ This file calls `mkManyVariants` with configuration:
 mkManyVariants {
   variants = ./variants.nix;           # Where version data lives
   aliases = { };                       # Deprecated/aliased versions
+  name = "isl";                        # Package name for eol/removed messages
+  eol = { };                           # EOL variants (warn + still build)
+  removed = { };                       # Removed variants (throw on access)
   defaultSelector = (p: p.v0_20);     # Which version is the default
   genericBuilder = ./generic.nix;      # Builder that handles all versions
   inherit callPackage;
@@ -232,6 +235,55 @@ passthru = mkVariantPassthru variantArgs // {
 ```
 
 This allows accessing other variants from a built package: `isl.variants.v0_27`
+
+## EOL and Removed Variants
+
+When a version reaches end-of-life or is dropped from `variants.nix`, use the `eol` and `removed` parameters to provide clear messages instead of silent breakage.
+
+Both require `name` to be set.
+
+### `eol` — Warn but still build
+
+For variants that are still in `variants.nix` but have reached end-of-life upstream. Accessing them emits a `lib.warn` and still returns the built package.
+
+```nix
+mkManyVariants {
+  variants = ./variants.nix;
+  name = "nodejs";
+  eol = {
+    v18 = "2025-04-30";    # Node.js 18 EOL date
+    v20 = "2026-04-30";
+  };
+  # ...
+}
+```
+
+Evaluating `nodejs.v18` prints:
+```
+evaluation warning: nodejs.v18 is EOL as of 2025-04-30. It is recommended to use a newer version.
+```
+
+### `removed` — Throw on access
+
+For variants that have been deleted from `variants.nix`. Accessing them throws an error. Only honoured when `config.allowAliases` is `true` (the default), so CI evaluation with `allowAliases = false` is unaffected.
+
+```nix
+mkManyVariants {
+  variants = ./variants.nix;
+  name = "linux";
+  removed = {
+    v6_17 = "2026-08-30";
+  };
+  # ...
+}
+```
+
+Evaluating `linux.v6_17` throws:
+```
+error: linux.v6_17 is no longer available and was removed on 2026-08-30.
+```
+
+Aliases in `stdenv/aliases.nix` should continue pointing to the variant (e.g. `linuxPackages_6_17 = linux.v6_17.pkgs;`) so the specific error is emitted instead of a generic "attribute missing".
 
 ## When to Use mkManyVariants
 
