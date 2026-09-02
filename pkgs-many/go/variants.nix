@@ -315,4 +315,22 @@
     bootstrapGo = buildPackages: buildPackages.go.v1_25;
   };
 
+  # Go 1.27.x
+  v1_27_0 = {
+    version = "1.27.0";
+    src-hash = "sha256-cAJAPXzERSnvbSb2mkSBgmM5Xq18FsBaWAiuBH6+sOU=";
+    bootstrap = ./bootstrap/bootstrap122.nix;
+    iana-patch = ./patches/1.25/iana-etc-1.25.patch;
+    buildGoModuleSuffix = "127";
+    bootstrapGo = buildPackages: buildPackages.go.v1_26;
+  };
+
+  v1_27_1 = {
+    version = "1.27.1";
+    src-hash = "sha256-TkCKuuEm2Ra2FkYnGT8sVPDjyhMS1pO4bbRfhiqyOLE=";
+    bootstrap = ./bootstrap/bootstrap122.nix;
+    iana-patch = ./patches/1.25/iana-etc-1.25.patch;
+    buildGoModuleSuffix = "127";
+    bootstrapGo = buildPackages: buildPackages.go.v1_26;
+  };
 }
