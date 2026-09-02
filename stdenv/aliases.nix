@@ -173,8 +173,11 @@ mapAliases {
   openssl_oqs = openssl.oqs;
   patchelfUnstable = throw "patchelfUnstable was removed because it was older than patchelf and unneeded, use patchelf instead";
   perl538 = perl.v5_38;
+  perl538Packages = lib.recurseIntoAttrs perl.v5_38.pkgs;
   perl540 = perl.v5_40;
+  perl540Packages = lib.recurseIntoAttrs perl.v5_40.pkgs;
   perl542 = perl.v5_42;
+  perl542Packages = lib.recurseIntoAttrs perl.v5_42.pkgs;
   phpExtensions = php.buildPecl;
   qemu-utils = qemu;
   r = r-lang;
