@@ -47,13 +47,12 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # TODO: services.udev.extraRules not yet available in ekaOS
     # Configure TrackPoint sensitivity and speed via udev
-    # services.udev.extraRules = ''
-    #   ACTION=="add|change", SUBSYSTEM=="input", ATTR{name}=="${cfg.device}", \
-    #     ATTR{device/sensitivity}="${toString cfg.sensitivity}", \
-    #     ATTR{device/speed}="${toString cfg.speed}"
-    # '';
+    services.udev.extraRules = ''
+      ACTION=="add|change", SUBSYSTEM=="input", ATTR{name}=="${cfg.device}", \
+        ATTR{device/sensitivity}="${toString cfg.sensitivity}", \
+        ATTR{device/speed}="${toString cfg.speed}"
+    '';
 
     # Set TrackPoint parameters via sysfs at activation
     system.activationScripts.trackpoint = lib.stringAfter [ "etc" ] ''
