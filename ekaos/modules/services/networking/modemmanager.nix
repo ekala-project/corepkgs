@@ -138,19 +138,17 @@ in
     ];
 
     services.dbus.packages = [ cfg.package ];
-    # TODO: services.udev.packages not yet available in EkaOS
-    # services.udev.packages = [ cfg.package ];
+    services.udev.packages = [ cfg.package ];
 
-    # TODO: security.polkit not yet available in EkaOS
-    # security.polkit.enable = true;
-    # security.polkit.extraConfig = ''
-    #   polkit.addRule(function(action, subject) {
-    #     if (
-    #       subject.isInGroup("networkmanager")
-    #       && action.id.indexOf("org.freedesktop.ModemManager") == 0
-    #       )
-    #         { return polkit.Result.YES; }
-    #   });
-    # '';
+    security.polkit.enable = true;
+    security.polkit.extraConfig = ''
+      polkit.addRule(function(action, subject) {
+        if (
+          subject.isInGroup("networkmanager")
+          && action.id.indexOf("org.freedesktop.ModemManager") == 0
+          )
+            { return polkit.Result.YES; }
+      });
+    '';
   };
 }
