@@ -302,7 +302,7 @@ in
 
         # Let gettext "checking for working iconv" success without trying
         # to convert between UTF-8 and EUC-JP which doesn't work here
-        # because of missing locale and gconv, same for libunistring below
+        # because of missing locale and gconv.
         gettext = super.gettext.overrideAttrs (attrs: {
           env = attrs.env or { } // {
             am_cv_func_iconv_works = "yes";
@@ -339,7 +339,6 @@ in
           m4
           perl
           patchelf
-          nukeReferences
           libxcrypt
           ;
         ${localSystem.libc} = prevStage.${localSystem.libc};
@@ -469,33 +468,10 @@ in
           bison
           texinfo
           which
-          nukeReferences
           libxcrypt
           ;
         # Avoids infinite recursion, as this is in the build-time dependencies of libc.
         libiconv = self.libcIconv prevStage.libc;
-
-        # We need libidn2 and its dependency libunistring as glibc dependency.
-        # To avoid the cycle, we build against bootstrap libc, nuke references,
-        # and use the result as input for our final glibc.  We also pass this pair
-        # through, so the final package-set uses exactly the same builds.
-        libunistring = super.libunistring.overrideAttrs (attrs: {
-          postFixup = attrs.postFixup or "" + ''
-            ${self.nukeReferences}/bin/nuke-refs "$out"/lib/lib*.so.*.*
-          '';
-          # Apparently iconv won't work with bootstrap glibc, but it will be used
-          # with glibc built later where we keep *this* build of libunistring,
-          # so we need to trick it into supporting libiconv.
-          env = attrs.env or { } // {
-            am_cv_func_iconv_works = "yes";
-          };
-        });
-        libidn2 = super.libidn2.overrideAttrs (attrs: {
-          postFixup = attrs.postFixup or "" + ''
-            ${self.nukeReferences}/bin/nuke-refs -e '${lib.getLib self.libunistring}' \
-              "$out"/lib/lib*.so.*.*
-          '';
-        });
 
         # This also contains the full, dynamically linked, final Glibc.
         binutils = prevStage.binutils.override {
@@ -577,10 +553,7 @@ in
             linuxHeaders
             m4
             bison
-            libidn2
-            libunistring
             libxcrypt
-            nukeReferences
             python3Minimal
             ;
         }
@@ -640,8 +613,6 @@ in
           texinfo
           zlib
           linuxHeaders
-          libidn2
-          libunistring
           python3Minimal
           ;
         ${localSystem.libc} = prevStage.${localSystem.libc};
@@ -762,8 +733,6 @@ in
               glibc
               attr
               acl
-              libidn2
-              libunistring
               linuxHeaders
               gcc
               fortify-headers
@@ -802,8 +771,6 @@ in
             acl
             zlib
             grep.pcre2
-            libidn2
-            libunistring
           ]
           # More complicated cases
           ++ (map (x: lib.getOutput x (prevStage.libc)) [
@@ -853,22 +820,9 @@ in
               attr
               acl
               zlib
-              libunistring
               ;
             inherit (prevStage.grep) pcre2;
             ${localSystem.libc} = prevStage.${localSystem.libc};
-
-            # Hack: avoid libidn2.{bin,dev} referencing bootstrap tools.  There's a logical cycle.
-            libidn2 = import ../../pkgs/libidn2/no-bootstrap-reference.nix {
-              inherit lib;
-              inherit (prevStage) libidn2;
-              inherit (self)
-                stdenv
-                runCommandLocal
-                patchelf
-                libunistring
-                ;
-            };
           }
           // lib.optionalAttrs (super.stdenv.targetPlatform == localSystem) {
             # Need to get rid of these when cross-compiling.
