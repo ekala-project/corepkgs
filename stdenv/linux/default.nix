@@ -123,6 +123,7 @@
 
 let
   inherit (localSystem) system;
+  genericStdenv = import ../generic { defaultConfig = config; };
 
   isFromNixpkgs = pkg: !(isFromBootstrapFiles pkg);
   isFromBootstrapFiles =
@@ -177,7 +178,7 @@ let
 
     let
 
-      thisStdenv = import ../generic {
+      thisStdenv = genericStdenv {
         name = "${name}-stdenv-linux";
         buildPlatform = localSystem;
         hostPlatform = localSystem;
@@ -708,7 +709,7 @@ in
     assert isBuiltByNixpkgsCompiler prevStage.patchelf;
     {
       inherit config overlays;
-      stdenv = import ../generic rec {
+      stdenv = genericStdenv rec {
         name = "stdenv-linux";
 
         buildPlatform = localSystem;
