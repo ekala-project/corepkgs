@@ -174,6 +174,7 @@ mapAliases {
   patchelfUnstable = throw "patchelfUnstable was removed because it was older than patchelf and unneeded, use patchelf instead";
   perl538 = perl.v5_38;
   perl540 = perl.v5_40;
+  perl542 = perl.v5_42;
   phpExtensions = php.buildPecl;
   qemu-utils = qemu;
   r = r-lang;
