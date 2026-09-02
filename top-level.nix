@@ -244,7 +244,7 @@ with final;
   mscgen = null;
   multipath-tools = null;
   neovim = null;
-  nodejs_latest = nodejs.v23;
+  nodejs_latest = nodejs.v26;
   nwdiag = null;
   nixos-icons = null; # imagemagick tests
   objgraph = null;
