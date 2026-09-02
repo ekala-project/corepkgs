@@ -121,6 +121,16 @@ stdenv.mkDerivation (
     ]
     ++ devExtraCmakeFlags;
 
+    # GCC 14 ICEs (segfault in ggc_set_mark) on template-heavy TUs at -O3;
+    # override the CMake Release flags to use -O2 instead.  Must use
+    # cmakeFlagsArray (not cmakeFlags) because the value contains a space.
+    preConfigure = lib.optionalString (!stdenv.hostPlatform.useLLVM) ''
+      cmakeFlagsArray+=(
+        "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG"
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG"
+      )
+    '';
+
     postPatch = ''
       # Make sure clang passes the correct location of libLTO to ld64
       substituteInPlace lib/Driver/ToolChains/Darwin.cpp \
@@ -177,13 +187,11 @@ stdenv.mkDerivation (
 
     env = lib.optionalAttrs (!stdenv.hostPlatform.useLLVM) {
       # GCC >= 12 triggers -Wmaybe-uninitialized warnings.
-      # GCC 14 ICEs (segfault in ggc_set_mark) on CGDebugInfo.cpp at -O3;
-      # -O2 avoids the crash.
       # GCC 14 also generates >4 GB .debug_info sections for clang's
       # template-heavy TUs, overflowing 32-bit DWARF relocations;
       # -gsplit-dwarf keeps per-TU debug info in .dwo files, sidestepping
       # the limit while still producing usable debuginfo.
-      NIX_CFLAGS_COMPILE = "-Wno-maybe-uninitialized -O2 -gsplit-dwarf";
+      NIX_CFLAGS_COMPILE = "-Wno-maybe-uninitialized -gsplit-dwarf";
     };
 
     passthru = {
