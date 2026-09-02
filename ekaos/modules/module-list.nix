@@ -43,6 +43,7 @@
   ./config/locale.nix
   ./config/fonts.nix
   ./config/power.nix
+  ./config/kernel-profile.nix
   ./config/xdg/mime.nix
   ./config/xdg/icons.nix
   ./config/xdg/autostart.nix
