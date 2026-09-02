@@ -18,6 +18,23 @@
   # Type: AttrSet AttrSet -> AttrSet AttrSet.
   aliases ? { ... }: { },
 
+  # Package name used in EOL/removed messages (e.g. "linux")
+  # Type: String
+  name ? null,
+
+  # Variants that have reached end-of-life. Still buildable but emit a warning.
+  # Maps variant name to EOL date string, e.g. { v6_17 = "2026-08-01"; }
+  # Requires `name` to be set.
+  # Type: AttrSet String
+  eol ? { },
+
+  # Variants that have been fully removed. Accessing them throws an error.
+  # Maps variant name to removal date string, e.g. { v6_13 = "2026-02-01"; }
+  # Only honoured when `config.allowAliases` is true.
+  # Requires `name` to be set.
+  # Type: AttrSet String
+  removed ? { },
+
   # A "projection" from the variant set to a variant to be used as the default
   # Type: AttrSet package -> package
   defaultSelector,
@@ -32,6 +49,8 @@
 
 # Some assertions as poor man's type checking
 assert builtins.isFunction defaultSelector;
+assert eol != { } -> name != null;
+assert removed != { } -> name != null;
 
 let
   importIfPath = x: if builtins.isPath x then import x else x;
@@ -63,12 +82,24 @@ let
 
       defaultVariant = defaultSelector currentVariants;
 
+      # Removed variants: throw on access (only when config.allowAliases)
+      removedOverlay = lib.optionalAttrs config.allowAliases (
+        builtins.mapAttrs (
+          n: date: throw "${name}.${n} is no longer available and was removed on ${date}."
+        ) removed
+      );
+
       mkVariantPassthru =
         variantArgs:
         let
           vs = builtins.mapAttrs (_: v: mkPackage (variantArgs // v)) currentVariants;
+          # EOL variants: wrap built packages with lib.warn
+          eolWrapped = builtins.mapAttrs (
+            n: date:
+            lib.warn "${name}.${n} is EOL as of ${date}. It is recommended to use a newer version." vs.${n}
+          ) eol;
         in
-        vs // { variants = vs; };
+        vs // eolWrapped // removedOverlay // { variants = vs; };
 
       # This also allows for additional attrs to be passed through besides variant and src
       mkVariantArgs =
