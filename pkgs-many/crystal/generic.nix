@@ -1,4 +1,11 @@
 {
+  version,
+  src-url,
+  src-hash,
+  ...
+}:
+
+{
   lib,
   stdenv,
   fetchurl,
@@ -15,13 +22,13 @@
   pkg-config,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation {
   pname = "crystal";
-  version = "1.20.3";
+  inherit version;
 
   src = fetchurl {
-    url = "https://github.com/crystal-lang/crystal/releases/download/${finalAttrs.version}/crystal-${finalAttrs.version}-1-linux-x86_64.tar.gz";
-    hash = "sha256-ti6iWyR3E/tj3Jkr60WbytiVVGXcwRoYH9Ik1OyVWmI=";
+    url = src-url;
+    hash = src-hash;
   };
 
   nativeBuildInputs = [
@@ -59,26 +66,38 @@ stdenv.mkDerivation (finalAttrs: {
           pkg-config
         ]
       } \
-      --set CRYSTAL_LIBRARY_PATH ${lib.makeLibraryPath finalAttrs.buildInputs}
+      --set CRYSTAL_LIBRARY_PATH ${
+        lib.makeLibraryPath [
+          llvmPackages.llvm
+          openssl
+          pcre2
+          libevent
+          libyaml
+          zlib
+          libxml2
+          gmp
+          boehmgc
+        ]
+      }
 
     runHook postInstall
   '';
 
   passthru = {
-    majorVersion = lib.versions.major finalAttrs.version;
-    minorVersion = lib.versions.majorMinor finalAttrs.version;
+    majorVersion = lib.versions.major version;
+    minorVersion = lib.versions.majorMinor version;
   };
 
   meta = {
     description = "Fast and statically typed, compiled language with Ruby-like syntax";
     homepage = "https://crystal-lang.org/";
-    changelog = "https://github.com/crystal-lang/crystal/releases/tag/${finalAttrs.version}";
+    changelog = "https://github.com/crystal-lang/crystal/releases/tag/${version}";
     license = lib.licenses.asl20;
-    platforms = [ "x86_64-linux" ]; # Binary distribution
+    platforms = [ "x86_64-linux" ];
     mainProgram = "crystal";
     identifiers.cpeParts = {
       vendor = "crystal-lang";
       product = "crystal";
     };
   };
-})
+}
