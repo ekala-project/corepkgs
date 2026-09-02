@@ -47,6 +47,10 @@ let
   commonPatches = [
     # Do not look in /usr etc. for dependencies.
     (versionPatches + "/no-sys-dirs.patch")
+
+    # Super-linear cache overflow in the regex engine.
+    ./patches/common/CVE-2026-15534-1.patch
+    ./patches/common/CVE-2026-15534-2.patch
   ]
 
   # Both fixed upstream in 5.42.0.
