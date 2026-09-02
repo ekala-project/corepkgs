@@ -18,6 +18,10 @@ mkManyVariants {
     nodejs_24 = "v24_20";
     nodejs_26 = "v26_8";
   };
+  name = "nodejs";
+  removed = {
+    v23 = "2025-06-01";
+  };
   defaultSelector = (p: p.v24); # Default to Node.js 24 LTS
   genericBuilder = ./generic.nix;
   inherit callPackage;
