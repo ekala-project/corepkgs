@@ -120,16 +120,10 @@ let
         features = kernelFeatures; # Ensure we know of all extra patches, etc.
       };
 
-      # TODO(corepkgs): This references NixOS modules, repleace with EkaOS usage
-      #intermediateNixConfig =
-      #  configfile.moduleStructuredConfig.intermediateNixConfig
-      #  # extra config in legacy string format
-      #  + extraConfig;
-
-      # (corepkgs): placeholder for now
       intermediateNixConfig =
+        configfile.moduleStructuredConfig.intermediateNixConfig
         # extra config in legacy string format
-        extraConfig;
+        + extraConfig;
 
       structuredConfigFromPatches = map (
         {
