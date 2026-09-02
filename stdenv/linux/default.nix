@@ -95,35 +95,18 @@
         };
       };
 
-      # Try to find an architecture compatible with our current system. We
-      # just try every bootstrap we’ve got and test to see if it is
-      # compatible with or current architecture.
-      getCompatibleTools = lib.foldl (
-        v: system:
-        if v != null then
-          v
-        else if localSystem.canExecute (lib.systems.elaborate { inherit system; }) then
-          archLookupTable.${system}
-        else
-          null
-      ) null (lib.attrNames archLookupTable);
-
       archLookupTable = table.${localSystem.libc} or (throw "unsupported libc for the pure Linux stdenv");
-      files =
-        archLookupTable.${localSystem.system} or (
-          if getCompatibleTools != null then
-            getCompatibleTools
-          else
-            (throw "unsupported platform for the pure Linux stdenv")
-        );
+      # Without an exact match, fall back to any bootstrap this system can execute.
+      compatibleSystem = lib.findFirst (
+        system: localSystem.canExecute (lib.systems.elaborate { inherit system; })
+      ) (throw "unsupported platform for the pure Linux stdenv") (lib.attrNames archLookupTable);
+      files = archLookupTable.${localSystem.system} or archLookupTable.${compatibleSystem};
     in
     (config.replaceBootstrapFiles or lib.id) files,
 }:
 
 let
   genericStdenv = import ../generic { defaultConfig = config; };
-
-  inherit (localSystem) system;
 
   isFromNixpkgs = pkg: !(isFromBootstrapFiles pkg);
   isFromBootstrapFiles =
@@ -212,11 +195,14 @@ let
               cc = prevStage.gcc-unwrapped;
               bintools = prevStage.binutils;
               isGNU = true;
-              inherit (prevStage) libc;
               inherit lib;
-              inherit (prevStage) coreutils grep;
+              inherit (prevStage)
+                libc
+                coreutils
+                grep
+                fortify-headers
+                ;
               stdenvNoCC = prevStage.ccWrapperStdenv;
-              fortify-headers = prevStage.fortify-headers;
               runtimeShell = prevStage.ccWrapperStdenv.shell;
             }).overrideAttrs
               (
@@ -271,7 +257,6 @@ in
     prevStage:
     # previous stage0 stdenv:
     assert isFromBootstrapFiles prevStage.binutils.bintools;
-    assert isFromBootstrapFiles prevStage."${localSystem.libc}";
     assert isFromBootstrapFiles prevStage.libc;
     assert isFromBootstrapFiles prevStage.gcc-unwrapped;
     assert isFromBootstrapFiles prevStage.coreutils;
@@ -319,7 +304,6 @@ in
   (
     prevStage:
     assert isBuiltByBootstrapFilesCompiler prevStage.binutils-unwrapped;
-    assert isFromBootstrapFiles prevStage."${localSystem.libc}";
     assert isFromBootstrapFiles prevStage.libc;
     assert isFromBootstrapFiles prevStage.gcc-unwrapped;
     assert isFromBootstrapFiles prevStage.coreutils;
@@ -447,7 +431,6 @@ in
     prevStage:
     # previous stage1 stdenv:
     assert isBuiltByBootstrapFilesCompiler prevStage.binutils-unwrapped;
-    assert isFromBootstrapFiles prevStage."${localSystem.libc}";
     assert isFromBootstrapFiles prevStage.libc;
     assert isBuiltByBootstrapFilesCompiler prevStage.gcc-unwrapped;
     assert isFromBootstrapFiles prevStage.coreutils;
@@ -525,7 +508,6 @@ in
     prevStage:
     # previous stage2 stdenv:
     assert isBuiltByNixpkgsCompiler prevStage.binutils-unwrapped;
-    assert isBuiltByNixpkgsCompiler prevStage.${localSystem.libc};
     assert isBuiltByNixpkgsCompiler prevStage.libc;
     assert isBuiltByBootstrapFilesCompiler prevStage.gcc-unwrapped;
     assert isFromBootstrapFiles prevStage.coreutils;
@@ -540,44 +522,40 @@ in
     stageFun prevStage {
       name = "bootstrap-stage3";
 
-      overrides =
-        self: super:
-        {
-          inherit (prevStage)
-            ccWrapperStdenv
-            binutils
-            coreutils
-            grep
-            perl
-            patchelf
-            linuxHeaders
-            m4
-            bison
-            libxcrypt
-            python3Minimal
-            ;
-        }
-        // {
-          ${localSystem.libc} = prevStage.${localSystem.libc};
-          gcc-unwrapped =
-            (super.gcc-unwrapped.override (
-              commonGccOverrides
-              // {
-                inherit (prevStage) which;
-              }
-            )).overrideAttrs
-              (a: {
-                # so we can add them to allowedRequisites below
-                passthru = a.passthru // {
-                  inherit (self)
-                    gmp
-                    mpfr
-                    libmpc
-                    isl
-                    ;
-                };
-              });
-        };
+      overrides = self: super: {
+        inherit (prevStage)
+          ccWrapperStdenv
+          binutils
+          coreutils
+          grep
+          perl
+          patchelf
+          linuxHeaders
+          m4
+          bison
+          libxcrypt
+          python3Minimal
+          ;
+        ${localSystem.libc} = prevStage.${localSystem.libc};
+        gcc-unwrapped =
+          (super.gcc-unwrapped.override (
+            commonGccOverrides
+            // {
+              inherit (prevStage) which;
+            }
+          )).overrideAttrs
+            (a: {
+              # so we can add them to allowedRequisites below
+              passthru = a.passthru // {
+                inherit (self)
+                  gmp
+                  mpfr
+                  libmpc
+                  isl
+                  ;
+              };
+            });
+      };
       extraNativeBuildInputs = [
         prevStage.patchelf
       ];
@@ -591,7 +569,6 @@ in
     prevStage:
     # previous stage3 stdenv:
     assert isBuiltByNixpkgsCompiler prevStage.binutils-unwrapped;
-    assert isBuiltByNixpkgsCompiler prevStage.${localSystem.libc};
     assert isBuiltByNixpkgsCompiler prevStage.libc;
     assert isBuiltByNixpkgsCompiler prevStage.gcc-unwrapped;
     assert isFromBootstrapFiles prevStage.coreutils;
@@ -636,8 +613,8 @@ in
             grep
             runtimeShell
             libc
+            fortify-headers
             ;
-          fortify-headers = self.fortify-headers;
         };
       };
       extraNativeBuildInputs = [
@@ -660,7 +637,6 @@ in
     # previous stage4 stdenv; see stage3 comment regarding gcc,
     # which applies here as well.
     assert isBuiltByNixpkgsCompiler prevStage.binutils-unwrapped;
-    assert isBuiltByNixpkgsCompiler prevStage.${localSystem.libc};
     assert isBuiltByNixpkgsCompiler prevStage.libc;
     assert isBuiltByNixpkgsCompiler prevStage.gcc-unwrapped;
     assert isBuiltByNixpkgsCompiler prevStage.coreutils;
@@ -697,48 +673,13 @@ in
         extraAttrs = {
           inherit stage0;
           shellPackage = prevStage.bash;
-        }
-        // (lib.optionalAttrs stage0.isMinimalBootstrap {
-          inherit (stage0) minimal-bootstrap;
-        })
-        // (lib.optionalAttrs (!stage0.isMinimalBootstrap) {
-          inherit (stage0) bootstrapTools;
-        });
+        };
 
         disallowedRequisites = stage0.disallowedInFinalStdenv;
 
         # Mainly avoid reference to bootstrap tools
         allowedRequisites =
-          let
-            inherit (prevStage)
-              gzip
-              bzip2
-              xz
-              zlib
-              bashNonInteractive
-              binutils
-              coreutils
-              diffutils
-              findutils
-              gawk
-              gmp
-              make
-              sed
-              tar
-              grep
-              patch
-              patchelf
-              ed
-              file
-              glibc
-              attr
-              acl
-              linuxHeaders
-              gcc
-              fortify-headers
-              gcc-unwrapped
-              ;
-          in
+          with prevStage;
           # Simple executable tools
           lib.concatMap
             (p: [
@@ -839,7 +780,6 @@ in
     # previous stage5 stdenv; see stage3 comment regarding gcc,
     # which applies here as well.
     assert isBuiltByNixpkgsCompiler prevStage.binutils-unwrapped;
-    assert isBuiltByNixpkgsCompiler prevStage.${localSystem.libc};
     assert isBuiltByNixpkgsCompiler prevStage.libc;
     assert isBuiltByNixpkgsCompiler prevStage.gcc-unwrapped;
     assert isBuiltByNixpkgsCompiler prevStage.coreutils;
