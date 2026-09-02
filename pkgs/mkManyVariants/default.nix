@@ -59,7 +59,7 @@ let
       # Resolve string aliases against the current raw variants
       aliases' = builtins.mapAttrs (_: v: if builtins.isString v then rawVariants.${v} else v) aliasesRaw;
 
-      currentVariants = if config.allowAliases then rawVariants // aliases' else rawVariants;
+      currentVariants = rawVariants // aliases';
 
       defaultVariant = defaultSelector currentVariants;
 
