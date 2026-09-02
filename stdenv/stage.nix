@@ -80,7 +80,7 @@ let
     adapters
     // {
       stdenvAdapters = adapters;
-      inherit config;
+      inherit config overlays;
     };
 
   trivialBuilders =
