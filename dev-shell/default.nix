@@ -11,6 +11,46 @@ let
   # Import service module infrastructure
   serviceLib = import ../services/lib/service-module.nix { inherit lib pkgs; };
 
+  # Language modules for devshell integration
+  languageModuleFiles = [
+    ../ekaos/modules/languages/zig.nix
+    ../ekaos/modules/languages/rust.nix
+    ../ekaos/modules/languages/go.nix
+  ];
+
+  # Stub module providing the options that language modules write to.
+  # In the full ekaos system these are defined by toplevel.nix and
+  # shell-environment.nix; in the devshell context we provide lightweight
+  # stubs and extract the collected values after evaluation.
+  languageStubModule = {
+    options.environment.systemPackages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [ ];
+      description = "Packages collected by language modules.";
+    };
+
+    options.environment.variables = lib.mkOption {
+      type = lib.types.attrsOf (
+        lib.types.oneOf [
+          lib.types.str
+          lib.types.path
+          lib.types.package
+        ]
+      );
+      default = { };
+      description = "Environment variables collected by language modules.";
+    };
+
+    # Stub for per-user options (languages modules extend users.users)
+    # In devshell context per-user config is unused, but the options must
+    # exist so the module evaluates without errors.
+    options.users.users = lib.mkOption {
+      type = lib.types.attrsOf (lib.types.submodule { });
+      default = { };
+      description = "Stub for per-user options (unused in devshell context).";
+    };
+  };
+
   # Simple mkShell implementation (Phase 1 - basic version)
   mkShell =
     attrs:
@@ -33,7 +73,7 @@ in
   # Main function: Create a development shell with services
   mkDevShell =
     {
-      # Service configuration via ekaos modules
+      # Service and language configuration via modules
       modules ? [ ],
 
       # Traditional mkShell options
@@ -54,9 +94,10 @@ in
     }@args:
 
     let
-      # Evaluate the service modules
+      # Evaluate the service modules (check = false ignores language options)
       servicesEval = lib.evalModules {
         modules = [
+          { _module.check = false; }
           {
             options.services = serviceLib.mkServicesOption;
           }
@@ -81,6 +122,30 @@ in
         inherit (processCompose) tui logDir dataDir;
       };
 
+      # Evaluate language modules (check = false ignores service options)
+      languagesEval = lib.evalModules {
+        modules = [
+          { _module.check = false; }
+          languageStubModule
+        ]
+        ++ languageModuleFiles
+        ++ modules;
+        specialArgs = {
+          inherit lib pkgs;
+        };
+      };
+
+      # Extract packages and environment variables from language evaluation
+      langPackages = languagesEval.config.environment.systemPackages;
+      langVariables = languagesEval.config.environment.variables;
+
+      # Generate export statements for language environment variables
+      langExports = lib.concatStringsSep "\n" (
+        lib.mapAttrsToList (
+          name: value: "export ${name}=${lib.escapeShellArg (toString value)}"
+        ) langVariables
+      );
+
       # Extract non-service options for mkShell
       shellArgs = builtins.removeAttrs args [
         "modules"
@@ -92,6 +157,11 @@ in
         # Create directories for services
         mkdir -p ${processCompose.logDir}
         mkdir -p ${processCompose.dataDir}
+
+        ${lib.optionalString (langVariables != { }) ''
+          # Language environment variables
+          ${langExports}
+        ''}
 
         # Display service information
         echo "================================================"
@@ -122,7 +192,8 @@ in
     mkShell (
       shellArgs
       // {
-        buildInputs = buildInputs ++ packages ++ [ processComposePackage ] ++ (lib.attrValues utilities);
+        buildInputs =
+          buildInputs ++ packages ++ langPackages ++ [ processComposePackage ] ++ (lib.attrValues utilities);
 
         shellHook = enhancedShellHook;
 
