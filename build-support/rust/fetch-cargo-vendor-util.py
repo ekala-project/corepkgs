@@ -79,7 +79,7 @@ def get_download_url_for_tarball(pkg: dict[str, Any]) -> str:
     if pkg["source"] != "registry+https://github.com/rust-lang/crates.io-index":
         raise Exception("Only the default crates.io registry is supported.")
 
-    return f"https://crates.io/api/v1/crates/{pkg["name"]}/{pkg["version"]}/download"
+    return f"https://static.crates.io/crates/{pkg["name"]}/{pkg["name"]}-{pkg["version"]}.crate"
 
 
 def download_tarball(session: requests.Session, pkg: dict[str, Any], out_dir: Path) -> None:
