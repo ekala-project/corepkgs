@@ -10,7 +10,7 @@
   };
 
   v5_42 = {
-    version = "5.42.0";
-    sha256 = "sha256-4JPvGE1/mhuXl+JGUpb1VRCtttq4hCsMPtUzKWYwltw=";
+    version = "5.42.3";
+    sha256 = "sha256-ETd0CYWDe1zfFfDPq5Miedy0NS+RL+1vwUTotPCCNic=";
   };
 }

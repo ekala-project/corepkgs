@@ -453,7 +453,9 @@ let
       patches =
         commonPatches
         # Missing d_fdopendir/HAS_FDOPENDIR: https://github.com/arsv/perl-cross/pull/159
-        ++ lib.optional (lib.versionAtLeast version "5.40.0") (versionPatches + "/cross-fdopendir.patch");
+        ++ lib.optional (lib.versionAtLeast version "5.40.0") (versionPatches + "/cross-fdopendir.patch")
+        # perl-cross 1.6.4 has no 5.42.3 patch set; link the 5.42.0 one.
+        ++ lib.optional (version == "5.42.3") (versionPatches + "/perl-cross-1.6.4--5.42.3.patch");
 
       depsBuildBuild = [
         buildPackages.stdenv.cc
