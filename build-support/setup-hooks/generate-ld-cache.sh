@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 
-# The NixOS resolution-cache note records, for each binary, the resolved paths
+# The EkaOS resolution-cache note records, for each binary, the resolved paths
 # of its DT_NEEDED libraries.  It must therefore be written only after every
 # other tool that rewrites ELF files has finished, so that it reflects the final
 # interpreter and RPATH.  In particular autoPatchelfHook rewrites those in
@@ -17,6 +17,32 @@ preFixupHooks+=(_registerGenerateLDCache)
 
 _registerGenerateLDCache() {
     postFixupHooks+=(_generateLDCacheAllOutputs)
+}
+
+# Whether the loader that will run this build's output reads the note at all.
+#
+# The note is a glibc extension (see pkgs/glibc/ldcache.patch), so a build whose
+# binaries are loaded by musl must not pay a patchelf pass for notes nothing
+# will read.  That question cannot be answered where the hook is added to
+# `extraNativeBuildInputs`: the native stdenv freezes that list and the cross
+# stdenv inherits it verbatim, so an entry keyed on the build platform's libc is
+# wrong in both cross directions.  Decide it here instead, from the host loader
+# the cc-wrapper records, which is host-accurate by construction.
+_ldCacheLoaderReadsNote() {
+    local linker
+    # stdenvNoCC has no cc-wrapper and so offers no signal.  Write the note
+    # there: on a glibc host that is the useful answer, and on any other host
+    # the note is inert rather than wrong.
+    [ -n "${NIX_CC-}" ] && [ -r "$NIX_CC/nix-support/dynamic-linker" ] || return 0
+    linker=$(< "$NIX_CC/nix-support/dynamic-linker")
+    # Name the loaders known not to read the note rather than trying to
+    # recognise glibc's, whose soname is architecture-dependent
+    # (ld-linux-x86-64.so.2, but ld64.so.2 on powerpc64 and ld.so.1 on mips).
+    # The patterns mirror the globs bintools-wrapper records for each libc.
+    case "${linker##*/}" in
+        ld-musl-* | ld*-uClibc*) return 1 ;;
+    esac
+    return 0
 }
 
 _generateLDCacheAllOutputs() {
@@ -36,6 +62,7 @@ _generateLDCacheAllOutputs() {
     # private postFixup function, whose name auto-patchelf.sh itself plans to
     # retire (see the XXX comment there).
     if [ -n "${dontGenerateLDCache-}" ]; then return 0; fi
+    if ! _ldCacheLoaderReadsNote; then return 0; fi
     if [ -n "${dontPatchELF-}" ] \
         && { [ -n "${dontAutoPatchelf-}" ] || ! declare -F autoPatchelf > /dev/null; }; then
         return 0

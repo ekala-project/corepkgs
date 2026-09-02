@@ -660,11 +660,13 @@ in
           prevStage.patchelf
           # Many tarballs come with obsolete config.sub/config.guess that don't recognize aarch64.
           prevStage.updateAutotoolsGnuConfigScriptsHook
-        ]
-        # Write the .note.nixos.ldcache resolution cache into every output's
-        # ELF files (read by the patched glibc, hence glibc hosts only; a musl
-        # bootstrap would pay the patchelf pass for notes no loader reads).
-        ++ lib.optionals (localSystem.libc == "glibc") [ prevStage.generateLdCacheHook ];
+          # Writes the .note.ekaos.ldcache resolution cache into every output's
+          # ELF files.  Added unconditionally: this list is frozen here and
+          # inherited verbatim by the cross stdenv, which cannot re-key it, so
+          # the hook itself decides from the host loader whether the note is
+          # read and skips the patchelf pass when it is not.
+          prevStage.generateLdCacheHook
+        ];
 
         cc = prevStage.gcc;
 
@@ -733,8 +735,8 @@ in
           ++ [
             prevStage.updateAutotoolsGnuConfigScriptsHook
             prevStage.gnu-config
+            prevStage.generateLdCacheHook
           ]
-          ++ lib.optionals (localSystem.libc == "glibc") [ prevStage.generateLdCacheHook ]
           ++ [
             gcc-unwrapped.gmp
             gcc-unwrapped.libmpc
