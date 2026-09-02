@@ -1,12 +1,12 @@
 {
   lib,
-  buildGo126Module,
+  go,
   fetchFromGitHub,
   installShellFiles,
   makeWrapper,
 }:
 
-buildGo126Module (finalAttrs: {
+go.v1_26.buildModule (finalAttrs: {
   pname = "skaffold";
   version = "2.24.0";
 

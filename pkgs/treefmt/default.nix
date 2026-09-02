@@ -1,12 +1,12 @@
 {
   lib,
   stdenv,
-  buildGo126Module,
+  go,
   callPackages,
   fetchFromGitHub,
   installShellFiles,
 }:
-buildGo126Module (finalAttrs: {
+go.v1_26.buildModule (finalAttrs: {
   pname = "treefmt";
   version = "2.5.0";
 

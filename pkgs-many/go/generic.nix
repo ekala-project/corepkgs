@@ -4,7 +4,6 @@
   bootstrap,
   bootstrapGo ? null,
   iana-patch,
-  buildGoModuleSuffix,
   packageAtLeast,
   packageOlder,
   ...
@@ -184,9 +183,12 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     inherit goBootstrap;
+    buildModule = callPackage ../../build-support/go/module.nix {
+      go = finalAttrs.finalPackage;
+    };
     tests = callPackage ./tests.nix {
       go = finalAttrs.finalPackage;
-      buildGoModule = buildPackages."buildGo${buildGoModuleSuffix}Module";
+      buildGoModule = finalAttrs.passthru.buildModule;
     };
   };
 
