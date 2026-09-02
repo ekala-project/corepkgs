@@ -63,7 +63,6 @@
   localSystem,
   config,
   overlays,
-
   bootstrapFiles ?
     let
       table = {
@@ -122,8 +121,9 @@
 }:
 
 let
-  inherit (localSystem) system;
   genericStdenv = import ../generic { defaultConfig = config; };
+
+  inherit (localSystem) system;
 
   isFromNixpkgs = pkg: !(isFromBootstrapFiles pkg);
   isFromBootstrapFiles =
@@ -155,7 +155,6 @@ let
 
   # Create a standard environment by downloading pre-built binaries of
   # coreutils, GCC, etc.
-
   stage0 = import ./stage0.nix {
     inherit
       lib
@@ -177,7 +176,6 @@ let
     }:
 
     let
-
       thisStdenv = genericStdenv {
         name = "${name}-stdenv-linux";
         buildPlatform = localSystem;
@@ -191,6 +189,7 @@ let
           ++ lib.optional (
             prevStage ? updateAutotoolsGnuConfigScriptsHook
           ) prevStage.updateAutotoolsGnuConfigScriptsHook;
+        inherit (stage0) initialPath;
         preHook = ''
           # Don't patch #!/interpreter because it leads to retained
           # dependencies on the bootstrapTools in the final stdenv.
@@ -198,7 +197,6 @@ let
           ${commonPreHook}
         '';
         shell = "${stage0.bash}/bin/bash";
-        inherit (stage0) initialPath;
 
         cc =
           if prevStage.gcc-unwrapped == null then
@@ -839,17 +837,16 @@ in
         overrides =
           self: super:
           {
+            # TODO: decide what should be in final stdenv
             inherit (prevStage)
               gzip
               bzip2
               xz
               bashNonInteractive
               coreutils
-              diffutils
               findutils
               gawk
               sed
-              tar
               grep
               patch
               patchelf

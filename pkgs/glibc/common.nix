@@ -31,7 +31,6 @@
   linuxHeaders ? null,
   gd ? null,
   libpng ? null,
-  libidn2,
   bison,
   python3Minimal,
   gettext,
@@ -148,6 +147,15 @@ stdenv.mkDerivation (
     # [CET]: https://en.wikipedia.org/wiki/Control-flow_integrity#Intel_Control-flow_Enforcement_Technology
     ++ lib.optional enableCETRuntimeDefault ./2.39-revert-cet-default-disable.patch;
 
+    # nixpkgs additionally patches inet/idna.c to dlopen libidn2 by store path, so
+    # that getaddrinfo(AI_IDN) can encode non-ASCII names. We deliberately don't:
+    # it makes glibc depend on libidn2 -> libunistring -> glibc, which nixpkgs
+    # breaks with a nuke-refs build of both in bootstrap stage 2 and a rewrite of
+    # libidn2.{bin,dev} in the final stage, and it puts both libraries in every
+    # closure. Every consumer here does IDNA itself through libidn2 directly.
+    # Without the patch glibc behaves as on a system without libidn2: ASCII names
+    # and NI_IDN are unaffected, non-ASCII AI_IDN lookups return EAI_IDN_ENCODE,
+    # which is what cross-built glibc already did.
     postPatch = ''
       # Needed for glibc to build with the make 3.82
       # http://comments.gmane.org/gmane.linux.lfs.support/31227
@@ -160,19 +168,6 @@ stdenv.mkDerivation (
       # Ensure that `__nss_files_fopen` can still be wrapped by `libredirect`.
       sed -i -e '/libc_hidden_def (__nss_files_fopen)/d' nss/nss_files_fopen.c
       sed -i -e '/libc_hidden_proto (__nss_files_fopen)/d' include/nss_files.h
-    ''
-    # FIXME: find a solution for infinite recursion in cross builds.
-    # For now it's hopefully acceptable that IDN from libc doesn't reliably work.
-    + lib.optionalString (stdenv.hostPlatform == stdenv.buildPlatform) ''
-
-      # Ensure that libidn2 is found.
-      patch -p 1 <<EOF
-      --- a/inet/idna.c
-      +++ b/inet/idna.c
-      @@ -25,1 +25,1 @@
-      -#define LIBIDN2_SONAME "libidn2.so.0"
-      +#define LIBIDN2_SONAME "${lib.getLib libidn2}/lib/libidn2.so.0"
-      EOF
     '';
 
     configureFlags = [
