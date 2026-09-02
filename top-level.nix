@@ -1406,9 +1406,7 @@ with final;
     withLastlog = false;
   };
 
-  perl538Packages = lib.recurseIntoAttrs perl.v5_38.pkgs;
-  perl540Packages = lib.recurseIntoAttrs perl.v5_40.pkgs;
-  perlPackages = perl540Packages;
+  perlPackages = perl.pkgs;
 
   testers = callPackage ./build-support/testers { };
 
