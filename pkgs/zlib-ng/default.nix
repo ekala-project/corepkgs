@@ -23,7 +23,6 @@ stdenv.mkDerivation (finalAttrs: {
   outputs = [
     "out"
     "dev"
-    "bin"
   ];
 
   strictDeps = true;
@@ -45,7 +44,6 @@ stdenv.mkDerivation (finalAttrs: {
   cmakeFlags = [
     "-DCMAKE_INSTALL_PREFIX=/"
     "-DBUILD_SHARED_LIBS=ON"
-    "-DINSTALL_UTILS=ON"
     (lib.cmakeBool "BUILD_TESTING" (finalAttrs.doCheck or false))
   ]
   ++ lib.optionals withZlibCompat [ "-DZLIB_COMPAT=ON" ];
