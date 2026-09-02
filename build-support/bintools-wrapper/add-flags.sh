@@ -30,8 +30,4 @@ if [ -z "$NIX_DYNAMIC_LINKER_@suffixSalt@" ] && [ -e @out@/nix-support/ld-set-dy
     NIX_DYNAMIC_LINKER_@suffixSalt@="$(< @out@/nix-support/dynamic-linker)"
 fi
 
-if [ -e @out@/nix-support/libc-ldflags-before ]; then
-    NIX_LDFLAGS_BEFORE_@suffixSalt@="$(< @out@/nix-support/libc-ldflags-before) $NIX_LDFLAGS_BEFORE_@suffixSalt@"
-fi
-
 export NIX_BINTOOLS_WRAPPER_FLAGS_SET_@suffixSalt@=1
