@@ -241,10 +241,7 @@ IGNORE_DIRS = [
     "r",
     "scripts",
     "services",
-    "stdenv/cygwin",
-    "stdenv/darwin",
-    "stdenv/freebsd",
-    "stdenv/linux/bootstrap-files",
+    "stdenv", # Ported 2026-09-01, except cross cygwin
     # keep-sorted end
 ]
 
