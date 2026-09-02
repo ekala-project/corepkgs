@@ -1,6 +1,6 @@
 {
   lib,
-  buildGo126Module,
+  go,
   fetchFromGitHub,
   installShellFiles,
 }:
@@ -8,7 +8,7 @@
 let
   config-module = "github.com/f1bonacc1/process-compose/src/config";
 in
-buildGo126Module (finalAttrs: {
+go.v1_26.buildModule (finalAttrs: {
   pname = "process-compose";
   version = "1.116.0";
 

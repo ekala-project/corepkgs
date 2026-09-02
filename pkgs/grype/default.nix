@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  buildGo126Module,
+  go,
   fetchFromGitHub,
   git,
   installShellFiles,
@@ -10,7 +10,7 @@
   zstd,
 }:
 
-buildGo126Module (finalAttrs: {
+go.v1_26.buildModule (finalAttrs: {
   pname = "grype";
   version = "0.116.1";
 

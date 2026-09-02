@@ -1,6 +1,6 @@
 {
   lib,
-  buildGo126Module,
+  go,
   fetchFromGitLab,
   installShellFiles,
   makeBinaryWrapper,
@@ -11,7 +11,7 @@
   gitMinimal,
 }:
 
-buildGo126Module (finalAttrs: {
+go.v1_26.buildModule (finalAttrs: {
   pname = "glab";
   version = "1.112.0";
 
