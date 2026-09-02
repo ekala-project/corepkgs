@@ -5,6 +5,7 @@
   cmake,
   pkg-config,
   gtest,
+  runUnitTests,
   withZlibCompat ? false,
 }:
 
@@ -39,15 +40,17 @@ stdenv.mkDerivation (finalAttrs: {
     NIX_CFLAGS_COMPILE = "-D_XOPEN_SOURCE=700";
   };
 
-  buildInputs = [ gtest ];
+  checkInputs = [ gtest ];
 
   cmakeFlags = [
     "-DCMAKE_INSTALL_PREFIX=/"
     "-DBUILD_SHARED_LIBS=ON"
-    "-DBUILD_TESTING=ON"
     "-DINSTALL_UTILS=ON"
+    (lib.cmakeBool "BUILD_TESTING" (finalAttrs.doCheck or false))
   ]
   ++ lib.optionals withZlibCompat [ "-DZLIB_COMPAT=ON" ];
+
+  passthru.tests.unittests = runUnitTests finalAttrs.finalPackage;
 
   meta = {
     description = "Zlib data compression library for the next generation systems";
