@@ -42,6 +42,10 @@ mapAliases {
   bolt_19 = llvm.v19.pkgs.bolt;
   bolt_20 = llvm.v20.pkgs.bolt;
   bolt_21 = llvm.v21.pkgs.bolt;
+  buildGo124Module = go.v1_24.buildModule;
+  buildGo125Module = go.v1_25.buildModule;
+  buildGo126Module = go.v1_26.buildModule;
+  buildGo127Module = go.v1_27.buildModule;
   clang_18 = llvm.v18.pkgs.clang;
   clang_19 = llvm.v19.pkgs.clang;
   clang_20 = llvm.v20.pkgs.clang;
