@@ -13,9 +13,29 @@ let
 
   # Language modules for devshell integration
   languageModuleFiles = [
-    ../ekaos/modules/languages/zig.nix
-    ../ekaos/modules/languages/rust.nix
+    ../ekaos/modules/languages/bun.nix
+    ../ekaos/modules/languages/clojure.nix
+    ../ekaos/modules/languages/crystal.nix
+    ../ekaos/modules/languages/deno.nix
+    ../ekaos/modules/languages/elixir.nix
+    ../ekaos/modules/languages/erlang.nix
     ../ekaos/modules/languages/go.nix
+    ../ekaos/modules/languages/guile.nix
+    ../ekaos/modules/languages/haskell.nix
+    ../ekaos/modules/languages/java.nix
+    ../ekaos/modules/languages/julia.nix
+    ../ekaos/modules/languages/kotlin.nix
+    ../ekaos/modules/languages/lua.nix
+    ../ekaos/modules/languages/nim.nix
+    ../ekaos/modules/languages/nodejs.nix
+    ../ekaos/modules/languages/perl.nix
+    ../ekaos/modules/languages/php.nix
+    ../ekaos/modules/languages/r-lang.nix
+    ../ekaos/modules/languages/ruby.nix
+    ../ekaos/modules/languages/rust.nix
+    ../ekaos/modules/languages/scala.nix
+    ../ekaos/modules/languages/tcl.nix
+    ../ekaos/modules/languages/zig.nix
   ];
 
   # Stub module providing the options that language modules write to.

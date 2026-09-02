@@ -78,9 +78,29 @@
   ./security/hardening.nix
 
   # Language modules
-  ./languages/zig.nix
-  ./languages/rust.nix
+  ./languages/bun.nix
+  ./languages/clojure.nix
+  ./languages/crystal.nix
+  ./languages/deno.nix
+  ./languages/elixir.nix
+  ./languages/erlang.nix
   ./languages/go.nix
+  ./languages/guile.nix
+  ./languages/haskell.nix
+  ./languages/java.nix
+  ./languages/julia.nix
+  ./languages/kotlin.nix
+  ./languages/lua.nix
+  ./languages/nim.nix
+  ./languages/nodejs.nix
+  ./languages/perl.nix
+  ./languages/php.nix
+  ./languages/r-lang.nix
+  ./languages/ruby.nix
+  ./languages/rust.nix
+  ./languages/scala.nix
+  ./languages/tcl.nix
+  ./languages/zig.nix
 
   # Program modules
   ./programs/git.nix
