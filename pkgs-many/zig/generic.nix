@@ -16,7 +16,6 @@
   libxml2,
   callPackage,
   llvm,
-  autoPatchelfHook,
 }:
 
 let
@@ -34,11 +33,9 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     cmake
     ninja
-    autoPatchelfHook
   ];
 
   buildInputs = [
-    stdenv.cc.cc.lib
     llvmPkgs.llvm
     llvmPkgs.lld
     llvmPkgs.libclang
@@ -47,7 +44,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   cmakeFlags = [
-    "-DZIG_STATIC_LLVM=OFF"
+    # Static LLVM avoids dynamic linking issues (musl vs glibc interpreter)
+    "-DZIG_STATIC_LLVM=ON"
     "-DZIG_TARGET_MCPU=baseline"
   ];
 

@@ -27,6 +27,7 @@ let
     ../ekaos/modules/languages/gleam.nix
     ../ekaos/modules/languages/go.nix
     ../ekaos/modules/languages/guile.nix
+    ../ekaos/modules/languages/hare.nix
     ../ekaos/modules/languages/haskell.nix
     ../ekaos/modules/languages/java.nix
     ../ekaos/modules/languages/javascript.nix

@@ -92,6 +92,7 @@
   ./languages/gleam.nix
   ./languages/go.nix
   ./languages/guile.nix
+  ./languages/hare.nix
   ./languages/haskell.nix
   ./languages/java.nix
   ./languages/javascript.nix
