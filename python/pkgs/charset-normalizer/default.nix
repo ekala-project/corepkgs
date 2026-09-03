@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   aiohttp,
   buildPythonPackage,
   fetchFromGitHub,
@@ -9,6 +10,10 @@
   requests,
   setuptools,
   setuptools-scm,
+  # mypyc compilation needs a working mypy for the host; it is also the leg of
+  # the cycle rustPlatform.fetchCargoVendor breaks when it builds its own
+  # requests, so keep it switchable.
+  withMypyc ? !isPyPy && !stdenv.hostPlatform.isStatic,
 }:
 
 buildPythonPackage rec {
@@ -27,9 +32,9 @@ buildPythonPackage rec {
     setuptools
     setuptools-scm
   ]
-  ++ lib.optional (!isPyPy) mypy;
+  ++ lib.optional withMypyc mypy;
 
-  env.CHARSET_NORMALIZER_USE_MYPYC = lib.optionalString (!isPyPy) "1";
+  env.CHARSET_NORMALIZER_USE_MYPYC = lib.optionalString withMypyc "1";
 
   nativeCheckInputs = [ pytestCheckHook ];
 
