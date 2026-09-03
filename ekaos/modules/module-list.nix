@@ -102,15 +102,18 @@
   ./languages/nim.nix
   ./languages/nix.nix
   ./languages/nodejs.nix
+  ./languages/odin.nix
   ./languages/opentofu.nix
   ./languages/perl.nix
   ./languages/php.nix
+  ./languages/purescript.nix
   ./languages/python.nix
   ./languages/r-lang.nix
   ./languages/ruby.nix
   ./languages/rust.nix
   ./languages/scala.nix
   ./languages/shell.nix
+  ./languages/solidity.nix
   ./languages/tcl.nix
   ./languages/texlive.nix
   ./languages/typst.nix

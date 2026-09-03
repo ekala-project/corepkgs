@@ -37,15 +37,18 @@ let
     ../ekaos/modules/languages/nim.nix
     ../ekaos/modules/languages/nix.nix
     ../ekaos/modules/languages/nodejs.nix
+    ../ekaos/modules/languages/odin.nix
     ../ekaos/modules/languages/opentofu.nix
     ../ekaos/modules/languages/perl.nix
     ../ekaos/modules/languages/php.nix
+    ../ekaos/modules/languages/purescript.nix
     ../ekaos/modules/languages/python.nix
     ../ekaos/modules/languages/r-lang.nix
     ../ekaos/modules/languages/ruby.nix
     ../ekaos/modules/languages/rust.nix
     ../ekaos/modules/languages/scala.nix
     ../ekaos/modules/languages/shell.nix
+    ../ekaos/modules/languages/solidity.nix
     ../ekaos/modules/languages/tcl.nix
     ../ekaos/modules/languages/texlive.nix
     ../ekaos/modules/languages/typst.nix
