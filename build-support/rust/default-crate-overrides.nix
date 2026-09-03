@@ -15,6 +15,7 @@
   fontconfig,
   foundationdb ? null,
   freetype,
+  fuse3,
   gdk-pixbuf,
   glib,
   gmp,
@@ -43,6 +44,7 @@
   udev,
   webkitgtk_4_1 ? null,
   zlib,
+  zstd,
   buildPackages,
   ...
 }:
@@ -51,6 +53,12 @@
   alsa-sys = attrs: {
     nativeBuildInputs = [ pkg-config ];
     buildInputs = [ alsa-lib ];
+  };
+
+  # Force using the cmake backend. At least on Darwin, the build else gets confused and fails.
+  aws-lc-sys = prev: {
+    nativeBuildInputs = [ cmake ];
+    env.AWS_LC_SYS_CMAKE_BUILDER = 1;
   };
 
   cairo-rs = attrs: {
@@ -123,6 +131,12 @@
 
   foundationdb-sys = attrs: {
     buildInputs = lib.optional (foundationdb != null) foundationdb;
+    # needed for 0.4+ release, when the FFI bindings are auto-generated
+    #
+    # patchPhase = ''
+    #   substituteInPlace ./foundationdb-sys/build.rs \
+    #     --replace /usr/local/include ${foundationdb.dev}/include
+    # '';
   };
 
   foundationdb = attrs: {
@@ -132,6 +146,11 @@
   freetype-sys = attrs: {
     nativeBuildInputs = [ cmake ];
     buildInputs = [ freetype ];
+  };
+
+  fuser = attrs: {
+    nativeBuildInputs = [ pkg-config ];
+    buildInputs = [ fuse3 ];
   };
 
   glib-sys = attrs: {
@@ -378,6 +397,12 @@
 
   xcb = attrs: {
     buildInputs = [ python3 ];
+  };
+
+  zstd-sys = attrs: {
+    ZSTD_SYS_USE_PKG_CONFIG = true;
+    nativeBuildInputs = [ pkg-config ];
+    buildInputs = [ zstd ];
   };
 
   atk-sys = attrs: {
