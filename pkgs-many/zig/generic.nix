@@ -36,6 +36,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
+    stdenv.cc.cc.lib
     llvmPkgs.llvm
     llvmPkgs.lld
     llvmPkgs.libclang
