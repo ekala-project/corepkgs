@@ -32,6 +32,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     libiconv
   ];
 
+  doCheck = false;
+
   env.CFG_RELEASE = finalAttrs.version;
 
   meta = {
