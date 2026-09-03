@@ -18,22 +18,26 @@ let
     ../ekaos/modules/languages/clojure.nix
     ../ekaos/modules/languages/cplusplus.nix
     ../ekaos/modules/languages/crystal.nix
+    ../ekaos/modules/languages/cue.nix
     ../ekaos/modules/languages/deno.nix
     ../ekaos/modules/languages/elixir.nix
     ../ekaos/modules/languages/erlang.nix
     ../ekaos/modules/languages/fortran.nix
     ../ekaos/modules/languages/gawk.nix
+    ../ekaos/modules/languages/gleam.nix
     ../ekaos/modules/languages/go.nix
     ../ekaos/modules/languages/guile.nix
     ../ekaos/modules/languages/haskell.nix
     ../ekaos/modules/languages/java.nix
     ../ekaos/modules/languages/javascript.nix
+    ../ekaos/modules/languages/jsonnet.nix
     ../ekaos/modules/languages/julia.nix
     ../ekaos/modules/languages/kotlin.nix
     ../ekaos/modules/languages/lua.nix
     ../ekaos/modules/languages/nim.nix
     ../ekaos/modules/languages/nix.nix
     ../ekaos/modules/languages/nodejs.nix
+    ../ekaos/modules/languages/opentofu.nix
     ../ekaos/modules/languages/perl.nix
     ../ekaos/modules/languages/php.nix
     ../ekaos/modules/languages/python.nix
@@ -44,7 +48,9 @@ let
     ../ekaos/modules/languages/shell.nix
     ../ekaos/modules/languages/tcl.nix
     ../ekaos/modules/languages/texlive.nix
+    ../ekaos/modules/languages/typst.nix
     ../ekaos/modules/languages/typescript.nix
+    ../ekaos/modules/languages/unison.nix
     ../ekaos/modules/languages/vala.nix
     ../ekaos/modules/languages/zig.nix
   ];

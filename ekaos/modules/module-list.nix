@@ -83,22 +83,26 @@
   ./languages/clojure.nix
   ./languages/cplusplus.nix
   ./languages/crystal.nix
+  ./languages/cue.nix
   ./languages/deno.nix
   ./languages/elixir.nix
   ./languages/erlang.nix
   ./languages/fortran.nix
   ./languages/gawk.nix
+  ./languages/gleam.nix
   ./languages/go.nix
   ./languages/guile.nix
   ./languages/haskell.nix
   ./languages/java.nix
   ./languages/javascript.nix
+  ./languages/jsonnet.nix
   ./languages/julia.nix
   ./languages/kotlin.nix
   ./languages/lua.nix
   ./languages/nim.nix
   ./languages/nix.nix
   ./languages/nodejs.nix
+  ./languages/opentofu.nix
   ./languages/perl.nix
   ./languages/php.nix
   ./languages/python.nix
@@ -109,7 +113,9 @@
   ./languages/shell.nix
   ./languages/tcl.nix
   ./languages/texlive.nix
+  ./languages/typst.nix
   ./languages/typescript.nix
+  ./languages/unison.nix
   ./languages/vala.nix
   ./languages/zig.nix
 
