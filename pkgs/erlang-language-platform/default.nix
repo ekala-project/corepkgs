@@ -53,7 +53,10 @@ stdenv.mkDerivation {
   meta = {
     description = "IDE-first library for the semantic analysis of Erlang code, including LSP server";
     homepage = "https://github.com/WhatsApp/erlang-language-platform/";
-    license = with lib.licenses; [ mit asl20 ];
+    license = with lib.licenses; [
+      mit
+      asl20
+    ];
     platforms = [
       "aarch64-linux"
       "x86_64-linux"

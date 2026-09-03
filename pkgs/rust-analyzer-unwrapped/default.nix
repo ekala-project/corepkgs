@@ -37,7 +37,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
   meta = {
     description = "Language server for the Rust language";
     homepage = "https://rust-analyzer.github.io";
-    license = with lib.licenses; [ mit asl20 ];
+    license = with lib.licenses; [
+      mit
+      asl20
+    ];
     mainProgram = "rust-analyzer";
   };
 })
