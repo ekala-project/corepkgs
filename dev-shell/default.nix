@@ -30,6 +30,7 @@ let
     ../ekaos/modules/languages/nodejs.nix
     ../ekaos/modules/languages/perl.nix
     ../ekaos/modules/languages/php.nix
+    ../ekaos/modules/languages/python.nix
     ../ekaos/modules/languages/r-lang.nix
     ../ekaos/modules/languages/ruby.nix
     ../ekaos/modules/languages/rust.nix

@@ -95,6 +95,7 @@
   ./languages/nodejs.nix
   ./languages/perl.nix
   ./languages/php.nix
+  ./languages/python.nix
   ./languages/r-lang.nix
   ./languages/ruby.nix
   ./languages/rust.nix
