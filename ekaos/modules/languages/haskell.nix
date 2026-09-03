@@ -31,7 +31,6 @@ let
     name = "haskell";
     defaultPackage = pkgs: pkgs.ghc;
     resolveVersion = resolveGhcVersion;
-    defaultLspPackage = pkgs: pkgs.haskell-language-server or null;
     environmentVariables = _: {
       CABAL_DIR = "$HOME/.cabal";
     };

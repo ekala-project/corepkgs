@@ -12,7 +12,6 @@ let
     name = "erlang";
     defaultPackage = pkgs: pkgs.erlang;
     resolveVersion = langLib.mkMajorVersionResolver "erlang";
-    defaultLspPackage = pkgs: pkgs.erlang-ls or null;
   };
 in
 

@@ -12,7 +12,6 @@ let
     name = "java";
     defaultPackage = pkgs: pkgs.java;
     resolveVersion = langLib.mkMajorVersionResolver "java";
-    defaultLspPackage = pkgs: pkgs.jdt-language-server or null;
     environmentVariables = cfg: {
       JAVA_HOME = "${cfg.package}";
     };

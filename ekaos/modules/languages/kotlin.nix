@@ -11,7 +11,7 @@ let
   mod = langLib.mkLanguageModule {
     name = "kotlin";
     defaultPackage = pkgs: pkgs.kotlin;
-    defaultLspPackage = pkgs: pkgs.kotlin-language-server or null;
+
   };
 in
 

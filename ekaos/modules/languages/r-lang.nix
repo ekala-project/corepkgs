@@ -11,7 +11,6 @@ let
   mod = langLib.mkLanguageModule {
     name = "r-lang";
     defaultPackage = pkgs: pkgs.r-lang;
-    defaultLspPackage = pkgs: pkgs.r-languageserver or null;
     environmentVariables = _: {
       R_LIBS_USER = "$HOME/.R/library";
     };

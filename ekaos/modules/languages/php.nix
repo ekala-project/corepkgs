@@ -12,7 +12,6 @@ let
     name = "php";
     defaultPackage = pkgs: pkgs.php;
     resolveVersion = langLib.mkCompactVersionResolver "php";
-    defaultLspPackage = pkgs: pkgs.phpactor or null;
   };
 in
 

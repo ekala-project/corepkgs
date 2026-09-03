@@ -11,7 +11,6 @@ let
   mod = langLib.mkLanguageModule {
     name = "elixir";
     defaultPackage = pkgs: pkgs.elixir;
-    defaultLspPackage = pkgs: pkgs.elixir-ls or null;
     environmentVariables = _: {
       MIX_HOME = "$HOME/.mix";
       HEX_HOME = "$HOME/.hex";

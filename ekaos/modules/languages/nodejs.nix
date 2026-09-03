@@ -12,7 +12,6 @@ let
     name = "nodejs";
     defaultPackage = pkgs: pkgs.nodejs;
     resolveVersion = langLib.mkMajorVersionResolver "nodejs";
-    defaultLspPackage = pkgs: pkgs.nodePackages.typescript-language-server or null;
     environmentVariables = _: {
       NODE_PATH = "$HOME/.node_modules";
     };

@@ -11,7 +11,7 @@ let
   mod = langLib.mkLanguageModule {
     name = "scala";
     defaultPackage = pkgs: pkgs.scala;
-    defaultLspPackage = pkgs: pkgs.metals or null;
+
   };
 in
 

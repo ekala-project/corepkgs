@@ -11,7 +11,7 @@ let
   mod = langLib.mkLanguageModule {
     name = "crystal";
     defaultPackage = pkgs: pkgs.crystal;
-    defaultLspPackage = pkgs: pkgs.crystalline or null;
+
   };
 in
 

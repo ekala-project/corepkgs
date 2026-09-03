@@ -11,7 +11,6 @@ let
   mod = langLib.mkLanguageModule {
     name = "nim";
     defaultPackage = pkgs: pkgs.nim;
-    defaultLspPackage = pkgs: pkgs.nimlsp or null;
     environmentVariables = _: {
       NIMBLE_DIR = "$HOME/.nimble";
     };

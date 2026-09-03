@@ -11,7 +11,6 @@ let
   mod = langLib.mkLanguageModule {
     name = "ruby";
     defaultPackage = pkgs: pkgs.ruby;
-    defaultLspPackage = pkgs: pkgs.solargraph or null;
     environmentVariables = _: {
       GEM_HOME = "$HOME/.gem";
     };
