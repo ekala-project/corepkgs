@@ -15,7 +15,7 @@
   fontconfig,
   foundationdb ? null,
   freetype,
-  fuse3,
+  fuse,
   gdk-pixbuf,
   glib,
   gmp,
@@ -150,7 +150,7 @@
 
   fuser = attrs: {
     nativeBuildInputs = [ pkg-config ];
-    buildInputs = [ fuse3 ];
+    buildInputs = [ fuse ];
   };
 
   glib-sys = attrs: {
