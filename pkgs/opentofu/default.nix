@@ -4,9 +4,11 @@
   buildGoModule,
   fetchFromGitHub,
   installShellFiles,
+  go,
 }:
 
-buildGoModule rec {
+# OpenTofu's vendored grpc uses http2.TrailerPrefix removed in Go 1.27
+(buildGoModule.override { go = go.v1_26; }) rec {
   pname = "opentofu";
   version = "1.12.6";
 
