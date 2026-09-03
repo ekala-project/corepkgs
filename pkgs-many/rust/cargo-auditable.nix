@@ -1,47 +1,11 @@
 {
-  lib,
   buildPackages,
-  fetchFromGitHub,
+  callPackage,
   makeRustPlatform,
-  installShellFiles,
-  stdenv,
 }:
-
 let
-  args = rec {
-    pname = "cargo-auditable";
-    version = "0.6.5";
-
-    src = fetchFromGitHub {
-      owner = "rust-secure-code";
-      repo = "cargo-auditable";
-      rev = "v${version}";
-      sha256 = "sha256-zjv2/qZM0vRyz45DeKRtPHaamv2iLtjpSedVTEXeDr8=";
-    };
-
-    cargoDeps = rustPlatform.fetchCargoVendor {
-      inherit pname version src;
-      hash = "sha256-oTPGmoGlNfPVZ6qha/oXyPJp94fT2cNlVggbIGHf2bc=";
-    };
-
-    checkFlags = [
-      # requires wasm32-unknown-unknown target
-      "--skip=test_wasm"
-    ];
-
-    meta = {
-      description = "Tool to make production Rust binaries auditable";
-      mainProgram = "cargo-auditable";
-      homepage = "https://github.com/rust-secure-code/cargo-auditable";
-      changelog = "https://github.com/rust-secure-code/cargo-auditable/blob/v${version}/cargo-auditable/CHANGELOG.md";
-      license = with lib.licenses; [
-        mit # or
-        asl20
-      ];
-      broken = stdenv.hostPlatform != stdenv.buildPlatform;
-    };
-  };
-
+  # Need to use the build platform rustc and Cargo so that
+  # we don't infrec
   rustPlatform = makeRustPlatform {
     inherit (buildPackages) rustc;
     cargo = buildPackages.cargo.override {
@@ -49,27 +13,23 @@ let
     };
   };
 
-  bootstrap = rustPlatform.buildRustPackage (
-    args
-    // {
-      auditable = false;
-    }
-  );
+  auditableBuilder = callPackage ./cargo-auditable-builder.nix {
+    inherit rustPlatform;
+    auditable-bootstrap = bootstrap;
+  };
+
+  version = "0.7.5";
+  hash = "sha256-0VONJCv/msLcGenItWMLJ7DH79RTD6vsU9gX/nphh1g=";
+  cargoHash = "sha256-/iAYib+xDQSJ8B559/V7b994ErSUGsPSDx64jFF5B6I=";
+
+  # cargo-auditable cannot be built with cargo-auditable until cargo-auditable is built
+  bootstrap = auditableBuilder {
+    inherit version hash cargoHash;
+    pname = "cargo-auditable-bootstrap";
+    auditable = false;
+  };
 in
-
-rustPlatform.buildRustPackage.override { cargo-auditable = bootstrap; } (
-  args
-  // {
-    nativeBuildInputs = [
-      installShellFiles
-    ];
-
-    postInstall = ''
-      installManPage cargo-auditable/cargo-auditable.1
-    '';
-
-    passthru = {
-      inherit bootstrap;
-    };
-  }
-)
+auditableBuilder {
+  inherit version hash cargoHash;
+  auditable = true;
+}
