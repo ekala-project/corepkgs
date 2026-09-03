@@ -3,11 +3,10 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
-  runCommand,
-  jq,
 }:
 
-let
+buildNpmPackage rec {
+  pname = "pyright";
   version = "1.1.412";
 
   src = fetchFromGitHub {
@@ -17,62 +16,11 @@ let
     hash = "sha256-V2sQp/LA43NjCdtr2/drZ1LMgm4u2tcf4EjdhWVLXHw=";
   };
 
-  patchedPackageJSON =
-    runCommand "package.json"
-      {
-        nativeBuildInputs = [ jq ];
-      }
-      ''
-        jq '
-          .devDependencies |= with_entries(select(.key == "glob" or .key == "jsonc-parser"))
-          | .scripts =  {  }
-          ' ${src}/package.json > $out
-      '';
+  # TODO: prefetch-npm-deps doesn't capture all transitive deps; needs investigation
+  npmDepsHash = "sha256-/sxbKCze7VNKeHNtWRp+fmwcUxDxlxaEGnaYk74YsHk=";
 
-  pyright-root = buildNpmPackage {
-    pname = "pyright-root";
-    inherit version src;
-    sourceRoot = "${src.name}";
-    npmDepsHash = "sha256-0w/CYFfAaEK6LKZZc9+nt5zUmxCqCcJfSZRAroOhJOA=";
-    dontNpmBuild = true;
-    postPatch = ''
-      cp ${patchedPackageJSON} ./package.json
-      cp ${./package-lock.json} ./package-lock.json
-    '';
-    installPhase = ''
-      runHook preInstall
-      cp -r . "$out"
-      runHook postInstall
-    '';
-  };
-
-  pyright-internal = buildNpmPackage {
-    pname = "pyright-internal";
-    inherit version src;
-    sourceRoot = "${src.name}/packages/pyright-internal";
-    npmDepsHash = "sha256-skTnHcET5ujyKTEqh3oyiBwHF6yvaY8c/ccOnwQQKJ0=";
-    dontNpmBuild = true;
-    installPhase = ''
-      runHook preInstall
-      cp -r . "$out"
-      runHook postInstall
-    '';
-  };
-in
-buildNpmPackage {
-  pname = "pyright";
-  inherit version src;
-
-  sourceRoot = "${src.name}/packages/pyright";
-  npmDepsHash = "sha256-rgENiJVYKMSZimWzlvaaiC6Z5/OEdk4W47gkjcuv0nw=";
-
-  postPatch = ''
-    chmod +w ../../
-    ln -s ${pyright-root}/node_modules ../../node_modules
-    chmod +w ../pyright-internal
-    ln -s ${pyright-internal}/node_modules ../pyright-internal/node_modules
-  '';
-
+  # pyright is in a monorepo workspace — build and install only the pyright CLI
+  npmWorkspace = "packages/pyright";
   dontNpmBuild = true;
 
   meta = {
