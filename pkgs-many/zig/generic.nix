@@ -61,6 +61,12 @@ stdenv.mkDerivation (finalAttrs: {
     export ZIG_LOCAL_CACHE_DIR=$TMPDIR/zig-cache
   '';
 
+  # Zig's self-hosted compiler produces a musl-linked binary even on glibc
+  # systems. Patch the interpreter to the nix glibc dynamic linker.
+  postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
+    patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" $out/bin/zig
+  '';
+
   postInstall = ''
     ln -s $out/bin/zig $out/bin/zig-${lib.versions.majorMinor version} || true
   '';

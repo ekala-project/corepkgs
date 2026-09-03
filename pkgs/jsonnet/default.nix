@@ -26,7 +26,10 @@ stdenv.mkDerivation (finalAttrs: {
     })
   ];
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    cmake.configurePhaseHook
+  ];
   buildInputs = [ gtest ];
 
   cmakeFlags = [
