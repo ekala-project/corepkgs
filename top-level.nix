@@ -128,7 +128,6 @@ with final;
   libidn = null; # defaultGemConfig
   capnproto = null; # defaultCrateOverrides
   celt = null; # ffmpeg
-  chameleon = null;
   chromaprint = null; # ffmpeg
   codec2 = null; # ffmpeg
   coeurl = null;

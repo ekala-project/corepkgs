@@ -16,7 +16,6 @@
   lingua,
 
   # tests
-  chameleon,
   mock,
   pytestCheckHook,
 }:
@@ -45,7 +44,6 @@ buildPythonPackage (finalAttrs: {
   };
 
   nativeCheckInputs = [
-    chameleon
     mock
     pytestCheckHook
   ]
