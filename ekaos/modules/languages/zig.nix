@@ -20,7 +20,7 @@ let
   mod = langLib.mkLanguageModule {
     name = "zig";
     defaultPackage = pkgs: pkgs.zig;
-    # TODO: zls cannot build until zig's libstdc++ runtime dep is fixed
+    defaultLspPackage = pkgs: pkgs.zls;
     environmentVariables = _: {
       ZIG_GLOBAL_CACHE_DIR = "$HOME/.cache/zig";
     };

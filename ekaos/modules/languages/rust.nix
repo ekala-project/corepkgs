@@ -26,6 +26,7 @@ let
   mod = langLib.mkLanguageModule {
     name = "rust";
     defaultPackage = pkgs': pkgs'.rust;
+    defaultLspPackage = pkgs': pkgs'.rust-analyzer;
     environmentVariables = _: {
       CARGO_HOME = "$HOME/.cargo";
     };
