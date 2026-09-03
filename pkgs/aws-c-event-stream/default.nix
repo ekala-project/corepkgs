@@ -44,7 +44,7 @@ stdenv.mkDerivation rec {
   ++ lib.optional stdenv.hostPlatform.isMusl libexecinfo;
 
   cmakeFlags = [
-    "-DBUILD_SHARED_LIBS:BOOL=ON"
+    (lib.cmakeBool "BUILD_SHARED_LIBS" true)
   ];
 
   passthru.tests = {

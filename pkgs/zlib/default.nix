@@ -58,7 +58,7 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optional splitStaticOutput "static";
   setOutputFlags = false;
-  outputDoc = "dev"; # single tiny man3 page
+  outputMan = "dev"; # single tiny man3 page
 
   dontConfigure = stdenv.hostPlatform.isMinGW;
 
