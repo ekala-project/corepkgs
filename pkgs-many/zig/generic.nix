@@ -16,6 +16,7 @@
   libxml2,
   callPackage,
   llvm,
+  autoPatchelfHook,
 }:
 
 let
@@ -33,6 +34,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     cmake
     ninja
+    autoPatchelfHook
   ];
 
   buildInputs = [
@@ -47,9 +49,6 @@ stdenv.mkDerivation (finalAttrs: {
   cmakeFlags = [
     "-DZIG_STATIC_LLVM=OFF"
     "-DZIG_TARGET_MCPU=baseline"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [
-    "-DZIG_TARGET_TRIPLE=${stdenv.hostPlatform.qemuArch}-linux-gnu"
   ];
 
   configurePhase = "cmakeConfigurePhase";
