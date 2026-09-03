@@ -7,7 +7,7 @@
   sed,
   findutils,
   gawk,
-  gitMinimal,
+  git,
   git-lfs,
 }:
 stdenv.mkDerivation (finalAttrs: {
@@ -26,7 +26,7 @@ stdenv.mkDerivation (finalAttrs: {
       lib.makeBinPath [
         findutils
         gawk
-        gitMinimal
+        git
         git-lfs
         coreutils
         sed

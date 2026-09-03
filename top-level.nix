@@ -87,6 +87,10 @@ with final;
   closureInfo = callPackage ./build-support/closure-info.nix { };
   nix-gitignore = callPackage ./build-support/nix-gitignore { };
 
+  # Default to gitMinimal to keep the fetcher's closure small; the `git`
+  # argument stays overridable for callers that need a different build.
+  nix-prefetch-git = callPackage ./pkgs/nix-prefetch-git { git = gitMinimal; };
+
   freshBootstrapTools = import ./stdenv/linux/make-bootstrap-tools.nix {
     pkgs = final;
   };
