@@ -99,6 +99,7 @@
   ./languages/jsonnet.nix
   ./languages/julia.nix
   ./languages/kotlin.nix
+  ./languages/lobster.nix
   ./languages/lua.nix
   ./languages/nim.nix
   ./languages/nix.nix
@@ -116,6 +117,7 @@
   ./languages/shell.nix
   ./languages/solidity.nix
   ./languages/tcl.nix
+  ./languages/terraform.nix
   ./languages/texlive.nix
   ./languages/typst.nix
   ./languages/typescript.nix

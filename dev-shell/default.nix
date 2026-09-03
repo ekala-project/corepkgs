@@ -34,6 +34,7 @@ let
     ../ekaos/modules/languages/jsonnet.nix
     ../ekaos/modules/languages/julia.nix
     ../ekaos/modules/languages/kotlin.nix
+    ../ekaos/modules/languages/lobster.nix
     ../ekaos/modules/languages/lua.nix
     ../ekaos/modules/languages/nim.nix
     ../ekaos/modules/languages/nix.nix
@@ -51,6 +52,7 @@ let
     ../ekaos/modules/languages/shell.nix
     ../ekaos/modules/languages/solidity.nix
     ../ekaos/modules/languages/tcl.nix
+    ../ekaos/modules/languages/terraform.nix
     ../ekaos/modules/languages/texlive.nix
     ../ekaos/modules/languages/typst.nix
     ../ekaos/modules/languages/typescript.nix
