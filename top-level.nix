@@ -119,8 +119,8 @@ with final;
   aria2 = null;
   aribb24 = null; # ffmpeg
   arrow-cpp = null;
-  at-spi2-atk = null; # gtk3
-  atk = null; # gtk2, gtk3, defaultGemConfig, defaultCrateOverrides
+  at-spi2-atk = at-spi2-core; # merged into at-spi2-core
+  atk = at-spi2-core; # merged into at-spi2-core
   avisynthplus = null; # ffmpeg
   awsebcli = null;
   azmq = null;
@@ -172,7 +172,7 @@ with final;
   graphene = null; # gtk4, defaultCrateOverrides
   graphicsmagick = null;
   gst_all_1 = gstAll1; # gtk4, libde265 tests
-  gsettings-desktop-schemas = null;
+  # gsettings-desktop-schemas is auto-registered from pkgs/gsettings-desktop-schemas
   gsm = null; # ffmpeg
   gtkmm3 = null;
   gunicorn = null;
@@ -198,7 +198,7 @@ with final;
   libcdio = null; # ffmpeg
   libcdio-paranoia = null; # ffmpeg
   libdc1394 = null; # ffmpeg
-  libdecor = null; # sdl3 `libdecorSupport`, xwayland
+  # libdecor is auto-registered from pkgs/libdecor
   libdvdnav = null; # ffmpeg
   libdvdread = null; # ffmpeg
   libgeotiff = null;
