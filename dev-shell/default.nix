@@ -66,7 +66,7 @@ let
   # shell-environment.nix; in the devshell context we provide lightweight
   # stubs and extract the collected values after evaluation.
   languageStubModule = {
-    options.environment.systemPackages = lib.mkOption {
+    options.environment.packages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [ ];
       description = "Packages collected by language modules.";
@@ -179,7 +179,7 @@ in
       };
 
       # Extract packages and environment variables from language evaluation
-      langPackages = languagesEval.config.environment.systemPackages;
+      langPackages = languagesEval.config.environment.packages;
       langVariables = languagesEval.config.environment.variables;
 
       # Generate export statements for language environment variables

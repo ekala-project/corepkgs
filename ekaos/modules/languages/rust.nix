@@ -58,17 +58,24 @@ let
       };
     };
 
-    extraConfig =
-      cfg: _pkgs':
-      let
-        rustPkgs = cfg.package.pkgs or { };
-      in
-      {
-        environment.systemPackages =
-          lib.optional (cfg.cargo.enable && rustPkgs ? cargo) rustPkgs.cargo
-          ++ lib.optional (cfg.clippy.enable && rustPkgs ? clippy) rustPkgs.clippy
-          ++ lib.optional (cfg.rustfmt.enable && rustPkgs ? rustfmt) rustPkgs.rustfmt;
-      };
+    # Extra module with full config access for wiring companion tools
+    imports = [
+      (
+        { config, lib, ... }:
+        let
+          cfg = config.languages.rust;
+          rustPkgs = cfg.package.pkgs or { };
+        in
+        {
+          config = lib.mkIf cfg.enable {
+            environment.packages =
+              lib.optional (cfg.cargo.enable && rustPkgs ? cargo) rustPkgs.cargo
+              ++ lib.optional (cfg.clippy.enable && rustPkgs ? clippy) rustPkgs.clippy
+              ++ lib.optional (cfg.rustfmt.enable && rustPkgs ? rustfmt) rustPkgs.rustfmt;
+          };
+        }
+      )
+    ];
   };
 in
 

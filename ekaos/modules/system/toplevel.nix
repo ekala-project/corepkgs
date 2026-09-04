@@ -368,6 +368,16 @@ in
       '';
     };
 
+    environment.packages = mkOption {
+      type = types.listOf types.package;
+      default = [ ];
+      description = ''
+        Context-agnostic package list. In the system context these are
+        forwarded to environment.systemPackages. Language modules and
+        devshells write to this option instead of systemPackages directly.
+      '';
+    };
+
     environment.systemPackages = mkOption {
       type = types.listOf types.package;
       default = [ ];
@@ -438,7 +448,7 @@ in
       ignoreCollisions = true;
     };
 
-    # Include default packages in system environment
-    environment.systemPackages = config.environment.defaultPackages;
+    # Include default packages and language module packages in system environment
+    environment.systemPackages = config.environment.defaultPackages ++ config.environment.packages;
   };
 }

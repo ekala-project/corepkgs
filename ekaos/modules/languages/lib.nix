@@ -105,9 +105,10 @@ in
       # Optional: additional options to merge into languages.<name>
       extraOptions ? { },
 
-      # Optional: additional config (receives the language cfg and pkgs, returns config attrset)
-      # Type: cfg -> pkgs -> { environment.systemPackages = [...]; ... }
-      extraConfig ? _: _: { },
+      # Optional: additional NixOS modules to import. These receive the full
+      # { config, lib, pkgs, ... } module arguments, giving them access to the
+      # entire system/devshell config — not just the language's own config.
+      imports ? [ ],
     }:
 
     let
@@ -176,6 +177,8 @@ in
     in
 
     {
+      inherit imports;
+
       options.languages.${name} = mkLanguageOptions pkgs;
 
       # Extend per-user options with the same language options, and wire
@@ -219,12 +222,9 @@ in
 
         # System-level config
         (mkIf cfg.enable {
-          environment.systemPackages = langPackages;
+          environment.packages = langPackages;
           environment.variables = envVars;
         })
-
-        # Language-specific extra config (system-level)
-        (mkIf cfg.enable (extraConfig cfg pkgs))
       ];
     };
 }
