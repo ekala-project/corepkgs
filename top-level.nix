@@ -1658,6 +1658,8 @@ with final;
   };
 
   makeFontsConf = callPackage ./build-support/make-fonts-conf { };
+  glfw = glfw3;
+
   makeFontsCache = callPackage ./build-support/make-fonts-cache { };
 
   gtk3 = callPackage ./pkgs/gtk/3.x.nix {
