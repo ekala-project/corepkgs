@@ -100,6 +100,7 @@
   ./languages/julia.nix
   ./languages/kotlin.nix
   ./languages/lobster.nix
+  ./languages/lean.nix
   ./languages/lua.nix
   ./languages/nim.nix
   ./languages/nix.nix
@@ -123,6 +124,7 @@
   ./languages/typescript.nix
   ./languages/unison.nix
   ./languages/vala.nix
+  ./languages/vlang.nix
   ./languages/zig.nix
 
   # Program modules
