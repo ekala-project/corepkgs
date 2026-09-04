@@ -85,6 +85,7 @@
   ./languages/crystal.nix
   ./languages/cue.nix
   ./languages/deno.nix
+  ./languages/dotnet.nix
   ./languages/elixir.nix
   ./languages/erlang.nix
   ./languages/fortran.nix
@@ -94,6 +95,7 @@
   ./languages/guile.nix
   ./languages/hare.nix
   ./languages/haskell.nix
+  ./languages/idris.nix
   ./languages/java.nix
   ./languages/javascript.nix
   ./languages/jsonnet.nix
@@ -105,17 +107,22 @@
   ./languages/nim.nix
   ./languages/nix.nix
   ./languages/nodejs.nix
+  ./languages/ocaml.nix
   ./languages/odin.nix
   ./languages/opentofu.nix
   ./languages/perl.nix
   ./languages/php.nix
+  ./languages/pkl.nix
   ./languages/purescript.nix
   ./languages/python.nix
+  ./languages/racket.nix
+  ./languages/raku.nix
   ./languages/r-lang.nix
   ./languages/ruby.nix
   ./languages/rust.nix
   ./languages/scala.nix
   ./languages/shell.nix
+  ./languages/sml.nix
   ./languages/solidity.nix
   ./languages/tcl.nix
   ./languages/terraform.nix
