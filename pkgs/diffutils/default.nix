@@ -2,7 +2,6 @@
   lib,
   mkEkaPackage,
   fetchurl,
-  xz,
   coreutils ? null,
   diffutils,
   runCommand,
@@ -18,12 +17,12 @@ let
   stdenv = mkEkaPackage.stdenv;
 in
 
-mkEkaPackage rec {
+mkEkaPackage (finalAttrs: {
   pname = "diffutils";
   version = "3.12";
 
   src = fetchurl {
-    url = "mirror://gnu/diffutils/diffutils-${version}.tar.xz";
+    url = "mirror://gnu/diffutils/diffutils-${finalAttrs.version}.tar.xz";
     hash = "sha256-fIt/n8hgkUH96pzs6FJJ0whiQ5H/Yd7a9Sj8szdyff0=";
   };
 
@@ -43,12 +42,13 @@ mkEkaPackage rec {
 
   commands = scope: {
     inherit (scope) updateAutotoolsGnuConfigScriptsHook;
-    xz = lib.getBin xz;
+    xz = lib.getBin scope.xz;
+    coreutils = if coreutils != null then coreutils else scope.coreutils;
   };
 
   # If no explicit coreutils is given, use the one from stdenv.
   libraries = scope: {
-    coreutils = coreutils;
+    coreutils = if coreutils != null then coreutils else scope.coreutils;
   };
 
   # Disable stack-related gnulib tests on x86_64-darwin because they have problems running under
@@ -72,7 +72,7 @@ mkEkaPackage rec {
   configureFlags =
     # "pr" need not be on the PATH as a run-time dep, so we need to tell
     # configure where it is. Covers the cross and native case alike.
-    lib.optional (coreutils != null) "PR_PROGRAM=${coreutils}/bin/pr"
+    lib.optional (coreutils != null) "PR_PROGRAM=${finalAttrs.commands.coreutils}/bin/pr"
     ++ lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
       "gl_cv_func_getopt_gnu=yes"
       "gl_cv_func_strcasecmp_works=yes"
@@ -101,6 +101,6 @@ mkEkaPackage rec {
     description = "Commands for showing the differences between files (diff, cmp, etc.)";
     license = lib.licenses.gpl3;
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" finalAttrs.version;
   };
-}
+})

@@ -177,10 +177,44 @@ let
 
   mkEkaPackage = fnOrAttrs: makeDerivationExtensible (toFunction fnOrAttrs);
 
+  # Resolve scope-receiving dependency functions so that finalAttrs.commands.foo
+  # returns the actual package.  The raw function form is preserved in `prev`
+  # inside overrideAttrs (via `rattrs final`), so composition still works:
+  #   pkg.overrideAttrs (prev: { commands = scope: prev.commands scope // { ... }; })
+  resolveScoped =
+    attrs:
+    let
+      resolve =
+        name: scopeKey:
+        if attrs ? ${name} then
+          {
+            ${name} =
+              let
+                fn = attrs.${name};
+              in
+              if isFunction fn then fn scopes.${scopeKey} else fn;
+          }
+        else
+          { };
+    in
+    resolve "commands" "buildHost"
+    // resolve "libraries" "hostTarget"
+    // resolve "propagatedCommands" "buildHost"
+    // resolve "propagatedLibraries" "hostTarget"
+    // resolve "depsBuildBuild" "buildBuild"
+    // resolve "depsBuildTarget" "buildTarget"
+    // resolve "depsHostHost" "hostHost"
+    // resolve "depsTargetTarget" "targetTarget";
+
   makeDerivationExtensible =
     rattrs:
     let
-      args = rattrs (args // { inherit finalPackage overrideAttrs; });
+      # rawArgs is the fixpoint: rattrs receives finalAttrs (with resolved deps)
+      # but returns the user's attrs (with raw functions).
+      rawArgs = rattrs (rawArgs // resolveScoped rawArgs // { inherit finalPackage overrideAttrs; });
+
+      # What mkDerivationSimple receives — raw function forms for dep attrs.
+      args = rawArgs;
 
       overrideAttrs =
         f0:
