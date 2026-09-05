@@ -122,7 +122,7 @@ let
       variants = variantsOf name;
     in
     map (vname: {
-      name = vname;
+      name = "${name}.${vname}";
       value = variants.${vname};
     }) (builtins.attrNames variants)
   ) manyVariantNames;
