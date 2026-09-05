@@ -7,10 +7,10 @@
 
 buildPerlModule {
   pname = "Syntax-Keyword-Try";
-  version = "0.29";
+  version = "0.31";
   src = fetchurl {
-    url = "mirror://cpan/authors/id/P/PE/PEVANS/Syntax-Keyword-Try-0.29.tar.gz";
-    hash = "sha256-zDIHGdNgjaqVFHQ6Q9rCvpnLjM2Ymx/vooUpDLHVnY8=";
+    url = "mirror://cpan/authors/id/P/PE/PEVANS/Syntax-Keyword-Try-0.31.tar.gz";
+    hash = "sha256-e8YkLXRjeJgqWZs03jXwfT3syeCdVkb4+juH9FlBSko=";
   };
   buildInputs = [ Test2Suite ];
   propagatedBuildInputs = [ XSParseKeyword ];

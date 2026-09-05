@@ -1,0 +1,17 @@
+# Unison programming language module
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+
+let
+  langLib = import ./lib.nix { inherit lib; };
+  mod = langLib.mkLanguageModule {
+    name = "unison";
+    defaultPackage = pkgs: pkgs.unison-ucm;
+  };
+in
+
+mod { inherit config lib pkgs; }

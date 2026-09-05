@@ -28,10 +28,16 @@ let
   # Create npm-deps FOD if npmDepsHash is provided
   npmDeps =
     if npmDepsHash != "" then
-      fetchNpmDeps {
-        inherit src;
-        hash = npmDepsHash;
-      }
+      fetchNpmDeps (
+        {
+          inherit src;
+          hash = npmDepsHash;
+        }
+        // lib.optionalAttrs (args ? sourceRoot) { inherit (args) sourceRoot; }
+        // lib.optionalAttrs (args ? postPatch) { inherit (args) postPatch; }
+        // lib.optionalAttrs (args ? patches) { inherit (args) patches; }
+        // lib.optionalAttrs (args ? prePatch) { inherit (args) prePatch; }
+      )
     else
       null;
 in

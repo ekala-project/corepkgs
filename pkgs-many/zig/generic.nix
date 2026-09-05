@@ -14,6 +14,7 @@
   ninja,
   zlib,
   libxml2,
+  coreutils,
   callPackage,
   llvm,
 }:
@@ -44,7 +45,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   cmakeFlags = [
-    "-DZIG_STATIC_LLVM=OFF"
+    "-DCMAKE_SKIP_BUILD_RPATH=ON"
+    "-DZIG_STATIC_LLVM=ON"
     "-DZIG_TARGET_MCPU=baseline"
   ];
 
@@ -55,9 +57,23 @@ stdenv.mkDerivation (finalAttrs: {
 
   doCheck = false;
 
+  # Zig inspects /usr/bin/env as an ELF binary to detect the host dynamic
+  # linker and glibc version.  In Nix's sandbox /usr/bin/env either doesn't
+  # exist or doesn't carry the right info, so zig falls back to musl.
+  # Point it at the coreutils env binary instead.
+  postPatch = ''
+    substituteInPlace lib/std/zig/system.zig \
+      --replace-fail "/usr/bin/env" "${lib.getExe' coreutils "env"}"
+  '';
+
   preBuild = ''
-    export ZIG_GLOBAL_CACHE_DIR=$TMPDIR/zig-cache
-    export ZIG_LOCAL_CACHE_DIR=$TMPDIR/zig-cache
+    export ZIG_GLOBAL_CACHE_DIR="$TMPDIR/zig-cache"
+    export ZIG_LOCAL_CACHE_DIR="$TMPDIR/zig-cache"
+  '';
+
+  # Safety net: ensure the final binary uses the nix glibc interpreter.
+  postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
+    patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" $out/bin/zig
   '';
 
   postInstall = ''
@@ -73,8 +89,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://ziglang.org/";
     changelog = "https://ziglang.org/download/${version}/release-notes.html";
     license = lib.licenses.mit;
-    platforms = lib.platforms.unix ++ lib.platforms.darwin;
+    platforms = lib.platforms.unix;
     mainProgram = "zig";
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "ziglang" version;
   };
 })

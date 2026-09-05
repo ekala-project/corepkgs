@@ -11,6 +11,89 @@ let
   # Import service module infrastructure
   serviceLib = import ../services/lib/service-module.nix { inherit lib pkgs; };
 
+  # Language modules for devshell integration
+  languageModuleFiles = [
+    ../ekaos/modules/languages/bun.nix
+    ../ekaos/modules/languages/c.nix
+    ../ekaos/modules/languages/clojure.nix
+    ../ekaos/modules/languages/cplusplus.nix
+    ../ekaos/modules/languages/crystal.nix
+    ../ekaos/modules/languages/cue.nix
+    ../ekaos/modules/languages/deno.nix
+    ../ekaos/modules/languages/elixir.nix
+    ../ekaos/modules/languages/erlang.nix
+    ../ekaos/modules/languages/fortran.nix
+    ../ekaos/modules/languages/gawk.nix
+    ../ekaos/modules/languages/gleam.nix
+    ../ekaos/modules/languages/go.nix
+    ../ekaos/modules/languages/guile.nix
+    ../ekaos/modules/languages/hare.nix
+    ../ekaos/modules/languages/haskell.nix
+    ../ekaos/modules/languages/java.nix
+    ../ekaos/modules/languages/javascript.nix
+    ../ekaos/modules/languages/jsonnet.nix
+    ../ekaos/modules/languages/julia.nix
+    ../ekaos/modules/languages/kotlin.nix
+    ../ekaos/modules/languages/lobster.nix
+    ../ekaos/modules/languages/lua.nix
+    ../ekaos/modules/languages/nim.nix
+    ../ekaos/modules/languages/nix.nix
+    ../ekaos/modules/languages/nodejs.nix
+    ../ekaos/modules/languages/odin.nix
+    ../ekaos/modules/languages/opentofu.nix
+    ../ekaos/modules/languages/perl.nix
+    ../ekaos/modules/languages/php.nix
+    ../ekaos/modules/languages/purescript.nix
+    ../ekaos/modules/languages/python.nix
+    ../ekaos/modules/languages/r-lang.nix
+    ../ekaos/modules/languages/ruby.nix
+    ../ekaos/modules/languages/rust.nix
+    ../ekaos/modules/languages/scala.nix
+    ../ekaos/modules/languages/shell.nix
+    ../ekaos/modules/languages/solidity.nix
+    ../ekaos/modules/languages/tcl.nix
+    ../ekaos/modules/languages/terraform.nix
+    ../ekaos/modules/languages/texlive.nix
+    ../ekaos/modules/languages/typst.nix
+    ../ekaos/modules/languages/typescript.nix
+    ../ekaos/modules/languages/unison.nix
+    ../ekaos/modules/languages/vala.nix
+    ../ekaos/modules/languages/zig.nix
+  ];
+
+  # Stub module providing the options that language modules write to.
+  # In the full ekaos system these are defined by toplevel.nix and
+  # shell-environment.nix; in the devshell context we provide lightweight
+  # stubs and extract the collected values after evaluation.
+  languageStubModule = {
+    options.environment.packages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [ ];
+      description = "Packages collected by language modules.";
+    };
+
+    options.environment.variables = lib.mkOption {
+      type = lib.types.attrsOf (
+        lib.types.oneOf [
+          lib.types.str
+          lib.types.path
+          lib.types.package
+        ]
+      );
+      default = { };
+      description = "Environment variables collected by language modules.";
+    };
+
+    # Stub for per-user options (languages modules extend users.users)
+    # In devshell context per-user config is unused, but the options must
+    # exist so the module evaluates without errors.
+    options.users.users = lib.mkOption {
+      type = lib.types.attrsOf (lib.types.submodule { });
+      default = { };
+      description = "Stub for per-user options (unused in devshell context).";
+    };
+  };
+
   # Simple mkShell implementation (Phase 1 - basic version)
   mkShell =
     attrs:
@@ -33,7 +116,7 @@ in
   # Main function: Create a development shell with services
   mkDevShell =
     {
-      # Service configuration via ekaos modules
+      # Service and language configuration via modules
       modules ? [ ],
 
       # Traditional mkShell options
@@ -54,9 +137,10 @@ in
     }@args:
 
     let
-      # Evaluate the service modules
+      # Evaluate the service modules (check = false ignores language options)
       servicesEval = lib.evalModules {
         modules = [
+          { _module.check = false; }
           {
             options.services = serviceLib.mkServicesOption;
           }
@@ -81,6 +165,30 @@ in
         inherit (processCompose) tui logDir dataDir;
       };
 
+      # Evaluate language modules (check = false ignores service options)
+      languagesEval = lib.evalModules {
+        modules = [
+          { _module.check = false; }
+          languageStubModule
+        ]
+        ++ languageModuleFiles
+        ++ modules;
+        specialArgs = {
+          inherit lib pkgs;
+        };
+      };
+
+      # Extract packages and environment variables from language evaluation
+      langPackages = languagesEval.config.environment.packages;
+      langVariables = languagesEval.config.environment.variables;
+
+      # Generate export statements for language environment variables
+      langExports = lib.concatStringsSep "\n" (
+        lib.mapAttrsToList (
+          name: value: "export ${name}=${lib.escapeShellArg (toString value)}"
+        ) langVariables
+      );
+
       # Extract non-service options for mkShell
       shellArgs = builtins.removeAttrs args [
         "modules"
@@ -92,6 +200,11 @@ in
         # Create directories for services
         mkdir -p ${processCompose.logDir}
         mkdir -p ${processCompose.dataDir}
+
+        ${lib.optionalString (langVariables != { }) ''
+          # Language environment variables
+          ${langExports}
+        ''}
 
         # Display service information
         echo "================================================"
@@ -114,6 +227,27 @@ in
         echo "================================================"
         echo ""
 
+        ${lib.optionalString (enabledServices != { }) ''
+          # Auto-start services in detached mode
+          echo "Starting services in the background..."
+          ${processComposePackage}/bin/process-compose -f "$PROCESS_COMPOSE_CONFIG" up \
+            --detached --tui=false \
+            --log-file "${processCompose.logDir}/process-compose.log" \
+            --unix-socket "${processCompose.dataDir}/process-compose.sock" \
+            2>"${processCompose.logDir}/process-compose-startup.log" || \
+            echo "WARNING: Failed to start services. Check ${processCompose.logDir}/process-compose-startup.log"
+          echo "Services started. Use 'pc-status' to check, 'pc-down' to stop."
+          echo ""
+
+          # Stop services when the shell exits
+          _pc_cleanup() {
+            ${processComposePackage}/bin/process-compose -f "$PROCESS_COMPOSE_CONFIG" down \
+              --unix-socket "${processCompose.dataDir}/process-compose.sock" \
+              2>/dev/null || true
+          }
+          trap _pc_cleanup EXIT
+        ''}
+
         # User's custom shellHook
         ${shellHook}
       '';
@@ -122,7 +256,8 @@ in
     mkShell (
       shellArgs
       // {
-        buildInputs = buildInputs ++ packages ++ [ processComposePackage ] ++ (lib.attrValues utilities);
+        buildInputs =
+          buildInputs ++ packages ++ langPackages ++ [ processComposePackage ] ++ (lib.attrValues utilities);
 
         shellHook = enhancedShellHook;
 
