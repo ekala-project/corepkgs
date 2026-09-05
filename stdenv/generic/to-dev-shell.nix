@@ -2,11 +2,11 @@ lib:
 
 originalArgs:
 
-# A special kind of derivation that is only meant to be consumed by the
-# nix-shell. Merges the original derivation's build inputs with
-# user-supplied overrides.
+# Extract shell-relevant information from a mkDerivation's derivationArg
+# and merge it with user-supplied overrides, producing an attrset
+# suitable for mkDevShell.
 {
-  name ? if originalArgs ? name then "${originalArgs.name}-dev-shell" else "nix-shell",
+  name ? if originalArgs ? name then "${originalArgs.name}-dev-shell" else "dev-shell",
   # a list of packages to add to the shell environment
   packages ? [ ],
   # propagate all the inputs from the given derivations
@@ -15,19 +15,127 @@ originalArgs:
   nativeBuildInputs ? [ ],
   propagatedBuildInputs ? [ ],
   propagatedNativeBuildInputs ? [ ],
+  shellHook ? "",
+  modules ? [ ],
+  env ? { },
   ...
 }@attrs:
 let
+  # Merge original derivation inputs with user-supplied overrides
   mergeInputs =
+    attrName:
+    (originalArgs.${attrName} or [ ])
+    ++ (attrs.${attrName} or [ ])
+    ++ (lib.subtractLists inputsFrom (lib.flatten (lib.catAttrs attrName inputsFrom)));
+
+  # Attrs from derivationArg that are build infrastructure, not environment
+  # variables.  Anything not in this set AND string/path-valued will be
+  # forwarded as an env var to the dev shell.
+  infrastructureAttrs = [
+    "name"
+    "pname"
+    "version"
+    "builder"
+    "args"
+    "system"
+    "outputs"
+    "out"
+    "src"
+    "srcs"
+    "sourceRoot"
+    "setSourceRoot"
+    "stdenv"
+    "buildInputs"
+    "nativeBuildInputs"
+    "propagatedBuildInputs"
+    "propagatedNativeBuildInputs"
+    "depsBuildBuild"
+    "depsBuildBuildPropagated"
+    "depsBuildTarget"
+    "depsBuildTargetPropagated"
+    "depsHostHost"
+    "depsHostHostPropagated"
+    "depsTargetTarget"
+    "depsTargetTargetPropagated"
+    "shellHook"
+    "patches"
+    "patchFlags"
+    "doCheck"
+    "doInstallCheck"
+    "strictDeps"
+    "userHook"
+    "__ignoreNulls"
+    "__structuredAttrs"
+    "__contentAddressed"
+    "outputHashAlgo"
+    "outputHashMode"
+    "outputHash"
+    "preferLocalBuild"
+    "allowSubstitutes"
+    "enableParallelBuilding"
+    "enableParallelChecking"
+    "enableParallelInstalling"
+    "meta"
+    "passthru"
+    "pos"
+    "separateDebugInfo"
+    "hardeningEnable"
+    "hardeningDisable"
+    "NIX_HARDENING_ENABLE"
+    "requiredSystemFeatures"
+    "__darwinAllowLocalNetworking"
+    "__sandboxProfile"
+    "__propagatedSandboxProfile"
+    "__impureHostDeps"
+    "__propagatedImpureHostDeps"
+    "allowedImpureDLLs"
+    "outputChecks"
+    "disallowedReferences"
+    "disallowedRequisites"
+    "allowedReferences"
+    "allowedRequisites"
+    "cmakeFlags"
+    "mesonFlags"
+    "configureFlags"
+    "configurePlatforms"
+    "makeFlags"
+    "makefile"
+    "installFlags"
+    "installTargets"
+    "dontInstall"
+    "dontBuild"
+    "dontConfigure"
+    "dontFixup"
+    "dontPatchShebangs"
+    "dontPatchELF"
+    "dontStrip"
+    "forceShare"
+    "setupHook"
+    "setupHooks"
+    "passAsFile"
+  ];
+
+  # Phase hooks and scripts (pre/post hooks, phase definitions, configure
+  # scripts, etc.) are build-time concerns and should not leak as env vars.
+  isPhaseAttr =
     name:
-    (originalArgs.${name} or [ ])
-    ++ (attrs.${name} or [ ])
-    # 1. get all `{build,nativeBuild,...}Inputs` from the elements of `inputsFrom`
-    # 2. since that is a list of lists, `flatten` that into a regular list
-    # 3. filter out of the result everything that's in `inputsFrom` itself
-    #    this leaves actual dependencies of the derivations in `inputsFrom`,
-    #    but never the derivations themselves
-    ++ (lib.subtractLists inputsFrom (lib.flatten (lib.catAttrs name inputsFrom)));
+    lib.hasPrefix "pre" name
+    || lib.hasPrefix "post" name
+    || lib.hasSuffix "Phase" name
+    || lib.hasSuffix "Phases" name
+    || lib.hasSuffix "Hook" name
+    || lib.hasSuffix "Script" name
+    || lib.hasSuffix "Flags" name;
+
+  # Environment variables from the original derivation (everything that's
+  # a string and not infrastructure — these are typically set via `env` or
+  # as top-level attrs in mkDerivation).
+  originalEnv = lib.filterAttrs (
+    n: v:
+    !(builtins.elem n infrastructureAttrs)
+    && !(isPhaseAttr n)
+    && (builtins.isString v || builtins.isPath v)
+  ) originalArgs;
 
   rest = builtins.removeAttrs attrs [
     "name"
@@ -38,40 +146,21 @@ let
     "propagatedBuildInputs"
     "propagatedNativeBuildInputs"
     "shellHook"
+    "modules"
+    "env"
   ];
 in
-originalArgs
-// {
-  inherit name;
+{
+  inherit name modules;
 
   buildInputs = mergeInputs "buildInputs";
   nativeBuildInputs = packages ++ (mergeInputs "nativeBuildInputs");
   propagatedBuildInputs = mergeInputs "propagatedBuildInputs";
   propagatedNativeBuildInputs = mergeInputs "propagatedNativeBuildInputs";
 
-  # Shell derivations only need a single output
-  outputs = [ "out" ];
+  inherit inputsFrom shellHook;
 
-  # Avoid explicit checkout, and assume that shell will be used on source in repo
-  src = null;
-
-  shellHook = lib.concatStringsSep "\n" (
-    lib.catAttrs "shellHook" (lib.reverseList inputsFrom ++ [ attrs ])
-  );
-
-  phases = [ "buildPhase" ];
-
-  buildPhase = ''
-    { echo "------------------------------------------------------------";
-      echo " WARNING: the existence of this path is not guaranteed.";
-      echo " It is an internal implementation detail for pkgs.mkShell.";
-      echo "------------------------------------------------------------";
-      echo;
-      # Record all build inputs as runtime dependencies
-      export;
-    } >> "$out"
-  '';
-
-  preferLocalBuild = true;
+  # Merge original derivation env vars with user-supplied env
+  env = originalEnv // env;
 }
 // rest
