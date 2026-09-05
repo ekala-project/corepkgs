@@ -1,17 +1,21 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
-  updateAutotoolsGnuConfigScriptsHook,
   # Causes consistent segfaults on ELFv1 PPC64 when trying to use Perl regex in grep
   # https://github.com/PCRE2Project/pcre2/issues/762
-  withJitSealloc ? !(stdenv.hostPlatform.isPower64 && stdenv.hostPlatform.isAbiElfv1),
+  withJitSealloc ?
+    !(mkEkaPackage.stdenv.hostPlatform.isPower64 && mkEkaPackage.stdenv.hostPlatform.isAbiElfv1),
   pcre2,
   grep,
   testers,
 }:
 
-stdenv.mkDerivation rec {
+let
+  stdenv = mkEkaPackage.stdenv;
+in
+
+mkEkaPackage rec {
   pname = "pcre2";
   version = "10.46";
 
@@ -20,7 +24,9 @@ stdenv.mkDerivation rec {
     hash = "sha256-FfvFq6a+7gsXrssEYCrjlDI5OroevY45t8q/fbiDKZ8=";
   };
 
-  nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ];
+  commands = scope: {
+    inherit (scope) updateAutotoolsGnuConfigScriptsHook;
+  };
 
   configureFlags = [
     "--enable-pcre2-16"

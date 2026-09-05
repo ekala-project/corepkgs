@@ -1,10 +1,8 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   buildPackages,
   fetchurl,
-  updateAutotoolsGnuConfigScriptsHook,
-  bison,
   util-linuxMinimal,
   coreutils,
   libredirect,
@@ -20,6 +18,7 @@
 }:
 
 let
+  stdenv = mkEkaPackage.stdenv;
   upstreamPatches = import ./bash-5.3-patches.nix (
     nr: sha256:
     fetchurl {
@@ -32,7 +31,7 @@ lib.warnIf (withDocs != null)
   ''
     bash: `.override { withDocs = true; }` is deprecated, the docs are always included.
   ''
-  stdenv.mkDerivation
+  mkEkaPackage
   (fa: {
     pname = "bash${lib.optionalString interactive "-interactive"}";
     version = "5.3${fa.patch_suffix}";
@@ -79,10 +78,6 @@ lib.warnIf (withDocs != null)
 
     patches = upstreamPatches ++ [
       # Enable PGRP_PIPE independently of the kernel of the build machine.
-      # This doesn't seem to be upstreamed despite such a mention of in https://github.com/NixOS/nixpkgs/pull/77196,
-      # which originally introduced the patch
-      # Some related discussion can be found in
-      # https://lists.gnu.org/archive/html/bug-bash/2015-05/msg00071.html
       ./pgrp-pipe-5.patch
     ];
 
@@ -124,15 +119,26 @@ lib.warnIf (withDocs != null)
     ];
 
     strictDeps = true;
-    # Note: Bison is needed because the patches above modify parse.y.
-    depsBuildBuild = [ buildPackages.stdenv.cc ];
-    nativeBuildInputs = [
-      updateAutotoolsGnuConfigScriptsHook
-      bison
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [ stdenv.cc.bintools ];
 
-    buildInputs = lib.optionals interactive [ readline ];
+    # Note: Bison is needed because the patches above modify parse.y.
+    depsBuildBuild = _: {
+      cc = buildPackages.stdenv.cc;
+    };
+
+    commands =
+      scope:
+      {
+        inherit (scope) updateAutotoolsGnuConfigScriptsHook bison;
+      }
+      // lib.optionalAttrs stdenv.hostPlatform.isDarwin {
+        bintools = stdenv.cc.bintools;
+      };
+
+    libraries =
+      scope:
+      lib.optionalAttrs interactive {
+        inherit (scope) readline;
+      };
 
     enableParallelBuilding = true;
 
@@ -179,14 +185,9 @@ lib.warnIf (withDocs != null)
         };
 
         patches = attrs.patches or [ ] ++ [
-          # See commit comment, also submitted upstream: https://lists.gnu.org/archive/html/bug-bash/2025-10/msg00054.html
           ./fail-tests.patch
-          # See commit comment, also submitted upstream: https://lists.gnu.org/archive/html/bug-bash/2025-10/msg00055.html
           ./failed-tests-output.patch
-          # The run-builtins test _almost_ succeeds, only has a bit of PATH trouble
-          # and some odd terminal column mismatch
           ./fix-builtins-tests.patch
-          # The run-invocation test _almost_ succeeds, only has a bit of PATH trouble
           ./fix-invocation-tests.patch
         ];
 
@@ -234,17 +235,7 @@ lib.warnIf (withDocs != null)
             # Can be enabled in 5.4
             run-printf
 
-            # This is probably fixable without too much trouble, but just not having a hardcoded PATH in type5.sub doesn't cut it
-            # 142,143c142,147
-            # < type5.sub: line 23: mkdir: command not found
-            # < type5.sub: line 24: cd: /build/type-23722: No such file or directory
-            # ---
-            # > cat is /bin/cat
-            # > cat is aliased to `echo cat'
-            # > /bin/cat
-            # > break is a shell builtin
-            # > break is a special shell builtin
-            # > ./e
+            # This is probably fixable without too much trouble
             run-type
           )
           for check in "''${disabled_checks[@]}"; do

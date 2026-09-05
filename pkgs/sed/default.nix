@@ -1,15 +1,17 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
-  updateAutotoolsGnuConfigScriptsHook,
-  perl,
   sed,
   runCommand,
   testers,
 }:
 
-stdenv.mkDerivation rec {
+let
+  stdenv = mkEkaPackage.stdenv;
+in
+
+mkEkaPackage rec {
   pname = "sed";
   version = "4.9";
 
@@ -23,10 +25,10 @@ stdenv.mkDerivation rec {
     "info"
   ];
 
-  nativeBuildInputs = [
-    updateAutotoolsGnuConfigScriptsHook
-    perl
-  ];
+  commands = scope: {
+    inherit (scope) updateAutotoolsGnuConfigScriptsHook perl;
+  };
+
   preConfigure = "patchShebangs ./build-aux/help2man";
 
   # Prevents attempts of running 'help2man' on cross-built binaries.

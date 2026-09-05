@@ -1,8 +1,8 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
-  shared ? !stdenv.hostPlatform.isStatic,
+  shared ? !mkEkaPackage.stdenv.hostPlatform.isStatic,
   static ? true,
   # If true, a separate .static output is created and the .a is moved there.
   # In this case `pkg-config` auto detection does not currently work if the
@@ -15,6 +15,10 @@
   runUnitTests,
 }:
 
+let
+  stdenv = mkEkaPackage.stdenv;
+in
+
 # Without either the build will actually still succeed because the build
 # system makes an arbitrary choice, but we shouldn't be so indecisive.
 assert shared || static;
@@ -26,7 +30,7 @@ assert shared || static;
 
 assert splitStaticOutput -> static;
 
-stdenv.mkDerivation (finalAttrs: {
+mkEkaPackage (finalAttrs: {
   pname = "zlib";
   version = "1.3.2";
 

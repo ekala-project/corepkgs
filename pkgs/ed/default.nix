@@ -1,9 +1,7 @@
 {
   lib,
   fetchurl,
-  lzip,
-  runtimeShellPackage,
-  stdenv,
+  mkEkaPackage,
   testers,
   runUnitTests,
 }:
@@ -13,7 +11,7 @@
 # place) that are needed here should be directly included together as regular
 # files.
 
-stdenv.mkDerivation (finalAttrs: {
+mkEkaPackage (finalAttrs: {
   pname = "ed";
   version = "1.22.2";
 
@@ -22,12 +20,16 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-9Y0VJCBW4Vr3bxPzTGDYkPoqLVywq++RwRXk2DeU/+M=";
   };
 
-  nativeBuildInputs = [ lzip ];
+  commands = scope: {
+    inherit (scope) lzip;
+  };
 
-  buildInputs = [ runtimeShellPackage ];
+  libraries = scope: {
+    inherit (scope) runtimeShellPackage;
+  };
 
   configureFlags = [
-    "CC=${stdenv.cc.targetPrefix}cc"
+    "CC=${mkEkaPackage.stdenv.cc.targetPrefix}cc"
   ];
 
   strictDeps = true;

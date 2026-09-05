@@ -1,6 +1,6 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
 }:
 
@@ -9,7 +9,7 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+mkEkaPackage rec {
   pname = "patchelf";
   version = "0.19.1";
 
@@ -25,7 +25,7 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   # fails 8 out of 24 tests, problems when loading libc.so.6
-  doCheck = stdenv.name == "stdenv-linux";
+  doCheck = mkEkaPackage.stdenv.name == "stdenv-linux";
 
   meta = {
     homepage = "https://github.com/NixOS/patchelf";

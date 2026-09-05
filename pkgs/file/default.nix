@@ -1,11 +1,8 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
   file,
-  zlib,
-  libgnurx,
-  updateAutotoolsGnuConfigScriptsHook,
   testers,
 }:
 
@@ -14,7 +11,11 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation (finalAttrs: {
+let
+  stdenv = mkEkaPackage.stdenv;
+in
+
+mkEkaPackage (finalAttrs: {
   pname = "file";
   version = "5.45";
 
@@ -49,11 +50,15 @@ stdenv.mkDerivation (finalAttrs: {
   strictDeps = true;
   enableParallelBuilding = true;
 
-  nativeBuildInputs = [
-    updateAutotoolsGnuConfigScriptsHook
-  ]
-  ++ lib.optional (stdenv.hostPlatform != stdenv.buildPlatform) file;
-  buildInputs = [ zlib ] ++ lib.optional stdenv.hostPlatform.isMinGW libgnurx;
+  commands = scope: {
+    inherit (scope) updateAutotoolsGnuConfigScriptsHook;
+    file = if stdenv.hostPlatform != stdenv.buildPlatform then file else null;
+  };
+
+  libraries = scope: {
+    inherit (scope) zlib;
+    libgnurx = if stdenv.hostPlatform.isMinGW then scope.libgnurx else null;
+  };
 
   # https://bugs.astron.com/view.php?id=382
   doCheck = !stdenv.buildPlatform.isMusl;

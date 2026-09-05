@@ -1,9 +1,8 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
-  autoreconfHook,
-  enableStatic ? stdenv.hostPlatform.isStatic,
+  enableStatic ? mkEkaPackage.stdenv.hostPlatform.isStatic,
   writeScript,
   testers,
   runUnitTests,
@@ -19,7 +18,11 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation (finalAttrs: {
+let
+  stdenv = mkEkaPackage.stdenv;
+in
+
+mkEkaPackage (finalAttrs: {
   pname = "xz";
   version = "5.8.3";
 
@@ -43,9 +46,11 @@ stdenv.mkDerivation (finalAttrs: {
 
   enableParallelBuilding = true;
 
-  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isOpenBSD [
-    autoreconfHook
-  ];
+  commands =
+    scope:
+    lib.optionalAttrs stdenv.hostPlatform.isOpenBSD {
+      inherit (scope) autoreconfHook;
+    };
 
   # this could be accomplished by updateAutotoolsGnuConfigScriptsHook, but that causes infinite recursion
   # necessary for FreeBSD code path in configure

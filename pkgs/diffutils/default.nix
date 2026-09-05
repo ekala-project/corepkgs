@@ -1,8 +1,7 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
-  updateAutotoolsGnuConfigScriptsHook,
   xz,
   coreutils ? null,
   diffutils,
@@ -15,7 +14,11 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+let
+  stdenv = mkEkaPackage.stdenv;
+in
+
+mkEkaPackage rec {
   pname = "diffutils";
   version = "3.12";
 
@@ -38,12 +41,15 @@ stdenv.mkDerivation rec {
     ./musl-llvm.patch
   ];
 
-  nativeBuildInputs = [
-    updateAutotoolsGnuConfigScriptsHook
-    (lib.getBin xz)
-  ];
+  commands = scope: {
+    inherit (scope) updateAutotoolsGnuConfigScriptsHook;
+    xz = lib.getBin xz;
+  };
+
   # If no explicit coreutils is given, use the one from stdenv.
-  buildInputs = [ coreutils ];
+  libraries = scope: {
+    coreutils = coreutils;
+  };
 
   # Disable stack-related gnulib tests on x86_64-darwin because they have problems running under
   # Rosetta 2: test-c-stack hangs, test-sigsegv-catch-stackoverflow and test-sigaction fail.

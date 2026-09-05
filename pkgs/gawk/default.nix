@@ -1,13 +1,8 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
-  removeReferencesTo,
-  runtimeShellPackage,
-  texinfo,
   interactive ? false,
-  readline,
-  autoreconfHook, # no-pma fix
   gawk,
   runCommand,
   testers,
@@ -19,14 +14,18 @@
      || stdenv.hostPlatform.isSunOS  # XXX: `_backsmalls1' fails, locale stuff?
      || stdenv.hostPlatform.isFreeBSD
   */
-  doCheck ? (interactive && stdenv.hostPlatform.isLinux),
+  doCheck ? (interactive && mkEkaPackage.stdenv.hostPlatform.isLinux),
   glibcLocales ? null,
   locale ? null,
 }:
 
+let
+  stdenv = mkEkaPackage.stdenv;
+in
+
 assert (doCheck && stdenv.hostPlatform.isLinux) -> glibcLocales != null;
 
-stdenv.mkDerivation rec {
+mkEkaPackage rec {
   pname = "gawk" + lib.optionalString interactive "-interactive";
   version = "5.3.2";
 
@@ -45,28 +44,34 @@ stdenv.mkDerivation rec {
   strictDeps = true;
 
   # no-pma fix
-  nativeBuildInputs = [
-    autoreconfHook
-    texinfo
-  ]
-  ++ lib.optionals interactive [
-    removeReferencesTo
-  ]
-  ++ lib.optionals (doCheck && stdenv.hostPlatform.isLinux) [
-    glibcLocales
-  ];
+  commands =
+    scope:
+    {
+      inherit (scope) autoreconfHook texinfo;
+    }
+    // lib.optionalAttrs interactive {
+      inherit (scope) removeReferencesTo;
+    }
+    // lib.optionalAttrs (doCheck && stdenv.hostPlatform.isLinux) {
+      inherit glibcLocales;
+    };
 
-  buildInputs =
-    lib.optionals interactive [
-      runtimeShellPackage
-      readline
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      locale
-    ];
+  libraries =
+    scope:
+    lib.optionalAttrs interactive {
+      inherit (scope) runtimeShellPackage readline;
+    }
+    // lib.optionalAttrs stdenv.hostPlatform.isDarwin {
+      inherit locale;
+    };
 
   configureFlags = [
-    (if interactive then "--with-readline=${readline.dev}" else "--without-readline")
+    (
+      if interactive then
+        "--with-readline=${(mkEkaPackage.scopes.hostTarget.readline or null).dev or ""}"
+      else
+        "--without-readline"
+    )
   ];
 
   env = lib.optionalAttrs stdenv.hostPlatform.isDarwin {

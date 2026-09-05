@@ -1,15 +1,18 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
   ed,
-  autoreconfHook,
   patch,
   runCommand,
   testers,
 }:
 
-stdenv.mkDerivation rec {
+let
+  stdenv = mkEkaPackage.stdenv;
+in
+
+mkEkaPackage rec {
   pname = "patch";
   version = "2.8";
 
@@ -23,7 +26,9 @@ stdenv.mkDerivation rec {
     sed -E -i -e '/bad-filenames/d' tests/Makefile.am
   '';
 
-  nativeBuildInputs = [ autoreconfHook ];
+  commands = scope: {
+    inherit (scope) autoreconfHook;
+  };
 
   configureFlags = lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
     "ac_cv_func_strnlen_working=yes"

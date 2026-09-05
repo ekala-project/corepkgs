@@ -1,8 +1,7 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
-  updateAutotoolsGnuConfigScriptsHook,
   coreutils,
   findutils,
   runCommand,
@@ -14,7 +13,11 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+let
+  stdenv = mkEkaPackage.stdenv;
+in
+
+mkEkaPackage rec {
   pname = "findutils";
   version = "4.10.0";
 
@@ -29,11 +32,15 @@ stdenv.mkDerivation rec {
 
   patches = [ ./no-install-statedir.patch ];
 
-  nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ];
-  buildInputs = [ coreutils ]; # bin/updatedb script needs to call sort
+  commands = scope: {
+    inherit (scope) updateAutotoolsGnuConfigScriptsHook;
+  };
+
+  libraries = scope: {
+    inherit coreutils; # bin/updatedb script needs to call sort
+  };
 
   # Since glibc-2.25 the i686 tests hang reliably right after test-sleep.
-  # !stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isFreeBSD && !(stdenv.hostPlatform.libc == "glibc" && stdenv.hostPlatform.isi686) && (stdenv.hostPlatform.libc != "musl") && !isCross;
   doCheck = false; # TODO: move to passhru
 
   outputs = [

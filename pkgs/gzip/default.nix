@@ -1,10 +1,7 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
-  makeShellWrapper,
-  updateAutotoolsGnuConfigScriptsHook,
-  runtimeShellPackage,
   gzip,
   runCommand,
   testers,
@@ -15,7 +12,7 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+mkEkaPackage rec {
   pname = "gzip";
   version = "1.14";
 
@@ -32,11 +29,13 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  nativeBuildInputs = [
-    updateAutotoolsGnuConfigScriptsHook
-    makeShellWrapper
-  ];
-  buildInputs = [ runtimeShellPackage ];
+  commands = scope: {
+    inherit (scope) updateAutotoolsGnuConfigScriptsHook makeShellWrapper;
+  };
+
+  libraries = scope: {
+    inherit (scope) runtimeShellPackage;
+  };
 
   makeFlags = [
     "SHELL=/bin/sh"
