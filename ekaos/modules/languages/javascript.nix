@@ -11,6 +11,7 @@ let
   mod = langLib.mkLanguageModule {
     name = "javascript";
     defaultPackage = pkgs: pkgs.nodejs;
+    defaultLspPackage = pkgs: pkgs.typescript-language-server;
     resolveVersion = langLib.mkMajorVersionResolver "nodejs";
     environmentVariables = _: {
       NODE_PATH = "$HOME/.node_modules";
