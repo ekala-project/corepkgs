@@ -3,6 +3,7 @@
 This document provides high-level guidelines for AI agents working with the core-pkgs repository. For detailed information on specific topics, see the `.agents/skills/` directory.
 
 **Quick access to detailed guides:**
+- [`.agents/skills/mkekapackage/SKILL.md`](.agents/skills/mkekapackage/SKILL.md) - mkEkaPackage scope-based dependency declaration, cc attribute, and migration from mkDerivation
 - [`.agents/skills/cmake/SKILL.md`](.agents/skills/cmake/SKILL.md) - CMake build system
 - [`.agents/skills/meson/SKILL.md`](.agents/skills/meson/SKILL.md) - Meson build system
 - [`.agents/skills/packaging/SKILL.md`](.agents/skills/packaging/SKILL.md) - Packaging conventions, including dependency management, cross-compilation, and passthru attributes

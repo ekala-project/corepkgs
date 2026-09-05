@@ -1,12 +1,7 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
-  autoreconfHook,
-  updateAutotoolsGnuConfigScriptsHook,
-  libintl,
-  aclSupport ? lib.meta.availableOn stdenv.hostPlatform acl,
-  acl,
   tar,
   runCommand,
   testers,
@@ -17,7 +12,14 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+let
+  stdenv = mkEkaPackage.stdenv;
+  aclSupport = lib.meta.availableOn stdenv.hostPlatform (
+    mkEkaPackage.scopes.hostTarget.acl or { meta = { }; }
+  );
+in
+
+mkEkaPackage rec {
   pname = "tar";
   version = "1.35";
 
@@ -42,14 +44,19 @@ stdenv.mkDerivation rec {
     "info"
   ];
 
-  nativeBuildInputs = [ autoreconfHook ];
+  commands = scope: {
+    inherit (scope) autoreconfHook;
+  };
 
   # Add libintl on Darwin specifically as it fails to link (or skip)
   # NLS on it's own:
   #  "_libintl_textdomain", referenced from:
   #    _main in tar.o
   #  ld: symbol(s) not found for architecture x86_64
-  buildInputs = lib.optional aclSupport acl ++ lib.optional stdenv.hostPlatform.isDarwin libintl;
+  libraries = scope: {
+    acl = if aclSupport then scope.acl else null;
+    libintl = if stdenv.hostPlatform.isDarwin then scope.libintl else null;
+  };
 
   # May have some issues with root compilation because the bootstrap tool
   # cannot be used as a login shell for now.

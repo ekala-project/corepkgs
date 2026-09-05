@@ -1,13 +1,11 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
-  autoreconfHook,
   guileSupport ? false,
   guile,
   # avoid guile depend on bootstrap to prevent dependency cycles
   inBootstrap ? false,
-  pkg-config,
   make,
   runCommand,
   testers,
@@ -17,7 +15,7 @@ let
   guileEnabled = guileSupport && !inBootstrap;
 in
 
-stdenv.mkDerivation rec {
+mkEkaPackage rec {
   pname = "make";
   version = "4.4.1";
 
@@ -34,16 +32,20 @@ stdenv.mkDerivation rec {
   #  $ # make changes, resolve conflicts, etc.
   #  $ git format-patch --output-directory ../patches --diff-algorithm=histogram $version
   #
-  # TODO: stdenv’s setup.sh should be aware of patch directories. It’s very
+  # TODO: stdenv's setup.sh should be aware of patch directories. It's very
   # convenient to keep them in a separate directory but we can defer listing the
   # directory until derivation realization to avoid unnecessary Nix evaluations.
   patches = lib.filesystem.listFilesRecursive ./patches;
 
-  nativeBuildInputs = [
-    autoreconfHook
-    pkg-config
-  ];
-  buildInputs = lib.optionals guileEnabled [ guile ];
+  commands = scope: {
+    inherit (scope) autoreconfHook pkg-config;
+  };
+
+  libraries =
+    scope:
+    lib.optionalAttrs guileEnabled {
+      inherit (scope) guile;
+    };
 
   configureFlags = lib.optional guileEnabled "--with-guile";
 

@@ -1,13 +1,8 @@
 {
   lib,
-  stdenv,
-  updateAutotoolsGnuConfigScriptsHook,
-  glibcLocales,
+  mkEkaPackage,
   fetchurl,
   pcre2,
-  libiconv,
-  perl,
-  runtimeShellPackage,
   grep,
   runCommand,
   testers,
@@ -19,10 +14,11 @@
 # files.
 
 let
+  stdenv = mkEkaPackage.stdenv;
   version = "3.12";
 in
 
-stdenv.mkDerivation {
+mkEkaPackage {
   pname = "grep";
   inherit version;
 
@@ -49,27 +45,27 @@ stdenv.mkDerivation {
     else
       null;
 
-  nativeCheckInputs = [
-    perl
-    glibcLocales
-  ];
+  # nativeCheckInputs is a standard list attribute, not scope-based
+  # These are only needed when doCheck is enabled
+
   outputs = [
     "out"
     "info"
   ]; # the man pages are rather small
 
-  nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ];
-  buildInputs = [
-    pcre2
-    libiconv
-  ]
-  ++ lib.optional (!stdenv.hostPlatform.isWindows) runtimeShellPackage;
+  commands = scope: {
+    inherit (scope) updateAutotoolsGnuConfigScriptsHook;
+  };
+
+  libraries = scope: {
+    inherit (scope) pcre2 libiconv;
+    runtimeShellPackage = if !stdenv.hostPlatform.isWindows then scope.runtimeShellPackage else null;
+  };
 
   # cygwin: FAIL: multibyte-white-space
   # freebsd: FAIL mb-non-UTF8-performance
   # x86_64-darwin: fails 'stack-overflow' tests on Rosetta 2 emulator
   # aarch32: fails 'stack-overflow' when run on qemu under x86_64
-  # !stdenv.hostPlatform.isCygwin && !stdenv.hostPlatform.isFreeBSD && !(stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isx86_64) && !stdenv.buildPlatform.isRiscV64 && !stdenv.hostPlatform.isAarch32;
   doCheck = false; # TODO: enable in passhru
 
   # On macOS, force use of mkdir -p, since Grep's fallback

@@ -1,10 +1,9 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
-  enableStatic ? with stdenv.hostPlatform; isStatic || isCygwin,
+  enableStatic ? with mkEkaPackage.stdenv.hostPlatform; isStatic || isCygwin,
   enableShared ? true,
-  autoreconfHook,
   testers,
 }:
 
@@ -13,7 +12,7 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation (
+mkEkaPackage (
   finalAttrs:
   let
     inherit (finalAttrs) version;
@@ -47,7 +46,10 @@ stdenv.mkDerivation (
     '';
 
     strictDeps = true;
-    nativeBuildInputs = [ autoreconfHook ];
+
+    commands = scope: {
+      inherit (scope) autoreconfHook;
+    };
 
     outputs = [
       "bin"

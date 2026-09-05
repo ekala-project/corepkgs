@@ -1,8 +1,7 @@
 {
   lib,
-  stdenv,
+  mkEkaPackage,
   fetchurl,
-  gettext,
   acl,
 }:
 
@@ -11,7 +10,7 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+mkEkaPackage rec {
   pname = "attr";
   version = "2.5.2";
 
@@ -28,7 +27,9 @@ stdenv.mkDerivation rec {
     "doc"
   ];
 
-  nativeBuildInputs = [ gettext ];
+  commands = scope: {
+    inherit (scope) gettext;
+  };
 
   patches = [ ./musl.patch ];
 
