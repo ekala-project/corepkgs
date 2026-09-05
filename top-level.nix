@@ -80,6 +80,10 @@ with final;
   # Creates development environments with running services using ekaos modules
   mkDevShell = (callPackage ./dev-shell { }).mkDevShell;
 
+  # Traditional nix-shell / nix develop wrapper (packages, inputsFrom, shellHook).
+  mkShell = callPackage ./build-support/mkshell { };
+  mkShellNoCC = mkShell.override { stdenv = stdenvNoCC; };
+
   # vmTools - VM building utilities for ekaosTest and disk image creation
   vmTools = callPackage ./build-support/vm { };
   makeInitrd = callPackage ./build-support/kernel/make-initrd.nix;
