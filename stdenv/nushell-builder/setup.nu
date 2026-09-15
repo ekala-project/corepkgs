@@ -582,6 +582,14 @@ def --env installPhase [] {
 }
 
 def --env fixupPhase [] {
+  # Ensure all output directories exist (even if empty)
+  for outputName in (getAllOutputNames) {
+    let outputPath = (getOutput $outputName)
+    if not ($outputPath | path exists) {
+      mkdir $outputPath
+    }
+  }
+
   # Make everything writable for strip et al.
   for outputName in (getAllOutputNames) {
     let outputPath = (getOutput $outputName)

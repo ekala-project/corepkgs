@@ -26,12 +26,8 @@ export def patchShebangs [dir: string] {
 }
 
 def patchShebang [file: string, path: string, hostPath: string] {
-  # Read first two bytes to check for #!
-  let magic = (do { open $file --raw | bytes at 0..2 } | complete)
-  if ($magic | get -o stdout | default "") != "#!" { return }
-
-  # Read first line
-  let firstLine = (open $file --raw | lines | first)
+  # Read first line and check for shebang
+  let firstLine = try { open $file --raw | lines | first } catch { return }
   if not ($firstLine | str starts-with "#!") { return }
 
   let shebang = ($firstLine | str substring 2.. | str trim)

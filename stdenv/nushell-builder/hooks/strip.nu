@@ -52,10 +52,13 @@ def stripDir [dir: string, strip: string, flags: list<string>, cores: string] {
 
   # Process files
   $files | split row "\u{0}" | where {|f| $f != ""} | each {|f|
-    # Check if file is ELF
-    let magic = (do { open $f --raw | bytes at 0..4 } | complete)
-    if ($magic | get -o stdout | default "") =~ "ELF" {
-      do { ^$strip ...$flags $f err>| ignore } | complete | ignore
+    # Check if file is ELF by reading magic bytes
+    let isElf = try {
+      let bytes = (open $f --raw | bytes at 0..4)
+      ($bytes | encode hex) == "7f454c46"  # \x7fELF
+    } catch { false }
+    if $isElf {
+      try { ^$strip ...$flags $f } catch { }
     }
   }
   null

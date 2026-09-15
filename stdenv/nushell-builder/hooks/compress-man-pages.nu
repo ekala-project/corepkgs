@@ -13,7 +13,7 @@ export def compressManPages [] {
   let files = (do { ^find $manDir -type f -not -name "*.gz" -not -name "*.bz2" -not -name "*.xz" } | complete | get stdout)
 
   $files | lines | where {|f| $f != ""} | each {|f|
-    ^gzip -9n $f
+    try { ^gzip -9nf $f } catch { }
   }
 
   # Fix symlinks pointing to uncompressed files
