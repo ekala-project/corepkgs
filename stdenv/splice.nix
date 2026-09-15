@@ -186,8 +186,9 @@ in
   pkgs = if actuallySplice then splicedPackages // { recurseForDerivations = false; } else pkgs;
 
   # mkEkaPackage — scope-based dependency declaration (EEP 0041)
+  # Uses nushell as native builder instead of bash.
   mkEkaPackage = {
-    inherit (pkgs) stdenv;
+    inherit (pkgs) stdenv nushell;
     cc = pkgs.stdenv.cc;
     scopes = {
       buildBuild = pkgs.pkgsBuildBuild;
@@ -203,7 +204,12 @@ in
       (import ./generic/make-eka-package.nix {
         inherit lib;
         inherit (pkgs) config;
-        inherit (self) stdenv cc scopes;
+        inherit (self)
+          stdenv
+          cc
+          scopes
+          nushell
+          ;
       }).mkEkaPackage
         fnOrAttrs;
   };

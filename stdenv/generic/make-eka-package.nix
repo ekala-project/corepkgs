@@ -12,6 +12,7 @@
   stdenv,
   cc ? stdenv.cc,
   scopes,
+  nushell,
 }:
 
 let
@@ -79,10 +80,8 @@ let
   ];
 
   doCheckByDefault = config.doCheckByDefault or false;
-  structuredAttrsByDefault = config.structuredAttrsByDefault or false;
   enableParallelBuildingByDefault = config.enableParallelBuildingByDefault or true;
   contentAddressedByDefault = config.contentAddressedByDefault or false;
-  userHook = config.stdenv.userHook or null;
 
   inherit (stdenv)
     hostPlatform
@@ -128,10 +127,15 @@ let
   stdenvHostSuffix = "-${hostPlatform.config}";
   stdenvStaticMarker = optionalString isStatic "-static";
 
+  nuBuilderSrc = builtins.path {
+    name = "nushell-builder";
+    path = ../nushell-builder;
+    filter = path: _type: builtins.match ".*\\.nu$" path != null || _type == "directory";
+  };
+
   defaultBuilderArgs = [
-    "-e"
-    ./source-stdenv.sh
-    ./default-builder.sh
+    "--no-config-file"
+    (nuBuilderSrc + "/setup.nu")
   ];
 
   requiredSystemFeaturesShouldBeSet =
@@ -292,7 +296,7 @@ let
       hardeningDisable ? [ ],
       patches ? [ ],
       __contentAddressed ? (!attrs ? outputHash) && contentAddressedByDefault,
-      __structuredAttrs ? structuredAttrsByDefault,
+      __structuredAttrs ? true,
 
       cmakeFlags ? [ ],
       mesonFlags ? [ ],
@@ -410,23 +414,13 @@ let
               "${attrs.pname}${staticMarker}${hostSuffix}-${attrs.version}"
           );
 
-        builder = attrs.realBuilder or stdenvShell;
-        args =
-          attrs.args or (
-            if attrs ? builder then
-              [
-                "-e"
-                ./source-stdenv.sh
-                attrs.builder
-              ]
-            else
-              defaultBuilderArgs
-          );
+        builder = attrs.realBuilder or "${nushell}/bin/nu";
+        args = attrs.args or defaultBuilderArgs;
         inherit stdenv;
         system = buildPlatformSystem;
-        inherit userHook;
         __ignoreNulls = true;
-        inherit __structuredAttrs strictDeps;
+        __structuredAttrs = true;
+        inherit strictDeps;
 
         # Map scope-based deps to the standard derivation dependency slots
         depsBuildBuild = flatDepsBuildBuild;
@@ -601,16 +595,6 @@ let
                     raw;
               }) outputs'
             );
-
-        # Non-structured attrs output checks
-        ${if !__structuredAttrs && attrs ? disallowedReferences then "disallowedReferences" else null} =
-          map unsafeDerivationToUntrackedOutpath attrs.disallowedReferences;
-        ${if !__structuredAttrs && attrs ? disallowedRequisites then "disallowedRequisites" else null} =
-          map unsafeDerivationToUntrackedOutpath attrs.disallowedRequisites;
-        ${if !__structuredAttrs && attrs ? allowedReferences then "allowedReferences" else null} =
-          mapNullable unsafeDerivationToUntrackedOutpath attrs.allowedReferences;
-        ${if !__structuredAttrs && attrs ? allowedRequisites then "allowedRequisites" else null} =
-          mapNullable unsafeDerivationToUntrackedOutpath attrs.allowedRequisites;
 
         cmakeFlags = makeCMakeFlags attrs;
         mesonFlags = makeMesonFlags attrs;
