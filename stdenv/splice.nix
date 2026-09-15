@@ -185,6 +185,29 @@ in
 
   pkgs = if actuallySplice then splicedPackages // { recurseForDerivations = false; } else pkgs;
 
+  # mkEkaPackage — scope-based dependency declaration (EEP 0041)
+  mkEkaPackage = {
+    inherit (pkgs) stdenv;
+    cc = pkgs.stdenv.cc;
+    scopes = {
+      buildBuild = pkgs.pkgsBuildBuild;
+      buildHost = pkgs.pkgsBuildHost;
+      buildTarget = pkgs.pkgsBuildTarget;
+      hostHost = pkgs.pkgsHostHost;
+      hostTarget = pkgs.pkgsHostTarget;
+      targetTarget = pkgs.pkgsTargetTarget;
+    };
+
+    __functor =
+      self: fnOrAttrs:
+      (import ./generic/make-eka-package.nix {
+        inherit lib;
+        inherit (pkgs) config;
+        inherit (self) stdenv cc scopes;
+      }).mkEkaPackage
+        fnOrAttrs;
+  };
+
   # prefill 2 fields of the function for convenience
   makeScopeWithSplicing = lib.makeScopeWithSplicing splicePackages pkgs.newScope;
   makeScopeWithSplicing' = lib.makeScopeWithSplicing' {
