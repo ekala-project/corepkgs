@@ -190,6 +190,7 @@ python3.pkgs.buildPythonApplication rec {
   env.hostPlatform = stdenv.targetPlatform.system;
   passthru = {
     configurePhaseHook = ./setup-hook.sh;
+    nushellHook = ./nushell-hook.nu;
     ekapkgs-update.semver-strategy = "patch";
     tests = {
       version = testers.testVersion {
