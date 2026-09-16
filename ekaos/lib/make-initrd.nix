@@ -193,13 +193,12 @@ let
     exec switch_root /mnt-root /init
   '';
 
-  # Kernel modules directory — aggregateModules takes a list of module
-  # packages (kernel, out-of-tree drivers, etc.) and runs depmod.
-  modulesTree = pkgs.aggregateModules [ kernelPackages.kernel ];
+  # Kernel modules directory
+  modulesTree = "${kernelPackages.kernel}/lib/modules";
 
 in
 
-kernelPackages.kernel.makeInitrd {
+pkgs.makeInitrd {
   contents = [
     {
       object = bootStage1;
