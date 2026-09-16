@@ -82,7 +82,7 @@ PATH_MAPPINGS = {
     "pkgs/julia": "pkgs/development/compilers/julia",
     "pkgs/kmod": "pkgs/os-specific/linux/kmod",
     "pkgs/libbpf": "pkgs/os-specific/linux/libbpf",
-    "pkgs/libidn2": "pkgs/development/libraries/libidn2",
+    "pkgs-many/libidn": "pkgs/development/libraries/libidn2",
     "pkgs/libinput": "pkgs/development/libraries/libinput",
     "pkgs/libliftoff": "pkgs/development/libraries/libliftoff",
     "pkgs/libunistring": "pkgs/development/libraries/libunistring",

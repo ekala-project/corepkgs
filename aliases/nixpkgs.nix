@@ -137,6 +137,7 @@ mapAliases {
   libffi_3_3 = libffi.v3_3;
   libiconv-darwin = libiconv.darwin;
   libiconvReal = libiconv.real;
+  libidn2 = libidn.v2;
   libmysqlclient = mariadb-connector-c;
   libnghttp2 = nghttp2;
   libtool2 = libtool.v2_5;
