@@ -736,29 +736,24 @@ rec {
       meta ? { },
       passthru ? { },
       substitutions ? { },
-      __structuredAttrs ? false,
     }:
     script:
     runCommand name
-      (
-        substitutions
-        // {
-          # TODO(@Artturin:) substitutions should be inside the env attrset
-          # but users are likely passing non-substitution arguments through substitutions
-          # turn off __structuredAttrs to unbreak substituteAll
-          inherit __structuredAttrs;
-          inherit meta;
-          inherit depsTargetTargetPropagated;
-          inherit propagatedBuildInputs;
-          inherit propagatedNativeBuildInputs;
-          # TODO 2023-01, no backport: simplify to inherit passthru;
-          passthru =
-            passthru
-            // optionalAttrs (substitutions ? passthru) (
-              warn "makeSetupHook (name = ${lib.strings.escapeNixString name}): `substitutions.passthru` is deprecated. Please set `passthru` directly." substitutions.passthru
-            );
-        }
-      )
+      {
+        env = builtins.mapAttrs (
+          # Force paths into the nix store, everything else needs to be coerced into bash suitable equivalent
+          _: v: if builtins.isPath v then "${v}" else toString v
+        ) substitutions;
+        inherit meta;
+        inherit depsTargetTargetPropagated;
+        inherit propagatedBuildInputs;
+        inherit propagatedNativeBuildInputs;
+        passthru =
+          passthru
+          // optionalAttrs (substitutions ? passthru) (
+            warn "makeSetupHook (name = ${lib.strings.escapeNixString name}): `substitutions.passthru` is deprecated. Please set `passthru` directly." substitutions.passthru
+          );
+      }
       (
         ''
           mkdir -p $out/nix-support
