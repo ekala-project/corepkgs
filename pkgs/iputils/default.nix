@@ -9,7 +9,7 @@
   libxslt,
   docbook-xsl-ns,
   libcap,
-  libidn2,
+  libidn,
   iproute2,
   libapparmor,
 }:
@@ -56,7 +56,7 @@ stdenv.mkDerivation rec {
     libxslt.bin
     docbook-xsl-ns
   ];
-  buildInputs = [ libcap ] ++ lib.optional (!stdenv.hostPlatform.isMusl) libidn2;
+  buildInputs = [ libcap ] ++ lib.optional (!stdenv.hostPlatform.isMusl) libidn.v2;
   nativeCheckInputs = [ iproute2 ];
 
   postInstall = ''
@@ -69,7 +69,7 @@ stdenv.mkDerivation rec {
       include <abstractions/nameservice>
       include "${
         apparmorRulesFromClosure { name = "ping"; } (
-          [ libcap ] ++ lib.optional (!stdenv.hostPlatform.isMusl) libidn2
+          [ libcap ] ++ lib.optional (!stdenv.hostPlatform.isMusl) libidn.v2
         )
       }"
       include <local/bin.ping>

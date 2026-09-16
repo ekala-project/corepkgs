@@ -4,7 +4,7 @@
   stdenv,
   libiconv,
   updateAutotoolsGnuConfigScriptsHook,
-  libidn2,
+  libidn,
 }:
 
 let
@@ -58,7 +58,7 @@ stdenv.mkDerivation (finalAttrs: {
   enableParallelChecking = false;
 
   passthru.tests = {
-    inherit libidn2;
+    inherit (libidn) v2;
   };
 
   meta = {

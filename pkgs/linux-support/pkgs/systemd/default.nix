@@ -40,7 +40,7 @@
   openssl,
   libgcrypt,
   libgpg-error,
-  libidn2,
+  libidn,
   curl,
   tar,
   gnupg,
@@ -391,7 +391,7 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optional withCryptsetup (lib.getDev cryptsetup.dev)
   ++ lib.optional withKexectools kexec-tools
   ++ lib.optional withKmod kmod
-  ++ lib.optional withLibidn2 libidn2
+  ++ lib.optional withLibidn2 libidn.v2
   ++ lib.optional withLibseccomp libseccomp
   ++ lib.optional withPam pam
   ++ lib.optional withPCRE2 pcre2

@@ -10,7 +10,7 @@
   gmp,
   buildPackages,
   automake,
-  libidn2,
+  libidn,
   libiconv,
   texinfo,
   dns-root-data,
@@ -147,7 +147,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     libtasn1
-    libidn2
+    libidn.v2
     zlib
     gmp
     libunistring

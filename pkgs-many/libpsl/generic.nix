@@ -16,7 +16,7 @@
   docbook-xml-dtd,
   gtk-doc,
   lzip,
-  libidn2,
+  libidn,
   libunistring,
   libxslt,
   pkg-config,
@@ -54,7 +54,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
-    libidn2
+    libidn.v2
     libunistring
   ]
   ++ lib.optionals buildDocs [

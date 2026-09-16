@@ -4,7 +4,7 @@
   fetchurl,
   pkg-config,
   nettle,
-  libidn2,
+  libidn,
   libnetfilter_conntrack,
   nftables,
   buildPackages,
@@ -79,7 +79,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [ pkg-config ];
   buildInputs = [
     nettle
-    libidn2
+    libidn.v2
   ]
   ++ lib.optionals dbusSupport [ dbus ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [

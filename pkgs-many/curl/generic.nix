@@ -41,7 +41,7 @@
   nghttp3,
   ngtcp2,
   ngtcp2-gnutls,
-  libidn2,
+  libidn,
   openldap,
   openssl,
   libpsl,
@@ -175,7 +175,7 @@ stdenv.mkDerivation (finalAttrs: {
       nghttp3
       (if gnutlsSupport then ngtcp2-gnutls else ngtcp2)
     ]
-    ++ lib.optional idnSupport libidn2
+    ++ lib.optional idnSupport libidn.v2
     ++ lib.optional ldapSupport openldap
     ++ lib.optional computedOpensslSupport openssl
     ++ lib.optional pslSupport libpsl.minimal
@@ -210,7 +210,7 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.withFeature pslSupport "libpsl")
     (lib.withFeatureAs brotliSupport "brotli" (lib.getDev brotli))
     (lib.withFeatureAs gnutlsSupport "gnutls" (lib.getDev gnutls))
-    (lib.withFeatureAs idnSupport "libidn2" (lib.getDev libidn2))
+    (lib.withFeatureAs idnSupport "libidn2" (lib.getDev libidn.v2))
     (lib.withFeatureAs computedOpensslSupport "openssl" (lib.getDev openssl))
     (lib.withFeatureAs computedScpSupport "libssh2" (lib.getDev libssh2))
     (lib.withFeatureAs wolfsslSupport "wolfssl" (lib.getDev wolfssl))
