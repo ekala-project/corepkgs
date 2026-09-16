@@ -130,7 +130,16 @@ let
             in
             makeScopeWithSplicing' {
               inherit otherSplices;
-              f = lib.extends autoCalledOverlay perlPackagesFun;
+              f =
+                let
+                  extensions = lib.composeManyExtensions (
+                    [
+                      autoCalledOverlay
+                    ]
+                    ++ config.overlays.perl
+                  );
+                in
+                lib.extends extensions perlPackagesFun;
             }
           )
           {
