@@ -34,4 +34,7 @@
 
   # Facter hardware auto-detection tests (pure eval, no VM)
   facter = import ./facter.nix { inherit pkgs; };
+
+  # Lightweight boot tests (no disk image, 9p nix store)
+  boot-to-multiuser = import ./boot-to-multiuser.nix { inherit pkgs; };
 }
