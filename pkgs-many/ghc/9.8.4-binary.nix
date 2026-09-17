@@ -454,6 +454,14 @@ stdenv.mkDerivation (finalAttrs: {
     # Our Cabal compiler name
     haskellCompilerName = "ghc-${version}";
 
+    # nixpkgs' GHCs expose this so that consumers needing a compiler on the
+    # build platform -- `writeShellApplication` runs shellcheck, a Haskell
+    # program, in its check phase -- can tell platforms where GHC works apart
+    # from platforms such as risc-v, where shellcheck is simply skipped.
+    # This bindist is prebuilt, so a compiler is available wherever its back
+    # end supports the platform.
+    bootstrapAvailable = import ./common-have-ncg.nix { inherit lib stdenv version; };
+
     # Normal GHC derivations expose the hadrian derivation used to build them
     # here. In the case of bindists we just make sure that the attribute exists,
     # as it is used for checking if a GHC derivation has been built with hadrian.
