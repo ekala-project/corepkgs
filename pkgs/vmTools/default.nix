@@ -17,7 +17,6 @@
   rpm,
   runCommand,
   util-linux,
-  virtiofsd,
   writeScript,
   writeText,
   xz,
@@ -40,7 +39,9 @@
     "virtio_balloon"
     "virtio_rng"
     "ext4"
-    "virtiofs"
+    "9p"
+    "9pnet"
+    "9pnet_virtio"
     "crc32c"
   ],
 }:
@@ -159,7 +160,7 @@ let
 
     echo "mounting Nix store..."
     mkdir -p /fs${storeDir}
-    mount -t virtiofs store /fs${storeDir}
+    mount -t 9p store /fs${storeDir} -o trans=virtio,version=9p2000.L,msize=131072,cache=loose
 
     mkdir -p /fs/tmp /fs/run /fs/var
     mount -t tmpfs -o "mode=1777" none /fs/tmp
@@ -168,7 +169,7 @@ let
 
     echo "mounting host's temporary directory..."
     mkdir -p /fs/tmp/xchg
-    mount -t virtiofs xchg /fs/tmp/xchg
+    mount -t 9p xchg /fs/tmp/xchg -o trans=virtio,version=9p2000.L,msize=131072
 
     mkdir -p /fs/proc
     mount -t proc none /fs/proc
@@ -256,10 +257,8 @@ let
     ${if (customQemu != null) then customQemu else (qemu-common.qemuBinary qemu)} \
       -nographic -no-reboot -vga none \
       -device virtio-rng-pci \
-      -chardev socket,id=store,path=virtio-store.sock \
-      -device vhost-user-fs-pci,chardev=store,tag=store \
-      -chardev socket,id=xchg,path=virtio-xchg.sock \
-      -device vhost-user-fs-pci,chardev=xchg,tag=xchg \
+      -virtfs local,path=${storeDir},security_model=none,mount_tag=store \
+      -virtfs local,path=xchg,security_model=none,mount_tag=xchg \
       ''${diskImage:+-drive file=$diskImage,if=virtio,cache=unsafe,werror=report,format=raw} \
       -kernel ${kernel}/${img} \
       -initrd ${initrd}/initrd \
@@ -301,15 +300,6 @@ let
       ${coreutils}/bin/cat > ./run-vm <<EOF
       #! ${bash}/bin/sh
       ''${diskImage:+diskImage=$diskImage}
-      # GitHub Actions runners seems to not allow installing seccomp filter: https://github.com/rcambrj/nix-pi-loader/issues/1#issuecomment-2605497516
-      # Since we are running in a sandbox already, the difference between seccomp and none is minimal
-      ${virtiofsd}/bin/virtiofsd --xattr --socket-path virtio-store.sock --sandbox none --seccomp none --shared-dir "${storeDir}" &
-      ${virtiofsd}/bin/virtiofsd --xattr --socket-path virtio-xchg.sock --sandbox none --seccomp none --shared-dir xchg &
-
-      # Wait until virtiofsd has created these sockets to avoid race condition.
-      until [[ -e virtio-store.sock ]]; do ${coreutils}/bin/sleep 1; done
-      until [[ -e virtio-xchg.sock ]]; do ${coreutils}/bin/sleep 1; done
-
       ${qemuCommand}
       EOF
 
