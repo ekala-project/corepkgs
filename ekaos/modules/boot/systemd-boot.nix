@@ -24,8 +24,29 @@ let
     configurationLimit = cfg.configurationLimit;
     inherit (cfg) consoleMode graceful;
 
-    inherit (config.boot.loader) efi;
+    efiSysMountPoint = config.boot.loader.efi.efiSysMountPoint;
+    bootMountPoint = cfg.xbootldrMountPoint or config.boot.loader.efi.efiSysMountPoint;
+    canTouchEfiVariables = if config.boot.loader.efi.canTouchEfiVariables then "True" else "False";
     efiType = builtins.toJSON config.boot.loader.efi.type;
+
+    checkMountpoints = pkgs.writeScript "check-mountpoints" ''
+      #!${pkgs.runtimeShell}
+      # Check that required mount points are mounted
+      for mp in "$@"; do
+        if ! mountpoint -q "$mp" 2>/dev/null; then
+          echo "Warning: $mp is not mounted" >&2
+        fi
+      done
+    '';
+    copyExtraFiles = pkgs.writeScript "copy-extra-files" ''
+      #!${pkgs.runtimeShell}
+      # No extra files to copy
+      true
+    '';
+    distroName = "ekaos";
+    nixosDir = "ekaos";
+    rebootForBitlocker = "False";
+    storeDir = builtins.storeDir;
 
     # bootspec tools (may need to be created or imported)
     bootspecTools = pkgs.writeScriptBin "synthesize" ''
