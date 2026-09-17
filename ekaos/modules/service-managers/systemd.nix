@@ -241,48 +241,40 @@ in
           '';
         }
 
-        # Preset policy: disable services that require extra configuration or
-        # dependencies not present in a minimal ekaos system.  The 00- prefix
-        # gives this file higher priority than the upstream 90-systemd.preset.
+        # Preset policy for first-boot unit enablement.  The 00- prefix gives
+        # this file higher priority than the upstream 90-systemd.preset.
+        #
+        # Services with ConditionXxx= that make them skip gracefully when not
+        # applicable (pcrlock, tpm2, pstore, sysext, oomd, boot-update, etc.)
+        # are left to the upstream preset — they simply won't run when their
+        # conditions aren't met.
+        #
+        # Services that need dedicated system users (resolved, networkd,
+        # timesyncd, oomd) are disabled here; the corresponding ekaos service
+        # modules create the users and enable the services when configured.
         {
           "systemd/system-preset/00-ekaos.preset".text = ''
-            # Core services we always want
-            enable systemd-journald.service
-            enable systemd-udevd.service
-            enable systemd-tmpfiles-setup.service
-            enable systemd-sysctl.service
-            enable getty@.service
-            enable serial-getty@.service
-
-            # Disable services that fail or hang without extra configuration
+            # Interactive first-boot wizard — hangs in unattended environments.
+            # ekaos pre-generates /etc/machine-id so ConditionFirstBoot=yes is
+            # never true, but disable explicitly as a safety net.
             disable systemd-firstboot.service
+
+            # These daemons run as dedicated users (systemd-resolve,
+            # systemd-network, systemd-timesync, systemd-oom) that must be
+            # created before the service starts.  The ekaos service modules
+            # (services.resolved, services.timesyncd, networking, etc.) handle
+            # user creation and re-enable the units when opted in.
             disable systemd-resolved.service
-            disable systemd-timesyncd.service
             disable systemd-networkd.service
             disable systemd-networkd-wait-online.service
-            disable systemd-homed.service
-            disable systemd-homed-activate.service
-            disable systemd-userdbd.socket
-            disable systemd-nsresourced.socket
+            disable systemd-timesyncd.service
             disable systemd-oomd.service
             disable systemd-oomd.socket
-            disable systemd-sysext.service
-            disable systemd-confext.service
-            disable systemd-pstore.service
-            disable systemd-boot-update.service
-            disable systemd-boot-clear-sysfail.service
-            disable systemd-network-generator.service
-            disable systemd-mountfsd.socket
-            disable systemd-tpm2-clear.service
-            disable systemd-pcrlock-firmware-code.service
-            disable systemd-pcrlock-firmware-config.service
-            disable systemd-pcrlock-file-system.service
-            disable systemd-pcrlock-machine-id.service
-            disable systemd-pcrlock-secureboot-authority.service
-            disable systemd-pcrlock-secureboot-policy.service
-            disable systemd-pcrlock-make-policy.service
 
-            # Let remaining services use upstream defaults
+            # homed manages encrypted home directories — opt-in feature that
+            # requires explicit configuration.
+            disable systemd-homed.service
+            disable systemd-homed-activate.service
           '';
         }
 
