@@ -71,5 +71,13 @@ in
         Overlays to be applied to each CUDA package set.
       '';
     };
+
+    overlays.linux = mkOption {
+      type = types.listOf overlayType;
+      default = [ ];
+      description = ''
+        Overlays to be applied to each Linux kernel packages set.
+      '';
+    };
   };
 }

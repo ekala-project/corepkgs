@@ -1,8 +1,5 @@
 {
   pkgs,
-  # This is meant to be be a list of overlays
-  # TODO(corepkgs): make a config.overlays.linux
-  kernelPackagesExtensions ? [ ],
   config,
   buildPackages,
   stdenv,
@@ -503,7 +500,7 @@ lib.makeScope pkgs.newScope (
           prl-tools = throw "Parallel Tools no longer provide any kernel module, please use pkgs.prl-tools instead."; # added 2025-10-04
         }
       )).extend
-        (lib.fixedPoints.composeManyExtensions kernelPackagesExtensions);
+        (lib.fixedPoints.composeManyExtensions config.overlays.linux);
 
     hardenedPackagesFor = kernel: overrides: packagesFor (hardenedKernelFor kernel overrides);
 
