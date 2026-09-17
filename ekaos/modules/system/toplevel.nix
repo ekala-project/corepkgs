@@ -65,9 +65,47 @@ let
     mkdir -p $out/bin
     cat > $out/bin/switch-to-configuration <<'WRAPPER'
     #!${pkgs.runtimeShell}
-    # Wrapper for ekaos activation (NixOS compatibility)
     set -e
     action="''${1:-switch}"
+
+    # Install bootloader when requested (e.g. during disk image creation)
+    if [ -n "$EKAOS_INSTALL_BOOTLOADER" ] || [ -n "$NIXOS_INSTALL_BOOTLOADER" ]; then
+      if [ -x $out/bin/install-bootloader ]; then
+        echo "Installing bootloader..."
+        $out/bin/install-bootloader $out || true
+      fi
+
+      # Write boot entry directly (fallback for fresh installs without generations)
+      bootMount="${config.boot.loader.efi.efiSysMountPoint}"
+      if [ -d "$bootMount" ] && [ ! -f "$bootMount/loader/entries/ekaos.conf" ]; then
+        echo "Writing boot entry..."
+        mkdir -p "$bootMount/ekaos" "$bootMount/loader/entries"
+
+        # Copy kernel
+        cp $out/extra-dependencies/kernel/${config.system.boot.loader.kernelFile} "$bootMount/ekaos/vmlinuz" 2>/dev/null || true
+
+        # Copy initrd if available
+        if [ -f "$out/initrd" ]; then
+          cp $out/initrd "$bootMount/ekaos/initrd"
+        fi
+
+        # Write loader config
+        cat > "$bootMount/loader/loader.conf" << 'LOADEREOF'
+    timeout 3
+    default ekaos.conf
+    editor no
+    LOADEREOF
+
+        # Write boot entry
+        cat > "$bootMount/loader/entries/ekaos.conf" << ENTRYEOF
+    title   ekaos
+    linux   /ekaos/vmlinuz
+    $([ -f "$out/initrd" ] && echo "initrd  /ekaos/initrd")
+    options init=$out/init ${toString config.boot.kernelParams}
+    ENTRYEOF
+      fi
+    fi
+
     exec $out/activate "$action"
     WRAPPER
     chmod +x $out/bin/switch-to-configuration
@@ -80,6 +118,11 @@ let
     ln -s ${config.system.build.etc}/etc $out/etc
     ln -s ${config.system.path} $out/sw
     ln -s ${config.systemd.package} $out/systemd
+
+    # Link bootloader installer if available
+    ${optionalString (config.system.build ? installBootLoader) ''
+      ln -s ${config.system.build.installBootLoader} $out/bin/install-bootloader
+    ''}
 
     # Write version information
     echo -n "${config.system.ekaos.version}" > $out/ekaos-version
@@ -170,39 +213,7 @@ let
     ''}
 
     # Generate bootspec (boot.json)
-    ${
-      let
-        hasUki = builtins.elem "uki" config.boot.loader.efi.type;
-        baseArgs = ''
-          --arg toplevel "$out" \
-          --arg init "$out/init"
-        '';
-        initrdArgs = optionalString config.boot.initrd.enable ''
-          --arg initrd "$out/initrd"
-        '';
-        ukiArgs = optionalString hasUki ''
-          --arg uki "$out/uki.efi"
-        '';
-        baseFilter = ''
-          ."org.nixos.bootspec.v1".toplevel = $toplevel |
-          ."org.nixos.bootspec.v1".init = $init
-        '';
-        initrdFilter = optionalString config.boot.initrd.enable ''
-          | ."org.nixos.bootspec.v1".initrd = $initrd
-        '';
-        ukiFilter = optionalString hasUki ''
-          | ."org.nixos.systemd-boot".uki = $uki
-        '';
-      in
-      ''
-        ${pkgs.jq}/bin/jq \
-          '${baseFilter}${initrdFilter}${ukiFilter}' \
-          ${baseArgs} \
-          ${initrdArgs} \
-          ${ukiArgs} \
-          < ${bootspecJson} > $out/boot.json
-      ''
-    }
+    ${pkgs.jq}/bin/jq --arg toplevel "$out" --arg init "$out/init" ${optionalString config.boot.initrd.enable ''--arg initrd "$out/initrd"''} '."org.nixos.bootspec.v1".toplevel = $toplevel | ."org.nixos.bootspec.v1".init = $init ${optionalString config.boot.initrd.enable ''| ."org.nixos.bootspec.v1".initrd = $initrd''}' < ${bootspecJson} > $out/boot.json
 
     # Create extra dependencies file for GC roots
     mkdir -p $out/extra-dependencies
