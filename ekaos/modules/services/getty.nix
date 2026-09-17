@@ -94,26 +94,16 @@ in
         ) (range 1 cfg.ttyCount)
       ))
 
-      # Create symlinks in wants directory to auto-start gettys
-      (listToAttrs (
-        map (
-          ttyNumber:
-          let
-            ttyName = "tty${toString ttyNumber}";
-          in
-          nameValuePair "systemd/system/multi-user.target.wants/getty@${ttyName}.service" {
-            source = "/dev/null"; # Placeholder - will be created by activation script
-          }
-        ) (range 1 cfg.ttyCount)
-      ))
+      # multi-user.target.wants/ symlinks are created by the getty activation script below
 
       # Ensure required systemd services are available
+      # Units live under example/ in the systemd package (moved from lib/ during build)
       {
         "systemd/system/systemd-vconsole-setup.service".source =
-          "${config.systemd.package}/lib/systemd/system/systemd-vconsole-setup.service";
+          "${config.systemd.package}/example/systemd/system/systemd-vconsole-setup.service";
 
         "systemd/system/systemd-user-sessions.service".source =
-          "${config.systemd.package}/lib/systemd/system/systemd-user-sessions.service";
+          "${config.systemd.package}/example/systemd/system/systemd-user-sessions.service";
       }
     ];
 

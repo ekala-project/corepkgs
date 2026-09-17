@@ -171,9 +171,10 @@ in
       ))
 
       # Symlink systemd-networkd service from systemd package
+      # Units live under example/ in the systemd package (moved from lib/ during build)
       {
         "systemd/system/systemd-networkd.service".source =
-          "${config.systemd.package}/lib/systemd/system/systemd-networkd.service";
+          "${config.systemd.package}/example/systemd/system/systemd-networkd.service";
       }
     ];
 
