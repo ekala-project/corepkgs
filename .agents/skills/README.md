@@ -10,6 +10,7 @@ directory containing a `SKILL.md` whose front matter declares when to load it.
 - **[mk-many-variants](mk-many-variants/SKILL.md)** - Multi-version packages in `pkgs-many`
 - **[packaging](packaging/SKILL.md)** - Packaging conventions
 - **[porting](porting/SKILL.md)** - Porting from nixpkgs
+- **[structured-attrs](structured-attrs/SKILL.md)** - Migrating bash to `__structuredAttrs = true`
 - **[validation](validation/SKILL.md)** - Validation procedures
 
 ## Usage
