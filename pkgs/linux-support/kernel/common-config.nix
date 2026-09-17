@@ -329,7 +329,7 @@ let
       IPV6_MROUTE = yes;
       IPV6_MROUTE_MULTIPLE_TABLES = yes;
       IPV6_PIMSM_V2 = yes;
-      IPV6_FOU_TUNNEL = module;
+      IPV6_FOU_TUNNEL = option module;
       IPV6_SEG6_LWTUNNEL = yes;
       IPV6_SEG6_HMAC = yes;
       IPV6_SEG6_BPF = yes;
