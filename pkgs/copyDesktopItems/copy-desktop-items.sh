@@ -24,14 +24,12 @@ postInstallHooks+=(copyDesktopItems)
 copyDesktopItems() {
     if [ "${dontCopyDesktopItems-}" = 1 ]; then return; fi
 
-    if [ -z "$desktopItems" ]; then
+    if [ "${#desktopItems[@]}" -eq 0 ]; then
         return
     fi
 
-    concatTo desktopItemsArray desktopItems
-
     applications="${!outputBin}/share/applications"
-    for desktopItem in "${desktopItemsArray[@]}"; do
+    for desktopItem in "${desktopItems[@]}"; do
         if [[ -f "$desktopItem" ]]; then
             echo "Copying '$desktopItem' into '${applications}'"
             install -D -m 444 -t "${applications}" "$desktopItem"

@@ -91,10 +91,10 @@ finish() {
 
 tryHashedMirrors() {
     if test -n "$NIX_HASHED_MIRRORS"; then
-        hashedMirrors="$NIX_HASHED_MIRRORS"
+        hashedMirrors=($NIX_HASHED_MIRRORS)
     fi
 
-    for mirror in $hashedMirrors; do
+    for mirror in "${hashedMirrors[@]}"; do
         url="$mirror/$outputHashAlgo/$outputHash"
         if "${curl[@]}" --retry 0 --connect-timeout "${NIX_CONNECT_TIMEOUT:-15}" \
             --fail --silent --show-error --head "$url" \
