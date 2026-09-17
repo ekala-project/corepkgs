@@ -75,7 +75,7 @@ mesonCheckPhase() {
         buildCores="$NIX_BUILD_CORES"
     fi
 
-    TERM=dumb ninja -j"$buildCores" $ninjaFlags "${ninjaFlagsArray[@]}" meson-test-prereq
+    TERM=dumb ninja -j"$buildCores" "${ninjaFlags[@]}" "${ninjaFlagsArray[@]}" meson-test-prereq
 
     echoCmd 'mesonCheckPhase flags' "${flagsArray[@]}"
     meson test --no-rebuild --print-errorlogs --max-lines=1000000 "${flagsArray[@]}"

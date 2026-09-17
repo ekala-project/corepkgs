@@ -24,12 +24,12 @@ postInstallHooks+=(copyPkgconfigItems)
 copyPkgconfigItems() {
     if [ "${dontCopyPkgconfigItems-}" = 1 ]; then return; fi
 
-    if [ -z "$pkgconfigItems" ]; then
+    if [ "${#pkgconfigItems[@]}" -eq 0 ]; then
         return
     fi
 
     pkgconfigdir="${!outputDev}/lib/pkgconfig"
-    for pkgconfigItem in $pkgconfigItems; do
+    for pkgconfigItem in "${pkgconfigItems[@]}"; do
         if [[ -f "$pkgconfigItem" ]]; then
             substituteAllInPlace "$pkgconfigItem"
             echo "Copying '$pkgconfigItem' into '${pkgconfigdir}'"

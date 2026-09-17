@@ -2,11 +2,11 @@
 # exist. Because the rest of the script assumes it does exist, we
 # handle this special case first.
 if ! test -d "$kernel/lib/modules"; then
-    if test -z "$rootModules" || test -n "$allowMissing"; then
+    if [ "${#rootModules[@]}" -eq 0 ] || test -n "$allowMissing"; then
         mkdir -p "$out"
         exit 0
     else
-        echo "Required modules: $rootModules"
+        echo "Required modules: ${rootModules[*]}"
         echo "Can not derive a closure of kernel modules because no modules were provided."
         exit 1
     fi
@@ -19,7 +19,7 @@ echo "kernel version is $version"
 # Determine the dependencies of each root module.
 mkdir -p $out/lib/modules/"$version"
 touch closure
-for module in $rootModules; do
+for module in "${rootModules[@]}"; do
     echo "root module: $module"
     modprobe --config no-config -d $kernel --set-version "$version" --show-depends "$module" \
     | while read cmd module args; do
@@ -87,7 +87,7 @@ for module in $(< ~-/closure); do
     done || :
 done
 
-for path in $extraFirmwarePaths; do
+for path in "${extraFirmwarePaths[@]}"; do
     mkdir -p $(dirname $out/lib/firmware/$path)
     for name in "$path" "$path.xz" "$path.zst" ""; do
         if cp -v --parents --no-preserve=mode lib/firmware/$name "$out" 2>/dev/null; then
