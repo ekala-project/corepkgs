@@ -147,7 +147,12 @@ lib.makeScope pkgs.newScope (
         in
         {
           inherit callPackage;
-          kernel = kernel_;
+          kernel = kernel_.overrideAttrs (oldAttrs: {
+            passthru = (oldAttrs.passthru or { }) // {
+              makeInitrd = pkgs.callPackage ../../pkgs-many/linux/makeInitrd;
+              makeModulesClosure = pkgs.callPackage ../../pkgs-many/linux/makeModulesClosure;
+            };
+          });
           inherit (kernel) stdenv; # in particular, use the same compiler by default
 
           # to help determine module compatibility

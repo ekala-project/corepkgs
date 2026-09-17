@@ -388,6 +388,7 @@ let
       util-linux
       parted
       e2fsprogs
+      dosfstools
       lkl
       config.system.build.nixos-install
       nixos-enter
@@ -758,7 +759,7 @@ let
           # nix builds in the target image if sandboxing is turned off (through
           # __noChroot for example).
           export HOME=$TMPDIR
-          NIXOS_INSTALL_BOOTLOADER=1 nixos-enter --root $mountPoint -- /nix/var/nix/profiles/system/bin/switch-to-configuration boot
+          nixos-enter --root $mountPoint -- /bin/sh -c 'EKAOS_INSTALL_BOOTLOADER=1 /nix/var/nix/profiles/system/bin/switch-to-configuration boot'
         ''}
 
         # Set the ownerships of the contents. The modes are set in preVM.

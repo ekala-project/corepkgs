@@ -42,3 +42,9 @@ in
     etc
     ;
 }
+// lib.optionalAttrs (eval.config.virtualisation.enable or false) {
+  inherit (eval.config.system.build) diskImage vm;
+}
+// lib.optionalAttrs (eval.config.isoImage.enable or false) {
+  inherit (eval.config.system.build) isoImage;
+}

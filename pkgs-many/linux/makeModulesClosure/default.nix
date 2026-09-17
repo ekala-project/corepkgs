@@ -15,6 +15,7 @@
 }:
 
 stdenvNoCC.mkDerivation {
+  __structuredAttrs = false;
   name = kernel.name + "-shrunk";
   builder = ./modules-closure.sh;
   nativeBuildInputs = [

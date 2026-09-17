@@ -15,6 +15,9 @@ let
     #!${pkgs.runtimeShell}
     set -e
 
+    # Set PATH to include essential system utilities
+    export PATH=${pkgs.coreutils}/bin:${pkgs.util-linux}/bin:${pkgs.systemd}/bin:${config.system.path}/bin:${config.system.path}/sbin:/bin:/sbin
+
     echo "${config.boot.stage2Greeting}"
 
     # Get the system configuration path
@@ -72,7 +75,8 @@ let
     # Start systemd as PID 1
     echo "Starting systemd..."
     ${optionalString (config.boot.extraSystemdUnitPaths != [ ]) ''
-      export SYSTEMD_UNIT_PATH="''${SYSTEMD_UNIT_PATH:+$SYSTEMD_UNIT_PATH:}${concatStringsSep ":" config.boot.extraSystemdUnitPaths}"
+      # Trailing colon means "append to default search path" rather than replace
+      export SYSTEMD_UNIT_PATH="${concatStringsSep ":" config.boot.extraSystemdUnitPaths}:"
     ''}
     exec ${config.systemd.package}/lib/systemd/systemd
   '';

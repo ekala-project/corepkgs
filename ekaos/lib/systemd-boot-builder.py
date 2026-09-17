@@ -34,12 +34,11 @@ GRACEFUL = "@graceful@"
 COPY_EXTRA_FILES = "@copyExtraFiles@"
 CHECK_MOUNTPOINTS = "@checkMountpoints@"
 STORE_DIR = "@storeDir@"
-EFI_TYPE = json.loads("@efiType@")  # e.g. ["efi"] or ["uki"] or ["efi", "uki"]
+EFI_TYPE = json.loads('@efiType@')  # e.g. ["efi"] or ["uki"] or ["efi", "uki"]
 
 @dataclass
 class BootSpec:
     init: Path
-    initrd: Path
     kernel: Path
     kernelParams: list[str]  # noqa: N815
     label: str
@@ -47,6 +46,7 @@ class BootSpec:
     toplevel: Path
     specialisations: dict[str, "BootSpec"]
     sortKey: str  # noqa: N815
+    initrd: Path | None = None
     devicetree: Path | None = None  # noqa: N815
     initrdSecrets: str | None = None  # noqa: N815
     uki: Path | None = None
@@ -90,8 +90,7 @@ BOOT_ENTRY = """title {title}
 sort-key {sort_key}
 version Generation {generation} {description}
 linux {kernel}
-initrd {initrd}
-options {kernel_params}
+{initrd_line}options {kernel_params}
 """
 
 def generation_conf_filename(profile: str | None, generation: int, specialisation: str | None) -> str:
@@ -167,6 +166,11 @@ def bootspec_from_json(bootspec_json: dict[str, Any]) -> BootSpec:
     for attr in ("kernel", "initrd", "toplevel"):
         if attr in main_json:
             main_json[attr] = Path(main_json[attr])
+    # Remove fields not in the BootSpec dataclass
+    known_fields = {f.name for f in BootSpec.__dataclass_fields__.values()}
+    extra_keys = set(main_json.keys()) - known_fields
+    for k in extra_keys:
+        main_json.pop(k)
     return BootSpec(
         **main_json,
         specialisations=specialisations,
@@ -194,7 +198,7 @@ def write_entry(profile: str | None, generation: int, specialisation: str | None
     if specialisation:
         bootspec = bootspec.specialisations[specialisation]
     kernel = copy_from_file(bootspec.kernel)
-    initrd = copy_from_file(bootspec.initrd)
+    initrd = copy_from_file(bootspec.initrd) if bootspec.initrd is not None else None
     devicetree = copy_from_file(bootspec.devicetree) if bootspec.devicetree is not None else None
 
     title = "{name}{profile}{specialisation}".format(
@@ -227,7 +231,7 @@ def write_entry(profile: str | None, generation: int, specialisation: str | None
                     sort_key=bootspec.sortKey,
                     generation=generation,
                     kernel=f"/{kernel}",
-                    initrd=f"/{initrd}",
+                    initrd_line=f"initrd /{initrd}\n" if initrd is not None else "",
                     kernel_params=kernel_params,
                     description=f"{bootspec.label}, built on {build_date}"))
         if machine_id is not None:
@@ -296,7 +300,8 @@ def remove_old_entries(gens: list[SystemIdentifier]) -> None:
     for gen in gens:
         bootspec = get_bootspec(gen.profile, gen.generation)
         known_paths.append(copy_from_file(bootspec.kernel, True).name)
-        known_paths.append(copy_from_file(bootspec.initrd, True).name)
+        if bootspec.initrd is not None:
+            known_paths.append(copy_from_file(bootspec.initrd, True).name)
         if bootspec.devicetree is not None:
             known_paths.append(copy_from_file(bootspec.devicetree, True).name)
 
@@ -374,7 +379,7 @@ def install_bootloader(args: argparse.Namespace) -> None:
     if GRACEFUL == "1":
         bootctl_flags.append("--graceful")
 
-    if os.getenv("NIXOS_INSTALL_BOOTLOADER") == "1":
+    if os.getenv("EKAOS_INSTALL_BOOTLOADER") == "1" or os.getenv("NIXOS_INSTALL_BOOTLOADER") == "1":
         # bootctl uses fopen() with modes "wxe" and fails if the file exists.
         LOADER_CONF.unlink(missing_ok=True)
 
