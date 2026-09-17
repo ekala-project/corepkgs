@@ -44,11 +44,7 @@ else
 fi
 
 getAllOutputNames() {
-    if [ -n "$__structuredAttrs" ]; then
-        echo "${!outputs[*]}"
-    else
-        echo "$outputs"
-    fi
+    echo "${!outputs[*]}"
 }
 
 # All provided arguments are joined with a space, then prefixed by the name of the function which invoked `nixLog` (or
@@ -349,77 +345,42 @@ addToSearchPath() {
     addToSearchPathWithCustomDelimiter ":" "$@"
 }
 
-# Prepend elements to variable "$1", which may come from an attr.
-#
-# This is useful in generic setup code, which must (for now) support
-# both derivations with and without __structuredAttrs true, so the
-# variable may be an array or a space-separated string.
-#
-# Expressions for individual packages should simply switch to array
-# syntax when they switch to setting __structuredAttrs = true.
+# Prepend elements to the array variable "$1".
 prependToVar() {
     local -n nameref="$1"
-    local useArray type
 
-    if [ -n "$__structuredAttrs" ]; then
-        useArray=true
-    else
-        useArray=false
-    fi
-
-    # check if variable already exist and if it does then do extra checks
+    # check if variable already exists and if it does then do extra checks
+    local type
     if type=$(declare -p "$1" 2> /dev/null); then
         case "${type#* }" in
             -A*)
                 echo "prependToVar(): ERROR: trying to use prependToVar on an associative array." >&2
                 return 1 ;;
-            -a*)
-                useArray=true ;;
-            *)
-                useArray=false ;;
         esac
     fi
 
     shift
 
-    if $useArray; then
-        nameref=( "$@" ${nameref+"${nameref[@]}"} )
-    else
-        nameref="$* ${nameref-}"
-    fi
+    nameref=( "$@" ${nameref+"${nameref[@]}"} )
 }
 
-# Same as above
+# Append elements to the array variable "$1".
 appendToVar() {
     local -n nameref="$1"
-    local useArray type
 
-    if [ -n "$__structuredAttrs" ]; then
-        useArray=true
-    else
-        useArray=false
-    fi
-
-    # check if variable already exist and if it does then do extra checks
+    # check if variable already exists and if it does then do extra checks
+    local type
     if type=$(declare -p "$1" 2> /dev/null); then
         case "${type#* }" in
             -A*)
                 echo "appendToVar(): ERROR: trying to use appendToVar on an associative array, use variable+=([\"X\"]=\"Y\") instead." >&2
                 return 1 ;;
-            -a*)
-                useArray=true ;;
-            *)
-                useArray=false ;;
         esac
     fi
 
     shift
 
-    if $useArray; then
-        nameref=( ${nameref+"${nameref[@]}"} "$@" )
-    else
-        nameref="${nameref-} $*"
-    fi
+    nameref=( ${nameref+"${nameref[@]}"} "$@" )
 }
 
 # Accumulate flags from the named variables $2+ into the indexed array $1.
