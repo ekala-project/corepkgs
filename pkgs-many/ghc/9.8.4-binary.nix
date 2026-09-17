@@ -11,6 +11,7 @@
   coreutils,
   targetPackages,
   runCommand,
+  replaceVarsWith,
 
   # minimal = true; will remove files that aren't strictly necessary for
   # regular builds and GHC bootstrapping.
@@ -203,6 +204,15 @@ let
     targetPackages.stdenv.cc.bintools.bintools
   ];
 
+  # Darwin's GHC is pointed at a gcc-compatible clang wrapper; its shebang is
+  # the `@shell@` placeholder, which has to be substituted before configure can
+  # execute it (nixpkgs does the same in its 8.2.2-binary.nix).
+  gccClangWrapper = replaceVarsWith {
+    src = ./gcc-clang-wrapper.sh;
+    isExecutable = true;
+    replacements = { inherit (stdenv) shell; };
+  };
+
 in
 
 stdenv.mkDerivation (finalAttrs: {
@@ -321,7 +331,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   configurePlatforms = [ ];
   configureFlags =
-    lib.optional stdenv.hostPlatform.isDarwin "--with-gcc=${./gcc-clang-wrapper.sh}"
+    lib.optional stdenv.hostPlatform.isDarwin "--with-gcc=${gccClangWrapper}"
     # From: https://github.com/NixOS/nixpkgs/pull/43369/commits
     ++ lib.optional stdenv.hostPlatform.isMusl "--disable-ld-override";
 
