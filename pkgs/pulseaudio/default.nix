@@ -1,0 +1,259 @@
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fetchpatch2,
+  pkg-config,
+  # TODO(corepkgs): Port libsndfile for audio file format support
+  # libsndfile,
+  libtool,
+  makeWrapper,
+  perlPackages,
+  libxtst,
+  libxi,
+  libx11,
+  libsm,
+  libice,
+  libcap,
+  alsa-lib,
+  glib,
+  dconf,
+  # TODO(corepkgs): Port libasyncns for async name resolution
+  # libasyncns,
+  dbus,
+  udev,
+  udevCheckHook,
+  openssl,
+  fftwFloat,
+  soxr,
+  # TODO(corepkgs): Port speexdsp for resampling support
+  # speexdsp,
+  systemd,
+  # TODO(corepkgs): Port webrtc-audio-processing for echo cancellation
+  # webrtc-audio-processing_1,
+  check,
+  meson,
+  ninja,
+  m4,
+
+  x11Support ? false,
+
+  useSystemd ? lib.meta.availableOn stdenv.hostPlatform systemd,
+
+  # Whether to build the OSS wrapper ("padsp").
+  ossWrapper ? true,
+
+  airtunesSupport ? false,
+
+  # TODO(corepkgs): Port bluez5 and sbc for bluetooth support
+  bluetoothSupport ? false,
+
+  alsaSupport ? stdenv.hostPlatform.isLinux,
+  udevSupport ? stdenv.hostPlatform.isLinux,
+
+  # Whether to build only the library.
+  libOnly ? false,
+}:
+
+stdenv.mkDerivation (finalAttrs: {
+  pname = "${lib.optionalString libOnly "lib"}pulseaudio";
+  version = "17.0";
+
+  src = fetchurl {
+    url = "https://freedesktop.org/software/pulseaudio/releases/pulseaudio-${finalAttrs.version}.tar.xz";
+    hash = "sha256-BTeU1mcaPjl9hJ5HioC4KmPLnYyilr01tzMXu1zrh7U=";
+  };
+
+  patches = [
+    # Install sysconfdir files inside of the nix store,
+    # but use a conventional runtime sysconfdir outside the store
+    ./add-option-for-installation-sysconfdir.patch
+
+    # Fix crashes with some UCM devices
+    # See https://gitlab.archlinux.org/archlinux/packaging/packages/pulseaudio/-/issues/4
+    (fetchpatch2 {
+      name = "alsa-ucm-Check-UCM-verb-before-working-with-device-status.patch";
+      url = "https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/commit/f5cacd94abcc47003bd88ad7ca1450de649ffb15.patch";
+      hash = "sha256-WyEqCitrqic2n5nNHeVS10vvGy5IzwObPPXftZKy/A8=";
+    })
+    (fetchpatch2 {
+      name = "alsa-ucm-Replace-port-device-UCM-context-assertion-with-an-error.patch";
+      url = "https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/commit/ed3d4f0837f670e5e5afb1afa5bcfc8ff05d3407.patch";
+      hash = "sha256-fMJ3EYq56sHx+zTrG6osvI/QgnhqLvWiifZxrRLMvns=";
+    })
+  ];
+
+  postPatch = ''
+    # Fails in LXC containers where not all cores are enabled, where this setaffinity call will return EINVAL
+    sed -i "/fail_unless(pthread_setaffinity_np/d" src/tests/once-test.c
+  '';
+
+  outputs = [
+    "out"
+    "dev"
+  ];
+
+  nativeBuildInputs = [
+    pkg-config
+    meson
+    meson.configurePhaseHook
+    ninja
+    makeWrapper
+    perlPackages.perl
+    perlPackages.XMLParser
+    m4
+    udevCheckHook
+  ]
+  ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [ glib ];
+
+  propagatedBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ libcap ];
+
+  buildInputs = [
+    libtool
+    # TODO(corepkgs): Port libsndfile — required for audio file I/O
+    # libsndfile
+    soxr
+    # TODO(corepkgs): Port speexdsp — used for resampling
+    # speexdsp
+    fftwFloat
+    check
+  ]
+  ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [
+    glib
+    dbus
+  ]
+  ++ lib.optionals (!libOnly) (
+    [
+      # TODO(corepkgs): Port libasyncns for async name resolution
+      # libasyncns
+      # TODO(corepkgs): Port webrtc-audio-processing_1 for echo cancellation
+      # webrtc-audio-processing_1
+    ]
+    ++ lib.optionals x11Support [
+      libice
+      libsm
+      libx11
+      libxi
+      libxtst
+    ]
+    ++ lib.optional useSystemd systemd
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      alsa-lib
+      udev
+    ]
+    ++ lib.optional airtunesSupport openssl
+  );
+
+  env =
+    lib.optionalAttrs (stdenv.cc.bintools.isLLVM && lib.versionAtLeast stdenv.cc.bintools.version "17")
+      {
+        # https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/issues/3848
+        NIX_LDFLAGS = "--undefined-version";
+      };
+
+  mesonFlags = [
+    (lib.mesonEnable "alsa" (!libOnly && alsaSupport))
+    # TODO(corepkgs): Re-enable when libasyncns is ported
+    (lib.mesonEnable "asyncns" false)
+    (lib.mesonEnable "avahi" false)
+    (lib.mesonEnable "bluez5" false)
+    (lib.mesonEnable "bluez5-gstreamer" false)
+    (lib.mesonOption "database" "simple")
+    (lib.mesonBool "doxygen" false)
+    (lib.mesonEnable "elogind" false)
+    # gsettings does not support cross-compilation
+    (lib.mesonEnable "gsettings" (
+      stdenv.hostPlatform.isLinux && (stdenv.buildPlatform == stdenv.hostPlatform)
+    ))
+    (lib.mesonEnable "gstreamer" false)
+    (lib.mesonEnable "gtk" false)
+    # TODO(corepkgs): Re-enable when libjack2 is ported
+    (lib.mesonEnable "jack" false)
+    # TODO(corepkgs): Re-enable when lirc is ported
+    (lib.mesonEnable "lirc" false)
+    (lib.mesonEnable "openssl" airtunesSupport)
+    (lib.mesonEnable "orc" false)
+    (lib.mesonEnable "systemd" (useSystemd && !libOnly))
+    (lib.mesonEnable "tcpwrap" false)
+    (lib.mesonEnable "udev" (!libOnly && udevSupport))
+    (lib.mesonEnable "valgrind" false)
+    # TODO(corepkgs): Re-enable when webrtc-audio-processing_1 is ported
+    (lib.mesonEnable "webrtc-aec" false)
+    (lib.mesonEnable "x11" x11Support)
+
+    (lib.mesonOption "localstatedir" "/var")
+    (lib.mesonOption "sysconfdir" "/etc")
+    (lib.mesonOption "sysconfdir_install" "${placeholder "out"}/etc")
+    (lib.mesonOption "udevrulesdir" "${placeholder "out"}/lib/udev/rules.d")
+
+    # pulseaudio complains if its binary is moved after installation;
+    # this is needed so that wrapGApp can operate *without*
+    # renaming the unwrapped binaries (see below)
+    "--bindir=${placeholder "out"}/.bin-unwrapped"
+  ]
+  ++ lib.optionals (stdenv.hostPlatform.isLinux && useSystemd) [
+    (lib.mesonOption "systemduserunitdir" "${placeholder "out"}/lib/systemd/user")
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    (lib.mesonEnable "consolekit" false)
+    (lib.mesonEnable "dbus" false)
+    (lib.mesonEnable "glib" false)
+    (lib.mesonEnable "oss-output" false)
+  ];
+
+  preCheck = ''
+    export HOME=$(mktemp -d)
+  '';
+
+  postInstall =
+    lib.optionalString libOnly ''
+      find $out/share -maxdepth 1 -mindepth 1 ! -name "vala" -prune -exec rm -r {} \;
+      find $out/share/vala -maxdepth 1 -mindepth 1 ! -name "vapi" -prune -exec rm -r {} \;
+      rm -r $out/{.bin-unwrapped,etc,lib/pulse-*}
+    ''
+    + ''
+      moveToOutput lib/cmake "$dev"
+      rm -f $out/.bin-unwrapped/qpaeq # this is packaged by the "qpaeq" package now, because of missing deps
+
+      cp config.h $dev/include/pulse
+    '';
+
+  preFixup =
+    lib.optionalString (stdenv.hostPlatform.isLinux && (stdenv.hostPlatform == stdenv.buildPlatform)) ''
+      wrapProgram $out/libexec/pulse/gsettings-helper \
+       --prefix XDG_DATA_DIRS : "$out/share/gsettings-schemas/${finalAttrs.pname}-${finalAttrs.version}" \
+       --prefix GIO_EXTRA_MODULES : "${lib.getLib dconf}/lib/gio/modules"
+    ''
+    # put symlinks to binaries in `$prefix/bin`;
+    # when pulseaudio is looking for its own binary (it does!),
+    # it will be happy to find it in its original installation location
+    + lib.optionalString (!libOnly) ''
+      mkdir -p $out/bin
+      ln -st $out/bin $out/.bin-unwrapped/*
+
+      # Ensure that service files use the wrapped binaries.
+      find "$out" -name "*.service" | while read f; do
+          substituteInPlace "$f" --replace "$out/.bin-unwrapped/" "$out/bin/"
+      done
+    '';
+
+  meta = {
+    description = "Sound server for POSIX and Win32 systems";
+    homepage = "http://www.pulseaudio.org/";
+    license = lib.licenses.lgpl2Plus;
+    platforms = lib.platforms.unix;
+
+    # https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/issues/1089
+    badPlatforms = [ lib.systems.inspect.platformPatterns.isStatic ];
+
+    longDescription = ''
+      PulseAudio is a sound server for POSIX and Win32 systems.  A
+      sound server is basically a proxy for your sound applications.
+      It allows you to do advanced operations on your sound data as it
+      passes between your application and your hardware.  Things like
+      transferring the audio to a different machine, changing the
+      sample format or channel count and mixing several sounds into
+      one are easily achieved using a sound server.
+    '';
+  };
+})

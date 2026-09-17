@@ -1074,6 +1074,10 @@ with final;
   # Variants: libpng.v1_2, libpng.v1_6 (default)
   libpng12 = prev.libpng.v1_2;
 
+  libpulseaudio = prev.pulseaudio.override {
+    libOnly = true;
+  };
+
   genericUpdater = callPackage ./pkgs/common-updater-scripts/generic-updater.nix { };
   _experimental-update-script-combinators =
     callPackage ./pkgs/common-updater-scripts/combinators.nix
