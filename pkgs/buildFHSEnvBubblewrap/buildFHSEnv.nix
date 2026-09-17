@@ -74,7 +74,7 @@ let
     coreutils
     less
     shadow
-    shadow
+    su
     gawk
     diffutils
     findutils
@@ -219,6 +219,7 @@ let
   rootfs =
     pkgs.runCommand "${name}-fhsenv-rootfs"
       {
+        __structuredAttrs = true;
         exportReferencesGraph.graph = lib.concatMap (p: p.paths) allPaths;
         inherit
           paths

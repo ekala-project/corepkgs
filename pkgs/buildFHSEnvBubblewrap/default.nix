@@ -345,6 +345,10 @@ lib.makeOverridable (
           ${finalAttrs.extraInstallCommands or ""}
         '';
 
+        __structuredAttrs = true;
+        strictDeps = true;
+
+        enableParallelBuilding = true;
         preferLocalBuild = true;
         allowSubstitutes = false;
 
