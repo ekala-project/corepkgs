@@ -20,6 +20,7 @@ changes differ significantly from whath one would expct with Nixpkgs.
 
 ## Package paradigms
 
+- `__structuredAttrs = true` is the default — derivation attributes are arrays, not space-separated strings.
 - setupHooks for build managers are now explicit and opt-in.
   - `meson.configurePhaseHook` and `cmake.configurePhaseHook` now needs to be specified.
 - `mesonBuildType` defaults to `release` instead of Nixpkgs' `plain`.

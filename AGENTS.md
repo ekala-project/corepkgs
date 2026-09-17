@@ -9,6 +9,7 @@ This document provides high-level guidelines for AI agents working with the core
 - [`.agents/skills/validation/SKILL.md`](.agents/skills/validation/SKILL.md) - Validation and testing, including troubleshooting and advanced validation
 - [`.agents/skills/porting/SKILL.md`](.agents/skills/porting/SKILL.md) - Porting from nixpkgs, including complete examples and best practices
 - [`.agents/skills/mk-many-variants/SKILL.md`](.agents/skills/mk-many-variants/SKILL.md) - Multi-version packages in pkgs-many
+- [`.agents/skills/structured-attrs/SKILL.md`](.agents/skills/structured-attrs/SKILL.md) - Migrating bash to `__structuredAttrs = true`
 - [`docs/common-issues/`](docs/common-issues/README.md) - Fixing build failures after version updates
 
 ## Package Organization
