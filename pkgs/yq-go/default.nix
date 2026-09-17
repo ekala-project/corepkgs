@@ -25,10 +25,13 @@ buildGoModule (finalAttrs: {
   vendorHash = "sha256-q/khSpZgo8D3K8adjI56Xj943vdWbGgnzG619NWrLY0=";
 
   # TestFormatStringFromFilename expects "unknown" for unrecognized extensions,
-  # but upstream changed the default to "yaml"
+  # but upstream changed the default to "yaml". Go's regexp engine has no
+  # negative lookahead, so asking for the complement of that one test with
+  # `-run` fails every check with "invalid regexp for element 0 of -test.run";
+  # `-skip` says the same thing in the syntax Go accepts.
   checkFlags = [
-    "-run"
-    "^(?!TestFormatStringFromFilename$)"
+    "-skip"
+    "TestFormatStringFromFilename"
   ];
 
   nativeBuildInputs = lib.optionals (stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
