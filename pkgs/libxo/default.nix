@@ -57,8 +57,6 @@ stdenv.mkDerivation (finalAttrs: {
     patchShebangs --host "$out/bin"
   '';
 
-  __structuredAttrs = true;
-
   meta = {
     description = "Library to generate text, XML, JSON, and HTML";
     homepage = "https://github.com/Juniper/libxo";

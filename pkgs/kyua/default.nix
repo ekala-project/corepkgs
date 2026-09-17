@@ -103,8 +103,6 @@ stdenv.mkDerivation (finalAttrs: {
     runHook postInstallCheck
   '';
 
-  __structuredAttrs = true;
-
   meta = {
     description = "Testing framework for infrastructure software";
     homepage = "https://github.com/freebsd/kyua/";
