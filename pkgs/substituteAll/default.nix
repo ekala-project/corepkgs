@@ -46,9 +46,9 @@ stdenvNoCC.mkDerivation (
     inherit src;
     preferLocalBuild = true;
     allowSubstitutes = false;
-    # `substitutions` is a known mkDerivation conflict point and the stdenv's
-    # `substituteAll` reads variables straight from the environment, so we
-    # don't need to do anything special here.
+    # structuredAttrs breaks the traditional substituteAll approach since
+    # variables aren't exported to the environment. Disable it here.
+    __structuredAttrs = false;
     builder = ./substitute-all-builder.sh;
   }
   // builtins.removeAttrs args [ "src" ]
