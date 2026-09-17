@@ -3,12 +3,8 @@
 preFixupHooks+=(_moveToShare)
 
 _moveToShare() {
-    if [ -n "$__structuredAttrs" ]; then
-        if [ -z "${forceShare-}" ]; then
-            forceShare=( man doc info )
-        fi
-    else
-        forceShare=( ${forceShare:-man doc info} )
+    if [ -z "${forceShare-}" ]; then
+        forceShare=( man doc info )
     fi
 
     if [[ -z "$out" ]]; then return; fi
