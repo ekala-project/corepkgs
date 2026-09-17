@@ -1,0 +1,62 @@
+{
+  lib,
+  acl,
+  attr,
+  autoreconfHook,
+  bzip2,
+  fetchFromGitea,
+  libburn,
+  libcdio,
+  libiconv,
+  libisofs,
+  pkg-config,
+  readline,
+  stdenv,
+  zlib,
+}:
+
+stdenv.mkDerivation (finalAttrs: {
+  pname = "libisoburn";
+  version = "1.5.8.pl02";
+
+  src = fetchFromGitea {
+    domain = "dev.lovelyhq.com";
+    owner = "libburnia";
+    repo = "libisoburn";
+    rev = "release-${finalAttrs.version}";
+    hash = "sha256-wYX2foI0YXrhVENz8QqfS9IdXwbsHP7rqYOWzlo8FdM=";
+  };
+
+  nativeBuildInputs = [
+    autoreconfHook
+    pkg-config
+  ];
+
+  buildInputs = [
+    bzip2
+    libcdio
+    libiconv
+    readline
+    zlib
+    libburn
+    libisofs
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    acl
+    attr
+  ];
+
+  propagatedBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
+    acl
+  ];
+
+  strictDeps = true;
+
+  meta = {
+    homepage = "http://libburnia-project.org/";
+    description = "Enables creation and expansion of ISO-9660 filesystems on CD/DVD/BD";
+    license = lib.licenses.gpl2Plus;
+    mainProgram = "osirrox";
+    inherit (libisofs.meta) platforms;
+  };
+})
