@@ -276,11 +276,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
 
   passthru = {
-    updateScript = gnome.updateScript {
-      packageName = "gtk";
-      versionPolicy = "odd-unstable";
-      attrPath = "gtk4";
-    };
     tests = {
       pkg-config = testers.hasPkgConfigModules {
         package = finalAttrs.finalPackage;
@@ -303,7 +298,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://www.gtk.org/";
     license = lib.licenses.lgpl2Plus;
     platforms = lib.platforms.all;
-    broken = true; # TODO: needs more deps
     changelog = "https://gitlab.gnome.org/GNOME/gtk/-/raw/${finalAttrs.version}/NEWS";
     pkgConfigModules = [
       "gtk4"
