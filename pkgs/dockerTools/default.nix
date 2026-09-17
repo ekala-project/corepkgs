@@ -1259,7 +1259,7 @@ rec {
       run ? null,
     }:
     assert lib.assertMsg (!(drv.drvAttrs.__structuredAttrs or false))
-      "streamNixShellImage: Does not work with the derivation ${drv.name} because it uses __structuredAttrs";
+      "streamNixShellImage: Does not work with the derivation ${drv.name} because it uses __structuredAttrs. Pass `__structuredAttrs = false` to the derivation to use streamNixShellImage.";
     assert lib.assertMsg (
       command == null || run == null
     ) "streamNixShellImage: Can't specify both command and run";
