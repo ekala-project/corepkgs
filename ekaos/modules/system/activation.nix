@@ -158,9 +158,9 @@ in
             mkdir -p /etc
           fi
 
-          # Copy files from /etc/static to /etc
+          # Copy files from /etc/static to /etc, overwriting any existing files
           if [ -d /etc/static ]; then
-            cp -rL /etc/static/* /etc/ 2>/dev/null || true
+            cp -rfL /etc/static/* /etc/
           fi
         '';
         supportsDryActivation = true;
@@ -171,6 +171,14 @@ in
         deps = [ "etc" ];
         text = ''
           echo "Setting up systemd units..."
+
+          # Ensure machine-id exists so systemd does not enter first-boot mode
+          # (first-boot mode runs systemd-firstboot which prompts interactively)
+          if [ ! -s /etc/machine-id ]; then
+            ${config.systemd.package}/bin/systemd-machine-id-setup 2>/dev/null \
+              || head -c 16 /dev/urandom | od -A n -t x1 | tr -d ' \n' > /etc/machine-id
+          fi
+
           # Reload systemd if it's running
           if [ -e /run/systemd/system ]; then
             systemctl daemon-reload || true
