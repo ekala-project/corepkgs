@@ -495,6 +495,8 @@ with final;
   # On macOS, the SDK provides the GLUT framework in `stdenv`. Packages
   # that use `libGLX` on macOS may need to depend on `freeglut`
   # directly if this doesn’t work.
+  libdbusmenu-gtk3 = libdbusmenu.override { withGtk3 = true; };
+
   libglut = freeglut;
   libva-minimal = callPackage ./pkgs/libva { minimal = true; };
   mesa = callPackage ./pkgs/mesa { };
