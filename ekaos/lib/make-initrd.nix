@@ -43,7 +43,11 @@ let
   extraUtils =
     pkgs.runCommand "initrd-utils"
       {
-        nativeBuildInputs = [ pkgs.buildPackages.nukeReferences ];
+        __structuredAttrs = false;
+        nativeBuildInputs = [
+          pkgs.buildPackages.nukeReferences
+          pkgs.buildPackages.patchelf
+        ];
         allowedReferences = [ "out" ];
       }
       ''
@@ -51,42 +55,45 @@ let
 
         mkdir -p $out/bin $out/lib
 
-        # Copy busybox (provides most basic utilities)
-        cp ${pkgs.busybox}/bin/busybox $out/bin/
+        # Copy statically-linked busybox (no dynamic linker needed in initrd)
+        cp ${pkgs.pkgsStatic.busybox}/bin/busybox $out/bin/
+        chmod u+w $out/bin/busybox
 
-        # Create busybox symlinks
-        for cmd in sh ash mount umount mkdir mknod switch_root cat cp mv rm ln chmod chown \
+        # Create busybox symlinks for all needed applets
+        for cmd in sh ash mkdir mknod switch_root cat cp mv rm ln chmod chown \
                    sleep echo test true false kill pidof ps grep sed awk cut sort uniq wc \
-                   find xargs basename dirname readlink realpath pwd which env; do
+                   find xargs basename dirname readlink realpath pwd which env \
+                   mount umount modprobe insmod lsmod rmmod; do
           ln -sf busybox $out/bin/$cmd
         done
 
-        # Copy modprobe for kernel module loading
+        # Helper to copy a dynamically-linked binary and all its libraries
         copy_bin_and_libs() {
           local BIN="$1"
           cp "$BIN" $out/bin/
+          chmod u+w "$out/bin/$(basename "$BIN")"
 
-          # Copy shared libraries
-          local LIBS=$(${pkgs.buildPackages.patchelf}/bin/patchelf --print-needed "$BIN" 2>/dev/null || true)
+          # Copy the dynamic linker
+          local INTERP=$(patchelf --print-interpreter "$BIN" 2>/dev/null) || INTERP=""
+          if [ -n "$INTERP" ] && [ -f "$INTERP" ]; then
+            cp -n "$INTERP" $out/lib/
+            chmod u+w "$out/lib/$(basename "$INTERP")"
+          fi
+
+          # Copy shared libraries by resolving via ldd
+          local LIBS=$(ldd "$BIN" 2>/dev/null | grep -o '/nix/store/[^ ]*') || LIBS=""
           for lib in $LIBS; do
-            local libPath=$(${pkgs.buildPackages.patchelf}/bin/patchelf --print-rpath "$BIN" 2>/dev/null | tr ':' '\n' | \
-              xargs -I{} find {} -name "$lib" 2>/dev/null | head -1)
-            if [ -n "$libPath" ] && [ -f "$libPath" ]; then
-              cp "$libPath" $out/lib/ 2>/dev/null || true
+            if [ -f "$lib" ]; then
+              cp -n "$lib" $out/lib/
+              chmod u+w "$out/lib/$(basename "$lib")"
             fi
           done
         }
 
-        copy_bin_and_libs ${pkgs.kmod}/bin/modprobe
-        ln -sf modprobe $out/bin/insmod
-        ln -sf modprobe $out/bin/lsmod
-        ln -sf modprobe $out/bin/rmmod
+        # Copy blkid for UUID-based root device lookup (no udev needed)
+        copy_bin_and_libs ${pkgs.util-linux}/bin/blkid
 
-        # Copy mount utilities
-        copy_bin_and_libs ${pkgs.util-linux}/bin/mount
-        copy_bin_and_libs ${pkgs.util-linux}/bin/umount
-
-        # Copy filesystem tools
+        # Copy filesystem check tools (these need glibc, can't use busybox)
         ${optionalString (lib.elem "ext4" supportedFilesystems) ''
           copy_bin_and_libs ${pkgs.e2fsprogs}/bin/e2fsck
           ln -sf e2fsck $out/bin/fsck.ext4
@@ -104,24 +111,46 @@ let
         # Extra utilities from configuration
         ${extraUtilsCommands}
 
-        # Strip binaries and nuke references
-        find $out/bin -type f -exec ${pkgs.buildPackages.patchelf}/bin/patchelf --set-rpath $out/lib {} \; || true
-        find $out/bin -type f -exec strip -s {} \; 2>/dev/null || true
-        find $out/lib -type f -exec strip -s {} \; 2>/dev/null || true
+        # Fix up dynamically-linked binaries to be self-contained:
+        # set interpreter and RPATH to $out/lib, strip, nuke external refs,
+        # then re-patch (nuke-refs destroys store hashes in the binary)
+        patch_dynamic_bins() {
+          local ldso=$(find $out/lib -name 'ld-linux-*.so.*' -o -name 'ld-*.so.*' 2>/dev/null | head -1)
+          for bin in $out/bin/*; do
+            [ -f "$bin" ] && [ ! -L "$bin" ] || continue
+            # strip debug symbols (may fail on static binaries — that's fine)
+            strip -s "$bin" 2>/dev/null || :
+            # only patch ELF binaries that have a dynamic interpreter
+            patchelf --print-interpreter "$bin" >/dev/null 2>&1 || continue
+            if [ -n "$ldso" ]; then
+              patchelf --set-interpreter "$ldso" --set-rpath $out/lib "$bin"
+            fi
+          done
+        }
 
-        nuke-refs $out/bin/* $out/lib/* || true
+        patch_dynamic_bins
+        find $out/lib -type f -exec strip -s {} \; 2>/dev/null || :
+
+        # Nuke references to other store paths (self-references via $out are OK)
+        nuke-refs $out/bin/* $out/lib/*
+
+        # Re-patch after nuke-refs (which destroys store hashes)
+        patch_dynamic_bins
       '';
 
   # Stage-1 init script
   bootStage1 = pkgs.writeScript "init" ''
-    #!${extraUtils}/bin/sh
-    set -e
+    #!/bin/sh
 
-    echo "ekaos stage-1 init starting..."
+    fail() {
+      echo "FATAL: $1"
+      echo "Dropping to emergency shell"
+      exec /bin/sh
+    }
 
     # Set up basic environment
-    export PATH=${extraUtils}/bin
-    export LD_LIBRARY_PATH=${extraUtils}/lib
+    export PATH=/bin
+    export LD_LIBRARY_PATH=/lib
 
     # Mount essential filesystems
     mount -t proc proc /proc
@@ -129,14 +158,28 @@ let
     mount -t devtmpfs devtmpfs /dev
     mount -t tmpfs tmpfs /run
 
+    # Redirect output to serial console if available
+    if [ -e /dev/ttyS0 ]; then
+      exec > /dev/ttyS0 2>&1 < /dev/ttyS0
+    fi
+
+    echo "ekaos stage-1 init starting..."
+
     # Create device nodes
     mkdir -p /dev/pts /dev/shm
     mount -t devpts devpts /dev/pts
     mount -t tmpfs tmpfs /dev/shm
 
     echo "Loading kernel modules..."
-    # Load kernel modules
-    ${concatStringsSep "\n" (map (mod: "modprobe ${mod} || true") allModules)}
+    # Set up /sbin/modprobe so the kernel's request_module() can auto-load dependencies
+    mkdir -p /sbin
+    ln -sf /bin/modprobe /sbin/modprobe
+    # /lib/modules is a symlink to the module closure — modprobe finds them at /lib/modules/VERSION/
+    ${concatStringsSep "\n" (
+      map (mod: ''
+        modprobe ${mod} 2>/dev/null || echo "  ${mod}: not available"
+      '') allModules
+    )}
 
     # Wait for devices to settle
     sleep 1
@@ -166,36 +209,145 @@ let
     echo "Mounting root filesystem..."
     mkdir -p /mnt-root
 
-    # Try to mount root (assume /dev/vda2 or similar for now)
-    # In a full implementation, this would parse kernel command line for root=
-    ROOT_DEVICE="/dev/vda2"
+    # Parse root= from kernel command line
+    ROOT_DEVICE=""
+    ROOT_UUID=""
+    for param in $(cat /proc/cmdline); do
+      case "$param" in
+        root=UUID=*)
+          ROOT_UUID="''${param#root=UUID=}"
+          ;;
+        root=PARTUUID=*)
+          ROOT_DEVICE="/dev/disk/by-partuuid/''${param#root=PARTUUID=}"
+          ;;
+        root=LABEL=*)
+          ROOT_DEVICE="/dev/disk/by-label/''${param#root=LABEL=}"
+          ;;
+        root=/dev/*)
+          ROOT_DEVICE="''${param#root=}"
+          ;;
+      esac
+    done
+
     if [ -e /dev/mapper/cryptroot ]; then
       ROOT_DEVICE="/dev/mapper/cryptroot"
+      ROOT_UUID=""
     fi
 
+    # Resolve UUID to device using blkid (no udev needed)
+    if [ -n "$ROOT_UUID" ]; then
+      echo "Looking for root filesystem UUID=$ROOT_UUID"
+      # Try /dev/disk/by-uuid first (works if udev is available)
+      if [ -e "/dev/disk/by-uuid/$ROOT_UUID" ]; then
+        ROOT_DEVICE="/dev/disk/by-uuid/$ROOT_UUID"
+      else
+        # Scan block devices for matching UUID
+        for dev in /dev/vda* /dev/sda* /dev/nvme*; do
+          if [ -b "$dev" ]; then
+            dev_uuid=$(blkid -s UUID -o value "$dev" 2>/dev/null)
+            if [ "$dev_uuid" = "$ROOT_UUID" ]; then
+              ROOT_DEVICE="$dev"
+              echo "Found root device: $ROOT_DEVICE"
+              break
+            fi
+          fi
+        done
+      fi
+    fi
+
+    # Fallback to common VM device
+    if [ -z "$ROOT_DEVICE" ]; then
+      ROOT_DEVICE="/dev/vda2"
+    fi
+
+    # Wait for root device to appear
+    for i in $(busybox seq 1 30); do
+      if [ -e "$ROOT_DEVICE" ]; then
+        break
+      fi
+      echo "Waiting for $ROOT_DEVICE..."
+      sleep 0.5
+    done
+
     mount "$ROOT_DEVICE" /mnt-root || {
-      echo "Failed to mount root filesystem"
+      echo "Failed to mount root filesystem on $ROOT_DEVICE"
       echo "Available block devices:"
-      ls -l /dev/vd* /dev/sd* /dev/mapper/* 2>/dev/null || true
-      /bin/sh  # Drop to shell for debugging
+      ls -l /dev/vd* /dev/sd* /dev/mapper/* 2>/dev/null
+      echo "Dropping to emergency shell"
+      exec /bin/sh
     }
 
     ${postMountCommands}
 
     echo "Switching to real root..."
+    # Create mount points on root filesystem if they don't exist
+    mkdir -p /mnt-root/proc /mnt-root/sys /mnt-root/dev /mnt-root/run /mnt-root/tmp
+
     # Move mounts to new root
     mount --move /proc /mnt-root/proc
     mount --move /sys /mnt-root/sys
     mount --move /dev /mnt-root/dev
     mount --move /run /mnt-root/run
 
-    # Switch to real root and exec stage-2 init
-    exec switch_root /mnt-root /init
+    # Parse init= from kernel command line to find the real init
+    REAL_INIT="/init"
+    for param in $(cat /mnt-root/proc/cmdline); do
+      case "$param" in
+        init=*)
+          REAL_INIT="''${param#init=}"
+          ;;
+      esac
+    done
+
+    echo "Executing $REAL_INIT..."
+    exec switch_root /mnt-root "$REAL_INIT" || fail "switch_root failed"
   '';
 
-  # Kernel modules directory — aggregateModules takes a list of module
-  # packages (kernel, out-of-tree drivers, etc.) and runs depmod.
-  modulesTree = pkgs.aggregateModules [ kernelPackages.kernel ];
+  # Build a minimal closure of only the needed kernel modules
+  modulesTree = kernelPackages.kernel.makeModulesClosure {
+    rootModules = allModules;
+    kernel = kernelPackages.kernel.modules;
+    firmware = [ ];
+    allowMissing = true;
+  };
+
+  # Decompressed kernel modules tree for busybox modprobe (which lacks xz support).
+  # Output: $out/modules/VERSION/{kernel/..., modules.dep, ...}
+  decompressedModules =
+    pkgs.runCommand "initrd-modules"
+      {
+        nativeBuildInputs = [
+          pkgs.buildPackages.xz
+          pkgs.buildPackages.kmod
+        ];
+      }
+      ''
+        mkdir -p $out/modules
+        cp -r ${modulesTree}/lib/modules/* $out/modules/
+        chmod -R u+w $out/modules
+        find $out/modules -name '*.ko.xz' -exec xz -d {} \;
+        find $out/modules -name '*.ko.zst' -exec zstd -d --rm {} \;
+        # Regenerate modules.dep for the decompressed .ko files
+        # depmod -b BASE looks for BASE/lib/modules/VERSION
+        mkdir -p $out/lib
+        ln -sf $out/modules $out/lib/modules
+        kernelVersion=$(ls $out/modules)
+        depmod -b $out -a "$kernelVersion"
+        rm $out/lib/modules
+        rmdir $out/lib
+      '';
+
+  # Combined /lib directory with both shared libraries and kernel modules
+  # This allows modprobe to find modules at the standard /lib/modules/VERSION/ path
+  combinedLib = pkgs.runCommand "initrd-lib" { } ''
+    mkdir -p $out
+    # Symlink shared libraries from extraUtils
+    for f in ${extraUtils}/lib/*; do
+      ln -sf "$f" $out/
+    done
+    # Symlink decompressed kernel modules
+    ln -sf ${decompressedModules}/modules $out/modules
+  '';
 
 in
 
@@ -206,16 +358,12 @@ kernelPackages.kernel.makeInitrd {
       symlink = "/init";
     }
     {
-      object = extraUtils;
+      object = "${extraUtils}/bin";
       symlink = "/bin";
     }
     {
-      object = "${extraUtils}/lib";
+      object = combinedLib;
       symlink = "/lib";
-    }
-    {
-      object = modulesTree;
-      symlink = "/lib/modules";
     }
   ];
 
