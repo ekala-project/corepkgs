@@ -83,8 +83,6 @@ stdenv'.mkDerivation (finalAttrs: {
     runHook postInstallCheck
   '';
 
-  __structuredAttrs = true;
-
   meta = {
     description = "Libraries to write tests in C, C++, and shell";
     homepage = "https://github.com/freebsd/atf/";

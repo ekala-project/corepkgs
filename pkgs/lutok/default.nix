@@ -72,8 +72,6 @@ lib.fix (
     checkInputs = [ atf' ];
     nativeCheckInputs = [ kyua' ];
 
-    __structuredAttrs = true;
-
     meta = {
       description = "Lightweight C++ API for Lua";
       homepage = "https://github.com/freebsd/lutok/";

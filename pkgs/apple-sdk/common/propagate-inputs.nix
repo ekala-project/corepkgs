@@ -35,8 +35,6 @@ let
 
     installTargets = [ "install-headers" ];
 
-    __structuredAttrs = true;
-
     meta = {
       inherit (cups.meta)
         homepage

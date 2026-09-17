@@ -112,8 +112,6 @@ stdenvNoCC.mkDerivation {
     ${linkManPages (lib.getMan ld64) "ld64" "ld64"}
   '';
 
-  __structuredAttrs = true;
-
   passthru = {
     inherit cctools_cmds llvm_cmds targetPrefix;
     isCCTools = true; # The fact ld64 is used instead of lld is why this isn’t `isLLVM`.

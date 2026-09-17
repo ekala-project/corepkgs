@@ -102,8 +102,6 @@ stdenvNoCC.mkDerivation (
       sdkroot = finalAttrs.finalPackage + "/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk";
     };
 
-    __structuredAttrs = true;
-
     meta = {
       description = "Frameworks and libraries required for building packages on Darwin";
       homepage = "https://developer.apple.com";

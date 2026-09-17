@@ -73,8 +73,6 @@ bootstrapStdenv.mkDerivation (finalAttrs: {
     ninja
   ];
 
-  __structuredAttrs = true;
-
   meta = {
     description = "Safely compose and manipulate strings in C";
     homepage = "https://www.freebsd.org";

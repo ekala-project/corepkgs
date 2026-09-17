@@ -159,8 +159,6 @@ stdenv'.mkDerivation (finalAttrs: {
     wrapProgram "$out/bin/xcrun" --set SDKROOT macosx
   '';
 
-  __structuredAttrs = true;
-
   passthru = {
     xcbuild =
       # lib.warn "xcbuild.xcbuild is deprecated and will be removed; use xcbuild instead."
