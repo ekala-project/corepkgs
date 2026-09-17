@@ -131,6 +131,7 @@ mapAliases {
   jdk11 = java.v11;
   jdk17 = java.v17;
   jdk21 = java;
+  kernelPackagesExtensions = throw "kernelPackagesExtensions has been removed in ekapkgs. Use config.overlays.linux instead";
   kotlinc = kotlin;
   libcIconv = libc: callPackage ../pkgs-many/libiconv/libc.nix { inherit libc; };
   libffiReal = libffi.real;
