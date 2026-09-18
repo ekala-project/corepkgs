@@ -1090,6 +1090,14 @@ with final;
     libOnly = true;
   };
 
+  speexdsp = callPackage ./pkgs/speexdsp {
+    fftw = fftwFloat;
+  };
+
+  speex = callPackage ./pkgs/speex {
+    fftw = fftwFloat;
+  };
+
   genericUpdater = callPackage ./pkgs/common-updater-scripts/generic-updater.nix { };
   _experimental-update-script-combinators =
     callPackage ./pkgs/common-updater-scripts/combinators.nix
