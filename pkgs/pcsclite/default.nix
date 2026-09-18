@@ -52,20 +52,16 @@ stdenv.mkDerivation (finalAttrs: {
     })
   ];
 
-  mesonFlags = [
-    (lib.mesonOption "sysconfdir" "/etc")
+  mesonEntries = {
+    sysconfdir = "/etc";
     # The OS should care on preparing the drivers into this location
-    (lib.mesonOption "usbdropdir" "/var/lib/pcsc/drivers")
-    (lib.mesonBool "libsystemd" systemdSupport)
-    (lib.mesonBool "polkit" polkitSupport)
-    (lib.mesonOption "ipcdir" "/run/pcscd")
-  ]
-  ++ lib.optionals systemdSupport [
-    (lib.mesonOption "systemdunit" "system")
-  ]
-  ++ lib.optionals (!udevSupport) [
-    (lib.mesonBool "libudev" false)
-  ];
+    usbdropdir = "/var/lib/pcsc/drivers";
+    libsystemd = systemdSupport;
+    polkit = polkitSupport;
+    ipcdir = "/run/pcscd";
+    ${if systemdSupport then "systemdunit" else null} = "system";
+    ${if !udevSupport then "libudev" else null} = false;
+  };
 
   # disable building pcsc-wirecheck{,-gen} when cross compiling
   # see also: https://github.com/LudovicRousseau/PCSC/issues/25
