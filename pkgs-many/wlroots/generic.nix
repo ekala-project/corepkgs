@@ -106,9 +106,9 @@ stdenv.mkDerivation (finalAttrs: {
     NIX_CFLAGS_COMPILE = "-Wno-error=switch";
   };
 
-  mesonFlags = [
-    (lib.mesonEnable "xwayland" finalAttrs.enableXWayland)
-  ];
+  mesonEntries = {
+    xwayland = if finalAttrs.enableXWayland then "enabled" else "disabled";
+  };
 
   postFixup = ''
     mkdir -p $examples/bin
