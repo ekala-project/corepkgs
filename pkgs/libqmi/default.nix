@@ -82,14 +82,14 @@ stdenv.mkDerivation (finalAttrs: {
     libqrtr-glib
   ];
 
-  mesonFlags = [
-    "-Dudevdir=${placeholder "out"}/lib/udev"
-    (lib.mesonBool "gtk_doc" withIntrospection)
-    (lib.mesonBool "introspection" withIntrospection)
-    (lib.mesonBool "man" withMan)
-    (lib.mesonBool "qrtr" withIntrospection)
-    (lib.mesonBool "udev" withIntrospection)
-  ];
+  mesonEntries = {
+    udevdir = "${placeholder "out"}/lib/udev";
+    gtk_doc = withIntrospection;
+    introspection = withIntrospection;
+    man = withMan;
+    qrtr = withIntrospection;
+    udev = withIntrospection;
+  };
 
   postPatch = ''
     patchShebangs \
