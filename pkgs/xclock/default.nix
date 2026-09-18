@@ -47,9 +47,9 @@ stdenv.mkDerivation (finalAttrs: {
     libxt
     xorgproto
   ];
-  mesonFlags = [
-    (lib.mesonOption "appdefaultdir" "${placeholder "out"}/share/X11/app-defaults")
-  ];
+  mesonEntries = {
+    appdefaultdir = "${placeholder "out"}/share/X11/app-defaults";
+  };
   nativeInstallCheckInputs = [ versionCheckHook ];
   versionCheckProgramArg = "-version";
   doInstallCheck = true;
