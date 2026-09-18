@@ -31,10 +31,13 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs = [ openssl ];
 
   cmakeFlags = [
-    "-DCMAKE_INSTALL_INCLUDEDIR=include"
-    "-DENABLE_SHARED=${if stdenv.hostPlatform.isStatic then "OFF" else "ON"}"
     "-UCMAKE_INSTALL_LIBDIR"
   ];
+
+  cmakeEntries = {
+    CMAKE_INSTALL_INCLUDEDIR = "include";
+    ENABLE_SHARED = if stdenv.hostPlatform.isStatic then "OFF" else "ON";
+  };
 
   meta = {
     description = "Secure, Reliable, Transport";
