@@ -68,11 +68,11 @@ stdenv.mkDerivation (finalAttrs: {
   ];
   separateDebugInfo = true;
 
-  mesonFlags = [
-    (lib.mesonBool "documentation" withDocumentation)
-    (lib.mesonBool "tests" withTests)
-    (lib.mesonBool "scanner" isScanner)
-  ];
+  mesonEntries = {
+    documentation = withDocumentation;
+    tests = withTests;
+    scanner = isScanner;
+  };
 
   depsBuildBuild = [
     pkg-config

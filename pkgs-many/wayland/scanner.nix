@@ -22,11 +22,11 @@ stdenv.mkDerivation (finalAttrs: {
   ];
   separateDebugInfo = true;
 
-  mesonFlags = [
-    (lib.mesonBool "documentation" false)
-    (lib.mesonBool "libraries" false)
-    (lib.mesonBool "tests" false)
-  ];
+  mesonEntries = {
+    documentation = false;
+    libraries = false;
+    tests = false;
+  };
 
   depsBuildBuild = [ pkg-config ];
 
