@@ -45,9 +45,9 @@ stdenv.mkDerivation (finalAttrs: {
   nativeInstallCheckInputs = [ versionCheckHook ];
   doInstallCheck = true;
 
-  cmakeFlags = [
-    (lib.cmakeBool "SHOW_FAILED_TEST_OUTPUT" true)
-  ];
+  cmakeEntries = {
+    SHOW_FAILED_TEST_OUTPUT = true;
+  };
 
   preConfigure = ''
     patchShebangs qtest/bin/qtest-driver
