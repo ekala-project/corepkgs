@@ -71,11 +71,11 @@ stdenv.mkDerivation (finalAttrs: {
     glib
   ];
 
-  mesonFlags = [
-    "-Dinstalled_test_prefix=${placeholder "installedTests"}"
-    (lib.mesonEnable "introspection" withIntrospection)
-    (lib.mesonEnable "documentation" withIntrospection)
-  ];
+  mesonEntries = {
+    installed_test_prefix = "${placeholder "installedTests"}";
+    introspection = if withIntrospection then "enabled" else "disabled";
+    documentation = if withIntrospection then "enabled" else "disabled";
+  };
 
   postFixup = ''
     # Move developer documentation to devdoc output.
