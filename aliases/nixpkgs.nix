@@ -139,6 +139,7 @@ mapAliases {
   libiconv-darwin = libiconv.darwin;
   libiconvReal = libiconv.real;
   libidn2 = libidn.v2;
+  libmpg123 = mpg123;
   libmysqlclient = mariadb-connector-c;
   libnghttp2 = nghttp2;
   libtool2 = libtool.v2_5;
@@ -279,6 +280,9 @@ mapAliases {
   ubootUtilite = uboot.ubootUtilite;
   ubootVisionFive2 = uboot.ubootVisionFive2;
   ubootWandboard = uboot.ubootWandboard;
+  webrtc-audio-processing_0_3 = webrtc-audio-processing.v0_3;
+  webrtc-audio-processing_1 = webrtc-audio-processing.v1;
+  webrtc-audio-processing_2 = webrtc-audio-processing.v2;
   wlroots_0_17 = wlroots.v0_17;
   wlroots_0_18 = wlroots.v0_18;
   wlroots_0_19 = wlroots.v0_19;
