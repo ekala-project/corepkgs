@@ -35,7 +35,7 @@
   libxml2,
   gnome,
   gsettings-desktop-schemas,
-  gst_all_1,
+  gstreamer,
   sassc ? null,
   trackerSupport ? stdenv.hostPlatform.isLinux,
   tinysparql ? null,
@@ -138,8 +138,8 @@ stdenv.mkDerivation (finalAttrs: {
     libdrm
   ]
   ++ [
-    gst_all_1.gst-plugins-base
-    gst_all_1.gst-plugins-bad
+    gstreamer.plugins-base
+    gstreamer.plugins-bad
     fribidi
     harfbuzz
   ]
