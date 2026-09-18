@@ -30,9 +30,10 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags =
-    lib.optional finalAttrs.finalPackage.doCheck "-DUNIT_TESTING=ON"
-    ++ lib.optional stdenv.hostPlatform.isStatic "-DBUILD_SHARED_LIBS=OFF";
+  cmakeEntries = {
+    ${if finalAttrs.finalPackage.doCheck then "UNIT_TESTING" else null} = true;
+    ${if stdenv.hostPlatform.isStatic then "BUILD_SHARED_LIBS" else null} = false;
+  };
 
   passthru.tests = {
     unittests = runUnitTests finalAttrs.finalPackage;

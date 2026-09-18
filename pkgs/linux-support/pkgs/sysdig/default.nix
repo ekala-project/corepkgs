@@ -122,19 +122,19 @@ stdenv.mkDerivation {
     )
   '';
 
-  cmakeFlags = [
-    "-DUSE_BUNDLED_DEPS=OFF"
-    "-DSYSDIG_VERSION=${version}"
-    "-DUSE_BUNDLED_B64=OFF"
-    "-DUSE_BUNDLED_TBB=OFF"
-    "-DUSE_BUNDLED_RE2=OFF"
-    "-DUSE_BUNDLED_JSONCPP=OFF"
-    "-DCREATE_TEST_TARGETS=OFF"
-    "-DVALIJSON_INCLUDE=${valijson}/include"
-    "-DUTHASH_INCLUDE=${uthash}/include"
-    (lib.cmakeBool "USE_BUNDLED_FALCOSECURITY_LIBS" true)
-  ]
-  ++ lib.optional (kernel == null) "-DBUILD_DRIVER=OFF";
+  cmakeEntries = {
+    USE_BUNDLED_DEPS = "OFF";
+    SYSDIG_VERSION = version;
+    USE_BUNDLED_B64 = "OFF";
+    USE_BUNDLED_TBB = "OFF";
+    USE_BUNDLED_RE2 = "OFF";
+    USE_BUNDLED_JSONCPP = "OFF";
+    CREATE_TEST_TARGETS = "OFF";
+    VALIJSON_INCLUDE = "${valijson}/include";
+    UTHASH_INCLUDE = "${uthash}/include";
+    USE_BUNDLED_FALCOSECURITY_LIBS = true;
+    ${if kernel == null then "BUILD_DRIVER" else null} = "OFF";
+  };
 
   env.NIX_CFLAGS_COMPILE =
     # fix compiler warnings been treated as errors

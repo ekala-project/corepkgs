@@ -94,17 +94,15 @@ stdenv.mkDerivation rec {
   # propagation is needed for Security.framework to be available when linking
   propagatedBuildInputs = [ aws-crt-cpp ];
 
-  cmakeFlags = [
-    "-DBUILD_DEPS=OFF"
-  ]
-  ++ lib.optional (!customMemoryManagement) "-DCUSTOM_MEMORY_MANAGEMENT=0"
-  ++ lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
-    "-DENABLE_TESTING=OFF"
-    "-DCURL_HAS_H2=1"
-    "-DCURL_HAS_TLS_PROXY=1"
-    "-DTARGET_ARCH=${host_os}"
-  ]
-  ++ lib.optional (apis != [ "*" ]) "-DBUILD_ONLY=${lib.concatStringsSep ";" apis}";
+  cmakeEntries = {
+    BUILD_DEPS = false;
+    ${if !customMemoryManagement then "CUSTOM_MEMORY_MANAGEMENT" else null} = "0";
+    ${if stdenv.buildPlatform != stdenv.hostPlatform then "ENABLE_TESTING" else null} = false;
+    ${if stdenv.buildPlatform != stdenv.hostPlatform then "CURL_HAS_H2" else null} = "1";
+    ${if stdenv.buildPlatform != stdenv.hostPlatform then "CURL_HAS_TLS_PROXY" else null} = "1";
+    ${if stdenv.buildPlatform != stdenv.hostPlatform then "TARGET_ARCH" else null} = host_os;
+    ${if apis != [ "*" ] then "BUILD_ONLY" else null} = lib.concatStringsSep ";" apis;
+  };
 
   env.NIX_CFLAGS_COMPILE = toString [
     # openssl 3 generates several deprecation warnings

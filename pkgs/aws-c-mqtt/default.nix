@@ -44,9 +44,9 @@ stdenv.mkDerivation rec {
     s2n-tls
   ];
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=ON"
-  ];
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = true;
+  };
 
   passthru.tests = {
     inherit nix;

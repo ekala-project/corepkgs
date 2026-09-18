@@ -40,12 +40,10 @@ stdenv.mkDerivation rec {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags =
-    [ ]
-    ++ lib.optionals stdenv.hostPlatform.isStatic [
-      "-DCARES_SHARED=OFF"
-      "-DCARES_STATIC=ON"
-    ];
+  cmakeEntries = {
+    ${if stdenv.hostPlatform.isStatic then "CARES_SHARED" else null} = false;
+    ${if stdenv.hostPlatform.isStatic then "CARES_STATIC" else null} = true;
+  };
 
   passthru.tests = {
     inherit grpc;

@@ -59,7 +59,22 @@ buildInputs = [
 ];
 ```
 
-### CMake Flags
+### CMake Entries (Preferred)
+
+Use `cmakeEntries` to specify CMake `-D` cache entries as a structured attrset.
+Booleans are automatically converted to `ON`/`OFF`.
+
+```nix
+cmakeEntries = {
+  BUILD_SHARED_LIBS = true;
+  ENABLE_TESTS = false;
+  CMAKE_INSTALL_LIBDIR = "lib";
+};
+```
+
+### CMake Flags (Legacy)
+
+`cmakeFlags` still works for string-based flags and non-`-D` flags:
 
 ```nix
 cmakeFlags = [
@@ -68,6 +83,10 @@ cmakeFlags = [
   "-DCMAKE_INSTALL_LIBDIR=lib"
 ];
 ```
+
+Both can be used together. `cmakeFlags` values override `cmakeEntries` for the
+same key (cmake uses last-wins for `-D` flags). Use `cmakeFlags` for non-`-D`
+flags like `-Wno-dev` or `-GNinja`.
 
 ### Cross-Compilation
 
@@ -83,18 +102,22 @@ depsBuildBuild = [ pkg-config ];
 
 **CMake can't find dependencies:**
 ```nix
-cmakeFlags = [
-  "-DZLIB_ROOT=${zlib}"
-  "-DOPENSSL_ROOT_DIR=${openssl}"
-];
+cmakeEntries = {
+  ZLIB_ROOT = "${zlib}";
+  OPENSSL_ROOT_DIR = "${openssl}";
+};
 ```
 
 **Library install to lib64:**
 ```nix
-cmakeFlags = [ "-DCMAKE_INSTALL_LIBDIR=lib" ];
+cmakeEntries = {
+  CMAKE_INSTALL_LIBDIR = "lib";
+};
 ```
 
 **Install prefix issues:**
 ```nix
-cmakeFlags = [ "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}" ];
+cmakeEntries = {
+  CMAKE_INSTALL_PREFIX = "${placeholder "out"}";
+};
 ```

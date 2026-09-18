@@ -58,26 +58,27 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals numaSupport [ numactl ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "ENABLE_ALPHA" true)
-    (lib.cmakeBool "ENABLE_MULTIVIEW" true)
-    (lib.cmakeBool "ENABLE_SCC_EXT" true)
-    "-Wno-dev"
-    (lib.cmakeBool "DETAILED_CU_STATS" custatsSupport)
-    (lib.cmakeBool "CHECKED_BUILD" debugSupport)
-    (lib.cmakeBool "ENABLE_PPA" ppaSupport)
-    (lib.cmakeBool "ENABLE_VTUNE" vtuneSupport)
-    (lib.cmakeBool "WARNINGS_AS_ERRORS" werrorSupport)
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isPower [
-    (lib.cmakeBool "ENABLE_ALTIVEC" false)
-    (lib.cmakeBool "CPU_POWER8" (stdenv.hostPlatform.isPower64 && stdenv.hostPlatform.isLittleEndian))
-  ]
-  ++ lib.optionals (neonSupport && stdenv.hostPlatform.isAarch32) [
-    (lib.cmakeBool "ENABLE_NEON" true)
-    (lib.cmakeBool "CPU_HAS_NEON" true)
-    (lib.cmakeBool "ENABLE_ASSEMBLY" true)
-  ];
+  cmakeFlags = [ "-Wno-dev" ];
+
+  cmakeEntries = {
+    ENABLE_ALPHA = true;
+    ENABLE_MULTIVIEW = true;
+    ENABLE_SCC_EXT = true;
+    DETAILED_CU_STATS = custatsSupport;
+    CHECKED_BUILD = debugSupport;
+    ENABLE_PPA = ppaSupport;
+    ENABLE_VTUNE = vtuneSupport;
+    WARNINGS_AS_ERRORS = werrorSupport;
+  }
+  // lib.optionalAttrs stdenv.hostPlatform.isPower {
+    ENABLE_ALTIVEC = false;
+    CPU_POWER8 = stdenv.hostPlatform.isPower64 && stdenv.hostPlatform.isLittleEndian;
+  }
+  // lib.optionalAttrs (neonSupport && stdenv.hostPlatform.isAarch32) {
+    ENABLE_NEON = true;
+    CPU_HAS_NEON = true;
+    ENABLE_ASSEMBLY = true;
+  };
 
   cmakeStaticLibFlags = [
     (lib.cmakeBool "HIGH_BIT_DEPTH" true)

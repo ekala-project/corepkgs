@@ -29,10 +29,10 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "BUILD_SHARED_LIBS" (!stdenv.hostPlatform.isStatic))
-    (lib.cmakeBool "BUILD_STATIC_LIBS" stdenv.hostPlatform.isStatic)
-  ];
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = !stdenv.hostPlatform.isStatic;
+    BUILD_STATIC_LIBS = stdenv.hostPlatform.isStatic;
+  };
 
   passthru.updateScript = nix-update-script {
     extraArgs = [ "--version-regex=release/v(.+)" ];

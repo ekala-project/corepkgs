@@ -95,9 +95,9 @@ stdenv.mkDerivation (finalAttrs: {
     lerc
   ];
 
-  cmakeFlags = [
-    "-DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON"
-  ];
+  cmakeEntries = {
+    CMAKE_FIND_PACKAGE_PREFER_CONFIG = true;
+  };
 
   # Avoid flakiness like https://gitlab.com/libtiff/libtiff/-/commit/94f6f7315b1
   enableParallelChecking = false;

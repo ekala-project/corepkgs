@@ -34,11 +34,11 @@ stdenv.mkDerivation rec {
     pkg-config
   ];
 
-  cmakeFlags = [
-    "-DCANONICAL_PREFIXES=ON"
-    "-DBUILD_SHARED_LIBS=${if static then "OFF" else "ON"}"
-  ]
-  ++ lib.optional static "-DCMAKE_SKIP_RPATH:BOOL=TRUE";
+  cmakeEntries = {
+    CANONICAL_PREFIXES = "ON";
+    BUILD_SHARED_LIBS = if static then "OFF" else "ON";
+    ${if static then "CMAKE_SKIP_RPATH:BOOL" else null} = "TRUE";
+  };
 
   propagatedBuildInputs = [ brotli ];
 

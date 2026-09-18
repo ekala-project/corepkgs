@@ -22,11 +22,11 @@ stdenv.mkDerivation rec {
   ];
   buildInputs = [ boost ];
 
-  cmakeFlags = [
-    "-DBoost_USE_STATIC_LIBS=OFF"
-    "-DUSE_Z3=OFF"
-    "-DUSE_CVC4=OFF"
-  ];
+  cmakeEntries = {
+    Boost_USE_STATIC_LIBS = false;
+    USE_Z3 = false;
+    USE_CVC4 = false;
+  };
 
   meta = {
     description = "Compiler for Ethereum smart contract language Solidity";

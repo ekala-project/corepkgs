@@ -44,10 +44,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeBuildType = "Release";
 
-  cmakeFlags = [
-    "-DFREEGLUT_BUILD_DEMOS=OFF"
-    "-DCMAKE_INSTALL_LIBDIR=lib"
-  ];
+  cmakeEntries = {
+    FREEGLUT_BUILD_DEMOS = false;
+    CMAKE_INSTALL_LIBDIR = "lib";
+  };
 
   meta = {
     description = "Open-source alternative to the OpenGL Utility Toolkit (GLUT) library";

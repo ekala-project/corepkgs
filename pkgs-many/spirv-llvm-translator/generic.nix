@@ -61,15 +61,16 @@ stdenv.mkDerivation {
 
   nativeCheckInputs = [ lit ];
 
-  cmakeFlags = [
-    "-DLLVM_INCLUDE_TESTS=ON"
-    "-DLLVM_DIR=${llvm.dev}"
-    "-DBUILD_SHARED_LIBS=YES"
-    "-DLLVM_SPIRV_BUILD_EXTERNAL=YES"
-    "-DCMAKE_SKIP_BUILD_RPATH=ON"
-    "-DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=${spirv-headers.src}"
-  ]
-  ++ lib.optional (packageAtLeast "19") "-DBASE_LLVM_VERSION=${lib.versions.majorMinor llvm.version}.0";
+  cmakeEntries = {
+    LLVM_INCLUDE_TESTS = "ON";
+    LLVM_DIR = "${llvm.dev}";
+    BUILD_SHARED_LIBS = "YES";
+    LLVM_SPIRV_BUILD_EXTERNAL = "YES";
+    CMAKE_SKIP_BUILD_RPATH = "ON";
+    LLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR = "${spirv-headers.src}";
+    ${if packageAtLeast "19" then "BASE_LLVM_VERSION" else null} =
+      "${lib.versions.majorMinor llvm.version}.0";
+  };
 
   doCheck = false;
 

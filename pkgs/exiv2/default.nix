@@ -48,11 +48,11 @@ stdenv.mkDerivation (finalAttrs: {
     zlib
   ];
 
-  cmakeFlags = [
-    "-DEXIV2_ENABLE_NLS=ON"
-    "-DEXIV2_BUILD_DOC=OFF"
-    "-DEXIV2_ENABLE_BMFF=ON"
-  ];
+  cmakeEntries = {
+    EXIV2_ENABLE_NLS = true;
+    EXIV2_BUILD_DOC = false;
+    EXIV2_ENABLE_BMFF = true;
+  };
 
   preFixup = ''
     remove-references-to -t ${stdenv.cc.cc} $lib/lib/*.so.*.*.* $out/bin/exiv2

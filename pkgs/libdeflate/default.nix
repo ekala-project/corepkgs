@@ -27,10 +27,10 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-QVF2XL8Qu3mTszKKtx+8BExkTGkpMANXjkAe3XXPUJQ=";
   };
 
-  cmakeFlags = [
-    "-DLIBDEFLATE_BUILD_TESTS=ON"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isStatic [ "-DLIBDEFLATE_BUILD_SHARED_LIB=OFF" ];
+  cmakeEntries = {
+    LIBDEFLATE_BUILD_TESTS = true;
+    ${if stdenv.hostPlatform.isStatic then "LIBDEFLATE_BUILD_SHARED_LIB" else null} = false;
+  };
 
   nativeBuildInputs = [
     cmake

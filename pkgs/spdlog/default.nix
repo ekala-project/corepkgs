@@ -34,14 +34,14 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs = [ catch2_3 ];
   propagatedBuildInputs = [ fmt ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "SPDLOG_BUILD_SHARED" (!staticBuild))
-    (lib.cmakeBool "SPDLOG_BUILD_STATIC" staticBuild)
-    (lib.cmakeBool "SPDLOG_BUILD_EXAMPLE" false)
-    (lib.cmakeBool "SPDLOG_BUILD_BENCH" false)
-    (lib.cmakeBool "SPDLOG_BUILD_TESTS" true)
-    (lib.cmakeBool "SPDLOG_FMT_EXTERNAL" true)
-  ];
+  cmakeEntries = {
+    SPDLOG_BUILD_SHARED = !staticBuild;
+    SPDLOG_BUILD_STATIC = staticBuild;
+    SPDLOG_BUILD_EXAMPLE = false;
+    SPDLOG_BUILD_BENCH = false;
+    SPDLOG_BUILD_TESTS = true;
+    SPDLOG_FMT_EXTERNAL = true;
+  };
 
   outputs = [
     "out"

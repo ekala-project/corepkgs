@@ -69,9 +69,9 @@ stdenv.mkDerivation (finalAttrs: {
     done
   '';
 
-  cmakeFlags = lib.optionals static [
-    "-DBUILD_SHARED_LIBS=OFF"
-  ];
+  cmakeEntries = {
+    ${if static then "BUILD_SHARED_LIBS" else null} = false;
+  };
 
   postConfigure = lib.optionalString static ''
     sed -e '/freetype freetype.c/d' -i ../tests/examples/CMakeLists.txt

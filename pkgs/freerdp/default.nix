@@ -139,42 +139,40 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   # https://github.com/FreeRDP/FreeRDP/issues/8526#issuecomment-1357134746
-  cmakeFlags = [
-    "-Wno-dev"
-    (lib.cmakeFeature "CMAKE_INSTALL_LIBDIR" "lib")
-    (lib.cmakeFeature "DOCBOOKXSL_DIR" "${docbook-xsl-nons}/xml/xsl/docbook")
-  ]
-  ++ lib.mapAttrsToList lib.cmakeBool (
-    {
-      BUILD_TESTING = false; # false is recommended by upstream
-      CHANNEL_RDPEWA = true;
-      CHANNEL_RDPEWA_CLIENT = true;
-      WITH_CAIRO = cairo != null;
-      WITH_CUPS = cups != null;
-      WITH_FAAC = false; # TODO(corepkgs): Port faac for AAC encoding
-      WITH_FAAD2 = false; # TODO(corepkgs): Port faad2 for AAC decoding
-      WITH_FUSE = stdenv.hostPlatform.isLinux && fuse != null;
-      WITH_JPEG = libjpeg != null;
-      WITH_KRB5 = libkrb5 != null;
-      WITH_OPENH264 = false; # TODO(corepkgs): Port openh264
-      WITH_OPUS = libopus != null;
-      WITH_OSS = false;
-      WITH_MANPAGES = withManPages;
-      WITH_PCSC = pcsclite != null;
-      WITH_PULSE = false; # TODO(corepkgs): Port libpulseaudio
-      WITH_SERVER = buildServer;
-      WITH_WEBVIEW = false; # avoid introducing webkit2gtk-4.0
-      WITH_VAAPI = false; # false is recommended by upstream
-    }
-    // lib.filterAttrs (_name: value: value) {
-      # Only select one
-      WITH_X11 = !withWaylandSupport;
-      WITH_WAYLAND = withWaylandSupport;
-    }
-  )
-  ++ lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
-    (lib.cmakeBool "SDL_USE_COMPILED_RESOURCES" false)
-  ];
+  cmakeFlags = [ "-Wno-dev" ];
+
+  cmakeEntries = {
+    CMAKE_INSTALL_LIBDIR = "lib";
+    DOCBOOKXSL_DIR = "${docbook-xsl-nons}/xml/xsl/docbook";
+    BUILD_TESTING = false; # false is recommended by upstream
+    CHANNEL_RDPEWA = true;
+    CHANNEL_RDPEWA_CLIENT = true;
+    WITH_CAIRO = cairo != null;
+    WITH_CUPS = cups != null;
+    WITH_FAAC = false; # TODO(corepkgs): Port faac for AAC encoding
+    WITH_FAAD2 = false; # TODO(corepkgs): Port faad2 for AAC decoding
+    WITH_FUSE = stdenv.hostPlatform.isLinux && fuse != null;
+    WITH_JPEG = libjpeg != null;
+    WITH_KRB5 = libkrb5 != null;
+    WITH_OPENH264 = false; # TODO(corepkgs): Port openh264
+    WITH_OPUS = libopus != null;
+    WITH_OSS = false;
+    WITH_MANPAGES = withManPages;
+    WITH_PCSC = pcsclite != null;
+    WITH_PULSE = false; # TODO(corepkgs): Port libpulseaudio
+    WITH_SERVER = buildServer;
+    WITH_WEBVIEW = false; # avoid introducing webkit2gtk-4.0
+    WITH_VAAPI = false; # false is recommended by upstream
+    ${
+      if !stdenv.buildPlatform.canExecute stdenv.hostPlatform then "SDL_USE_COMPILED_RESOURCES" else null
+    } =
+      false;
+  }
+  // lib.filterAttrs (_name: value: value) {
+    # Only select one
+    WITH_X11 = !withWaylandSupport;
+    WITH_WAYLAND = withWaylandSupport;
+  };
 
   env.NIX_CFLAGS_COMPILE = toString (
     lib.optionals stdenv.hostPlatform.isDarwin [

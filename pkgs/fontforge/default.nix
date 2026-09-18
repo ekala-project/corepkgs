@@ -95,15 +95,15 @@ stdenv.mkDerivation (finalAttrs: {
     ++ lib.optional (gtkmm3 != null) gtkmm3
   );
 
-  cmakeFlags = [
-    "-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON"
-  ]
-  ++ lib.optional (!withSpiro) "-DENABLE_LIBSPIRO=OFF"
-  ++ lib.optional (!withGUI) "-DENABLE_GUI=OFF"
-  ++ lib.optional (!withGTK) "-DENABLE_X11=ON"
-  ++ lib.optional (!withPython) "-DENABLE_PYTHON_SCRIPTING=OFF"
-  ++ lib.optional withPython "-DPython3_EXECUTABLE=${lib.getExe py}"
-  ++ lib.optional withExtras "-DENABLE_FONTFORGE_EXTRAS=ON";
+  cmakeEntries = {
+    CMAKE_BUILD_WITH_INSTALL_RPATH = "ON";
+    ${if !withSpiro then "ENABLE_LIBSPIRO" else null} = "OFF";
+    ${if !withGUI then "ENABLE_GUI" else null} = "OFF";
+    ${if !withGTK then "ENABLE_X11" else null} = "ON";
+    ${if !withPython then "ENABLE_PYTHON_SCRIPTING" else null} = "OFF";
+    ${if withPython then "Python3_EXECUTABLE" else null} = "${lib.getExe py}";
+    ${if withExtras then "ENABLE_FONTFORGE_EXTRAS" else null} = "ON";
+  };
 
   preConfigure = ''
     # The way $version propagates to $version of .pe-scripts (https://github.com/dejavu-fonts/dejavu-fonts/blob/358190f/scripts/generate.pe#L19)

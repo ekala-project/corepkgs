@@ -62,24 +62,24 @@ stdenv.mkDerivation (finalAttrs: {
     ls -l ${libclang.dev}/lib/cmake/clang/ClangConfig.cmake
     ls -l ${mlir.dev}/lib/cmake/mlir/MLIRConfig.cmake
   '';
-  cmakeFlags = [
-    (lib.cmakeBool "CMAKE_VERBOSE_MAKEFILE" true)
-    (lib.cmakeFeature "LLVM_DIR" "${libllvm.dev}/lib/cmake/llvm")
+  cmakeEntries = {
+    CMAKE_VERBOSE_MAKEFILE = true;
+    LLVM_DIR = "${libllvm.dev}/lib/cmake/llvm";
     # TODO: Needs patches and the `lit` package like other LLVM builds?
-    (lib.cmakeFeature "LLVM_TOOLS_BINARY_DIR" "${buildLlvmPackages.tblgen}/bin/")
-    (lib.cmakeFeature "LLVM_EXTERNAL_LIT" "${buildLlvmPackages.tblgen}/bin/llvm-lit")
-    (lib.cmakeFeature "CLANG_DIR" "${libclang.dev}/lib/cmake/clang")
-    (lib.cmakeFeature "MLIR_DIR" "${mlir.dev}/lib/cmake/mlir")
-    (lib.cmakeFeature "MLIR_TABLEGEN_EXE" "${buildLlvmPackages.tblgen}/bin/mlir-tblgen")
-    (lib.cmakeFeature "MLIR_TABLEGEN_TARGET" "MLIR-TBLGen")
-    (lib.cmakeBool "LLVM_BUILD_EXAMPLES" false)
-    (lib.cmakeBool "LLVM_ENABLE_PLUGINS" false)
-    (lib.cmakeBool "FLANG_STANDALONE_BUILD" true)
-    (lib.cmakeBool "LLVM_INCLUDE_EXAMPLES" false)
-    (lib.cmakeBool "FLANG_INCLUDE_TESTS" false)
+    LLVM_TOOLS_BINARY_DIR = "${buildLlvmPackages.tblgen}/bin/";
+    LLVM_EXTERNAL_LIT = "${buildLlvmPackages.tblgen}/bin/llvm-lit";
+    CLANG_DIR = "${libclang.dev}/lib/cmake/clang";
+    MLIR_DIR = "${mlir.dev}/lib/cmake/mlir";
+    MLIR_TABLEGEN_EXE = "${buildLlvmPackages.tblgen}/bin/mlir-tblgen";
+    MLIR_TABLEGEN_TARGET = "MLIR-TBLGen";
+    LLVM_BUILD_EXAMPLES = false;
+    LLVM_ENABLE_PLUGINS = false;
+    FLANG_STANDALONE_BUILD = true;
+    LLVM_INCLUDE_EXAMPLES = false;
+    FLANG_INCLUDE_TESTS = false;
+  };
 
-  ]
-  ++ devExtraCmakeFlags;
+  cmakeFlags = devExtraCmakeFlags;
 
   postUnpack = ''
     chmod -R u+w -- $sourceRoot/..

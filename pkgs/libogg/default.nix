@@ -25,9 +25,9 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "BUILD_SHARED_LIBS" (!stdenv.hostPlatform.isStatic))
-  ];
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = !stdenv.hostPlatform.isStatic;
+  };
 
   meta = {
     description = "Media container library to manipulate Ogg files";

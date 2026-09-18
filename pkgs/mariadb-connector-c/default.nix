@@ -79,12 +79,12 @@ stdenv.mkDerivation (finalAttrs: {
     zstd
   ];
 
-  cmakeFlags = [
-    "-DMARIADB_UNIX_ADDR=/run/mysqld/mysqld.sock"
-    "-DWITH_CURL=ON"
-    "-DWITH_EXTERNAL_ZLIB=ON"
-    "-DWITH_MYSQLCOMPAT=ON"
-  ];
+  cmakeEntries = {
+    MARIADB_UNIX_ADDR = "/run/mysqld/mysqld.sock";
+    WITH_CURL = true;
+    WITH_EXTERNAL_ZLIB = true;
+    WITH_MYSQLCOMPAT = true;
+  };
 
   postInstall = ''
     moveToOutput bin/mariadb_config "$dev"

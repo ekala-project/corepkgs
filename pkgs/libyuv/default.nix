@@ -36,9 +36,9 @@ stdenv.mkDerivation {
     libjpeg
   ];
 
-  cmakeFlags = [
-    "-DCMAKE_INSTALL_LIBDIR=lib"
-  ];
+  cmakeEntries = {
+    CMAKE_INSTALL_LIBDIR = "lib";
+  };
 
   postPatch = ''
     mkdir -p $out/lib/pkgconfig

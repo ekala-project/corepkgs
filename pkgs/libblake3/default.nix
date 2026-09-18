@@ -37,10 +37,10 @@ stdenv.mkDerivation (finalAttrs: {
     onetbb
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "BLAKE3_USE_TBB" useTBB)
-    (lib.cmakeBool "BUILD_SHARED_LIBS" (!stdenv.hostPlatform.isStatic))
-  ];
+  cmakeEntries = {
+    BLAKE3_USE_TBB = useTBB;
+    BUILD_SHARED_LIBS = !stdenv.hostPlatform.isStatic;
+  };
 
   meta = {
     description = "Official C implementation of BLAKE3";

@@ -58,12 +58,12 @@ stdenv.mkDerivation (finalAttrs: {
     qt6.qtsvg
   ];
 
-  cmakeFlags = [
-    "-Duse_sys_spdlog=ON"
-    "-Duse_sys_fmt=ON"
-    "-Duse_sys_sqlite3=ON"
-  ]
-  ++ lib.optional (qt6 != null) "-Dbuild_wizard=YES";
+  cmakeEntries = {
+    use_sys_spdlog = "ON";
+    use_sys_fmt = "ON";
+    use_sys_sqlite3 = "ON";
+    ${if qt6 != null then "build_wizard" else null} = "YES";
+  };
 
   # put examples in an output so people/tools can test against them
   outputs = [

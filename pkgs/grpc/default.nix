@@ -59,15 +59,15 @@ stdenv.mkDerivation (finalAttrs: {
     # TODO(corepkgs): Port libnsl for NIS/NIS+ support on Linux
   ];
 
-  cmakeFlags = [
-    "-DgRPC_ZLIB_PROVIDER=package"
-    "-DgRPC_CARES_PROVIDER=package"
-    "-DgRPC_RE2_PROVIDER=package"
-    "-DgRPC_SSL_PROVIDER=package"
-    "-DgRPC_PROTOBUF_PROVIDER=package"
-    "-DgRPC_ABSL_PROVIDER=package"
-    "-DBUILD_SHARED_LIBS=ON"
-  ];
+  cmakeEntries = {
+    gRPC_ZLIB_PROVIDER = "package";
+    gRPC_CARES_PROVIDER = "package";
+    gRPC_RE2_PROVIDER = "package";
+    gRPC_SSL_PROVIDER = "package";
+    gRPC_PROTOBUF_PROVIDER = "package";
+    gRPC_ABSL_PROVIDER = "package";
+    BUILD_SHARED_LIBS = true;
+  };
 
   cmakeBuildType = "Release";
 

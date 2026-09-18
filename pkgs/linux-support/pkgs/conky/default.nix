@@ -159,30 +159,30 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optional pulseSupport libpulseaudio
   ++ lib.optional journalSupport systemd;
 
-  cmakeFlags = [
-    (lib.cmakeBool "REPRODUCIBLE_BUILD" true)
-    (lib.cmakeBool "RELEASE" true)
-    (lib.cmakeBool "BUILD_TESTING" finalAttrs.finalPackage.doCheck)
-    (lib.cmakeBool "BUILD_EXTRAS" extrasSupport)
-    (lib.cmakeBool "BUILD_DOCS" docsSupport)
-    (lib.cmakeBool "BUILD_CURL" curlSupport)
-    (lib.cmakeBool "BUILD_IBM" ibmSupport)
-    (lib.cmakeBool "BUILD_IMLIB2" imlib2Support)
-    (lib.cmakeBool "BUILD_LUA_CAIRO" luaCairoSupport)
-    (lib.cmakeBool "BUILD_LUA_IMLIB2" luaImlib2Support)
-    (lib.cmakeBool "BUILD_MPD" mpdSupport)
-    (lib.cmakeBool "BUILD_NCURSES" ncursesSupport)
-    (lib.cmakeBool "BUILD_RSS" rssSupport)
-    (lib.cmakeBool "BUILD_X11" x11Support)
-    (lib.cmakeBool "BUILD_WAYLAND" waylandSupport)
-    (lib.cmakeBool "BUILD_XDAMAGE" xdamageSupport)
-    (lib.cmakeBool "BUILD_XDBE" doubleBufferSupport)
-    (lib.cmakeBool "BUILD_WLAN" wirelessSupport)
-    (lib.cmakeBool "BUILD_NVIDIA" nvidiaSupport)
-    (lib.cmakeBool "BUILD_PULSEAUDIO" pulseSupport)
-    (lib.cmakeBool "BUILD_JOURNAL" journalSupport)
-    (lib.cmakeFeature "CMAKE_INSTALL_DATAROOTDIR" "${placeholder "out"}/share")
-  ];
+  cmakeEntries = {
+    REPRODUCIBLE_BUILD = true;
+    RELEASE = true;
+    BUILD_TESTING = finalAttrs.finalPackage.doCheck;
+    BUILD_EXTRAS = extrasSupport;
+    BUILD_DOCS = docsSupport;
+    BUILD_CURL = curlSupport;
+    BUILD_IBM = ibmSupport;
+    BUILD_IMLIB2 = imlib2Support;
+    BUILD_LUA_CAIRO = luaCairoSupport;
+    BUILD_LUA_IMLIB2 = luaImlib2Support;
+    BUILD_MPD = mpdSupport;
+    BUILD_NCURSES = ncursesSupport;
+    BUILD_RSS = rssSupport;
+    BUILD_X11 = x11Support;
+    BUILD_WAYLAND = waylandSupport;
+    BUILD_XDAMAGE = xdamageSupport;
+    BUILD_XDBE = doubleBufferSupport;
+    BUILD_WLAN = wirelessSupport;
+    BUILD_NVIDIA = nvidiaSupport;
+    BUILD_PULSEAUDIO = pulseSupport;
+    BUILD_JOURNAL = journalSupport;
+    CMAKE_INSTALL_DATAROOTDIR = "${placeholder "out"}/share";
+  };
 
   doCheck = true;
 

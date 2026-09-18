@@ -52,11 +52,12 @@ stdenv.mkDerivation (finalAttrs: {
     python3
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "LIBUNWIND_ENABLE_SHARED" enableShared)
-    (lib.cmakeFeature "LLVM_ENABLE_RUNTIMES" "libunwind")
-  ]
-  ++ devExtraCmakeFlags;
+  cmakeEntries = {
+    LIBUNWIND_ENABLE_SHARED = enableShared;
+    LLVM_ENABLE_RUNTIMES = "libunwind";
+  };
+
+  cmakeFlags = devExtraCmakeFlags;
 
   postInstall =
     lib.optionalString (enableShared && !stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isWindows)

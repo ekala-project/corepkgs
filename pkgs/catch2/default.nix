@@ -34,9 +34,12 @@ stdenv.mkDerivation rec {
 
   cmakeFlags = [
     "-H.."
-    "-DCMAKE_INSTALL_INCLUDEDIR=include"
-    "-DCMAKE_INSTALL_LIBDIR=lib"
   ];
+
+  cmakeEntries = {
+    CMAKE_INSTALL_INCLUDEDIR = "include";
+    CMAKE_INSTALL_LIBDIR = "lib";
+  };
 
   meta = {
     description = "Multi-paradigm automated test framework for C++ and Objective-C (and, maybe, C)";

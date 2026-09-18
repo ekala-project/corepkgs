@@ -39,22 +39,19 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-kBQqTxMIWMCZJA1SuxVb29Y7k+V1Y2qVR2EntoY4FUo=";
   };
 
-  cmakeFlags = [
-    "-DREGEX_BACKEND=pcre2"
-    "-DUSE_HTTP_PARSER=llhttp"
-    "-DUSE_SSH=ON"
-    (lib.cmakeBool "USE_GSSAPI" withGssapi)
-    "-DBUILD_SHARED_LIBS=${if staticBuild then "OFF" else "ON"}"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isWindows [
-    "-DDLLTOOL=${stdenv.cc.bintools.targetPrefix}dlltool"
+  cmakeEntries = {
+    REGEX_BACKEND = "pcre2";
+    USE_HTTP_PARSER = "llhttp";
+    USE_SSH = true;
+    USE_GSSAPI = withGssapi;
+    BUILD_SHARED_LIBS = !staticBuild;
+    ${if stdenv.hostPlatform.isWindows then "DLLTOOL" else null} =
+      "${stdenv.cc.bintools.targetPrefix}dlltool";
     # For ws2_32, referred to by a `*.pc` file
-    "-DCMAKE_LIBRARY_PATH=${stdenv.cc.libc}/lib"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isOpenBSD [
+    ${if stdenv.hostPlatform.isWindows then "CMAKE_LIBRARY_PATH" else null} = "${stdenv.cc.libc}/lib";
     # openbsd headers fail with default c90
-    "-DCMAKE_C_STANDARD=99"
-  ];
+    ${if stdenv.hostPlatform.isOpenBSD then "CMAKE_C_STANDARD" else null} = "99";
+  };
 
   nativeBuildInputs = [
     cmake

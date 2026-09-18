@@ -44,11 +44,11 @@ stdenv.mkDerivation (finalAttrs: {
     libxml2
   ];
 
-  cmakeFlags = [
-    "-DCMAKE_SKIP_BUILD_RPATH=ON"
-    "-DZIG_STATIC_LLVM=ON"
-    "-DZIG_TARGET_MCPU=baseline"
-  ];
+  cmakeEntries = {
+    CMAKE_SKIP_BUILD_RPATH = "ON";
+    ZIG_STATIC_LLVM = "ON";
+    ZIG_TARGET_MCPU = "baseline";
+  };
 
   configurePhase = "cmakeConfigurePhase";
   buildPhase = "ninjaBuildPhase";

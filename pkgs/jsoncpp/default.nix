@@ -39,13 +39,13 @@ stdenv.mkDerivation (finalAttrs: {
     validatePkgConfig
   ];
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=ON"
-    "-DBUILD_OBJECT_LIBS=OFF"
-    "-DJSONCPP_WITH_CMAKE_PACKAGE=ON"
-    "-DBUILD_STATIC_LIBS=OFF"
-  ]
-  ++ lib.optional (stdenv.buildPlatform != stdenv.hostPlatform) "-DJSONCPP_WITH_TESTS=OFF";
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = true;
+    BUILD_OBJECT_LIBS = false;
+    JSONCPP_WITH_CMAKE_PACKAGE = true;
+    BUILD_STATIC_LIBS = false;
+    ${if stdenv.buildPlatform != stdenv.hostPlatform then "JSONCPP_WITH_TESTS" else null} = false;
+  };
 
   meta = {
     homepage = "https://github.com/open-source-parsers/jsoncpp";

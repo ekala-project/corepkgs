@@ -163,38 +163,37 @@ stdenv.mkDerivation (finalAttrs: {
       ibusMinimal
     ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "SDL_ALSA" alsaSupport)
-    (lib.cmakeBool "SDL_DBUS" dbusSupport)
-    (lib.cmakeBool "SDL_HIDAPI_LIBUSB" libusbSupport)
-    (lib.cmakeBool "SDL_IBUS" ibusSupport)
-    (lib.cmakeBool "SDL_JACK" jackSupport)
-    (lib.cmakeBool "SDL_KMSDRM" drmSupport)
-    (lib.cmakeBool "SDL_LIBUDEV" libudevSupport)
-    (lib.cmakeBool "SDL_OPENGL" openglSupport)
-    (lib.cmakeBool "SDL_PIPEWIRE" pipewireSupport)
-    (lib.cmakeBool "SDL_PULSEAUDIO" pulseaudioSupport)
-    (lib.cmakeBool "SDL_SNDIO" sndioSupport)
-    (lib.cmakeBool "SDL_TEST_LIBRARY" true)
-    (lib.cmakeBool "SDL_TRAY_DUMMY" (!traySupport))
-    (lib.cmakeBool "SDL_VULKAN" vulkanSupport)
-    (lib.cmakeBool "SDL_WAYLAND" waylandSupport)
-    (lib.cmakeBool "SDL_WAYLAND_LIBDECOR" libdecorSupport)
-    (lib.cmakeBool "SDL_X11" x11Support)
+  cmakeEntries = {
+    SDL_ALSA = alsaSupport;
+    SDL_DBUS = dbusSupport;
+    SDL_HIDAPI_LIBUSB = libusbSupport;
+    SDL_IBUS = ibusSupport;
+    SDL_JACK = jackSupport;
+    SDL_KMSDRM = drmSupport;
+    SDL_LIBUDEV = libudevSupport;
+    SDL_OPENGL = openglSupport;
+    SDL_PIPEWIRE = pipewireSupport;
+    SDL_PULSEAUDIO = pulseaudioSupport;
+    SDL_SNDIO = sndioSupport;
+    SDL_TEST_LIBRARY = true;
+    SDL_TRAY_DUMMY = !traySupport;
+    SDL_VULKAN = vulkanSupport;
+    SDL_WAYLAND = waylandSupport;
+    SDL_WAYLAND_LIBDECOR = libdecorSupport;
+    SDL_X11 = x11Support;
 
-    (lib.cmakeBool "SDL_TESTS" true)
-    (lib.cmakeBool "SDL_INSTALL_TESTS" true)
-    (lib.cmakeBool "SDL_DEPS_SHARED" false)
+    SDL_TESTS = true;
+    SDL_INSTALL_TESTS = true;
+    SDL_DEPS_SHARED = false;
 
     # Only ppc64le baseline guarantees AltiVec
-    (lib.cmakeBool "SDL_ALTIVEC" (stdenv.hostPlatform.isPower64 && stdenv.hostPlatform.isLittleEndian))
+    SDL_ALTIVEC = stdenv.hostPlatform.isPower64 && stdenv.hostPlatform.isLittleEndian;
 
-    (lib.cmakeBool "SDL_UNIX_CONSOLE_BUILD" (
+    SDL_UNIX_CONSOLE_BUILD =
       stdenv.hostPlatform.isUnix
       && !(stdenv.hostPlatform.isDarwin || stdenv.hostPlatform.isAndroid)
-      && !(x11Support || waylandSupport)
-    ))
-  ];
+      && !(x11Support || waylandSupport);
+  };
 
   doCheck = true;
 

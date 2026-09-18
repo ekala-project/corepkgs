@@ -63,13 +63,13 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [ libsodium ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "BUILD_SHARED" (!stdenv.hostPlatform.isStatic))
-    (lib.cmakeBool "ENABLE_CURVE" true)
-    (lib.cmakeBool "ENABLE_DRAFTS" enableDrafts)
-    (lib.cmakeBool "WITH_LIBSODIUM" true)
-    "-DWITH_DOC=OFF"
-  ];
+  cmakeEntries = {
+    BUILD_SHARED = !stdenv.hostPlatform.isStatic;
+    ENABLE_CURVE = true;
+    ENABLE_DRAFTS = enableDrafts;
+    WITH_LIBSODIUM = true;
+    WITH_DOC = "OFF";
+  };
 
   postPatch = ''
     substituteInPlace CMakeLists.txt \

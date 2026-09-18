@@ -42,12 +42,12 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = [
+  cmakeEntries = {
     # FIXME remove once Taskflow is updated to 4.0.0
-    (lib.cmakeFeature "CMAKE_CXX_STANDARD" "20")
+    CMAKE_CXX_STANDARD = "20";
     # building the tests implies running them in the buildPhase
-    (lib.cmakeBool "TF_BUILD_TESTS" finalAttrs.finalPackage.doCheck)
-  ];
+    TF_BUILD_TESTS = finalAttrs.finalPackage.doCheck;
+  };
 
   # Massive test suite
   doCheck = false;

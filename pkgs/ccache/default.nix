@@ -80,7 +80,9 @@ stdenv.mkDerivation (finalAttrs: {
     zstd
   ];
 
-  cmakeFlags = [ "-DENABLE_TESTING=OFF" ];
+  cmakeEntries = {
+    ENABLE_TESTING = false;
+  };
 
   passthru = {
     # A derivation that provides gcc and g++ commands, but that

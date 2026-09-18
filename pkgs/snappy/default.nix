@@ -40,11 +40,11 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeBuildType = "Release";
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=ON"
-    "-DSNAPPY_BUILD_TESTS=OFF"
-    "-DSNAPPY_BUILD_BENCHMARKS=OFF"
-  ];
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = true;
+    SNAPPY_BUILD_TESTS = false;
+    SNAPPY_BUILD_BENCHMARKS = false;
+  };
 
   postInstall = ''
     substituteInPlace "$out"/lib/cmake/Snappy/SnappyTargets.cmake \

@@ -106,35 +106,30 @@ stdenv.mkDerivation (
 
     hardeningDisable = [ "format" ];
 
-    cmakeFlags = [
-      (lib.cmakeBool "LLDB_INCLUDE_TESTS" finalAttrs.finalPackage.doCheck)
-      (lib.cmakeBool "LLVM_ENABLE_RTTI" false)
-      (lib.cmakeFeature "Clang_DIR" "${lib.getDev libclang}/lib/cmake")
-      (lib.cmakeFeature "LLVM_EXTERNAL_LIT" "${lit}/bin/lit")
-      (lib.cmakeFeature "CLANG_RESOURCE_DIR" "../../../../${lib.getLib libclang}")
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      (lib.cmakeBool "LLDB_USE_SYSTEM_DEBUGSERVER" true)
-    ]
-    ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [
-      (lib.cmakeFeature "LLDB_CODESIGN_IDENTITY" "") # codesigning makes nondeterministic
-    ]
-    ++ lib.optionals enableManpages [
-      (lib.cmakeBool "LLVM_ENABLE_SPHINX" true)
-      (lib.cmakeBool "SPHINX_OUTPUT_MAN" true)
-      (lib.cmakeBool "SPHINX_OUTPUT_HTML" false)
+    cmakeEntries = {
+      LLDB_INCLUDE_TESTS = finalAttrs.finalPackage.doCheck;
+      LLVM_ENABLE_RTTI = false;
+      Clang_DIR = "${lib.getDev libclang}/lib/cmake";
+      LLVM_EXTERNAL_LIT = "${lit}/bin/lit";
+      CLANG_RESOURCE_DIR = "../../../../${lib.getLib libclang}";
+      ${if stdenv.hostPlatform.isDarwin then "LLDB_USE_SYSTEM_DEBUGSERVER" else null} = true;
+      ${if !stdenv.hostPlatform.isDarwin then "LLDB_CODESIGN_IDENTITY" else null} = ""; # codesigning makes nondeterministic
+      ${if enableManpages then "LLVM_ENABLE_SPHINX" else null} = true;
+      ${if enableManpages then "SPHINX_OUTPUT_MAN" else null} = true;
+      ${if enableManpages then "SPHINX_OUTPUT_HTML" else null} = false;
       # docs reference `automodapi` but it's not added to the extensions list when
       # only building the manpages:
       # https://github.com/llvm/llvm-project/blob/af6ec9200b09039573d85e349496c4f5b17c3d7f/lldb/docs/conf.py#L54
       #
       # so, we just ignore the resulting errors
-      (lib.cmakeBool "SPHINX_WARNINGS_AS_ERRORS" false)
-    ]
-    ++ lib.optionals finalAttrs.finalPackage.doCheck [
-      (lib.cmakeFeature "LLDB_TEST_C_COMPILER" "${stdenv.cc}/bin/${stdenv.cc.targetPrefix}cc")
-      (lib.cmakeFeature "-DLLDB_TEST_CXX_COMPILER" "${stdenv.cc}/bin/${stdenv.cc.targetPrefix}c++")
-    ]
-    ++ devExtraCmakeFlags;
+      ${if enableManpages then "SPHINX_WARNINGS_AS_ERRORS" else null} = false;
+      ${if finalAttrs.finalPackage.doCheck then "LLDB_TEST_C_COMPILER" else null} =
+        "${stdenv.cc}/bin/${stdenv.cc.targetPrefix}cc";
+      ${if finalAttrs.finalPackage.doCheck then "LLDB_TEST_CXX_COMPILER" else null} =
+        "${stdenv.cc}/bin/${stdenv.cc.targetPrefix}c++";
+    };
+
+    cmakeFlags = devExtraCmakeFlags;
 
     doCheck = false;
     doInstallCheck = false;

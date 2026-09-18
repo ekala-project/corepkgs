@@ -24,16 +24,16 @@ stdenv.mkDerivation rec {
     "dev"
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "BUILD_SHARED_LIBS" (!stdenv.hostPlatform.isStatic))
-    "-DBUILD_CODEC=ON"
-    "-DBUILD_THIRDPARTY=OFF"
-    "-DBUILD_JPIP=OFF"
-    "-DBUILD_JPIP_SERVER=OFF"
-    "-DBUILD_VIEWER=OFF"
-    "-DBUILD_JAVA=OFF"
-    "-DBUILD_TESTING=OFF"
-  ];
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = !stdenv.hostPlatform.isStatic;
+    BUILD_CODEC = true;
+    BUILD_THIRDPARTY = false;
+    BUILD_JPIP = false;
+    BUILD_JPIP_SERVER = false;
+    BUILD_VIEWER = false;
+    BUILD_JAVA = false;
+    BUILD_TESTING = false;
+  };
 
   nativeBuildInputs = [
     cmake

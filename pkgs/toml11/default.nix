@@ -43,9 +43,9 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
     cmake.configurePhaseHook
   ];
-  cmakeFlags = [
-    (lib.cmakeBool "TOML11_BUILD_TOML_TESTS" finalAttrs.finalPackage.doCheck)
-  ];
+  cmakeEntries = {
+    TOML11_BUILD_TOML_TESTS = finalAttrs.finalPackage.doCheck;
+  };
   checkInputs = [
     doctest
     nlohmann_json

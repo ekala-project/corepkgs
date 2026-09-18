@@ -41,9 +41,10 @@ stdenv.mkDerivation (finalAttrs: {
   # case‐insensitive Darwin systems.
   cmakeBuildDir = "build.dir";
 
-  cmakeFlags =
-    lib.optional finalAttrs.finalPackage.doCheck "-DWITH_TESTS=ON"
-    ++ lib.optional (!stdenv.hostPlatform.isStatic) "-DBUILD_SHARED_LIBS=ON";
+  cmakeEntries = {
+    ${if finalAttrs.finalPackage.doCheck then "WITH_TESTS" else null} = true;
+    ${if !stdenv.hostPlatform.isStatic then "BUILD_SHARED_LIBS" else null} = true;
+  };
 
   # Tests are restricted while pkgsStatic.cmocka is broken. Tracked at:
   # https://github.com/NixOS/nixpkgs/issues/213623

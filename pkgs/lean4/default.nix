@@ -82,13 +82,13 @@ stdenv.mkDerivation (finalAttrs: {
 
   patches = [ ./mimalloc.patch ];
 
-  cmakeFlags = [
-    "-DUSE_GITHASH=OFF"
-    "-DINSTALL_LICENSE=OFF"
-    "-DINSTALL_CADICAL=OFF"
-    "-DCADICAL=${cadical'}/bin/cadical"
-    "-DUSE_MIMALLOC=${if enableMimalloc then "ON" else "OFF"}"
-  ];
+  cmakeEntries = {
+    USE_GITHASH = "OFF";
+    INSTALL_LICENSE = "OFF";
+    INSTALL_CADICAL = "OFF";
+    CADICAL = "${cadical'}/bin/cadical";
+    USE_MIMALLOC = if enableMimalloc then "ON" else "OFF";
+  };
 
   meta = {
     description = "Automatic and interactive theorem prover";

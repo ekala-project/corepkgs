@@ -36,10 +36,10 @@ stdenv.mkDerivation rec {
   ];
 
   # Put libraries in "lib" subdirectory, not top level of $out
-  cmakeFlags = [
-    "-DCMAKE_INSTALL_LIBDIR=lib"
-    "-DLIBBPF_EMBEDDED=OFF"
-  ];
+  cmakeEntries = {
+    CMAKE_INSTALL_LIBDIR = "lib";
+    LIBBPF_EMBEDDED = false;
+  };
 
   meta = {
     homepage = "https://git.kernel.org/pub/scm/devel/pahole/pahole.git/";

@@ -64,24 +64,16 @@ stdenv.mkDerivation (finalAttrs: {
     java
   ];
 
-  cmakeFlags = [
-    "-DENABLE_STATIC=${if enableStatic then "1" else "0"}"
-    "-DENABLE_SHARED=${if enableShared then "1" else "0"}"
-  ]
-  ++ lib.optionals enableJava [
-    "-DWITH_JAVA=1"
-  ]
-  ++ lib.optionals enableJpeg7 [
-    "-DWITH_JPEG7=1"
-  ]
-  ++ lib.optionals enableJpeg8 [
-    "-DWITH_JPEG8=1"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isRiscV [
+  cmakeEntries = {
+    ENABLE_STATIC = enableStatic;
+    ENABLE_SHARED = enableShared;
+    ${if enableJava then "WITH_JAVA" else null} = "1";
+    ${if enableJpeg7 then "WITH_JPEG7" else null} = "1";
+    ${if enableJpeg8 then "WITH_JPEG8" else null} = "1";
     # https://github.com/libjpeg-turbo/libjpeg-turbo/issues/428
     # https://github.com/libjpeg-turbo/libjpeg-turbo/commit/88bf1d16786c74f76f2e4f6ec2873d092f577c75
-    "-DFLOATTEST=fp-contract"
-  ];
+    ${if stdenv.hostPlatform.isRiscV then "FLOATTEST" else null} = "fp-contract";
+  };
 
   doInstallCheck = true;
   installCheckTarget = "test";

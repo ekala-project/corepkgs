@@ -59,10 +59,10 @@ stdenv.mkDerivation rec {
     s2n-tls
   ];
 
-  cmakeFlags = [
-    "-DBUILD_DEPS=OFF"
-    "-DBUILD_SHARED_LIBS=ON"
-  ];
+  cmakeEntries = {
+    BUILD_DEPS = false;
+    BUILD_SHARED_LIBS = true;
+  };
 
   postInstall = ''
     # Prevent dependency cycle.

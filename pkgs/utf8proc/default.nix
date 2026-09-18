@@ -27,10 +27,10 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "BUILD_SHARED_LIBS" true)
-    (lib.cmakeBool "UTF8PROC_ENABLE_TESTING" false)
-  ];
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = true;
+    UTF8PROC_ENABLE_TESTING = false;
+  };
 
   doCheck = false;
 

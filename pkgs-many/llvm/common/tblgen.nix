@@ -89,18 +89,17 @@ let
       updateAutotoolsGnuConfigScriptsHook
     ];
 
-    cmakeFlags = [
+    cmakeEntries = {
       # Projects with tablegen-like tools.
-      "-DLLVM_ENABLE_PROJECTS=${
-        lib.concatStringsSep ";" [
-          "llvm"
-          "clang"
-          "clang-tools-extra"
-          "mlir"
-        ]
-      }"
-    ]
-    ++ devExtraCmakeFlags;
+      LLVM_ENABLE_PROJECTS = lib.concatStringsSep ";" [
+        "llvm"
+        "clang"
+        "clang-tools-extra"
+        "mlir"
+      ];
+    };
+
+    cmakeFlags = devExtraCmakeFlags;
 
     ninjaFlags = targets;
 

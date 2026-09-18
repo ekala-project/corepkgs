@@ -45,7 +45,9 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = [ (lib.cmakeBool "BUILD_SHARED_LIBS" enableShared) ];
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = enableShared;
+  };
 
   passthru = mkVariantPassthru variantArgs // {
     tests = {

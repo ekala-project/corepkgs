@@ -43,19 +43,16 @@ stdenv.mkDerivation (finalAttrs: {
     export PATH=$NIX_BUILD_TOP:$PATH
   '';
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=ON"
-    "-DENABLE_TESTS=OFF"
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = "ON";
+    ENABLE_TESTS = "OFF";
     # TODO(corepkgs): Enable when libvmaf is packaged.
-    "-DCONFIG_TUNE_VMAF=0"
-  ]
-  ++ lib.optionals (stdenv.isCross && !stdenv.hostPlatform.isx86) [
-    "-DCMAKE_ASM_COMPILER=${lib.getBin stdenv.cc}/bin/${stdenv.cc.targetPrefix}cc"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isAarch32 [
+    CONFIG_TUNE_VMAF = "0";
+    ${if stdenv.isCross && !stdenv.hostPlatform.isx86 then "CMAKE_ASM_COMPILER" else null} =
+      "${lib.getBin stdenv.cc}/bin/${stdenv.cc.targetPrefix}cc";
     # armv7l-hf-multiplatform does not support NEON
-    "-DENABLE_NEON=0"
-  ];
+    ${if stdenv.hostPlatform.isAarch32 then "ENABLE_NEON" else null} = "0";
+  };
 
   postFixup = ''
     # Fix broken pkgconfig paths (double slashes from cmake prefix joining)

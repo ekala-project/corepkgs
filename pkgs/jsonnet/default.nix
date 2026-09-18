@@ -24,13 +24,12 @@ stdenv.mkDerivation (finalAttrs: {
   ];
   buildInputs = [ gtest ];
 
-  cmakeFlags = [
-    "-DUSE_SYSTEM_GTEST=ON"
-    "-DBUILD_STATIC_LIBS=${if stdenv.hostPlatform.isStatic then "ON" else "OFF"}"
-  ]
-  ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [
-    "-DBUILD_SHARED_BINARIES=${if stdenv.hostPlatform.isStatic then "OFF" else "ON"}"
-  ];
+  cmakeEntries = {
+    USE_SYSTEM_GTEST = true;
+    BUILD_STATIC_LIBS = stdenv.hostPlatform.isStatic;
+    ${if !stdenv.hostPlatform.isDarwin then "BUILD_SHARED_BINARIES" else null} =
+      !stdenv.hostPlatform.isStatic;
+  };
 
   meta = {
     description = "Purely-functional configuration language that helps you define JSON data";
