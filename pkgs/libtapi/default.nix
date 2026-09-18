@@ -113,29 +113,29 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeDir = "../llvm";
 
-  cmakeFlags = [
-    (lib.cmakeFeature "LLVM_ENABLE_PROJECTS" "clang;tapi")
-    (lib.cmakeFeature "LLVM_EXTERNAL_PROJECTS" "tapi")
-    (lib.cmakeBool "TAPI_INCLUDE_DOCS" true)
+  cmakeEntries = {
+    LLVM_ENABLE_PROJECTS = "clang;tapi";
+    LLVM_EXTERNAL_PROJECTS = "tapi";
+    TAPI_INCLUDE_DOCS = true;
     # Matches the version string format reported by upstream `tapi`.
-    (lib.cmakeFeature "TAPI_REPOSITORY_STRING" "tapi-${finalAttrs.version}")
-    (lib.cmakeFeature "TAPI_FULL_VERSION" appleLlvm.version)
+    TAPI_REPOSITORY_STRING = "tapi-${finalAttrs.version}";
+    TAPI_FULL_VERSION = appleLlvm.version;
     # Match the versioning used by Apple’s LLVM fork (primarily used for .so versioning).
-    (lib.cmakeFeature "LLVM_VERSION_MAJOR" (lib.versions.major appleLlvm.version))
-    (lib.cmakeFeature "LLVM_VERSION_MINOR" (lib.versions.minor appleLlvm.version))
-    (lib.cmakeFeature "LLVM_VERSION_PATCH" (lib.versions.patch appleLlvm.version))
-    (lib.cmakeFeature "LLVM_VERSION_SUFFIX" "")
+    LLVM_VERSION_MAJOR = lib.versions.major appleLlvm.version;
+    LLVM_VERSION_MINOR = lib.versions.minor appleLlvm.version;
+    LLVM_VERSION_PATCH = lib.versions.patch appleLlvm.version;
+    LLVM_VERSION_SUFFIX = "";
     # Upstream `tapi` does not link against ncurses. Disable it explicitly to make sure
     # it is not detected incorrectly from the bootstrap tools tarball.
-    (lib.cmakeBool "LLVM_ENABLE_TERMINFO" false)
+    LLVM_ENABLE_TERMINFO = false;
     # Disabling the benchmarks avoids a failure during the configure phase because
     # the sparse checkout does not include the benchmarks.
-    (lib.cmakeBool "LLVM_INCLUDE_BENCHMARKS" false)
+    LLVM_INCLUDE_BENCHMARKS = false;
     # tapi’s tests expect to target macOS 13.0 and build both x86_64 and universal
     # binaries regardless of the host platform.
-    (lib.cmakeBool "LLVM_INCLUDE_TESTS" false)
-    (lib.cmakeBool "TAPI_INCLUDE_TESTS" false)
-  ];
+    LLVM_INCLUDE_TESTS = false;
+    TAPI_INCLUDE_TESTS = false;
+  };
 
   ninjaFlags = [
     "libtapi"
