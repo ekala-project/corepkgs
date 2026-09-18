@@ -27,10 +27,10 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "ENABLE_SHARED_LIB" (!stdenv.hostPlatform.isStatic))
-    (lib.cmakeBool "ENABLE_STATIC_LIB" stdenv.hostPlatform.isStatic)
-  ];
+  cmakeEntries = {
+    ENABLE_SHARED_LIB = !stdenv.hostPlatform.isStatic;
+    ENABLE_STATIC_LIB = stdenv.hostPlatform.isStatic;
+  };
 
   passthru.tests = {
     unittests = runUnitTests finalAttrs.finalPackage;
