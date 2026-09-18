@@ -56,20 +56,20 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals stdenv.cc.isClang [ llvmPackages.openmp ];
 
-  cmakeFlags = [
-    "-DIGRAPH_USE_INTERNAL_BLAS=OFF"
-    "-DIGRAPH_USE_INTERNAL_LAPACK=OFF"
-    "-DIGRAPH_USE_INTERNAL_ARPACK=ON"
-    "-DIGRAPH_USE_INTERNAL_GLPK=ON"
-    "-DIGRAPH_USE_INTERNAL_GMP=OFF"
-    "-DIGRAPH_USE_INTERNAL_PLFIT=ON"
-    "-DIGRAPH_GLPK_SUPPORT=ON"
-    "-DIGRAPH_GRAPHML_SUPPORT=ON"
-    "-DIGRAPH_OPENMP_SUPPORT=ON"
-    "-DIGRAPH_ENABLE_LTO=AUTO"
-    "-DIGRAPH_ENABLE_TLS=ON"
-    "-DBUILD_SHARED_LIBS=ON"
-  ];
+  cmakeEntries = {
+    IGRAPH_USE_INTERNAL_BLAS = false;
+    IGRAPH_USE_INTERNAL_LAPACK = false;
+    IGRAPH_USE_INTERNAL_ARPACK = true;
+    IGRAPH_USE_INTERNAL_GLPK = true;
+    IGRAPH_USE_INTERNAL_GMP = false;
+    IGRAPH_USE_INTERNAL_PLFIT = true;
+    IGRAPH_GLPK_SUPPORT = true;
+    IGRAPH_GRAPHML_SUPPORT = true;
+    IGRAPH_OPENMP_SUPPORT = true;
+    IGRAPH_ENABLE_LTO = "AUTO";
+    IGRAPH_ENABLE_TLS = true;
+    BUILD_SHARED_LIBS = true;
+  };
 
   postFixup = ''
     substituteInPlace $dev/lib/cmake/igraph/igraph-targets.cmake \
