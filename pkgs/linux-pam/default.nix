@@ -84,22 +84,22 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   mesonAutoFeatures = "auto";
-  mesonFlags = [
-    (lib.mesonEnable "logind" withLogind)
-    (lib.mesonEnable "audit" withAudit)
-    (lib.mesonEnable "pam_lastlog" (!stdenv.hostPlatform.isMusl)) # TODO: switch to pam_lastlog2, pam_lastlog is deprecated and broken on musl
-    (lib.mesonEnable "pam_unix" true)
-    (lib.mesonOption "sysconfdir" "etc") # relative to meson prefix, which is $out
-    (lib.mesonEnable "elogind" false)
-    (lib.mesonEnable "econf" false)
-    (lib.mesonOption "vendordir" "")
-    (lib.mesonEnable "selinux" false)
-    (lib.mesonEnable "nis" false)
-    (lib.mesonBool "xtests" false)
-    (lib.mesonBool "examples" false)
-  ]
-  # warning: slower execution due to debug makes VM tests fail!
-  ++ lib.optional debugMode (lib.mesonBool "pam-debug" true);
+  mesonEntries = {
+    logind = if withLogind then "enabled" else "disabled";
+    audit = if withAudit then "enabled" else "disabled";
+    pam_lastlog = if !stdenv.hostPlatform.isMusl then "enabled" else "disabled"; # TODO: switch to pam_lastlog2, pam_lastlog is deprecated and broken on musl
+    pam_unix = "enabled";
+    sysconfdir = "etc"; # relative to meson prefix, which is $out
+    elogind = "disabled";
+    econf = "disabled";
+    vendordir = "";
+    selinux = "disabled";
+    nis = "disabled";
+    xtests = false;
+    examples = false;
+    # warning: slower execution due to debug makes VM tests fail!
+    ${if debugMode then "pam-debug" else null} = true;
+  };
 
   postInstall = ''
     moveToOutput sbin/pam_namespace_helper $scripts
