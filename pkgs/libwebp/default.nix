@@ -60,17 +60,17 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "BUILD_SHARED_LIBS" true)
-    (lib.cmakeBool "WEBP_USE_THREAD" threadingSupport)
-    (lib.cmakeBool "WEBP_BUILD_VWEBP" openglSupport)
-    (lib.cmakeBool "WEBP_BUILD_IMG2WEBP" (pngSupport || jpegSupport || tiffSupport))
-    (lib.cmakeBool "WEBP_BUILD_GIF2WEBP" gifSupport)
-    (lib.cmakeBool "WEBP_BUILD_ANIM_UTILS" false) # Not installed
-    (lib.cmakeBool "WEBP_BUILD_EXTRAS" false) # Not installed
-    (lib.cmakeBool "WEBP_ENABLE_SWAP_16BIT_CSP" swap16bitcspSupport)
-    (lib.cmakeBool "WEBP_BUILD_LIBWEBPMUX" libwebpmuxSupport)
-  ];
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = true;
+    WEBP_USE_THREAD = threadingSupport;
+    WEBP_BUILD_VWEBP = openglSupport;
+    WEBP_BUILD_IMG2WEBP = pngSupport || jpegSupport || tiffSupport;
+    WEBP_BUILD_GIF2WEBP = gifSupport;
+    WEBP_BUILD_ANIM_UTILS = false; # Not installed
+    WEBP_BUILD_EXTRAS = false; # Not installed
+    WEBP_ENABLE_SWAP_16BIT_CSP = swap16bitcspSupport;
+    WEBP_BUILD_LIBWEBPMUX = libwebpmuxSupport;
+  };
 
   nativeBuildInputs = [
     cmake
