@@ -189,15 +189,15 @@ stdenv.mkDerivation (finalAttrs: {
     cups
   ];
 
-  mesonFlags = [
-    "-Dgtk_doc=${lib.boolToString withIntrospection}"
-    "-Dtests=false"
-    "-Dtracker3=${lib.boolToString trackerSupport}"
-    "-Dbroadway_backend=${lib.boolToString broadwaySupport}"
-    "-Dx11_backend=${lib.boolToString x11Support}"
-    "-Dquartz_backend=${lib.boolToString (stdenv.hostPlatform.isDarwin && !x11Support)}"
-    "-Dintrospection=${lib.boolToString withIntrospection}"
-  ];
+  mesonEntries = {
+    gtk_doc = withIntrospection;
+    tests = false;
+    tracker3 = trackerSupport;
+    broadway_backend = broadwaySupport;
+    x11_backend = x11Support;
+    quartz_backend = stdenv.hostPlatform.isDarwin && !x11Support;
+    introspection = withIntrospection;
+  };
 
   doCheck = false; # needs X11
 
