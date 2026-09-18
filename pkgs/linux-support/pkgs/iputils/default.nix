@@ -34,14 +34,14 @@ stdenv.mkDerivation rec {
   # /build/source/build/ping/ping: socket: Operation not permitted
   doCheck = false;
 
-  mesonFlags = [
-    "-DNO_SETCAP_OR_SUID=true"
-    "-Dsystemdunitdir=etc/systemd/system"
-    "-DINSTALL_SYSTEMD_UNITS=true"
-    "-DSKIP_TESTS=${lib.boolToString (!doCheck)}"
-  ]
-  # Disable idn usage w/musl (https://github.com/iputils/iputils/pull/111):
-  ++ lib.optional stdenv.hostPlatform.isMusl "-DUSE_IDN=false";
+  mesonEntries = {
+    NO_SETCAP_OR_SUID = true;
+    systemdunitdir = "etc/systemd/system";
+    INSTALL_SYSTEMD_UNITS = true;
+    SKIP_TESTS = !doCheck;
+    # Disable idn usage w/musl (https://github.com/iputils/iputils/pull/111):
+    ${if stdenv.hostPlatform.isMusl then "USE_IDN" else null} = false;
+  };
 
   nativeBuildInputs = [
     meson
