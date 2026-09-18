@@ -408,7 +408,7 @@ stdenv.mkDerivation (
 
     cmakeBuildType = "Release";
 
-    cmakeFlags =
+    cmakeEntries =
       let
         # These flags influence llvm-config's BuildVariables.inc in addition to the
         # general build. We need to make sure these are also passed via
@@ -423,88 +423,79 @@ stdenv.mkDerivation (
           (lib.cmakeBool "LLVM_LINK_LLVM_DYLIB" enableSharedLibraries)
           (lib.cmakeFeature "LLVM_TABLEGEN" "${buildLlvmPackages.tblgen}/bin/llvm-tblgen")
         ];
+        isCross =
+          (stdenv.hostPlatform != stdenv.buildPlatform)
+          && !(stdenv.buildPlatform.canExecute stdenv.hostPlatform);
       in
-      flagsForLlvmConfig
-      ++ [
-        (lib.cmakeBool "LLVM_INSTALL_UTILS" true) # Needed by rustc
-        (lib.cmakeBool "LLVM_BUILD_TESTS" finalAttrs.finalPackage.doCheck)
-        (lib.cmakeBool "LLVM_ENABLE_FFI" true)
-        (lib.cmakeFeature "LLVM_HOST_TRIPLE" stdenv.hostPlatform.config)
-        (lib.cmakeFeature "LLVM_DEFAULT_TARGET_TRIPLE" stdenv.hostPlatform.config)
-        (lib.cmakeBool "LLVM_ENABLE_DUMP" true)
-        (lib.cmakeBool "LLVM_ENABLE_TERMINFO" enableTerminfo)
-        (lib.cmakeBool "LLVM_INCLUDE_TESTS" finalAttrs.finalPackage.doCheck)
-      ]
-      ++ optionals stdenv.hostPlatform.isStatic [
+      {
+        LLVM_INSTALL_PACKAGE_DIR = "${placeholder "dev"}/lib/cmake/llvm";
+        LLVM_ENABLE_RTTI = true;
+        LLVM_LINK_LLVM_DYLIB = enableSharedLibraries;
+        LLVM_TABLEGEN = "${buildLlvmPackages.tblgen}/bin/llvm-tblgen";
+        LLVM_INSTALL_UTILS = true; # Needed by rustc
+        LLVM_BUILD_TESTS = finalAttrs.finalPackage.doCheck;
+        LLVM_ENABLE_FFI = true;
+        LLVM_HOST_TRIPLE = stdenv.hostPlatform.config;
+        LLVM_DEFAULT_TARGET_TRIPLE = stdenv.hostPlatform.config;
+        LLVM_ENABLE_DUMP = true;
+        LLVM_ENABLE_TERMINFO = enableTerminfo;
+        LLVM_INCLUDE_TESTS = finalAttrs.finalPackage.doCheck;
         # Disables building of shared libs, -fPIC is still injected by cc-wrapper
-        (lib.cmakeBool "LLVM_ENABLE_PIC" false)
-        (lib.cmakeBool "CMAKE_SKIP_INSTALL_RPATH" true)
-        (lib.cmakeBool "LLVM_BUILD_STATIC" true)
+        ${if stdenv.hostPlatform.isStatic then "LLVM_ENABLE_PIC" else null} = false;
+        ${if stdenv.hostPlatform.isStatic then "CMAKE_SKIP_INSTALL_RPATH" else null} = true;
+        ${if stdenv.hostPlatform.isStatic then "LLVM_BUILD_STATIC" else null} = true;
         # libxml2 needs to be disabled because the LLVM build system ignores its .la
         # file and doesn't link zlib as well.
         # https://github.com/ClangBuiltLinux/tc-build/issues/150#issuecomment-845418812
-        (lib.cmakeBool "LLVM_ENABLE_LIBXML2" false)
-      ]
-      ++ optionals enableManpages [
-        (lib.cmakeBool "LLVM_BUILD_DOCS" true)
-        (lib.cmakeBool "LLVM_ENABLE_SPHINX" true)
-        (lib.cmakeBool "SPHINX_OUTPUT_MAN" true)
-        (lib.cmakeBool "SPHINX_OUTPUT_HTML" false)
-        (lib.cmakeBool "SPHINX_WARNINGS_AS_ERRORS" false)
-      ]
-      ++ optionals (libbfd != null) [
+        ${if stdenv.hostPlatform.isStatic then "LLVM_ENABLE_LIBXML2" else null} = false;
+        ${if enableManpages then "LLVM_BUILD_DOCS" else null} = true;
+        ${if enableManpages then "LLVM_ENABLE_SPHINX" else null} = true;
+        ${if enableManpages then "SPHINX_OUTPUT_MAN" else null} = true;
+        ${if enableManpages then "SPHINX_OUTPUT_HTML" else null} = false;
+        ${if enableManpages then "SPHINX_WARNINGS_AS_ERRORS" else null} = false;
         # LLVM depends on binutils only through libbfd/include/plugin-api.h, which
         # is meant to be a stable interface. Depend on that file directly rather
         # than through a build of BFD to break the dependency of clang on the target
         # triple. The result of this is that a single clang build can be used for
         # multiple targets.
-        (lib.cmakeFeature "LLVM_BINUTILS_INCDIR" "${libbfd.plugin-api-header}/include")
-      ]
-      ++ optionals stdenv.hostPlatform.isDarwin [
-        (lib.cmakeBool "LLVM_ENABLE_LIBCXX" true)
-        (lib.cmakeBool "CAN_TARGET_i386" false)
-      ]
-      ++
-        optionals
-          (
-            (stdenv.hostPlatform != stdenv.buildPlatform)
-            && !(stdenv.buildPlatform.canExecute stdenv.hostPlatform)
-          )
-          [
-            (lib.cmakeBool "CMAKE_CROSSCOMPILING" true)
-            (
-              let
-                nativeCC = pkgsBuildBuild.targetPackages.stdenv.cc;
-                nativeBintools = nativeCC.bintools.bintools;
-                nativeToolchainFlags = [
-                  (lib.cmakeFeature "CMAKE_C_COMPILER" "${nativeCC}/bin/${nativeCC.targetPrefix}cc")
-                  (lib.cmakeFeature "CMAKE_CXX_COMPILER" "${nativeCC}/bin/${nativeCC.targetPrefix}c++")
-                  (lib.cmakeFeature "CMAKE_AR" "${nativeBintools}/bin/${nativeBintools.targetPrefix}ar")
-                  (lib.cmakeFeature "CMAKE_STRIP" "${nativeBintools}/bin/${nativeBintools.targetPrefix}strip")
-                  (lib.cmakeFeature "CMAKE_RANLIB" "${nativeBintools}/bin/${nativeBintools.targetPrefix}ranlib")
-                ];
-                # We need to repass the custom GNUInstallDirs values, otherwise CMake
-                # will choose them for us, leading to wrong results in llvm-config-native
-                nativeInstallFlags = [
-                  (lib.cmakeFeature "CMAKE_INSTALL_PREFIX" (placeholder "out"))
-                  (lib.cmakeFeature "CMAKE_INSTALL_BINDIR" "${placeholder "out"}/bin")
-                  (lib.cmakeFeature "CMAKE_INSTALL_INCLUDEDIR" "${placeholder "dev"}/include")
-                  (lib.cmakeFeature "CMAKE_INSTALL_LIBDIR" "${placeholder "lib"}/lib")
-                  (lib.cmakeFeature "CMAKE_INSTALL_LIBEXECDIR" "${placeholder "lib"}/libexec")
-                ];
-              in
-              lib.cmakeOptionType "list" "CROSS_TOOLCHAIN_FLAGS_NATIVE" (
-                lib.concatStringsSep ";" (
-                  lib.concatLists [
-                    flagsForLlvmConfig
-                    nativeToolchainFlags
-                    nativeInstallFlags
-                  ]
-                )
-              )
-            )
-          ]
-      ++ devExtraCmakeFlags;
+        ${if libbfd != null then "LLVM_BINUTILS_INCDIR" else null} = "${libbfd.plugin-api-header}/include";
+        ${if stdenv.hostPlatform.isDarwin then "LLVM_ENABLE_LIBCXX" else null} = true;
+        ${if stdenv.hostPlatform.isDarwin then "CAN_TARGET_i386" else null} = false;
+        ${if isCross then "CMAKE_CROSSCOMPILING" else null} = true;
+      }
+      // lib.optionalAttrs isCross (
+        let
+          nativeCC = pkgsBuildBuild.targetPackages.stdenv.cc;
+          nativeBintools = nativeCC.bintools.bintools;
+          nativeToolchainFlags = [
+            (lib.cmakeFeature "CMAKE_C_COMPILER" "${nativeCC}/bin/${nativeCC.targetPrefix}cc")
+            (lib.cmakeFeature "CMAKE_CXX_COMPILER" "${nativeCC}/bin/${nativeCC.targetPrefix}c++")
+            (lib.cmakeFeature "CMAKE_AR" "${nativeBintools}/bin/${nativeBintools.targetPrefix}ar")
+            (lib.cmakeFeature "CMAKE_STRIP" "${nativeBintools}/bin/${nativeBintools.targetPrefix}strip")
+            (lib.cmakeFeature "CMAKE_RANLIB" "${nativeBintools}/bin/${nativeBintools.targetPrefix}ranlib")
+          ];
+          # We need to repass the custom GNUInstallDirs values, otherwise CMake
+          # will choose them for us, leading to wrong results in llvm-config-native
+          nativeInstallFlags = [
+            (lib.cmakeFeature "CMAKE_INSTALL_PREFIX" (placeholder "out"))
+            (lib.cmakeFeature "CMAKE_INSTALL_BINDIR" "${placeholder "out"}/bin")
+            (lib.cmakeFeature "CMAKE_INSTALL_INCLUDEDIR" "${placeholder "dev"}/include")
+            (lib.cmakeFeature "CMAKE_INSTALL_LIBDIR" "${placeholder "lib"}/lib")
+            (lib.cmakeFeature "CMAKE_INSTALL_LIBEXECDIR" "${placeholder "lib"}/libexec")
+          ];
+        in
+        {
+          "CROSS_TOOLCHAIN_FLAGS_NATIVE:list" = lib.concatStringsSep ";" (
+            lib.concatLists [
+              flagsForLlvmConfig
+              nativeToolchainFlags
+              nativeInstallFlags
+            ]
+          );
+        }
+      );
+
+    cmakeFlags = devExtraCmakeFlags;
 
     postInstall = ''
       mkdir -p $python/share
