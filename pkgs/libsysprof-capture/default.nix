@@ -23,17 +23,17 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
   ];
 
-  mesonFlags = [
-    "-Dsysprofd=none"
-    "-Dgtk=false"
-    "-Dlibsysprof=false"
-    "-Dhelp=false"
-    "-Dtools=false"
-    "-Dtests=false"
-    "-Dexamples=false"
-    "-Dpolkit-agent=disabled"
-    "-Ddebuginfod=disabled"
-  ];
+  mesonEntries = {
+    sysprofd = "none";
+    gtk = false;
+    libsysprof = false;
+    help = false;
+    tools = false;
+    tests = false;
+    examples = false;
+    polkit-agent = "disabled";
+    debuginfod = "disabled";
+  };
 
   meta = {
     description = "Static library for Sysprof capture data generation";
