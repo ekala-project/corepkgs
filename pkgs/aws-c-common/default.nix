@@ -29,12 +29,10 @@ stdenv.mkDerivation rec {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=ON"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isRiscV [
-    "-DCMAKE_C_FLAGS=-fasynchronous-unwind-tables"
-  ];
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = true;
+    ${if stdenv.hostPlatform.isRiscV then "CMAKE_C_FLAGS" else null} = "-fasynchronous-unwind-tables";
+  };
 
   # aws-c-common misuses cmake modules, so we need
   # to manually add a MODULE_PATH to its consumers
