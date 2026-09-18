@@ -23,6 +23,10 @@ changes differ significantly from whath one would expct with Nixpkgs.
 - `__structuredAttrs = true` is the default — derivation attributes are arrays, not space-separated strings.
 - setupHooks for build managers are now explicit and opt-in.
   - `meson.configurePhaseHook` and `cmake.configurePhaseHook` now needs to be specified.
+- `cmakeEntries` is the preferred way to pass CMake `-D` cache entries as a
+  structured attrset (e.g. `cmakeEntries = { BUILD_TESTING = false; };`).
+  Booleans are automatically canonicalized to `ON`/`OFF`. The legacy
+  `cmakeFlags` list still works for non-`-D` flags and backward compatibility.
 - `mesonBuildType` defaults to `release` instead of Nixpkgs' `plain`.
 - `doCheck` now defaults to `false` across the package set.
   - Test suites are not executed as part of the main build by default.
