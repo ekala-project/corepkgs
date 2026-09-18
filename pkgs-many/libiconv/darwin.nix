@@ -49,7 +49,9 @@ mkAppleDerivation (finalAttrs: {
   # `gperf` is used to generate a lookup table from module to ops functions.
   nativeBuildInputs = lib.optionals hostPlatform.isStatic [ gperf ];
 
-  mesonFlags = [ (lib.mesonBool "tests" finalAttrs.finalPackage.doInstallCheck) ];
+  mesonEntries = {
+    tests = finalAttrs.finalPackage.doInstallCheck;
+  };
 
   postBuild =
     # Add `libcharset.a` contents to `libiconv.a` to duplicate the reexport from `libiconv.dylib`.
