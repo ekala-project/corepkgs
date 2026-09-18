@@ -43,16 +43,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   hardeningDisable = [ "trivialautovarinit" ];
 
-  cmakeFlags = [
-    "-DCATCH_DEVELOPMENT_BUILD=ON"
-    "-DCATCH_BUILD_TESTING=${if finalAttrs.finalPackage.doCheck then "ON" else "OFF"}"
-    "-DCATCH_ENABLE_WERROR=OFF"
-  ]
-  ++ lib.optionals (stdenv.cc.isClang && finalAttrs.finalPackage.doCheck) [
+  cmakeEntries = {
+    CATCH_DEVELOPMENT_BUILD = true;
+    CATCH_BUILD_TESTING = finalAttrs.finalPackage.doCheck;
+    CATCH_ENABLE_WERROR = false;
     # test has a faulty path normalization technique that won't work in
     # our darwin/LLVM build environment https://github.com/catchorg/Catch2/issues/1691
-    "-DCMAKE_CTEST_ARGUMENTS=-E;ApprovalTests"
-  ];
+    ${if stdenv.cc.isClang && finalAttrs.finalPackage.doCheck then "CMAKE_CTEST_ARGUMENTS" else null} =
+      "-E;ApprovalTests";
+  };
 
   env =
     lib.optionalAttrs stdenv.hostPlatform.isx86_32 {
