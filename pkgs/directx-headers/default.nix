@@ -29,7 +29,9 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   # tests require WSL2
-  mesonFlags = [ "-Dbuild-test=false" ];
+  mesonEntries = {
+    build-test = false;
+  };
 
   meta = {
     description = "Official D3D12 headers from Microsoft";
