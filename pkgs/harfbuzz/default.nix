@@ -39,18 +39,18 @@ stdenv.mkDerivation (finalAttrs: {
   ];
   outputBin = "dev";
 
-  mesonFlags = [
-    (lib.mesonEnable "cairo" false)
-    (lib.mesonEnable "raster" false)
-    (lib.mesonEnable "chafa" false)
-    (lib.mesonEnable "coretext" false)
-    (lib.mesonEnable "graphite" withGraphite2)
-    (lib.mesonEnable "icu" withIcu)
-    (lib.mesonEnable "introspection" false)
-    (lib.mesonEnable "docs" false)
-    (lib.mesonEnable "gpu" false)
-    (lib.mesonEnable "gpu_demo" false)
-  ];
+  mesonEntries = {
+    cairo = "disabled";
+    raster = "disabled";
+    chafa = "disabled";
+    coretext = "disabled";
+    graphite = if withGraphite2 then "enabled" else "disabled";
+    icu = if withIcu then "enabled" else "disabled";
+    introspection = "disabled";
+    docs = "disabled";
+    gpu = "disabled";
+    gpu_demo = "disabled";
+  };
 
   depsBuildBuild = [
     pkg-config
