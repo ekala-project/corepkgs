@@ -27,9 +27,9 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "BUILD_APPS" false)
-  ];
+  cmakeEntries = {
+    BUILD_APPS = false;
+  };
 
   passthru.tests = {
     inherit elfutils;
