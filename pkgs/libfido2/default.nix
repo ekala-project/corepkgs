@@ -50,19 +50,13 @@ stdenv.mkDerivation rec {
 
   doInstallCheck = true;
 
-  cmakeFlags = [
-    "-DUDEV_RULES_DIR=${placeholder "out"}/etc/udev/rules.d"
-    "-DCMAKE_INSTALL_LIBDIR=lib"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    "-DUSE_HIDAPI=1"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [
-    "-DNFC_LINUX=1"
-  ]
-  ++ lib.optionals (stdenv.hostPlatform.isLinux && withPcsclite) [
-    "-DUSE_PCSC=1"
-  ];
+  cmakeEntries = {
+    UDEV_RULES_DIR = "${placeholder "out"}/etc/udev/rules.d";
+    CMAKE_INSTALL_LIBDIR = "lib";
+    ${if stdenv.hostPlatform.isDarwin then "USE_HIDAPI" else null} = "1";
+    ${if stdenv.hostPlatform.isLinux then "NFC_LINUX" else null} = "1";
+    ${if stdenv.hostPlatform.isLinux && withPcsclite then "USE_PCSC" else null} = "1";
+  };
 
   # causes possible redefinition of _FORTIFY_SOURCE?
   hardeningDisable = [ "fortify3" ];
