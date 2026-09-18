@@ -112,7 +112,20 @@ meta = {
 
 **CMake packages:**
 
-Include `cmake.configurePhaseHook` in nativeBuildInputs.
+Include `cmake.configurePhaseHook` in nativeBuildInputs. Use `cmakeEntries` (an attrset) instead
+of `cmakeFlags` (a list of strings) for CMake `-D` cache entries. Booleans are automatically
+canonicalized to `ON`/`OFF`.
+
+```nix
+nativeBuildInputs = [ cmake cmake.configurePhaseHook ];
+
+cmakeEntries = {
+  BUILD_SHARED_LIBS = true;
+  CMAKE_INSTALL_LIBDIR = "lib";
+};
+```
+
+Use `cmakeFlags` only for non-`-D` flags (e.g. `-Wno-dev`). Both can be used together.
 
 **Detailed guide:** See [`.agents/skills/cmake/SKILL.md`](.agents/skills/cmake/SKILL.md) for complete CMake documentation.
 
