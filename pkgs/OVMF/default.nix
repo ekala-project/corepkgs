@@ -8,11 +8,10 @@
   llvmPackages,
   fetchFromGitLab,
   python3,
-  pexpect ? null,
-  xorriso ? null,
+  xorriso,
   qemu,
   dosfstools,
-  mtools ? null,
+  mtools,
   fdSize2MB ? false,
   fdSize4MB ? secureBoot,
   secureBoot ? false,
@@ -102,10 +101,6 @@ in
 assert msVarsTemplate -> fdSize4MB;
 assert msVarsTemplate -> platformSpecific ? ${cpuName};
 assert msVarsTemplate -> platformSpecific.${cpuName} ? msVarsArgs;
-# TODO(corepkgs): Remove these assertions once we port pexpect, xorriso, and mtools
-assert msVarsTemplate -> pexpect != null;
-assert msVarsTemplate -> xorriso != null;
-assert msVarsTemplate -> mtools != null;
 
 edk2.mkDerivation projectDscPath (finalAttrs: {
   pname = "OVMF";
@@ -127,7 +122,7 @@ edk2.mkDerivation projectDscPath (finalAttrs: {
   ]
   ++ lib.optionals msVarsTemplate [
     python3
-    pexpect
+    python3.pkgs.pexpect
     xorriso
     qemu
     dosfstools
