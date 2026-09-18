@@ -31,6 +31,10 @@
   meson,
   ninja,
   m4,
+  bluez,
+  sbc,
+  libjack2,
+  lirc,
 
   x11Support ? false,
 
@@ -41,8 +45,11 @@
 
   airtunesSupport ? false,
 
-  # TODO(corepkgs): Port bluez5 and sbc for bluetooth support
-  bluetoothSupport ? false,
+  bluetoothSupport ? stdenv.hostPlatform.isLinux,
+
+  jackSupport ? !libOnly,
+
+  lircSupport ? !libOnly,
 
   alsaSupport ? stdenv.hostPlatform.isLinux,
   udevSupport ? stdenv.hostPlatform.isLinux,
@@ -134,6 +141,12 @@ stdenv.mkDerivation (finalAttrs: {
       udev
     ]
     ++ lib.optional airtunesSupport openssl
+    ++ lib.optionals bluetoothSupport [
+      bluez
+      sbc
+    ]
+    ++ lib.optional jackSupport libjack2
+    ++ lib.optional lircSupport lirc
   );
 
   env =
@@ -147,7 +160,7 @@ stdenv.mkDerivation (finalAttrs: {
     alsa = if (!libOnly && alsaSupport) then "enabled" else "disabled";
     asyncns = if (!libOnly) then "enabled" else "disabled";
     avahi = "disabled";
-    bluez5 = "disabled";
+    bluez5 = if (!libOnly && bluetoothSupport) then "enabled" else "disabled";
     bluez5-gstreamer = "disabled";
     database = "simple";
     doxygen = false;
@@ -160,10 +173,8 @@ stdenv.mkDerivation (finalAttrs: {
         "disabled";
     gstreamer = "disabled";
     gtk = "disabled";
-    # TODO(corepkgs): Re-enable when libjack2 is ported
-    jack = "disabled";
-    # TODO(corepkgs): Re-enable when lirc is ported
-    lirc = "disabled";
+    jack = if (!libOnly && jackSupport) then "enabled" else "disabled";
+    lirc = if (!libOnly && lircSupport) then "enabled" else "disabled";
     openssl = if airtunesSupport then "enabled" else "disabled";
     orc = "disabled";
     systemd = if (useSystemd && !libOnly) then "enabled" else "disabled";
