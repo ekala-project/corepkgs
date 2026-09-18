@@ -38,17 +38,19 @@ stdenv.mkDerivation rec {
   mesonAutoFeatures = "disabled";
 
   mesonEntries = {
-    gbm = "enabled";
     gbm-backends-path = "${libglvnd.driverLink}/lib/gbm";
-
-    egl = "disabled";
-    glx = "disabled";
-    zlib = "disabled";
 
     platforms = "";
     gallium-drivers = "";
     vulkan-drivers = "";
     vulkan-layers = "";
+  };
+
+  mesonFeatures = {
+    gbm = true;
+    egl = false;
+    glx = false;
+    zlib = false;
   };
 
   mesonFlags = [

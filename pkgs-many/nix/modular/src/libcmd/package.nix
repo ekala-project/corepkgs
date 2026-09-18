@@ -51,8 +51,11 @@ mkMesonLibrary (finalAttrs: {
     nlohmann_json
   ];
 
+  mesonFeatures = {
+    markdown = enableMarkdown;
+  };
+
   mesonEntries = {
-    markdown = if enableMarkdown then "enabled" else "disabled";
     readline-flavor = readlineFlavor;
   };
 

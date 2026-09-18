@@ -73,10 +73,13 @@ stdenv.mkDerivation (finalAttrs: {
     perl.pkgs.Test2Harness
   ];
 
+  mesonFeatures = lib.optionalAttrs atLeast223 {
+    tests = finalAttrs.finalPackage.doCheck;
+  };
+
   mesonEntries = lib.optionalAttrs atLeast223 {
     dbi_path = "${perl.pkgs.DBI}/${perl.libPrefix}";
     dbd_sqlite_path = "${perl.pkgs.DBDSQLite}/${perl.libPrefix}";
-    tests = if finalAttrs.finalPackage.doCheck then "enabled" else "disabled";
   };
 
   configureFlags = lib.optionals (!atLeast223) [

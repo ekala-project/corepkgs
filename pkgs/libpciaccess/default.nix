@@ -42,7 +42,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   mesonEntries = {
     pci-ids = "${hwdata}/share/hwdata";
-    zlib = "enabled";
+  };
+
+  mesonFeatures = {
+    zlib = true;
   };
 
   passthru.tests = {

@@ -87,12 +87,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   mesonEntries = {
     gio_sniffing = false;
-    android = "disabled";
-    glycin = "disabled";
     documentation = withIntrospection;
-    introspection = if withIntrospection then "enabled" else "disabled";
-    others = "enabled";
     ${if stdenv.hostPlatform.isStatic then "builtin_loaders" else null} = "all";
+  };
+
+  mesonFeatures = {
+    android = false;
+    glycin = false;
+    introspection = withIntrospection;
+    others = true;
   };
 
   postPatch = ''

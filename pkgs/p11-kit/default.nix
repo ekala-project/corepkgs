@@ -57,7 +57,6 @@ stdenv.mkDerivation rec {
 
   mesonEntries = {
     man = true;
-    systemd = "disabled";
     bashcompdir = "${placeholder "bin"}/share/bash-completion/completions";
     trust_paths = lib.concatStringsSep ":" [
       "/etc/ssl/trust-source" # p11-kit trust source
@@ -66,6 +65,10 @@ stdenv.mkDerivation rec {
       "/var/lib/ca-certificates/ca-bundle.pem" # openSUSE
       "/etc/ssl/cert.pem" # Darwin/macOS
     ];
+  };
+
+  mesonFeatures = {
+    systemd = false;
   };
 
   doCheck = stdenv.buildPlatform.canExecute stdenv.hostPlatform;

@@ -31,8 +31,11 @@ stdenv.mkDerivation (finalAttrs: {
     tools = false;
     tests = false;
     examples = false;
-    polkit-agent = "disabled";
-    debuginfod = "disabled";
+  };
+
+  mesonFeatures = {
+    polkit-agent = false;
+    debuginfod = false;
   };
 
   meta = {

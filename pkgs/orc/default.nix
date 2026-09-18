@@ -26,12 +26,12 @@ stdenv.mkDerivation (finalAttrs: {
     sed -i '/memcpy_speed/d' testsuite/meson.build
   '';
 
-  mesonFlags = [
-    (lib.mesonEnable "examples" false)
-    (lib.mesonEnable "benchmarks" false)
-    (lib.mesonEnable "tests" finalAttrs.finalPackage.doCheck)
-    (lib.mesonEnable "hotdoc" false)
-  ];
+  mesonFeatures = {
+    examples = false;
+    benchmarks = false;
+    tests = finalAttrs.finalPackage.doCheck;
+    hotdoc = false;
+  };
 
   nativeBuildInputs = [
     meson

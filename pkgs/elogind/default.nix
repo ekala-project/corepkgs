@@ -149,7 +149,10 @@ stdenv.mkDerivation rec {
     dbussystemservicedir = "${placeholder "out"}/share/dbus-1/system-services";
     sysconfdir = "${placeholder "out"}/etc";
     utmp = !stdenv.hostPlatform.isMusl;
-    xenctrl = "disabled";
+  };
+
+  mesonFeatures = {
+    xenctrl = false;
   };
 
   meta = {

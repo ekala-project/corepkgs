@@ -73,8 +73,11 @@ stdenv.mkDerivation (finalAttrs: {
 
   mesonEntries = {
     installed_test_prefix = "${placeholder "installedTests"}";
-    introspection = if withIntrospection then "enabled" else "disabled";
-    documentation = if withIntrospection then "enabled" else "disabled";
+  };
+
+  mesonFeatures = {
+    introspection = withIntrospection;
+    documentation = withIntrospection;
   };
 
   postFixup = ''

@@ -49,8 +49,11 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   mesonEntries = {
-    tests = "disabled";
     sysconfdir = "/etc";
+  };
+
+  mesonFeatures = {
+    tests = false;
   };
 
   doInstallCheck = true;

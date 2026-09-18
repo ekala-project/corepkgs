@@ -115,8 +115,11 @@ stdenv.mkDerivation (finalAttrs: {
     "--datadir=${placeholder "dev"}/share"
   ];
 
+  mesonFeatures = {
+    cairo = false;
+  };
+
   mesonEntries = {
-    cairo = "disabled";
     gtk_doc = stdenv.hostPlatform == stdenv.buildPlatform;
     ${if !stdenv.buildPlatform.canExecute stdenv.hostPlatform then "gi_cross_ldd_wrapper" else null} =
       "${replaceVarsWith {

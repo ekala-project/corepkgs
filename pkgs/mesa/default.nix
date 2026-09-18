@@ -207,9 +207,6 @@ stdenv.mkDerivation {
     vulkan-drivers = lib.concatStringsSep "," vulkanDrivers;
     vulkan-layers = lib.concatStringsSep "," vulkanLayers;
 
-    # Enable glvnd for dynamic libGL dispatch
-    glvnd = "enabled";
-    gbm = "enabled";
     libgbm-external = true;
 
     teflon = true; # TensorFlow frontend
@@ -233,29 +230,31 @@ stdenv.mkDerivation {
     # Enable more sensors in gallium-hud
     gallium-extra-hud = true;
 
+    ${if enablePatentEncumberedCodecs then "video-codecs" else null} = "all";
+
+    # Build and install extra tools for cross
+    ${if !needNativeCLC then "tools" else null} = "asahi,panfrost";
+    ${if !needNativeCLC then "install-mesa-clc" else null} = true;
+    ${if !needNativeCLC then "install-precomp-compiler" else null} = true;
+    ${if needNativeCLC then "mesa-clc" else null} = "system";
+    ${if needNativeCLC then "precomp-compiler" else null} = "system";
+  };
+
+  mesonFeatures = {
+    # Enable glvnd for dynamic libGL dispatch
+    glvnd = true;
+    gbm = true;
+
     # Disable valgrind on targets where it's not available
-    valgrind = if withValgrind then "enabled" else "disabled";
+    valgrind = withValgrind;
 
     # Enable Intel RT stuff when available
-    intel-rt =
-      if (stdenv.hostPlatform.isx86_64 || stdenv.hostPlatform.isAarch64) then "enabled" else "disabled";
+    intel-rt = stdenv.hostPlatform.isx86_64 || stdenv.hostPlatform.isAarch64;
 
     # meson auto_features enables these, but we do not want them
-    gallium-mediafoundation = "disabled"; # Windows only
-    android-libbacktrace = "disabled"; # Android only
-    microsoft-clc = "disabled"; # Only relevant on Windows (OpenCL 1.2 API on top of D3D12)
-
-    ${if enablePatentEncumberedCodecs then "video-codecs" else null} = "all";
-  }
-  // lib.optionalAttrs (!needNativeCLC) {
-    # Build and install extra tools for cross
-    tools = "asahi,panfrost";
-    install-mesa-clc = true;
-    install-precomp-compiler = true;
-  }
-  // lib.optionalAttrs needNativeCLC {
-    mesa-clc = "system";
-    precomp-compiler = "system";
+    gallium-mediafoundation = false; # Windows only
+    android-libbacktrace = false; # Android only
+    microsoft-clc = false; # Only relevant on Windows (OpenCL 1.2 API on top of D3D12)
   };
 
   mesonFlags = [

@@ -63,9 +63,9 @@ stdenv.mkDerivation {
     "--datadir=${placeholder "out"}/share"
   ];
 
-  mesonEntries = {
-    glvnd = "disabled";
-    llvm = "enabled";
+  mesonFeatures = {
+    glvnd = false;
+    llvm = true;
   };
 
   passthru = {

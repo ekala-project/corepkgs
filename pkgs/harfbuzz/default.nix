@@ -39,17 +39,17 @@ stdenv.mkDerivation (finalAttrs: {
   ];
   outputBin = "dev";
 
-  mesonEntries = {
-    cairo = "disabled";
-    raster = "disabled";
-    chafa = "disabled";
-    coretext = "disabled";
-    graphite = if withGraphite2 then "enabled" else "disabled";
-    icu = if withIcu then "enabled" else "disabled";
-    introspection = "disabled";
-    docs = "disabled";
-    gpu = "disabled";
-    gpu_demo = "disabled";
+  mesonFeatures = {
+    cairo = false;
+    raster = false;
+    chafa = false;
+    coretext = false;
+    graphite = withGraphite2;
+    icu = withIcu;
+    introspection = false;
+    docs = false;
+    gpu = false;
+    gpu_demo = false;
   };
 
   depsBuildBuild = [

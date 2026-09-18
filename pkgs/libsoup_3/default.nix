@@ -67,14 +67,17 @@ stdenv.mkDerivation (finalAttrs: {
 
   mesonEntries = {
     tls_check = false;
-    gssapi = "disabled";
-    ntlm = "disabled";
-    autobahn = "disabled";
-    pkcs11_tests = "disabled";
-    sysprof = "disabled";
-    docs = if withIntrospection then "enabled" else "disabled";
-    introspection = if withIntrospection then "enabled" else "disabled";
-    vapi = if withIntrospection then "enabled" else "disabled";
+  };
+
+  mesonFeatures = {
+    gssapi = false;
+    ntlm = false;
+    autobahn = false;
+    pkcs11_tests = false;
+    sysprof = false;
+    docs = withIntrospection;
+    introspection = withIntrospection;
+    vapi = withIntrospection;
   };
 
   separateDebugInfo = true;

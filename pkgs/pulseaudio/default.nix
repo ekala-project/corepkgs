@@ -157,32 +157,8 @@ stdenv.mkDerivation (finalAttrs: {
       };
 
   mesonEntries = {
-    alsa = if (!libOnly && alsaSupport) then "enabled" else "disabled";
-    asyncns = if (!libOnly) then "enabled" else "disabled";
-    avahi = "disabled";
-    bluez5 = if (!libOnly && bluetoothSupport) then "enabled" else "disabled";
-    bluez5-gstreamer = "disabled";
     database = "simple";
     doxygen = false;
-    elogind = "disabled";
-    # gsettings does not support cross-compilation
-    gsettings =
-      if (stdenv.hostPlatform.isLinux && (stdenv.buildPlatform == stdenv.hostPlatform)) then
-        "enabled"
-      else
-        "disabled";
-    gstreamer = "disabled";
-    gtk = "disabled";
-    jack = if (!libOnly && jackSupport) then "enabled" else "disabled";
-    lirc = if (!libOnly && lircSupport) then "enabled" else "disabled";
-    openssl = if airtunesSupport then "enabled" else "disabled";
-    orc = "disabled";
-    systemd = if (useSystemd && !libOnly) then "enabled" else "disabled";
-    tcpwrap = "disabled";
-    udev = if (!libOnly && udevSupport) then "enabled" else "disabled";
-    valgrind = "disabled";
-    webrtc-aec = if (!libOnly) then "enabled" else "disabled";
-    x11 = if x11Support then "enabled" else "disabled";
 
     localstatedir = "/var";
     sysconfdir = "/etc";
@@ -191,12 +167,33 @@ stdenv.mkDerivation (finalAttrs: {
 
     ${if stdenv.hostPlatform.isLinux && useSystemd then "systemduserunitdir" else null} =
       "${placeholder "out"}/lib/systemd/user";
-  }
-  // lib.optionalAttrs stdenv.hostPlatform.isDarwin {
-    consolekit = "disabled";
-    dbus = "disabled";
-    glib = "disabled";
-    oss-output = "disabled";
+  };
+
+  mesonFeatures = {
+    alsa = !libOnly && alsaSupport;
+    asyncns = !libOnly;
+    avahi = false;
+    bluez5 = !libOnly && bluetoothSupport;
+    bluez5-gstreamer = false;
+    elogind = false;
+    # gsettings does not support cross-compilation
+    gsettings = stdenv.hostPlatform.isLinux && (stdenv.buildPlatform == stdenv.hostPlatform);
+    gstreamer = false;
+    gtk = false;
+    jack = !libOnly && jackSupport;
+    lirc = !libOnly && lircSupport;
+    openssl = airtunesSupport;
+    orc = false;
+    systemd = useSystemd && !libOnly;
+    tcpwrap = false;
+    udev = !libOnly && udevSupport;
+    valgrind = false;
+    webrtc-aec = !libOnly;
+    x11 = x11Support;
+    consolekit = !stdenv.hostPlatform.isDarwin;
+    dbus = !stdenv.hostPlatform.isDarwin;
+    glib = !stdenv.hostPlatform.isDarwin;
+    oss-output = !stdenv.hostPlatform.isDarwin;
   };
 
   mesonFlags = [

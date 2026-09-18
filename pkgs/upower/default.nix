@@ -73,9 +73,12 @@ stdenv.mkDerivation (finalAttrs: {
     systemdsystemunitdir = "${placeholder "out"}/etc/systemd/system";
     udevrulesdir = "${placeholder "out"}/lib/udev/rules.d";
     udevhwdbdir = "${placeholder "out"}/lib/udev/hwdb.d";
-    introspection = "enabled";
     gtk-doc = false;
-    idevice = "disabled";
+  };
+
+  mesonFeatures = {
+    introspection = true;
+    idevice = false;
   };
 
   mesonFlags = [
