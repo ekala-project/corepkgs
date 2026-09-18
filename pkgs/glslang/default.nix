@@ -36,13 +36,13 @@ stdenv.mkDerivation (finalAttrs: {
     spirv-headers
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "BUILD_SHARED_LIBS" (!stdenv.hostPlatform.isStatic))
-    (lib.cmakeBool "BUILD_EXTERNAL" false)
-    (lib.cmakeBool "ALLOW_EXTERNAL_SPIRV_TOOLS" true)
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = !stdenv.hostPlatform.isStatic;
+    BUILD_EXTERNAL = false;
+    ALLOW_EXTERNAL_SPIRV_TOOLS = true;
     # Skip tests to avoid gtest dependency
-    (lib.cmakeBool "BUILD_TESTING" false)
-  ];
+    BUILD_TESTING = false;
+  };
 
   postInstall = ''
     ln -s $bin/bin/glslang $bin/bin/glslangValidator
