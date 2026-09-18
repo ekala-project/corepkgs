@@ -42,17 +42,17 @@ stdenv.mkDerivation (finalAttrs: {
     zlib
   ];
 
-  cmakeFlags = [
-    "-DZZIP_TESTCVE=OFF"
-    "-DBUILD_SHARED_LIBS=True"
-    "-DBUILD_STATIC_LIBS=False"
-    "-DBUILD_TESTS=OFF"
-    "-DMSVC_STATIC_RUNTIME=OFF"
-    "-DZZIPSDL=OFF"
-    "-DZZIPTEST=OFF"
-    "-DZZIPWRAP=OFF"
-    "-DBUILDTESTS=OFF"
-  ];
+  cmakeEntries = {
+    ZZIP_TESTCVE = "OFF";
+    BUILD_SHARED_LIBS = "True";
+    BUILD_STATIC_LIBS = "False";
+    BUILD_TESTS = "OFF";
+    MSVC_STATIC_RUNTIME = "OFF";
+    ZZIPSDL = "OFF";
+    ZZIPTEST = "OFF";
+    ZZIPWRAP = "OFF";
+    BUILDTESTS = "OFF";
+  };
 
   meta = {
     homepage = "https://github.com/gdraheim/zziplib";
