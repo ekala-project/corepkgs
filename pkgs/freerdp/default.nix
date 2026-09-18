@@ -33,8 +33,11 @@
   cairo,
   libcbor,
   libfido2,
+  libpulseaudio,
   libusb1,
+  libxdamage,
   cups,
+  orc,
   pcsclite,
   sdl3,
   systemd,
@@ -118,17 +121,17 @@ stdenv.mkDerivation (finalAttrs: {
     pcre2
     pcsclite
     sdl3
+    libpulseaudio
+    libxdamage
+    orc
     zlib
     # TODO(corepkgs): Port openh264 for H.264 codec support
     # TODO(corepkgs): Port faad2 for AAC decoding support
     # TODO(corepkgs): Port pkcs11helper for PKCS#11 support
     # TODO(corepkgs): Port uriparser for URI parsing support
-    # TODO(corepkgs): Port orc for optimized inner loops
     # TODO(corepkgs): Port cjson for JSON support
     # TODO(corepkgs): Port sdl3-ttf for SDL3 TTF rendering
     # TODO(corepkgs): Port sdl3-image for SDL3 image loading
-    # TODO(corepkgs): Port libpulseaudio for PulseAudio support
-    # TODO(corepkgs): Port libxdamage for X11 damage extension
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
     alsa-lib
@@ -159,7 +162,7 @@ stdenv.mkDerivation (finalAttrs: {
     WITH_OSS = false;
     WITH_MANPAGES = withManPages;
     WITH_PCSC = pcsclite != null;
-    WITH_PULSE = false; # TODO(corepkgs): Port libpulseaudio
+    WITH_PULSE = libpulseaudio != null;
     WITH_SERVER = buildServer;
     WITH_WEBVIEW = false; # avoid introducing webkit2gtk-4.0
     WITH_VAAPI = false; # false is recommended by upstream
