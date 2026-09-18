@@ -198,7 +198,7 @@ let
   wantCurl = withRemote || withImportd;
 
   # Use the command below to update `releaseTimestamp` on every (major) version
-  # change. More details in the commentary at mesonFlags.
+  # change. More details in the commentary at mesonEntries.
   # command:
   #  $ curl -s https://api.github.com/repos/systemd/systemd/releases/latest | \
   #     jq '.created_at|strptime("%Y-%m-%dT%H:%M:%SZ")|mktime'
@@ -414,7 +414,7 @@ stdenv.mkDerivation (finalAttrs: {
     }
   );
 
-  mesonFlags = [
+  mesonEntries = {
     # Options
 
     # We bump this attribute on every (major) version change to ensure that we
@@ -424,182 +424,182 @@ stdenv.mkDerivation (finalAttrs: {
     # years from the system time.
     # See the systemd v250 release notes for further details:
     #   https://github.com/systemd/systemd/blob/60e930fc3e6eb8a36fbc184773119eb8d2f30364/NEWS#L258-L266
-    (lib.mesonOption "time-epoch" releaseTimestamp)
+    time-epoch = releaseTimestamp;
 
-    (lib.mesonOption "version-tag" finalAttrs.version)
-    (lib.mesonOption "mode" "release")
-    (lib.mesonOption "tty-gid" "3") # tty in NixOS has gid 3
-    (lib.mesonOption "pamconfdir" "${placeholder "out"}/etc/pam.d")
-    (lib.mesonOption "shellprofiledir" "${placeholder "out"}/etc/profile.d")
+    version-tag = finalAttrs.version;
+    mode = "release";
+    tty-gid = "3"; # tty in NixOS has gid 3
+    pamconfdir = "${placeholder "out"}/etc/pam.d";
+    shellprofiledir = "${placeholder "out"}/etc/profile.d";
 
     # /bin/sh is also the upstream default. Explicitly set this so that we're
     # independent of upstream changes to the default.
-    (lib.mesonOption "debug-shell" "/bin/sh")
+    debug-shell = "/bin/sh";
 
     # Use the correct path for Bash for user shells (e.g. used in nspawn and
     # homed), which otherwise defaults to /bin/bash.
-    (lib.mesonOption "default-user-shell" "/run/current-system/sw/bin/bash")
+    default-user-shell = "/run/current-system/sw/bin/bash";
 
     # Attempts to check /usr/sbin and that fails in macOS sandbox because
     # permission is denied. If /usr/sbin is not a symlink, it defaults to true.
     # We set it to false since stdenv moves sbin/* to bin and creates a symlink,
     # that is, we do not have split bin.
-    (lib.mesonOption "split-bin" "false")
+    split-bin = "false";
 
     # D-Bus
-    (lib.mesonOption "dbuspolicydir" "${placeholder "out"}/share/dbus-1/system.d")
-    (lib.mesonOption "dbussessionservicedir" "${placeholder "out"}/share/dbus-1/services")
-    (lib.mesonOption "dbussystemservicedir" "${placeholder "out"}/share/dbus-1/system-services")
+    dbuspolicydir = "${placeholder "out"}/share/dbus-1/system.d";
+    dbussessionservicedir = "${placeholder "out"}/share/dbus-1/services";
+    dbussystemservicedir = "${placeholder "out"}/share/dbus-1/system-services";
 
     # pkgconfig
-    (lib.mesonOption "pkgconfiglibdir" "${placeholder "dev"}/lib/pkgconfig")
-    (lib.mesonOption "pkgconfigdatadir" "${placeholder "dev"}/share/pkgconfig")
+    pkgconfiglibdir = "${placeholder "dev"}/lib/pkgconfig";
+    pkgconfigdatadir = "${placeholder "dev"}/share/pkgconfig";
 
     # SBAT
-    (lib.mesonOption "sbat-distro" "nixos")
-    (lib.mesonOption "sbat-distro-summary" "NixOS")
-    (lib.mesonOption "sbat-distro-url" "https://nixos.org/")
-    (lib.mesonOption "sbat-distro-pkgname" pname)
-    (lib.mesonOption "sbat-distro-version" finalAttrs.version)
+    sbat-distro = "nixos";
+    sbat-distro-summary = "NixOS";
+    sbat-distro-url = "https://nixos.org/";
+    sbat-distro-pkgname = pname;
+    sbat-distro-version = finalAttrs.version;
 
     # Users
-    (lib.mesonOption "system-uid-max" "999")
-    (lib.mesonOption "system-gid-max" "999")
+    system-uid-max = "999";
+    system-gid-max = "999";
 
     # SysVinit
-    (lib.mesonOption "sysvinit-path" "")
-    (lib.mesonOption "sysvrcnd-path" "")
+    sysvinit-path = "";
+    sysvrcnd-path = "";
 
     # Login
-    (lib.mesonOption "sulogin-path" "${lib.getOutput "login" util-linux}/bin/sulogin")
-    (lib.mesonOption "nologin-path" "${lib.getOutput "login" util-linux}/bin/nologin")
+    sulogin-path = "${lib.getOutput "login" util-linux}/bin/sulogin";
+    nologin-path = "${lib.getOutput "login" util-linux}/bin/nologin";
 
     # Mount
-    (lib.mesonOption "mount-path" "${lib.getOutput "mount" util-linux}/bin/mount")
-    (lib.mesonOption "umount-path" "${lib.getOutput "mount" util-linux}/bin/umount")
+    mount-path = "${lib.getOutput "mount" util-linux}/bin/mount";
+    umount-path = "${lib.getOutput "mount" util-linux}/bin/umount";
 
     # SSH
-    (lib.mesonOption "sshconfdir" "")
-    (lib.mesonOption "sshdconfdir" "no")
+    sshconfdir = "";
+    sshdconfdir = "no";
 
     # RPM
     # This stops building/installing RPM specific tools.
-    (lib.mesonOption "rpmmacrosdir" "no")
+    rpmmacrosdir = "no";
 
     # Features
 
     # Tests
-    (lib.mesonBool "tests" withTests)
-    (lib.mesonEnable "glib" withTests)
-    (lib.mesonEnable "dbus" withTests)
+    tests = withTests;
+    glib = if withTests then "enabled" else "disabled";
+    dbus = if withTests then "enabled" else "disabled";
 
     # Compression
-    (lib.mesonEnable "bzip2" withCompression)
-    (lib.mesonEnable "lz4" withCompression)
-    (lib.mesonEnable "xz" withCompression)
-    (lib.mesonEnable "zstd" withCompression)
-    (lib.mesonEnable "zlib" withCompression)
+    bzip2 = if withCompression then "enabled" else "disabled";
+    lz4 = if withCompression then "enabled" else "disabled";
+    xz = if withCompression then "enabled" else "disabled";
+    zstd = if withCompression then "enabled" else "disabled";
+    zlib = if withCompression then "enabled" else "disabled";
 
     # NSS
-    (lib.mesonEnable "nss-mymachines" (withNss && withMachined))
-    (lib.mesonEnable "nss-resolve" withNss)
-    (lib.mesonBool "nss-myhostname" withNss)
-    (lib.mesonBool "nss-systemd" withNss)
+    nss-mymachines = if withNss && withMachined then "enabled" else "disabled";
+    nss-resolve = if withNss then "enabled" else "disabled";
+    nss-myhostname = withNss;
+    nss-systemd = withNss;
 
     # Cryptsetup
-    (lib.mesonEnable "libcryptsetup" withCryptsetup)
-    (lib.mesonEnable "libcryptsetup-plugins" withCryptsetup)
-    (lib.mesonEnable "p11kit" (withHomed || withCryptsetup))
+    libcryptsetup = if withCryptsetup then "enabled" else "disabled";
+    libcryptsetup-plugins = if withCryptsetup then "enabled" else "disabled";
+    p11kit = if withHomed || withCryptsetup then "enabled" else "disabled";
 
     # FIDO2
-    (lib.mesonEnable "libfido2" withFido2)
-    (lib.mesonEnable "openssl" withOpenSSL)
+    libfido2 = if withFido2 then "enabled" else "disabled";
+    openssl = if withOpenSSL then "enabled" else "disabled";
 
     # Password Quality
-    (lib.mesonEnable "pwquality" withPasswordQuality)
-    (lib.mesonEnable "passwdqc" false)
+    pwquality = if withPasswordQuality then "enabled" else "disabled";
+    passwdqc = "disabled";
 
     # Remote
-    (lib.mesonEnable "remote" withRemote)
-    (lib.mesonEnable "microhttpd" withRemote)
+    remote = if withRemote then "enabled" else "disabled";
+    microhttpd = if withRemote then "enabled" else "disabled";
 
-    (lib.mesonEnable "pam" withPam)
-    (lib.mesonEnable "acl" withAcl)
-    (lib.mesonEnable "audit" withAudit)
-    (lib.mesonEnable "apparmor" withApparmor)
-    (lib.mesonEnable "gcrypt" withGcrypt)
-    (lib.mesonEnable "importd" withImportd)
-    (lib.mesonEnable "homed" withHomed)
-    (lib.mesonEnable "polkit" withPolkit)
-    (lib.mesonEnable "elfutils" withCoredump)
-    (lib.mesonEnable "libcurl" wantCurl)
-    (lib.mesonEnable "libidn" false)
-    (lib.mesonEnable "libidn2" withLibidn2)
-    (lib.mesonEnable "libiptc" false)
-    (lib.mesonEnable "repart" withRepart)
-    (lib.mesonEnable "sysupdate" withSysupdate)
-    (lib.mesonEnable "sysupdated" withSysupdate)
-    (lib.mesonEnable "seccomp" withLibseccomp)
-    (lib.mesonEnable "selinux" withSelinux)
-    (lib.mesonEnable "tpm2" withTpm2Tss)
-    (lib.mesonEnable "pcre2" withPCRE2)
-    (lib.mesonEnable "bpf-framework" withLibBPF)
-    (lib.mesonEnable "bootloader" withBootloader)
-    (lib.mesonEnable "ukify" withUkify)
-    (lib.mesonEnable "kmod" withKmod)
-    (lib.mesonEnable "qrencode" withQrencode)
-    (lib.mesonEnable "vmspawn" withVmspawn)
-    (lib.mesonEnable "libarchive" withLibarchive)
-    (lib.mesonEnable "xenctrl" false)
-    (lib.mesonEnable "gnutls" false)
-    (lib.mesonEnable "xkbcommon" false)
-    (lib.mesonEnable "man" true)
-    (lib.mesonEnable "nspawn" withNspawn)
+    pam = if withPam then "enabled" else "disabled";
+    acl = if withAcl then "enabled" else "disabled";
+    audit = if withAudit then "enabled" else "disabled";
+    apparmor = if withApparmor then "enabled" else "disabled";
+    gcrypt = if withGcrypt then "enabled" else "disabled";
+    importd = if withImportd then "enabled" else "disabled";
+    homed = if withHomed then "enabled" else "disabled";
+    polkit = if withPolkit then "enabled" else "disabled";
+    elfutils = if withCoredump then "enabled" else "disabled";
+    libcurl = if wantCurl then "enabled" else "disabled";
+    libidn = "disabled";
+    libidn2 = if withLibidn2 then "enabled" else "disabled";
+    libiptc = "disabled";
+    repart = if withRepart then "enabled" else "disabled";
+    sysupdate = if withSysupdate then "enabled" else "disabled";
+    sysupdated = if withSysupdate then "enabled" else "disabled";
+    seccomp = if withLibseccomp then "enabled" else "disabled";
+    selinux = if withSelinux then "enabled" else "disabled";
+    tpm2 = if withTpm2Tss then "enabled" else "disabled";
+    pcre2 = if withPCRE2 then "enabled" else "disabled";
+    bpf-framework = if withLibBPF then "enabled" else "disabled";
+    bootloader = if withBootloader then "enabled" else "disabled";
+    ukify = if withUkify then "enabled" else "disabled";
+    kmod = if withKmod then "enabled" else "disabled";
+    qrencode = if withQrencode then "enabled" else "disabled";
+    vmspawn = if withVmspawn then "enabled" else "disabled";
+    libarchive = if withLibarchive then "enabled" else "disabled";
+    xenctrl = "disabled";
+    gnutls = "disabled";
+    xkbcommon = "disabled";
+    man = "enabled";
+    nspawn = if withNspawn then "enabled" else "disabled";
 
-    (lib.mesonBool "vconsole" withVConsole)
-    (lib.mesonBool "analyze" withAnalyze)
-    (lib.mesonBool "logind" withLogind)
-    (lib.mesonBool "localed" withLocaled)
-    (lib.mesonBool "hostnamed" withHostnamed)
-    (lib.mesonBool "machined" withMachined)
-    (lib.mesonBool "networkd" withNetworkd)
-    (lib.mesonBool "oomd" withOomd)
-    (lib.mesonBool "portabled" withPortabled)
-    (lib.mesonBool "hwdb" withHwdb)
-    (lib.mesonBool "timedated" withTimedated)
-    (lib.mesonBool "timesyncd" withTimesyncd)
-    (lib.mesonBool "userdb" withUserDb)
-    (lib.mesonBool "coredump" withCoredump)
-    (lib.mesonBool "firstboot" withFirstboot)
-    (lib.mesonBool "resolve" withResolved)
-    (lib.mesonBool "sysusers" withSysusers)
-    (lib.mesonBool "efi" withEfi)
-    (lib.mesonBool "utmp" withUtmp)
-    (lib.mesonBool "log-trace" withLogTrace)
-    (lib.mesonBool "kernel-install" withKernelInstall)
-    (lib.mesonBool "quotacheck" false)
-    (lib.mesonBool "ldconfig" false)
-    (lib.mesonBool "install-sysconfdir" false)
-    (lib.mesonBool "create-log-dirs" false)
-    (lib.mesonBool "smack" true)
-    (lib.mesonBool "b_pie" true)
-  ]
-  ++ lib.optionals withVConsole [
-    (lib.mesonOption "loadkeys-path" "${kbd}/bin/loadkeys")
-    (lib.mesonOption "setfont-path" "${kbd}/bin/setfont")
-  ]
-  ++ lib.optionals withKmod [
-    (lib.mesonOption "kmod-path" "${kmod}/bin/kmod")
-  ]
-  ++ lib.optionals (withShellCompletions == false) [
-    (lib.mesonOption "bashcompletiondir" "no")
-    (lib.mesonOption "zshcompletiondir" "no")
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isMusl [
-    (lib.mesonOption "libc" "musl")
-    (lib.mesonBool "gshadow" false)
-    (lib.mesonBool "idn" false)
-  ];
+    vconsole = withVConsole;
+    analyze = withAnalyze;
+    logind = withLogind;
+    localed = withLocaled;
+    hostnamed = withHostnamed;
+    machined = withMachined;
+    networkd = withNetworkd;
+    oomd = withOomd;
+    portabled = withPortabled;
+    hwdb = withHwdb;
+    timedated = withTimedated;
+    timesyncd = withTimesyncd;
+    userdb = withUserDb;
+    coredump = withCoredump;
+    firstboot = withFirstboot;
+    resolve = withResolved;
+    sysusers = withSysusers;
+    efi = withEfi;
+    utmp = withUtmp;
+    log-trace = withLogTrace;
+    kernel-install = withKernelInstall;
+    quotacheck = false;
+    ldconfig = false;
+    install-sysconfdir = false;
+    create-log-dirs = false;
+    smack = true;
+    b_pie = true;
+
+    # VConsole paths
+    ${if withVConsole then "loadkeys-path" else null} = "${kbd}/bin/loadkeys";
+    ${if withVConsole then "setfont-path" else null} = "${kbd}/bin/setfont";
+
+    # Kmod path
+    ${if withKmod then "kmod-path" else null} = "${kmod}/bin/kmod";
+
+    # Shell completions
+    ${if withShellCompletions == false then "bashcompletiondir" else null} = "no";
+    ${if withShellCompletions == false then "zshcompletiondir" else null} = "no";
+
+    # Musl
+    ${if stdenv.hostPlatform.isMusl then "libc" else null} = "musl";
+    ${if stdenv.hostPlatform.isMusl then "gshadow" else null} = false;
+    ${if stdenv.hostPlatform.isMusl then "idn" else null} = false;
+  };
   preConfigure =
     let
       # A list of all the runtime binaries referenced by the source code (plus
