@@ -9,6 +9,8 @@
   mtdev,
   udev,
   libwacom,
+  cairo,
+  gtk3,
   python3,
   lua,
 }:
@@ -55,14 +57,14 @@ stdenv.mkDerivation (finalAttrs: {
     lua.v5_4
     (python3.withPackages (
       pp: with pp; [
-        # TODO(corepkgs): Port python3Packages.libevdev
-        # TODO(corepkgs): Port python3Packages.pyudev
+        libevdev
+        pyudev
         pyyaml
         setuptools
       ]
     ))
-    # TODO(corepkgs): Port cairo for event GUI support
-    # TODO(corepkgs): Port gtk3 for event GUI support
+    cairo
+    gtk3
   ];
 
   propagatedBuildInputs = [
