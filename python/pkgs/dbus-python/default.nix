@@ -68,7 +68,9 @@ lib.fix (
       "-Cbuild-dir=_meson-build"
     ];
 
-    mesonFlags = [ (lib.mesonBool "tests" finalPackage.doInstallCheck) ];
+    mesonEntries = {
+      tests = finalPackage.doInstallCheck;
+    };
 
     # workaround bug in meson-python
     # https://github.com/mesonbuild/meson-python/issues/240
