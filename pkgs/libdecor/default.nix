@@ -31,9 +31,9 @@ stdenv.mkDerivation (finalAttrs: {
     "dev"
   ];
 
-  mesonFlags = [
-    (lib.mesonBool "demo" false)
-  ];
+  mesonEntries = {
+    demo = false;
+  };
 
   nativeBuildInputs = [
     meson
