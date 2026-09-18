@@ -25,7 +25,9 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = lib.optional staticOnly "-DBUILD_SHARED_LIBS=OFF";
+  cmakeEntries = {
+    ${if staticOnly then "BUILD_SHARED_LIBS" else null} = false;
+  };
 
   outputs = [
     "out"
