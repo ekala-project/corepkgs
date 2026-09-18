@@ -284,6 +284,7 @@ mapAliases {
   ubootUtilite = uboot.ubootUtilite;
   ubootVisionFive2 = uboot.ubootVisionFive2;
   ubootWandboard = uboot.ubootWandboard;
+  wafHook = waf.hook;
   webrtc-audio-processing_0_3 = webrtc-audio-processing.v0_3;
   webrtc-audio-processing_1 = webrtc-audio-processing.v1;
   webrtc-audio-processing_2 = webrtc-audio-processing.v2;
