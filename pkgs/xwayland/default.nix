@@ -116,14 +116,14 @@ stdenv.mkDerivation (finalAttrs: {
     libunwind
   ];
 
-  mesonFlags = [
-    (lib.mesonBool "xcsecurity" true)
-    (lib.mesonOption "default_font_path" defaultFontPath)
-    (lib.mesonOption "xkb_bin_dir" "${xkbcomp}/bin")
-    (lib.mesonOption "xkb_dir" "${xkeyboard-config}/share/X11/xkb")
-    (lib.mesonOption "xkb_output_dir" "${placeholder "out"}/share/X11/xkb/compiled")
-    (lib.mesonBool "libunwind" withLibunwind)
-  ];
+  mesonEntries = {
+    xcsecurity = true;
+    default_font_path = defaultFontPath;
+    xkb_bin_dir = "${xkbcomp}/bin";
+    xkb_dir = "${xkeyboard-config}/share/X11/xkb";
+    xkb_output_dir = "${placeholder "out"}/share/X11/xkb/compiled";
+    libunwind = withLibunwind;
+  };
 
   meta = {
     description = "X server for interfacing X11 apps with the Wayland protocol";
