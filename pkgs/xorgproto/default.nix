@@ -46,7 +46,9 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   # adds support for printproto needed for libXp
-  mesonFlags = [ "-Dlegacy=true" ];
+  mesonEntries = {
+    legacy = true;
+  };
 
   # xorgproto's meson.build generates .pc files with
   # includedir=${prefix}/<absolute-includedir>. Fix the doubled prefix
