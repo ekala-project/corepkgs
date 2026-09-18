@@ -39,12 +39,12 @@ stdenv.mkDerivation (finalAttrs: {
     python3
   ];
 
-  cmakeFlags = [
-    "-DSPIRV-Headers_SOURCE_DIR=${spirv-headers}"
+  cmakeEntries = {
+    "SPIRV-Headers_SOURCE_DIR" = "${spirv-headers}";
     # Avoid blanket -Werror to evade build failures on less
     # tested compilers.
-    "-DSPIRV_WERROR=OFF"
-  ];
+    SPIRV_WERROR = "OFF";
+  };
 
   meta = {
     description = "SPIR-V Tools project provides an API and commands for processing SPIR-V modules";
