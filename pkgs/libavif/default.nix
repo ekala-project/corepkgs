@@ -48,14 +48,14 @@ stdenv.mkDerivation rec {
     libyuv
   ];
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=ON"
-    "-DAVIF_CODEC_AOM=SYSTEM"
-    "-DAVIF_CODEC_DAV1D=SYSTEM"
-    "-DAVIF_BUILD_APPS=OFF"
-    "-DAVIF_BUILD_GDK_PIXBUF=OFF"
-    "-DAVIF_LIBYUV=SYSTEM"
-  ];
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = true;
+    AVIF_CODEC_AOM = "SYSTEM";
+    AVIF_CODEC_DAV1D = "SYSTEM";
+    AVIF_BUILD_APPS = false;
+    AVIF_BUILD_GDK_PIXBUF = false;
+    AVIF_LIBYUV = "SYSTEM";
+  };
 
   meta = {
     description = "C implementation of the AV1 Image File Format";
