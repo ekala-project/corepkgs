@@ -141,36 +141,36 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals stdenv.hostPlatform.isLinux [ udev ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [ libapplewm ];
 
-  mesonFlags = [
-    "-Dxephyr=true"
-    "-Dxvfb=true"
-    "-Dxnest=true"
-    "-Dxorg=true"
+  mesonEntries = {
+    xephyr = true;
+    xvfb = true;
+    xnest = true;
+    xorg = true;
 
-    "-Dlog_dir=/var/log"
-    "-Ddefault_font_path="
+    log_dir = "/var/log";
+    default_font_path = "";
 
-    "-Dxkb_bin_dir=${xkbcomp}/bin"
-    "-Dxkb_dir=${xkeyboard-config}/share/X11/xkb"
-    "-Dxkb_output_dir=$out/share/X11/xkb/compiled"
+    xkb_bin_dir = "${xkbcomp}/bin";
+    xkb_dir = "${xkeyboard-config}/share/X11/xkb";
+    xkb_output_dir = "$out/share/X11/xkb/compiled";
 
-    "-Dxcsecurity=true"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    "-Dglamor=false"
-    "-Dsecure-rpc=false"
-    "-Dint10=false"
-    "-Dpciaccess=false"
-    "-Dapple-application-name=XQuartz"
-    "-Dapple-applications-dir=${placeholder "out"}/Applications"
-    "-Dbundle-id-prefix=org.nixos.xquartz"
-    "-Dsha1=CommonCrypto"
-  ]
-  ++ lib.optionals (!stdenv.hostPlatform.isLinux) [
+    xcsecurity = true;
+  }
+  // lib.optionalAttrs stdenv.hostPlatform.isDarwin {
+    glamor = false;
+    secure-rpc = false;
+    int10 = false;
+    pciaccess = false;
+    apple-application-name = "XQuartz";
+    apple-applications-dir = "${placeholder "out"}/Applications";
+    bundle-id-prefix = "org.nixos.xquartz";
+    sha1 = "CommonCrypto";
+  }
+  // lib.optionalAttrs (!stdenv.hostPlatform.isLinux) {
     # fixed upstream (unreleased)
-    "-Dudev=false"
-    "-Dudev_kms=false"
-  ];
+    udev = false;
+    udev_kms = false;
+  };
 
   postPatch = lib.optionalString stdenv.hostPlatform.isDarwin ''
     substituteInPlace hw/xquartz/mach-startup/stub.c \
