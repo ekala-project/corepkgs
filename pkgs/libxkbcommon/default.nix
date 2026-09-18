@@ -62,13 +62,13 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeCheckInputs = [ python3 ];
 
-  mesonFlags = [
-    "-Dxkb-config-root=${xkeyboard-config}/etc/X11/xkb"
-    "-Dxkb-config-extra-path=/etc/xkb" # default=$sysconfdir/xkb ($out/etc)
-    "-Dx-locale-root=${libx11.out}/share/X11/locale"
-    "-Denable-docs=true"
-    "-Denable-wayland=${lib.boolToString withWaylandTools}"
-  ];
+  mesonEntries = {
+    xkb-config-root = "${xkeyboard-config}/etc/X11/xkb";
+    xkb-config-extra-path = "/etc/xkb"; # default=$sysconfdir/xkb ($out/etc)
+    x-locale-root = "${libx11.out}/share/X11/locale";
+    enable-docs = true;
+    enable-wayland = withWaylandTools;
+  };
 
   doCheck = false; # TODO: disable just a part of the tests
   preCheck = ''
