@@ -43,9 +43,9 @@ stdenv.mkDerivation (finalAttrs: {
     ffmpeg_8-headless
   ];
 
-  mesonFlags = [
-    "-Ddoc=disabled"
-  ];
+  mesonFeatures = {
+    doc = false;
+  };
 
   postPatch = ''
     patchShebangs \

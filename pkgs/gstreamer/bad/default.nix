@@ -137,140 +137,110 @@ stdenv.mkDerivation (finalAttrs: {
     webrtc-audio-processing.v1
   ];
 
-  mesonFlags = [
-    "-Dauto_features=auto"
-    "-Dexamples=disabled"
-    "-Dglib_debug=disabled"
-    "-Ddoc=disabled"
+  mesonFeatures = {
+    auto_features = "auto";
+    examples = false;
+    glib_debug = false;
+    doc = false;
 
-    "-Damfcodec=disabled"
-    "-Dandroidmedia=disabled"
-    "-Davtp=disabled"
-    "-Dcuda-nvmm=disabled"
-    "-Ddirectshow=disabled"
-    "-Dqt6d3d11=disabled"
-    "-Ddts=disabled"
-    "-Dzbar=disabled"
-    "-Dfaac=disabled"
-    "-Diqa=disabled"
-    "-Dlcevcencoder=disabled"
-    "-Dmagicleap=disabled"
-    "-Dmsdk=disabled"
-    "-Dmusepack=disabled"
-    "-Dnvcomp=disabled"
-    "-Dnvdswrapper=disabled"
-    "-Dopenni2=disabled"
-    "-Dopensles=disabled"
-    "-Dsvthevcenc=disabled"
-    "-Dsvtjpegxs=disabled"
-    "-Dteletext=disabled"
-    "-Dtinyalsa=disabled"
-    "-Dvoamrwbenc=disabled"
-    "-Dvulkan=disabled"
-    "-Dwasapi=disabled"
-    "-Dwasapi2=disabled"
-    "-Dwpe=disabled"
-    "-Dwpe2=disabled"
-    "-Dgs=disabled"
-    "-Donnx=disabled"
-    "-Dopenaptx=disabled"
-    "-Dopencv=disabled"
-    "-Daja=disabled"
-    "-Dmicrodns=disabled"
-    "-Dbluez=${if bluezSupport then "enabled" else "disabled"}"
-    (lib.mesonEnable "openh264" false)
-    (lib.mesonEnable "directfb" false)
-    (lib.mesonEnable "lcevcdecoder" false)
-    (lib.mesonEnable "ldac" false)
-    (lib.mesonEnable "webrtcdsp" webrtcAudioProcessingSupport)
-    (lib.mesonEnable "isac" webrtcAudioProcessingSupport)
+    amfcodec = false;
+    androidmedia = false;
+    avtp = false;
+    cuda-nvmm = false;
+    directshow = false;
+    qt6d3d11 = false;
+    dts = false;
+    zbar = false;
+    faac = false;
+    iqa = false;
+    lcevcencoder = false;
+    magicleap = false;
+    msdk = false;
+    musepack = false;
+    nvcomp = false;
+    nvdswrapper = false;
+    openni2 = false;
+    opensles = false;
+    svthevcenc = false;
+    svtjpegxs = false;
+    teletext = false;
+    tinyalsa = false;
+    voamrwbenc = false;
+    vulkan = false;
+    wasapi = false;
+    wasapi2 = false;
+    wpe = false;
+    wpe2 = false;
+    gs = false;
+    onnx = false;
+    openaptx = false;
+    opencv = false;
+    aja = false;
+    microdns = false;
+    bluez = bluezSupport;
+    openh264 = false;
+    directfb = false;
+    lcevcdecoder = false;
+    ldac = false;
+    webrtcdsp = webrtcAudioProcessingSupport;
+    isac = webrtcAudioProcessingSupport;
     # Disabled deps not yet in core-pkgs
-    "-Dflite=disabled"
-    "-Dgsm=disabled"
-    "-Ddc1394=disabled"
-    "-Dneon=disabled"
-    "-Dopenal=disabled"
-    "-Dopenexr=disabled"
-    "-Dopenmpt=disabled"
-    "-Drtmp2=disabled"
-    "-Dsbc=disabled"
-    "-Dsoundtouch=disabled"
-    "-Dspandsp=disabled"
-    "-Dsrtp=disabled"
-    "-Dwildmidi=disabled"
-    "-Dfluidsynth=disabled"
-    "-Dgme=disabled"
-    "-Dvoaacenc=disabled"
-    "-Dzxing=disabled"
-    "-Dsctp=disabled"
-    "-Dbs2b=disabled"
-    "-Dmodplug=disabled"
-    "-Dchromaprint=disabled"
-    "-Dfdkaac=disabled"
-    "-Dladspa=disabled"
-    "-Dladspa-rdf=disabled"
-    "-Dlv2=disabled"
-    "-Drtmp=disabled"
-    "-Dlc3=disabled"
-    "-Dassrender=${if libass != null then "enabled" else "disabled"}"
-    "-Dwebrtc=disabled"
-    "-Dgtk3=disabled"
-    "-Drsvg=disabled"
-    "-Dcurl-ssh2=disabled"
-    "-Dshm=disabled"
-    "-Ddtls=disabled"
-  ]
-  ++ lib.mapAttrsToList lib.mesonEnable {
+    flite = false;
+    gsm = false;
+    dc1394 = false;
+    neon = false;
+    openal = false;
+    openexr = false;
+    openmpt = false;
+    rtmp2 = false;
+    sbc = false;
+    soundtouch = false;
+    spandsp = false;
+    srtp = false;
+    wildmidi = false;
+    fluidsynth = false;
+    gme = false;
+    voaacenc = false;
+    zxing = false;
+    sctp = false;
+    bs2b = false;
+    modplug = false;
+    chromaprint = false;
+    fdkaac = false;
+    ladspa = false;
+    ladspa-rdf = false;
+    lv2 = false;
+    rtmp = false;
+    lc3 = false;
+    assrender = libass != null;
+    webrtc = false;
+    gtk3 = false;
+    rsvg = false;
+    curl-ssh2 = false;
+    shm = false;
+    dtls = false;
     mpeghdec = false;
     tflite = false;
-  }
-  ++ lib.optionals (!stdenv.hostPlatform.isLinux || !stdenv.hostPlatform.isx86) [
-    "-Dnvcodec=disabled"
-  ]
-  ++ lib.optionals (!stdenv.hostPlatform.isLinux || !gst-plugins-base.waylandEnabled) [
-    "-Dva=disabled"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    "-Dkms=disabled"
-    "-Ddvb=disabled"
-    "-Dfbdev=disabled"
-    "-Duvcgadget=disabled"
-    "-Duvch264=disabled"
-    "-Dv4l2codecs=disabled"
-  ]
-  ++
-    lib.optionals
-      (!stdenv.hostPlatform.isLinux || !stdenv.hostPlatform.isx86_64 || !gst-plugins-base.waylandEnabled)
-      [
-        "-Dqsv=disabled"
-      ]
-  ++ lib.optionals (!gst-plugins-base.glEnabled) [
-    "-Dgl=disabled"
-    "-Dapplemedia=disabled"
-  ]
-  ++ lib.optionals (!gst-plugins-base.waylandEnabled) [
-    "-Dwayland=disabled"
-  ]
-  ++ (
-    if enableGplPlugins then
-      [
-        "-Dgpl=enabled"
-        "-Dfaad=disabled"
-        "-Dresindvd=disabled"
-        "-Dmpeg2enc=disabled"
-        "-Dmplex=disabled"
-      ]
-    else
-      [
-        "-Ddts=disabled"
-        "-Dfaad=disabled"
-        "-Diqa=disabled"
-        "-Dmpeg2enc=disabled"
-        "-Dmplex=disabled"
-        "-Dresindvd=disabled"
-        "-Dx265=disabled"
-      ]
-  );
+    gpl = enableGplPlugins;
+    faad = false;
+    resindvd = false;
+    mpeg2enc = false;
+    mplex = false;
+    nvcodec = stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isx86;
+    va = stdenv.hostPlatform.isLinux && gst-plugins-base.waylandEnabled;
+    kms = !stdenv.hostPlatform.isDarwin;
+    dvb = !stdenv.hostPlatform.isDarwin;
+    fbdev = !stdenv.hostPlatform.isDarwin;
+    uvcgadget = !stdenv.hostPlatform.isDarwin;
+    uvch264 = !stdenv.hostPlatform.isDarwin;
+    v4l2codecs = !stdenv.hostPlatform.isDarwin;
+    qsv =
+      stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isx86_64 && gst-plugins-base.waylandEnabled;
+    gl = gst-plugins-base.glEnabled;
+    applemedia = gst-plugins-base.glEnabled;
+    wayland = gst-plugins-base.waylandEnabled;
+    x265 = enableGplPlugins;
+  };
 
   postPatch = ''
     patchShebangs \

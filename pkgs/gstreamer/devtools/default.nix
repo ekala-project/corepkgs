@@ -56,10 +56,10 @@ stdenv.mkDerivation (finalAttrs: {
     gst-rtsp-server
   ];
 
-  mesonFlags = [
-    "-Ddoc=disabled"
-    "-Ddots_viewer=disabled"
-  ];
+  mesonFeatures = {
+    doc = false;
+    dots_viewer = false;
+  };
 
   preFixup = ''
     moveToOutput "lib/gstreamer-1.0/pkgconfig" "$dev"

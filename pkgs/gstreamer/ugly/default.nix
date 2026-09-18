@@ -58,27 +58,17 @@ stdenv.mkDerivation (finalAttrs: {
     libdvdread
   ];
 
-  mesonFlags = [
-    "-Dglib_debug=disabled"
-    "-Dsidplay=disabled"
-    "-Ddoc=disabled"
-  ]
-  ++ lib.optional (libdvdread == null) "-Ddvdread=disabled"
-  ++ (
-    if enableGplPlugins then
-      [
-        "-Dgpl=enabled"
-      ]
-    else
-      [
-        "-Da52dec=disabled"
-        "-Dcdio=disabled"
-        "-Ddvdread=disabled"
-        "-Dmpeg2dec=disabled"
-        "-Dsidplay=disabled"
-        "-Dx264=disabled"
-      ]
-  );
+  mesonFeatures = {
+    glib_debug = false;
+    sidplay = false;
+    doc = false;
+    gpl = enableGplPlugins;
+    dvdread = enableGplPlugins && libdvdread != null;
+    a52dec = enableGplPlugins;
+    cdio = enableGplPlugins;
+    mpeg2dec = enableGplPlugins;
+    x264 = enableGplPlugins;
+  };
 
   postPatch = ''
     patchShebangs \

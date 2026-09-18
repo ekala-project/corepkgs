@@ -124,34 +124,30 @@ stdenv.mkDerivation (finalAttrs: {
     wayland
   ];
 
-  mesonFlags = [
-    "-Dexamples=disabled"
-    "-Dglib_debug=disabled"
-    "-Ddoc=disabled"
-    (lib.mesonEnable "asm" true)
-    "-Dqt5=disabled"
-    "-Dqt6=disabled"
-    "-Dgtk3=disabled"
+  mesonFeatures = {
+    examples = false;
+    glib_debug = false;
+    doc = false;
+    asm = true;
+    qt5 = false;
+    qt6 = false;
+    gtk3 = false;
     # Deps not yet in core-pkgs
-    "-Dtwolame=disabled"
-    "-Damrnb=disabled"
-    "-Damrwbdec=disabled"
-    "-Daalib=disabled"
-    "-Dwavpack=disabled"
-    "-Djack=disabled"
-    "-Dv4l2=disabled"
-    "-Dv4l2-gudev=disabled"
-    "-Ddv1394=disabled"
-    "-Drpicamsrc=disabled"
-  ]
-  ++ lib.optionals (!enableX11) [
-    "-Dximagesrc=disabled"
-  ]
-  ++ lib.optionals (!stdenv.hostPlatform.isLinux) [
-    "-Doss4=disabled"
-    "-Doss=disabled"
-    "-Dpulse=disabled"
-  ];
+    twolame = false;
+    amrnb = false;
+    amrwbdec = false;
+    aalib = false;
+    wavpack = false;
+    jack = false;
+    v4l2 = false;
+    v4l2-gudev = false;
+    dv1394 = false;
+    rpicamsrc = false;
+    ximagesrc = enableX11;
+    oss4 = stdenv.hostPlatform.isLinux;
+    oss = stdenv.hostPlatform.isLinux;
+    pulse = stdenv.hostPlatform.isLinux;
+  };
 
   postPatch = ''
     patchShebangs \

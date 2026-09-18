@@ -117,35 +117,32 @@ stdenv.mkDerivation (finalAttrs: {
     libdrm
   ];
 
-  mesonFlags = [
-    "-Dglib_debug=disabled"
-    "-Dexamples=disabled"
-    "-Dgl_winsys=${
-      lib.concatStringsSep "," (
-        lib.optional enableX11 "x11"
-        ++ lib.optional enableWayland "wayland"
-        ++ lib.optional enableCocoa "cocoa"
-      )
-    }"
-    (lib.mesonEnable "introspection" withIntrospection)
-    "-Ddoc=disabled"
-    (lib.mesonEnable "libvisual" false)
-    (lib.mesonEnable "tremor" false)
-    (lib.mesonEnable "vorbis" true)
-  ]
-  ++ lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
-    "-Dtests=disabled"
-  ]
-  ++ lib.optionals (!enableX11) [
-    "-Dx11=disabled"
-    "-Dxi=disabled"
-    "-Dxshm=disabled"
-    "-Dxvideo=disabled"
-  ]
-  ++ lib.optional (!enableGl) "-Dgl=disabled"
-  ++ lib.optional (!enableAlsa) "-Dalsa=disabled"
-  ++ lib.optional (!enableCdparanoia) "-Dcdparanoia=disabled"
-  ++ lib.optional stdenv.hostPlatform.isDarwin "-Ddrm=disabled";
+  mesonEntries = {
+    gl_winsys = lib.concatStringsSep "," (
+      lib.optional enableX11 "x11"
+      ++ lib.optional enableWayland "wayland"
+      ++ lib.optional enableCocoa "cocoa"
+    );
+  };
+
+  mesonFeatures = {
+    glib_debug = false;
+    examples = false;
+    introspection = withIntrospection;
+    doc = false;
+    libvisual = false;
+    tremor = false;
+    vorbis = true;
+    tests = stdenv.buildPlatform == stdenv.hostPlatform;
+    x11 = enableX11;
+    xi = enableX11;
+    xshm = enableX11;
+    xvideo = enableX11;
+    gl = enableGl;
+    alsa = enableAlsa;
+    cdparanoia = enableCdparanoia;
+    drm = !stdenv.hostPlatform.isDarwin;
+  };
 
   postPatch = ''
     patchShebangs \
