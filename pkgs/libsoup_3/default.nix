@@ -65,18 +65,17 @@ stdenv.mkDerivation (finalAttrs: {
     glib
   ];
 
-  mesonFlags = [
-    "-Dtls_check=false"
-    "-Dgssapi=disabled"
-    "-Dntlm=disabled"
-    "-Dautobahn=disabled"
-    "-Dpkcs11_tests=disabled"
-    "-Dsysprof=disabled"
-
-    (lib.mesonEnable "docs" withIntrospection)
-    (lib.mesonEnable "introspection" withIntrospection)
-    (lib.mesonEnable "vapi" withIntrospection)
-  ];
+  mesonEntries = {
+    tls_check = false;
+    gssapi = "disabled";
+    ntlm = "disabled";
+    autobahn = "disabled";
+    pkcs11_tests = "disabled";
+    sysprof = "disabled";
+    docs = if withIntrospection then "enabled" else "disabled";
+    introspection = if withIntrospection then "enabled" else "disabled";
+    vapi = if withIntrospection then "enabled" else "disabled";
+  };
 
   separateDebugInfo = true;
 
