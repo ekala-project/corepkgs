@@ -40,10 +40,10 @@ stdenv.mkDerivation (finalAttrs: {
     zlib
   ];
 
-  mesonFlags = [
-    (lib.mesonOption "pci-ids" "${hwdata}/share/hwdata")
-    (lib.mesonEnable "zlib" true)
-  ];
+  mesonEntries = {
+    pci-ids = "${hwdata}/share/hwdata";
+    zlib = "enabled";
+  };
 
   passthru.tests = {
     inherit libdrm;
