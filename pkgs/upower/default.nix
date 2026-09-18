@@ -68,16 +68,19 @@ stdenv.mkDerivation (finalAttrs: {
     polkit
   ];
 
+  mesonEntries = {
+    os_backend = "linux";
+    systemdsystemunitdir = "${placeholder "out"}/etc/systemd/system";
+    udevrulesdir = "${placeholder "out"}/lib/udev/rules.d";
+    udevhwdbdir = "${placeholder "out"}/lib/udev/hwdb.d";
+    introspection = "enabled";
+    gtk-doc = false;
+    idevice = "disabled";
+  };
+
   mesonFlags = [
     "--localstatedir=/var"
     "--sysconfdir=/etc"
-    "-Dos_backend=linux"
-    "-Dsystemdsystemunitdir=${placeholder "out"}/etc/systemd/system"
-    "-Dudevrulesdir=${placeholder "out"}/lib/udev/rules.d"
-    "-Dudevhwdbdir=${placeholder "out"}/lib/udev/hwdb.d"
-    "-Dintrospection=enabled"
-    "-Dgtk-doc=false"
-    "-Didevice=disabled"
   ];
 
   postPatch = ''
