@@ -23,7 +23,9 @@ stdenv.mkDerivation rec {
     python3
   ];
 
-  cmakeFlags = [ "-DBUILD_TESTS=0" ];
+  cmakeEntries = {
+    BUILD_TESTS = "0";
+  };
 
   meta = {
     homepage = "https://github.com/WebAssembly/binaryen";
