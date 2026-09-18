@@ -194,7 +194,7 @@ in
 stdenv:
 
 let
-  inherit (import ../lib/cmake.nix { inherit lib stdenv; }) makeCMakeFlags;
+  inherit (import ../lib/cmake.nix { inherit lib stdenv; }) makeCMakeFlags makeCMakeEntries;
   inherit (import ../lib/meson.nix { inherit lib stdenv; }) makeMesonFlags;
 
   # Nix itself uses the `system` field of a derivation to decide where
@@ -953,6 +953,7 @@ let
         // {
           ${if __structuredAttrs then "env" else null} = checkedEnv;
           cmakeFlags = makeCMakeFlags attrs;
+          cmakeEntries = makeCMakeEntries attrs;
           mesonFlags = makeMesonFlags attrs;
         }
       );

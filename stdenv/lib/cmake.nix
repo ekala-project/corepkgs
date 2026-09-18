@@ -4,11 +4,15 @@ let
   inherit (lib)
     findFirst
     isString
+    mapAttrs
+    optionalAttrs
     optional
     optionals
     ;
 
-  cmakeFlags' = optionals (stdenv.hostPlatform != stdenv.buildPlatform) (
+  isCross = stdenv.hostPlatform != stdenv.buildPlatform;
+
+  cmakeFlags' = optionals isCross (
     [
       "-DCMAKE_SYSTEM_NAME=${
         findFirst isString "Generic" (
@@ -45,6 +49,34 @@ let
     ]
   );
 
+  # Cross-compilation entries as an attrset for cmakeEntries
+  cmakeEntries' = optionalAttrs isCross {
+    CMAKE_SYSTEM_NAME = findFirst isString "Generic" (
+      optional (!stdenv.hostPlatform.isRedox) stdenv.hostPlatform.uname.system
+    );
+    ${if stdenv.hostPlatform.uname.processor != null then "CMAKE_SYSTEM_PROCESSOR" else null} =
+      stdenv.hostPlatform.uname.processor;
+    ${if stdenv.hostPlatform.uname.release != null then "CMAKE_SYSTEM_VERSION" else null} =
+      stdenv.hostPlatform.uname.release;
+    ${if stdenv.hostPlatform.isDarwin then "CMAKE_OSX_ARCHITECTURES" else null} =
+      stdenv.hostPlatform.darwinArch;
+    ${if stdenv.buildPlatform.uname.system != null then "CMAKE_HOST_SYSTEM_NAME" else null} =
+      stdenv.buildPlatform.uname.system;
+    ${if stdenv.buildPlatform.uname.processor != null then "CMAKE_HOST_SYSTEM_PROCESSOR" else null} =
+      stdenv.buildPlatform.uname.processor;
+    ${if stdenv.buildPlatform.uname.release != null then "CMAKE_HOST_SYSTEM_VERSION" else null} =
+      stdenv.buildPlatform.uname.release;
+    ${
+      if stdenv.buildPlatform.canExecute stdenv.hostPlatform then
+        "CMAKE_CROSSCOMPILING_EMULATOR"
+      else
+        null
+    } =
+      "env";
+    ${if stdenv.hostPlatform.isNone then "CMAKE_TRY_COMPILE_TARGET_TYPE" else null} = "STATIC_LIBRARY";
+    ${if stdenv.hostPlatform.isStatic then "CMAKE_LINK_SEARCH_START_STATIC" else null} = "ON";
+  };
+
   makeCMakeFlags =
     {
       cmakeFlags ? [ ],
@@ -52,7 +84,19 @@ let
     }:
     cmakeFlags ++ cmakeFlags';
 
+  # Canonicalize user cmakeEntries values (bools -> "ON"/"OFF", others -> toString)
+  # and merge with cross-compilation entries (user values take precedence).
+  makeCMakeEntries =
+    {
+      cmakeEntries ? { },
+      ...
+    }:
+    let
+      canonicalize = _: v: if builtins.isBool v then (if v then "ON" else "OFF") else builtins.toString v;
+    in
+    cmakeEntries' // (mapAttrs canonicalize cmakeEntries);
+
 in
 {
-  inherit makeCMakeFlags;
+  inherit makeCMakeFlags makeCMakeEntries;
 }
