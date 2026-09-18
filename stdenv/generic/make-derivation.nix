@@ -896,7 +896,7 @@ let
     # produce derivations that use this stdenv and its shell.
     #
     # Internally, it delegates most of its behavior to `makeDerivationArgument`,
-    # except for the `env`, `cmakeFlags`, and `mesonFlags` attributes, as well
+    # except for the `env`, `cmakeFlags`, `mesonFlags`, and `mesonFeatures` attributes, as well
     # as the attributes `meta` and `passthru` that affect [package attributes],
     # and not the derivation itself.
     #

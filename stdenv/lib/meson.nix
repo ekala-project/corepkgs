@@ -59,13 +59,16 @@ let
   makeMesonEntries =
     {
       mesonEntries ? { },
+      mesonFeatures ? { },
       ...
     }:
     let
       canonicalize =
         _: v: if builtins.isBool v then (if v then "true" else "false") else builtins.toString v;
+      canonicalizeFeature =
+        _: v: if builtins.isBool v then (if v then "enabled" else "disabled") else builtins.toString v;
     in
-    mapAttrs canonicalize mesonEntries;
+    mapAttrs canonicalize mesonEntries // mapAttrs canonicalizeFeature mesonFeatures;
 
 in
 {
