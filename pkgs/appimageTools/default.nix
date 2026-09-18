@@ -212,7 +212,7 @@ rec {
 
         # TODO(corepkgs): port libxcomposite
         # TODO(corepkgs): port libxtst
-        # TODO(corepkgs): port gst_all_1 (gstreamer, gst-plugins-base, gst-plugins-ugly)
+        # TODO(corepkgs): wire up gstreamer plugins (gstreamer.plugins-base, gstreamer.plugins-ugly)
         # TODO(corepkgs): port libxinerama
         # TODO(corepkgs): port libxdamage
         # TODO(corepkgs): port libxcursor

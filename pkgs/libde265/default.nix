@@ -10,7 +10,7 @@
   # for passthru.tests
   imagemagick,
   libheif,
-  gst_all_1,
+  gstreamer,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -38,7 +38,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru.tests = {
     inherit imagemagick libheif;
-    inherit (gst_all_1) gst-plugins-bad;
+    gst-plugins-bad = gstreamer.plugins-bad;
 
     test-corpus-decode = callPackage ./test-corpus-decode.nix {
       libde265 = finalAttrs.finalPackage;

@@ -2,24 +2,7 @@
 # This mainly serves as a way to define attrs at the top-level of pkgs which
 # require more than just passing default arguments to nix expressions
 
-final: prev:
-let
-  gstAll1 = final.lib.genAttrs [
-    "gst-devtools"
-    "gst-editing-services"
-    "gst-libav"
-    "gst-plugins-bad"
-    "gst-plugins-base"
-    "gst-plugins-good"
-    "gst-plugins-rs"
-    "gst-plugins-ugly"
-    "gst-rtsp-server"
-    "gstreamer"
-    "gstreamermm"
-  ] (_: null);
-in
-with final;
-{
+final: prev: with final; {
 
   tests = { };
 
@@ -92,7 +75,6 @@ with final;
 
   at-spi2-atk = at-spi2-core; # merged into at-spi2-core
   atk = at-spi2-core; # merged into at-spi2-core
-  gst_all_1 = gstAll1; # gtk4, libde265 tests
   mpi = null; # fftwMpi, boost
   nodejs_latest = nodejs.v26;
   xcodebuild = xcbuild;

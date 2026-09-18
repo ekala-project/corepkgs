@@ -294,4 +294,16 @@ mapAliases {
   wrapRustcWith = rustPackages.wrapRustcWith;
   xxHash = xxhash;
   # keep-sorted end
+
+  gst_all_1 = {
+    inherit gstreamer;
+    gst-plugins-base = gstreamer.plugins-base;
+    gst-plugins-good = gstreamer.plugins-good;
+    gst-plugins-bad = gstreamer.plugins-bad;
+    gst-plugins-ugly = gstreamer.plugins-ugly;
+    gst-rtsp-server = gstreamer.rtsp-server;
+    gst-libav = gstreamer.libav;
+    gst-devtools = gstreamer.devtools;
+    gst-editing-services = gstreamer.editing-services;
+  };
 }
