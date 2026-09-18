@@ -66,9 +66,12 @@ stdenv.mkDerivation (finalAttrs: {
 
   mesonFlags = [
     "--sysconfdir=/etc"
-    (lib.mesonBool "gtk_doc" false)
-    (lib.mesonBool "vapi" withIntrospection)
   ];
+
+  mesonEntries = {
+    gtk_doc = false;
+    vapi = withIntrospection;
+  };
 
   nativeCheckInputs = [
     dbus # for dbus-daemon
