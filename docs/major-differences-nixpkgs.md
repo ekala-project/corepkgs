@@ -27,6 +27,12 @@ changes differ significantly from whath one would expct with Nixpkgs.
   structured attrset (e.g. `cmakeEntries = { BUILD_TESTING = false; };`).
   Booleans are automatically canonicalized to `ON`/`OFF`. The legacy
   `cmakeFlags` list still works for non-`-D` flags and backward compatibility.
+- `mesonEntries` is the preferred way to pass Meson `-D` options as a
+  structured attrset (e.g. `mesonEntries = { tests = false; systemd = "disabled"; };`).
+  Booleans are automatically canonicalized to `true`/`false`. Feature options
+  use `"enabled"`/`"disabled"`/`"auto"` strings. The legacy `mesonFlags` list
+  still works for non-`-D` flags (e.g. `--sysconfdir`, `--cross-file`) and
+  backward compatibility.
 - `mesonBuildType` defaults to `release` instead of Nixpkgs' `plain`.
 - `doCheck` now defaults to `false` across the package set.
   - Test suites are not executed as part of the main build by default.
