@@ -46,12 +46,10 @@ stdenv.mkDerivation rec {
     ninja
   ];
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=${if static then "OFF" else "ON"}"
-  ]
-  ++ lib.optionals (cxx_standard != null) [
-    "-DCMAKE_CXX_STANDARD=${cxx_standard}"
-  ];
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = !static;
+    ${if cxx_standard != null then "CMAKE_CXX_STANDARD" else null} = cxx_standard;
+  };
 
   meta = {
     description = "Google's framework for writing C++ tests";
