@@ -81,12 +81,12 @@ stdenv.mkDerivation rec {
   ]
   ++ lib.optional isFuse3 "udev";
 
-  mesonFlags = lib.optionals isFuse3 [
-    "-Dudevrulesdir=/udev/rules.d"
-    "-Duseroot=false"
-    "-Dinitscriptdir="
-    "-Dexamples=false" # examples fail on musl and are just generally useless
-  ];
+  mesonEntries = lib.optionalAttrs isFuse3 {
+    udevrulesdir = "/udev/rules.d";
+    useroot = false;
+    initscriptdir = "";
+    examples = false; # examples fail on musl and are just generally useless
+  };
 
   # Ensure that FUSE calls the setuid wrapper, not
   # $out/bin/fusermount. It falls back to calling fusermount in
