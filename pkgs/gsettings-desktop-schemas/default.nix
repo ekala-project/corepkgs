@@ -34,9 +34,9 @@ stdenv.mkDerivation rec {
     gobject-introspection
   ];
 
-  mesonFlags = [
-    (lib.mesonBool "introspection" withIntrospection)
-  ];
+  mesonEntries = {
+    introspection = withIntrospection;
+  };
 
   preInstall = ''
     mkdir -p $out/share/glib-2.0/schemas
