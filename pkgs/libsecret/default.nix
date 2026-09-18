@@ -124,12 +124,12 @@ stdenv.mkDerivation rec {
   ++ lib.optional (python3Packages ? pygobject3) python3Packages.pygobject3
   ++ lib.optional (gjs != null) gjs;
 
-  mesonFlags = [
-    (lib.mesonBool "introspection" withIntrospection)
-    (lib.mesonBool "gtk_doc" withIntrospection)
-    (lib.mesonBool "tpm2" withTpm2Tss)
-    (lib.mesonOption "bashcompdir" "share/bash-completion/completions")
-  ];
+  mesonEntries = {
+    introspection = withIntrospection;
+    gtk_doc = withIntrospection;
+    tpm2 = withTpm2Tss;
+    bashcompdir = "share/bash-completion/completions";
+  };
 
   doCheck = stdenv.hostPlatform.isLinux && withIntrospection && python3Packages ? pygobject3;
   separateDebugInfo = true;
