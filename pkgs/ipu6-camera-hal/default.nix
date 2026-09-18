@@ -46,16 +46,16 @@ stdenv.mkDerivation {
     pkg-config
   ];
 
-  cmakeFlags = [
-    "-DCMAKE_BUILD_TYPE=Release"
-    "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}"
-    "-DCMAKE_INSTALL_LIBDIR=lib"
-    "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
-    "-DBUILD_CAMHAL_ADAPTOR=ON"
-    "-DBUILD_CAMHAL_PLUGIN=ON"
-    "-DIPU_VERSIONS=${ipuVersion}"
-    "-DUSE_PG_LITE_PIPE=ON"
-  ];
+  cmakeEntries = {
+    CMAKE_BUILD_TYPE = "Release";
+    CMAKE_INSTALL_PREFIX = "${placeholder "out"}";
+    CMAKE_INSTALL_LIBDIR = "lib";
+    CMAKE_POLICY_VERSION_MINIMUM = "3.5";
+    BUILD_CAMHAL_ADAPTOR = "ON";
+    BUILD_CAMHAL_PLUGIN = "ON";
+    IPU_VERSIONS = ipuVersion;
+    USE_PG_LITE_PIPE = "ON";
+  };
 
   env.NIX_CFLAGS_COMPILE = toString [
     "-Wno-error"
