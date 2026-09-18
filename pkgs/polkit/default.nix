@@ -147,17 +147,19 @@ stdenv.mkDerivation rec {
   mesonFlags = [
     "--datadir=${system}/share"
     "--sysconfdir=/etc"
-    "-Dpolkitd_user=polkituser" # TODO? <nixos> config.ids.uids.polkituser
-    "-Dos_type=redhat" # affects PAM includes and privileged group name (wheel)
-    "-Dintrospection=${lib.boolToString withIntrospection}"
-    "-Dtests=${lib.boolToString doCheck}"
-    "-Dgtk_doc=${lib.boolToString withIntrospection}"
-    "-Dman=true"
-    "-Dsystemdsystemunitdir=${placeholder "out"}/lib/systemd/system"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [
-    "-Dsession_tracking=${if useSystemd then "logind" else "elogind"}"
   ];
+
+  mesonEntries = {
+    polkitd_user = "polkituser"; # TODO? <nixos> config.ids.uids.polkituser
+    os_type = "redhat"; # affects PAM includes and privileged group name (wheel)
+    introspection = withIntrospection;
+    tests = doCheck;
+    gtk_doc = withIntrospection;
+    man = true;
+    systemdsystemunitdir = "${placeholder "out"}/lib/systemd/system";
+    ${if stdenv.hostPlatform.isLinux then "session_tracking" else null} =
+      if useSystemd then "logind" else "elogind";
+  };
 
   inherit doCheck;
 
