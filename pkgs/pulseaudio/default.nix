@@ -143,52 +143,56 @@ stdenv.mkDerivation (finalAttrs: {
         NIX_LDFLAGS = "--undefined-version";
       };
 
-  mesonFlags = [
-    (lib.mesonEnable "alsa" (!libOnly && alsaSupport))
-    (lib.mesonEnable "asyncns" (!libOnly))
-    (lib.mesonEnable "avahi" false)
-    (lib.mesonEnable "bluez5" false)
-    (lib.mesonEnable "bluez5-gstreamer" false)
-    (lib.mesonOption "database" "simple")
-    (lib.mesonBool "doxygen" false)
-    (lib.mesonEnable "elogind" false)
+  mesonEntries = {
+    alsa = if (!libOnly && alsaSupport) then "enabled" else "disabled";
+    asyncns = if (!libOnly) then "enabled" else "disabled";
+    avahi = "disabled";
+    bluez5 = "disabled";
+    bluez5-gstreamer = "disabled";
+    database = "simple";
+    doxygen = false;
+    elogind = "disabled";
     # gsettings does not support cross-compilation
-    (lib.mesonEnable "gsettings" (
-      stdenv.hostPlatform.isLinux && (stdenv.buildPlatform == stdenv.hostPlatform)
-    ))
-    (lib.mesonEnable "gstreamer" false)
-    (lib.mesonEnable "gtk" false)
+    gsettings =
+      if (stdenv.hostPlatform.isLinux && (stdenv.buildPlatform == stdenv.hostPlatform)) then
+        "enabled"
+      else
+        "disabled";
+    gstreamer = "disabled";
+    gtk = "disabled";
     # TODO(corepkgs): Re-enable when libjack2 is ported
-    (lib.mesonEnable "jack" false)
+    jack = "disabled";
     # TODO(corepkgs): Re-enable when lirc is ported
-    (lib.mesonEnable "lirc" false)
-    (lib.mesonEnable "openssl" airtunesSupport)
-    (lib.mesonEnable "orc" false)
-    (lib.mesonEnable "systemd" (useSystemd && !libOnly))
-    (lib.mesonEnable "tcpwrap" false)
-    (lib.mesonEnable "udev" (!libOnly && udevSupport))
-    (lib.mesonEnable "valgrind" false)
-    (lib.mesonEnable "webrtc-aec" (!libOnly))
-    (lib.mesonEnable "x11" x11Support)
+    lirc = "disabled";
+    openssl = if airtunesSupport then "enabled" else "disabled";
+    orc = "disabled";
+    systemd = if (useSystemd && !libOnly) then "enabled" else "disabled";
+    tcpwrap = "disabled";
+    udev = if (!libOnly && udevSupport) then "enabled" else "disabled";
+    valgrind = "disabled";
+    webrtc-aec = if (!libOnly) then "enabled" else "disabled";
+    x11 = if x11Support then "enabled" else "disabled";
 
-    (lib.mesonOption "localstatedir" "/var")
-    (lib.mesonOption "sysconfdir" "/etc")
-    (lib.mesonOption "sysconfdir_install" "${placeholder "out"}/etc")
-    (lib.mesonOption "udevrulesdir" "${placeholder "out"}/lib/udev/rules.d")
+    localstatedir = "/var";
+    sysconfdir = "/etc";
+    sysconfdir_install = "${placeholder "out"}/etc";
+    udevrulesdir = "${placeholder "out"}/lib/udev/rules.d";
 
+    ${if stdenv.hostPlatform.isLinux && useSystemd then "systemduserunitdir" else null} =
+      "${placeholder "out"}/lib/systemd/user";
+  }
+  // lib.optionalAttrs stdenv.hostPlatform.isDarwin {
+    consolekit = "disabled";
+    dbus = "disabled";
+    glib = "disabled";
+    oss-output = "disabled";
+  };
+
+  mesonFlags = [
     # pulseaudio complains if its binary is moved after installation;
     # this is needed so that wrapGApp can operate *without*
     # renaming the unwrapped binaries (see below)
     "--bindir=${placeholder "out"}/.bin-unwrapped"
-  ]
-  ++ lib.optionals (stdenv.hostPlatform.isLinux && useSystemd) [
-    (lib.mesonOption "systemduserunitdir" "${placeholder "out"}/lib/systemd/user")
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    (lib.mesonEnable "consolekit" false)
-    (lib.mesonEnable "dbus" false)
-    (lib.mesonEnable "glib" false)
-    (lib.mesonEnable "oss-output" false)
   ];
 
   preCheck = ''
