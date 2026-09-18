@@ -28,10 +28,10 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "BUILD_SHARED_LIBS" (!stdenv.hostPlatform.isStatic))
-    (lib.cmakeBool "RC_INSTALL_ALL_EXTRAS" true)
-  ];
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = !stdenv.hostPlatform.isStatic;
+    RC_INSTALL_ALL_EXTRAS = true;
+  };
 
   postInstall = ''
     moveToOutput share/rapidcheck/cmake "$dev"
