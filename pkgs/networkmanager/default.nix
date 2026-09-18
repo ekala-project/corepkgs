@@ -74,49 +74,51 @@ stdenv.mkDerivation (finalAttrs: {
     "doc"
   ];
 
+  mesonEntries = {
+    # System paths
+    systemdsystemunitdir = if withSystemd then "${placeholder "out"}/etc/systemd/system" else "no";
+    # to enable link-local connections
+    udev_dir = "${placeholder "out"}/lib/udev";
+    dbus_conf_dir = "${placeholder "out"}/share/dbus-1/system.d";
+    kernel_firmware_dir = "/run/current-system/firmware";
+
+    # Platform
+    modprobe = "${kmod}/bin/modprobe";
+    session_tracking = if withSystemd then "systemd" else "no";
+    systemd_journal = withSystemd;
+    libaudit = "yes-disabled-by-default";
+    polkit_agent_helper_1 = "/run/wrappers/bin/polkit-agent-helper-1";
+
+    # Features
+    iwd = true;
+    pppd = "${ppp}/bin/pppd";
+    iptables = "${iptables}/bin/iptables";
+    nft = "${nftables}/bin/nft";
+    modem_manager = true;
+    nmtui = true;
+    dnsmasq = "${dnsmasq}/bin/dnsmasq";
+    qt = false;
+    nbft = false;
+    clat = false;
+
+    # Handlers
+    resolvconf = "${openresolv}/bin/resolvconf";
+
+    # DHCP clients
+    dhcpcd = "${dhcpcd}/bin/dhcpcd";
+
+    # Miscellaneous
+    docs = enableDocs && isNative;
+    man = enableDocs && isNative;
+    tests = "no";
+    crypto = "gnutls";
+    mobile_broadband_provider_info_database = "${mobile-broadband-provider-info}/share/mobile-broadband-provider-info/serviceproviders.xml";
+  };
+
   mesonFlags = [
     # System paths
     "--sysconfdir=/etc"
     "--localstatedir=/var"
-    (lib.mesonOption "systemdsystemunitdir" (
-      if withSystemd then "${placeholder "out"}/etc/systemd/system" else "no"
-    ))
-    # to enable link-local connections
-    "-Dudev_dir=${placeholder "out"}/lib/udev"
-    "-Ddbus_conf_dir=${placeholder "out"}/share/dbus-1/system.d"
-    "-Dkernel_firmware_dir=/run/current-system/firmware"
-
-    # Platform
-    "-Dmodprobe=${kmod}/bin/modprobe"
-    (lib.mesonOption "session_tracking" (if withSystemd then "systemd" else "no"))
-    (lib.mesonBool "systemd_journal" withSystemd)
-    "-Dlibaudit=yes-disabled-by-default"
-    "-Dpolkit_agent_helper_1=/run/wrappers/bin/polkit-agent-helper-1"
-
-    # Features
-    "-Diwd=true"
-    "-Dpppd=${ppp}/bin/pppd"
-    "-Diptables=${iptables}/bin/iptables"
-    "-Dnft=${nftables}/bin/nft"
-    "-Dmodem_manager=true"
-    "-Dnmtui=true"
-    "-Ddnsmasq=${dnsmasq}/bin/dnsmasq"
-    "-Dqt=false"
-    "-Dnbft=false"
-    "-Dclat=false"
-
-    # Handlers
-    "-Dresolvconf=${openresolv}/bin/resolvconf"
-
-    # DHCP clients
-    "-Ddhcpcd=${dhcpcd}/bin/dhcpcd"
-
-    # Miscellaneous
-    "-Ddocs=${lib.boolToString (enableDocs && isNative)}"
-    "-Dman=${lib.boolToString (enableDocs && isNative)}"
-    "-Dtests=no"
-    "-Dcrypto=gnutls"
-    "-Dmobile_broadband_provider_info_database=${mobile-broadband-provider-info}/share/mobile-broadband-provider-info/serviceproviders.xml"
   ];
 
   patches = [
