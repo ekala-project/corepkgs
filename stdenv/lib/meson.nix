@@ -1,7 +1,11 @@
 { stdenv, lib }:
 
 let
-  inherit (lib) boolToString optionals;
+  inherit (lib)
+    boolToString
+    mapAttrs
+    optionals
+    ;
 
   # See https://mesonbuild.com/Reference-tables.html#cpu-families
   cpuFamily =
@@ -51,7 +55,19 @@ let
     }:
     crossFlags ++ mesonFlags;
 
+  # Canonicalize user mesonEntries values (bools -> "true"/"false", others -> toString).
+  makeMesonEntries =
+    {
+      mesonEntries ? { },
+      ...
+    }:
+    let
+      canonicalize =
+        _: v: if builtins.isBool v then (if v then "true" else "false") else builtins.toString v;
+    in
+    mapAttrs canonicalize mesonEntries;
+
 in
 {
-  inherit makeMesonFlags;
+  inherit makeMesonFlags makeMesonEntries;
 }

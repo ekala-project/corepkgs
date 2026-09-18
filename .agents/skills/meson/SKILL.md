@@ -67,7 +67,25 @@ buildInputs = [
 ];
 ```
 
-### Meson Flags
+### Meson Entries (Preferred)
+
+Use `mesonEntries` to specify Meson `-D` options as a structured attrset.
+Booleans are automatically converted to `true`/`false`.
+
+```nix
+mesonEntries = {
+  docs = false;
+  tests = false;
+  systemd = "disabled";
+  man = true;
+};
+```
+
+**Feature options:** Use `"enabled"`/`"disabled"`/`"auto"` strings.
+
+### Meson Flags (Legacy)
+
+`mesonFlags` still works for string-based flags and non-`-D` flags:
 
 ```nix
 mesonFlags = [
@@ -78,7 +96,9 @@ mesonFlags = [
 ];
 ```
 
-**Feature options:** Use `enabled`/`disabled`/`auto`.
+Both can be used together. `mesonFlags` values override `mesonEntries` for the
+same key (meson uses last-wins for `-D` flags). Use `mesonFlags` for non-`-D`
+flags like `--cross-file`.
 
 ### Cross-Compilation
 
@@ -94,24 +114,24 @@ depsBuildBuild = [ pkg-config ];
 
 **Dependency not found:**
 ```nix
-mesonFlags = [ "-Doptional_feature=disabled" ];
+mesonEntries = { optional_feature = "disabled"; };
 ```
 
 **Disable subproject downloads:**
 ```nix
-mesonFlags = [ "-Dwrap_mode=nodownload" ];
+mesonEntries = { wrap_mode = "nodownload"; };
 ```
 
 **Disable documentation:**
 ```nix
-mesonFlags = [
-  "-Ddocs=false"
-  "-Dgtk_doc=false"
-  "-Dman=false"
-];
+mesonEntries = {
+  docs = false;
+  gtk_doc = false;
+  man = false;
+};
 ```
 
 **Force library directory:**
 ```nix
-mesonFlags = [ "-Dlibdir=lib" ];
+mesonEntries = { libdir = "lib"; };
 ```

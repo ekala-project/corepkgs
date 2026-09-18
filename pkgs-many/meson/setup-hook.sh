@@ -1,5 +1,95 @@
 # shellcheck shell=bash disable=SC2206
 
+# --- mesonEntries helpers ---
+# mesonEntries is a bash associative array of Meson -D options.
+# When passed as a Nix attrset, structured attrs creates the array automatically.
+# These helpers manipulate it and convert entries to -Dkey=value flags.
+
+if ! declare -p mesonEntries &>/dev/null 2>&1; then
+    declare -gA mesonEntries
+fi
+
+# Canonicalize a value to Meson boolean true/false.
+_mesonBoolValue() {
+    case "${1,,}" in
+        1|true|on|yes|y) echo "true" ;;
+        ""|0|false|off|no|n) echo "false" ;;
+        *) echo "$1" ;;
+    esac
+}
+
+# Canonicalize a value to Meson feature enabled/disabled/auto.
+_mesonFeatureValue() {
+    case "${1,,}" in
+        1|true|on|yes|y|enabled) echo "enabled" ;;
+        ""|0|false|off|no|n|disabled) echo "disabled" ;;
+        auto) echo "auto" ;;
+        *) echo "$1" ;;
+    esac
+}
+
+# Set a string entry, overwriting any existing value.
+setMesonEntry() {
+    mesonEntries[$1]="$2"
+}
+
+# Set a boolean entry (canonicalized to true/false), overwriting any existing value.
+setMesonEntryBool() {
+    mesonEntries[$1]="$(_mesonBoolValue "$2")"
+}
+
+# Set a feature entry (canonicalized to enabled/disabled/auto), overwriting any existing value.
+setMesonEntryFeature() {
+    mesonEntries[$1]="$(_mesonFeatureValue "$2")"
+}
+
+# Set a string entry only if the key is not already present.
+prependMesonEntry() {
+    if ! [[ -v "mesonEntries[$1]" ]]; then
+        mesonEntries[$1]="$2"
+    fi
+}
+
+# Set a boolean entry only if the key is not already present.
+prependMesonEntryBool() {
+    if ! [[ -v "mesonEntries[$1]" ]]; then
+        mesonEntries[$1]="$(_mesonBoolValue "$2")"
+    fi
+}
+
+# Set a feature entry only if the key is not already present.
+prependMesonEntryFeature() {
+    if ! [[ -v "mesonEntries[$1]" ]]; then
+        mesonEntries[$1]="$(_mesonFeatureValue "$2")"
+    fi
+}
+
+# Remove an entry.
+removeMesonEntry() {
+    unset "mesonEntries[$1]"
+}
+
+# Get an entry value, or the optional default if not present.
+getMesonEntry() {
+    if [[ -v "mesonEntries[$1]" ]]; then
+        echo "${mesonEntries[$1]}"
+    elif (( $# >= 2 )); then
+        echo "$2"
+    else
+        echo "getMesonEntry: key '$1' not found and no default provided" >&2
+        return 1
+    fi
+}
+
+# Append -Dkey=value flags for all mesonEntries into the named array variable.
+concatMesonEntryFlagsTo() {
+    local -n _targetArray="$1"
+    local _key
+    for _key in "${!mesonEntries[@]}"; do
+        _targetArray+=("-D${_key}=${mesonEntries[$_key]}")
+    done
+}
+
 mesonConfigurePhase() {
     runHook preConfigure
 
@@ -37,6 +127,7 @@ mesonConfigurePhase() {
         flagsArray+=("-Db_lundef=false")
     fi
 
+    concatMesonEntryFlagsTo flagsArray
     concatTo flagsArray mesonFlags mesonFlagsArray
 
     echoCmd 'mesonConfigurePhase flags' "${flagsArray[@]}"
