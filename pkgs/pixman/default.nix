@@ -53,9 +53,9 @@ stdenv.mkDerivation (finalAttrs: {
   #   https://gitlab.freedesktop.org/pixman/pixman/-/issues/88
   mesonAutoFeatures = "auto";
   # fix armv7 build
-  mesonEntries = lib.optionalAttrs stdenv.hostPlatform.isAarch32 {
-    arm-simd = "disabled";
-    neon = "disabled";
+  mesonFeatures = lib.optionalAttrs stdenv.hostPlatform.isAarch32 {
+    arm-simd = false;
+    neon = false;
   };
 
   preConfigure = ''

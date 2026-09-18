@@ -238,58 +238,59 @@ stdenv.mkDerivation (finalAttrs: {
     "--sysconfdir=/var/lib"
   ];
 
-  mesonEntries =
+  mesonEntries = {
+    install_prefix = placeholder "out";
+    localstatedir = "/var";
+    runstatedir = "/run";
+    sshconfdir = "/etc/ssh/ssh_config.d";
+
+    init_script = "systemd";
+  };
+
+  mesonFeatures =
     let
-      feat = enable: if enable then "enabled" else "disabled";
       driver = name: enable: {
         name = "driver_${name}";
-        value = feat enable;
+        value = enable;
       };
       storage = name: enable: {
         name = "storage_${name}";
-        value = feat enable;
+        value = enable;
       };
     in
     {
-      install_prefix = placeholder "out";
-      localstatedir = "/var";
-      runstatedir = "/run";
-      sshconfdir = "/etc/ssh/ssh_config.d";
-
-      init_script = "systemd";
-
-      apparmor = feat isLinux;
-      attr = feat isLinux;
-      audit = feat isLinux;
-      bash_completion = feat true;
-      blkid = feat isLinux;
-      capng = feat isLinux;
-      curl = feat true;
-      docs = feat true;
-      expensive_tests = feat true;
-      firewalld = feat isLinux;
-      firewalld_zone = feat isLinux;
-      fuse = feat isLinux;
-      glusterfs = feat false;
-      host_validate = feat true;
-      libiscsi = feat false;
-      libnl = feat isLinux;
-      libpcap = feat true;
-      libssh2 = feat true;
-      login_shell = feat isLinux;
-      nss = feat (isLinux && !stdenv.hostPlatform.isMusl);
-      numactl = feat isLinux;
+      apparmor = isLinux;
+      attr = isLinux;
+      audit = isLinux;
+      bash_completion = true;
+      blkid = isLinux;
+      capng = isLinux;
+      curl = true;
+      docs = true;
+      expensive_tests = true;
+      firewalld = isLinux;
+      firewalld_zone = isLinux;
+      fuse = isLinux;
+      glusterfs = false;
+      host_validate = true;
+      libiscsi = false;
+      libnl = isLinux;
+      libpcap = true;
+      libssh2 = true;
+      login_shell = isLinux;
+      nss = isLinux && !stdenv.hostPlatform.isMusl;
+      numactl = isLinux;
       # TODO(corepkgs): enable numad when ported
-      numad = feat false;
-      pciaccess = feat isLinux;
-      polkit = feat isLinux;
-      readline = feat true;
-      secdriver_apparmor = feat isLinux;
-      ssh_proxy = feat isLinux;
-      tests = feat true;
-      udev = feat isLinux;
-      json_c = feat true;
-      libvirtd = feat true;
+      numad = false;
+      pciaccess = isLinux;
+      polkit = isLinux;
+      readline = true;
+      secdriver_apparmor = isLinux;
+      ssh_proxy = isLinux;
+      tests = true;
+      udev = isLinux;
+      json_c = true;
+      libvirtd = true;
     }
     // builtins.listToAttrs [
       (driver "ch" (isLinux && (stdenv.hostPlatform.isx86_64 || stdenv.hostPlatform.isAarch64)))

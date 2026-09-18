@@ -70,8 +70,11 @@ stdenv.mkDerivation (finalAttrs: {
   mesonEntries = {
     documentation = false;
     man-pages = true;
-    introspection = "disabled";
-    xft = if x11Support then "enabled" else "disabled";
+  };
+
+  mesonFeatures = {
+    introspection = false;
+    xft = x11Support;
   };
 
   env.FONTCONFIG_FILE = makeFontsConf {

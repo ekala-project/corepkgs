@@ -41,12 +41,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   mesonEntries = {
     install-test-programs = true;
-    cairo-tests = "disabled";
-    intel = "enabled";
-    omap = if stdenv.hostPlatform.isLinux then "enabled" else "disabled";
-    valgrind = "disabled";
-    ${if stdenv.hostPlatform.isAarch then "tegra" else null} = "enabled";
-    ${if !stdenv.hostPlatform.isLinux then "etnaviv" else null} = "disabled";
+  };
+
+  mesonFeatures = {
+    cairo-tests = false;
+    intel = true;
+    omap = stdenv.hostPlatform.isLinux;
+    valgrind = false;
+    ${if stdenv.hostPlatform.isAarch then "tegra" else null} = true;
+    ${if !stdenv.hostPlatform.isLinux then "etnaviv" else null} = false;
   };
 
   passthru.tests = {

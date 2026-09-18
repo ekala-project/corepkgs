@@ -84,21 +84,25 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   mesonAutoFeatures = "auto";
+
   mesonEntries = {
-    logind = if withLogind then "enabled" else "disabled";
-    audit = if withAudit then "enabled" else "disabled";
-    pam_lastlog = if !stdenv.hostPlatform.isMusl then "enabled" else "disabled"; # TODO: switch to pam_lastlog2, pam_lastlog is deprecated and broken on musl
-    pam_unix = "enabled";
     sysconfdir = "etc"; # relative to meson prefix, which is $out
-    elogind = "disabled";
-    econf = "disabled";
     vendordir = "";
-    selinux = "disabled";
-    nis = "disabled";
     xtests = false;
     examples = false;
     # warning: slower execution due to debug makes VM tests fail!
     ${if debugMode then "pam-debug" else null} = true;
+  };
+
+  mesonFeatures = {
+    logind = withLogind;
+    audit = withAudit;
+    pam_lastlog = !stdenv.hostPlatform.isMusl; # TODO: switch to pam_lastlog2, pam_lastlog is deprecated and broken on musl
+    pam_unix = true;
+    elogind = false;
+    econf = false;
+    selinux = false;
+    nis = false;
   };
 
   postInstall = ''

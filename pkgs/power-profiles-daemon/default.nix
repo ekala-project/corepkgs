@@ -65,11 +65,14 @@ stdenv.mkDerivation (finalAttrs: {
   mesonEntries = {
     systemdsystemunitdir = "${placeholder "out"}/lib/systemd/system";
     gtk_doc = true;
-    pylint = "disabled";
     tests = false;
-    manpage = "disabled";
-    bashcomp = "disabled";
     zshcomp = "";
+  };
+
+  mesonFeatures = {
+    pylint = false;
+    manpage = false;
+    bashcomp = false;
   };
 
   env.PKG_CONFIG_POLKIT_GOBJECT_1_POLICYDIR = "${placeholder "out"}/share/polkit-1/actions";

@@ -45,8 +45,11 @@ stdenv.mkDerivation (finalAttrs: {
 
   mesonEntries = {
     libseat-logind = "systemd";
-    libseat-builtin = "enabled";
-    server = "enabled";
+  };
+
+  mesonFeatures = {
+    libseat-builtin = true;
+    server = true;
   };
 
   meta = {

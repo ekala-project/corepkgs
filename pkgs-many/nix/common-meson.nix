@@ -181,14 +181,17 @@ stdenv.mkDerivation (finalAttrs: {
       ''}
     '';
 
+  mesonFeatures = {
+    "libutil:cpuid" = stdenv.hostPlatform.isx86_64;
+    "libstore:seccomp-sandboxing" = withLibseccomp;
+  };
+
   mesonEntries = {
     unit-tests = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
     bindings = false;
     "libstore:store-dir" = storeDir;
     "libstore:localstatedir" = stateDir;
     "libstore:sysconfdir" = confDir;
-    "libutil:cpuid" = if stdenv.hostPlatform.isx86_64 then "enabled" else "disabled";
-    "libstore:seccomp-sandboxing" = if withLibseccomp then "enabled" else "disabled";
     "libstore:embedded-sandbox-shell" = stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isStatic;
     doc-gen = enableDocumentation;
   }

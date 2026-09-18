@@ -46,10 +46,10 @@ stdenv.mkDerivation (finalAttrs: {
     glib
   ];
 
-  mesonEntries = {
-    introspection = if withIntrospection then "enabled" else "disabled";
-    vapi = if withIntrospection then "enabled" else "disabled";
-    tests = "disabled";
+  mesonFeatures = {
+    introspection = withIntrospection;
+    vapi = withIntrospection;
+    tests = false;
   };
 
   meta = {

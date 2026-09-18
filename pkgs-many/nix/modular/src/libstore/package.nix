@@ -54,8 +54,11 @@ mkMesonLibrary (finalAttrs: {
     nlohmann_json
   ];
 
+  mesonFeatures = {
+    seccomp-sandboxing = stdenv.hostPlatform.isLinux;
+  };
+
   mesonEntries = {
-    seccomp-sandboxing = if stdenv.hostPlatform.isLinux then "enabled" else "disabled";
     embedded-sandbox-shell = embeddedSandboxShell;
   }
   // lib.optionalAttrs stdenv.hostPlatform.isLinux {

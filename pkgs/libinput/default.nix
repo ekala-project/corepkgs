@@ -79,7 +79,10 @@ stdenv.mkDerivation (finalAttrs: {
     debug-gui = false;
     tests = false;
     libwacom = true;
-    lua-plugins = "enabled";
+  };
+
+  mesonFeatures = {
+    lua-plugins = true;
   };
 
   doInstallCheck = true;

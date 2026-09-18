@@ -73,7 +73,10 @@ stdenv.mkDerivation (finalAttrs: {
     dbus_daemon = "dbus-daemon";
     ${if systemdSupport then "dbus_broker" else null} = "dbus-broker-launch";
     ${if !systemdSupport then "use_systemd" else null} = false;
-    ${if !withIntrospection then "introspection" else null} = "disabled";
+  };
+
+  mesonFeatures = {
+    ${if !withIntrospection then "introspection" else null} = false;
   };
 
   postFixup = ''

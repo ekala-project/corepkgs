@@ -88,17 +88,19 @@ stdenv.mkDerivation (
 
     mesonEntries = {
       gtk_doc = true;
+    };
 
+    mesonFeatures = {
       # error: #error config.h must be included before this header
-      symbol-lookup = "disabled";
+      symbol-lookup = false;
 
       # Only used in tests, causes a dependency cycle
-      spectre = "disabled";
+      spectre = false;
 
-      glib = if gobjectSupport then "enabled" else "disabled";
-      tests = if finalAttrs.finalPackage.doCheck then "enabled" else "disabled";
-      xlib = if x11Support then "enabled" else "disabled";
-      xcb = if xcbSupport then "enabled" else "disabled";
+      glib = gobjectSupport;
+      tests = finalAttrs.finalPackage.doCheck;
+      xlib = x11Support;
+      xcb = xcbSupport;
     };
 
     mesonFlags = lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [

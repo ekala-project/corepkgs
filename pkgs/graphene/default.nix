@@ -50,14 +50,15 @@ stdenv.mkDerivation (finalAttrs: {
     glib
   ];
 
-  mesonFlags = [
-    (lib.mesonBool "gtk_doc" false)
-    (lib.mesonEnable "introspection" withIntrospection)
-    (lib.mesonBool "installed_tests" false)
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isAarch32 [
-    "-Darm_neon=false"
-  ];
+  mesonEntries = {
+    gtk_doc = false;
+    installed_tests = false;
+    ${if stdenv.hostPlatform.isAarch32 then "arm_neon" else null} = false;
+  };
+
+  mesonFeatures = {
+    introspection = withIntrospection;
+  };
 
   doCheck = true;
 

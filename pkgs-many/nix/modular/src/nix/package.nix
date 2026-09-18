@@ -25,8 +25,8 @@ mkMesonExecutable (finalAttrs: {
     nix-cmd
   ];
 
-  mesonEntries = {
-    ${if lib.versionAtLeast version "2.35" then "mimalloc" else null} = "disabled";
+  mesonFeatures = {
+    ${if lib.versionAtLeast version "2.35" then "mimalloc" else null} = false;
   };
 
   meta = {

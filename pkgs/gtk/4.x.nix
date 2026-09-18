@@ -193,15 +193,18 @@ stdenv.mkDerivation (finalAttrs: {
     # ../docs/tools/shooter.c:4:10: fatal error: 'cairo-xlib.h' file not found
     documentation = x11Support;
     build-tests = false;
-    tracker = if trackerSupport then "enabled" else "disabled";
     broadway-backend = broadwaySupport;
-    vulkan = if vulkanSupport then "enabled" else "disabled";
-    print-cups = if cupsSupport then "enabled" else "disabled";
     x11-backend = x11Support;
+  };
+
+  mesonFeatures = {
+    tracker = trackerSupport;
+    vulkan = vulkanSupport;
+    print-cups = cupsSupport;
     ${
       if stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isAarch64 then "media-gstreamer" else null
     } =
-      "disabled"; # requires gstreamer-gl
+      false; # requires gstreamer-gl
   };
 
   doCheck = false; # needs X11

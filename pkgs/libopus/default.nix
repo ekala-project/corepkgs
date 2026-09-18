@@ -39,10 +39,13 @@ stdenv.mkDerivation (finalAttrs: {
   mesonEntries = {
     fixed-point = fixedPoint;
     custom-modes = withCustomModes;
-    intrinsics = if withIntrinsics then "enabled" else "disabled";
-    rtcd = if (withIntrinsics || withAsm) then "enabled" else "disabled";
-    asm = if withAsm then "enabled" else "disabled";
-    docs = "disabled";
+  };
+
+  mesonFeatures = {
+    intrinsics = withIntrinsics;
+    rtcd = withIntrinsics || withAsm;
+    asm = withAsm;
+    docs = false;
   };
 
   doCheck = !stdenv.hostPlatform.isi686 && !stdenv.hostPlatform.isAarch32;

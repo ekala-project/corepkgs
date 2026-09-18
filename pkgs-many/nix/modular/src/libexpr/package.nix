@@ -57,8 +57,8 @@ mkMesonLibrary (finalAttrs: {
   ]
   ++ lib.optional enableGC boehmgc;
 
-  mesonEntries = {
-    gc = if enableGC then "enabled" else "disabled";
+  mesonFeatures = {
+    gc = enableGC;
   };
 
   meta = {

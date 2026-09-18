@@ -98,7 +98,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   mesonEntries = {
     gpg_path = "${lib.getBin gnupg}/bin/gpg";
-    systemd = if systemdSupport then "enabled" else "disabled";
+  };
+
+  mesonFeatures = {
+    systemd = systemdSupport;
   };
 
   env.PKG_CONFIG_SYSTEMD_SYSTEMDUSERUNITDIR = "${placeholder "out"}/lib/systemd/user";

@@ -414,6 +414,73 @@ stdenv.mkDerivation (finalAttrs: {
     }
   );
 
+  mesonFeatures = {
+    # Tests
+    glib = withTests;
+    dbus = withTests;
+
+    # Compression
+    bzip2 = withCompression;
+    lz4 = withCompression;
+    xz = withCompression;
+    zstd = withCompression;
+    zlib = withCompression;
+
+    # NSS
+    nss-mymachines = withNss && withMachined;
+    nss-resolve = withNss;
+
+    # Cryptsetup
+    libcryptsetup = withCryptsetup;
+    libcryptsetup-plugins = withCryptsetup;
+    p11kit = withHomed || withCryptsetup;
+
+    # FIDO2
+    libfido2 = withFido2;
+    openssl = withOpenSSL;
+
+    # Password Quality
+    pwquality = withPasswordQuality;
+    passwdqc = false;
+
+    # Remote
+    remote = withRemote;
+    microhttpd = withRemote;
+
+    pam = withPam;
+    acl = withAcl;
+    audit = withAudit;
+    apparmor = withApparmor;
+    gcrypt = withGcrypt;
+    importd = withImportd;
+    homed = withHomed;
+    polkit = withPolkit;
+    elfutils = withCoredump;
+    libcurl = wantCurl;
+    libidn = false;
+    libidn2 = withLibidn2;
+    libiptc = false;
+    repart = withRepart;
+    sysupdate = withSysupdate;
+    sysupdated = withSysupdate;
+    seccomp = withLibseccomp;
+    selinux = withSelinux;
+    tpm2 = withTpm2Tss;
+    pcre2 = withPCRE2;
+    bpf-framework = withLibBPF;
+    bootloader = withBootloader;
+    ukify = withUkify;
+    kmod = withKmod;
+    qrencode = withQrencode;
+    vmspawn = withVmspawn;
+    libarchive = withLibarchive;
+    xenctrl = false;
+    gnutls = false;
+    xkbcommon = false;
+    man = true;
+    nspawn = withNspawn;
+  };
+
   mesonEntries = {
     # Options
 
@@ -490,71 +557,10 @@ stdenv.mkDerivation (finalAttrs: {
 
     # Tests
     tests = withTests;
-    glib = if withTests then "enabled" else "disabled";
-    dbus = if withTests then "enabled" else "disabled";
-
-    # Compression
-    bzip2 = if withCompression then "enabled" else "disabled";
-    lz4 = if withCompression then "enabled" else "disabled";
-    xz = if withCompression then "enabled" else "disabled";
-    zstd = if withCompression then "enabled" else "disabled";
-    zlib = if withCompression then "enabled" else "disabled";
 
     # NSS
-    nss-mymachines = if withNss && withMachined then "enabled" else "disabled";
-    nss-resolve = if withNss then "enabled" else "disabled";
     nss-myhostname = withNss;
     nss-systemd = withNss;
-
-    # Cryptsetup
-    libcryptsetup = if withCryptsetup then "enabled" else "disabled";
-    libcryptsetup-plugins = if withCryptsetup then "enabled" else "disabled";
-    p11kit = if withHomed || withCryptsetup then "enabled" else "disabled";
-
-    # FIDO2
-    libfido2 = if withFido2 then "enabled" else "disabled";
-    openssl = if withOpenSSL then "enabled" else "disabled";
-
-    # Password Quality
-    pwquality = if withPasswordQuality then "enabled" else "disabled";
-    passwdqc = "disabled";
-
-    # Remote
-    remote = if withRemote then "enabled" else "disabled";
-    microhttpd = if withRemote then "enabled" else "disabled";
-
-    pam = if withPam then "enabled" else "disabled";
-    acl = if withAcl then "enabled" else "disabled";
-    audit = if withAudit then "enabled" else "disabled";
-    apparmor = if withApparmor then "enabled" else "disabled";
-    gcrypt = if withGcrypt then "enabled" else "disabled";
-    importd = if withImportd then "enabled" else "disabled";
-    homed = if withHomed then "enabled" else "disabled";
-    polkit = if withPolkit then "enabled" else "disabled";
-    elfutils = if withCoredump then "enabled" else "disabled";
-    libcurl = if wantCurl then "enabled" else "disabled";
-    libidn = "disabled";
-    libidn2 = if withLibidn2 then "enabled" else "disabled";
-    libiptc = "disabled";
-    repart = if withRepart then "enabled" else "disabled";
-    sysupdate = if withSysupdate then "enabled" else "disabled";
-    sysupdated = if withSysupdate then "enabled" else "disabled";
-    seccomp = if withLibseccomp then "enabled" else "disabled";
-    selinux = if withSelinux then "enabled" else "disabled";
-    tpm2 = if withTpm2Tss then "enabled" else "disabled";
-    pcre2 = if withPCRE2 then "enabled" else "disabled";
-    bpf-framework = if withLibBPF then "enabled" else "disabled";
-    bootloader = if withBootloader then "enabled" else "disabled";
-    ukify = if withUkify then "enabled" else "disabled";
-    kmod = if withKmod then "enabled" else "disabled";
-    qrencode = if withQrencode then "enabled" else "disabled";
-    vmspawn = if withVmspawn then "enabled" else "disabled";
-    libarchive = if withLibarchive then "enabled" else "disabled";
-    xenctrl = "disabled";
-    gnutls = "disabled";
-    xkbcommon = "disabled";
-    man = "enabled";
-    nspawn = if withNspawn then "enabled" else "disabled";
 
     vconsole = withVConsole;
     analyze = withAnalyze;
