@@ -31,9 +31,9 @@ stdenv.mkDerivation (finalAttrs: {
     nasm
   ];
 
-  cmakeFlags = [
-    "-DSVT_AV1_LTO=ON"
-  ];
+  cmakeEntries = {
+    SVT_AV1_LTO = "ON";
+  };
 
   meta = {
     homepage = "https://gitlab.com/AOMediaCodec/SVT-AV1";
