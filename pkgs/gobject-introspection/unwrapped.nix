@@ -113,12 +113,13 @@ stdenv.mkDerivation (finalAttrs: {
 
   mesonFlags = [
     "--datadir=${placeholder "dev"}/share"
-    "-Dcairo=disabled"
-    "-Dgtk_doc=${lib.boolToString (stdenv.hostPlatform == stdenv.buildPlatform)}"
-  ]
-  ++ lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
-    "-Dgi_cross_ldd_wrapper=${
-      replaceVarsWith {
+  ];
+
+  mesonEntries = {
+    cairo = "disabled";
+    gtk_doc = stdenv.hostPlatform == stdenv.buildPlatform;
+    ${if !stdenv.buildPlatform.canExecute stdenv.hostPlatform then "gi_cross_ldd_wrapper" else null} =
+      "${replaceVarsWith {
         name = "g-ir-scanner-lddwrapper";
         isExecutable = true;
         src = ./wrappers/g-ir-scanner-lddwrapper.sh;
@@ -126,14 +127,14 @@ stdenv.mkDerivation (finalAttrs: {
           inherit (buildPackages) bash;
           buildlddtree = "${buildPackages.pax-utils}/bin/lddtree";
         };
-      }
-    }"
-    "-Dgi_cross_binary_wrapper=${stdenv.hostPlatform.emulator buildPackages}"
+      }}";
+    ${
+      if !stdenv.buildPlatform.canExecute stdenv.hostPlatform then "gi_cross_binary_wrapper" else null
+    } =
+      "${stdenv.hostPlatform.emulator buildPackages}";
     # can't use canExecute, we need prebuilt when cross
-  ]
-  ++ lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
-    "-Dgi_cross_use_prebuilt_gi=true"
-  ];
+    ${if stdenv.buildPlatform != stdenv.hostPlatform then "gi_cross_use_prebuilt_gi" else null} = true;
+  };
 
   # During configurePhase, two python scripts are generated and need this. See
   # https://github.com/NixOS/nixpkgs/pull/98316#issuecomment-695785692
