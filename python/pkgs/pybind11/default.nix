@@ -64,15 +64,15 @@ buildPythonPackage rec {
     "-Cbuild-dir=build"
   ];
 
-  cmakeFlags = [
+  cmakeEntries = {
     # Always build tests, because even when cross compiling building the tests
     # is another confirmation that everything is OK.
-    (lib.cmakeBool "BUILD_TESTING" true)
+    BUILD_TESTING = true;
 
     # Override the `PYBIND11_NOPYTHON = true` in `pyproject.toml`. This
     # is required to build the tests.
-    (lib.cmakeBool "PYBIND11_NOPYTHON" false)
-  ];
+    PYBIND11_NOPYTHON = false;
+  };
 
   dontUseCmakeConfigure = true;
 
