@@ -40,9 +40,9 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "EIGEN_LEAVE_TEST_IN_ALL_TARGET" true) # Build tests in parallel
-  ];
+  cmakeEntries = {
+    EIGEN_LEAVE_TEST_IN_ALL_TARGET = true; # Build tests in parallel
+  };
 
   # too many flaky tests
   doCheck = false;
