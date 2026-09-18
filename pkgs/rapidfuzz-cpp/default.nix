@@ -29,9 +29,9 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = lib.optionals finalAttrs.finalPackage.doCheck [
-    "-DRAPIDFUZZ_BUILD_TESTING=ON"
-  ];
+  cmakeEntries = {
+    ${if finalAttrs.finalPackage.doCheck then "RAPIDFUZZ_BUILD_TESTING" else null} = true;
+  };
 
   CXXFLAGS = lib.optionals stdenv.cc.isClang [
     # error: no member named 'fill' in namespace 'std'
