@@ -22,8 +22,7 @@
   zlib,
   less,
   texinfo,
-  # TODO(corepkgs): Enable graphviz for R vignettes (needs gd, gts ported)
-  # graphviz,
+  graphviz,
   icu,
   pkg-config,
   bison,
@@ -87,6 +86,7 @@ stdenv.mkDerivation (finalAttrs: {
     zlib
     less
     texinfo
+    graphviz
     icu
     which
     blas
