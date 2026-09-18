@@ -90,16 +90,6 @@ with final;
   # nv-codec-headers version aliases for ffmpeg
   nv-codec-headers-12 = nv-codec-headers.override { majorVersion = "12"; };
 
-  # fftw precision variants; the package builds one precision per derivation
-  fftwSinglePrec = fftw.override { precision = "single"; };
-  fftwFloat = fftwSinglePrec; # the configure option is just an alias
-  fftwLongDouble = fftw.override { precision = "long-double"; };
-  # quad precision needs libquadmath, which comes from gcc
-  fftwQuad = fftw.override {
-    precision = "quad-precision";
-    stdenv = gccStdenv;
-  };
-
   at-spi2-atk = at-spi2-core; # merged into at-spi2-core
   atk = at-spi2-core; # merged into at-spi2-core
   gst_all_1 = gstAll1; # gtk4, libde265 tests
@@ -1088,14 +1078,6 @@ with final;
 
   libpulseaudio = prev.pulseaudio.override {
     libOnly = true;
-  };
-
-  speexdsp = callPackage ./pkgs/speexdsp {
-    fftw = fftwFloat;
-  };
-
-  speex = callPackage ./pkgs/speex {
-    fftw = fftwFloat;
   };
 
   genericUpdater = callPackage ./pkgs/common-updater-scripts/generic-updater.nix { };

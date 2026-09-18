@@ -89,6 +89,10 @@ mapAliases {
   ffmpeg_8 = ffmpeg.v4;
   ffmpeg_8-full = ffmpeg.v4.full;
   ffmpeg_8-headless = ffmpeg.v4.headless;
+  fftwFloat = fftw.float;
+  fftwLongDouble = fftw.long_double;
+  fftwQuad = fftw.quad;
+  fftwSinglePrec = fftw.float;
   flang_20 = llvm.v20.pkgs.flang;
   flang_21 = llvm.v21.pkgs.flang;
   flex_2_5_39 = flex.v2_5;

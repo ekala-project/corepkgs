@@ -1,25 +1,27 @@
 {
+  precision,
+  useGccStdenv ? false,
+  ...
+}@variantArgs:
+
+{
   fetchurl,
   stdenv,
   lib,
   gfortran,
   perl,
   llvmPackages,
-  precision ? "double",
+  gccStdenv,
   enableMpi ? false,
   mpi,
   withDoc ? stdenv.cc.isGNU,
   testers,
-}:
+}@args:
 
-assert lib.elem precision [
-  "single"
-  "double"
-  "long-double"
-  "quad-precision"
-];
-
-stdenv.mkDerivation (finalAttrs: {
+let
+  effectiveStdenv = if useGccStdenv then gccStdenv else stdenv;
+in
+effectiveStdenv.mkDerivation (finalAttrs: {
   pname = "fftw-${precision}";
   version = "3.3.11";
 
@@ -42,7 +44,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [ gfortran ];
 
   buildInputs =
-    lib.optionals stdenv.cc.isClang [
+    lib.optionals effectiveStdenv.cc.isClang [
       # TODO: This may mismatch the LLVM version sin the stdenv, see #79818.
       llvmPackages.openmp
     ]
@@ -53,12 +55,12 @@ stdenv.mkDerivation (finalAttrs: {
     "--enable-threads"
     "--enable-openmp"
   ]
-
   ++ lib.optional (precision != "double") "--enable-${precision}"
   # https://www.fftw.org/fftw3_doc/SIMD-alignment-and-fftw_005fmalloc.html
   # FFTW will try to detect at runtime whether the CPU supports these extensions
   ++
-    lib.optionals (stdenv.hostPlatform.isx86_64 && (precision == "single" || precision == "double"))
+    lib.optionals
+      (effectiveStdenv.hostPlatform.isx86_64 && (precision == "single" || precision == "double"))
       [
         "--enable-sse2"
         "--enable-avx"
@@ -67,7 +69,8 @@ stdenv.mkDerivation (finalAttrs: {
         "--enable-avx128-fma"
       ]
   ++
-    lib.optionals (stdenv.hostPlatform.isAarch64 && (precision == "single" || precision == "double"))
+    lib.optionals
+      (effectiveStdenv.hostPlatform.isAarch64 && (precision == "single" || precision == "double"))
       [
         "--enable-neon"
       ]
