@@ -11,6 +11,7 @@
   openssl,
   protobuf,
   abseil-cpp,
+  libnsl,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -56,7 +57,9 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs = [
     openssl
     protobuf
-    # TODO(corepkgs): Port libnsl for NIS/NIS+ support on Linux
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    libnsl
   ];
 
   cmakeEntries = {
