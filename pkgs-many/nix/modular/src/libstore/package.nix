@@ -54,13 +54,13 @@ mkMesonLibrary (finalAttrs: {
     nlohmann_json
   ];
 
-  mesonFlags = [
-    (lib.mesonEnable "seccomp-sandboxing" stdenv.hostPlatform.isLinux)
-    (lib.mesonBool "embedded-sandbox-shell" embeddedSandboxShell)
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [
-    (lib.mesonOption "sandbox-shell" "${busybox-sandbox-shell}/bin/busybox")
-  ];
+  mesonEntries = {
+    seccomp-sandboxing = if stdenv.hostPlatform.isLinux then "enabled" else "disabled";
+    embedded-sandbox-shell = embeddedSandboxShell;
+  }
+  // lib.optionalAttrs stdenv.hostPlatform.isLinux {
+    sandbox-shell = "${busybox-sandbox-shell}/bin/busybox";
+  };
 
   meta = {
     platforms = lib.platforms.unix ++ lib.platforms.windows;

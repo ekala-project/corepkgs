@@ -24,8 +24,7 @@ mkMesonLibrary (finalAttrs: {
     rapidcheck
   ];
 
-  mesonFlags = [
-  ];
+  mesonEntries = { };
 
   meta = {
     platforms = lib.platforms.unix ++ lib.platforms.windows;

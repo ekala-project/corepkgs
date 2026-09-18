@@ -32,8 +32,7 @@ mkMesonExecutable (finalAttrs: {
     gtest
   ];
 
-  mesonFlags = [
-  ];
+  mesonEntries = { };
 
   passthru = {
     tests = {

@@ -45,11 +45,11 @@ perl.pkgs.toPerlModule (
         echo ${finalAttrs.version} > .version
       '';
 
-    mesonFlags = [
-      (lib.mesonOption "dbi_path" "${perlPackages.DBI}/${perl.libPrefix}")
-      (lib.mesonOption "dbd_sqlite_path" "${perlPackages.DBDSQLite}/${perl.libPrefix}")
-      (lib.mesonEnable "tests" finalAttrs.finalPackage.doCheck)
-    ];
+    mesonEntries = {
+      dbi_path = "${perlPackages.DBI}/${perl.libPrefix}";
+      dbd_sqlite_path = "${perlPackages.DBDSQLite}/${perl.libPrefix}";
+      tests = if finalAttrs.finalPackage.doCheck then "enabled" else "disabled";
+    };
 
     mesonCheckFlags = [
       "--print-errorlogs"

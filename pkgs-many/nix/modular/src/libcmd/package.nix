@@ -51,10 +51,10 @@ mkMesonLibrary (finalAttrs: {
     nlohmann_json
   ];
 
-  mesonFlags = [
-    (lib.mesonEnable "markdown" enableMarkdown)
-    (lib.mesonOption "readline-flavor" readlineFlavor)
-  ];
+  mesonEntries = {
+    markdown = if enableMarkdown then "enabled" else "disabled";
+    readline-flavor = readlineFlavor;
+  };
 
   meta = {
     platforms = lib.platforms.unix ++ lib.platforms.windows;

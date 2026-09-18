@@ -20,18 +20,6 @@ let
   atLeast223 = lib.versionAtLeast nix.version "2.23";
   atLeast224 = lib.versionAtLeast nix.version "2.24";
   atLeast226 = lib.versionAtLeast nix.version "2.26";
-
-  mkConfigureOption =
-    {
-      mesonOption,
-      autoconfOption,
-      value,
-    }:
-    let
-      setFlagTo =
-        if atLeast223 then lib.mesonOption mesonOption else lib.withFeatureAs true autoconfOption;
-    in
-    setFlagTo value;
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "nix-perl";
@@ -85,20 +73,15 @@ stdenv.mkDerivation (finalAttrs: {
     perl.pkgs.Test2Harness
   ];
 
-  ${if atLeast223 then "mesonFlags" else "configureFlags"} = [
-    (mkConfigureOption {
-      mesonOption = "dbi_path";
-      autoconfOption = "dbi";
-      value = "${perl.pkgs.DBI}/${perl.libPrefix}";
-    })
-    (mkConfigureOption {
-      mesonOption = "dbd_sqlite_path";
-      autoconfOption = "dbd-sqlite";
-      value = "${perl.pkgs.DBDSQLite}/${perl.libPrefix}";
-    })
-  ]
-  ++ lib.optionals atLeast223 [
-    (lib.mesonEnable "tests" finalAttrs.finalPackage.doCheck)
+  mesonEntries = lib.optionalAttrs atLeast223 {
+    dbi_path = "${perl.pkgs.DBI}/${perl.libPrefix}";
+    dbd_sqlite_path = "${perl.pkgs.DBDSQLite}/${perl.libPrefix}";
+    tests = if finalAttrs.finalPackage.doCheck then "enabled" else "disabled";
+  };
+
+  configureFlags = lib.optionals (!atLeast223) [
+    (lib.withFeatureAs true "dbi" "${perl.pkgs.DBI}/${perl.libPrefix}")
+    (lib.withFeatureAs true "dbd-sqlite" "${perl.pkgs.DBDSQLite}/${perl.libPrefix}")
   ];
 
   preConfigure = "export NIX_STATE_DIR=$TMPDIR";
