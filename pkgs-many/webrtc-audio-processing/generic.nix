@@ -116,9 +116,13 @@ stdenv.mkDerivation (finalAttrs: {
 
   enableParallelBuilding = packageOlder "1.0";
 
-  mesonFlags = lib.optionals (packageAtLeast "2.0") (
-    lib.optional (!stdenv.hostPlatform.isAarch64) "-Dneon=disabled"
-    ++ lib.optional stdenv.hostPlatform.isi686 "-Dinline-sse=false"
+  mesonEntries = lib.optionalAttrs (packageAtLeast "2.0") (
+    lib.optionalAttrs (!stdenv.hostPlatform.isAarch64) {
+      neon = "disabled";
+    }
+    // lib.optionalAttrs stdenv.hostPlatform.isi686 {
+      inline-sse = false;
+    }
   );
 
   env =
