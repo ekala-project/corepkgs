@@ -16,7 +16,9 @@ stdenv.mkDerivation (finalAttrs: {
     ninja
   ];
 
-  cmakeFlags = lib.optionals stdenv.hostPlatform.isDarwin [ "-DVULKAN_HEADERS_ENABLE_MODULE=OFF" ];
+  cmakeEntries = lib.optionalAttrs stdenv.hostPlatform.isDarwin {
+    VULKAN_HEADERS_ENABLE_MODULE = "OFF";
+  };
 
   src = fetchFromGitHub {
     owner = "KhronosGroup";
