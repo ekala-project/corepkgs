@@ -43,11 +43,11 @@ stdenv.mkDerivation (finalAttrs: {
     systemdLibs
   ];
 
-  mesonFlags = [
-    "-Dlibseat-logind=systemd"
-    "-Dlibseat-builtin=enabled"
-    "-Dserver=enabled"
-  ];
+  mesonEntries = {
+    libseat-logind = "systemd";
+    libseat-builtin = "enabled";
+    server = "enabled";
+  };
 
   meta = {
     description = "Minimal seat management daemon, and a universal seat management library";
