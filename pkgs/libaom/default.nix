@@ -60,7 +60,7 @@ stdenv.mkDerivation (finalAttrs: {
     sed -i "s|includedir=.*|includedir=$dev/include|" "$dev/lib/pkgconfig/aom.pc"
     moveToOutput lib/libaom.a "$static"
     # Fix cmake export files to reference the static output for libaom.a
-    sed -i "s|$out/lib/libaom.a|$static/lib/libaom.a|g" "$dev"/lib/cmake/aom/aomTargets*.cmake
+    sed -i "s|$out/lib/libaom.a|$static/lib/libaom.a|g" "$dev"/lib/cmake/AOM/AOMTargets*.cmake
   ''
   + lib.optionalString stdenv.hostPlatform.isStatic ''
     ln -s $static $out
