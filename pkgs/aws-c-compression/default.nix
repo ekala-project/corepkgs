@@ -33,9 +33,9 @@ stdenv.mkDerivation rec {
     aws-c-common
   ];
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=ON"
-  ];
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = true;
+  };
 
   passthru.tests = {
     inherit nix;
