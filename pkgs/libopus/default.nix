@@ -36,14 +36,14 @@ stdenv.mkDerivation (finalAttrs: {
     ninja
   ];
 
-  mesonFlags = [
-    (lib.mesonBool "fixed-point" fixedPoint)
-    (lib.mesonBool "custom-modes" withCustomModes)
-    (lib.mesonEnable "intrinsics" withIntrinsics)
-    (lib.mesonEnable "rtcd" (withIntrinsics || withAsm))
-    (lib.mesonEnable "asm" withAsm)
-    (lib.mesonEnable "docs" false)
-  ];
+  mesonEntries = {
+    fixed-point = fixedPoint;
+    custom-modes = withCustomModes;
+    intrinsics = if withIntrinsics then "enabled" else "disabled";
+    rtcd = if (withIntrinsics || withAsm) then "enabled" else "disabled";
+    asm = if withAsm then "enabled" else "disabled";
+    docs = "disabled";
+  };
 
   doCheck = !stdenv.hostPlatform.isi686 && !stdenv.hostPlatform.isAarch32;
 
