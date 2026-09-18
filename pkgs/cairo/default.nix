@@ -86,21 +86,22 @@ stdenv.mkDerivation (
     ++ optionals xcbSupport [ libxcb ]
     ++ optional gobjectSupport glib; # TODO: maybe liblzo but what would it be for here?
 
-    mesonFlags = [
-      "-Dgtk_doc=true"
+    mesonEntries = {
+      gtk_doc = true;
 
       # error: #error config.h must be included before this header
-      "-Dsymbol-lookup=disabled"
+      symbol-lookup = "disabled";
 
       # Only used in tests, causes a dependency cycle
-      "-Dspectre=disabled"
+      spectre = "disabled";
 
-      (lib.mesonEnable "glib" gobjectSupport)
-      (lib.mesonEnable "tests" finalAttrs.finalPackage.doCheck)
-      (lib.mesonEnable "xlib" x11Support)
-      (lib.mesonEnable "xcb" xcbSupport)
-    ]
-    ++ lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
+      glib = if gobjectSupport then "enabled" else "disabled";
+      tests = if finalAttrs.finalPackage.doCheck then "enabled" else "disabled";
+      xlib = if x11Support then "enabled" else "disabled";
+      xcb = if xcbSupport then "enabled" else "disabled";
+    };
+
+    mesonFlags = lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
       "--cross-file=${builtins.toFile "cross-file.conf" ''
         [properties]
         ipc_rmid_deferred_release = ${
