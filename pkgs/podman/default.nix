@@ -17,13 +17,13 @@
   symlinkJoin,
   replaceVars,
   extraPackages ? [ ],
-  # crun,  # TODO: blocked by criu dependency
+  crun,
   runc,
   conmon,
   extraRuntimes ? lib.optionals stdenv.hostPlatform.isLinux [ runc ], # e.g.: runc, gvisor, youki
   fuse-overlayfs,
   util-linuxMinimal,
-  # nftables,  # TODO: missing dependency
+  nftables,
   iptables,
   iproute2,
   catatonit,
@@ -152,7 +152,7 @@ buildGoModule (finalAttrs: {
         util-linuxMinimal
         iptables
         iproute2
-        # nftables  # TODO: missing dependency
+        nftables
       ]
       ++ extraPackages
     );
@@ -168,7 +168,7 @@ buildGoModule (finalAttrs: {
           netavark
           passt
           conmon
-          # crun  # TODO: blocked by criu dependency
+          crun
         ]
         ++ extraRuntimes;
     };
