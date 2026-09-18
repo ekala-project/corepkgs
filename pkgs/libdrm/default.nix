@@ -39,19 +39,15 @@ stdenv.mkDerivation (finalAttrs: {
     libpciaccess
   ];
 
-  mesonFlags = [
-    "-Dinstall-test-programs=true"
-    "-Dcairo-tests=disabled"
-    (lib.mesonEnable "intel" true)
-    (lib.mesonEnable "omap" stdenv.hostPlatform.isLinux)
-    (lib.mesonEnable "valgrind" false) # Disable valgrind support for simplicity
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isAarch [
-    "-Dtegra=enabled"
-  ]
-  ++ lib.optionals (!stdenv.hostPlatform.isLinux) [
-    "-Detnaviv=disabled"
-  ];
+  mesonEntries = {
+    install-test-programs = true;
+    cairo-tests = "disabled";
+    intel = "enabled";
+    omap = if stdenv.hostPlatform.isLinux then "enabled" else "disabled";
+    valgrind = "disabled";
+    ${if stdenv.hostPlatform.isAarch then "tegra" else null} = "enabled";
+    ${if !stdenv.hostPlatform.isLinux then "etnaviv" else null} = "disabled";
+  };
 
   passthru.tests = {
     inherit mesa;
