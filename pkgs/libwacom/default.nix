@@ -48,10 +48,10 @@ stdenv.mkDerivation (finalAttrs: {
     libgudev
   ];
 
-  mesonFlags = [
-    (lib.mesonEnable "tests" false)
-    (lib.mesonOption "sysconfdir" "/etc")
-  ];
+  mesonEntries = {
+    tests = "disabled";
+    sysconfdir = "/etc";
+  };
 
   doInstallCheck = true;
 
