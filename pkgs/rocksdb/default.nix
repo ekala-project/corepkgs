@@ -54,26 +54,26 @@ stdenv.mkDerivation (finalAttrs: {
     "tools"
   ];
 
-  cmakeFlags = [
-    "-DPORTABLE=1"
-    "-DWITH_JEMALLOC=${if enableJemalloc then "1" else "0"}"
-    "-DWITH_LIBURING=${if enableLiburing then "1" else "0"}"
-    "-DWITH_JNI=0"
-    "-DWITH_BENCHMARK_TOOLS=0"
-    "-DWITH_TESTS=1"
-    "-DWITH_TOOLS=0"
-    "-DWITH_CORE_TOOLS=1"
-    "-DWITH_BZ2=1"
-    "-DWITH_LZ4=1"
-    "-DWITH_SNAPPY=1"
-    "-DWITH_ZLIB=1"
-    "-DWITH_ZSTD=1"
-    "-DWITH_GFLAGS=1"
-    "-DUSE_RTTI=1"
-    "-DFAIL_ON_WARNINGS=NO"
-  ]
-  ++ lib.optional sse42Support "-DFORCE_SSE42=1"
-  ++ lib.optional (!enableShared) "-DROCKSDB_BUILD_SHARED=0";
+  cmakeEntries = {
+    PORTABLE = "1";
+    WITH_JEMALLOC = if enableJemalloc then "1" else "0";
+    WITH_LIBURING = if enableLiburing then "1" else "0";
+    WITH_JNI = "0";
+    WITH_BENCHMARK_TOOLS = "0";
+    WITH_TESTS = "1";
+    WITH_TOOLS = "0";
+    WITH_CORE_TOOLS = "1";
+    WITH_BZ2 = "1";
+    WITH_LZ4 = "1";
+    WITH_SNAPPY = "1";
+    WITH_ZLIB = "1";
+    WITH_ZSTD = "1";
+    WITH_GFLAGS = "1";
+    USE_RTTI = "1";
+    FAIL_ON_WARNINGS = "NO";
+    ${if sse42Support then "FORCE_SSE42" else null} = "1";
+    ${if !enableShared then "ROCKSDB_BUILD_SHARED" else null} = "0";
+  };
 
   preInstall = ''
     mkdir -p $tools/bin
