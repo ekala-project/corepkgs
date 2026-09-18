@@ -36,11 +36,11 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-NhSjW1ZK4XFv7L/IaoTjN5ojwjTDQa178k73zoaneuE=";
   };
 
-  mesonFlags = [
-    "-Dudevdir=${placeholder "out"}/lib/udev"
-    (lib.mesonBool "introspection" withIntrospection)
-    (lib.mesonBool "man" withDocs)
-  ];
+  mesonEntries = {
+    udevdir = "${placeholder "out"}/lib/udev";
+    introspection = withIntrospection;
+    man = withDocs;
+  };
 
   nativeBuildInputs = [
     meson
