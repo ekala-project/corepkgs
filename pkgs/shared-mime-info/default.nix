@@ -43,9 +43,9 @@ stdenv.mkDerivation rec {
     glib
   ];
 
-  mesonFlags = [
-    "-Dupdate-mimedb=true"
-  ];
+  mesonEntries = {
+    update-mimedb = true;
+  };
 
   meta = {
     description = "Database of common MIME types";
