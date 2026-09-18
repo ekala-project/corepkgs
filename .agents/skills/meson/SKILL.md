@@ -75,13 +75,26 @@ Booleans are automatically converted to `true`/`false`.
 ```nix
 mesonEntries = {
   docs = false;
-  tests = false;
-  systemd = "disabled";
   man = true;
+  wrap_mode = "nodownload";
 };
 ```
 
-**Feature options:** Use `"enabled"`/`"disabled"`/`"auto"` strings.
+### Meson Features
+
+Use `mesonFeatures` for Meson `feature` type options (those that accept
+`enabled`/`disabled`/`auto`). Booleans are automatically converted to
+`enabled`/`disabled`.
+
+```nix
+mesonFeatures = {
+  introspection = withIntrospection;
+  tests = false;
+};
+```
+
+Both `mesonEntries` and `mesonFeatures` are merged into the same set of `-D`
+flags. If a key appears in both, `mesonFeatures` wins.
 
 ### Meson Flags (Legacy)
 
@@ -114,7 +127,7 @@ depsBuildBuild = [ pkg-config ];
 
 **Dependency not found:**
 ```nix
-mesonEntries = { optional_feature = "disabled"; };
+mesonFeatures = { optional_feature = false; };
 ```
 
 **Disable subproject downloads:**
