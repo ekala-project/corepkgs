@@ -52,14 +52,14 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = [
+  cmakeEntries = {
     # .pc file uses INCLUDEDIR as a relative path
-    "-DCMAKE_INSTALL_INCLUDEDIR=include"
-    "-DJSON_BuildTests=${if finalAttrs.finalPackage.doCheck then "ON" else "OFF"}"
-    "-DJSON_FastTests=ON"
-    "-DJSON_MultipleHeaders=ON"
-  ]
-  ++ lib.optional finalAttrs.finalPackage.doCheck "-DJSON_TestDataDirectory=${testData}";
+    CMAKE_INSTALL_INCLUDEDIR = "include";
+    JSON_BuildTests = finalAttrs.finalPackage.doCheck;
+    JSON_FastTests = true;
+    JSON_MultipleHeaders = true;
+    ${if finalAttrs.finalPackage.doCheck then "JSON_TestDataDirectory" else null} = "${testData}";
+  };
 
   # TODO(corepkgs): move to passthru. Test suite isn't currently being ran anyway
   doCheck = false;
