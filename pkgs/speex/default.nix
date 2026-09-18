@@ -31,7 +31,7 @@ stdenv.mkDerivation rec {
     autoreconfHook
     pkg-config
   ];
-  buildInputs = lib.optionals withFft [ fftw ] ++ [ speexdsp ];
+  buildInputs = lib.optionals withFft [ fftw.float ] ++ [ speexdsp ];
 
   propagatedBuildInputs = [ speexdsp ];
 

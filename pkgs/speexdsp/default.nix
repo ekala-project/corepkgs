@@ -29,7 +29,7 @@ stdenv.mkDerivation rec {
     autoreconfHook
     pkg-config
   ];
-  buildInputs = lib.optionals withFftw3 [ fftw ];
+  buildInputs = lib.optionals withFftw3 [ fftw.float ];
 
   configureFlags =
     lib.optionals withFftw3 [ "--with-fft=gpl-fftw3" ]

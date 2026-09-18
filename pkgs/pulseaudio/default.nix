@@ -22,7 +22,7 @@
   udev,
   udevCheckHook,
   openssl,
-  fftwFloat,
+  fftw,
   soxr,
   speexdsp,
   systemd,
@@ -109,7 +109,7 @@ stdenv.mkDerivation (finalAttrs: {
     libsndfile
     soxr
     speexdsp
-    fftwFloat
+    fftw.float
     check
   ]
   ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [
