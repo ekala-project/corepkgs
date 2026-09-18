@@ -494,6 +494,8 @@ final: prev: with final; {
   # TODO: Remove alias
   libjpeg = libjpeg_turbo;
 
+  xorriso = libisoburn;
+
   # Less secure variant of lowdown for use inside Nix builds.
   lowdown-unsandboxed = lowdown.override {
     enableDarwinSandbox = false;
