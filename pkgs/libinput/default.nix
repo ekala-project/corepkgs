@@ -70,14 +70,17 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   mesonFlags = [
-    (lib.mesonBool "documentation" false)
-    (lib.mesonBool "debug-gui" false)
-    (lib.mesonBool "tests" false)
-    (lib.mesonBool "libwacom" true)
-    (lib.mesonEnable "lua-plugins" true)
     "--sysconfdir=/etc"
     "--libexecdir=${placeholder "bin"}/libexec"
   ];
+
+  mesonEntries = {
+    documentation = false;
+    debug-gui = false;
+    tests = false;
+    libwacom = true;
+    lua-plugins = "enabled";
+  };
 
   doInstallCheck = true;
 
