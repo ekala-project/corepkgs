@@ -35,7 +35,9 @@ stdenv.mkDerivation (finalAttrs: {
 
   # Don’t build examples, which are not installed and require additional dependencies not
   # included in `buildInputs` such as libx11.
-  cmakeFlags = [ "-DWITH_EXAMPLES=OFF" ];
+  cmakeEntries = {
+    WITH_EXAMPLES = false;
+  };
 
   buildInputs = [
     zlib
