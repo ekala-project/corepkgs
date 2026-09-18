@@ -7,7 +7,7 @@
   stdenv,
   extraPackages ? [ ],
   runc, # Default container runtime
-  # crun, # Container runtime (default with cgroups v2 for podman/buildah) - TODO: blocked by criu
+  crun, # Container runtime (default with cgroups v2 for podman/buildah)
   conmon, # Container runtime monitor
   slirp4netns, # User-mode networking for unprivileged namespaces
   fuse-overlayfs, # CoW for images, much faster than default vfs
@@ -24,7 +24,7 @@ let
     ]
     ++ lib.optionals stdenv.hostPlatform.isLinux [
       runc
-      # crun  # TODO: blocked by criu dependency
+      crun
       conmon
       slirp4netns
       fuse-overlayfs
