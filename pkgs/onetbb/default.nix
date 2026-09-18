@@ -71,12 +71,12 @@ stdenv.mkDerivation (finalAttrs: {
       --replace-fail 'tbb_add_test(SUBDIR conformance NAME conformance_resumable_tasks DEPENDENCIES TBB::tbb)' ""
   '';
 
-  cmakeFlags = [
-    (lib.cmakeBool "TBB_DISABLE_HWLOC_AUTOMATIC_SEARCH" false)
+  cmakeEntries = {
+    TBB_DISABLE_HWLOC_AUTOMATIC_SEARCH = false;
     # The majority of the build is the test suite.
     # TODO(corepkgs): Run in passthru
-    (lib.cmakeBool "TBB_TEST" finalAttrs.doCheck)
-  ];
+    TBB_TEST = finalAttrs.doCheck;
+  };
 
   env = {
     # Fix build with modern gcc
