@@ -37,10 +37,10 @@ stdenv.mkDerivation (finalAttrs: {
     xxhash
   ];
 
-  mesonFlags = [
-    "-Denable_tools=false"
-    "-Denable_examples=false"
-  ];
+  mesonEntries = {
+    enable_tools = false;
+    enable_examples = false;
+  };
 
   doCheck = true;
 
