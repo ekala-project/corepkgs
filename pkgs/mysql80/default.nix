@@ -71,27 +71,27 @@ let
       "man"
     ];
 
-    cmakeFlags = [
-      "-DFORCE_UNSUPPORTED_COMPILER=1"
-      "-DWITH_ROUTER=OFF"
-      "-DWITH_SYSTEM_LIBS=ON"
-      "-DWITH_PROTOBUF=bundled"
-      "-DWITH_TIRPC=bundled"
-      "-DWITHOUT_GROUP_REPLICATION=1" # requires rpcgen from rpcsvc-proto
-      "-DWITH_UNIT_TESTS=OFF"
-      "-DMYSQL_UNIX_ADDR=/run/mysqld/mysqld.sock"
-      "-DMYSQL_DATADIR=/var/lib/mysql"
-      "-DINSTALL_INFODIR=share/mysql/docs"
-      "-DINSTALL_MANDIR=share/man"
-      "-DINSTALL_PLUGINDIR=lib/mysql/plugin"
-      "-DINSTALL_INCLUDEDIR=include/mysql"
-      "-DINSTALL_DOCREADMEDIR=share/mysql"
-      "-DINSTALL_SUPPORTFILESDIR=share/mysql"
-      "-DINSTALL_MYSQLSHAREDIR=share/mysql"
-      "-DINSTALL_MYSQLTESTDIR="
-      "-DINSTALL_DOCDIR=share/mysql/docs"
-      "-DINSTALL_SHAREDIR=share/mysql"
-    ];
+    cmakeEntries = {
+      FORCE_UNSUPPORTED_COMPILER = "1";
+      WITH_ROUTER = false;
+      WITH_SYSTEM_LIBS = true;
+      WITH_PROTOBUF = "bundled";
+      WITH_TIRPC = "bundled";
+      WITHOUT_GROUP_REPLICATION = "1"; # requires rpcgen from rpcsvc-proto
+      WITH_UNIT_TESTS = false;
+      MYSQL_UNIX_ADDR = "/run/mysqld/mysqld.sock";
+      MYSQL_DATADIR = "/var/lib/mysql";
+      INSTALL_INFODIR = "share/mysql/docs";
+      INSTALL_MANDIR = "share/man";
+      INSTALL_PLUGINDIR = "lib/mysql/plugin";
+      INSTALL_INCLUDEDIR = "include/mysql";
+      INSTALL_DOCREADMEDIR = "share/mysql";
+      INSTALL_SUPPORTFILESDIR = "share/mysql";
+      INSTALL_MYSQLSHAREDIR = "share/mysql";
+      INSTALL_MYSQLTESTDIR = "";
+      INSTALL_DOCDIR = "share/mysql/docs";
+      INSTALL_SHAREDIR = "share/mysql";
+    };
 
     cmakeBuildType = "Release";
 
@@ -125,10 +125,10 @@ let
     // {
       pname = "mysql-client";
 
-      cmakeFlags = common'.cmakeFlags ++ [
-        "-DWITHOUT_SERVER=ON"
-        "-DINSTALL_MYSQLSHAREDIR=share/mysql-client"
-      ];
+      cmakeEntries = common'.cmakeEntries // {
+        WITHOUT_SERVER = true;
+        INSTALL_MYSQLSHAREDIR = "share/mysql-client";
+      };
       meta = common'.meta // {
         mainProgram = "mysql";
       };
