@@ -64,9 +64,9 @@ stdenv.mkDerivation (finalAttrs: {
     patchShebangs scripts tests
   '';
 
-  mesonFlags = [
-    "-Dlocalstatedir=/var"
-  ];
+  mesonEntries = {
+    localstatedir = "/var";
+  };
 
   env = {
     PKG_CONFIG_SYSTEMD_SYSTEMDSYSTEMUNITDIR = "${placeholder "out"}/lib/systemd/system";
