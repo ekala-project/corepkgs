@@ -28,17 +28,17 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = [
+  cmakeEntries = {
     # networkmanager relies on libjansson.so:
     #   https://github.com/NixOS/nixpkgs/pull/176302#issuecomment-1150239453
-    "-DJANSSON_BUILD_SHARED_LIBS=${if stdenv.hostPlatform.isStatic then "OFF" else "ON"}"
+    JANSSON_BUILD_SHARED_LIBS = !stdenv.hostPlatform.isStatic;
 
     # Fix the build with CMake 4.
     #
     # Remove on next release; upstream fix is coupled with additional
     # changes in <https://github.com/akheron/jansson/pull/692>.
-    "-DCMAKE_POLICY_VERSION_MINIMUM=3.10"
-  ];
+    CMAKE_POLICY_VERSION_MINIMUM = "3.10";
+  };
 
   postFixup = ''
     # Incorrectly references the dev output, libjansson.so is in out
