@@ -69,18 +69,12 @@ stdenv.mkDerivation (finalAttrs: {
     glib
   ];
 
-  mesonFlags = [
-    "-Ddbus_daemon=dbus-daemon"
-  ]
-  ++ lib.optionals systemdSupport [
-    "-Ddbus_broker=dbus-broker-launch"
-  ]
-  ++ lib.optionals (!systemdSupport) [
-    "-Duse_systemd=false"
-  ]
-  ++ lib.optionals (!withIntrospection) [
-    (lib.mesonEnable "introspection" false)
-  ];
+  mesonEntries = {
+    dbus_daemon = "dbus-daemon";
+    ${if systemdSupport then "dbus_broker" else null} = "dbus-broker-launch";
+    ${if !systemdSupport then "use_systemd" else null} = false;
+    ${if !withIntrospection then "introspection" else null} = "disabled";
+  };
 
   postFixup = ''
     busLauncherWrapperArgs=(
