@@ -100,6 +100,14 @@ meta = {
 
 **Detailed guide:** See [`.agents/skills/packaging/SKILL.md`](.agents/skills/packaging/SKILL.md) for complete meta attribute documentation.
 
+### Structured Attrs
+
+`__structuredAttrs = true` is the default — **never set it explicitly**. If a
+package's build phases break under structured attrs, fix the phases instead of
+setting `__structuredAttrs = false`. See
+[`.agents/skills/structured-attrs/SKILL.md`](.agents/skills/structured-attrs/SKILL.md)
+for migration patterns (array iteration, `env` attrset, `substituteAll`, etc.).
+
 ### Testing
 
 - `doCheck = false;` is the default - don't set it explicitly
