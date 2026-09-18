@@ -34,10 +34,10 @@ stdenv.mkDerivation rec {
 
   buildInputs = [ gtest ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "BENCHMARK_USE_BUNDLED_GTEST" false)
-    (lib.cmakeBool "BENCHMARK_ENABLE_WERROR" false)
-  ];
+  cmakeEntries = {
+    BENCHMARK_USE_BUNDLED_GTEST = false;
+    BENCHMARK_ENABLE_WERROR = false;
+  };
 
   # We ran into issues with gtest 1.8.5 conditioning on
   # `#if __has_cpp_attribute(maybe_unused)`, which was, for some
