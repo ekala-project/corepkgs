@@ -181,27 +181,21 @@ stdenv.mkDerivation (finalAttrs: {
       ''}
     '';
 
-  mesonFlags = [
-    (lib.mesonBool "unit-tests" (stdenv.buildPlatform.canExecute stdenv.hostPlatform))
-    (lib.mesonBool "bindings" false)
-    (lib.mesonOption "libstore:store-dir" storeDir)
-    (lib.mesonOption "libstore:localstatedir" stateDir)
-    (lib.mesonOption "libstore:sysconfdir" confDir)
-    (lib.mesonEnable "libutil:cpuid" stdenv.hostPlatform.isx86_64)
-    (lib.mesonEnable "libstore:seccomp-sandboxing" withLibseccomp)
-    (lib.mesonBool "libstore:embedded-sandbox-shell" (
-      stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isStatic
-    ))
-    (lib.mesonBool "doc-gen" enableDocumentation)
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [
-    (lib.mesonOption "libstore:sandbox-shell" "${busybox-sandbox-shell}/bin/busybox")
+  mesonEntries = {
+    unit-tests = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
+    bindings = false;
+    "libstore:store-dir" = storeDir;
+    "libstore:localstatedir" = stateDir;
+    "libstore:sysconfdir" = confDir;
+    "libutil:cpuid" = if stdenv.hostPlatform.isx86_64 then "enabled" else "disabled";
+    "libstore:seccomp-sandboxing" = if withLibseccomp then "enabled" else "disabled";
+    "libstore:embedded-sandbox-shell" = stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isStatic;
+    doc-gen = enableDocumentation;
+  }
+  // lib.optionalAttrs stdenv.hostPlatform.isLinux {
+    "libstore:sandbox-shell" = "${busybox-sandbox-shell}/bin/busybox";
     # RISC-V support in progress https://github.com/seccomp/libseccomp/pull/50
-  ]
-  ++ lib.optionals (stdenv.cc.isGNU && !enableStatic) [
-    # TODO: do we still need this?
-    # "--enable-lto"
-  ];
+  };
 
   doCheck = true;
 

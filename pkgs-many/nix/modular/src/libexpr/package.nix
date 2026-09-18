@@ -57,9 +57,9 @@ mkMesonLibrary (finalAttrs: {
   ]
   ++ lib.optional enableGC boehmgc;
 
-  mesonFlags = [
-    (lib.mesonEnable "gc" enableGC)
-  ];
+  mesonEntries = {
+    gc = if enableGC then "enabled" else "disabled";
+  };
 
   meta = {
     platforms = lib.platforms.unix ++ lib.platforms.windows;

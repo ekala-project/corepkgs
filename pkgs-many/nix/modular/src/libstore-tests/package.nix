@@ -37,8 +37,7 @@ mkMesonExecutable (finalAttrs: {
     nix-store-test-support
   ];
 
-  mesonFlags = [
-  ];
+  mesonEntries = { };
 
   excludedTestPatterns = lib.optionals (lib.versionOlder finalAttrs.version "2.31") [
     "nix_api_util_context.nix_store_real_path_binary_cache"

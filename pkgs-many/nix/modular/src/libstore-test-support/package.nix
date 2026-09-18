@@ -28,8 +28,7 @@ mkMesonLibrary (finalAttrs: {
   ]
   ++ lib.optional (lib.versionAtLeast version "2.34") gtest;
 
-  mesonFlags = [
-  ];
+  mesonEntries = { };
 
   meta = {
     platforms = lib.platforms.unix ++ lib.platforms.windows;

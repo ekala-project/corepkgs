@@ -21,8 +21,7 @@ mkMesonLibrary (finalAttrs: {
     nix-expr
   ];
 
-  mesonFlags = [
-  ];
+  mesonEntries = { };
 
   meta = {
     platforms = lib.platforms.unix ++ lib.platforms.windows;

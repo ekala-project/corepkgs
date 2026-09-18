@@ -41,9 +41,9 @@ mkMesonLibrary (finalAttrs: {
   ]
   ++ lib.optional (lib.versionAtLeast version "2.35") zstd;
 
-  mesonFlags = [
-    (lib.mesonEnable "cpuid" stdenv.hostPlatform.isx86_64)
-  ];
+  mesonEntries = {
+    cpuid = if stdenv.hostPlatform.isx86_64 then "enabled" else "disabled";
+  };
 
   meta = {
     platforms = lib.platforms.unix ++ lib.platforms.windows;

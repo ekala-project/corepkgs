@@ -39,8 +39,7 @@ mkMesonExecutable (finalAttrs: {
     libgit2
   ];
 
-  mesonFlags = [
-  ];
+  mesonEntries = { };
 
   passthru = {
     tests = {

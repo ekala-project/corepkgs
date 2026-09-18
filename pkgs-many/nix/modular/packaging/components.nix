@@ -111,23 +111,21 @@ let
     # in a shell hook: overriding `mesonBuildType` flips LTO along with it.
     # More on build types here: https://mesonbuild.com/Builtin-options.html#details-for-buildtype.
     mesonBuildType = prevAttrs.mesonBuildType or "release";
-    mesonFlags =
-      prevAttrs.mesonFlags or [ ]
-      ++
-        lib.optional
+    mesonEntries =
+      prevAttrs.mesonEntries or { }
+      //
+        lib.optionalAttrs
           (
             !stdenv.hostPlatform.isWindows
             # build failure
             && !stdenv.hostPlatform.isStatic
           )
-          (
-            lib.mesonBool "b_lto" (
-              lib.elem finalAttrs.mesonBuildType [
-                "release"
-                "minsize"
-              ]
-            )
-          );
+          {
+            b_lto = lib.elem finalAttrs.mesonBuildType [
+              "release"
+              "minsize"
+            ];
+          };
 
     nativeBuildInputs = [
       meson
@@ -177,7 +175,9 @@ let
   bsdNoLinkAsNeeded =
     finalAttrs: prevAttrs:
     lib.optionalAttrs stdenv.hostPlatform.isBSD {
-      mesonFlags = [ (lib.mesonBool "b_asneeded" false) ] ++ prevAttrs.mesonFlags or [ ];
+      mesonEntries = prevAttrs.mesonEntries or { } // {
+        b_asneeded = false;
+      };
     };
 
   nixDefaultsLayer = finalAttrs: prevAttrs: {
