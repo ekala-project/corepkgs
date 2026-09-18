@@ -33,10 +33,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeBuildType = "Release";
 
-  cmakeFlags = [
-    "-DGFLAGS_BUILD_SHARED_LIBS=${if enableShared then "ON" else "OFF"}"
-    "-DGFLAGS_BUILD_STATIC_LIBS=ON"
-  ];
+  cmakeEntries = {
+    GFLAGS_BUILD_SHARED_LIBS = enableShared;
+    GFLAGS_BUILD_STATIC_LIBS = true;
+  };
 
   meta = {
     description = "C++ library that implements commandline flags processing";
