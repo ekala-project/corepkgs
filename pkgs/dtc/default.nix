@@ -81,9 +81,9 @@ stdenv.mkDerivation (finalAttrs: {
   env.DESTDIR = "/";
 
   mesonAutoFeatures = "auto";
-  mesonFlags = [
-    (lib.mesonBool "tests" finalAttrs.finalPackage.doCheck)
-  ];
+  mesonEntries = {
+    tests = finalAttrs.finalPackage.doCheck;
+  };
 
   doCheck =
     # Checks are broken on aarch64 darwin
@@ -97,8 +97,8 @@ stdenv.mkDerivation (finalAttrs: {
       !stdenv.hostPlatform.isStatic
     &&
 
-      # we must explicitly disable this here so that mesonFlags receives
-      # `-Dtests=disabled`; without it meson will attempt to run
+      # we must explicitly disable this here so that mesonEntries receives
+      # `tests = false`; without it meson will attempt to run
       # hostPlatform binaries during the configurePhase.
       (with stdenv; buildPlatform.canExecute hostPlatform);
 
