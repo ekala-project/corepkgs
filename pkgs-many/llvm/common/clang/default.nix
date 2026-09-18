@@ -93,33 +93,29 @@ stdenv.mkDerivation (
       libllvm
     ];
 
-    cmakeFlags = [
-      (lib.cmakeFeature "CLANG_INSTALL_PACKAGE_DIR" "${placeholder "dev"}/lib/cmake/clang")
-      (lib.cmakeBool "CLANGD_BUILD_XPC" false)
-      (lib.cmakeBool "LLVM_ENABLE_RTTI" true)
-      (lib.cmakeBool "LLVM_INCLUDE_TESTS" false)
-      (lib.cmakeFeature "LLVM_TABLEGEN_EXE" "${buildLlvmPackages.tblgen}/bin/llvm-tblgen")
-      (lib.cmakeFeature "CLANG_TABLEGEN" "${buildLlvmPackages.tblgen}/bin/clang-tblgen")
-      (lib.cmakeFeature "CLANG_TIDY_CONFUSABLE_CHARS_GEN" "${buildLlvmPackages.tblgen}/bin/clang-tidy-confusable-chars-gen")
-    ]
-    ++ lib.optional (lib.versionAtLeast release_version "20") (
-      lib.cmakeFeature "LLVM_DIR" "${libllvm.dev}/lib/cmake/llvm"
-    )
-    ++ lib.optionals (lib.versionAtLeast release_version "21") [
-      (lib.cmakeFeature "CLANG_RESOURCE_DIR" "${placeholder "lib"}/lib/clang/${lib.versions.major release_version}")
-    ]
-    ++ lib.optionals enableManpages [
-      (lib.cmakeBool "CLANG_INCLUDE_DOCS" true)
-      (lib.cmakeBool "LLVM_ENABLE_SPHINX" true)
-      (lib.cmakeBool "SPHINX_OUTPUT_MAN" true)
-      (lib.cmakeBool "SPHINX_OUTPUT_HTML" false)
-      (lib.cmakeBool "SPHINX_WARNINGS_AS_ERRORS" false)
-    ]
-    ++ lib.optionals (lib.versionOlder release_version "20") [
+    cmakeEntries = {
+      CLANG_INSTALL_PACKAGE_DIR = "${placeholder "dev"}/lib/cmake/clang";
+      CLANGD_BUILD_XPC = false;
+      LLVM_ENABLE_RTTI = true;
+      LLVM_INCLUDE_TESTS = false;
+      LLVM_TABLEGEN_EXE = "${buildLlvmPackages.tblgen}/bin/llvm-tblgen";
+      CLANG_TABLEGEN = "${buildLlvmPackages.tblgen}/bin/clang-tblgen";
+      CLANG_TIDY_CONFUSABLE_CHARS_GEN = "${buildLlvmPackages.tblgen}/bin/clang-tidy-confusable-chars-gen";
+      ${if lib.versionAtLeast release_version "20" then "LLVM_DIR" else null} =
+        "${libllvm.dev}/lib/cmake/llvm";
+      ${if lib.versionAtLeast release_version "21" then "CLANG_RESOURCE_DIR" else null} =
+        "${placeholder "lib"}/lib/clang/${lib.versions.major release_version}";
+      ${if enableManpages then "CLANG_INCLUDE_DOCS" else null} = true;
+      ${if enableManpages then "LLVM_ENABLE_SPHINX" else null} = true;
+      ${if enableManpages then "SPHINX_OUTPUT_MAN" else null} = true;
+      ${if enableManpages then "SPHINX_OUTPUT_HTML" else null} = false;
+      ${if enableManpages then "SPHINX_WARNINGS_AS_ERRORS" else null} = false;
       # clang-pseudo removed in LLVM20: https://github.com/llvm/llvm-project/commit/ed8f78827895050442f544edef2933a60d4a7935
-      (lib.cmakeFeature "CLANG_PSEUDO_GEN" "${buildLlvmPackages.tblgen}/bin/clang-pseudo-gen")
-    ]
-    ++ devExtraCmakeFlags;
+      ${if lib.versionOlder release_version "20" then "CLANG_PSEUDO_GEN" else null} =
+        "${buildLlvmPackages.tblgen}/bin/clang-pseudo-gen";
+    };
+
+    cmakeFlags = devExtraCmakeFlags;
 
     # GCC 14 ICEs (segfault in ggc_set_mark) on template-heavy TUs at -O3;
     # override the CMake Release flags to use -O2 instead.  Must use
