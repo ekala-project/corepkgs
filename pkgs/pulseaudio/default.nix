@@ -4,8 +4,7 @@
   fetchurl,
   fetchpatch2,
   pkg-config,
-  # TODO(corepkgs): Port libsndfile for audio file format support
-  # libsndfile,
+  libsndfile,
   libtool,
   makeWrapper,
   perlPackages,
@@ -18,19 +17,16 @@
   alsa-lib,
   glib,
   dconf,
-  # TODO(corepkgs): Port libasyncns for async name resolution
-  # libasyncns,
+  libasyncns,
   dbus,
   udev,
   udevCheckHook,
   openssl,
   fftwFloat,
   soxr,
-  # TODO(corepkgs): Port speexdsp for resampling support
-  # speexdsp,
+  speexdsp,
   systemd,
-  # TODO(corepkgs): Port webrtc-audio-processing for echo cancellation
-  # webrtc-audio-processing_1,
+  webrtc-audio-processing,
   check,
   meson,
   ninja,
@@ -110,11 +106,9 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [
     libtool
-    # TODO(corepkgs): Port libsndfile — required for audio file I/O
-    # libsndfile
+    libsndfile
     soxr
-    # TODO(corepkgs): Port speexdsp — used for resampling
-    # speexdsp
+    speexdsp
     fftwFloat
     check
   ]
@@ -124,10 +118,8 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals (!libOnly) (
     [
-      # TODO(corepkgs): Port libasyncns for async name resolution
-      # libasyncns
-      # TODO(corepkgs): Port webrtc-audio-processing_1 for echo cancellation
-      # webrtc-audio-processing_1
+      libasyncns
+      webrtc-audio-processing
     ]
     ++ lib.optionals x11Support [
       libice
@@ -153,8 +145,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   mesonFlags = [
     (lib.mesonEnable "alsa" (!libOnly && alsaSupport))
-    # TODO(corepkgs): Re-enable when libasyncns is ported
-    (lib.mesonEnable "asyncns" false)
+    (lib.mesonEnable "asyncns" (!libOnly))
     (lib.mesonEnable "avahi" false)
     (lib.mesonEnable "bluez5" false)
     (lib.mesonEnable "bluez5-gstreamer" false)
@@ -177,8 +168,7 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.mesonEnable "tcpwrap" false)
     (lib.mesonEnable "udev" (!libOnly && udevSupport))
     (lib.mesonEnable "valgrind" false)
-    # TODO(corepkgs): Re-enable when webrtc-audio-processing_1 is ported
-    (lib.mesonEnable "webrtc-aec" false)
+    (lib.mesonEnable "webrtc-aec" (!libOnly))
     (lib.mesonEnable "x11" x11Support)
 
     (lib.mesonOption "localstatedir" "/var")
