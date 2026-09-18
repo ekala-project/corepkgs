@@ -55,9 +55,9 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optional (!minimal && libGL != null) libGL;
 
-  mesonFlags = lib.optionals (stdenv.hostPlatform.isLinux && mesa != null) [
-    "-Ddriverdir=${mesa.driverLink or "/run/opengl-driver"}/lib/dri:/usr/lib/dri:/usr/lib32/dri"
-  ];
+  mesonEntries = lib.optionalAttrs (stdenv.hostPlatform.isLinux && mesa != null) {
+    driverdir = "${mesa.driverLink or "/run/opengl-driver"}/lib/dri:/usr/lib/dri:/usr/lib32/dri";
+  };
 
   env =
     lib.optionalAttrs (stdenv.cc.bintools.isLLVM && lib.versionAtLeast stdenv.cc.bintools.version "17")
