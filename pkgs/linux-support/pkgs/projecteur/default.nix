@@ -35,11 +35,11 @@ stdenv.mkDerivation (finalAttrs: {
     udevCheckHook
   ];
 
-  cmakeFlags = [
-    "-DCMAKE_INSTALL_PREFIX:PATH=${placeholder "out"}"
-    "-DPACKAGE_TARGETS=OFF"
-    "-DCMAKE_INSTALL_UDEVRULESDIR=${placeholder "out"}/lib/udev/rules.d"
-  ];
+  cmakeEntries = {
+    "CMAKE_INSTALL_PREFIX:PATH" = "${placeholder "out"}";
+    PACKAGE_TARGETS = "OFF";
+    CMAKE_INSTALL_UDEVRULESDIR = "${placeholder "out"}/lib/udev/rules.d";
+  };
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
