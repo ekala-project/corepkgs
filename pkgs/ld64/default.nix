@@ -122,11 +122,11 @@ stdenv.mkDerivation (finalAttrs: {
   # ld built with this fails to link glib's gio
   hardeningDisable = [ "libcxxhardeningfast" ];
 
-  mesonFlags = [
-    (lib.mesonOption "b_ndebug" "if-release")
-    (lib.mesonOption "default_library" (if stdenv.hostPlatform.isStatic then "static" else "shared"))
-    (lib.mesonOption "libllvm_path" llvmPath)
-  ];
+  mesonEntries = {
+    b_ndebug = "if-release";
+    default_library = if stdenv.hostPlatform.isStatic then "static" else "shared";
+    libllvm_path = llvmPath;
+  };
 
   doInstallCheck = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
 
