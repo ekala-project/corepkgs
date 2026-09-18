@@ -34,9 +34,9 @@ stdenv.mkDerivation (finalAttrs: {
     gettext # msgfmt
   ];
 
-  mesonFlags = [
-    (lib.mesonBool "xorg-rules-symlinks" true)
-  ];
+  mesonEntries = {
+    xorg-rules-symlinks = true;
+  };
 
   prePatch = ''
     patchShebangs rules/merge.py rules/compat/map-variants.py rules/generate-options-symbols.py rules/xml2lst.pl
