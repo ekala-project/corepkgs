@@ -44,9 +44,9 @@ stdenv.mkDerivation (finalAttrs: {
     liburing
   ];
 
-  mesonFlags = [
-    "-Ddocs=true"
-  ];
+  mesonEntries = {
+    docs = true;
+  };
 
   postFixup = ''
     # Cannot be in postInstall, otherwise _multioutDocs hook in preFixup will move right back.
