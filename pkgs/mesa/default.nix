@@ -200,64 +200,66 @@ stdenv.mkDerivation {
 
   env.MESON_PACKAGE_CACHE_DIR = packageCache;
 
-  mesonFlags = [
-    "--sysconfdir=/etc"
-
+  mesonEntries = {
     # What to build
-    (lib.mesonOption "platforms" (lib.concatStringsSep "," eglPlatforms))
-    (lib.mesonOption "gallium-drivers" (lib.concatStringsSep "," galliumDrivers))
-    (lib.mesonOption "vulkan-drivers" (lib.concatStringsSep "," vulkanDrivers))
-    (lib.mesonOption "vulkan-layers" (lib.concatStringsSep "," vulkanLayers))
+    platforms = lib.concatStringsSep "," eglPlatforms;
+    gallium-drivers = lib.concatStringsSep "," galliumDrivers;
+    vulkan-drivers = lib.concatStringsSep "," vulkanDrivers;
+    vulkan-layers = lib.concatStringsSep "," vulkanLayers;
 
     # Enable glvnd for dynamic libGL dispatch
-    (lib.mesonEnable "glvnd" true)
-    (lib.mesonEnable "gbm" true)
-    (lib.mesonBool "libgbm-external" true)
+    glvnd = "enabled";
+    gbm = "enabled";
+    libgbm-external = true;
 
-    (lib.mesonBool "teflon" true) # TensorFlow frontend
+    teflon = true; # TensorFlow frontend
 
     # Enable all freedreno kernel mode drivers. (For example, virtio can be
     # used with a virtio-gpu device supporting drm native context.) This option
     # is ignored when freedreno is not being built.
-    (lib.mesonOption "freedreno-kmds" "msm,kgsl,virtio,wsl")
+    freedreno-kmds = "msm,kgsl,virtio,wsl";
 
     # Enable virtio-gpu kernel mode driver (native context) support for amdgpu as well.
     # This option is ignored when RadeonSI/RADV are not being built.
-    (lib.mesonBool "amdgpu-virtio" true)
+    amdgpu-virtio = true;
 
     # Required for OpenCL
-    (lib.mesonOption "clang-libdir" "${lib.getLib llvmPackages.clang-unwrapped}/lib")
+    clang-libdir = "${lib.getLib llvmPackages.clang-unwrapped}/lib";
 
     # Rusticl, new OpenCL frontend
-    (lib.mesonBool "gallium-rusticl" true)
-    (lib.mesonOption "gallium-rusticl-enable-drivers" "auto")
+    gallium-rusticl = true;
+    gallium-rusticl-enable-drivers = "auto";
 
     # Enable more sensors in gallium-hud
-    (lib.mesonBool "gallium-extra-hud" true)
+    gallium-extra-hud = true;
 
     # Disable valgrind on targets where it's not available
-    (lib.mesonEnable "valgrind" withValgrind)
+    valgrind = if withValgrind then "enabled" else "disabled";
 
     # Enable Intel RT stuff when available
-    (lib.mesonEnable "intel-rt" (stdenv.hostPlatform.isx86_64 || stdenv.hostPlatform.isAarch64))
+    intel-rt =
+      if (stdenv.hostPlatform.isx86_64 || stdenv.hostPlatform.isAarch64) then "enabled" else "disabled";
 
     # meson auto_features enables these, but we do not want them
-    (lib.mesonEnable "gallium-mediafoundation" false) # Windows only
-    (lib.mesonEnable "android-libbacktrace" false) # Android only
-    (lib.mesonEnable "microsoft-clc" false) # Only relevant on Windows (OpenCL 1.2 API on top of D3D12)
-  ]
-  ++ lib.optionals enablePatentEncumberedCodecs [
-    (lib.mesonOption "video-codecs" "all")
-  ]
-  ++ lib.optionals (!needNativeCLC) [
+    gallium-mediafoundation = "disabled"; # Windows only
+    android-libbacktrace = "disabled"; # Android only
+    microsoft-clc = "disabled"; # Only relevant on Windows (OpenCL 1.2 API on top of D3D12)
+
+    ${if enablePatentEncumberedCodecs then "video-codecs" else null} = "all";
+  }
+  // lib.optionalAttrs (!needNativeCLC) {
     # Build and install extra tools for cross
-    (lib.mesonOption "tools" "asahi,panfrost")
-    (lib.mesonBool "install-mesa-clc" true)
-    (lib.mesonBool "install-precomp-compiler" true)
-  ]
-  ++ lib.optionals needNativeCLC [
-    (lib.mesonOption "mesa-clc" "system")
-    (lib.mesonOption "precomp-compiler" "system")
+    tools = "asahi,panfrost";
+    install-mesa-clc = true;
+    install-precomp-compiler = true;
+  }
+  // lib.optionalAttrs needNativeCLC {
+    mesa-clc = "system";
+    precomp-compiler = "system";
+  };
+
+  mesonFlags = [
+    "--sysconfdir=/etc"
   ];
 
   buildInputs = [

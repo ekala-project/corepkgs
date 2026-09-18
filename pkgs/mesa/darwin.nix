@@ -61,9 +61,12 @@ stdenv.mkDerivation {
   mesonFlags = [
     "--sysconfdir=/etc"
     "--datadir=${placeholder "out"}/share"
-    (lib.mesonEnable "glvnd" false)
-    (lib.mesonEnable "llvm" true)
   ];
+
+  mesonEntries = {
+    glvnd = "disabled";
+    llvm = "enabled";
+  };
 
   passthru = {
     # needed to pass evaluation of bad platforms
