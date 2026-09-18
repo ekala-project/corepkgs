@@ -25,6 +25,7 @@
   libxmu,
   libxpm,
   libxrender,
+  libdecor,
   libxshmfence,
   libxt,
   mesa-gl-headers,
@@ -108,8 +109,8 @@ stdenv.mkDerivation (finalAttrs: {
     xorgproto
     xtrans
     zlib
+    libdecor
     # TODO(corepkgs): port egl-wayland for the EGLStream backend
-    # TODO(corepkgs): port libdecor for rootful window decorations
     # TODO(corepkgs): port libei for XTEST input emulation
   ]
   ++ lib.optionals withLibunwind [
