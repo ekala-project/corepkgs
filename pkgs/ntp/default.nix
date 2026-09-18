@@ -6,6 +6,7 @@
   openssl,
   perl,
   libcap,
+  pps-tools,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -41,8 +42,8 @@ stdenv.mkDerivation (finalAttrs: {
     perl
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
-    # TODO(corepkgs): Port pps-tools for PPS support
     libcap
+    pps-tools
   ];
 
   postInstall = ''
