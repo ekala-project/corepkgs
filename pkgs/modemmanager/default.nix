@@ -78,18 +78,21 @@ stdenv.mkDerivation rec {
     systemd
   ];
 
+  mesonEntries = {
+    udevdir = "${placeholder "out"}/lib/udev";
+    dbus_policy_dir = "${placeholder "out"}/share/dbus-1/system.d";
+    systemdsystemunitdir = "${placeholder "out"}/lib/systemd/system";
+    introspection = withIntrospection;
+    qrtr = withIntrospection;
+    vapi = withIntrospection;
+    systemd_suspend_resume = withSystemd;
+    systemd_journal = withSystemd;
+    polkit = if withPolkit then "strict" else "no";
+  };
+
   mesonFlags = [
-    "-Dudevdir=${placeholder "out"}/lib/udev"
-    "-Ddbus_policy_dir=${placeholder "out"}/share/dbus-1/system.d"
-    "-Dsystemdsystemunitdir=${placeholder "out"}/lib/systemd/system"
     "--sysconfdir=/etc"
     "--localstatedir=/var"
-    (lib.mesonBool "introspection" withIntrospection)
-    (lib.mesonBool "qrtr" withIntrospection)
-    (lib.mesonBool "vapi" withIntrospection)
-    (lib.mesonBool "systemd_suspend_resume" withSystemd)
-    (lib.mesonBool "systemd_journal" withSystemd)
-    (lib.mesonOption "polkit" (if withPolkit then "strict" else "no"))
   ];
 
   postPatch = ''
