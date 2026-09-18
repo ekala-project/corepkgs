@@ -39,11 +39,11 @@ stdenv.mkDerivation (finalAttrs: {
 
   checkInputs = [ gtest ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "ZLIB_COMPAT" withZlibCompat)
-    (lib.cmakeBool "BUILD_SHARED_LIBS" true)
-    (lib.cmakeBool "WITH_GTEST" finalAttrs.finalPackage.doCheck)
-  ];
+  cmakeEntries = {
+    ZLIB_COMPAT = withZlibCompat;
+    BUILD_SHARED_LIBS = true;
+    WITH_GTEST = finalAttrs.finalPackage.doCheck;
+  };
 
   passthru.tests.unittests = runUnitTests finalAttrs.finalPackage;
 
