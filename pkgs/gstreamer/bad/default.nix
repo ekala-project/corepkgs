@@ -21,6 +21,7 @@
   pango,
   curl,
   json-glib,
+  libaom,
   libde265,
   libdrm,
   libdvdnav ? null,
@@ -93,6 +94,7 @@ stdenv.mkDerivation (finalAttrs: {
     libopus
     openjpeg
     curl.dev
+    libaom
     libde265
     qrencode
     libsndfile
@@ -174,7 +176,6 @@ stdenv.mkDerivation (finalAttrs: {
     "-Dopenaptx=disabled"
     "-Dopencv=disabled"
     "-Daja=disabled"
-    "-Daom=disabled"
     "-Dmicrodns=disabled"
     "-Dbluez=${if bluezSupport then "enabled" else "disabled"}"
     (lib.mesonEnable "openh264" false)
