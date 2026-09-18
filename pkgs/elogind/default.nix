@@ -144,13 +144,13 @@ stdenv.mkDerivation rec {
     patchShebangs src/basic/generate-*.{sh,py}
   '';
 
-  mesonFlags = [
-    (lib.mesonOption "dbuspolicydir" "${placeholder "out"}/share/dbus-1/system.d")
-    (lib.mesonOption "dbussystemservicedir" "${placeholder "out"}/share/dbus-1/system-services")
-    (lib.mesonOption "sysconfdir" "${placeholder "out"}/etc")
-    (lib.mesonBool "utmp" (!stdenv.hostPlatform.isMusl))
-    (lib.mesonEnable "xenctrl" false)
-  ];
+  mesonEntries = {
+    dbuspolicydir = "${placeholder "out"}/share/dbus-1/system.d";
+    dbussystemservicedir = "${placeholder "out"}/share/dbus-1/system-services";
+    sysconfdir = "${placeholder "out"}/etc";
+    utmp = !stdenv.hostPlatform.isMusl;
+    xenctrl = "disabled";
+  };
 
   meta = {
     homepage = "https://github.com/elogind/elogind";
