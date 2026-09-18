@@ -80,16 +80,15 @@ stdenv.mkDerivation (finalAttrs: {
     icu
   ];
 
-  cmakeFlags = [
-    "-DENABLE_GTK_DOC=False"
-    "-DLIBICAL_BUILD_EXAMPLES=False"
-    "-DGOBJECT_INTROSPECTION=${if withIntrospection then "True" else "False"}"
-    "-DICAL_GLIB_VAPI=${if withIntrospection then "True" else "False"}"
-    "-DSTATIC_ONLY=${if stdenv.hostPlatform.isStatic then "True" else "False"}"
-  ]
-  ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
-    "-DIMPORT_ICAL_GLIB_SRC_GENERATOR=${lib.getDev pkgsBuildBuild.libical}/lib/cmake/LibIcal/IcalGlibSrcGenerator.cmake"
-  ];
+  cmakeEntries = {
+    ENABLE_GTK_DOC = false;
+    LIBICAL_BUILD_EXAMPLES = false;
+    GOBJECT_INTROSPECTION = withIntrospection;
+    ICAL_GLIB_VAPI = withIntrospection;
+    STATIC_ONLY = stdenv.hostPlatform.isStatic;
+    ${if stdenv.hostPlatform != stdenv.buildPlatform then "IMPORT_ICAL_GLIB_SRC_GENERATOR" else null} =
+      "${lib.getDev pkgsBuildBuild.libical}/lib/cmake/LibIcal/IcalGlibSrcGenerator.cmake";
+  };
 
   patches = [
     # Will appear in 3.1.0
