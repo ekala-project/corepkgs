@@ -68,17 +68,16 @@ stdenv.mkDerivation (finalAttrs: {
     python3
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "LIBOMP_ENABLE_SHARED" (
-      !stdenv.hostPlatform.isStatic && stdenv.hostPlatform.hasSharedLibraries
-    ))
-    (lib.cmakeBool "LIBOMP_OMPD_SUPPORT" ompdSupport)
-    (lib.cmakeBool "LIBOMP_OMPD_GDB_SUPPORT" ompdGdbSupport)
-    (lib.cmakeFeature "CLANG_TOOL" "${clang-unwrapped}/bin/clang")
-    (lib.cmakeFeature "OPT_TOOL" "${llvm}/bin/opt")
-    (lib.cmakeFeature "LINK_TOOL" "${llvm}/bin/llvm-link")
-  ]
-  ++ devExtraCmakeFlags;
+  cmakeEntries = {
+    LIBOMP_ENABLE_SHARED = !stdenv.hostPlatform.isStatic && stdenv.hostPlatform.hasSharedLibraries;
+    LIBOMP_OMPD_SUPPORT = ompdSupport;
+    LIBOMP_OMPD_GDB_SUPPORT = ompdGdbSupport;
+    CLANG_TOOL = "${clang-unwrapped}/bin/clang";
+    OPT_TOOL = "${llvm}/bin/opt";
+    LINK_TOOL = "${llvm}/bin/llvm-link";
+  };
+
+  cmakeFlags = devExtraCmakeFlags;
 
   doCheck = false;
 
