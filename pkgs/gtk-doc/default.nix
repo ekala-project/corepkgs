@@ -67,10 +67,10 @@ python3.pkgs.buildPythonApplication rec {
     lxml
   ];
 
-  mesonFlags = [
-    "-Dtests=false"
-    "-Dyelp_manual=false"
-  ];
+  mesonEntries = {
+    tests = false;
+    yelp_manual = false;
+  };
 
   doCheck = false; # requires a lot of stuff
   doInstallCheck = false; # fails
