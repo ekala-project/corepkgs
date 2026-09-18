@@ -139,8 +139,22 @@ Use `cmakeFlags` only for non-`-D` flags (e.g. `-Wno-dev`). Both can be used tog
 
 **Meson packages:**
 
-Include `meson.configurePhaseHook` and `ninja` in nativeBuildInputs. `mesonBuildType` defaults
-to `release`; set it only when a package requires a different build type.
+Include `meson.configurePhaseHook` and `ninja` in nativeBuildInputs. Use `mesonEntries` (an attrset)
+instead of `mesonFlags` (a list of strings) for Meson `-D` options. Booleans are automatically
+canonicalized to `true`/`false`.
+
+```nix
+nativeBuildInputs = [ meson meson.configurePhaseHook ninja pkg-config ];
+
+mesonEntries = {
+  docs = false;
+  tests = false;
+  systemd = "disabled";
+};
+```
+
+Use `mesonFlags` only for non-`-D` flags (e.g. `--cross-file`). Both can be used together.
+`mesonBuildType` defaults to `release`; set it only when a package requires a different build type.
 
 **Detailed guide:** See [`.agents/skills/meson/SKILL.md`](.agents/skills/meson/SKILL.md) for complete Meson documentation.
 

@@ -195,7 +195,7 @@ stdenv:
 
 let
   inherit (import ../lib/cmake.nix { inherit lib stdenv; }) makeCMakeFlags makeCMakeEntries;
-  inherit (import ../lib/meson.nix { inherit lib stdenv; }) makeMesonFlags;
+  inherit (import ../lib/meson.nix { inherit lib stdenv; }) makeMesonFlags makeMesonEntries;
 
   # Nix itself uses the `system` field of a derivation to decide where
   # to build it. This is a bit confusing for cross compilation.
@@ -373,7 +373,7 @@ let
 
     # `makeDerivationArgument` is responsible for the `mkDerivation` arguments that
     # affect the actual derivation, excluding a few behaviors that are not
-    # essential, and specific to `mkDerivation`: `env`, `cmakeFlags`, `mesonFlags`.
+    # essential, and specific to `mkDerivation`: `env`, `cmakeFlags`, `mesonFlags`, `mesonEntries`.
     #
     # See also:
     #
@@ -955,6 +955,7 @@ let
           cmakeFlags = makeCMakeFlags attrs;
           cmakeEntries = makeCMakeEntries attrs;
           mesonFlags = makeMesonFlags attrs;
+          mesonEntries = makeMesonEntries attrs;
         }
       );
 
