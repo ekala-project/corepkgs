@@ -38,14 +38,14 @@ stdenv.mkDerivation (finalAttrs: {
     openssl
   ];
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=ON"
-    "-DENABLE_COMMONCRYPTO=OFF"
-    "-DENABLE_GNUTLS=OFF"
-    "-DENABLE_MBEDTLS=OFF"
-    "-DENABLE_OPENSSL=ON"
-    "-DENABLE_WINDOWS_CRYPTO=OFF"
-  ];
+  cmakeEntries = {
+    BUILD_SHARED_LIBS = true;
+    ENABLE_COMMONCRYPTO = false;
+    ENABLE_GNUTLS = false;
+    ENABLE_MBEDTLS = false;
+    ENABLE_OPENSSL = true;
+    ENABLE_WINDOWS_CRYPTO = false;
+  };
 
   passthru.tests = {
     pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
