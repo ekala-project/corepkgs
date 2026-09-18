@@ -29,11 +29,11 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = lib.optionals stdenv.hostPlatform.isStatic [
+  cmakeEntries = {
     # One of the examples tests shared library support
     # and fails linking.
-    "-DDOCTEST_WITH_TESTS=OFF"
-  ];
+    ${if stdenv.hostPlatform.isStatic then "DOCTEST_WITH_TESTS" else null} = false;
+  };
 
   passthru.tests = lib.optionalAttrs (!stdenv.hostPlatform.isStatic) {
     unittests = runUnitTests finalAttrs.finalPackage;
