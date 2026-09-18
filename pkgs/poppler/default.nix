@@ -29,8 +29,6 @@
 }:
 
 let
-  mkFlag = optset: flag: "-DENABLE_${flag}=${if optset then "on" else "off"}";
-
   testData = fetchFromGitLab {
     domain = "gitlab.freedesktop.org";
     owner = "poppler";
@@ -90,19 +88,19 @@ stdenv.mkDerivation (finalAttrs: {
     gpgme
   ];
 
-  cmakeFlags = [
-    (mkFlag true "UNSTABLE_API_ABI_HEADERS")
-    (mkFlag (!minimal) "GLIB")
-    (mkFlag (!minimal) "CPP")
-    (mkFlag (!minimal) "LIBCURL")
-    (mkFlag (!minimal) "LCMS")
-    (mkFlag (!minimal) "LIBTIFF")
-    (mkFlag (!minimal) "NSS3")
-    (mkFlag utils "UTILS")
-    (mkFlag false "QT5")
-    (mkFlag false "QT6")
-    (mkFlag gpgmeSupport "GPGME")
-  ];
+  cmakeEntries = {
+    ENABLE_UNSTABLE_API_ABI_HEADERS = true;
+    ENABLE_GLIB = !minimal;
+    ENABLE_CPP = !minimal;
+    ENABLE_LIBCURL = !minimal;
+    ENABLE_LCMS = !minimal;
+    ENABLE_LIBTIFF = !minimal;
+    ENABLE_NSS3 = !minimal;
+    ENABLE_UTILS = utils;
+    ENABLE_QT5 = false;
+    ENABLE_QT6 = false;
+    ENABLE_GPGME = gpgmeSupport;
+  };
 
   cmakeBuildType = "Release";
 
