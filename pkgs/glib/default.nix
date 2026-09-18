@@ -220,27 +220,21 @@ stdenv.mkDerivation (finalAttrs: {
     shared-mime-info
   ];
 
-  mesonFlags = [
-    "-Dglib_debug=disabled" # https://gitlab.gnome.org/GNOME/glib/-/issues/3421#note_2206315
-    "-Ddocumentation=true" # gvariant specification can be built without gi-docgen
-    (lib.mesonEnable "dtrace" withDtrace)
-    (lib.mesonEnable "systemtap" withDtrace) # requires dtrace option to be enabled
-    "-Dnls=enabled"
-    "-Ddevbindir=${placeholder "dev"}/bin"
-    (lib.mesonEnable "introspection" withIntrospection)
+  mesonEntries = {
+    glib_debug = "disabled"; # https://gitlab.gnome.org/GNOME/glib/-/issues/3421#note_2206315
+    documentation = true; # gvariant specification can be built without gi-docgen
+    dtrace = if withDtrace then "enabled" else "disabled";
+    systemtap = if withDtrace then "enabled" else "disabled"; # requires dtrace option to be enabled
+    nls = "enabled";
+    devbindir = "${placeholder "dev"}/bin";
+    introspection = if withIntrospection then "enabled" else "disabled";
     # FIXME: Fails when linking target glib/tests/libconstructor-helper.so
     # relocation R_X86_64_32 against hidden symbol `__TMC_END__' can not be used when making a shared object
-    "-Dtests=${lib.boolToString (!stdenv.hostPlatform.isStatic)}"
-  ]
-  ++ lib.optionals (!lib.meta.availableOn stdenv.hostPlatform elfutils) [
-    "-Dlibelf=disabled"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isFreeBSD [
-    "-Dxattr=false"
-  ]
-  ++ lib.optionals (!withSysprof) [
-    "-Dsysprof=disabled" # sysprof-capture does not build on FreeBSD
-  ];
+    tests = !stdenv.hostPlatform.isStatic;
+    ${if !lib.meta.availableOn stdenv.hostPlatform elfutils then "libelf" else null} = "disabled";
+    ${if stdenv.hostPlatform.isFreeBSD then "xattr" else null} = false;
+    ${if !withSysprof then "sysprof" else null} = "disabled"; # sysprof-capture does not build on FreeBSD
+  };
 
   env = {
     NIX_CFLAGS_COMPILE = toString [
