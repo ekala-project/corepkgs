@@ -94,31 +94,26 @@ stdenv.mkDerivation rec {
     ./sighandler_t-macos.patch
   ];
 
-  cmakeFlags = [
-    "-DWITH_DBUS=OFF"
+  cmakeEntries = {
+    WITH_DBUS = false;
     # libselinux is missing propagatedBuildInputs
-    "-DWITH_SELINUX=OFF"
+    WITH_SELINUX = false;
 
-    "-DCMAKE_INSTALL_LOCALSTATEDIR=/var"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [
-    "-DMKTREE_BACKEND=rootfs"
-  ]
-  ++ lib.optionals (!stdenv.hostPlatform.isLinux) [
+    CMAKE_INSTALL_LOCALSTATEDIR = "/var";
+
+    ${if stdenv.hostPlatform.isLinux then "MKTREE_BACKEND" else null} = "rootfs";
+
     # Test suite rely on either podman or bubblewrap
-    "-DENABLE_TESTSUITE=OFF"
+    ${if !stdenv.hostPlatform.isLinux then "ENABLE_TESTSUITE" else null} = false;
+    ${if !stdenv.hostPlatform.isLinux then "WITH_CAP" else null} = false;
+    ${if !stdenv.hostPlatform.isLinux then "WITH_AUDIT" else null} = false;
+    ${if !stdenv.hostPlatform.isLinux then "WITH_ACL" else null} = false;
 
-    "-DWITH_CAP=OFF"
-    "-DWITH_AUDIT=OFF"
-    "-DWITH_ACL=OFF"
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    "-DWITH_LIBELF=OFF"
-    "-DWITH_LIBDW=OFF"
-  ]
-  ++ lib.optionals disableUnshare [
-    "-DHAVE_UNSHARE=OFF"
-  ];
+    ${if stdenv.hostPlatform.isDarwin then "WITH_LIBELF" else null} = false;
+    ${if stdenv.hostPlatform.isDarwin then "WITH_LIBDW" else null} = false;
+
+    ${if disableUnshare then "HAVE_UNSHARE" else null} = false;
+  };
 
   # rpm/rpmlib.h includes popt.h, and then the pkg-config file mentions these as linkage requirements
   propagatedBuildInputs = [
