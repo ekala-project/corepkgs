@@ -67,12 +67,12 @@ stdenv.mkDerivation (finalAttrs: {
     libxft
   ];
 
-  mesonFlags = [
-    (lib.mesonBool "documentation" false)
-    (lib.mesonBool "man-pages" true)
-    (lib.mesonEnable "introspection" false)
-    (lib.mesonEnable "xft" x11Support)
-  ];
+  mesonEntries = {
+    documentation = false;
+    man-pages = true;
+    introspection = "disabled";
+    xft = if x11Support then "enabled" else "disabled";
+  };
 
   env.FONTCONFIG_FILE = makeFontsConf {
     fontDirectories = [ dejavu_fonts ];
