@@ -85,17 +85,15 @@ stdenv.mkDerivation (finalAttrs: {
     libpng
   ];
 
-  mesonFlags = [
-    "-Dgio_sniffing=false"
-    "-Dandroid=disabled"
-    "-Dglycin=disabled"
-    (lib.mesonBool "documentation" withIntrospection)
-    (lib.mesonEnable "introspection" withIntrospection)
-    (lib.mesonEnable "others" true)
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isStatic [
-    "-Dbuiltin_loaders=all"
-  ];
+  mesonEntries = {
+    gio_sniffing = false;
+    android = "disabled";
+    glycin = "disabled";
+    documentation = withIntrospection;
+    introspection = if withIntrospection then "enabled" else "disabled";
+    others = "enabled";
+    ${if stdenv.hostPlatform.isStatic then "builtin_loaders" else null} = "all";
+  };
 
   postPatch = ''
     chmod +x build-aux/* # patchShebangs only applies to executables
