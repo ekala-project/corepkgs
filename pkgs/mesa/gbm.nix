@@ -37,20 +37,22 @@ stdenv.mkDerivation rec {
 
   mesonAutoFeatures = "disabled";
 
+  mesonEntries = {
+    gbm = "enabled";
+    gbm-backends-path = "${libglvnd.driverLink}/lib/gbm";
+
+    egl = "disabled";
+    glx = "disabled";
+    zlib = "disabled";
+
+    platforms = "";
+    gallium-drivers = "";
+    vulkan-drivers = "";
+    vulkan-layers = "";
+  };
+
   mesonFlags = [
     "--sysconfdir=/etc"
-
-    (lib.mesonEnable "gbm" true)
-    (lib.mesonOption "gbm-backends-path" "${libglvnd.driverLink}/lib/gbm")
-
-    (lib.mesonEnable "egl" false)
-    (lib.mesonEnable "glx" false)
-    (lib.mesonEnable "zlib" false)
-
-    (lib.mesonOption "platforms" "")
-    (lib.mesonOption "gallium-drivers" "")
-    (lib.mesonOption "vulkan-drivers" "")
-    (lib.mesonOption "vulkan-layers" "")
   ];
 
   propagatedBuildInputs = [ libdrm ];
