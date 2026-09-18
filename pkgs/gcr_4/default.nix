@@ -83,8 +83,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   mesonFlags = [
-    "-Dgpg_path=${lib.getBin gnupg}/bin/gpg"
-    (lib.mesonEnable "systemd" systemdSupport)
     "--cross-file=${
       ini.generate "cross-file.conf" {
         binaries = {
@@ -97,6 +95,11 @@ stdenv.mkDerivation (finalAttrs: {
       }
     }"
   ];
+
+  mesonEntries = {
+    gpg_path = "${lib.getBin gnupg}/bin/gpg";
+    systemd = if systemdSupport then "enabled" else "disabled";
+  };
 
   env.PKG_CONFIG_SYSTEMD_SYSTEMDUSERUNITDIR = "${placeholder "out"}/lib/systemd/user";
 
