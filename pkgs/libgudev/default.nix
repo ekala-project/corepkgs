@@ -46,11 +46,11 @@ stdenv.mkDerivation (finalAttrs: {
     glib
   ];
 
-  mesonFlags = [
-    (lib.mesonEnable "introspection" withIntrospection)
-    (lib.mesonEnable "vapi" withIntrospection)
-    (lib.mesonEnable "tests" false)
-  ];
+  mesonEntries = {
+    introspection = if withIntrospection then "enabled" else "disabled";
+    vapi = if withIntrospection then "enabled" else "disabled";
+    tests = "disabled";
+  };
 
   meta = {
     description = "Library that provides GObject bindings for libudev";
