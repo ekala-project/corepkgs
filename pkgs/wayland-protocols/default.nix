@@ -53,7 +53,9 @@ stdenv.mkDerivation (finalAttrs: {
   ];
   checkInputs = [ wayland ];
 
-  mesonFlags = [ "-Dtests=${lib.boolToString finalAttrs.finalPackage.doCheck}" ];
+  mesonEntries = {
+    tests = finalAttrs.finalPackage.doCheck;
+  };
 
   meta = {
     description = "Wayland protocol extensions";
