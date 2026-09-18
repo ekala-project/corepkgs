@@ -83,9 +83,9 @@ buildPythonApplication rec {
     pyxdg
   ];
 
-  mesonFlags = [
-    "-Dsystemddir=${placeholder "out"}/lib/systemd"
-  ];
+  mesonEntries = {
+    systemddir = "${placeholder "out"}/lib/systemd";
+  };
 
   preConfigure = ''
     patchShebangs build-aux/meson/postinstall.py
