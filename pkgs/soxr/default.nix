@@ -25,9 +25,9 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = [
-    "-DINCLUDE_INSTALL_DIR=${placeholder "dev"}/include"
-  ];
+  cmakeEntries = {
+    INCLUDE_INSTALL_DIR = "${placeholder "dev"}/include";
+  };
 
   postPatch = ''
     substituteInPlace CMakeLists.txt \
