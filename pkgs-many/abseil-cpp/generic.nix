@@ -27,14 +27,12 @@ stdenv.mkDerivation (finalAttrs: {
     hash = src-hash;
   };
 
-  cmakeFlags = [
-    (lib.cmakeBool "ABSL_BUILD_TEST_HELPERS" true)
-    (lib.cmakeBool "ABSL_USE_EXTERNAL_GOOGLETEST" true)
-    (lib.cmakeBool "BUILD_SHARED_LIBS" (!static))
-  ]
-  ++ lib.optionals (cxxStandard != null) [
-    (lib.cmakeFeature "CMAKE_CXX_STANDARD" cxxStandard)
-  ];
+  cmakeEntries = {
+    ABSL_BUILD_TEST_HELPERS = true;
+    ABSL_USE_EXTERNAL_GOOGLETEST = true;
+    BUILD_SHARED_LIBS = !static;
+    ${if cxxStandard != null then "CMAKE_CXX_STANDARD" else null} = cxxStandard;
+  };
 
   patches = lib.optionals (packageOlder "20220000") [
     # Use CMAKE_INSTALL_FULL_{LIBDIR,INCLUDEDIR}
