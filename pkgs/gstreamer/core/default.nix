@@ -86,16 +86,16 @@ stdenv.mkDerivation (finalAttrs: {
     glib
   ];
 
-  mesonFlags = [
-    "-Dglib_debug=disabled"
-    "-Ddbghelp=disabled"
-    "-Dexamples=disabled"
-    "-Dptp-helper=disabled"
-    (lib.mesonEnable "introspection" withIntrospection)
-    "-Ddoc=disabled"
-    (lib.mesonEnable "libunwind" withLibunwind)
-    (lib.mesonEnable "libdw" (withLibunwind && hasElfutils))
-  ];
+  mesonFeatures = {
+    glib_debug = false;
+    dbghelp = false;
+    examples = false;
+    ptp-helper = false;
+    introspection = withIntrospection;
+    doc = false;
+    libunwind = withLibunwind;
+    libdw = withLibunwind && hasElfutils;
+  };
 
   postPatch = ''
     patchShebangs \

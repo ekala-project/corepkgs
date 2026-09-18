@@ -55,10 +55,10 @@ stdenv.mkDerivation (finalAttrs: {
     gst-plugins-bad
   ];
 
-  mesonFlags = [
-    "-Ddoc=disabled"
-    (lib.mesonEnable "tests" false)
-  ];
+  mesonFeatures = {
+    doc = false;
+    tests = false;
+  };
 
   postPatch = ''
     patchShebangs \

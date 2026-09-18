@@ -43,11 +43,11 @@ stdenv.mkDerivation (finalAttrs: {
     gst-plugins-bad
   ];
 
-  mesonFlags = [
-    "-Dglib_debug=disabled"
-    "-Dexamples=disabled"
-    "-Ddoc=disabled"
-  ];
+  mesonFeatures = {
+    glib_debug = false;
+    examples = false;
+    doc = false;
+  };
 
   postPatch = ''
     patchShebangs \
