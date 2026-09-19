@@ -77,6 +77,8 @@ buildPythonPackage (finalAttrs: {
   disabledTestPaths = [
     # store permissions issue in Nix:
     "tests/test_editable.py"
+    # requires README.md not in test_src
+    "tests/test_setup.py"
   ];
 
   pythonImportsCheck = [ "scikit_build_core" ];
