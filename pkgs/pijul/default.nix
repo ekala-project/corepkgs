@@ -25,7 +25,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   cargoHash = "sha256-Ldb+CpKiVvNOeMhdD/hfQfAAMwdwUy/npY85VBPBq5k=";
 
-  doCheck = false;
+  # identity test fails to compile: SecretKey type removed from pijul_core::key
+  cargoTestFlags = [ "--bins" ];
   nativeBuildInputs = [
     installShellFiles
     pkg-config
