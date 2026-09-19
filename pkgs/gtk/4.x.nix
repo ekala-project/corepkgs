@@ -199,7 +199,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   mesonFeatures = {
     tracker = trackerSupport && tinysparql != null;
-    vulkan = vulkanSupport && shaderc != null;
+    vulkan = vulkanSupport;
     print-cups = cupsSupport;
     ${
       if stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isAarch64 then "media-gstreamer" else null
