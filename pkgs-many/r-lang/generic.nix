@@ -76,7 +76,10 @@ stdenv.mkDerivation (finalAttrs: {
     "--with-libtiff"
   ];
 
-  TZDIR = "${tzdata}/share/zoneinfo";
+  env = {
+    TZDIR = "${tzdata}/share/zoneinfo";
+    CURL_CONFIG = "${lib.getExe' (lib.getDev curl) "curl-config"}";
+  };
 
   passthru = {
     ekapkgs-update.semver-strategy = "patch";
