@@ -28,11 +28,6 @@ stdenv.mkDerivation (finalAttrs: {
     '';
   };
 
-  preConfigure = ''
-    substituteInPlace Makefile \
-      --replace-fail "(GIT_COMMIT)" "(shell cat COMMIT)"
-  '';
-
   nativeBuildInputs = [ pkg-config ];
   buildInputs = [
     glib
@@ -47,6 +42,7 @@ stdenv.mkDerivation (finalAttrs: {
   # manpage requires building the vendored go-md2man
   makeFlags = [
     "bin/conmon"
+    "GIT_COMMIT=${lib.trim (builtins.readFile "${finalAttrs.src}/COMMIT")}"
   ];
 
   installPhase = ''
