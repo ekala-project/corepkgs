@@ -5,6 +5,7 @@
   fetchFromGitHub,
   pkg-config,
   erlang,
+  git,
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -25,7 +26,16 @@ rustPlatform.buildRustPackage (finalAttrs: {
     erlang
   ];
 
-  doCheck = false;
+  nativeCheckInputs = [ git ];
+
+  checkFlags = [
+    # scans build directory and chokes on .d files from cargo
+    "--skip=tests::all_files_have_copyright_notice"
+    # requires erlang escriptize which needs network/deps
+    "--skip=tests::escript_success_with_dependency"
+    # echo tests require bun (JavaScript runtime)
+    "--skip=tests::echo::"
+  ];
 
   meta = {
     description = "Statically typed language for the Erlang VM";
