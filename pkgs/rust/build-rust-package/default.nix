@@ -171,7 +171,20 @@ lib.extendMkDerivation {
           runHook postConfigure
         '';
 
-      doCheck = args.doCheck or true;
+      doCheck = args.doCheck or false;
+
+      passthru =
+        let
+          userPassthru = args.passthru or { };
+          autoTests = {
+            # Re-run the build with tests enabled
+            build = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+          };
+        in
+        {
+          tests = autoTests // (userPassthru.tests or { });
+        }
+        // removeAttrs userPassthru [ "tests" ];
 
       meta = meta // {
         badPlatforms = meta.badPlatforms or [ ] ++ rustc.badTargetPlatforms;
