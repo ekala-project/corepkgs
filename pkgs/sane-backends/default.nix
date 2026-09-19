@@ -56,6 +56,15 @@ stdenv.mkDerivation (finalAttrs: {
       hash = "sha256-9KKTr7p1vCgvGr6hFY83K5gbL7Ilm4Uzc86JIxv+ahI=";
       revert = true;
     })
+    # Fix build with C23 compilers where false/true are keywords
+    (fetchpatch {
+      url = "https://gitlab.com/sane-project/backends/-/commit/90815a9f2576c2428287a500cab6caeddb80f9a8.patch";
+      hash = "sha256-RwFkjPMGFvk7jXMaEHv/B+mjkAIbMDJma5dJpn/FXqY=";
+    })
+    (fetchpatch {
+      url = "https://gitlab.com/sane-project/backends/-/commit/c9bf95744ae3c32c31202dea3327064c0d121444.patch";
+      hash = "sha256-8/dOHp8uOnYHy00jxlMaAHO5oGrljWcVaqmSJMO1uRw=";
+    })
   ];
 
   postPatch = ''
