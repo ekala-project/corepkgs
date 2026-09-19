@@ -33,6 +33,19 @@ buildPythonPackage (finalAttrs: {
     "test_installed_ctor_w_dist_info"
     "test_installed_ctor_w_name"
     "test_installed_ctor_w_package"
+    # tests referencing fixture wheel/sdist archives in docs/examples/
+    "test_wheel"
+    "test_get_metadata_w_wheel"
+    "test_sdist"
+  ];
+
+  # Most tests require fixture archives from docs/examples/ not present in PyPI sdist
+  disabledTestPaths = [
+    "pkginfo/tests/test_sdist.py"
+    "pkginfo/tests/test_wheel.py"
+    "pkginfo/tests/test_utils.py"
+    "pkginfo/tests/test_bdist.py"
+    "pkginfo/tests/test_develop.py"
   ];
 
   pythonImportsCheck = [ "pkginfo" ];
