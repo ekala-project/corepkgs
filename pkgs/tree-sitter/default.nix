@@ -34,7 +34,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   ];
 
   # Tests require grammar fixtures not included in the source
-  doCheck = false;
+  dontCargoCheck = true;
 
   patches = [
     ./remove-web-interface.patch
