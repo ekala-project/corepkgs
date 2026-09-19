@@ -15,6 +15,11 @@
   glib,
   python3,
   docutils,
+  gobject-introspection,
+  withIntrospection ?
+    lib.meta.availableOn stdenv.hostPlatform gobject-introspection
+    && stdenv.hostPlatform.emulatorAvailable buildPackages,
+  buildPackages,
   x11Support ? !stdenv.hostPlatform.isDarwin,
   libxft,
   testers,
@@ -50,6 +55,9 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
     python3
     docutils
+  ]
+  ++ lib.optionals withIntrospection [
+    gobject-introspection
   ];
 
   buildInputs = [
@@ -73,7 +81,7 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   mesonFeatures = {
-    introspection = false;
+    introspection = withIntrospection;
     xft = x11Support;
   };
 
