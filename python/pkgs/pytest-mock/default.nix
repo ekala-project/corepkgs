@@ -35,6 +35,12 @@ buildPythonPackage (finalAttrs: {
 
   testPaths = [ "tests" ];
 
+  disabledTests = [
+    # pytest internals changed; _pytest.assertion.util API mismatch
+    "test_assert_called_kwargs_with_introspection"
+    "test_assert_called_args_with_introspection"
+  ];
+
   pythonImportsCheck = [ "pytest_mock" ];
 
   meta = {
