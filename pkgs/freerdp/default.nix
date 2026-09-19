@@ -163,6 +163,7 @@ stdenv.mkDerivation (finalAttrs: {
     WITH_MANPAGES = withManPages;
     WITH_PCSC = pcsclite != null;
     WITH_PULSE = libpulseaudio != null;
+    WITH_CLIENT_SDL3 = false; # requires sdl3-ttf which is not yet available
     WITH_SERVER = buildServer;
     WITH_WEBVIEW = false; # avoid introducing webkit2gtk-4.0
     WITH_VAAPI = false; # false is recommended by upstream
