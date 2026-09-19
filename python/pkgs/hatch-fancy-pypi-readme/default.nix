@@ -47,11 +47,13 @@ buildPythonPackage (finalAttrs: {
     "README.md"
   ];
 
-  # Requires network connection
   disabledTests = [
-    "test_build" # Requires internet
+    "test_build" # requires internet
     "test_invalid_config"
   ];
+
+  # CLI end-to-end tests need pyproject.toml at source root
+  disabledTestPaths = [ "tests/test_cli.py" ];
 
   pythonImportsCheck = [ "hatch_fancy_pypi_readme" ];
 
