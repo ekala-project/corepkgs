@@ -33,6 +33,9 @@ final: prev: with final; {
         inherit (stdenv) hostPlatform;
       };
 
+  # mkEkaPackage (nushell builder) test variant of jq
+  jq_nu = callPackage ./pkgs/jq/nushell.nix { };
+
   nix-update-script = callPackage ./pkgs/nix-update-script { };
   nixos = null;
 
