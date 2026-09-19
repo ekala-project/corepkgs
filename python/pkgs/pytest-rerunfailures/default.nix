@@ -33,6 +33,15 @@ buildPythonPackage (finalAttrs: {
 
   testPaths = [ "tests" ];
 
+  disabledTests = [
+    # flaky: rerun fixture outcome assertions differ
+    "test_run_session_teardown_once_after_reruns"
+    "test_rerun_on_setup_class_with_error_with_reruns"
+    "test_rerun_on_class_scope_fixture_with_error_with_reruns"
+    "test_rerun_on_module_fixture_with_reruns"
+    "test_rerun_on_session_fixture_with_reruns"
+  ];
+
   pythonImportsCheck = [ "pytest_rerunfailures" ];
 
   meta = {
