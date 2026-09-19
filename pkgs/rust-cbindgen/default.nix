@@ -2,6 +2,7 @@
   lib,
   fetchFromGitHub,
   rustPlatform,
+  cmake,
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -17,8 +18,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   cargoHash = "sha256-f6YoDoiVoh0BVPYHFO1FsdI4OCsF+LY72QaD57StdIQ=";
 
-  # Tests require cython and rust nightly features
-  doCheck = false;
+  # Tests require nightly rustc (-Zunpretty=expanded) and cython
+  dontCargoCheck = true;
 
   meta = {
     description = "Tool for generating C bindings to Rust code";
