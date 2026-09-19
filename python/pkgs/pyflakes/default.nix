@@ -25,7 +25,15 @@ buildPythonPackage (finalAttrs: {
 
   testPaths = [ "pyflakes/test" ];
 
-  disabledTests = lib.optionals isPyPy [
+  disabledTests = [
+    # paths in error messages differ in sandbox
+    "test_readFromStdin"
+    "test_errors_io"
+    "test_errors_syntax"
+    "test_fileWithFlakes"
+    "test_goodFile"
+  ]
+  ++ lib.optionals isPyPy [
     # https://github.com/PyCQA/pyflakes/issues/779
     "test_eofSyntaxError"
     "test_misencodedFileUTF16"
