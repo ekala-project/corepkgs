@@ -32,7 +32,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     libiconv
   ];
 
-  doCheck = false;
+  # Tests require rustfmt +stable toolchain and real Rust sysroot
+  dontCargoCheck = true;
 
   env.CFG_RELEASE = finalAttrs.version;
 
