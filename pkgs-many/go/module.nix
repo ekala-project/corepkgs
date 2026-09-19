@@ -367,7 +367,7 @@ lib.extendMkDerivation {
           ''
         );
 
-      doCheck = args.doCheck or (!buildTestBinaries);
+      doCheck = args.doCheck or false;
       checkPhase =
         args.checkPhase or ''
           runHook preCheck
@@ -395,14 +395,26 @@ lib.extendMkDerivation {
       inherit allowGoReference;
       disallowedReferences = lib.optional (!finalAttrs.allowGoReference) go;
 
-      passthru = {
-        inherit go;
-        # Canonicallize `overrideModAttrs` as an attribute overlay.
-        # `passthru.overrideModAttrs` will be overridden
-        # when users want to override `goModules`.
-        overrideModAttrs = lib.toExtension overrideModAttrs;
-      }
-      // passthru;
+      passthru =
+        let
+          autoTests = {
+            # Re-run the build with tests enabled; allow Go references since
+            # test binaries may embed the Go compiler path
+            build = finalAttrs.finalPackage.overrideAttrs {
+              doCheck = true;
+              allowGoReference = true;
+            };
+          };
+        in
+        {
+          inherit go;
+          # Canonicallize `overrideModAttrs` as an attribute overlay.
+          # `passthru.overrideModAttrs` will be overridden
+          # when users want to override `goModules`.
+          overrideModAttrs = lib.toExtension overrideModAttrs;
+          tests = autoTests // (passthru.tests or { });
+        }
+        // removeAttrs passthru [ "tests" ];
 
       meta = {
         # Add default meta information.
