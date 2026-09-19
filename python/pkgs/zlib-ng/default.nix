@@ -53,6 +53,12 @@ buildPythonPackage (finalAttrs: {
     rm -rf src
   '';
 
+  # tests/data/README.rst is a relative symlink to ../../README.rst which
+  # breaks in the test_src output where the directory layout differs.
+  postFixup = ''
+    find "$test_src" -xtype l -delete
+  '';
+
   disabledTests = [
     # commandline tests fail to find the built module
     "test_compress_fast_best_are_exclusive"
