@@ -30,7 +30,7 @@ stdenv.mkDerivation (
       runHook postBuild
     '';
 
-    installFlags = if attrs.doCheck or true then [ ] else [ "--no-test-load" ];
+    installFlags = if attrs.doCheck or false then [ ] else [ "--no-test-load" ];
 
     rCommand = "R";
 
