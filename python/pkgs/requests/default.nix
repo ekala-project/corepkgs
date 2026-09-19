@@ -68,6 +68,8 @@ buildPythonPackage (finalAttrs: {
     "test_use_proxy_from_environment"
     "TestRequests"
     "TestTimeout"
+    # ZIP does not support timestamps before 1980
+    "test_zipped_paths_extracted"
   ]
   ++ lib.optionals (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64) [
     # Fatal Python error: Aborted
