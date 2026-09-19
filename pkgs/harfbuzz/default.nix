@@ -12,6 +12,11 @@
   withGraphite2 ? true,
   withIcu ? false,
   icu,
+  gobject-introspection,
+  withIntrospection ?
+    lib.meta.availableOn stdenv.hostPlatform gobject-introspection
+    && stdenv.hostPlatform.emulatorAvailable buildPackages,
+  buildPackages,
   testers,
 
   # for passthru.tests
@@ -46,7 +51,7 @@ stdenv.mkDerivation (finalAttrs: {
     coretext = false;
     graphite = withGraphite2;
     icu = withIcu;
-    introspection = false;
+    introspection = withIntrospection;
     docs = false;
     gpu = false;
     gpu_demo = false;
@@ -63,6 +68,9 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
     python3
     glib
+  ]
+  ++ lib.optionals withIntrospection [
+    gobject-introspection
   ];
 
   buildInputs = [
