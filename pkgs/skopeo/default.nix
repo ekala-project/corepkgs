@@ -61,8 +61,7 @@ buildGoModule rec {
     runHook postBuild
   '';
 
-  # Embeds paths from go
-  doCheck = false;
+  # Test binaries embed Go compiler paths; tests run via passthru.tests.build
 
   installPhase = ''
     runHook preInstall
