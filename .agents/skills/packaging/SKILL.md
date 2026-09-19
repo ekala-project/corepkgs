@@ -55,20 +55,61 @@ platforms = lib.platforms.all;      # All platforms
 
 ## Testing
 
-**Default:** `doCheck = false;` - Don't set explicitly.
+**Goal:** Keep builds as fast as possible by disabling in-build tests. Use `passthru.tests` to preserve test coverage without slowing every build.
 
-**Preferred pattern:**
+### Defaults
+
+`doCheck = false;` and `doInstallCheck = false;` are the defaults across all build systems (`stdenv.mkDerivation`, `buildPythonPackage`, `buildRustPackage`, `buildGoModule`, `buildPerlPackage`). Don't set them explicitly.
+
+### Auto-Generated `passthru.tests.build`
+
+`buildRustPackage` and `buildGoModule` automatically provide `passthru.tests.build` — a variant that re-runs the build with `doCheck = true`. User-supplied `passthru.tests` entries are merged alongside, not replaced.
+
+For `stdenv.mkDerivation` packages, add `passthru.tests` manually:
+
 ```nix
 passthru.tests = {
-  unittests = runUnitTests finalAttrs.finalPackage;
+  withChecks = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
 };
 ```
 
-**Enable tests only when essential:**
+### Python: `testPaths` (Preferred)
+
+Set `testPaths` to auto-generate `passthru.tests.python` and a `test_src` output:
+
 ```nix
-doCheck = true;
-checkInputs = [ pytest ];
+nativeCheckInputs = [ pytestCheckHook ];
+testPaths = [ "tests" ];
 ```
+
+The `test_src` output bundles the listed paths plus config files (`conftest.py`, `pyproject.toml`, etc.). A standalone test derivation runs the suite against the installed package.
+
+For suites that need extra files (helper modules, fixture data):
+```nix
+testPaths = [ "tests" "src/helpers" "README.rst" ];
+```
+
+Test configuration attributes are forwarded automatically:
+- `disabledTests`, `disabledTestPaths`, `enabledTestPaths`
+- `pytestFlags`, `pytestFlagsArray`, `unittestFlagsArray`
+- `preCheck`, `postCheck`, `preInstallCheck`, `postInstallCheck`
+
+### Python: Manual `tests.nix` (Fallback)
+
+When `testPaths` is not suitable (e.g., circular dependencies with pytest), create a separate `tests.nix`:
+
+```nix
+# default.nix
+passthru.tests = {
+  pytest = callPackage ./tests.nix { };
+};
+```
+
+### Acceptable In-Build Checks
+
+`doInstallCheck = true;` is acceptable for:
+- `versionCheckHook` — verifies the built binary runs and prints expected version
+- `pythonImportsCheck` — runs automatically in `buildPythonPackage`, no need to enable explicitly
 
 ## Dependencies
 

@@ -110,9 +110,32 @@ for migration patterns (array iteration, `env` attrset, `substituteAll`, etc.).
 
 ### Testing
 
-- `doCheck = false;` is the default - don't set it explicitly
-- Prefer `passthru.tests` for unit tests
-- Only enable `doCheck = true;` for critical packages
+**Goal:** Keep builds as fast as possible. Tests run in `passthru.tests`, not during the main build.
+
+**Rules:**
+- `doCheck = false;` and `doInstallCheck = false;` are the defaults across all build systems — don't set them explicitly
+- Move test suites to `passthru.tests` so they can be built on demand without slowing every build
+- Very minimal test suites may be permitted in-build, but the strong default is tests off
+- `doInstallCheck = true;` is acceptable for lightweight checks (e.g., `versionCheckHook`)
+
+**Auto-generated tests:** `buildRustPackage` and `buildGoModule` automatically provide `passthru.tests.build` — a variant that re-runs the build with `doCheck = true`. User-supplied `passthru.tests` entries are merged alongside, not replaced.
+
+**Additional `passthru.tests` (optional):**
+```nix
+passthru.tests.version = testers.testVersion {
+  package = finalAttrs.finalPackage;
+};
+```
+
+**Python — use `testPaths` (preferred):**
+```nix
+nativeCheckInputs = [ pytestCheckHook ];
+testPaths = [ "tests" ];
+```
+
+This auto-generates `passthru.tests.python` and a `test_src` output. Test configuration attributes (`disabledTests`, `pytestFlags`, etc.) are forwarded automatically. For suites needing extra files: `testPaths = [ "tests" "src/helpers" "README.rst" ];`.
+
+When `testPaths` is not suitable (e.g., circular dependencies with pytest), create a separate `tests.nix` referenced via `passthru.tests`.
 
 **Detailed guide:** See [`.agents/skills/packaging/SKILL.md`](.agents/skills/packaging/SKILL.md#testing) for testing patterns.
 
