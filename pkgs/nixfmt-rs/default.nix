@@ -2,6 +2,7 @@
   lib,
   rustPlatform,
   fetchFromGitHub,
+  git,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -17,7 +18,7 @@ rustPlatform.buildRustPackage rec {
 
   cargoHash = "sha256-LVn9QxJU2r6urD6MA7Z52ajXcgE2Q6dmjirgA/jBKUw=";
 
-  doCheck = false;
+  nativeCheckInputs = [ git ];
 
   meta = with lib; {
     description = "A from-scratch Rust reimplementation of nixfmt that produces byte-identical output to the Haskell original.";
