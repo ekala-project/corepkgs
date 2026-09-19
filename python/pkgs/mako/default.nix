@@ -51,7 +51,13 @@ buildPythonPackage (finalAttrs: {
 
   testPaths = [ "test" ];
 
-  disabledTests = lib.optionals isPyPy [
+  disabledTests = [
+    # HTML rendering output differs across pygments/markupsafe versions
+    "test_custom_tback"
+    "test_py_utf8_html_error_template"
+    "test_utf8_format_exceptions_pygments"
+  ]
+  ++ lib.optionals isPyPy [
     # https://github.com/sqlalchemy/mako/issues/315
     "test_alternating_file_names"
     # https://github.com/sqlalchemy/mako/issues/238
