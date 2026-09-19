@@ -40,8 +40,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "uv"
   ];
 
-  # Tests require python3
-  doCheck = false;
+  # Tests require python3, network access, and keyring
+  dontCargoCheck = true;
 
   postInstall = lib.optionalString (stdenv.hostPlatform.emulatorAvailable buildPackages) (
     let
