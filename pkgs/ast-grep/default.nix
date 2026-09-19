@@ -32,9 +32,17 @@ rustPlatform.buildRustPackage (finalAttrs: {
   nativeBuildInputs = [ installShellFiles ];
 
   cargoBuildFlags = [
-    "--package ast-grep --bin ast-grep"
+    "--package"
+    "ast-grep"
+    "--bin"
+    "ast-grep"
   ]
-  ++ lib.optionals enableLegacySg [ "--package ast-grep --bin sg" ];
+  ++ lib.optionals enableLegacySg [
+    "--package"
+    "ast-grep"
+    "--bin"
+    "sg"
+  ];
 
   postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
     installShellCompletion --cmd ast-grep \
