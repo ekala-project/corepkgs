@@ -27,8 +27,16 @@ rustPlatform.buildRustPackage rec {
     libiconv
   ];
 
-  # Requires network access, fails in sandbox.
-  doCheck = false;
+  cargoTestFlags = [ "--lib" ];
+
+  checkFlags = [
+    # these tests require pyo3 crate not included in vendored deps
+    "--skip=build_options::tests::"
+    # these tests require files not included in the source
+    "--skip=metadata::tests::test_implicit_readme"
+    "--skip=metadata::tests::test_merge_metadata_from_pyproject_toml"
+    "--skip=metadata::tests::test_pep639"
+  ];
 
   passthru = {
     tests = {
