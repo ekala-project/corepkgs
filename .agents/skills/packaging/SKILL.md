@@ -1,9 +1,40 @@
 ---
 name: packaging
-description: corepkgs packaging conventions. Use when writing or reviewing any pkgs/<name>/default.nix — covers the finalAttrs pattern, meta attributes, where each kind of dependency belongs, fetchers, patching, install phases, multiple outputs, and passthru.
+description: corepkgs packaging conventions. Use when writing or reviewing any pkgs/<name>/default.nix — covers package organization (auto-registration, top-level.nix, alternative implementations), the finalAttrs pattern, meta attributes, where each kind of dependency belongs, fetchers, patching, install phases, multiple outputs, and passthru.
 ---
 
 # Packaging Conventions
+
+## Package Organization
+
+Packages in `pkgs/` and `pkgs-many/` are automatically added to the `pkgs.*` scope based on their directory name. No explicit entry in `top-level.nix` is needed.
+
+**When to add an explicit `top-level.nix` entry:**
+- Only when inputs deviate from those declared in the nix expression
+- Or when overriding default arguments / providing additional configuration
+
+```nix
+# top-level.nix — only if inputs deviate
+libxslt = callPackage ./pkgs/libxslt {
+  pythonSupport = false;
+  cryptoSupport = true;
+};
+```
+
+### Alternative Implementations
+
+Keep alternative implementations in the same package directory using multiple files:
+`default.nix` (short selector), `generic.nix` (usual implementation), `darwin.nix` (Apple's implementation).
+
+Keep selection logic inside the package folder using ordinary `if` expressions and `callPackage`, forwarding explicit overrides. Avoid separate `apple-<package>` entries.
+
+Expose `libpcap.apple` when callers need to choose an implementation. Preserve `.override` and `.overrideAttrs` on each implementation. For `pkgs-many/` families, dispatch to separate implementation files from `generic.nix`. Use short variant names (`real`, `darwin`, `v3_3`); don't repeat the package name in package-local aliases.
+
+### Rules
+
+- **Never set `meta.maintainers` or `meta.teams`** — neither is a recognised `meta` key; setting one fails `check-meta`. Simply omit them.
+- **`__structuredAttrs = true` is the default** — never set it explicitly. If phases break, fix them instead of disabling. See [structured-attrs](../structured-attrs/SKILL.md).
+- **`doCheck = false` and `doInstallCheck = false` are defaults** — don't set them explicitly. Use `passthru.tests` for test coverage.
 
 ## Package Structure
 
