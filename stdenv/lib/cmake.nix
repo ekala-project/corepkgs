@@ -92,7 +92,7 @@ let
       ...
     }:
     # Skip canonicalization for non-cmake builds; avoids per-derivation overhead during evaluation.
-    if !isCross && !(attrs ? cmakeEntries) then
+    if !(attrs ? cmakeEntries) then
       { }
     else
       let
