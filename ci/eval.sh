@@ -13,7 +13,7 @@ trap 'rm -f "$stderr"' EXIT
 # Real failures are `abort`s, missing attributes and type errors, none of which
 # `tryEval` can catch -- so they surface here as a non-zero exit with Nix's own
 # message, which names the offending expression and its source location.
-if ! result="$(nix-instantiate --eval --strict --json ci/eval.nix 2>"$stderr")"; then
+if ! result="$(nix-instantiate --eval --strict --json ci/eval.nix --option allow-import-from-derivation false 2>"$stderr")"; then
   cat "$stderr" >&2
   exit 1
 fi
