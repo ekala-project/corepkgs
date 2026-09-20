@@ -57,18 +57,22 @@ let
 
   # Canonicalize user mesonEntries values (bools -> "true"/"false", others -> toString).
   makeMesonEntries =
-    {
+    attrs@{
       mesonEntries ? { },
       mesonFeatures ? { },
       ...
     }:
-    let
-      canonicalize =
-        _: v: if builtins.isBool v then (if v then "true" else "false") else builtins.toString v;
-      canonicalizeFeature =
-        _: v: if builtins.isBool v then (if v then "enabled" else "disabled") else builtins.toString v;
-    in
-    mapAttrs canonicalize mesonEntries // mapAttrs canonicalizeFeature mesonFeatures;
+    # Skip canonicalization for non-meson builds; avoids per-derivation overhead during evaluation.
+    if !(attrs ? mesonEntries) && !(attrs ? mesonFeatures) then
+      { }
+    else
+      let
+        canonicalize =
+          _: v: if builtins.isBool v then (if v then "true" else "false") else builtins.toString v;
+        canonicalizeFeature =
+          _: v: if builtins.isBool v then (if v then "enabled" else "disabled") else builtins.toString v;
+      in
+      mapAttrs canonicalize mesonEntries // mapAttrs canonicalizeFeature mesonFeatures;
 
 in
 {

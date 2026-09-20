@@ -87,14 +87,18 @@ let
   # Canonicalize user cmakeEntries values (bools -> "ON"/"OFF", others -> toString)
   # and merge with cross-compilation entries (user values take precedence).
   makeCMakeEntries =
-    {
+    attrs@{
       cmakeEntries ? { },
       ...
     }:
-    let
-      canonicalize = _: v: if builtins.isBool v then (if v then "ON" else "OFF") else builtins.toString v;
-    in
-    cmakeEntries' // (mapAttrs canonicalize cmakeEntries);
+    # Skip canonicalization for non-cmake builds; avoids per-derivation overhead during evaluation.
+    if !isCross && !(attrs ? cmakeEntries) then
+      { }
+    else
+      let
+        canonicalize = _: v: if builtins.isBool v then (if v then "ON" else "OFF") else builtins.toString v;
+      in
+      cmakeEntries' // (mapAttrs canonicalize cmakeEntries);
 
 in
 {
