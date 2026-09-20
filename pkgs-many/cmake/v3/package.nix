@@ -205,6 +205,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = mkVariantPassthru variantArgs // {
     configurePhaseHook = ../configure-phase-hook.sh;
+    nushellHook = ../nushell-hook.nu;
     updateScript = gitUpdater {
       url = "https://gitlab.kitware.com/cmake/cmake.git";
       rev-prefix = "v";
