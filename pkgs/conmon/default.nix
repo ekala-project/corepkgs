@@ -19,13 +19,7 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "containers";
     repo = "conmon";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-YkPgpT+0cE7FCP/dcqnTy6oonPbXKiutFCGX5Lj1JB8=";
-    leaveDotGit = true;
-    postFetch = ''
-      cd $out
-      git rev-parse HEAD > COMMIT
-      rm -rf .git
-    '';
+    hash = "sha256-NIbH/fiz/m2W7aGt2On7E6zkWFa5IKzrPROuCAYwNFk=";
   };
 
   nativeBuildInputs = [ pkg-config ];
@@ -42,7 +36,7 @@ stdenv.mkDerivation (finalAttrs: {
   # manpage requires building the vendored go-md2man
   makeFlags = [
     "bin/conmon"
-    "GIT_COMMIT=${lib.trim (builtins.readFile "${finalAttrs.src}/COMMIT")}"
+    "GIT_COMMIT=${finalAttrs.src.rev}"
   ];
 
   installPhase = ''
