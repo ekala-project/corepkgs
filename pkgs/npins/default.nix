@@ -16,11 +16,11 @@
   # when --hash is passed without --builder (corepkgs#211). Only that second
   # half goes away if #211 is fixed; the direct calls do not.
   nix,
-  nix-prefetch-git,
-  nix-prefetch-docker,
   # Spawned directly for container pins (libnpins/src/nix.rs:204). nixpkgs'
   # expression omits it and is latently broken for `npins add container`.
   skopeo,
+  nix-prefetch-git,
+  nix-prefetch-docker,
   git, # for `git ls-remote`
 }:
 
@@ -32,6 +32,11 @@ let
     skopeo
     git
   ];
+
+  # npins-completions is a build-time helper, not a shipped binary: it is only
+  # useful on a host that can execute the npins it just built, so it is neither
+  # built nor invoked when cross-compiling.
+  canRunCompletions = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
 in
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "npins";
@@ -49,6 +54,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
   cargoBuildFlags = [
     "-p"
     "npins"
+  ]
+  ++ lib.optionals canRunCompletions [
     "-p"
     "npins-completions"
   ];
@@ -58,26 +65,26 @@ rustPlatform.buildRustPackage (finalAttrs: {
     installShellFiles
   ];
 
+  # Generating completions and discarding the helper that generates them are
+  # one guarded unit, so the removal cannot drift ahead of the use.
+  postInstall = lib.optionalString canRunCompletions ''
+    installShellCompletion --cmd npins \
+      --bash <($out/bin/npins-completions bash) \
+      --fish <(cat <($out/bin/npins-completions fish) $src/completions/pin-completions.fish) \
+      --zsh <($out/bin/npins-completions zsh)
+
+    rm -f $out/bin/npins-completions
+  '';
+
   # NOTE: openssh is deliberately absent from runtimePath. npins sets
   # GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=yes", which git resolves
   # through the shell and therefore through PATH, so ssh:// pins work anywhere
   # openssh is provided by the caller's environment (any standard system) and
   # fail loudly with "ssh: command not found" where it is not. Add openssh to
   # runtimePath only if hermetic ssh support becomes a requirement.
-  postFixup =
-    lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
-      installShellCompletion --cmd npins \
-        --bash <($out/bin/npins-completions bash) \
-        --fish <(cat <($out/bin/npins-completions fish) $src/completions/pin-completions.fish) \
-        --zsh <($out/bin/npins-completions zsh)
-    ''
-    + ''
-      # Generated above, but a build-time tool rather than a shipped binary —
-      # removed unconditionally so it does not survive into cross builds.
-      rm -f $out/bin/npins-completions
-
-      wrapProgram $out/bin/npins --prefix PATH : "${runtimePath}"
-    '';
+  postFixup = ''
+    wrapProgram $out/bin/npins --prefix PATH : "${runtimePath}"
+  '';
 
   passthru.tests.version = testers.testVersion { package = finalAttrs.finalPackage; };
   passthru.updateScript = nix-update-script { };
