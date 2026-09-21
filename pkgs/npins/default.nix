@@ -10,9 +10,16 @@
   nix-update-script,
 
   # runtime dependencies — npins shells out to all of these
+  # Spawned directly by npins itself, so required on every invocation
+  # (nix-prefetch-url libnpins/src/nix.rs:20, nix-instantiate :264). Also
+  # supplies the nix-hash/nix-store that nix-prefetch-git's own wrapper omits
+  # when --hash is passed without --builder (corepkgs#211). Only that second
+  # half goes away if #211 is fixed; the direct calls do not.
   nix,
   nix-prefetch-git,
   nix-prefetch-docker,
+  # Spawned directly for container pins (libnpins/src/nix.rs:204). nixpkgs'
+  # expression omits it and is latently broken for `npins add container`.
   skopeo,
   git, # for `git ls-remote`
 }:
