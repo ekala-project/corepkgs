@@ -472,7 +472,7 @@ final: prev: with final; {
   libglut = freeglut;
   libva-minimal = callPackage ./pkgs/libva { minimal = true; };
   mesa = callPackage ./pkgs/mesa { };
-  mesa_i686 = null; # TODO(corepkgs): needs pkgsi686Linux
+  mesa_i686 = pkgsi686Linux.mesa;
   libgbm = callPackage ./pkgs/mesa/gbm.nix { };
   mesa-gl-headers = callPackage ./pkgs/mesa/headers.nix { };
 
