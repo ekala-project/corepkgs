@@ -49,7 +49,7 @@
   xorgproto,
   zstd,
   enablePatentEncumberedCodecs ? true,
-  withValgrind ? lib.meta.availableOn stdenv.hostPlatform valgrind-light,
+  withValgrind ? valgrind-light != null && lib.meta.availableOn stdenv.hostPlatform valgrind-light,
 
   # We enable as many drivers as possible here, to build cross tools
   # and support emulation use cases (emulated x86_64 on aarch64, etc)
