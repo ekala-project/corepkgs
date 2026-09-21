@@ -16,15 +16,21 @@
   # when --hash is passed without --builder (corepkgs#211). Only that second
   # half goes away if #211 is fixed; the direct calls do not.
   nix,
+  nix-prefetch-git,
+  nix-prefetch-docker,
   # Spawned directly for container pins (libnpins/src/nix.rs:204). nixpkgs'
   # expression omits it and is latently broken for `npins add container`.
   skopeo,
-  nix-prefetch-git,
-  nix-prefetch-docker,
   git, # for `git ls-remote`
 }:
 
 let
+  # NOTE: openssh is deliberately absent from runtimePath. npins sets
+  # GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=yes", which git resolves
+  # through the shell and therefore through PATH, so ssh:// pins work anywhere
+  # openssh is provided by the caller's environment (any standard system) and
+  # fail loudly with "ssh: command not found" where it is not. Add openssh here
+  # only if hermetic ssh support becomes a requirement.
   runtimePath = lib.makeBinPath [
     nix
     nix-prefetch-git
@@ -76,12 +82,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     rm -f $out/bin/npins-completions
   '';
 
-  # NOTE: openssh is deliberately absent from runtimePath. npins sets
-  # GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=yes", which git resolves
-  # through the shell and therefore through PATH, so ssh:// pins work anywhere
-  # openssh is provided by the caller's environment (any standard system) and
-  # fail loudly with "ssh: command not found" where it is not. Add openssh to
-  # runtimePath only if hermetic ssh support becomes a requirement.
   postFixup = ''
     wrapProgram $out/bin/npins --prefix PATH : "${runtimePath}"
   '';
