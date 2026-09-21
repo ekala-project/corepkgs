@@ -79,6 +79,8 @@ final: prev: with final; {
   nodejs_latest = nodejs.v26;
   xcodebuild = xcbuild;
 
+  valgrind-light = valgrind.light;
+
   # Darwin packages use the ordinary package scope and shared package directories.
   bootstrapStdenv = stdenv.override (old: {
     extraBuildInputs = map (
