@@ -89,6 +89,23 @@ This file contains an attribute set where each attribute represents a version:
 - Use `rec` to allow self-referencing (e.g., `version` in `src-url`)
 - Common fields: `version`, `src-url`, `src-hash`
 - Version-specific fields: `configureFlags`, `patches`, `cmakeFlags`, etc.
+- **Variant inheritance:** Non-default variants inherit all attributes from the `default` variant (selected by `defaultSelector`). Variants only need to specify attributes that differ — there is no need to repeat `version`, `src-url`, `src-hash`, etc. when only changing build flags or feature toggles.
+
+**Feature-toggle variants** (same version, different build options):
+```nix
+{
+  default = {
+    version = "3.27.1";
+    src-hash = "sha256-XViRUuuAccAv6rjOarcZ5DGh+8PisXAPVDJjKouSZNw=";
+    withGdb = true;
+  };
+
+  # Inherits version and src-hash from default, only overrides withGdb.
+  light = {
+    withGdb = false;
+  };
+}
+```
 
 ### 3. `generic.nix` - Generic Builder with Conditional Logic
 
@@ -291,10 +308,11 @@ Use mkManyVariants when:
 - Package needs **multiple versions** available simultaneously
 - Different versions have **conditional dependencies** or build logic
 - Versions share **most of the build logic** but differ in specifics
+- Package needs **feature-toggle variants** of the same version (e.g., `valgrind` vs `valgrind.light`, `graphviz.withXorg` vs `graphviz.withoutXorg`)
 - Want to provide **variant composition** (access to other versions)
 
 Don't use for:
-- Single-version packages (use normal `pkgs/` structure)
+- Single-version packages with no feature variants (use normal `pkgs/` structure)
 - Completely different build processes per version (use separate packages)
 
 ## Creating a New mkManyVariants Package
