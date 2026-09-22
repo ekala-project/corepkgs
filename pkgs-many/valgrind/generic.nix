@@ -12,8 +12,7 @@
   fetchpatch,
   autoreconfHook,
   perl,
-  # TODO: gdb is not yet available in core-pkgs
-  gdb ? null,
+  gdb,
 }:
 
 stdenv.mkDerivation {
@@ -64,7 +63,7 @@ stdenv.mkDerivation {
 
   # GDB is needed to provide a sane default for `--db-command'.
   # Perl is needed for `callgrind_{annotate,control}'.
-  buildInputs = lib.optional (withGdb && gdb != null) gdb ++ [
+  buildInputs = lib.optional withGdb gdb ++ [
     perl
   ];
 
