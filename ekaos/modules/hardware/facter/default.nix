@@ -17,6 +17,7 @@
     ./disk.nix
     ./fingerprint.nix
     ./firmware.nix
+    ./firmware-split.nix
     ./fwupd.nix
     ./gaming.nix
     ./gpu.nix

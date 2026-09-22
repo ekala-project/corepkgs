@@ -175,6 +175,32 @@ let
         32
       ]
     ) (smbios.chassis or [ ]);
+
+  # Query if a facter report contains a network controller with the given PCI vendor ID
+  hasNetworkVendor =
+    vendorId:
+    {
+      hardware ? { },
+      ...
+    }:
+    builtins.any (
+      {
+        vendor ? { },
+        ...
+      }:
+      (vendor.value or 0) == vendorId
+    ) (hardware.network_controller or [ ]);
+
+  # Check if any entries in a hardware category have a specific driver module prefix
+  hasDriver =
+    category: driverPrefix:
+    {
+      hardware ? { },
+      ...
+    }:
+    builtins.any (entry: builtins.any (m: lib.hasPrefix driverPrefix m) (entry.driver_modules or [ ])) (
+      hardware.${category} or [ ]
+    );
 in
 {
   inherit
@@ -190,6 +216,8 @@ in
     hasPciDevice
     hasUsbVendor
     isConvertibleChassis
+    hasNetworkVendor
+    hasDriver
     ;
 
   hasAmdCpu = hasCpu "AuthenticAMD";
