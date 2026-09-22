@@ -291,6 +291,8 @@ mapAliases {
   wlroots_0_17 = wlroots.v0_17;
   wlroots_0_18 = wlroots.v0_18;
   wlroots_0_19 = wlroots.v0_19;
+  wrapGAppsHook3 = gtk3.wrapGAppsHook;
+  wrapGAppsHook4 = gtk4.wrapGAppsHook;
   wrapRustc = rustPackages.wrapRustc;
   wrapRustcWith = rustPackages.wrapRustcWith;
   xxHash = xxhash;
