@@ -501,11 +501,6 @@ final: prev: with final; {
   wrapGAppsNoGuiHook = callPackage ./pkgs/wrapGAppsNoGuiHook {
     makeWrapper = makeBinaryWrapper;
   };
-  wrapGAppsHook3 = wrapGAppsNoGuiHook.override { isGraphical = true; };
-  wrapGAppsHook4 = wrapGAppsNoGuiHook.override {
-    isGraphical = true;
-    gtk3 = gtk4;
-  };
 
   # Less secure variant of lowdown for use inside Nix builds.
   lowdown-unsandboxed = lowdown.override {
@@ -1285,12 +1280,15 @@ final: prev: with final; {
     }).overrideAttrs
       (oldAttrs: {
         passthru = (oldAttrs.passthru or { }) // {
-          wrapGAppsHook = wrapGAppsHook3;
+          wrapGAppsHook = wrapGAppsNoGuiHook.override { isGraphical = true; };
         };
       });
   gtk4 = (callPackage ./pkgs/gtk/4.x.nix { }).overrideAttrs (oldAttrs: {
     passthru = (oldAttrs.passthru or { }) // {
-      wrapGAppsHook = wrapGAppsHook4;
+      wrapGAppsHook = wrapGAppsNoGuiHook.override {
+        isGraphical = true;
+        gtk3 = gtk4;
+      };
     };
   });
 
