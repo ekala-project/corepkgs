@@ -19,7 +19,6 @@
   pygobject3,
   pyxdg,
   systemd,
-  wrapGAppsHook3,
 }:
 
 buildPythonApplication rec {
@@ -61,7 +60,7 @@ buildPythonApplication rec {
     meson.configurePhaseHook
     ninja
     pkg-config
-    wrapGAppsHook3
+    gtk3.wrapGAppsHook
 
     # Python packages
     dbus-python
