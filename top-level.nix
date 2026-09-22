@@ -428,7 +428,6 @@ final: prev: with final; {
   # TODO: proper freebsd port
   freebsd = { };
 
-  fts = if stdenv.hostPlatform.isMusl then musl-fts else null;
 
   inherit (callPackages ./pkgs/patchRcPathHooks { })
     patchRcPathBash
