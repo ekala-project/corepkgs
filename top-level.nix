@@ -1281,12 +1281,16 @@ final: prev: with final; {
       (oldAttrs: {
         passthru = (oldAttrs.passthru or { }) // {
           wrapGAppsHook = wrapGAppsNoGuiHook.override { isGraphical = true; };
+          wrapGAppsNoGuiHook = wrapGAppsNoGuiHook;
         };
       });
   gtk4 = (callPackage ./pkgs/gtk/4.x.nix { }).overrideAttrs (oldAttrs: {
     passthru = (oldAttrs.passthru or { }) // {
       wrapGAppsHook = wrapGAppsNoGuiHook.override {
         isGraphical = true;
+        gtk3 = gtk4;
+      };
+      wrapGAppsNoGuiHook = wrapGAppsNoGuiHook.override {
         gtk3 = gtk4;
       };
     };
