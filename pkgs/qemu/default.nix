@@ -54,7 +54,6 @@
   gtk3,
   gettext,
   vte ? null,
-  wrapGAppsHook3 ? null,
   vncSupport ? !nixosTestRunner && !minimal,
   libjpeg,
   libpng,
@@ -173,7 +172,7 @@ stdenv.mkDerivation (finalAttrs: {
     # `python/scripts/mkvenv.py` can detect `meson` otherwise the vendored meson without patches will be used.
     python3Packages.python
   ]
-  ++ lib.optionals gtkSupport [ wrapGAppsHook3 ]
+  ++ lib.optionals gtkSupport [ gtk3.wrapGAppsHook ]
   ++ lib.optionals enableDocs [
     python3Packages.sphinx
     python3Packages.sphinx-rtd-theme
