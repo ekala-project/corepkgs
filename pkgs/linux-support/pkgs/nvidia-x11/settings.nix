@@ -18,7 +18,6 @@ nvidia_x11: sha256:
   libvdpau ? null,
   librsvg ? null,
   libglvnd,
-  wrapGAppsHook3,
   addDriverRunpath,
   withGtk3 ? true,
 }:
@@ -136,7 +135,7 @@ stdenv.mkDerivation {
     m4
     addDriverRunpath
   ]
-  ++ lib.optionals withGtk3 [ wrapGAppsHook3 ];
+  ++ lib.optionals withGtk3 [ gtk3.wrapGAppsHook ];
 
   buildInputs = [
     jansson
