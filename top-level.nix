@@ -1277,12 +1277,22 @@ final: prev: with final; {
 
   glfw = glfw3;
 
-  gtk3 = callPackage ./pkgs/gtk/3.x.nix {
-    trackerSupport = false;
-    cupsSupport = false;
-    withIntrospection = false;
-  };
-  gtk4 = callPackage ./pkgs/gtk/4.x.nix { };
+  gtk3 =
+    (callPackage ./pkgs/gtk/3.x.nix {
+      trackerSupport = false;
+      cupsSupport = false;
+      withIntrospection = false;
+    }).overrideAttrs
+      (oldAttrs: {
+        passthru = (oldAttrs.passthru or { }) // {
+          wrapGAppsHook = wrapGAppsHook3;
+        };
+      });
+  gtk4 = (callPackage ./pkgs/gtk/4.x.nix { }).overrideAttrs (oldAttrs: {
+    passthru = (oldAttrs.passthru or { }) // {
+      wrapGAppsHook = wrapGAppsHook4;
+    };
+  });
 
   buildcatrust = with python3.pkgs; toPythonApplication buildcatrust;
 
