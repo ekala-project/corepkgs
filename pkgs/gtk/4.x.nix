@@ -185,7 +185,7 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ [
     # Required for GSettings schemas at runtime.
-    # Will be picked up by wrapGAppsHook4.
+    # Will be picked up by gtk4.wrapGAppsHook.
     gsettings-desktop-schemas
   ];
 
