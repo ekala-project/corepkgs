@@ -41,7 +41,7 @@
   stdenv,
   systemd,
   unixODBC,
-  wrapGAppsHook3 ? null,
+  gtk3 ? null,
   wxGTK32 ? null,
   libx11,
   zlib,
@@ -62,7 +62,7 @@ let
         libGLU
         wxGTK32
         libx11
-        wrapGAppsHook3
+        gtk3.wrapGAppsHook
       ];
 
   major = builtins.head (builtins.splitVersion version);
