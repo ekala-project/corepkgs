@@ -193,10 +193,14 @@ in
       hardware.enableRedistributableFirmware = true;
     })
 
-    # Auto-add linux-firmware when redistributable firmware is enabled
-    (mkIf (cfg.enableRedistributableFirmware && pkgs ? linux-firmware) {
-      hardware.firmware = [ pkgs.linux-firmware ];
-    })
+    # When redistributable firmware is enabled without facter, add the
+    # combined linux-firmware meta-package as a fallback.  When facter is
+    # active, firmware-split.nix selects only the needed sub-packages.
+    (mkIf (cfg.enableRedistributableFirmware && !config.hardware.facter.enable && pkgs ? linux-firmware)
+      {
+        hardware.firmware = [ pkgs.linux-firmware ];
+      }
+    )
 
     # KSM
     (mkIf cfg.ksm.enable {
