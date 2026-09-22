@@ -18,8 +18,6 @@
   openssh,
   systemd,
   gobject-introspection,
-  # TODO(corepkgs): wrapGAppsHook4 is not yet available
-  # wrapGAppsHook4,
   vala,
   gi-docgen,
   python3,
@@ -55,8 +53,7 @@ stdenv.mkDerivation (finalAttrs: {
     gettext
     gobject-introspection
     gi-docgen
-    # TODO(corepkgs): wrapGAppsHook4 is not yet available
-    # wrapGAppsHook4
+    gtk4.wrapGAppsHook
     vala
     shared-mime-info
   ];
