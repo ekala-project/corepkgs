@@ -10,27 +10,16 @@
   nix-update-script,
 
   # runtime dependencies — npins shells out to all of these
-  # Spawned directly by npins itself, so required on every invocation
-  # (nix-prefetch-url libnpins/src/nix.rs:20, nix-instantiate :264). Also
-  # supplies the nix-hash/nix-store that nix-prefetch-git's own wrapper omits
-  # when --hash is passed without --builder (corepkgs#211). Only that second
-  # half goes away if #211 is fixed; the direct calls do not.
-  nix,
+  nix, # direct calls (nix.rs:20,:264) and nix-prefetch-git's nix-hash (corepkgs#211)
   nix-prefetch-git,
   nix-prefetch-docker,
-  # Spawned directly for container pins (libnpins/src/nix.rs:204). nixpkgs'
-  # expression omits it and is latently broken for `npins add container`.
-  skopeo,
+  skopeo, # container pins; absent upstream, leaving `npins add container` broken
   git, # for `git ls-remote`
 }:
 
 let
-  # NOTE: openssh is deliberately absent from runtimePath. npins sets
-  # GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=yes", which git resolves
-  # through the shell and therefore through PATH, so ssh:// pins work anywhere
-  # openssh is provided by the caller's environment (any standard system) and
-  # fail loudly with "ssh: command not found" where it is not. Add openssh here
-  # only if hermetic ssh support becomes a requirement.
+  # openssh deliberately absent: npins sets GIT_SSH_COMMAND, so git resolves
+  # `ssh` via PATH and callers supply it.
   runtimePath = lib.makeBinPath [
     nix
     nix-prefetch-git
@@ -39,9 +28,7 @@ let
     git
   ];
 
-  # npins-completions is a build-time helper, not a shipped binary: it is only
-  # useful on a host that can execute the npins it just built, so it is neither
-  # built nor invoked when cross-compiling.
+  # npins-completions only runs on a host that can execute what it just built.
   canRunCompletions = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
 in
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -71,8 +58,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     installShellFiles
   ];
 
-  # Generating completions and discarding the helper that generates them are
-  # one guarded unit, so the removal cannot drift ahead of the use.
+  # built and removed together so the removal cannot drift ahead of the use
   postInstall = lib.optionalString canRunCompletions ''
     installShellCompletion --cmd npins \
       --bash <($out/bin/npins-completions bash) \
