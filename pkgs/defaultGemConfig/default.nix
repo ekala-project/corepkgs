@@ -98,7 +98,6 @@
   patchelf,
   binutils,
   freetds ? null,
-  wrapGAppsHook3 ? null,
   atk ? null,
   bundler,
   libsass ? null,
@@ -151,7 +150,7 @@ in
     ++ lib.optionals stdenv.hostPlatform.isDarwin [ DarwinTools ];
     propagatedBuildInputs = [
       gobject-introspection
-      wrapGAppsHook3
+      gtk3.wrapGAppsHook
       atk
     ];
   };
@@ -384,7 +383,7 @@ in
     ++ lib.optionals stdenv.hostPlatform.isDarwin [ DarwinTools ];
     propagatedBuildInputs = [
       gobject-introspection
-      wrapGAppsHook3
+      gtk3.wrapGAppsHook
       gdk-pixbuf
     ];
   };
@@ -398,7 +397,7 @@ in
     ++ lib.optionals stdenv.hostPlatform.isDarwin [ DarwinTools ];
     propagatedBuildInputs = [
       gobject-introspection
-      wrapGAppsHook3
+      gtk3.wrapGAppsHook
       gdk-pixbuf
       cairo
     ];
@@ -579,7 +578,7 @@ in
     nativeBuildInputs = [ pkg-config ] ++ lib.optionals stdenv.hostPlatform.isDarwin [ DarwinTools ];
     propagatedBuildInputs = [
       gobject-introspection
-      wrapGAppsHook3
+      gtk3.wrapGAppsHook
       glib
       pcre2
     ]
@@ -879,7 +878,7 @@ in
     ];
     propagatedBuildInputs = [
       gobject-introspection
-      wrapGAppsHook3
+      gtk3.wrapGAppsHook
     ];
   };
 
