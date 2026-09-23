@@ -33,7 +33,6 @@ final: prev: with final; {
         inherit (stdenv) hostPlatform;
       };
 
-  nix-update-script = callPackage ./pkgs/nix-update-script { };
   nixos = null;
 
   haskell = callPackage ./haskell { inherit config; };
@@ -57,8 +56,6 @@ final: prev: with final; {
   # Creates development environments with running services using ekaos modules
   mkDevShell = (callPackage ./dev-shell { }).mkDevShell;
 
-  # Default to gitMinimal to keep the fetcher's closure small; the `git`
-  # argument stays overridable for callers that need a different build.
   nix-prefetch-git = callPackage ./pkgs/nix-prefetch-git { git = gitMinimal; };
 
   freshBootstrapTools =
@@ -73,13 +70,7 @@ final: prev: with final; {
   # nv-codec-headers version aliases for ffmpeg
   nv-codec-headers-12 = nv-codec-headers.override { majorVersion = "12"; };
 
-  at-spi2-atk = at-spi2-core; # merged into at-spi2-core
-  atk = at-spi2-core; # merged into at-spi2-core
   mpi = null; # fftwMpi, boost
-  nodejs_latest = nodejs.v26;
-  xcodebuild = xcbuild;
-
-  valgrind-light = valgrind.light;
 
   # Darwin packages use the ordinary package scope and shared package directories.
   bootstrapStdenv = stdenv.override (old: {
@@ -438,15 +429,9 @@ final: prev: with final; {
   json-schema-for-humans = with python3Packages; toPythonApplication json-schema-for-humans;
 
   libGLU = mesa_glu;
-
-  # On macOS, the SDK provides the GLUT framework in `stdenv`. Packages
-  # that use `libGLX` on macOS may need to depend on `freeglut`
-  # directly if this doesn’t work.
   libdbusmenu-gtk3 = libdbusmenu.gtk3;
-
   libglut = freeglut;
   libva-minimal = callPackage ./pkgs/libva { minimal = true; };
-  mesa = callPackage ./pkgs/mesa { };
   mesa_i686 = pkgsi686Linux.mesa;
   libgbm = callPackage ./pkgs/mesa/gbm.nix { };
   mesa-gl-headers = callPackage ./pkgs/mesa/headers.nix { };
@@ -466,10 +451,7 @@ final: prev: with final; {
     };
   };
 
-  # TODO: Remove alias
   libjpeg = libjpeg_turbo;
-
-  xorriso = libisoburn;
 
   # Less secure variant of lowdown for use inside Nix builds.
   lowdown-unsandboxed = lowdown.override {
@@ -491,9 +473,6 @@ final: prev: with final; {
       null;
 
   po4a = perlPackages.Po4a;
-
-  pnpmConfigHook = callPackage ./pkgs/pnpmConfigHook { };
-  fetchPnpmDeps = callPackage ./pkgs/fetchPnpmDeps { };
 
   inherit (callPackages ./pkgs/fetchYarnDeps { })
     fetchYarnDeps
@@ -562,18 +541,9 @@ final: prev: with final; {
 
   buildGoModule = go.buildModule;
 
-  R = callPackage ./pkgs/R { };
-
   rPackages = callPackage ./r { inherit config; };
 
-  buildMavenPackage = java.buildMavenPackage;
-  buildGradlePackage = java.buildGradlePackage;
   buildNpmPackage = nodejs.buildNpmPackage;
-  buildNpmApplication = nodejs.buildNpmApplication;
-  buildPnpmApplication = nodejs.buildPnpmApplication;
-  buildYarnApplication = nodejs.buildYarnApplication;
-
-  gnome = callPackage ./pkgs/gnome { };
 
   gnuStdenv =
     if stdenv.cc.isGNU then
@@ -695,11 +665,9 @@ final: prev: with final; {
       });
 
   # gcc-releases is auto-imported from pkgs-many/gcc-releases/ via mkManyVariants
-  # Individual versions: gcc-releases.v13, gcc-releases.v14, gcc-releases.v15
   gcc13 = gcc-releases.v13;
   gcc14 = gcc-releases.v14;
   gcc15 = gcc-releases.v15;
-
   gcc_latest = gcc15;
 
   libgccjit = gcc.cc.override {
@@ -828,17 +796,13 @@ final: prev: with final; {
   bashFHS = callPackage ./pkgs/bash/5.nix {
     forFHSEnv = true;
   };
-  bashInteractiveFHS = bashFHS;
 
-  # Python interpreters. All standard library modules are included except for tkinter, which is
-  # available as `pythonPackages.tkinter` and can be used as any other Python package.
   python = python3;
   python2 = python27;
   python3 = python313;
 
-  # pythonPackages further below, but assigned here because they need to be in sync
-  python2Packages = lib.dontRecurseIntoAttrs python27Packages;
-  python3Packages = lib.dontRecurseIntoAttrs python313Packages;
+  python2Packages = lib.dontRecurseIntoAttrs python27.pkgs;
+  python3Packages = lib.dontRecurseIntoAttrs python313.pkgs;
 
   pypy = pypy2;
   pypy2 = pypy27;
@@ -890,19 +854,8 @@ final: prev: with final; {
     ;
 
   # Python package sets.
-  python27Packages = python27.pkgs;
-  python310Packages = python310.pkgs;
-  python311Packages = python311.pkgs;
   python312Packages = lib.recurseIntoAttrs python312.pkgs;
   python313Packages = lib.recurseIntoAttrs python313.pkgs;
-  python314Packages = python314.pkgs;
-  python315Packages = python315.pkgs;
-  pypyPackages = pypy.pkgs;
-  pypy2Packages = pypy2.pkgs;
-  pypy27Packages = pypy27.pkgs;
-  pypy3Packages = pypy3.pkgs;
-  pypy310Packages = pypy310.pkgs;
-  pypy311Packages = pypy311.pkgs;
 
   pythonManylinuxPackages = callPackage ./python/manylinux { };
 
@@ -947,8 +900,6 @@ final: prev: with final; {
           throw "mesonEmulatorHook may only be added to nativeBuildInputs when the target binaries can't be executed; however you are attempting to use it in a situation where ${stdenv.hostPlatform.config} can execute ${stdenv.targetPlatform.config}. Consider only adding mesonEmulatorHook according to a conditional based canExecute in your package expression."
       );
 
-  coreutils = callPackage ./pkgs/coreutils { };
-
   # The coreutils above is built with dependencies from
   # bootstrapping. We cannot override it here, because that pulls in
   # openssl from the previous stage as well.
@@ -974,7 +925,6 @@ final: prev: with final; {
     conf = ./pkgs-many/openssl/3.0/legacy.cnf;
   };
 
-  makeWrapper = makeShellWrapper;
   arrayUtilities =
     let
       arrayUtilitiesPackages = makeScopeWithSplicing' {
@@ -991,7 +941,7 @@ final: prev: with final; {
       };
     in
     lib.recurseIntoAttrs arrayUtilitiesPackages;
-  strip-nondeterminism = perlPackages.strip-nondeterminism;
+  makeWrapper = makeShellWrapper;
 
   readline70 = callPackage ./pkgs/readline/7.0.nix { };
   readline = callPackage ./pkgs/readline/8.3.nix { };
@@ -1008,10 +958,6 @@ final: prev: with final; {
   };
 
   perlPackages = perl.pkgs;
-
-  texinfo6 = texinfo.v6;
-  texinfo7 = texinfo.v7;
-  texinfoInteractive = texinfo.interactive;
 
   # On non-GNU systems we need GNU Gettext for libintl.
   libintl = if stdenv.hostPlatform.libc != "glibc" then gettext else null;
@@ -1072,8 +1018,6 @@ final: prev: with final; {
   };
   gawkextlib = callPackage ./pkgs/gawk/gawkextlib.nix { };
   gawkInteractive = gawk.override { interactive = true; };
-
-  tclPackages = tcl.pkgs;
 
   pam =
     if stdenv.hostPlatform.isLinux then
@@ -1160,7 +1104,6 @@ final: prev: with final; {
     docbook-xsl-ns # was docbook-xsl-ns
     ;
 
-  # Alias for compatibility
   docbook-xsl = docbook-xsl-nons;
 
   inherit (callPackage ./pkgs/libxml2 { })
@@ -1170,7 +1113,7 @@ final: prev: with final; {
 
   c-aresMinimal = callPackage ./pkgs/c-ares { withCMake = false; };
 
-  libkrb5 = krb5; # TODO(de11n) Try to make krb5 reuse libkrb5 as a dependency
+  libkrb5 = krb5;
 
   ngtcp2-gnutls = callPackage ./pkgs/ngtcp2/gnutls.nix { };
 
@@ -1221,8 +1164,6 @@ final: prev: with final; {
   deterministic-host-uname = deterministic-uname.override {
     forPlatform = stdenv.targetPlatform; # offset by 1 so it works in nativeBuildInputs
   };
-
-  glfw = glfw3;
 
   gtk3 =
     (callPackage ./pkgs/gtk/3.x.nix {
@@ -1301,8 +1242,6 @@ final: prev: with final; {
   # nix is auto-imported from pkgs-many/nix/ via mkManyVariants
   # nix defaults to v2_34 (stable). Variants: nix.v2_28, ..., nix.v2_35, nix.git
   # Access individual components via nixVersions.nixComponents_2_34.nix-store, etc.
-
-  nixStatic = pkgsStatic.nix;
 
   # Backwards-compatible nixVersions and nixComponents scopes for splicing.
   # The nixComponents_* attrs are constructed independently (not via nix.vX_Y.pkgs)
@@ -1503,10 +1442,7 @@ final: prev: with final; {
   # ValueError: ZIP does not support timestamps before 1980
   ensureNewerSourcesForZipFilesHook = ensureNewerSourcesHook { year = "1980"; };
 
-  libclang = llvmPackages.libclang;
-  clang-manpages = llvmPackages.clang-manpages;
   clang = llvmPackages.clang;
-  clang-tools = llvmPackages.clang-tools;
   clangStdenv = if stdenv.cc.isClang then stdenv else lib.lowPrio llvmPackages.stdenv;
   libcxxStdenv =
     if stdenv.hostPlatform.isDarwin then stdenv else lib.lowPrio llvmPackages.libcxxStdenv;
@@ -1591,14 +1527,6 @@ final: prev: with final; {
     else
       prev.llvm.git.pkgs;
 
-  # Common LLVM packages from the default version
-  lld = llvmPackages.lld;
-  lldb = llvmPackages.lldb;
-  flang = llvm.v20.pkgs.flang;
-  libclc = llvmPackages.libclc;
-  libllvm = llvmPackages.libllvm;
-  llvm-manpages = llvmPackages.llvm-manpages;
-
   # Lua is auto-imported from pkgs-many/lua via mkManyVariants
   # lua defaults to v5_4 (Lua 5.4.7) as the Lua interpreter
   # lua.pkgs provides the full Lua package scope (awesome-wm-widgets, etc.)
@@ -1606,9 +1534,8 @@ final: prev: with final; {
   # LuaJIT variants accessible as: lua.luajit_2_0, lua.luajit_2_1, lua.luajit_openresty
   # Package scopes accessible as: lua.v5_3.pkgs, lua.luajit_2_0.pkgs, etc.
 
+  lld = llvmPackages.lld;
   luaPackages = lua.pkgs;
-  luajitPackages = lua.luajit_2_1.pkgs;
-  luarocks = luaPackages.luarocks_bootstrap;
 
   poppler-utils = poppler.override {
     suffix = "utils";
@@ -1696,8 +1623,6 @@ final: prev: with final; {
   texlivePackages = lib.recurseIntoAttrs (lib.mapAttrs (_: v: v.build) texlive.pkgs);
 
   # Rust is auto-imported from pkgs-many/rust via mkManyVariants
-  # Individual versions: rust.v1_91, rust.v1_98, etc.
-  # Package scopes: rust.pkgs, rust.v1_91.pkgs, etc.
   rustPackages = rust.pkgs;
 
   inherit (rustPackages)
@@ -1745,7 +1670,6 @@ final: prev: with final; {
   buildPgrxExtension = callPackage ./pkgs/cargo-pgrx/buildPgrxExtension.nix { };
 
   rust-bindgen-unwrapped = callPackage ./pkgs/rust-bindgen/unwrapped.nix { };
-  rustup-toolchain-install-master = callPackage ./pkgs/rustup-toolchain-install-master { };
 
   mkNugetDeps = null; # TODO(corepkgs): implement NuGet dependency fetcher
   mkNugetSource = null; # TODO(corepkgs): implement NuGet source builder

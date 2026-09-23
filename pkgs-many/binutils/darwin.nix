@@ -5,7 +5,7 @@
   clang-unwrapped,
   ld64,
   llvm,
-  llvm-manpages,
+  llvmPackages,
   makeWrapper,
   enableManpages ? stdenvNoCC.targetPlatform == stdenvNoCC.hostPlatform,
 }:
@@ -81,7 +81,7 @@ stdenvNoCC.mkDerivation {
       if [ -e "$llvmPath/$llvmTool" ]; then
         ln -s "$llvmPath/$llvmTool" "$out/bin/${targetPrefix}$cctoolsTool"
       fi
-      ${linkManPages llvm-manpages "$llvmTool" "$cctoolsTool"}
+      ${linkManPages llvmPackages.llvm-manpages "$llvmTool" "$cctoolsTool"}
     done
 
     for tool in ${toString cctools_cmds}; do

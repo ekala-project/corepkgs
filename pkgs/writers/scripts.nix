@@ -1182,7 +1182,7 @@ rec {
       ])
       // {
         interpreter =
-          if pythonPackages != pkgs.pypy2Packages || pythonPackages != pkgs.pypy3Packages then
+          if pythonPackages != pkgs.pypy2.pkgs || pythonPackages != pkgs.pypy3.pkgs then
             if libraries == [ ] then
               python.interpreter
             else if (lib.isFunction libraries) then
@@ -1220,7 +1220,7 @@ rec {
 
     :::
   */
-  writePyPy2 = makePythonWriter pkgs.pypy2 pkgs.pypy2Packages buildPackages.pypy2Packages;
+  writePyPy2 = makePythonWriter pkgs.pypy2 pkgs.pypy2.pkgs buildPackages.pypy2.pkgs;
 
   /**
     writePyPy2Bin takes the same arguments as writePyPy2 but outputs a directory (like writeScriptBin)
@@ -1274,7 +1274,7 @@ rec {
 
     :::
   */
-  writePyPy3 = makePythonWriter pkgs.pypy3 pkgs.pypy3Packages buildPackages.pypy3Packages;
+  writePyPy3 = makePythonWriter pkgs.pypy3 pkgs.pypy3.pkgs buildPackages.pypy3.pkgs;
 
   /**
     writePyPy3Bin takes the same arguments as writePyPy3 but outputs a directory (like writeScriptBin)
