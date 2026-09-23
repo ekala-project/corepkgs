@@ -1243,163 +1243,61 @@ final: prev: with final; {
   # nix defaults to v2_34 (stable). Variants: nix.v2_28, ..., nix.v2_35, nix.git
   # Access individual components via nixVersions.nixComponents_2_34.nix-store, etc.
 
-  # Backwards-compatible nixVersions and nixComponents scopes for splicing.
-  # The nixComponents_* attrs are constructed independently (not via nix.vX_Y.pkgs)
-  # to avoid infinite recursion with the splice infrastructure.
+  # Backwards-compatible nixVersions scope. The nix_2_* aliases come from the
+  # mkManyVariants nix package; the nixComponents_* scopes are pulled from each
+  # variant's passthru.pkgs (the spliced component scope built in generic.nix).
   nixVersions =
     let
-      addTestsShallowly =
-        tests: pkg:
-        pkg
-        // {
-          tests = pkg.tests // tests;
-          passthru.tests = pkg.tests // tests;
-        };
       addFallbackPathsCheck =
         pkg:
-        addTestsShallowly {
-          nix-fallback-paths =
-            runCommand "test-nix-fallback-paths-version-equals-nix-stable"
-              {
-                paths = lib.concatStringsSep "\n" (
-                  builtins.attrValues (import ./nixos/modules/installer/tools/nix-fallback-paths.nix)
-                );
-              }
-              ''
-                if [[ "" != $(grep -vE 'nix-([^-]*-)*${
-                  lib.strings.replaceStrings [ "." ] [ "\\." ] pkg.version
-                }$' <<< "$paths") ]]; then
-                  echo "nix-fallback-paths not up to date with nixVersions.stable (nix-${pkg.version})"
-                  echo "The following paths are not up to date:"
-                  grep -v 'nix-${pkg.version}$' <<< "$paths"
-                  echo
-                  echo "Fix it by running:"
-                  echo
-                  echo "curl https://releases.nixos.org/nix/nix-${pkg.version}/fallback-paths.nix >nixos/modules/installer/tools/nix-fallback-paths.nix"
-                  echo
-                  exit 1
-                else
-                  echo "nix-fallback-paths versions up to date"
-                  touch $out
-                fi
-              '';
-        } pkg;
+        pkg
+        // {
+          tests = pkg.tests // {
+            nix-fallback-paths =
+              runCommand "test-nix-fallback-paths-version-equals-nix-stable"
+                {
+                  paths = lib.concatStringsSep "\n" (
+                    builtins.attrValues (import ./nixos/modules/installer/tools/nix-fallback-paths.nix)
+                  );
+                }
+                ''
+                  if [[ "" != $(grep -vE 'nix-([^-]*-)*${
+                    lib.strings.replaceStrings [ "." ] [ "\\." ] pkg.version
+                  }$' <<< "$paths") ]]; then
+                    echo "nix-fallback-paths not up to date with nixVersions.stable (nix-${pkg.version})"
+                    echo "The following paths are not up to date:"
+                    grep -v 'nix-${pkg.version}$' <<< "$paths"
+                    echo
+                    echo "Fix it by running:"
+                    echo
+                    echo "curl https://releases.nixos.org/nix/nix-${pkg.version}/fallback-paths.nix >nixos/modules/installer/tools/nix-fallback-paths.nix"
+                    echo
+                    exit 1
+                  else
+                    echo "nix-fallback-paths versions up to date"
+                    touch $out
+                  fi
+                '';
+          };
+        };
 
-      # Nix >= 2.33 requires boost >= 1.87
-      nixDependencies187 = nixDependencies.overrideScope (
-        final: prev: {
-          boost = pkgs.boost.v1_87;
-        }
+      # Collect nixComponents scopes from each modular variant's passthru.pkgs.
+      # v2_28 is monolithic (no component scope), so it's excluded.
+      modularVariants = lib.filterAttrs (name: _: lib.hasPrefix "v2_" name && name != "v2_28") (
+        import ./pkgs-many/nix/variants.nix
       );
 
-      # Independently construct nixComponents scopes for splicing.
-      # These must NOT go through nix.vX_Y.pkgs to avoid splice cycles.
-      mkNixComponents =
-        {
-          version,
-          src,
-          deps,
-          attrName,
-        }:
-        deps.callPackage ./pkgs-many/nix/modular/packages.nix {
-          inherit version src;
-          nixDependencies = deps;
-          otherSplices = generateSplicesForMkScope [
-            "nixVersions"
-            attrName
-          ];
+      nixComponentsFromVariants =
+        lib.mapAttrs' (
+          name: _:
+          let
+            componentsName = "nixComponents_${lib.removePrefix "v" name}";
+          in
+          lib.nameValuePair componentsName nix.${name}.pkgs
+        ) modularVariants
+        // {
+          nixComponents_git = nix.git.pkgs;
         };
-
-      nixComponentsArgs = {
-        nixComponents_2_29 = {
-          version = "2.29.4";
-          src = fetchFromGitHub {
-            owner = "NixOS";
-            repo = "nix";
-            tag = "2.29.4";
-            hash = "sha256-eVELGOeQg37AZLu7xnsaW9VA4fBr3x1d97I0iAoIt8A=";
-          };
-          deps = nixDependencies;
-          attrName = "nixComponents_2_29";
-        };
-        nixComponents_2_30 = {
-          version = "2.30.5";
-          src = fetchFromGitHub {
-            owner = "NixOS";
-            repo = "nix";
-            tag = "2.30.5";
-            hash = "sha256-tGiV71RxtCNcUNX86ZwmOIghG4pLwm5nlRKd89er7Gk=";
-          };
-          deps = nixDependencies;
-          attrName = "nixComponents_2_30";
-        };
-        nixComponents_2_31 = {
-          version = "2.31.5";
-          src = fetchFromGitHub {
-            owner = "NixOS";
-            repo = "nix";
-            tag = "2.31.5";
-            hash = "sha256-b7fhCXxl9qKTNPQvG8T/+nOxB95kalt9/aSY+ZSRctk=";
-          };
-          deps = nixDependencies;
-          attrName = "nixComponents_2_31";
-        };
-        nixComponents_2_32 = {
-          version = "2.32.8";
-          src = fetchFromGitHub {
-            owner = "NixOS";
-            repo = "nix";
-            tag = "2.32.8";
-            hash = "sha256-vj5o3dP9QaiW025a5INgg9j9XwScFsCYr6WrBxqSvUk=";
-          };
-          deps = nixDependencies;
-          attrName = "nixComponents_2_32";
-        };
-        nixComponents_2_33 = {
-          version = "2.33.6";
-          src = fetchFromGitHub {
-            owner = "NixOS";
-            repo = "nix";
-            tag = "2.33.6";
-            hash = "sha256-I3A0vFSFg3iI8tGBuQlAy7DzcxYcG39b06rfKOzGRvc=";
-          };
-          deps = nixDependencies187;
-          attrName = "nixComponents_2_33";
-        };
-        nixComponents_2_34 = {
-          version = "2.34.8";
-          src = fetchFromGitHub {
-            owner = "NixOS";
-            repo = "nix";
-            tag = "2.34.8";
-            hash = "sha256-Rvy1PmIUMGI0IS/kwDwmf/VrorU8v1iZYejssSVu1rY=";
-          };
-          deps = nixDependencies187;
-          attrName = "nixComponents_2_34";
-        };
-        nixComponents_2_35 = {
-          version = "2.35.2";
-          src = fetchFromGitHub {
-            owner = "NixOS";
-            repo = "nix";
-            tag = "2.35.2";
-            hash = "sha256-C/YEm/5IPiAMxQH5aHlkwgQMkLqK7NVsudEWdlzBZAA=";
-          };
-          deps = nixDependencies187;
-          attrName = "nixComponents_2_35";
-        };
-        nixComponents_git = {
-          version = "2.36pre20260825_3aef07e8";
-          src = fetchFromGitHub {
-            owner = "NixOS";
-            repo = "nix";
-            rev = "3aef07e8fe2dc4b226515ecd536b3002c93577c7";
-            hash = "sha256-78tbhNekla4TxDb1FEzt6kPybcoueszGFpjqC1CuLBU=";
-          };
-          deps = nixDependencies187;
-          attrName = "nixComponents_git";
-        };
-      };
     in
     lib.recurseIntoAttrs (
       {
@@ -1415,7 +1313,7 @@ final: prev: with final; {
         latest = nix.v2_35;
         stable = addFallbackPathsCheck nix;
       }
-      // builtins.mapAttrs (_name: args: mkNixComponents args) nixComponentsArgs
+      // nixComponentsFromVariants
     );
 
   ensureNewerSourcesHook =
