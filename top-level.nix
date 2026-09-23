@@ -439,9 +439,6 @@ final: prev: with final; {
 
   libGLU = mesa_glu;
 
-  # `libglvnd` does not work (yet?) on macOS.
-  libGLX = if stdenv.hostPlatform.isDarwin then mesa else libglvnd;
-
   # On macOS, the SDK provides the GLUT framework in `stdenv`. Packages
   # that use `libGLX` on macOS may need to depend on `freeglut`
   # directly if this doesn’t work.
