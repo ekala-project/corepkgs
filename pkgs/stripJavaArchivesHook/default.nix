@@ -1,6 +1,6 @@
-{ makeSetupHook, strip-nondeterminism }:
+{ makeSetupHook, perlPackages }:
 
 makeSetupHook {
   name = "strip-java-archives-hook";
-  propagatedBuildInputs = [ strip-nondeterminism ];
+  propagatedBuildInputs = [ perlPackages.strip-nondeterminism ];
 } ./strip-java-archives.sh
