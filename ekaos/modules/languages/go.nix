@@ -20,7 +20,6 @@ let
   mod = langLib.mkLanguageModule {
     name = "go";
     defaultPackage = pkgs: pkgs.go;
-    defaultLspPackage = pkgs: pkgs.gopls;
     environmentVariables = _: {
       GOPATH = "$HOME/go";
     };
