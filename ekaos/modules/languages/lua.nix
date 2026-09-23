@@ -11,7 +11,6 @@ let
   mod = langLib.mkLanguageModule {
     name = "lua";
     defaultPackage = pkgs: pkgs.lua;
-    defaultLspPackage = pkgs: pkgs.lua-language-server;
   };
 in
 
