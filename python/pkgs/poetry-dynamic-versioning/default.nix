@@ -5,7 +5,6 @@
   fetchFromGitHub,
   jinja2,
   poetry-core,
-  poetry,
   pytestCheckHook,
   pythonOlder,
   tomlkit,
@@ -36,7 +35,6 @@ buildPythonPackage rec {
   # Takes a long time
   nativeCheckInputs = [
     pytestCheckHook
-    poetry
   ];
 
   # virtualenv: error: argument dest: the destination . is not write-able at /
