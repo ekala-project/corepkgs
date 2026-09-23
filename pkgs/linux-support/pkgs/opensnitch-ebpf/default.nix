@@ -2,7 +2,6 @@
   lib,
   kernel,
   stdenv,
-  clang-tools,
   llvmPackages,
   elfutils,
   flex,
