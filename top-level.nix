@@ -1159,8 +1159,6 @@ final: prev: with final; {
     pname = "systemd-ukify";
     withUkify = true;
   };
-  udev = if lib.meta.availableOn stdenv.hostPlatform systemdLibs then systemdLibs else libudev-zero;
-
   inherit (callPackages ./pkgs/docbook-xsl { })
     docbook-xsl-nons # was docbook_xsl
     docbook-xsl-ns # was docbook-xsl-ns
