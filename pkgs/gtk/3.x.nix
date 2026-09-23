@@ -20,8 +20,7 @@
   cairo,
   pango,
   gdk-pixbuf,
-  atk,
-  at-spi2-atk,
+  at-spi2-core,
   gobject-introspection,
   buildPackages,
   withIntrospection ?
@@ -150,8 +149,7 @@ stdenv.mkDerivation (finalAttrs: {
   #TODO: colord?
 
   propagatedBuildInputs = [
-    at-spi2-atk
-    atk
+    at-spi2-core
     cairo
     expat
     fribidi

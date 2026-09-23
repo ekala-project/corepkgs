@@ -2,7 +2,7 @@
   lib,
   stdenv,
   alsa-lib,
-  atk,
+  at-spi2-core,
   autoconf,
   automake,
   cairo,
@@ -407,7 +407,7 @@
 
   atk-sys = attrs: {
     nativeBuildInputs = [ pkg-config ];
-    buildInputs = [ atk ];
+    buildInputs = [ at-spi2-core ];
   };
 
   # Assumes it can run Command::new(env::var("CARGO")).arg("locate-project")
