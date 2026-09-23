@@ -1,4 +1,8 @@
 # Java programming language module
+#
+# Usage:
+#   languages.java.enable = true;
+#   languages.java.version = "21";  # optional: select specific version
 {
   config,
   lib,

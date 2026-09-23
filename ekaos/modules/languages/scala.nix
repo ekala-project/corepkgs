@@ -1,4 +1,7 @@
 # Scala programming language module
+#
+# Usage:
+#   languages.scala.enable = true;
 {
   config,
   lib,
@@ -11,7 +14,6 @@ let
   mod = langLib.mkLanguageModule {
     name = "scala";
     defaultPackage = pkgs: pkgs.scala;
-
   };
 in
 
