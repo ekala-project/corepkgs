@@ -1,4 +1,8 @@
 # Node.js programming language module
+#
+# Usage:
+#   languages.nodejs.enable = true;
+#   languages.nodejs.version = "22";  # optional: select specific version
 {
   config,
   lib,
@@ -11,7 +15,6 @@ let
   mod = langLib.mkLanguageModule {
     name = "nodejs";
     defaultPackage = pkgs: pkgs.nodejs;
-    defaultLspPackage = pkgs: pkgs.typescript-language-server;
     resolveVersion = langLib.mkMajorVersionResolver "nodejs";
     environmentVariables = _: {
       NODE_PATH = "$HOME/.node_modules";
