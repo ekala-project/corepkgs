@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  glfw,
+  glfw3,
   freetype,
   openssl,
   makeWrapper,
@@ -57,7 +57,7 @@ stdenv.mkDerivation {
   };
 
   propagatedBuildInputs = [
-    glfw
+    glfw3
     freetype
     openssl
     sqlite
