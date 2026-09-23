@@ -13,7 +13,7 @@
   zstd,
   bashInteractive,
   doctest,
-  xcodebuild,
+  xcbuild,
   makeWrapper,
   writableTmpDirAsHomeHook,
 }:
