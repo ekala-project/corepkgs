@@ -55,7 +55,7 @@ let
     glibcLocales
     (if isMultiBuild then glibc_multi else glibc)
     (toString gcc.cc.lib)
-    bashInteractiveFHS
+    bashFHS
     coreutils
     less
     shadow

@@ -70,7 +70,7 @@ let
     glibcLocales
     (if isMultiBuild then glibc_multi else glibc)
     gcc.cc.lib
-    bashInteractiveFHS
+    bashFHS
     coreutils
     less
     shadow
