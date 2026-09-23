@@ -1,4 +1,7 @@
 # Python programming language module
+#
+# Usage:
+#   languages.python.enable = true;
 {
   config,
   lib,
@@ -11,7 +14,6 @@ let
   mod = langLib.mkLanguageModule {
     name = "python";
     defaultPackage = pkgs: pkgs.python3;
-    defaultLspPackage = pkgs: pkgs.pyright;
   };
 in
 
