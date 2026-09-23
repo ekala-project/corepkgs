@@ -20,6 +20,7 @@ let
     ../ekaos/modules/languages/crystal.nix
     ../ekaos/modules/languages/cue.nix
     ../ekaos/modules/languages/deno.nix
+    ../ekaos/modules/languages/dotnet.nix
     ../ekaos/modules/languages/elixir.nix
     ../ekaos/modules/languages/erlang.nix
     ../ekaos/modules/languages/fortran.nix
@@ -29,27 +30,34 @@ let
     ../ekaos/modules/languages/guile.nix
     ../ekaos/modules/languages/hare.nix
     ../ekaos/modules/languages/haskell.nix
+    ../ekaos/modules/languages/idris.nix
     ../ekaos/modules/languages/java.nix
     ../ekaos/modules/languages/javascript.nix
     ../ekaos/modules/languages/jsonnet.nix
     ../ekaos/modules/languages/julia.nix
     ../ekaos/modules/languages/kotlin.nix
+    ../ekaos/modules/languages/lean.nix
     ../ekaos/modules/languages/lobster.nix
     ../ekaos/modules/languages/lua.nix
     ../ekaos/modules/languages/nim.nix
     ../ekaos/modules/languages/nix.nix
     ../ekaos/modules/languages/nodejs.nix
+    ../ekaos/modules/languages/ocaml.nix
     ../ekaos/modules/languages/odin.nix
     ../ekaos/modules/languages/opentofu.nix
     ../ekaos/modules/languages/perl.nix
     ../ekaos/modules/languages/php.nix
+    ../ekaos/modules/languages/pkl.nix
     ../ekaos/modules/languages/purescript.nix
     ../ekaos/modules/languages/python.nix
     ../ekaos/modules/languages/r-lang.nix
+    ../ekaos/modules/languages/racket.nix
+    ../ekaos/modules/languages/raku.nix
     ../ekaos/modules/languages/ruby.nix
     ../ekaos/modules/languages/rust.nix
     ../ekaos/modules/languages/scala.nix
     ../ekaos/modules/languages/shell.nix
+    ../ekaos/modules/languages/sml.nix
     ../ekaos/modules/languages/solidity.nix
     ../ekaos/modules/languages/tcl.nix
     ../ekaos/modules/languages/terraform.nix
@@ -58,6 +66,7 @@ let
     ../ekaos/modules/languages/typescript.nix
     ../ekaos/modules/languages/unison.nix
     ../ekaos/modules/languages/vala.nix
+    ../ekaos/modules/languages/vlang.nix
     ../ekaos/modules/languages/zig.nix
   ];
 
@@ -93,6 +102,17 @@ let
       description = "Stub for per-user options (unused in devshell context).";
     };
   };
+
+  # Devshell feature modules (dotenv, scripts, etc.)
+  devshellModuleFiles = [
+    ./modules/dotenv.nix
+    ./modules/enterShell.nix
+    ./modules/env.nix
+    ./modules/files.nix
+    ./modules/packages.nix
+    ./modules/scripts.nix
+    ./modules/treefmt.nix
+  ];
 
   # Simple mkShell implementation (Phase 1 - basic version)
   mkShell =
@@ -165,13 +185,14 @@ in
         inherit (processCompose) tui logDir dataDir;
       };
 
-      # Evaluate language modules (check = false ignores service options)
+      # Evaluate language + devshell feature modules (check = false ignores service options)
       languagesEval = lib.evalModules {
         modules = [
           { _module.check = false; }
           languageStubModule
         ]
         ++ languageModuleFiles
+        ++ devshellModuleFiles
         ++ modules;
         specialArgs = {
           inherit lib pkgs;
@@ -181,6 +202,75 @@ in
       # Extract packages and environment variables from language evaluation
       langPackages = languagesEval.config.environment.packages;
       langVariables = languagesEval.config.environment.variables;
+
+      # Extract devshell feature config
+      dotenvCfg = languagesEval.config.dotenv or { enable = false; };
+      scriptsCfg = languagesEval.config.scripts or { };
+      treefmtCfg = languagesEval.config.treefmt or { enable = false; };
+      enterShellCode = languagesEval.config.enterShell or "";
+      envVars = languagesEval.config.env or { };
+      modulePackages = languagesEval.config.packages or [ ];
+      filesCfg = languagesEval.config.files or { };
+
+      # Build script wrappers from scripts config
+      scriptPackages = lib.mapAttrsToList (name: body: pkgs.writeShellScriptBin name body) scriptsCfg;
+
+      # Extra packages from devshell features
+      featurePackages = lib.optional (treefmtCfg.enable or false) pkgs.treefmt;
+
+      # Dotenv loading shell code
+      dotenvShellHook =
+        let
+          files =
+            if builtins.isList (dotenvCfg.filename or ".env") then
+              dotenvCfg.filename
+            else
+              [ (dotenvCfg.filename or ".env") ];
+          loadFile = f: ''
+            if [ -f "${f}" ]; then
+              set -a
+              . "${f}"
+              set +a
+            fi
+          '';
+        in
+        lib.optionalString (dotenvCfg.enable or false) (lib.concatMapStringsSep "\n" loadFile files);
+
+      # User-defined env vars
+      envExports = lib.concatStringsSep "\n" (
+        lib.mapAttrsToList (name: value: "export ${name}=${lib.escapeShellArg value}") envVars
+      );
+
+      # File generation shell code
+      filesShellHook =
+        let
+          enabledFiles = lib.filterAttrs (
+            _: cfg: cfg.text != null || cfg.json != null || cfg.toml != null
+          ) filesCfg;
+          generateFile =
+            name: cfg:
+            let
+              content =
+                if cfg.text != null then
+                  cfg.text
+                else if cfg.json != null then
+                  builtins.toJSON cfg.json
+                else if cfg.toml != null then
+                  (lib.generators.toTOML { } cfg.toml)
+                else
+                  "";
+              mode = if cfg.executable then "755" else "644";
+              escapedContent = lib.escapeShellArg content;
+            in
+            ''
+              mkdir -p "$(dirname "${name}")"
+              printf '%s\n' ${escapedContent} > "${name}"
+              chmod ${mode} "${name}"
+            '';
+        in
+        lib.optionalString (enabledFiles != { }) (
+          "# Generated files\n" + lib.concatStringsSep "" (lib.mapAttrsToList generateFile enabledFiles)
+        );
 
       # Generate export statements for language environment variables
       langExports = lib.concatStringsSep "\n" (
@@ -248,6 +338,11 @@ in
           trap _pc_cleanup EXIT
         ''}
 
+        ${lib.optionalString (envVars != { }) envExports}
+        ${filesShellHook}
+        ${dotenvShellHook}
+        ${enterShellCode}
+
         # User's custom shellHook
         ${shellHook}
       '';
@@ -257,7 +352,14 @@ in
       shellArgs
       // {
         buildInputs =
-          buildInputs ++ packages ++ langPackages ++ [ processComposePackage ] ++ (lib.attrValues utilities);
+          buildInputs
+          ++ packages
+          ++ modulePackages
+          ++ langPackages
+          ++ featurePackages
+          ++ scriptPackages
+          ++ [ processComposePackage ]
+          ++ (lib.attrValues utilities);
 
         shellHook = enhancedShellHook;
 

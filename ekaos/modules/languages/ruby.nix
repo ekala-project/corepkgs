@@ -1,4 +1,7 @@
 # Ruby programming language module
+#
+# Usage:
+#   languages.ruby.enable = true;
 {
   config,
   lib,
