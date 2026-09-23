@@ -8,7 +8,7 @@
   llvmPackages,
   fetchFromGitLab,
   python3,
-  xorriso,
+  libisoburn,
   qemu,
   dosfstools,
   mtools,
@@ -18,7 +18,7 @@
   systemManagementModeRequired ? secureBoot && stdenv.hostPlatform.isx86,
   # Whether to create an nvram variables template
   # which includes the MSFT secure boot keys
-  # Note: Requires pexpect, xorriso, and mtools to be available
+  # Note: Requires pexpect, libisoburn, and mtools to be available
   msVarsTemplate ? false,
   # When creating the nvram variables template with
   # the MSFT keys, we also must provide a certificate
@@ -123,7 +123,7 @@ edk2.mkDerivation projectDscPath (finalAttrs: {
   ++ lib.optionals msVarsTemplate [
     python3
     python3.pkgs.pexpect
-    xorriso
+    libisoburn
     qemu
     dosfstools
     mtools
