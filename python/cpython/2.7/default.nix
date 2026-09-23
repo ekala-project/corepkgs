@@ -14,7 +14,6 @@
   sqlite,
   tcl ? null,
   tk ? null,
-  tclPackages,
   libx11 ? null,
   x11Support ? false,
   zlib,
@@ -326,8 +325,8 @@ stdenv.mkDerivation (
 
     setupHook = python-setup-hook sitePackages;
 
-    postPatch = lib.optionalString (x11Support && ((tclPackages.tix or null) != null)) ''
-      substituteInPlace "Lib/lib-tk/Tix.py" --replace "os.environ.get('TIX_LIBRARY')" "os.environ.get('TIX_LIBRARY') or '${tclPackages.tix}/lib'"
+    postPatch = lib.optionalString (x11Support && ((tcl.pkgs.tix or null) != null)) ''
+      substituteInPlace "Lib/lib-tk/Tix.py" --replace "os.environ.get('TIX_LIBRARY')" "os.environ.get('TIX_LIBRARY') or '${tcl.pkgs.tix}/lib'"
     '';
 
     postInstall = ''

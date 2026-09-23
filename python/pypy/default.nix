@@ -17,7 +17,6 @@
   expat,
   tcl,
   tk,
-  tclPackages ? { },
   libx11,
   gdbm,
   db,
@@ -177,9 +176,9 @@ stdenv.mkDerivation rec {
     substituteInPlace lib_pypy/pypy_tools/build_cffi_imports.py \
       --replace "multiprocessing.cpu_count()" "$NIX_BUILD_CORES"
 
-    ${lib.optionalString (tclPackages ? tix) ''
+    ${lib.optionalString (tcl.pkgs ? tix) ''
       substituteInPlace "lib-python/${if isPy3k then "3/tkinter/tix.py" else "2.7/lib-tk/Tix.py"}" \
-        --replace "os.environ.get('TIX_LIBRARY')" "os.environ.get('TIX_LIBRARY') or '${tclPackages.tix}/lib'"
+        --replace "os.environ.get('TIX_LIBRARY')" "os.environ.get('TIX_LIBRARY') or '${tcl.pkgs.tix}/lib'"
     ''}
   '';
 
