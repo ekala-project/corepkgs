@@ -9,7 +9,7 @@
   setuptools,
 
   # native dependencies
-  xcodebuild,
+  xcbuild,
   pkgsBuildHost,
   pkgsHostTarget,
 }:
@@ -35,7 +35,7 @@ buildPythonPackage rec {
     cython
     setuptools
   ]
-  ++ lib.optionals stdenv.hostPlatform.isDarwin [ xcodebuild ];
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ xcbuild ];
 
   # required for build time dependency check
   nativeBuildInputs = [
