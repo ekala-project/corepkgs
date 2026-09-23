@@ -142,8 +142,10 @@ basePackage.overrideAttrs (oldAttrs: {
     // mkVariantPassthru variantArgs
     // {
       inherit variantArgs;
-      # Individual component packages are accessible via nixVersions.nixComponents_2_X
-      # (not via passthru.pkgs) to avoid infinite recursion with the splice infrastructure.
+      # The spliced component scope. nixVersions collects these for the splice
+      # infrastructure (generateSplicesForMkScope ["nixVersions" "nixComponents_2_X"]).
+      # Accessing passthru does NOT force derivation evaluation, so this is safe.
+      pkgs = nixComponents;
       ekapkgs-update.skip = false;
       ekapkgs-update.semver-strategy = "patch";
     };
