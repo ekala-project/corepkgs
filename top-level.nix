@@ -1751,9 +1751,6 @@ final: prev: with final; {
   rust-bindgen-unwrapped = callPackage ./pkgs/rust-bindgen/unwrapped.nix { };
   rustup-toolchain-install-master = callPackage ./pkgs/rustup-toolchain-install-master { };
 
-  # TODO(corepkgs): gixy requires packages not yet in core-pkgs (writeNginxConfig validation)
-  gixy = null;
-
   mkNugetDeps = null; # TODO(corepkgs): implement NuGet dependency fetcher
   mkNugetSource = null; # TODO(corepkgs): implement NuGet source builder
 

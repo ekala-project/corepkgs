@@ -79,5 +79,13 @@ in
         Overlays to be applied to each Linux kernel packages set.
       '';
     };
+
+    overlays.writers = mkOption {
+      type = types.listOf overlayType;
+      default = [ ];
+      description = ''
+        Overlays to be applied to the writers package scope.
+      '';
+    };
   };
 }
