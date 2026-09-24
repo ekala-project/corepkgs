@@ -471,10 +471,6 @@ final: prev: with final; {
 
   xorriso = libisoburn;
 
-  wrapGAppsNoGuiHook = callPackage ./pkgs/wrapGAppsNoGuiHook {
-    makeWrapper = makeBinaryWrapper;
-  };
-
   # Less secure variant of lowdown for use inside Nix builds.
   lowdown-unsandboxed = lowdown.override {
     enableDarwinSandbox = false;
