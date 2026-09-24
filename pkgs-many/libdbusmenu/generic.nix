@@ -1,4 +1,10 @@
 {
+  withGtk3 ? false,
+  mkVariantPassthru,
+  ...
+}@variantArgs:
+
+{
   stdenv,
   fetchurl,
   lib,
@@ -10,8 +16,7 @@
   json-glib,
   gobject-introspection,
   vala,
-  withGtk3 ? false,
-  gtk3,
+  gtk3 ? null,
   testers,
 }:
 
@@ -70,7 +75,9 @@ stdenv.mkDerivation (finalAttrs: {
     "typelibdir=${placeholder "out"}/lib/girepository-1.0"
   ];
 
-  passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  passthru = mkVariantPassthru variantArgs // {
+    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  };
 
   meta = {
     description = "Library for passing menu structures across DBus";
