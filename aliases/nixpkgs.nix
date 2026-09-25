@@ -263,17 +263,11 @@ mapAliases {
   openssl_oqs = renamed "openssl_oqs" "openssl.oqs" openssl.oqs;
   patchelfUnstable = throw "patchelfUnstable was removed because it was older than patchelf and unneeded, use patchelf instead";
   perl538 = renamed "perl538" "perl.v5_38" perl.v5_38;
-  perl538Packages = renamed "perl538Packages" "perl.v5_38.pkgs" (
-    lib.recurseIntoAttrs perl.v5_38.pkgs
-  );
+  perl538Packages = renamed "perl538Packages" "perl.v5_38.pkgs" perl.v5_38.pkgs;
   perl540 = renamed "perl540" "perl.v5_40" perl.v5_40;
-  perl540Packages = renamed "perl540Packages" "perl.v5_40.pkgs" (
-    lib.recurseIntoAttrs perl.v5_40.pkgs
-  );
+  perl540Packages = renamed "perl540Packages" "perl.v5_40.pkgs" perl.v5_40.pkgs;
   perl542 = renamed "perl542" "perl.v5_42" perl.v5_42;
-  perl542Packages = renamed "perl542Packages" "perl.v5_42.pkgs" (
-    lib.recurseIntoAttrs perl.v5_42.pkgs
-  );
+  perl542Packages = renamed "perl542Packages" "perl.v5_42.pkgs" perl.v5_42.pkgs;
   phpExtensions = renamed "phpExtensions" "php.buildPecl" php.buildPecl;
   pypy27Packages = renamed "pypy27Packages" "pypy27.pkgs" pypy27.pkgs;
   pypy2Packages = renamed "pypy2Packages" "pypy2.pkgs" pypy2.pkgs;
