@@ -74,7 +74,6 @@ let
     coreutils
     less
     shadow
-    su
     gawk
     diffutils
     findutils
