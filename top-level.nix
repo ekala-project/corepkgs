@@ -1099,12 +1099,10 @@ final: prev: with final; {
     pname = "systemd-ukify";
     withUkify = true;
   };
-  inherit (callPackages ./pkgs/docbook-xsl { })
-    docbook-xsl-nons # was docbook_xsl
-    docbook-xsl-ns # was docbook-xsl-ns
-    ;
-
-  docbook-xsl = docbook-xsl-nons;
+  # docbook-xsl is auto-imported from pkgs-many/docbook-xsl/ via mkManyVariants
+  # Variants: docbook-xsl.nons (default), docbook-xsl.ns
+  docbook-xsl-nons = docbook-xsl.nons;
+  docbook-xsl-ns = docbook-xsl.ns;
 
   inherit (callPackage ./pkgs/libxml2 { })
     libxml2_13
