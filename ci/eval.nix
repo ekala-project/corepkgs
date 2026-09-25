@@ -11,7 +11,7 @@
 #
 # `handleEvalIssue` decides which `check-meta` rejections are bugs.
 # `unknown-meta` and `broken-outputs` mean the `meta` itself is malformed, so
-# they `abort` and name the package. Everything else -- broken, unfree,
+# they `abort` and name the package. Everything else -- broken, blocklisted,
 # unsupported, insecure -- is a package correctly refusing to evaluate here,
 # and `throw`s.
 #

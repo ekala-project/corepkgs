@@ -11,7 +11,7 @@
 #
 # When `checkMeta` is enabled, `handleEvalIssue` decides which rejections are bugs.
 # `unknown-meta` and `broken-outputs` mean the `meta` itself is malformed, so
-# they `abort` and name the package. Everything else -- broken, unfree,
+# they `abort` and name the package. Everything else -- broken, blocklisted,
 # unsupported, insecure -- is a package correctly refusing to evaluate here,
 # and `throw`s.
 #
@@ -28,10 +28,18 @@
 }:
 
 let
+  lib = import ../lib.nix;
+
   pkgs = import ../. {
     config = {
       aliases.nixpkgs = false;
       inherit checkMeta;
+
+      # Prevent non-redistributable packages from entering the binary cache.
+      # Redistributable unfree packages (drivers, firmware) are fine.
+      blocklistedLicenses = [
+        lib.licenses.unfree
+      ];
 
       handleEvalIssue =
         reason: msg:
@@ -46,8 +54,6 @@ let
           throw msg;
     };
   };
-
-  inherit (pkgs) lib;
 
   # Forcing `drvPath` resolves every dependency and, for ci/eval.nix, runs
   # `check-meta`. `package` arrives unforced, so a lookup that throws is caught
