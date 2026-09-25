@@ -1104,10 +1104,9 @@ final: prev: with final; {
   docbook-xsl-nons = docbook-xsl.nons;
   docbook-xsl-ns = docbook-xsl.ns;
 
-  inherit (callPackage ./pkgs/libxml2 { })
-    libxml2_13
-    libxml2
-    ;
+  # libxml2 is auto-imported from pkgs-many/libxml2/ via mkManyVariants
+  # Variants: libxml2.v2_13, libxml2.v2_15 (default)
+  libxml2_13 = prev.libxml2.v2_13;
 
   c-aresMinimal = callPackage ./pkgs/c-ares { withCMake = false; };
 
