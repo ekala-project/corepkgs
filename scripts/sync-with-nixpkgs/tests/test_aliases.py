@@ -35,6 +35,24 @@ class TestParse:
     def test_hyphenated_names_are_read(self):
         assert aliases.parse(block("  tcl-8_6 = tcl.v8_6;")) == {"tcl-8_6": "tcl.v8_6"}
 
+    def test_unwraps_renamed_to_target(self):
+        line = '  SDL = renamed "SDL" "sdl12-compat" sdl12-compat;'
+        assert aliases.parse(block(line)) == {"SDL": "sdl12-compat"}
+
+    def test_unwraps_renamed_with_dotted_target(self):
+        line = '  autoconf269 = renamed "autoconf269" "autoconf.v2_69" autoconf.v2_69;'
+        assert aliases.parse(block(line)) == {"autoconf269": "autoconf.v2_69"}
+
+    def test_reads_multiline_renamed_entries(self):
+        lines = (
+            '  armTrustedFirmwareAllwinner =\n'
+            '    renamed "armTrustedFirmwareAllwinner" "arm-trusted-firmware.allwinner"\n'
+            '      arm-trusted-firmware.allwinner;'
+        )
+        assert aliases.parse(block(lines)) == {
+            "armTrustedFirmwareAllwinner": "arm-trusted-firmware.allwinner"
+        }
+
 
 class TestLoad:
     def _write(self, root, name, text):
