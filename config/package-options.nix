@@ -40,13 +40,22 @@ in
 
     allowUnfree = mkOption {
       type = types.bool;
-      default = false;
-      # getEnv part is in check-meta.nix
-      defaultText = literalExpression ''false || builtins.getEnv "NIXPKGS_ALLOW_UNFREE" == "1"'';
+      default = true;
       description = ''
         Whether to allow unfree packages.
 
-        See [Installing unfree packages](https://nixos.org/manual/nixpkgs/stable/#sec-allow-unfree) in the NixOS manual.
+        Defaults to `true` to reduce user friction for using software. Unfree
+        packages are not available in the cache and will have to be built locally.
+      '';
+    };
+
+    blocklistedLicenses = mkOption {
+      type = types.listOf types.attrs;
+      default = [ ];
+      description = ''
+        List of licenses whose packages should be rejected at evaluation
+        time, regardless of `allowUnfree`.  Use this to prevent
+        non-redistributable packages from being built and cached.
       '';
     };
 

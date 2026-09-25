@@ -1,5 +1,4 @@
 # nixpkgs configuration options
-# Provides nixpkgs.config.allowUnfree and related settings
 {
   config,
   lib,
