@@ -33,6 +33,15 @@ scope.gstreamer.overrideAttrs (old: {
     devtools = scope.gst-devtools;
     editing-services = scope.gst-editing-services;
 
+    pkgs = removeAttrs scope [
+      "callFromScope"
+      "callPackage"
+      "gstreamer"
+      "newScope"
+      "overrideScope"
+      "packages"
+    ];
+
     # Expose scope for nixpkgs compat alias
     _scope = scope;
   };

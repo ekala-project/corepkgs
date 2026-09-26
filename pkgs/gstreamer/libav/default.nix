@@ -9,7 +9,7 @@
   gstreamer,
   gst-plugins-base,
   gettext,
-  ffmpeg_8-headless,
+  ffmpeg,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -40,7 +40,7 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs = [
     gstreamer
     gst-plugins-base
-    ffmpeg_8-headless
+    ffmpeg.headless
   ];
 
   mesonFeatures = {

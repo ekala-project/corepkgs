@@ -67,6 +67,8 @@ final: prev: with final; {
     else
       import ./stdenv/linux/make-bootstrap-tools.nix { pkgs = final; };
 
+  gstreamerPkgs = lib.recurseIntoAttrs gstreamer.pkgs;
+
   # nv-codec-headers version aliases for ffmpeg
   nv-codec-headers-12 = nv-codec-headers.override { majorVersion = "12"; };
 

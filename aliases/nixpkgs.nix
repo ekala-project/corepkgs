@@ -161,6 +161,26 @@ mapAliases {
   gradle_7 = renamed "gradle_7" "gradle.v7" gradle.v7;
   gradle_8 = renamed "gradle_8" "gradle" gradle;
   gradle_9 = renamed "gradle_9" "gradle.v9" gradle.v9;
+  gst-devtools = renamed "gst-devtools" "gstreamerPkgs.gst-devtools" gstreamerPkgs.gst-devtools;
+  gst-editing-services =
+    renamed "gst-editing-services" "gstreamerPkgs.gst-editing-services"
+      gstreamerPkgs.gst-editing-services;
+  gst-libav = renamed "gst-libav" "gstreamerPkgs.gst-libav" gstreamerPkgs.gst-libav;
+  gst-plugins-bad =
+    renamed "gst-plugins-bad" "gstreamerPkgs.gst-plugins-bad"
+      gstreamerPkgs.gst-plugins-bad;
+  gst-plugins-base =
+    renamed "gst-plugins-base" "gstreamerPkgs.gst-plugins-base"
+      gstreamerPkgs.gst-plugins-base;
+  gst-plugins-good =
+    renamed "gst-plugins-good" "gstreamerPkgs.gst-plugins-good"
+      gstreamerPkgs.gst-plugins-good;
+  gst-plugins-ugly =
+    renamed "gst-plugins-ugly" "gstreamerPkgs.gst-plugins-ugly"
+      gstreamerPkgs.gst-plugins-ugly;
+  gst-rtsp-server =
+    renamed "gst-rtsp-server" "gstreamerPkgs.gst-rtsp-server"
+      gstreamerPkgs.gst-rtsp-server;
   gtk2 = throw "gtk2 has reached end of life. All consumers should migrate to gtk3+";
   guile_1_8 = renamed "guile_1_8" "guile.v1_8" guile.v1_8;
   guile_2_0 = renamed "guile_2_0" "guile.v2_0" guile.v2_0;
@@ -420,13 +440,15 @@ mapAliases {
 
   gst_all_1 = lib.warn "'gst_all_1' has been renamed to 'gstreamer' in ekapkgs" {
     inherit gstreamer;
-    gst-plugins-base = gstreamer.plugins-base;
-    gst-plugins-good = gstreamer.plugins-good;
-    gst-plugins-bad = gstreamer.plugins-bad;
-    gst-plugins-ugly = gstreamer.plugins-ugly;
-    gst-rtsp-server = gstreamer.rtsp-server;
-    gst-libav = gstreamer.libav;
-    gst-devtools = gstreamer.devtools;
-    gst-editing-services = gstreamer.editing-services;
+    inherit (gstreamerPkgs)
+      gst-plugins-base
+      gst-plugins-good
+      gst-plugins-bad
+      gst-plugins-ugly
+      gst-rtsp-server
+      gst-libav
+      gst-devtools
+      gst-editing-services
+      ;
   };
 }
