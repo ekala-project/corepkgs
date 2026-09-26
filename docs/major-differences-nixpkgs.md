@@ -8,6 +8,11 @@ changes differ significantly from whath one would expct with Nixpkgs.
 
 - See [stdenv/README.md](../stdenv/README.md)
 
+## Unfree packages
+
+- `config.allowUnfree` defaults to `true` instead of Nixpkgs' `false`.
+- `config.allowUnfreePackages` has been renamed to `config.licenses.accept`.
+
 ## Evaluation behavior
 
 - Impure locations like `~/.config/nix` is no longer respected for `config` or `overlays`
