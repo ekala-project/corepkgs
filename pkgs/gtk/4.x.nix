@@ -1,6 +1,7 @@
 {
   lib,
   stdenv,
+  callPackage,
   buildPackages,
   replaceVars,
   fetchurl,
@@ -279,13 +280,19 @@ stdenv.mkDerivation (finalAttrs: {
       moveToOutput "share/doc" "$devdoc"
     '';
 
-  passthru = {
-    tests = {
-      pkg-config = testers.hasPkgConfigModules {
-        package = finalAttrs.finalPackage;
+  passthru =
+    let
+      wrapGAppsNoGuiHook = callPackage ./hooks/wrap-gapps-hook.nix { gtk3 = finalAttrs.finalPackage; };
+    in
+    {
+      tests = {
+        pkg-config = testers.hasPkgConfigModules {
+          package = finalAttrs.finalPackage;
+        };
       };
+      wrapGAppsHook = wrapGAppsNoGuiHook.override { isGraphical = true; };
+      inherit wrapGAppsNoGuiHook;
     };
-  };
 
   meta = {
     description = "Multi-platform toolkit for creating graphical user interfaces";

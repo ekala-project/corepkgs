@@ -1162,29 +1162,12 @@ final: prev: with final; {
     forPlatform = stdenv.targetPlatform; # offset by 1 so it works in nativeBuildInputs
   };
 
-  gtk3 =
-    (callPackage ./pkgs/gtk/3.x.nix {
-      trackerSupport = false;
-      cupsSupport = false;
-      withIntrospection = false;
-    }).overrideAttrs
-      (oldAttrs: {
-        passthru = (oldAttrs.passthru or { }) // {
-          wrapGAppsHook = wrapGAppsNoGuiHook.override { isGraphical = true; };
-          wrapGAppsNoGuiHook = wrapGAppsNoGuiHook;
-        };
-      });
-  gtk4 = (callPackage ./pkgs/gtk/4.x.nix { }).overrideAttrs (oldAttrs: {
-    passthru = (oldAttrs.passthru or { }) // {
-      wrapGAppsHook = wrapGAppsNoGuiHook.override {
-        isGraphical = true;
-        gtk3 = gtk4;
-      };
-      wrapGAppsNoGuiHook = wrapGAppsNoGuiHook.override {
-        gtk3 = gtk4;
-      };
-    };
-  });
+  gtk3 = callPackage ./pkgs/gtk/3.x.nix {
+    trackerSupport = false;
+    cupsSupport = false;
+    withIntrospection = false;
+  };
+  gtk4 = callPackage ./pkgs/gtk/4.x.nix { };
 
   buildcatrust = with python3.pkgs; toPythonApplication buildcatrust;
 

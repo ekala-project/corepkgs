@@ -1,6 +1,7 @@
 {
   lib,
   stdenv,
+  callPackage,
   replaceVars,
   fetchurl,
   pkg-config,
@@ -262,14 +263,20 @@ stdenv.mkDerivation (finalAttrs: {
       sed '/^# ModulesPath =/d' -i "$out"/lib/gtk-*/*/immodules.cache
     '';
 
-  passthru = {
-    updateScript = gnome.updateScript {
-      packageName = "gtk";
-      attrPath = "gtk3";
-      freeze = true;
+  passthru =
+    let
+      wrapGAppsNoGuiHook = callPackage ./hooks/wrap-gapps-hook.nix { };
+    in
+    {
+      updateScript = gnome.updateScript {
+        packageName = "gtk";
+        attrPath = "gtk3";
+        freeze = true;
+      };
+      tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      wrapGAppsHook = wrapGAppsNoGuiHook.override { isGraphical = true; };
+      inherit wrapGAppsNoGuiHook;
     };
-    tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
-  };
 
   meta = {
     description = "Multi-platform toolkit for creating graphical user interfaces";
