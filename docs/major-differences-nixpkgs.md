@@ -11,14 +11,7 @@ changes differ significantly from whath one would expct with Nixpkgs.
 ## Unfree packages
 
 - `config.allowUnfree` defaults to `true` instead of Nixpkgs' `false`.
-  - Firmware and redistributable driver packages evaluate without extra
-    user configuration.
-  - Non-redistributable packages (`lib.licenses.unfree`) are blocked from
-    the CI buildable set via `config.blocklistedLicenses`, preventing them
-    from entering the binary cache.
 - `config.allowUnfreePackages` has been renamed to `config.licenses.accept`.
-  - The old name still works via `mkRenamedOptionModule` but emits a
-    deprecation warning.
 
 ## Evaluation behavior
 

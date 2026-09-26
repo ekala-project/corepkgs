@@ -49,6 +49,15 @@ in
       '';
     };
 
+    licenses.accept = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = ''
+        A list of unfree package names that should be allowed to evaluate
+        even when `allowUnfree` is `false`.
+      '';
+    };
+
     blocklistedLicenses = mkOption {
       type = types.listOf types.attrs;
       default = [ ];

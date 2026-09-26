@@ -131,6 +131,7 @@ let
       ./config/build-options.nix
       ./config/package-options.nix
       ./config/overlays.nix
+      (lib.mkRenamedOptionModule [ "allowUnfreePackages" ] [ "licenses" "accept" ])
       {
         _file = "nixpkgs.config";
         # Allow both:
