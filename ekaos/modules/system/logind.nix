@@ -1,44 +1,34 @@
-# Systemd-logind session management
-# Handles power events, session tracking, and user session lifecycle
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+# Adios port of ekaos/modules/system/logind.nix.
+#
+# Tree path: system/logind is parent.system.logind.
+# Self-contained; no cross-module reads. logind.conf generation is pure
+# (no derivations), so the header takes only types.
+# TODO(adios-cutover): priority lost (was mkDefault): the KillUserProcesses
+# / HandlePowerKey / HandleLidSwitch / IdleAction defaults no longer yield
+# to user overrides at merge time; user settings win via `//` below.
+# TODO(adios-cutover): impl returns services.logind.settings (this
+# module's own option); the tree must merge impl outputs back (NixOS
+# module-merge semantics).
+{ types, ... }:
 
 let
-  cfg = config.services.logind;
-
-  # Generate logind.conf
-  logindConf =
-    let
-      formatValue = v: if isBool v then (if v then "yes" else "no") else toString v;
-      lines = mapAttrsToList (k: v: "${k}=${formatValue v}") cfg.settings;
-    in
-    ''
-      [Login]
-      ${concatStringsSep "\n" lines}
-    '';
-
+  mapAttrsToList = f: attrs: builtins.map (n: f n attrs.${n}) (builtins.attrNames attrs);
 in
 
 {
-  options.services.logind = {
-    enable = mkOption {
+  options = {
+    enable = {
       type = types.bool;
       default = true;
       description = "Whether to enable systemd-logind session management.";
     };
 
-    settings = mkOption {
+    settings = {
       type = types.attrsOf (
-        types.oneOf [
+        types.union [
           types.bool
           types.int
-          types.str
+          types.string
         ]
       );
       default = { };
@@ -64,15 +54,29 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
-    # Default settings
-    services.logind.settings = {
-      KillUserProcesses = mkDefault false;
-      HandlePowerKey = mkDefault "poweroff";
-      HandleLidSwitch = mkDefault "suspend";
-      IdleAction = mkDefault "ignore";
-    };
+  impl =
+    { options, inputs }:
+    let
+      effectiveSettings = {
+        KillUserProcesses = false;
+        HandlePowerKey = "poweroff";
+        HandleLidSwitch = "suspend";
+        IdleAction = "ignore";
+      }
+      // options.settings;
 
-    environment.etc."systemd/logind.conf".text = logindConf;
-  };
+      formatValue = v: if builtins.isBool v then (if v then "yes" else "no") else toString v;
+      logindConf = ''
+        [Login]
+        ${builtins.concatStringsSep "\n" (mapAttrsToList (k: v: "${k}=${formatValue v}") effectiveSettings)}
+      '';
+    in
+    if !options.enable then
+      { }
+    else
+      {
+        services.logind.settings = effectiveSettings;
+
+        environment.etc."systemd/logind.conf".text = logindConf;
+      };
 }

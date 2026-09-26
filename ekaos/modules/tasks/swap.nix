@@ -1,191 +1,168 @@
-# Swap device configuration
+# Adios port of ekaos/modules/tasks/swap.nix.
+#
+# Tree path: tasks/swap is parent.tasks.swap.
+# Self-contained; no cross-module reads. The legacy `config = mkMerge
+# [...]` becomes lib.merge.attrs.recursively with two conditional
+# mutators (lib = adios.lib from the header).
+# TODO(adios-cutover): devices is types.listOf types.attrs; legacy swap
+# submodule validation lost (expected keys: enable, device, label, size,
+# priority, options, randomEncryption.{enable,cipher,keySize}). Element
+# defaults are applied via `or` fallbacks in impl.
 {
-  config,
+  types,
   lib,
   pkgs,
   ...
 }:
 
-with lib;
-
-let
-  cfg = config.swap;
-  enabledDevices = filter (d: d.enable) cfg.devices;
-
-  # Generate fstab swap entries
-  swapFstabLines = concatMapStringsSep "\n" (
-    dev:
-    let
-      device = if dev.label != null then "/dev/disk/by-label/${dev.label}" else dev.device;
-      options = concatStringsSep "," dev.options;
-    in
-    "${device} none swap ${options} 0 0"
-  ) enabledDevices;
-
-  swapSubmodule = {
-    options = {
-      enable = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Whether to enable this swap device.";
-      };
-
-      device = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        example = "/dev/sda3";
-        description = ''
-          Path to the swap device or swap file.
-          Set automatically when label is used.
-        '';
-      };
-
-      label = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        example = "swap";
-        description = "Label of the swap partition.";
-      };
-
-      size = mkOption {
-        type = types.nullOr types.int;
-        default = null;
-        example = 4096;
-        description = ''
-          Size in MiB. Only used when creating a swap file
-          (device is a regular file path, not a block device).
-        '';
-      };
-
-      priority = mkOption {
-        type = types.nullOr types.int;
-        default = null;
-        example = 100;
-        description = "Swap priority (higher = preferred). null uses kernel default.";
-      };
-
-      options = mkOption {
-        type = types.listOf types.str;
-        default = [ "defaults" ];
-        description = "Mount options for the swap entry in fstab.";
-      };
-
-      randomEncryption = {
-        enable = mkOption {
-          type = types.bool;
-          default = false;
-          description = ''
-            Encrypt swap with a random key on each boot.
-            Data is not recoverable after reboot.
-          '';
-        };
-
-        cipher = mkOption {
-          type = types.str;
-          default = "aes-xts-plain64";
-          description = "Encryption cipher for random swap encryption.";
-        };
-
-        keySize = mkOption {
-          type = types.int;
-          default = 256;
-          description = "Key size in bits.";
-        };
-      };
-    };
-  };
-
-in
-
 {
-  options.swap = {
-    devices = mkOption {
-      type = types.listOf (types.submodule swapSubmodule);
+  options = {
+    devices = {
+      type = types.listOf types.attrs;
       default = [ ];
-      example = literalExpression ''
-        [
-          { device = "/dev/sda3"; }
-          { device = "/swapfile"; size = 4096; }
-        ]
+      example = [
+        { device = "/dev/sda3"; }
+        {
+          device = "/swapfile";
+          size = 4096;
+        }
+      ];
+      description = ''
+        List of swap devices or swap files. Each entry may set enable
+        (default true), device, label, size (MiB, for swap files),
+        priority, options (default ["defaults"]), and
+        randomEncryption.{enable,cipher,keySize}.
       '';
-      description = "List of swap devices or swap files.";
     };
 
     zram = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to enable zram-based compressed swap.";
-      };
+      description = "Zram-based compressed swap.";
+      options = {
+        enable = {
+          type = types.bool;
+          default = false;
+          description = "Whether to enable zram-based compressed swap.";
+        };
 
-      memoryPercent = mkOption {
-        type = types.int;
-        default = 50;
-        description = "Percentage of RAM to use for zram swap.";
-      };
+        memoryPercent = {
+          type = types.int;
+          default = 50;
+          description = "Percentage of RAM to use for zram swap.";
+        };
 
-      algorithm = mkOption {
-        type = types.enum [
-          "lzo"
-          "lz4"
-          "zstd"
-        ];
-        default = "zstd";
-        description = "Compression algorithm for zram.";
+        algorithm = {
+          type = types.enum "zram-algorithm" [
+            "lzo"
+            "lz4"
+            "zstd"
+          ];
+          default = "zstd";
+          description = "Compression algorithm for zram.";
+        };
       };
     };
   };
 
-  config = mkMerge [
-    # Append swap entries to fstab
-    (mkIf (enabledDevices != [ ]) {
-      system.activationScripts.swap =
-        stringAfter
-          [
-            "etc"
-            "filesystems"
-          ]
-          ''
-            ${concatMapStringsSep "\n" (
-              dev:
-              let
-                device = if dev.label != null then "/dev/disk/by-label/${dev.label}" else dev.device;
-              in
-              ''
-                # Activate swap: ${device}
-                ${optionalString (dev.size != null) ''
-                  # Create swap file if it doesn't exist
-                  if [ ! -f "${device}" ]; then
-                    echo "Creating swap file ${device} (${toString dev.size} MiB)..."
-                    dd if=/dev/zero of="${device}" bs=1M count=${toString dev.size} 2>/dev/null
-                    chmod 600 "${device}"
-                    ${pkgs.util-linux}/bin/mkswap "${device}"
-                  fi
-                ''}
-                ${pkgs.util-linux}/bin/swapon ${
-                  optionalString (dev.priority != null) "-p ${toString dev.priority}"
-                } "${device}" 2>/dev/null || true
-              ''
-            ) enabledDevices}
-          '';
-    })
-
-    # Zram swap
-    (mkIf cfg.zram.enable {
-      boot.kernelModules = [ "zram" ];
-
-      system.activationScripts.zram = stringAfter [ "etc" ] ''
-        # Set up zram swap
-        if [ -e /sys/block/zram0 ]; then
-          echo "Configuring zram swap..."
-          mem_total=$(${pkgs.gawk}/bin/awk '/MemTotal/ {print $2}' /proc/meminfo)
-          zram_size=$((mem_total * ${toString cfg.zram.memoryPercent} / 100 * 1024))
-          echo ${cfg.zram.algorithm} > /sys/block/zram0/comp_algorithm 2>/dev/null || true
-          echo $zram_size > /sys/block/zram0/disksize
-          ${pkgs.util-linux}/bin/mkswap /dev/zram0
-          ${pkgs.util-linux}/bin/swapon -p 100 /dev/zram0
-        fi
-      '';
-    })
+  assertions = [
+    {
+      verify = { options, inputs }: options.zram.memoryPercent >= 1 && options.zram.memoryPercent <= 100;
+      explain =
+        { options, inputs }:
+        "zram.memoryPercent must be 1-100, got ${toString options.zram.memoryPercent}";
+    }
   ];
+
+  impl =
+    { options, inputs }:
+    let
+      enabledDevices = builtins.filter (d: (d.enable or true)) options.devices;
+
+      # Generate fstab swap entries (kept for parity; the fstab itself is
+      # emitted by tasks/filesystems.nix, as in legacy).
+      swapFstabLines = builtins.concatStringsSep "\n" (
+        builtins.map (
+          dev:
+          let
+            device = if (dev.label or null) != null then "/dev/disk/by-label/${dev.label}" else dev.device;
+            entryOptions = builtins.concatStringsSep "," (dev.options or [ "defaults" ]);
+          in
+          "${device} none swap ${entryOptions} 0 0"
+        ) enabledDevices
+      );
+      _lines = swapFstabLines;
+    in
+    lib.merge.attrs.recursively {
+      mutators = [
+        # Append swap entries to fstab
+        (
+          if enabledDevices != [ ] then
+            {
+              system.activationScripts.swap = {
+                deps = [
+                  "etc"
+                  "filesystems"
+                ];
+                text = ''
+                  ${builtins.concatStringsSep "\n" (
+                    builtins.map (
+                      dev:
+                      let
+                        device = if (dev.label or null) != null then "/dev/disk/by-label/${dev.label}" else dev.device;
+                      in
+                      ''
+                        # Activate swap: ${device}
+                        ${
+                          if (dev.size or null) != null then
+                            ''
+                              # Create swap file if it doesn't exist
+                              if [ ! -f "${device}" ]; then
+                                echo "Creating swap file ${device} (${toString dev.size} MiB)..."
+                                dd if=/dev/zero of="${device}" bs=1M count=${toString dev.size} 2>/dev/null
+                                chmod 600 "${device}"
+                                ${pkgs.util-linux}/bin/mkswap "${device}"
+                              fi
+                            ''
+                          else
+                            ""
+                        }
+                        ${pkgs.util-linux}/bin/swapon ${
+                          if (dev.priority or null) != null then "-p ${toString dev.priority}" else ""
+                        } "${device}" 2>/dev/null || true
+                      ''
+                    ) enabledDevices
+                  )}
+                '';
+              };
+            }
+          else
+            { }
+        )
+
+        # Zram swap
+        (
+          if options.zram.enable then
+            {
+              boot.kernelModules = [ "zram" ];
+
+              system.activationScripts.zram = {
+                deps = [ "etc" ];
+                text = ''
+                  # Set up zram swap
+                  if [ -e /sys/block/zram0 ]; then
+                    echo "Configuring zram swap..."
+                    mem_total=$(${pkgs.gawk}/bin/awk '/MemTotal/ {print $2}' /proc/meminfo)
+                    zram_size=$((mem_total * ${toString options.zram.memoryPercent} / 100 * 1024))
+                    echo ${options.zram.algorithm} > /sys/block/zram0/comp_algorithm 2>/dev/null || true
+                    echo $zram_size > /sys/block/zram0/disksize
+                    ${pkgs.util-linux}/bin/mkswap /dev/zram0
+                    ${pkgs.util-linux}/bin/swapon -p 100 /dev/zram0
+                  fi
+                '';
+              };
+            }
+          else
+            { }
+        )
+      ];
+    };
 }

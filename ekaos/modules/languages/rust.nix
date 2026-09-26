@@ -1,3 +1,4 @@
+# Adios port of ekaos/modules/languages/rust.nix.
 # Rust programming language module
 #
 # Provides languages.rust options for system-wide and per-user configuration.
@@ -8,24 +9,18 @@
 #
 #   # Per-user:
 #   users.users.alice.languages.rust.enable = true;
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-
-  mod = langLib.mkLanguageModule {
-    name = "rust";
-    defaultPackage = pkgs': pkgs'.rust;
-    environmentVariables = _: {
-      CARGO_HOME = "$HOME/.cargo";
-    };
-    sessionPath = _: [ "$HOME/.cargo/bin" ];
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "rust";
+  defaultPackage = pkgs': pkgs'.rust;
+  environmentVariables = _: {
+    CARGO_HOME = "$HOME/.cargo";
+  };
+  sessionPath = _: [ "$HOME/.cargo/bin" ];
+}

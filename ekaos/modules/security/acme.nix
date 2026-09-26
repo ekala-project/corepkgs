@@ -1,101 +1,13 @@
-# ACME certificate management module
-# Auto-provisions Let's Encrypt certificates for hostnames declared
-# in port contracts with tls.acme = true
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
-
+# Adios port of ekaos/modules/security/acme.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, pkgs, ... }:
 let
-  cfg = config.security.acme;
-  acmeHosts = config.networking.ports.acmeHosts or [ ];
-
-  # Merge auto-discovered hosts with manually declared certs
-  allCertHosts = unique (acmeHosts ++ (attrNames cfg.certs));
-
-  # Build lego command for a given hostname
-  mkLegoCertScript =
-    hostname:
-    let
-      certCfg = cfg.certs.${hostname} or { };
-      certDir = "${cfg.certDir}/${hostname}";
-      extraDomains = certCfg.extraDomainNames or [ ];
-      domainArgs = concatMapStringsSep " " (d: "-d ${d}") ([ hostname ] ++ extraDomains);
-      webroot = certCfg.webroot or cfg.defaults.webroot;
-      dnsProvider = certCfg.dnsProvider or cfg.defaults.dnsProvider;
-    in
-    ''
-      # Certificate for ${hostname}
-      mkdir -p ${certDir}
-
-      if [ ! -f ${certDir}/fullchain.pem ] || \
-         [ "$(${pkgs.coreutils}/bin/find ${certDir}/fullchain.pem -mtime +${toString cfg.renewDays})" ]; then
-        echo "Requesting/renewing certificate for ${hostname}..."
-        ${pkgs.lego}/bin/lego \
-          --email "${cfg.email}" \
-          --accept-tos \
-          ${domainArgs} \
-          --path ${certDir} \
-          ${
-            if dnsProvider != null then
-              "--dns ${dnsProvider}"
-            else if webroot != null then
-              "--http --http.webroot ${webroot}"
-            else
-              "--http"
-          } \
-          run || echo "Warning: certificate request for ${hostname} failed"
-      else
-        echo "Certificate for ${hostname} is still valid"
-      fi
-    '';
-
-  certSubmodule = {
-    options = {
-      extraDomainNames = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Additional domain names (SANs) for this certificate.";
-      };
-
-      webroot = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        description = "Webroot path for HTTP-01 challenge. Overrides defaults.";
-      };
-
-      dnsProvider = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        example = "cloudflare";
-        description = "DNS provider for DNS-01 challenge. Overrides defaults.";
-      };
-
-      reloadServices = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        example = [ "nginx" ];
-        description = "Services to reload after certificate renewal.";
-      };
-
-      directory = mkOption {
-        type = types.str;
-        readOnly = true;
-        default = "${cfg.certDir}/certificates";
-        description = "Directory containing the certificate files.";
-      };
-    };
-  };
-
+  # Local reimplementation of nixpkgs `lib.unique` (order-preserving dedup).
+  unique = list: builtins.foldl' (acc: x: if builtins.elem x acc then acc else acc ++ [ x ]) [ ] list;
 in
-
 {
-  options.security.acme = {
-    enable = mkOption {
+  options = {
+    enable = {
       type = types.bool;
       default = false;
       description = ''
@@ -105,8 +17,9 @@ in
       '';
     };
 
-    email = mkOption {
-      type = types.str;
+    email = {
+      type = types.string;
+      # TODO(adios-cutover): legacy option has no default (required); no default set here.
       example = "admin@example.com";
       description = ''
         Email address for ACME account registration.
@@ -114,7 +27,7 @@ in
       '';
     };
 
-    acceptTerms = mkOption {
+    acceptTerms = {
       type = types.bool;
       default = false;
       description = ''
@@ -123,8 +36,8 @@ in
       '';
     };
 
-    server = mkOption {
-      type = types.str;
+    server = {
+      type = types.string;
       default = "https://acme-v02.api.letsencrypt.org/directory";
       example = "https://acme-staging-v02.api.letsencrypt.org/directory";
       description = ''
@@ -132,35 +45,36 @@ in
       '';
     };
 
-    certDir = mkOption {
-      type = types.str;
+    certDir = {
+      type = types.string;
       default = "/var/lib/acme";
       description = "Base directory for certificate storage.";
     };
 
-    renewDays = mkOption {
-      type = types.ints.positive;
+    renewDays = {
+      type = types.int;
       default = 30;
       description = "Renew certificates when they are this many days old.";
     };
 
-    defaults = {
-      webroot = mkOption {
-        type = types.nullOr types.str;
-        default = "/var/lib/acme/acme-challenge";
-        description = "Default webroot for HTTP-01 challenges.";
-      };
-
-      dnsProvider = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        example = "cloudflare";
-        description = "Default DNS provider for DNS-01 challenges.";
-      };
+    defaultsWebroot = {
+      type = types.nullOr types.string;
+      default = "/var/lib/acme/acme-challenge";
+      description = "Default webroot for HTTP-01 challenges.";
     };
 
-    certs = mkOption {
-      type = types.attrsOf (types.submodule certSubmodule);
+    defaultsDnsProvider = {
+      type = types.nullOr types.string;
+      default = null;
+      example = "cloudflare";
+      description = "Default DNS provider for DNS-01 challenges.";
+    };
+
+    certs = {
+      # TODO(adios-cutover): submodule validation lost (legacy `certSubmodule`
+      # with extraDomainNames/webroot/dnsProvider/reloadServices/directory,
+      # including its readOnly `directory` default).
+      type = types.attrsOf types.attrs;
       default = { };
       description = ''
         Per-hostname certificate configuration.
@@ -170,37 +84,107 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
-    assertions = [
-      {
-        assertion = cfg.acceptTerms;
-        message = "security.acme.acceptTerms must be true to use ACME certificates.";
-      }
-      {
-        assertion = cfg.email != "";
-        message = "security.acme.email must be set for ACME registration.";
-      }
-    ];
-
-    # Auto-populate certs from port contracts
-    security.acme.certs = listToAttrs (
-      map (hostname: nameValuePair hostname { }) (filter (h: !(hasAttr h cfg.certs)) acmeHosts)
-    );
-
-    # Install lego
-    environment.systemPackages = [ pkgs.lego ];
-
-    # Create certificate directories and request/renew certs during activation
-    system.activationScripts.acme = stringAfter [ "etc" "users" ] ''
-      echo "ACME certificate management..."
-      mkdir -p ${cfg.certDir}
-      chmod 750 ${cfg.certDir}
-
-      ${optionalString (cfg.defaults.webroot != null) ''
-        mkdir -p ${cfg.defaults.webroot}
-      ''}
-
-      ${concatMapStringsSep "\n" mkLegoCertScript allCertHosts}
-    '';
+  inputs = {
+    ports.from = { root }: root.networking.ports;
+    # TODO(adios-cutover): `inputs.ports.acmeHosts` assumes a
+    # parent.networking.ports tree node exposes acmeHosts; verify against
+    # the networking port-contract port (unresolvable from this batch).
   };
+
+  assertions = [
+    {
+      verify = { options }: options.renewDays > 0;
+      explain = { options }: "renewDays must be positive, got ${toString options.renewDays}";
+    }
+    {
+      verify = { options }: (options.certs or { }) == { } || options.acceptTerms;
+      explain = { options }: "security.acme.acceptTerms must be true to use ACME certificates.";
+    }
+    {
+      verify = { options }: (options.certs or { }) == { } || (options.email or "") != "";
+      explain = { options }: "security.acme.email must be set for ACME registration.";
+    }
+  ];
+
+  impl =
+    { options, inputs }:
+    let
+      acmeHosts = inputs.ports.acmeHosts or [ ];
+
+      # Merge auto-discovered hosts with manually declared certs
+      allCertHosts = unique (acmeHosts ++ (builtins.attrNames options.certs));
+
+      # Build lego command for a given hostname
+      mkLegoCertScript =
+        hostname:
+        let
+          certCfg = options.certs.${hostname} or { };
+          certDir = "${options.certDir}/${hostname}";
+          extraDomains = certCfg.extraDomainNames or [ ];
+          domainArgs = builtins.concatStringsSep " " (
+            builtins.map (d: "-d ${d}") ([ hostname ] ++ extraDomains)
+          );
+          webroot = certCfg.webroot or options.defaultsWebroot;
+          dnsProvider = certCfg.dnsProvider or options.defaultsDnsProvider;
+        in
+        ''
+          # Certificate for ${hostname}
+          mkdir -p ${certDir}
+
+          if [ ! -f ${certDir}/fullchain.pem ] || \
+             [ "$(${pkgs.coreutils}/bin/find ${certDir}/fullchain.pem -mtime +${toString options.renewDays})" ]; then
+            echo "Requesting/renewing certificate for ${hostname}..."
+            ${pkgs.lego}/bin/lego \
+              --email "${options.email}" \
+              --accept-tos \
+              ${domainArgs} \
+              --path ${certDir} \
+              ${
+                if dnsProvider != null then
+                  "--dns ${dnsProvider}"
+                else if webroot != null then
+                  "--http --http.webroot ${webroot}"
+                else
+                  "--http"
+              } \
+              run || echo "Warning: certificate request for ${hostname} failed"
+          else
+            echo "Certificate for ${hostname} is still valid"
+          fi
+        '';
+    in
+    if options.enable then
+      {
+        # Auto-populate certs from port contracts
+        security.acme.certs = builtins.listToAttrs (
+          builtins.map (hostname: {
+            name = hostname;
+            value = { };
+          }) (builtins.filter (h: !(builtins.hasAttr h options.certs)) acmeHosts)
+        );
+
+        # Install lego
+        environment.systemPackages = [ pkgs.lego ];
+
+        # Create certificate directories and request/renew certs during activation
+        # TODO(adios-cutover): legacy stringAfter [ "etc" "users" ] ordering lost.
+        system.activationScripts.acme = ''
+          echo "ACME certificate management..."
+          mkdir -p ${options.certDir}
+          chmod 750 ${options.certDir}
+
+          ${
+            if (options.defaultsWebroot != null) then
+              ''
+                mkdir -p ${options.defaultsWebroot}
+              ''
+            else
+              ""
+          }
+
+          ${builtins.concatStringsSep "\n" (builtins.map mkLegoCertScript allCertHosts)}
+        '';
+      }
+    else
+      { };
 }

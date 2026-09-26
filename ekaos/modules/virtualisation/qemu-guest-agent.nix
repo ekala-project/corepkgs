@@ -1,23 +1,18 @@
-# QEMU guest agent
-# Enables host-guest communication for VMs (graceful shutdown, filesystem
-# freeze/thaw, network info reporting)
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
-
-let
-  cfg = config.services.qemu-guest-agent;
-
-in
+# Adios port of ekaos/modules/virtualisation/qemu-guest-agent.nix.
+#
+# Tree path: virtualisation/qemu-guest-agent is
+# parent.virtualisation."qemu-guest-agent".
+# Owns services.qemu-guest-agent.* (consumed by the service-manager
+# modules). Self-contained; no cross-module reads.
+# TODO(adios-cutover): impl computes command/args/user/restartPolicy/
+# systemd (legacy self-augmenting config write); the tree must merge impl
+# outputs back (NixOS module-merge semantics). command had no legacy
+# default (internal); no default here either. internal dropped.
+{ types, pkgs, ... }:
 
 {
-  options.services.qemu-guest-agent = {
-    enable = mkOption {
+  options = {
+    enable = {
       type = types.bool;
       default = false;
       description = ''
@@ -29,69 +24,72 @@ in
       '';
     };
 
-    description = mkOption {
-      type = types.str;
+    description = {
+      type = types.string;
       default = "QEMU Guest Agent";
       description = "Service description.";
     };
 
-    command = mkOption {
-      type = types.str;
-      internal = true;
-      description = "Command to run (set automatically).";
+    command = {
+      type = types.string;
+      description = "Command to run (set automatically by impl).";
     };
 
-    args = mkOption {
-      type = types.listOf types.str;
-      internal = true;
+    args = {
+      type = types.listOf types.string;
       default = [ ];
-      description = "Command arguments (set automatically).";
+      description = "Command arguments (set automatically by impl).";
     };
 
-    user = mkOption {
-      type = types.str;
+    user = {
+      type = types.string;
       default = "root";
       description = "User to run guest agent as.";
     };
 
-    restartPolicy = mkOption {
-      type = types.str;
+    restartPolicy = {
+      type = types.string;
       default = "always";
       description = "Restart policy.";
     };
 
-    systemd = mkOption {
-      type = types.attrsOf types.anything;
+    systemd = {
+      type = types.attrsOf types.any;
       default = { };
       description = "Systemd-specific options.";
     };
 
-    package = mkOption {
-      type = types.package;
+    package = {
+      type = types.derivation;
       default = pkgs.qemu;
       description = "QEMU package providing the guest agent.";
     };
   };
 
-  config = mkIf cfg.enable {
-    services.qemu-guest-agent = {
-      command = "${cfg.package}/bin/qemu-ga";
-      args = [
-        "--daemonize"
-        "--method"
-        "virtio-serial"
-        "--path"
-        "/dev/virtio-ports/org.qemu.guest_agent.0"
-      ];
-      user = "root";
-      restartPolicy = "always";
+  impl =
+    { options, inputs }:
+    if !options.enable then
+      { }
+    else
+      {
+        services.qemu-guest-agent = {
+          command = "${options.package}/bin/qemu-ga";
+          args = [
+            "--daemonize"
+            "--method"
+            "virtio-serial"
+            "--path"
+            "/dev/virtio-ports/org.qemu.guest_agent.0"
+          ];
+          user = "root";
+          restartPolicy = "always";
 
-      systemd = {
-        after = [ "local-fs.target" ];
-        wantedBy = [ "multi-user.target" ];
+          systemd = {
+            after = [ "local-fs.target" ];
+            wantedBy = [ "multi-user.target" ];
+          };
+        };
+
+        environment.systemPackages = [ options.package ];
       };
-    };
-
-    environment.systemPackages = [ cfg.package ];
-  };
 }

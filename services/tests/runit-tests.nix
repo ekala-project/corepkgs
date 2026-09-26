@@ -82,7 +82,7 @@ let
       # Default dependencies for test scripts
       defaultDeps = with pkgs; [
         coreutils
-        gnugrep
+        grep
         sed
         curl
         netcat

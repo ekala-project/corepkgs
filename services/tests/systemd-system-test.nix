@@ -103,7 +103,7 @@ let
       };
       path = with pkgs; [
         coreutils
-        gnugrep
+        grep
       ];
     };
   };

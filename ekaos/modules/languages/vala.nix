@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/vala.nix.
 # Vala programming language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "vala";
-    defaultPackage = pkgs: pkgs.vala;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "vala";
+  defaultPackage = pkgs: pkgs.vala;
+}

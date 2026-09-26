@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/racket.nix.
 # Racket programming language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "racket";
-    defaultPackage = pkgs: pkgs.racket;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "racket";
+  defaultPackage = pkgs: pkgs.racket;
+}

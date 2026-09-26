@@ -1,20 +1,16 @@
+# Adios port of ekaos/modules/languages/python.nix.
 # Python programming language module
 #
 # Usage:
 #   languages.python.enable = true;
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "python";
-    defaultPackage = pkgs: pkgs.python3;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "python";
+  defaultPackage = pkgs: pkgs.python3;
+}

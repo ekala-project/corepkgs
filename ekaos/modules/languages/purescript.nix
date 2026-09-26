@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/purescript.nix.
 # PureScript programming language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "purescript";
-    defaultPackage = pkgs: pkgs.purescript;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "purescript";
+  defaultPackage = pkgs: pkgs.purescript;
+}

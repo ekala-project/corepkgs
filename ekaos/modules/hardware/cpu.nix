@@ -1,23 +1,15 @@
-# CPU microcode update support
-# Provides options for AMD and Intel microcode loading
+# Adios port of ekaos/modules/hardware/cpu.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
 {
-  config,
+  types,
   lib,
   pkgs,
   ...
 }:
 
-with lib;
-
-let
-  cfgAmd = config.hardware.cpu.amd;
-  cfgIntel = config.hardware.cpu.intel;
-
-in
-
 {
   options = {
-    hardware.cpu.amd.updateMicrocode = mkOption {
+    amdUpdateMicrocode = {
       type = types.bool;
       default = false;
       description = ''
@@ -27,7 +19,7 @@ in
       '';
     };
 
-    hardware.cpu.intel.updateMicrocode = mkOption {
+    intelUpdateMicrocode = {
       type = types.bool;
       default = false;
       description = ''
@@ -38,15 +30,29 @@ in
     };
   };
 
-  config = mkMerge [
-    (mkIf cfgAmd.updateMicrocode {
-      hardware.firmware = [ pkgs.amd-microcode ];
-      boot.initrd.kernelModules = [ "microcode" ];
-    })
+  impl =
+    { options, ... }:
+    lib.merge.attrs.recursively {
+      mutators = [
+        (
+          if options.amdUpdateMicrocode then
+            {
+              hardware.firmware = [ pkgs.amd-microcode ];
+              boot.initrd.kernelModules = [ "microcode" ];
+            }
+          else
+            { }
+        )
 
-    (mkIf cfgIntel.updateMicrocode {
-      hardware.firmware = [ pkgs.intel-microcode ];
-      boot.initrd.kernelModules = [ "microcode" ];
-    })
-  ];
+        (
+          if options.intelUpdateMicrocode then
+            {
+              hardware.firmware = [ pkgs.intel-microcode ];
+              boot.initrd.kernelModules = [ "microcode" ];
+            }
+          else
+            { }
+        )
+      ];
+    };
 }

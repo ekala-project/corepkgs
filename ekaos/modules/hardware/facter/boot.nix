@@ -1,15 +1,28 @@
-# Auto-configure boot loader based on UEFI detection
-{ config, lib, ... }:
+# Adios port of ekaos/modules/hardware/facter/boot.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, ... }:
+
 {
-  options.hardware.facter.detected.uefi.supported = lib.mkEnableOption "Facter UEFI detection" // {
-    default = config.hardware.facter.report.uefi.supported or false;
-    defaultText = "hardware dependent";
+  options = {
+    uefiSupported = {
+      type = types.bool;
+      defaultFunc = { inputs, ... }: inputs.facter.report.uefi.supported or false;
+      description = "Whether to enable Facter UEFI detection.";
+    };
   };
 
-  config =
-    lib.mkIf (config.hardware.facter.enable && config.hardware.facter.detected.uefi.supported)
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
+  };
+
+  impl =
+    { options, inputs }:
+    if (inputs.facter.enable && options.uefiSupported) then
       {
-        boot.loader.systemd-boot.enable = lib.mkDefault true;
-        boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
-      };
+        # TODO(adios-cutover): legacy mkDefault priority lost (both options).
+        boot.loader.systemd-boot.enable = true;
+        boot.loader.efi.canTouchEfiVariables = true;
+      }
+    else
+      { };
 }

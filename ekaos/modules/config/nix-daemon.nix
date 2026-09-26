@@ -1,42 +1,16 @@
-# Nix daemon configuration
+# Adios port of ekaos/modules/config/nix-daemon.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
 # Generates /etc/nix/nix.conf
 {
-  config,
+  types,
   lib,
   pkgs,
   ...
 }:
 
-with lib;
-
-let
-  cfg = config.nix;
-
-  # Format a nix.conf value
-  formatValue =
-    v:
-    if isBool v then
-      (if v then "true" else "false")
-    else if isList v then
-      concatStringsSep " " (map toString v)
-    else
-      toString v;
-
-  # Generate nix.conf from settings
-  nixConf = concatStringsSep "\n" (
-    mapAttrsToList (name: value: "${name} = ${formatValue value}") cfg.settings
-  );
-
-  # Generate nix-path setting
-  nixPathConf = optionalString (cfg.nixPath != [ ]) (
-    "nix-path = ${concatStringsSep ":" cfg.nixPath}"
-  );
-
-in
-
 {
-  options.nix = {
-    enable = mkOption {
+  options = {
+    enable = {
       type = types.bool;
       default = true;
       description = ''
@@ -45,10 +19,9 @@ in
       '';
     };
 
-    package = mkOption {
-      type = types.package;
+    package = {
+      type = types.derivation;
       default = pkgs.nix;
-      defaultText = literalExpression "pkgs.nix";
       description = ''
         The Nix package to use for the daemon and CLI tools.
 
@@ -56,35 +29,33 @@ in
       '';
     };
 
-    settings = mkOption {
+    settings = {
       type = types.attrsOf (
-        types.oneOf [
+        types.union [
           types.bool
           types.int
-          types.str
-          types.path
-          (types.listOf types.str)
+          types.string
+          types.pathLike
+          (types.listOf types.string)
         ]
       );
       default = { };
-      example = literalExpression ''
-        {
-          max-jobs = 4;
-          cores = 0;
-          sandbox = true;
-          auto-optimise-store = true;
-          substituters = [ "https://cache.nixos.org" ];
-          trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
-        }
-      '';
+      example = {
+        max-jobs = 4;
+        cores = 0;
+        sandbox = true;
+        auto-optimise-store = true;
+        substituters = [ "https://cache.nixos.org" ];
+        trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
+      };
       description = ''
         Nix daemon settings written to /etc/nix/nix.conf.
         See nix.conf(5) for available options.
       '';
     };
 
-    extraOptions = mkOption {
-      type = types.lines;
+    extraOptions = {
+      type = types.string;
       default = "";
       example = ''
         keep-outputs = true
@@ -97,8 +68,8 @@ in
       '';
     };
 
-    nixPath = mkOption {
-      type = types.listOf types.str;
+    nixPath = {
+      type = types.listOf types.string;
       default = [ ];
       example = [
         "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
@@ -111,7 +82,7 @@ in
       '';
     };
 
-    nrBuildUsers = mkOption {
+    nrBuildUsers = {
       type = types.int;
       default = 32;
       description = ''
@@ -122,69 +93,75 @@ in
     };
 
     gc = {
-      automatic = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to run nix garbage collection automatically.";
-      };
+      options = {
+        automatic = {
+          type = types.bool;
+          default = false;
+          description = "Whether to run nix garbage collection automatically.";
+        };
 
-      dates = mkOption {
-        type = types.str;
-        default = "weekly";
-        example = "03:15";
-        description = ''
-          Schedule for automatic garbage collection.
+        dates = {
+          type = types.string;
+          default = "weekly";
+          example = "03:15";
+          description = ''
+            Schedule for automatic garbage collection.
 
-          Accepts calendar specs like "daily", "weekly", "monthly",
-          or systemd OnCalendar syntax like "03:15", "Mon..Fri 02:00".
-        '';
-      };
+            Accepts calendar specs like "daily", "weekly", "monthly",
+            or systemd OnCalendar syntax like "03:15", "Mon..Fri 02:00".
+          '';
+        };
 
-      options = mkOption {
-        type = types.str;
-        default = "--delete-older-than 30d";
-        example = "--max-freed 1G";
-        description = "Options passed to nix-collect-garbage.";
-      };
+        options = {
+          type = types.string;
+          default = "--delete-older-than 30d";
+          example = "--max-freed 1G";
+          description = "Options passed to nix-collect-garbage.";
+        };
 
-      persistent = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Whether to catch up on missed GC runs after sleep/shutdown.";
-      };
+        persistent = {
+          type = types.bool;
+          default = true;
+          description = "Whether to catch up on missed GC runs after sleep/shutdown.";
+        };
 
-      randomizedDelay = mkOption {
-        type = types.nullOr types.int;
-        default = null;
-        example = 1800;
-        description = "Random delay in seconds before GC to prevent thundering herd.";
+        randomizedDelay = {
+          type = types.nullOr types.int;
+          default = null;
+          example = 1800;
+          description = "Random delay in seconds before GC to prevent thundering herd.";
+        };
       };
+      description = "Automatic nix garbage collection settings.";
     };
 
     optimise = {
-      automatic = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Whether to automatically optimise the Nix store (deduplicate via hard links).
-        '';
-      };
+      options = {
+        automatic = {
+          type = types.bool;
+          default = false;
+          description = ''
+            Whether to automatically optimise the Nix store (deduplicate via hard links).
+          '';
+        };
 
-      dates = mkOption {
-        type = types.str;
-        default = "03:45";
-        example = "weekly";
-        description = "Schedule for automatic store optimization (calendar spec).";
-      };
+        dates = {
+          type = types.string;
+          default = "03:45";
+          example = "weekly";
+          description = "Schedule for automatic store optimization (calendar spec).";
+        };
 
-      persistent = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Whether to catch up on missed optimise runs.";
+        persistent = {
+          type = types.bool;
+          default = true;
+          description = "Whether to catch up on missed optimise runs.";
+        };
       };
+      description = "Automatic Nix store optimization settings.";
     };
 
-    checkConfig = mkOption {
+    checkConfig = {
       type = types.bool;
       default = true;
       description = ''
@@ -193,7 +170,7 @@ in
       '';
     };
 
-    checkAllErrors = mkOption {
+    checkAllErrors = {
       type = types.bool;
       default = true;
       description = ''
@@ -202,7 +179,7 @@ in
       '';
     };
 
-    distributedBuilds = mkOption {
+    distributedBuilds = {
       type = types.bool;
       default = false;
       description = ''
@@ -211,89 +188,12 @@ in
       '';
     };
 
-    buildMachines = mkOption {
-      type = types.listOf (
-        types.submodule {
-          options = {
-            hostName = mkOption {
-              type = types.str;
-              description = "Hostname or IP of the remote builder.";
-            };
-
-            protocol = mkOption {
-              type = types.nullOr (
-                types.enum [
-                  "ssh"
-                  "ssh-ng"
-                ]
-              );
-              default = "ssh";
-              description = "Protocol for connecting to the builder.";
-            };
-
-            system = mkOption {
-              type = types.nullOr types.str;
-              default = null;
-              example = "x86_64-linux";
-              description = "System type the builder supports (takes precedence over systems).";
-            };
-
-            systems = mkOption {
-              type = types.listOf types.str;
-              default = [ ];
-              example = [
-                "x86_64-linux"
-                "aarch64-linux"
-              ];
-              description = "System types the builder supports.";
-            };
-
-            sshUser = mkOption {
-              type = types.nullOr types.str;
-              default = null;
-              example = "builder";
-              description = "SSH user for connecting to the builder.";
-            };
-
-            sshKey = mkOption {
-              type = types.nullOr types.str;
-              default = null;
-              example = "/root/.ssh/builder_key";
-              description = "Path to the SSH private key for the builder.";
-            };
-
-            maxJobs = mkOption {
-              type = types.int;
-              default = 1;
-              description = "Maximum number of concurrent builds on this machine.";
-            };
-
-            speedFactor = mkOption {
-              type = types.int;
-              default = 1;
-              description = "Speed factor for build scheduling (higher = preferred).";
-            };
-
-            mandatoryFeatures = mkOption {
-              type = types.listOf types.str;
-              default = [ ];
-              description = "Features the machine must have for a build to be scheduled.";
-            };
-
-            supportedFeatures = mkOption {
-              type = types.listOf types.str;
-              default = [ ];
-              description = "Features the machine supports.";
-            };
-
-            publicHostKey = mkOption {
-              type = types.nullOr types.str;
-              default = null;
-              description = "Base64-encoded public host key of the builder.";
-            };
-          };
-        }
-      );
+    buildMachines = {
+      # TODO(adios-cutover): submodule validation lost. Legacy validated each
+      # machine (hostName, protocol ssh/ssh-ng, system/systems, sshUser,
+      # sshKey, maxJobs, speedFactor, mandatoryFeatures, supportedFeatures,
+      # publicHostKey).
+      type = types.listOf types.attrs;
       default = [ ];
       description = ''
         Remote machines for distributed Nix builds.
@@ -302,37 +202,10 @@ in
       '';
     };
 
-    registry = mkOption {
-      type = types.attrsOf (
-        types.submodule {
-          options = {
-            from = mkOption {
-              type = types.attrsOf types.anything;
-              description = "Flake reference to rewrite.";
-            };
-
-            to = mkOption {
-              type = types.attrsOf types.anything;
-              description = "Flake reference to rewrite to.";
-            };
-
-            exact = mkOption {
-              type = types.bool;
-              default = true;
-              description = "Whether 'from' must match exactly.";
-            };
-
-            flake = mkOption {
-              type = types.nullOr types.anything;
-              default = null;
-              description = ''
-                A flake input to use as the rewrite target.
-                When set, 'to' is derived automatically.
-              '';
-            };
-          };
-        }
-      );
+    registry = {
+      # TODO(adios-cutover): submodule validation lost. Legacy validated each
+      # entry (from/to attrsets, exact bool, flake).
+      type = types.attrsOf types.attrs;
       default = { };
       description = ''
         System-wide flake registry.
@@ -343,41 +216,44 @@ in
     };
 
     sshServe = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Whether to enable serving the Nix store over SSH.
+      options = {
+        enable = {
+          type = types.bool;
+          default = false;
+          description = ''
+            Whether to enable serving the Nix store over SSH.
 
-          Allows other machines to use this machine as a binary cache
-          via SSH.
-        '';
-      };
+            Allows other machines to use this machine as a binary cache
+            via SSH.
+          '';
+        };
 
-      keys = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "SSH public keys allowed to access the Nix store.";
-      };
+        keys = {
+          type = types.listOf types.string;
+          default = [ ];
+          description = "SSH public keys allowed to access the Nix store.";
+        };
 
-      protocol = mkOption {
-        type = types.enum [
-          "ssh"
-          "ssh-ng"
-        ];
-        default = "ssh-ng";
-        description = "Nix store protocol to use for SSH serving.";
-      };
+        protocol = {
+          type = types.enum "ssh-serve-protocol" [
+            "ssh"
+            "ssh-ng"
+          ];
+          default = "ssh-ng";
+          description = "Nix store protocol to use for SSH serving.";
+        };
 
-      write = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to allow writing to the Nix store over SSH.";
+        write = {
+          type = types.bool;
+          default = false;
+          description = "Whether to allow writing to the Nix store over SSH.";
+        };
       };
+      description = "Nix store SSH serving settings.";
     };
 
-    daemonCPUSchedPolicy = mkOption {
-      type = types.enum [
+    daemonCPUSchedPolicy = {
+      type = types.enum "daemon-cpu-sched-policy" [
         "other"
         "batch"
         "idle"
@@ -392,8 +268,8 @@ in
       '';
     };
 
-    daemonIOSchedClass = mkOption {
-      type = types.enum [
+    daemonIOSchedClass = {
+      type = types.enum "daemon-io-sched-class" [
         "best-effort"
         "idle"
       ];
@@ -406,7 +282,7 @@ in
       '';
     };
 
-    daemonIOSchedPriority = mkOption {
+    daemonIOSchedPriority = {
       type = types.int;
       default = 4;
       description = ''
@@ -416,142 +292,225 @@ in
     };
 
     channel = {
-      enable = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Whether to enable the default Nix channel.";
+      options = {
+        enable = {
+          type = types.bool;
+          default = true;
+          description = "Whether to enable the default Nix channel.";
+        };
       };
+      description = "Nix channel settings.";
     };
   };
 
-  config = {
-    # Default sane settings
-    nix.settings = {
-      max-jobs = mkDefault "auto";
-      cores = mkDefault 0;
-      sandbox = mkDefault true;
-      experimental-features = mkDefault "nix-command flakes";
-    };
+  assertions = [
+    {
+      verify = { options }: options.nrBuildUsers >= 0;
+      explain = { options }: "nrBuildUsers must be non-negative, got ${toString options.nrBuildUsers}";
+    }
+    {
+      verify = { options }: options.daemonIOSchedPriority >= 0 && options.daemonIOSchedPriority <= 7;
+      explain =
+        { options }: "daemonIOSchedPriority must be 0-7, got ${toString options.daemonIOSchedPriority}";
+    }
+  ];
 
-    # Generate /etc/nix/nix.conf
-    environment.etc."nix/nix.conf".text = ''
-      # Generated by ekaos nix-daemon module
-      ${nixConf}
-      ${nixPathConf}
-      ${optionalString (cfg.extraOptions != "") ''
+  impl =
+    { options, ... }:
+    let
+      optionalString = cond: s: if cond then s else "";
+      mapAttrsToList = f: set: builtins.map (n: f n set.${n}) (builtins.attrNames set);
 
-        # Extra options
-        ${cfg.extraOptions}
-      ''}
-    '';
+      # Format a nix.conf value
+      formatValue =
+        v:
+        if builtins.isBool v then
+          (if v then "true" else "false")
+        else if builtins.isList v then
+          builtins.concatStringsSep " " (builtins.map toString v)
+        else
+          toString v;
 
-    # Create nix directories and build users
-    system.activationScripts.nix-daemon = stringAfter [ "etc" ] ''
-      mkdir -p /etc/nix
-      mkdir -p /nix/var/nix/profiles/per-user
-      mkdir -p /nix/var/nix/gcroots/per-user
+      # Generate nix.conf from settings
+      nixConf = builtins.concatStringsSep "\n" (
+        mapAttrsToList (name: value: "${name} = ${formatValue value}") options.settings
+      );
 
-      # Ensure nixbld group exists and create build users
-      ${optionalString (cfg.nrBuildUsers > 0) ''
-        for i in $(seq 1 ${toString cfg.nrBuildUsers}); do
-          if ! id "nixbld$i" >/dev/null 2>&1; then
-            echo "Build user nixbld$i should be created by user management"
-          fi
-        done
-      ''}
-    '';
+      # Generate nix-path setting
+      nixPathConf = optionalString (options.nixPath != [ ]) (
+        "nix-path = ${builtins.concatStringsSep ":" options.nixPath}"
+      );
 
-    # Build users
-    users.groups.nixbld = mkIf (cfg.nrBuildUsers > 0) {
-      gid = 30000;
-      members = genList (i: "nixbld${toString (i + 1)}") cfg.nrBuildUsers;
-    };
+      buildUsers =
+        if (options.nrBuildUsers > 0) then
+          builtins.listToAttrs (
+            builtins.genList (
+              i:
+              let
+                n = i + 1;
+              in
+              {
+                name = "nixbld${toString n}";
+                value = {
+                  uid = 30000 + n;
+                  group = "nixbld";
+                  description = "Nix build user ${toString n}";
+                  isSystemUser = true;
+                  homeDirectory = "/var/empty";
+                  shell = "/run/current-system/sw/bin/nologin";
+                };
+              }
+            ) options.nrBuildUsers
+          )
+        else
+          { };
 
-    users.users = mkMerge [
-      (mkIf (cfg.nrBuildUsers > 0) (
-        listToAttrs (
-          genList (
-            i:
-            let
-              n = i + 1;
-            in
-            nameValuePair "nixbld${toString n}" {
-              uid = 30000 + n;
-              group = "nixbld";
-              description = "Nix build user ${toString n}";
-              isSystemUser = true;
-              homeDirectory = "/var/empty";
-              shell = "/run/current-system/sw/bin/nologin";
-            }
-          ) cfg.nrBuildUsers
-        )
-      ))
-
-      (mkIf cfg.sshServe.enable {
-        nix-ssh = {
-          description = "Nix SSH store user";
-          isSystemUser = true;
-          group = "nogroup";
-          shell = "${cfg.package}/bin/nix-store --serve ${optionalString cfg.sshServe.write "--write"}";
-          openssh.authorizedKeys.keys = cfg.sshServe.keys;
-        };
-      })
-    ];
-
-    # Generate /etc/nix/machines for distributed builds
-    environment.etc."nix/machines" = mkIf (cfg.buildMachines != [ ]) {
-      text = concatMapStringsSep "\n" (
-        m:
-        let
-          systems = if m.system != null then [ m.system ] else m.systems;
-          protocol = if m.protocol != null then "${m.protocol}://" else "";
-          user = optionalString (m.sshUser != null) "${m.sshUser}@";
-          key = optionalString (m.sshKey != null) " ${m.sshKey}";
-        in
-        "${protocol}${user}${m.hostName} ${concatStringsSep "," systems} ${key} ${toString m.maxJobs} ${toString m.speedFactor} ${concatStringsSep "," m.supportedFeatures} ${concatStringsSep "," m.mandatoryFeatures}"
-      ) cfg.buildMachines;
-    };
-
-    nix.settings.builders = mkIf cfg.distributedBuilds (mkDefault "@/etc/nix/machines");
-
-    # Generate flake registry
-    environment.etc."nix/registry.json" = mkIf (cfg.registry != { }) {
-      text = builtins.toJSON {
-        version = 2;
-        flakes = mapAttrsToList (
-          name: entry:
+      sshServeUser =
+        if options.sshServe.enable then
           {
-            inherit (entry) from to exact;
-          }
-          // optionalAttrs (entry.from == { }) {
-            from = {
-              type = "indirect";
-              id = name;
+            nix-ssh = {
+              description = "Nix SSH store user";
+              isSystemUser = true;
+              group = "nogroup";
+              shell = "${options.package}/bin/nix-store --serve ${optionalString options.sshServe.write "--write"}";
+              openssh.authorizedKeys.keys = options.sshServe.keys;
             };
           }
-        ) cfg.registry;
+        else
+          { };
+    in
+    {
+      # Default sane settings
+      # TODO(adios-cutover): priority lost (each value was mkDefault).
+      nix.settings = {
+        max-jobs = "auto";
+        cores = 0;
+        sandbox = true;
+        experimental-features = "nix-command flakes";
       };
-    };
 
-    # Automatic GC via timers
-    timers.nix-gc = mkIf cfg.gc.automatic {
-      enable = true;
-      description = "Nix garbage collection";
-      schedule.calendar = cfg.gc.dates;
-      schedule.persistent = cfg.gc.persistent;
-      schedule.randomDelay = cfg.gc.randomizedDelay;
-      script = "${cfg.package}/bin/nix-collect-garbage ${cfg.gc.options}";
-      user = "root";
-    };
+      # Generate /etc/nix/nix.conf
+      environment.etc."nix/nix.conf".text = ''
+        # Generated by ekaos nix-daemon module
+        ${nixConf}
+        ${nixPathConf}
+        ${optionalString (options.extraOptions != "") ''
 
-    # Automatic store optimization via timers
-    timers.nix-optimise = mkIf cfg.optimise.automatic {
-      enable = true;
-      description = "Nix store optimization";
-      schedule.calendar = cfg.optimise.dates;
-      schedule.persistent = cfg.optimise.persistent;
-      script = "${cfg.package}/bin/nix store optimise";
-      user = "root";
+          # Extra options
+          ${options.extraOptions}
+        ''}
+      '';
+
+      # Create nix directories and build users
+      system.activationScripts.nix-daemon = {
+        deps = [ "etc" ];
+        text = ''
+          mkdir -p /etc/nix
+          mkdir -p /nix/var/nix/profiles/per-user
+          mkdir -p /nix/var/nix/gcroots/per-user
+
+          # Ensure nixbld group exists and create build users
+          ${optionalString (options.nrBuildUsers > 0) ''
+            for i in $(seq 1 ${toString options.nrBuildUsers}); do
+              if ! id "nixbld$i" >/dev/null 2>&1; then
+                echo "Build user nixbld$i should be created by user management"
+              fi
+            done
+          ''}
+        '';
+      };
+
+      # Build users
+      users.groups =
+        if (options.nrBuildUsers > 0) then
+          {
+            nixbld = {
+              gid = 30000;
+              members = builtins.genList (i: "nixbld${toString (i + 1)}") options.nrBuildUsers;
+            };
+          }
+        else
+          { };
+
+      users.users = buildUsers // sshServeUser;
+
+      # Generate /etc/nix/machines for distributed builds
+      environment.etc."nix/machines" =
+        if (options.buildMachines != [ ]) then
+          {
+            text = builtins.concatStringsSep "\n" (
+              builtins.map (
+                m:
+                let
+                  systems = if m.system != null then [ m.system ] else m.systems;
+                  protocol = if m.protocol != null then "${m.protocol}://" else "";
+                  user = optionalString (m.sshUser != null) "${m.sshUser}@";
+                  key = optionalString (m.sshKey != null) " ${m.sshKey}";
+                in
+                "${protocol}${user}${m.hostName} ${builtins.concatStringsSep "," systems} ${key} ${toString m.maxJobs} ${toString m.speedFactor} ${builtins.concatStringsSep "," m.supportedFeatures} ${builtins.concatStringsSep "," m.mandatoryFeatures}"
+              ) options.buildMachines
+            );
+          }
+        else
+          { };
+
+      nix.settings.builders = if options.distributedBuilds then "@/etc/nix/machines" else null;
+
+      # Generate flake registry
+      environment.etc."nix/registry.json" =
+        if (options.registry != { }) then
+          {
+            text = builtins.toJSON {
+              version = 2;
+              flakes = mapAttrsToList (
+                name: entry:
+                {
+                  inherit (entry) from to exact;
+                }
+                // (
+                  if (entry.from == { }) then
+                    {
+                      from = {
+                        type = "indirect";
+                        id = name;
+                      };
+                    }
+                  else
+                    { }
+                )
+              ) options.registry;
+            };
+          }
+        else
+          { };
+
+      # Automatic GC via timers
+      timers.nix-gc =
+        if options.gc.automatic then
+          {
+            enable = true;
+            description = "Nix garbage collection";
+            schedule.calendar = options.gc.dates;
+            schedule.persistent = options.gc.persistent;
+            schedule.randomDelay = options.gc.randomizedDelay;
+            script = "${options.package}/bin/nix-collect-garbage ${options.gc.options}";
+            user = "root";
+          }
+        else
+          { };
+
+      # Automatic store optimization via timers
+      timers.nix-optimise =
+        if options.optimise.automatic then
+          {
+            enable = true;
+            description = "Nix store optimization";
+            schedule.calendar = options.optimise.dates;
+            schedule.persistent = options.optimise.persistent;
+            script = "${options.package}/bin/nix store optimise";
+            user = "root";
+          }
+        else
+          { };
     };
-  };
 }

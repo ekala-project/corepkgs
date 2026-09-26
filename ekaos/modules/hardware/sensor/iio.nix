@@ -1,18 +1,11 @@
-# IIO sensor support (accelerometer, gyroscope, ambient light)
-# Ported from nixpkgs/nixos/modules/hardware/sensor/iio.nix
+# Adios port of ekaos/modules/hardware/sensor/iio.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, pkgs, ... }:
+
 {
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-let
-  cfg = config.hardware.sensor.iio;
-in
-{
-  options.hardware.sensor.iio = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
+  options = {
+    enable = {
+      type = types.bool;
       default = false;
       description = ''
         Enable IIO sensor support with iio-sensor-proxy.
@@ -22,20 +15,32 @@ in
       '';
     };
 
-    package = lib.mkOption {
-      type = lib.types.package;
-      default = pkgs.iio-sensor-proxy or (throw "iio-sensor-proxy package not available");
-      defaultText = lib.literalExpression "pkgs.iio-sensor-proxy";
+    package = {
+      type = types.nullOr types.derivation;
+      default = pkgs.iio-sensor-proxy or null;
       description = "The iio-sensor-proxy package to use.";
     };
   };
 
-  config = lib.mkIf cfg.enable {
-    boot.initrd.availableKernelModules = [ "hid-sensor-hub" ];
+  assertions = [
+    {
+      verify = { options, ... }: (!options.enable) || (options.package != null);
+      explain =
+        { options, ... }: "package option must be set when enabled (iio-sensor-proxy is not in core-pkgs)";
+    }
+  ];
 
-    environment.systemPackages = [ cfg.package ];
-    services.dbus.packages = [ cfg.package ];
+  impl =
+    { options, ... }:
+    if options.enable then
+      {
+        boot.initrd.availableKernelModules = [ "hid-sensor-hub" ];
 
-    services.udev.packages = [ cfg.package ];
-  };
+        environment.systemPackages = [ options.package ];
+        services.dbus.packages = [ options.package ];
+
+        services.udev.packages = [ options.package ];
+      }
+    else
+      { };
 }

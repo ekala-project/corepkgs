@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/kotlin.nix.
 # Kotlin programming language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "kotlin";
-    defaultPackage = pkgs: pkgs.kotlin;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "kotlin";
+  defaultPackage = pkgs: pkgs.kotlin;
+}

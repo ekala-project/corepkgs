@@ -1,28 +1,42 @@
-# mkLanguageModule - Template function for languages.<name> modules
+# Adios port of ekaos/modules/languages/lib.nix.
 #
-# Generates a NixOS module with common language options (enable, package,
-# version, lsp) and wiring for both system-wide and per-user contexts.
-# Each language module imports this and extends it with language-specific options.
-{ lib }:
+# Adios-aware helper consumed via relative import by each
+# ekaos/adios/modules/languages/<name>.nix module:
+#   langLib = import ./lib.nix { inherit types; };
+#   langLib.mkLanguageModule { inherit pkgs; name = "..."; ... }
+#
+# Takes `{ types, ... }:` (korora/adios types only, never nixpkgs lib) and
+# exposes the pkgs-many version resolvers plus `mkLanguageModule`, which
+# RETURNS AN ADIOS MODULE (`{ options, impl }`) for one language.
+#
+# TODO(adios-cutover): per-user wiring (`users.users.<u>.languages.<lang>`
+# with packages/sessionVariables/sessionPath, including version resolution
+# via mkDefault) from the legacy helper is dropped; there is no adios users
+# module to attach it to yet. `sessionPath` args are still accepted (each
+# language file preserves its expr verbatim) but currently unused --
+# sessionPath only ever fed per-user config in the legacy helper.
+# TODO(adios-cutover): `imports` passthrough dropped; legacy imports are
+# covered by tree node parent.<path> (none of the language modules use it).
+# TODO(adios-cutover): version-resolution priority lost (was `mkDefault`):
+# when `version` is set the resolved package always wins; an explicit
+# `package` no longer takes precedence.
+# TODO(adios-cutover): `extraOptions` (legacy nixpkgs `mkOption` sets) are
+# merged verbatim and may reference nixpkgs types; none of the current
+# language modules use them.
+{ types, ... }:
 
 let
-  inherit (lib)
-    mkOption
-    mkEnableOption
-    mkDefault
-    mkIf
-    mkMerge
-    types
-    optional
-    concatStringsSep
-    splitString
-    ;
+  # Local split-on-"." (no nixpkgs lib allowed). `builtins.split` keeps the
+  # separators (as strings or empty group lists), so keep only the parts.
+  splitDot =
+    s:
+    builtins.filter (p: builtins.isString p && builtins.match "[.]" p == null) (builtins.split "[.]" s);
 
   # Convert a version string like "0.15" or "0.15.2" to variant attr name "v0_15"
   versionToVariantName =
     version:
     let
-      parts = splitString "." version;
+      parts = splitDot version;
       major = builtins.elemAt parts 0;
       minor = builtins.elemAt parts 1;
     in
@@ -43,7 +57,7 @@ let
           builtins.attrNames pkg
         );
       in
-      throw "languages.${name}: version \"${version}\" is not available. Known variants: ${concatStringsSep ", " availableNames}";
+      throw "languages.${name}: version \"${version}\" is not available. Known variants: ${builtins.concatStringsSep ", " availableNames}";
 
   # Standard resolver: "0.15" or "0.15.2" -> v0_15 (major.minor)
   mkVersionResolver =
@@ -57,7 +71,7 @@ let
   mkMajorVersionResolver =
     name: pkgs: version:
     let
-      parts = splitString "." version;
+      parts = splitDot version;
       major = builtins.elemAt parts 0;
       variantName = "v${major}";
     in
@@ -79,6 +93,9 @@ in
 
   mkLanguageModule =
     {
+      # pkgs for default-package / version-resolver evaluation (module args).
+      pkgs,
+
       # Required: language name (e.g. "zig", "rust", "go")
       name,
 
@@ -95,136 +112,95 @@ in
       defaultLspPackage ? _: null,
 
       # Optional: language-specific environment variables
-      # Type: config -> attrset of string
+      # Type: options -> attrset of string
       environmentVariables ? _: { },
 
-      # Optional: language-specific session path entries
-      # Type: config -> list of string
+      # Optional: language-specific session path entries (per-user only in
+      # legacy; accepted but unused here, see header TODO).
+      # Type: options -> list of string
       sessionPath ? _: [ ],
 
-      # Optional: additional options to merge into languages.<name>
+      # Optional: additional options to merge into the module options
       extraOptions ? { },
 
-      # Optional: additional NixOS modules to import. These receive the full
-      # { config, lib, pkgs, ... } module arguments, giving them access to the
-      # entire system/devshell config — not just the language's own config.
+      # Optional (legacy): additional NixOS modules to import. Dropped in
+      # adios (see header TODO); accepted so call sites stay verbatim.
       imports ? [ ],
     }:
 
     let
-      # Build the option set used for both system-level and per-user
-      mkLanguageOptions =
-        pkgs:
-        let
-          lspPkg = defaultLspPackage pkgs;
-        in
-        {
-          enable = mkEnableOption "the ${name} programming language toolchain";
+      lspPkg = defaultLspPackage pkgs;
+    in
 
-          package = mkOption {
-            type = types.package;
-            default = defaultPackage pkgs;
-            description = "The ${name} compiler/toolchain package.";
-          };
+    # Return an adios module. Tree path: languages/<name> is
+    # parent.languages.<name>.
+    {
+      options = {
+        enable = {
+          type = types.bool;
+          default = false;
+          description = "Whether to enable the ${name} programming language toolchain.";
+        };
 
-          version = mkOption {
-            type = types.nullOr types.str;
-            default = null;
-            example = "0.15";
-            description = ''
-              Version of ${name} to use. When set, overrides `package` by
-              resolving through the pkgs-many variant system.
-              Uses major.minor matching (e.g. "0.15" matches variant v0_15).
-            '';
-          };
+        package = {
+          type = types.derivation;
+          default = defaultPackage pkgs;
+          description = "The ${name} compiler/toolchain package.";
+        };
 
-          lsp = {
-            enable = mkOption {
+        version = {
+          type = types.nullOr types.string;
+          default = null;
+          example = "0.15";
+          description = ''
+            Version of ${name} to use. When set, overrides `package` by
+            resolving through the pkgs-many variant system.
+            Uses major.minor matching (e.g. "0.15" matches variant v0_15).
+          '';
+        };
+
+        lsp = {
+          description = "The ${name} language server.";
+          options = {
+            enable = {
               type = types.bool;
               default = lspPkg != null;
               description = "Whether to include the ${name} language server.";
             };
 
-            package = mkOption {
-              type = types.nullOr types.package;
+            package = {
+              type = types.nullOr types.derivation;
               default = lspPkg;
               description = "The ${name} language server package.";
             };
           };
-        }
-        // extraOptions;
-    in
+        };
+      }
+      # TODO(adios-cutover): legacy extraOptions were nixpkgs mkOption sets;
+      # merged verbatim, may reference nixpkgs types.
+      // extraOptions;
 
-    # Return a NixOS module function
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-
-    let
-      cfg = config.languages.${name};
-
-      # Collect packages for this language
-      langPackages = [
-        cfg.package
-      ]
-      ++ optional (cfg.lsp.enable && cfg.lsp.package != null) cfg.lsp.package;
-
-      envVars = environmentVariables cfg;
-      paths = sessionPath cfg;
-    in
-
-    {
-      inherit imports;
-
-      options.languages.${name} = mkLanguageOptions pkgs;
-
-      # Extend per-user options with the same language options, and wire
-      # per-user config within the submodule to avoid infinite recursion.
-      options.users.users = mkOption {
-        type = types.attrsOf (
-          types.submodule (
-            { config, ... }:
-            let
-              uCfg = config.languages.${name};
-              uPkgs = [ uCfg.package ] ++ optional (uCfg.lsp.enable && uCfg.lsp.package != null) uCfg.lsp.package;
-              uEnvVars = environmentVariables uCfg;
-              uPaths = sessionPath uCfg;
-            in
-            {
-              options.languages.${name} = mkLanguageOptions pkgs;
-
-              config = mkMerge [
-                # Per-user version resolution
-                (mkIf (uCfg.enable && uCfg.version != null) {
-                  languages.${name}.package = mkDefault (resolveVersion pkgs uCfg.version);
-                })
-
-                # Per-user packages and environment
-                (mkIf uCfg.enable {
-                  packages = uPkgs;
-                  sessionVariables = builtins.mapAttrs (_: toString) uEnvVars;
-                  sessionPath = uPaths;
-                })
-              ];
-            }
-          )
-        );
-      };
-
-      config = mkMerge [
-        # Version resolution: set package via mkDefault so explicit package overrides win
-        (mkIf (cfg.enable && cfg.version != null) {
-          languages.${name}.package = mkDefault (resolveVersion pkgs cfg.version);
-        })
-
-        # System-level config
-        (mkIf cfg.enable {
-          environment.packages = langPackages;
-          environment.variables = envVars;
-        })
-      ];
+      impl =
+        { options, ... }:
+        let
+          # TODO(adios-cutover): priority lost (was `mkDefault`): an explicit
+          # `package` no longer wins over `version`.
+          pkg = if options.version != null then resolveVersion pkgs options.version else options.package;
+          langPackages = [
+            pkg
+          ]
+          ++ (if options.lsp.enable && options.lsp.package != null then [ options.lsp.package ] else [ ]);
+          envVars = environmentVariables (options // { package = pkg; });
+          # Accepted-for-parity only; feeds nothing at system level (see
+          # header TODO about dropped per-user wiring).
+          _paths = sessionPath (options // { package = pkg; });
+        in
+        if !options.enable then
+          { }
+        else
+          {
+            environment.packages = langPackages;
+            environment.variables = envVars;
+          };
     };
 }

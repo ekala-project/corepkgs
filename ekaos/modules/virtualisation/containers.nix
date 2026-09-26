@@ -1,55 +1,51 @@
-# OCI container infrastructure
-# Shared configuration for Podman and Docker container runtimes
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
-
-let
-  cfg = config.virtualisation.containers;
-in
+# Adios port of ekaos/modules/virtualisation/containers.nix.
+#
+# Tree path: virtualisation/containers is parent.virtualisation.containers.
+# Shared OCI container infrastructure (storage, registries, policy)
+# for Podman and Docker. Self-contained; no cross-module reads.
+{ types, ... }:
 
 {
   options = {
-    virtualisation.containers = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Whether to enable shared OCI container infrastructure.
+    enable = {
+      type = types.bool;
+      default = false;
+      description = ''
+        Whether to enable shared OCI container infrastructure.
 
-          This provides container storage, registries, and policy
-          configuration shared between Podman and Docker.
-        '';
-      };
+        This provides container storage, registries, and policy
+        configuration shared between Podman and Docker.
+      '';
+    };
 
-      registries = {
-        search = mkOption {
-          type = types.listOf types.str;
+    registries = {
+      description = "Container registry configuration.";
+      options = {
+        search = {
+          type = types.listOf types.string;
           default = [ "docker.io" ];
           description = "Default registries searched for unqualified image names.";
         };
 
-        insecure = mkOption {
-          type = types.listOf types.str;
+        insecure = {
+          type = types.listOf types.string;
           default = [ ];
           description = "Registries to access without TLS verification.";
         };
 
-        block = mkOption {
-          type = types.listOf types.str;
+        block = {
+          type = types.listOf types.string;
           default = [ ];
           description = "Registries to block (deny pulling from).";
         };
       };
+    };
 
-      storage = {
-        driver = mkOption {
-          type = types.enum [
+    storage = {
+      description = "Container image storage configuration.";
+      options = {
+        driver = {
+          type = types.enum "container-storage-driver" [
             "overlay"
             "vfs"
             "btrfs"
@@ -59,53 +55,67 @@ in
           description = "Container storage driver.";
         };
 
-        graphRoot = mkOption {
-          type = types.str;
+        graphRoot = {
+          type = types.string;
           default = "/var/lib/containers/storage";
           description = "Root directory for container image storage.";
         };
 
-        runRoot = mkOption {
-          type = types.str;
+        runRoot = {
+          type = types.string;
           default = "/run/containers/storage";
           description = "Root directory for container runtime storage.";
         };
       };
+    };
 
-      policy = mkOption {
-        type = types.attrs;
-        default = {
-          default = [ { type = "insecureAcceptAnything"; } ];
-        };
-        description = "Container signature verification policy.";
+    policy = {
+      type = types.attrs;
+      default = {
+        default = [ { type = "insecureAcceptAnything"; } ];
       };
+      description = "Container signature verification policy.";
     };
   };
 
-  config = mkIf cfg.enable {
-    environment.etc."containers/registries.conf".text = ''
-      [registries.search]
-      registries = [${concatMapStringsSep ", " (r: "\"${r}\"") cfg.registries.search}]
+  impl =
+    { options, inputs }:
+    if !options.enable then
+      { }
+    else
+      {
+        environment.etc."containers/registries.conf".text = ''
+          [registries.search]
+          registries = [${
+            builtins.concatStringsSep ", " (builtins.map (r: "\"${r}\"") options.registries.search)
+          }]
 
-      [registries.insecure]
-      registries = [${concatMapStringsSep ", " (r: "\"${r}\"") cfg.registries.insecure}]
+          [registries.insecure]
+          registries = [${
+            builtins.concatStringsSep ", " (builtins.map (r: "\"${r}\"") options.registries.insecure)
+          }]
 
-      [registries.block]
-      registries = [${concatMapStringsSep ", " (r: "\"${r}\"") cfg.registries.block}]
-    '';
+          [registries.block]
+          registries = [${
+            builtins.concatStringsSep ", " (builtins.map (r: "\"${r}\"") options.registries.block)
+          }]
+        '';
 
-    environment.etc."containers/storage.conf".text = ''
-      [storage]
-      driver = "${cfg.storage.driver}"
-      graphroot = "${cfg.storage.graphRoot}"
-      runroot = "${cfg.storage.runRoot}"
-    '';
+        environment.etc."containers/storage.conf".text = ''
+          [storage]
+          driver = "${options.storage.driver}"
+          graphroot = "${options.storage.graphRoot}"
+          runroot = "${options.storage.runRoot}"
+        '';
 
-    environment.etc."containers/policy.json".text = builtins.toJSON cfg.policy;
+        environment.etc."containers/policy.json".text = builtins.toJSON options.policy;
 
-    system.activationScripts.containers = stringAfter [ "etc" ] ''
-      mkdir -p ${cfg.storage.graphRoot}
-      mkdir -p ${cfg.storage.runRoot}
-    '';
-  };
+        system.activationScripts.containers = {
+          deps = [ "etc" ];
+          text = ''
+            mkdir -p ${options.storage.graphRoot}
+            mkdir -p ${options.storage.runRoot}
+          '';
+        };
+      };
 }

@@ -166,7 +166,8 @@ lib.makeScope pkgs.newScope (
 
           acpi_call = callPackage ./pkgs/acpi-call { };
 
-          ajantv2 = callPackage ./pkgs/ajantv2 { };
+          # TODO: libajantv2 was never ported; stub null until it lands.
+          ajantv2 = null; # was: callPackage ./pkgs/ajantv2 { };
 
           akvcam = callPackage ./pkgs/akvcam { };
 

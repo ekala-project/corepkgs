@@ -1,172 +1,199 @@
-# Auto-configure NVIDIA GPU: driver options, generation detection, and PRIME
-{
-  lib,
-  config,
-  ...
-}:
+# Adios port of ekaos/modules/hardware/facter/nvidia.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, lib, ... }:
 let
-  facterLib = import ./lib.nix lib;
-  inherit (config.hardware.facter) report;
-  cfg = config.hardware.facter.detected.nvidia;
-  isBaremetal = config.hardware.facter.detected.virtualisation.none.enable;
-
-  gpus = report.hardware.graphics_card or [ ];
-
-  # Extract NVIDIA GPUs from facter report
-  nvidiaGpus = builtins.filter (
-    {
-      vendor ? { },
-      ...
-    }:
-    (vendor.value or 0) == 4318 # 0x10de
-  ) gpus;
-
-  # Extract non-NVIDIA GPUs (for hybrid detection)
-  otherGpus = builtins.filter (
-    {
-      vendor ? { },
-      ...
-    }:
+  # Local reimplementation of nixpkgs `lib.splitString` (single-char
+  # separator split; separators are dropped, unlike `builtins.split`).
+  splitString =
+    sep: s:
     let
-      vid = vendor.value or 0;
+      len = builtins.stringLength s;
+      go =
+        i: cur: acc:
+        if i >= len then
+          acc ++ [ cur ]
+        else
+          let
+            c = builtins.substring i 1 s;
+          in
+          if c == sep then go (i + 1) "" (acc ++ [ cur ]) else go (i + 1) "${cur}${c}" acc;
     in
-    vid != 4318 && (vid == 32902 || vid == 4098) # Intel or AMD
-  ) gpus;
+    go 0 "" [ ];
 
-  hasNvidia = builtins.length nvidiaGpus > 0;
-  hasOtherGpu = builtins.length otherGpus > 0;
-  isHybrid = hasNvidia && hasOtherGpu;
-
-  # Extract PCI bus ID from slot field in format "PCI:X:Y:Z"
-  slotToBusId =
-    slot:
+  # Local reimplementation of nixpkgs `lib.findFirst`.
+  findFirst =
+    pred: default: list:
     let
-      # slot format is typically "0000:XX:YY.Z"
-      parts = lib.splitString ":" slot;
-      hasDomain = builtins.length parts >= 3;
-      # Drop the domain prefix if present
-      busStr = if hasDomain then builtins.elemAt parts 1 else builtins.elemAt parts 0;
-      rest = if hasDomain then builtins.elemAt parts 2 else builtins.elemAt parts 1;
-      devFn = lib.splitString "." rest;
-      devStr = builtins.elemAt devFn 0;
-      fnStr = if builtins.length devFn > 1 then builtins.elemAt devFn 1 else "0";
+      found = builtins.filter pred list;
     in
-    "PCI:${builtins.toString (facterLib.hexToInt busStr)}:${builtins.toString (facterLib.hexToInt devStr)}:${fnStr}";
+    if found == [ ] then default else builtins.head found;
 
-  # Simple hex string to int for bus IDs (handles 1-2 hex digits)
-  hexToInt =
-    s:
-    let
-      hexChars = {
-        "0" = 0;
-        "1" = 1;
-        "2" = 2;
-        "3" = 3;
-        "4" = 4;
-        "5" = 5;
-        "6" = 6;
-        "7" = 7;
-        "8" = 8;
-        "9" = 9;
-        "a" = 10;
-        "b" = 11;
-        "c" = 12;
-        "d" = 13;
-        "e" = 14;
-        "f" = 15;
-      };
-      chars = lib.stringToCharacters (lib.toLower s);
-    in
-    lib.foldl' (acc: c: acc * 16 + (hexChars.${c} or 0)) 0 chars;
+  nvidiaVendorId = 4318; # 0x10de
+  intelVendorId = 32902; # 0x8086
+  amdVendorId = 4098; # 0x1002
 
-  # Extract bus ID from a GPU entry
+  nvidiaGpus =
+    report:
+    builtins.filter (
+      {
+        vendor ? { },
+        ...
+      }:
+      (vendor.value or 0) == nvidiaVendorId
+    ) (report.hardware.graphics_card or [ ]);
+
+  otherGpus =
+    report:
+    builtins.filter (
+      {
+        vendor ? { },
+        ...
+      }:
+      let
+        vid = vendor.value or 0;
+      in
+      vid != nvidiaVendorId && (vid == intelVendorId || vid == amdVendorId)
+    ) (report.hardware.graphics_card or [ ]);
+
+  # Extract PCI bus ID from slot field in format "PCI:X:Y:Z".
+  # NOTE: the legacy file also defines `slotToBusId` (identical logic, using
+  # the missing `facterLib.hexToInt`); only this copy is live, the duplicate
+  # is dropped here.
   gpuBusId =
-    gpu:
+    facterLib: gpu:
     let
       slot = gpu.slot or "";
-      parts = lib.splitString ":" slot;
+      parts = splitString ":" slot;
       hasDomain = builtins.length parts >= 3;
       busStr = if hasDomain then builtins.elemAt parts 1 else builtins.elemAt parts 0;
       rest = if hasDomain then builtins.elemAt parts 2 else builtins.elemAt parts 1;
-      devFn = lib.splitString "." rest;
+      devFn = splitString "." rest;
       devStr = builtins.elemAt devFn 0;
       fnStr = if builtins.length devFn > 1 then builtins.elemAt devFn 1 else "0";
     in
     if slot == "" then
       ""
     else
-      "PCI:${builtins.toString (hexToInt busStr)}:${builtins.toString (hexToInt devStr)}:${fnStr}";
-
-  nvidiaBusId = if builtins.length nvidiaGpus > 0 then gpuBusId (builtins.head nvidiaGpus) else "";
-
-  # Determine iGPU bus ID and type
-  iGpu = if builtins.length otherGpus > 0 then builtins.head otherGpus else null;
-  iGpuBusId = if iGpu != null then gpuBusId iGpu else "";
-  iGpuIsIntel = iGpu != null && (iGpu.vendor.value or 0) == 32902;
-  iGpuIsAmd = iGpu != null && (iGpu.vendor.value or 0) == 4098;
+      "PCI:${builtins.toString (facterLib.hexToInt busStr)}:${builtins.toString (facterLib.hexToInt devStr)}:${fnStr}";
 in
 {
-  options.hardware.facter.detected.nvidia = {
-    enable = lib.mkEnableOption "Facter NVIDIA GPU auto-configuration" // {
-      default = hasNvidia && isBaremetal;
-      defaultText = "hardware dependent";
+  options = {
+    enable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        builtins.length (nvidiaGpus inputs.facter.report) > 0 && inputs.virt.noneEnable;
+      description = "Whether to enable Facter NVIDIA GPU auto-configuration.";
     };
 
-    hybrid.enable = lib.mkEnableOption "Facter hybrid GPU (PRIME) detection" // {
-      default = isHybrid && isBaremetal;
-      defaultText = "hardware dependent";
+    hybridEnable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          report = inputs.facter.report;
+        in
+        builtins.length (nvidiaGpus report) > 0
+        && builtins.length (otherGpus report) > 0
+        && inputs.virt.noneEnable;
+      description = "Whether to enable Facter hybrid GPU (PRIME) detection.";
     };
 
-    busId = lib.mkOption {
-      type = lib.types.str;
-      default = nvidiaBusId;
-      defaultText = "hardware dependent";
+    busId = {
+      type = types.string;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          facterLib = import ./lib.nix { };
+          gpus = nvidiaGpus inputs.facter.report;
+        in
+        if builtins.length gpus > 0 then gpuBusId facterLib (builtins.head gpus) else "";
       description = "PCI bus ID of the NVIDIA GPU (auto-detected from facter report).";
     };
 
-    iGpuBusId = lib.mkOption {
-      type = lib.types.str;
-      default = iGpuBusId;
-      defaultText = "hardware dependent";
+    iGpuBusId = {
+      type = types.string;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          facterLib = import ./lib.nix { };
+          gpus = otherGpus inputs.facter.report;
+        in
+        if builtins.length gpus > 0 then gpuBusId facterLib (builtins.head gpus) else "";
       description = "PCI bus ID of the integrated GPU (auto-detected from facter report).";
     };
 
-    iGpuVendor = lib.mkOption {
-      type = lib.types.enum [
+    iGpuVendor = {
+      type = types.enum "iGpuVendor" [
         "intel"
         "amd"
         "none"
       ];
-      default =
-        if iGpuIsIntel then
+      defaultFunc =
+        { inputs, ... }:
+        let
+          gpus = otherGpus inputs.facter.report;
+          iGpu = if builtins.length gpus > 0 then builtins.head gpus else null;
+        in
+        if iGpu != null && (iGpu.vendor.value or 0) == intelVendorId then
           "intel"
-        else if iGpuIsAmd then
+        else if iGpu != null && (iGpu.vendor.value or 0) == amdVendorId then
           "amd"
         else
           "none";
-      defaultText = "hardware dependent";
       description = "Vendor of the integrated GPU.";
     };
   };
 
-  config = lib.mkIf config.hardware.facter.enable (
-    lib.mkMerge [
-      # Enable the NVIDIA hardware module with auto-detected settings
-      (lib.mkIf cfg.enable {
-        hardware.nvidia.enable = lib.mkDefault true;
-        hardware.nvidia.prime.nvidiaBusId = lib.mkDefault cfg.busId;
-      })
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
+    virt.from = { root }: root.hardware.facter.virtualisation;
+  };
 
-      # Hybrid GPU: auto-configure PRIME offload with detected bus IDs
-      (lib.mkIf cfg.hybrid.enable {
-        hardware.nvidia.prime.offload.enable = lib.mkDefault true;
-        hardware.nvidia.prime.intelBusId = lib.mkIf (cfg.iGpuVendor == "intel") (
-          lib.mkDefault cfg.iGpuBusId
-        );
-        hardware.nvidia.prime.amdgpuBusId = lib.mkIf (cfg.iGpuVendor == "amd") (
-          lib.mkDefault cfg.iGpuBusId
-        );
-      })
-    ]
-  );
+  impl =
+    { options, inputs }:
+    lib.merge.attrs.recursively {
+      mutators = [
+        # Enable the NVIDIA hardware module with auto-detected settings
+        (
+          if options.enable then
+            {
+              # TODO(adios-cutover): legacy mkDefault priority lost (both options).
+              hardware.nvidia.enable = true;
+              hardware.nvidia.prime.nvidiaBusId = options.busId;
+            }
+          else
+            { }
+        )
+
+        # Hybrid GPU: auto-configure PRIME offload with detected bus IDs
+        # TODO(adios-cutover): legacy mkDefault priority lost (all options).
+        (
+          if options.hybridEnable then
+            {
+              hardware.nvidia.prime.offload.enable = true;
+            }
+          else
+            { }
+        )
+
+        (
+          if (options.hybridEnable && options.iGpuVendor == "intel") then
+            {
+              hardware.nvidia.prime.intelBusId = options.iGpuBusId;
+            }
+          else
+            { }
+        )
+
+        (
+          if (options.hybridEnable && options.iGpuVendor == "amd") then
+            {
+              hardware.nvidia.prime.amdgpuBusId = options.iGpuBusId;
+            }
+          else
+            { }
+        )
+      ];
+    };
 }

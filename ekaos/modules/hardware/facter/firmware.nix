@@ -1,12 +1,22 @@
-# Auto-configure firmware for bare-metal systems
-{ lib, config, ... }:
-let
-  facterLib = import ./lib.nix lib;
-  inherit (config.hardware.facter) report;
-  isBaremetal = config.hardware.facter.detected.virtualisation.none.enable;
-in
+# Adios port of ekaos/modules/hardware/facter/firmware.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ ... }:
+
 {
-  config = lib.mkIf (config.hardware.facter.enable && isBaremetal) {
-    hardware.enableRedistributableFirmware = lib.mkDefault true;
+  options = { };
+
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
+    virt.from = { root }: root.hardware.facter.virtualisation;
   };
+
+  impl =
+    { inputs, ... }:
+    if (inputs.facter.enable && inputs.virt.noneEnable) then
+      {
+        # TODO(adios-cutover): legacy mkDefault priority lost.
+        hardware.enableRedistributableFirmware = true;
+      }
+    else
+      { };
 }

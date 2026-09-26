@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/sml.nix.
 # Standard ML programming language module (MLton)
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "sml";
-    defaultPackage = pkgs: pkgs.mlton;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "sml";
+  defaultPackage = pkgs: pkgs.mlton;
+}

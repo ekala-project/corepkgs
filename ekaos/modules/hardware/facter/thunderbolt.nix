@@ -1,35 +1,35 @@
-# Auto-detect Thunderbolt/USB4 controllers
-{
-  lib,
-  config,
-  ...
-}:
-let
-  inherit (config.hardware.facter) report;
-  isBaremetal = config.hardware.facter.detected.virtualisation.none.enable;
+# Adios port of ekaos/modules/hardware/facter/thunderbolt.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, ... }:
 
-  # Thunderbolt controllers appear as PCI devices
-  # Intel Thunderbolt: vendor 0x8086 (32902), various device IDs
-  # The facter report may list them under a dedicated category or as generic PCI
-  thunderboltDevices = report.hardware.thunderbolt_controller or [ ];
-
-  hasThunderbolt = builtins.length thunderboltDevices > 0;
-in
 {
-  options.hardware.facter.detected.thunderbolt.enable =
-    lib.mkEnableOption "Facter Thunderbolt/USB4 detection"
-    // {
-      default = hasThunderbolt && isBaremetal;
-      defaultText = "hardware dependent";
+  options = {
+    enable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        builtins.length (inputs.facter.report.hardware.thunderbolt_controller or [ ]) > 0
+        && inputs.virt.noneEnable;
+      description = "Whether to enable Facter Thunderbolt/USB4 detection.";
     };
+  };
 
-  config =
-    lib.mkIf (config.hardware.facter.enable && config.hardware.facter.detected.thunderbolt.enable)
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
+    virt.from = { root }: root.hardware.facter.virtualisation;
+  };
+
+  impl =
+    { options, inputs }:
+    if (inputs.facter.enable && options.enable) then
       {
         # Load thunderbolt kernel module for device authorization
         boot.kernelModules = [ "thunderbolt" ];
 
         # Enable boltd for Thunderbolt device authorization
-        services.hardware.bolt.enable = lib.mkDefault true;
-      };
+        # TODO(adios-cutover): legacy mkDefault priority lost.
+        services.hardware.bolt.enable = true;
+      }
+    else
+      { };
 }

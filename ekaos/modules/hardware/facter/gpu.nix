@@ -1,52 +1,87 @@
-# Auto-configure GPU vendor-specific graphics defaults
+# Adios port of ekaos/modules/hardware/facter/gpu.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, lib, ... }:
+
 {
-  lib,
-  config,
-  ...
-}:
-let
-  facterLib = import ./lib.nix lib;
-  inherit (config.hardware.facter) report;
-  cfg = config.hardware.facter.detected.gpu;
-in
-{
-  options.hardware.facter.detected.gpu = {
-    amd.enable = lib.mkEnableOption "Facter AMD GPU detection" // {
-      default = facterLib.hasAmdGpu report;
-      defaultText = "hardware dependent";
+  options = {
+    amdEnable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          facterLib = import ./lib.nix { };
+        in
+        facterLib.hasAmdGpu inputs.facter.report;
+      description = "Whether to enable Facter AMD GPU detection.";
     };
 
-    intel.enable = lib.mkEnableOption "Facter Intel GPU detection" // {
-      default = facterLib.hasIntelGpu report;
-      defaultText = "hardware dependent";
+    intelEnable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          facterLib = import ./lib.nix { };
+        in
+        facterLib.hasIntelGpu inputs.facter.report;
+      description = "Whether to enable Facter Intel GPU detection.";
     };
 
-    nvidia.enable = lib.mkEnableOption "Facter NVIDIA GPU detection" // {
-      default = facterLib.hasNvidiaGpu report;
-      defaultText = "hardware dependent";
+    nvidiaEnable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          facterLib = import ./lib.nix { };
+        in
+        facterLib.hasNvidiaGpu inputs.facter.report;
+      description = "Whether to enable Facter NVIDIA GPU detection.";
     };
   };
 
-  config = lib.mkIf config.hardware.facter.enable (
-    lib.mkMerge [
-      # AMD GPU: enable graphics with 32-bit support, early KMS for display at boot
-      (lib.mkIf cfg.amd.enable {
-        hardware.graphics.enable = lib.mkDefault true;
-        hardware.graphics.enable32Bit = lib.mkDefault true;
-        boot.initrd.kernelModules = [ "amdgpu" ];
-      })
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
+  };
 
-      # Intel GPU: enable graphics stack, load i915 early for display at boot
-      (lib.mkIf cfg.intel.enable {
-        hardware.graphics.enable = lib.mkDefault true;
-        boot.initrd.kernelModules = [ "i915" ];
-      })
+  impl =
+    { options, inputs }:
+    lib.merge.attrs.recursively {
+      mutators = [
+        # AMD GPU: enable graphics with 32-bit support, early KMS for display at boot
+        # TODO(adios-cutover): legacy mkDefault priority lost (both options).
+        (
+          if options.amdEnable then
+            {
+              hardware.graphics.enable = true;
+              hardware.graphics.enable32Bit = true;
+              boot.initrd.kernelModules = [ "amdgpu" ];
+            }
+          else
+            { }
+        )
 
-      # NVIDIA GPU: enable graphics stack
-      # Driver configuration is handled by hardware.nvidia (via facter/nvidia.nix)
-      (lib.mkIf cfg.nvidia.enable {
-        hardware.graphics.enable = lib.mkDefault true;
-      })
-    ]
-  );
+        # Intel GPU: enable graphics stack, load i915 early for display at boot
+        # TODO(adios-cutover): legacy mkDefault priority lost.
+        (
+          if options.intelEnable then
+            {
+              hardware.graphics.enable = true;
+              boot.initrd.kernelModules = [ "i915" ];
+            }
+          else
+            { }
+        )
+
+        # NVIDIA GPU: enable graphics stack
+        # Driver configuration is handled by hardware.nvidia (via facter/nvidia.nix)
+        # TODO(adios-cutover): legacy mkDefault priority lost.
+        (
+          if options.nvidiaEnable then
+            {
+              hardware.graphics.enable = true;
+            }
+          else
+            { }
+        )
+      ];
+    };
 }

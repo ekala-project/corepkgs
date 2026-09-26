@@ -1,21 +1,8 @@
-# Kernel tuning profiles
-#
-# Selects runtime sysctl values, kernel boot parameters, and power management
-# defaults appropriate for a given workload.  Compile-time kernel config
-# (PREEMPT, HZ, BFQ, BBR, etc.) is set in common-config.nix and already
-# targets interactive desktop use.  These profiles tune the *runtime* knobs
-# on top of that base.
-{
-  config,
-  lib,
-  ...
-}:
-
-with lib;
+# Adios port of ekaos/modules/config/kernel-profile.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, ... }:
 
 let
-  cfg = config.boot.kernel.profile;
-
   # ── profile definitions ──────────────────────────────────────────────
   #
   # Each profile is an attrset of:
@@ -125,30 +112,39 @@ let
     };
 
   };
-
-  chosen = profiles.${cfg};
 in
 
 {
-  options.boot.kernel.profile = mkOption {
-    type = types.enum (attrNames profiles);
-    default = "reactive";
-    example = "battery";
-    description = ''
-      Kernel tuning profile.  Selects runtime sysctl values, boot
-      parameters, and a CPU frequency governor appropriate for the
-      workload.
+  options = {
+    profile = {
+      type = types.enum "kernel-profile" (builtins.attrNames profiles);
+      default = "reactive";
+      example = "battery";
+      description = ''
+        Kernel tuning profile.  Selects runtime sysctl values, boot
+        parameters, and a CPU frequency governor appropriate for the
+        workload.
 
-      Available profiles:
-      ${concatStringsSep "\n" (mapAttrsToList (n: p: "- ${n}: ${p.description}") profiles)}
-    '';
+        Available profiles:
+        ${builtins.concatStringsSep "\n" (
+          builtins.map (n: "- ${n}: ${profiles.${n}.description}") (builtins.attrNames profiles)
+        )}
+      '';
+    };
   };
 
-  config = {
-    boot.kernel.sysctl = mapAttrs (_: mkDefault) chosen.sysctl;
+  impl =
+    { options, ... }:
+    let
+      chosen = profiles.${options.profile};
+    in
+    {
+      # TODO(adios-cutover): priority lost (each value was mkDefault).
+      boot.kernel.sysctl = chosen.sysctl;
 
-    boot.kernelParams = chosen.params;
+      boot.kernelParams = chosen.params;
 
-    power.cpuFreqGovernor = mkIf (chosen.power != null) (mkDefault chosen.power);
-  };
+      # TODO(adios-cutover): priority lost (was mkDefault); null means "don't touch".
+      power.cpuFreqGovernor = if chosen.power != null then chosen.power else null;
+    };
 }

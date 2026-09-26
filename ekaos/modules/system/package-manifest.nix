@@ -1,22 +1,51 @@
-# Package manifest generation for SBOM support
+# Adios port of ekaos/modules/system/package-manifest.nix.
+#
+# Tree path: system/package-manifest is parent.system.package-manifest.
 #
 # Produces a JSON file listing all packages in the system closure with
 # authoritative metadata (name, version, license, description, homepage)
-# and role classification (default, user, service, home, boot).
+# and role classification (default, user, service, home, boot), embedded
+# at <toplevel>/package-manifest.json and consumed by `ekapkgs closure
+# sbom` for CycloneDX SBOM generation.
 #
-# The manifest is embedded at <toplevel>/package-manifest.json and consumed
-# by `ekapkgs closure sbom` to produce CycloneDX SBOMs without the
-# heuristic store-path-name parsing that tools like sbomnix rely on.
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+# Reads service packages via inputs.services (parent.services), system
+# packages + ekaos version via inputs.sysenv (parent.system.toplevel),
+# home packages via inputs.home (parent.config."users-groups"), and boot
+# packages via inputs.bootKernel (parent.boot.kernel) + inputs.sysenv
+# (systemd.package).
+# TODO(adios-cutover): AGGREGATION GAP (load-bearing). Legacy scans
+# config.services / config.users.users via the global fixpoint (with
+# tryEval guards for disabled services). Adios inputs resolve to whatever
+# the tree wires; arbitrary service/user modules outside the tree are
+# invisible, so service/home roles may be misclassified as user/default.
+# TODO(adios-cutover): lib.isDerivation / lib.toList / lib.findFirst have
+# no adios.lib equivalents; smallest local reimplementations below.
+{ types, pkgs, ... }:
 
 let
+  filterAttrs =
+    pred: set:
+    builtins.listToAttrs (
+      builtins.map (n: {
+        name = n;
+        value = set.${n};
+      }) (builtins.filter (n: pred n set.${n}) (builtins.attrNames set))
+    );
+  mapAttrsToList = f: attrs: builtins.map (n: f n attrs.${n}) (builtins.attrNames attrs);
+  toList = x: if builtins.isList x then x else [ x ];
+  isDerivation = x: builtins.isAttrs x && (x.type or "") == "derivation";
+  findFirst =
+    pred: default: list:
+    builtins.foldl' (
+      acc: x:
+      if acc != default then
+        acc
+      else if pred x then
+        x
+      else
+        default
+    ) default list;
+
   # Safely extract metadata from a package.
   # Uses tryEval because some packages have meta values that cannot be
   # serialized to JSON (thunks, infinite recursion, etc).
@@ -41,17 +70,20 @@ let
           raw = pkg.outputs or { };
         in
         if builtins.isList raw then
-          listToAttrs (
-            map (name: nameValuePair name (builtins.unsafeDiscardStringContext (toString pkg.${name}))) raw
+          builtins.listToAttrs (
+            builtins.map (name: {
+              inherit name;
+              value = builtins.unsafeDiscardStringContext (toString pkg.${name});
+            }) raw
           )
         else
-          mapAttrs (_: v: builtins.unsafeDiscardStringContext (toString v)) raw
+          builtins.mapAttrs (_: v: builtins.unsafeDiscardStringContext (toString v)) raw
       );
       licenses =
         let
           raw = tryOr [ ] (toList (pkg.meta.license or [ ]));
         in
-        map (l: {
+        builtins.map (l: {
           spdxId = tryOr null (l.spdxId or null);
           fullName = tryOr "unknown" (l.fullName or l.shortName or "unknown");
         }) raw;
@@ -72,7 +104,7 @@ let
       # Source provenance: list of source type names
       # e.g., ["fromSource"] or ["binaryNativeCode"]
       sourceProvenance = tryOr [ ] (
-        map (t: t.shortName or (t.name or "unknown")) (pkg.meta.sourceProvenance or [ ])
+        builtins.map (t: t.shortName or (t.name or "unknown")) (pkg.meta.sourceProvenance or [ ])
       );
 
       # Known vulnerabilities: list of CVE identifiers
@@ -119,7 +151,7 @@ let
         builtins.isAttrs svc
         && (svc.enable or false)
         && (svc ? package)
-        && (builtins.isAttrs (svc.package or null) || lib.isDerivation (svc.package or null))
+        && (builtins.isAttrs (svc.package or null) || isDerivation (svc.package or null))
       );
     in
     if result.success && result.value then
@@ -139,7 +171,7 @@ let
         builtins.isAttrs subSvc
         && (subSvc.enable or false)
         && (subSvc ? package)
-        && (builtins.isAttrs (subSvc.package or null) || lib.isDerivation (subSvc.package or null))
+        && (builtins.isAttrs (subSvc.package or null) || isDerivation (subSvc.package or null))
       );
     in
     if result.success && result.value then
@@ -152,148 +184,181 @@ let
     else
       [ ];
 
-  servicePackages =
-    let
-      svcs = config.services or { };
-      collected = concatLists (
-        mapAttrsToList (
-          name: svc:
+  collectServicePackages =
+    services:
+    builtins.concatLists (
+      mapAttrsToList (
+        name: svc:
+        let
+          direct = tryGetServicePkg name svc;
+        in
+        if direct != [ ] then
+          direct
+        else if builtins.isAttrs svc then
+          # Check one level of nesting (e.g., services.networking.nginx)
           let
-            direct = tryGetServicePkg name svc;
+            subResult = builtins.tryEval (filterAttrs (_: v: builtins.isAttrs v) svc);
           in
-          if direct != [ ] then
-            direct
-          else if builtins.isAttrs svc then
-            # Check one level of nesting (e.g., services.networking.nginx)
-            let
-              subResult = builtins.tryEval (filterAttrs (_: v: builtins.isAttrs v) svc);
-            in
-            if subResult.success then
-              concatLists (
-                mapAttrsToList (subName: subSvc: tryGetSubServicePkg name subName subSvc) subResult.value
-              )
-            else
-              [ ]
+          if subResult.success then
+            builtins.concatLists (
+              mapAttrsToList (subName: subSvc: tryGetSubServicePkg name subName subSvc) subResult.value
+            )
           else
             [ ]
-        ) svcs
-      );
-    in
-    collected;
+        else
+          [ ]
+      ) services
+    );
 
-  # Build store path sets for role classification.
-  defaultPkgPaths = map (
-    p: builtins.unsafeDiscardStringContext (toString p)
-  ) config.environment.defaultPackages;
-  servicePkgPaths = map (s: builtins.unsafeDiscardStringContext (toString s.pkg)) servicePackages;
-  homePkgs = concatLists (
-    mapAttrsToList (
-      userName: userCfg:
-      map (p: {
-        pkg = p;
-        source = "users.users.${userName}.packages";
-      }) (userCfg.packages or [ ])
-    ) (config.users.users or { })
-  );
-  homePkgPaths = map (h: builtins.unsafeDiscardStringContext (toString h.pkg)) homePkgs;
-
-  # Classify a system package.
-  classifySystemPkg =
-    pkg:
+  # Build the manifest derivation from explicitly passed package sets.
+  buildManifest =
+    {
+      services,
+      defaultPackages,
+      systemPackages,
+      users,
+      kernel,
+      systemdPkg,
+      ekaosVersion,
+      system,
+    }:
     let
-      path = builtins.unsafeDiscardStringContext (toString pkg);
-    in
-    if builtins.elem path defaultPkgPaths then
-      {
-        role = "default";
-        source = "environment.defaultPackages";
-      }
-    else if builtins.elem path servicePkgPaths then
-      let
-        match = findFirst (
-          s: builtins.unsafeDiscardStringContext (toString s.pkg) == path
-        ) null servicePackages;
-      in
-      {
-        role = "service";
-        source = if match != null then match.source else "services";
-      }
-    else
-      {
-        role = "user";
-        source = "environment.systemPackages";
+      servicePackages = collectServicePackages services;
+
+      # Build store path sets for role classification.
+      defaultPkgPaths = builtins.map (
+        p: builtins.unsafeDiscardStringContext (toString p)
+      ) defaultPackages;
+      servicePkgPaths = builtins.map (
+        s: builtins.unsafeDiscardStringContext (toString s.pkg)
+      ) servicePackages;
+      homePkgs = builtins.concatLists (
+        mapAttrsToList (
+          userName: userCfg:
+          builtins.map (p: {
+            pkg = p;
+            source = "users.users.${userName}.packages";
+          }) (userCfg.packages or [ ])
+        ) users
+      );
+      homePkgPaths = builtins.map (h: builtins.unsafeDiscardStringContext (toString h.pkg)) homePkgs;
+
+      # Classify a system package.
+      classifySystemPkg =
+        pkg:
+        let
+          path = builtins.unsafeDiscardStringContext (toString pkg);
+        in
+        if builtins.elem path defaultPkgPaths then
+          {
+            role = "default";
+            source = "environment.defaultPackages";
+          }
+        else if builtins.elem path servicePkgPaths then
+          let
+            match = findFirst (
+              s: builtins.unsafeDiscardStringContext (toString s.pkg) == path
+            ) null servicePackages;
+          in
+          {
+            role = "service";
+            source = if match != null then match.source else "services";
+          }
+        else
+          {
+            role = "user";
+            source = "environment.systemPackages";
+          };
+
+      # Collect all packages with classifications.
+      systemPkgEntries = builtins.map (
+        pkg:
+        let
+          cls = classifySystemPkg pkg;
+        in
+        extractMeta pkg cls.role cls.source
+      ) systemPackages;
+
+      homePkgEntries = builtins.map (h: extractMeta h.pkg "home" h.source) homePkgs;
+
+      bootPkgEntries =
+        (if kernel != null then [ (extractMeta kernel "boot" "boot.kernelPackages.kernel") ] else [ ])
+        ++ (if systemdPkg != null then [ (extractMeta systemdPkg "boot" "systemd.package") ] else [ ]);
+
+      # Deduplicate by store path, preferring entries with more specific roles.
+      allEntries = systemPkgEntries ++ homePkgEntries ++ bootPkgEntries;
+
+      # Convert to the JSON-friendly format (rename "licenses" to "license"
+      # to match the schema the Rust side expects).
+      toJsonEntry = entry: {
+        inherit (entry)
+          pname
+          version
+          storePath
+          outputs
+          description
+          homepage
+          role
+          source
+          cpe
+          purl
+          sourceProvenance
+          knownVulnerabilities
+          changelog
+          mainProgram
+          ;
+        license = entry.licenses;
       };
 
-  # Collect all packages with classifications.
-  systemPkgEntries = map (
-    pkg:
-    let
-      cls = classifySystemPkg pkg;
+      manifest = {
+        version = 1;
+        inherit system;
+        inherit ekaosVersion;
+        packages = builtins.map toJsonEntry allEntries;
+      };
     in
-    extractMeta pkg cls.role cls.source
-  ) config.environment.systemPackages;
-
-  homePkgEntries = map (h: extractMeta h.pkg "home" h.source) homePkgs;
-
-  bootPkgEntries =
-    let
-      kernel = config.boot.kernelPackages.kernel or null;
-      systemd = config.systemd.package or null;
-    in
-    (optional (kernel != null) (extractMeta kernel "boot" "boot.kernelPackages.kernel"))
-    ++ (optional (systemd != null) (extractMeta systemd "boot" "systemd.package"));
-
-  # Deduplicate by store path, preferring entries with more specific roles.
-  allEntries = systemPkgEntries ++ homePkgEntries ++ bootPkgEntries;
-
-  # Convert to the JSON-friendly format (rename "licenses" to "license"
-  # to match the schema the Rust side expects).
-  toJsonEntry = entry: {
-    inherit (entry)
-      pname
-      version
-      storePath
-      outputs
-      description
-      homepage
-      role
-      source
-      cpe
-      purl
-      sourceProvenance
-      knownVulnerabilities
-      changelog
-      mainProgram
-      ;
-    license = entry.licenses;
-  };
-
-  manifest = {
-    version = 1;
-    system = pkgs.stdenv.hostPlatform.system;
-    ekaosVersion = config.system.ekaos.version;
-    packages = map toJsonEntry allEntries;
-  };
-
-  manifestFile = pkgs.writeText "package-manifest.json" (builtins.toJSON manifest);
-
+    pkgs.writeText "package-manifest.json" (builtins.toJSON manifest);
 in
 
 {
-  options.system.build.packageManifest = mkOption {
-    type = types.package;
-    readOnly = true;
-    description = ''
-      JSON manifest of all packages in the system closure with metadata.
+  options = {
+    # Exposed as an option (via defaultFunc) so sibling modules can consume it
+    # through adios inputs, which only see OPTIONS, never impl results.
+    buildPackageManifest = {
+      type = types.derivation;
+      defaultFunc = { options, inputs }:
+        buildManifest {
+          services = inputs.services;
+          defaultPackages = inputs.sysenv.environment.defaultPackages;
+          systemPackages = inputs.sysenv.environment.systemPackages;
+          users = inputs.home.users.users or { };
+          kernel = inputs.bootKernel.kernelPackages.kernel or null;
+          systemdPkg = inputs.sysenv.systemd.package or null;
+          ekaosVersion = inputs.sysenv.ekaos.version;
+          system = pkgs.stdenv.hostPlatform.system;
+        };
+      description = ''
+        JSON manifest of all packages in the system closure with metadata.
 
-      Contains package name, version, license, description, homepage,
-      and role classification for SBOM generation.
+        Contains package name, version, license, description, homepage,
+        and role classification for SBOM generation.
 
-      The file is embedded at `<toplevel>/package-manifest.json`.
-    '';
+        The file is embedded at `<toplevel>/package-manifest.json`.
+        Read-only output; value comes from the defaultFunc.
+      '';
+    };
   };
 
-  config = {
-    system.build.packageManifest = manifestFile;
+  inputs = {
+    services.from = { root }: root.services;
+    sysenv.from = { parent }: parent.toplevel;
+    home.from = { root }: root.config."users-groups";
+    bootKernel.from = { root }: root.boot.kernel;
   };
+
+  impl =
+    { options, inputs }:
+    {
+      system.build.packageManifest = options.buildPackageManifest;
+    };
 }

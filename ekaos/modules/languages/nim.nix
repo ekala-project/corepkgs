@@ -1,21 +1,17 @@
+# Adios port of ekaos/modules/languages/nim.nix.
 # Nim programming language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "nim";
-    defaultPackage = pkgs: pkgs.nim;
-    environmentVariables = _: {
-      NIMBLE_DIR = "$HOME/.nimble";
-    };
-    sessionPath = _: [ "$HOME/.nimble/bin" ];
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "nim";
+  defaultPackage = pkgs: pkgs.nim;
+  environmentVariables = _: {
+    NIMBLE_DIR = "$HOME/.nimble";
+  };
+  sessionPath = _: [ "$HOME/.nimble/bin" ];
+}

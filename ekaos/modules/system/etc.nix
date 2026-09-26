@@ -1,19 +1,31 @@
-# /etc file management
-# Builds the /etc directory for the system
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+# Adios port of ekaos/modules/system/etc.nix.
+#
+# Tree path: system/etc is parent.system.etc.
+# Reads ekaos version via inputs.toplevel (parent.system.toplevel, option
+# ekaos.version), hostname via inputs.networking (parent.networking,
+# option hostName), and shell environment via inputs.shellEnv
+# (parent.config."shell-environment": variables, shellAliases,
+# interactiveInit, shell.init, shell.loginInit).
+# TODO(adios-cutover): etc is types.attrsOf types.attrs; legacy per-file
+# submodule validation lost (expected keys: enable bool default true,
+# target default attr name, text/source null, mode null).
+# TODO(adios-cutover): priority lost (was mkDefault): the hostname file
+# no longer yields to user overrides; essentials win over options.etc on
+# key collision (legacy merged per-file submodule fields instead).
+# TODO(adios-cutover): impl returns environment.etc essentials and
+# system.build.etc; the tree must merge impl outputs back (NixOS
+# module-merge semantics). buildEtc is additionally exposed as an option
+# (via defaultFunc) so siblings can read it through adios inputs.
+{ types, pkgs, ... }:
 
 let
-  etc' = filter (f: f.enable) (attrValues config.environment.etc);
+  mapAttrsToList = f: attrs: builtins.map (n: f n attrs.${n}) (builtins.attrNames attrs);
+  # Local escapeShellArg (no nixpkgs lib allowed).
+  escapeShellArg = s: "'${builtins.replaceStrings [ "'" ] [ "'\\''" ] (toString s)}'";
 
-  # Build the /etc directory
-  etcDir =
+  # Build the /etc directory from an enabled file list.
+  buildEtcDir =
+    files:
     pkgs.runCommand "etc"
       {
         preferLocalBuild = true;
@@ -21,122 +33,58 @@ let
       ''
         mkdir -p $out/etc
 
-        ${concatMapStringsSep "\n" (
-          file:
-          let
-            # If text is provided but source is not, create a source file
-            source =
-              if file.source != null then
-                file.source
-              else if file.text != null then
-                pkgs.writeText file.target file.text
-              else
-                null;
-          in
-          ''
-            mkdir -p $out/etc/$(dirname ${escapeShellArg file.target})
-            ${
-              if source != null then
-                ''
-                  ln -s ${source} $out/etc/${escapeShellArg file.target}
-                ''
-              else
-                throw "etc file ${file.target} has neither source nor text"
-            }
-          ''
-        ) etc'}
+        ${builtins.concatStringsSep "\n" (
+          builtins.map (
+            file:
+            let
+              source =
+                if (file.source or null) != null then
+                  file.source
+                else if (file.text or null) != null then
+                  pkgs.writeText file.target file.text
+                else
+                  null;
+            in
+            ''
+              mkdir -p $out/etc/$(dirname ${escapeShellArg file.target})
+              ${
+                if source != null then
+                  ''
+                    ln -s ${source} $out/etc/${escapeShellArg file.target}
+                  ''
+                else
+                  throw "etc file ${file.target} has neither source nor text"
+              }
+            ''
+          ) files
+        )}
       '';
 
-in
-
-{
-  options = {
-    environment.etc = mkOption {
-      type = types.attrsOf (
-        types.submodule (
-          { name, config, ... }:
-          {
-            options = {
-              enable = mkOption {
-                type = types.bool;
-                default = true;
-                description = "Whether this /etc file should be generated.";
-              };
-
-              target = mkOption {
-                type = types.str;
-                default = name;
-                description = "Name of the file in /etc (relative path).";
-              };
-
-              text = mkOption {
-                type = types.nullOr types.lines;
-                default = null;
-                description = "Text content of the file.";
-              };
-
-              source = mkOption {
-                type = types.nullOr types.path;
-                default = null;
-                description = "Source file to symlink.";
-              };
-
-              mode = mkOption {
-                type = types.nullOr types.str;
-                default = null;
-                example = "0600";
-                description = "File mode (permissions).";
-              };
-            };
-
-            config = {
-              # No auto-conversion needed - handled in etcDir build
-            };
-          }
-        )
-      );
-      default = { };
-      description = ''
-        Files to include in /etc.
-
-        Each attribute defines a file in /etc with its content or source.
-      '';
-      example = literalExpression ''
-        {
-          "hostname".text = "myhost";
-          "hosts".text = '''
-            127.0.0.1 localhost
-            ::1 localhost
-          ''';
-        }
-      '';
-    };
-
-    system.build.etc = mkOption {
-      type = types.package;
-      internal = true;
-      description = "The /etc directory for the system.";
-    };
-  };
-
-  config = {
-    system.build.etc = etcDir;
-
-    # Essential /etc files for a bootable system
-    environment.etc = {
+  # Essential /etc files for a bootable system.
+  mkEssential =
+    {
+      ekaosVersion,
+      hostName,
+      shellAliases,
+      interactiveInit,
+      envVars,
+      shellInit,
+      loginInit,
+    }:
+    {
       # fstab is now managed by tasks/filesystems.nix
 
       "os-release".text = ''
         NAME="ekaos"
         ID=ekaos
-        VERSION="${config.system.ekaos.version}"
-        VERSION_ID="${config.system.ekaos.version}"
-        PRETTY_NAME="ekaos ${config.system.ekaos.version}"
+        VERSION="${ekaosVersion}"
+        VERSION_ID="${ekaosVersion}"
+        PRETTY_NAME="ekaos ${ekaosVersion}"
         HOME_URL="https://github.com/your-org/ekaos"
       '';
 
       "issue".text = ''
-        ekaos ${config.system.ekaos.version} \n \l
+        ekaos ${ekaosVersion} \n \l
 
       '';
 
@@ -163,19 +111,12 @@ in
         fi
 
         # Aliases
-        ${concatStringsSep "\n" (
-          mapAttrsToList (name: value: "alias ${name}=${escapeShellArg value}") (
-            config.programs.bash.shellAliases or {
-              ls = "ls --color=auto";
-              ll = "ls -lh";
-              la = "ls -lah";
-              grep = "grep --color=auto";
-            }
-          )
+        ${builtins.concatStringsSep "\n" (
+          mapAttrsToList (name: value: "alias ${name}=${escapeShellArg value}") shellAliases
         )}
 
         # Interactive shell initialization
-        ${config.programs.bash.interactiveInit or ""}
+        ${interactiveInit}
 
         # Source user's bashrc if it exists
         [ -f ~/.bashrc ] && source ~/.bashrc
@@ -194,10 +135,8 @@ in
         fi
 
         # User-defined environment variables
-        ${concatStringsSep "\n" (
-          mapAttrsToList (name: value: "export ${name}=${escapeShellArg (toString value)}") (
-            config.environment.variables or { }
-          )
+        ${builtins.concatStringsSep "\n" (
+          mapAttrsToList (name: value: "export ${name}=${escapeShellArg (toString value)}") envVars
         )}
 
         # XDG base directories
@@ -205,7 +144,7 @@ in
         export XDG_CONFIG_DIRS="/etc/xdg''${XDG_CONFIG_DIRS:+:$XDG_CONFIG_DIRS}"
 
         # System shell initialization
-        ${config.environment.shell.init or ""}
+        ${shellInit}
 
         # Source bash-specific profile
         if [ -n "$BASH_VERSION" ]; then
@@ -213,21 +152,101 @@ in
         fi
 
         # Login shell initialization
-        ${config.environment.shell.loginInit or ""}
+        ${loginInit}
 
         # Source user's profile if it exists
         [ -f ~/.profile ] && source ~/.profile
       '';
 
       # Hostname configuration
-      "hostname".text = mkDefault "${config.networking.hostName or "ekaos"}";
+      "hostname".text = "${hostName}";
 
       # Hosts file
       "hosts".text = ''
         127.0.0.1 localhost
         ::1 localhost
-        127.0.1.1 ${config.networking.hostName or "ekaos"}
+        127.0.1.1 ${hostName}
+      '';
+    };
+
+  # Shared computation used by both the buildEtc defaultFunc (so sibling
+  # modules can read this module's output via inputs) and impl below.
+  computeEnabled =
+    { options, inputs }:
+    let
+      essentials = mkEssential {
+        ekaosVersion = inputs.toplevel.ekaos.version;
+        hostName = inputs.networking.hostName or "ekaos";
+        shellAliases =
+          inputs.shellEnv.shellAliases or {
+            ls = "ls --color=auto";
+            ll = "ls -lh";
+            la = "ls -lah";
+            grep = "grep --color=auto";
+          };
+        interactiveInit = inputs.shellEnv.interactiveInit or "";
+        envVars = inputs.shellEnv.variables or { };
+        shellInit = inputs.shellEnv.shell.init or "";
+        loginInit = inputs.shellEnv.shell.loginInit or "";
+      };
+      merged = options.etc // essentials;
+      withTargets = builtins.mapAttrs (
+        name: f: if builtins.isAttrs f then f // { target = f.target or name; } else f
+      ) merged;
+    in
+    {
+      inherit essentials;
+      enabled = builtins.filter (f: (f.enable or true)) (builtins.attrValues withTargets);
+    };
+in
+
+{
+  options = {
+    etc = {
+      type = types.attrsOf types.attrs;
+      default = { };
+      example = {
+        "hostname".text = "myhost";
+        "hosts".text = ''
+          127.0.0.1 localhost
+          ::1 localhost
+        '';
+      };
+      description = ''
+        Files to include in /etc.
+
+        Each attribute defines a file in /etc with its content or source.
+      '';
+    };
+
+    # Read-only output exposed as an option (via defaultFunc, not impl) so
+    # sibling modules can consume it through adios inputs, which only see
+    # options — never impl results.
+    buildEtc = {
+      type = types.derivation;
+      defaultFunc = { options, inputs }: buildEtcDir (computeEnabled { inherit options inputs; }).enabled;
+      description = ''
+        The /etc directory for the system.
+        Read-only output computed from options + inputs.
       '';
     };
   };
+
+  inputs = {
+    toplevel.from = { parent }: parent.toplevel;
+    networking.from = { root }: root.networking;
+    shellEnv.from = { root }: root.config."shell-environment";
+  };
+
+  impl =
+    { options, inputs }:
+    let
+      computed = computeEnabled { inherit options inputs; };
+    in
+    {
+      # Essential /etc files contribution (tree merges with user files).
+      environment.etc = computed.essentials;
+
+      system.build.etc = buildEtcDir computed.enabled;
+    };
 }

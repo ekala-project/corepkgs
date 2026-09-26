@@ -1,18 +1,15 @@
-# Getty (console login) service
-# Provides console login on virtual terminals
+# Adios port of ekaos/modules/services/getty.nix.
+# TODO(adios-cutover): helpLine is declared but never consumed by the legacy
+# config either; kept for interface stability.
 {
-  config,
+  types,
   lib,
   pkgs,
   ...
 }:
 
-with lib;
-
 let
-  cfg = config.services.getty;
-
-  # Generate getty service unit content for a single tty
+  # Generate getty service unit content for a single tty.
   mkGettyUnit = ttyName: ''
     [Unit]
     Description=Getty on ${ttyName}
@@ -42,95 +39,103 @@ let
     [Install]
     WantedBy=multi-user.target
   '';
-
 in
 
 {
   options = {
-    services.getty = {
-      enable = mkOption {
-        type = types.bool;
-        default = true;
-        description = ''
-          Whether to enable getty (console login) on virtual terminals.
+    enable = {
+      type = types.bool;
+      default = true;
+      description = ''
+        Whether to enable getty (console login) on virtual terminals.
 
-          When enabled, getty will spawn login prompts on tty1 through tty{ttyCount}.
-        '';
-      };
+        When enabled, getty will spawn login prompts on tty1 through tty{ttyCount}.
+      '';
+    };
 
-      ttyCount = mkOption {
-        type = types.ints.positive;
-        default = 6;
-        description = ''
-          Number of gettys to spawn on virtual terminals (tty1-ttyN).
+    ttyCount = {
+      type = types.int;
+      default = 6;
+      description = ''
+        Number of gettys to spawn on virtual terminals (tty1-ttyN).
 
-          Defaults to 6, which provides login prompts on tty1 through tty6.
-        '';
-      };
+        Defaults to 6, which provides login prompts on tty1 through tty6.
+      '';
+    };
 
-      helpLine = mkOption {
-        type = types.lines;
-        default = "";
-        description = ''
-          Additional help text to show on the login screen after the issue text.
-        '';
-      };
+    helpLine = {
+      type = types.string;
+      default = "";
+      description = ''
+        Additional help text to show on the login screen after the issue text.
+      '';
     };
   };
 
-  config = mkIf cfg.enable {
-    # Inject getty service unit files directly into /etc/systemd/system
-    environment.etc = mkMerge [
-      # Create getty service units for each tty
-      (listToAttrs (
-        map (
-          ttyNumber:
-          let
-            ttyName = "tty${toString ttyNumber}";
-          in
-          nameValuePair "systemd/system/getty@${ttyName}.service" {
-            text = mkGettyUnit ttyName;
-          }
-        ) (range 1 cfg.ttyCount)
-      ))
-
-      # Create symlinks in wants directory to auto-start gettys
-      (listToAttrs (
-        map (
-          ttyNumber:
-          let
-            ttyName = "tty${toString ttyNumber}";
-          in
-          nameValuePair "systemd/system/multi-user.target.wants/getty@${ttyName}.service" {
-            source = "/dev/null"; # Placeholder - will be created by activation script
-          }
-        ) (range 1 cfg.ttyCount)
-      ))
-
-      # Ensure required systemd services are available
-      {
-        "systemd/system/systemd-vconsole-setup.service".source =
-          "${config.systemd.package}/lib/systemd/system/systemd-vconsole-setup.service";
-
-        "systemd/system/systemd-user-sessions.service".source =
-          "${config.systemd.package}/lib/systemd/system/systemd-user-sessions.service";
-      }
-    ];
-
-    # Add activation script to create getty service symlinks
-    system.activationScripts.getty = stringAfter [ "etc" ] ''
-      # Create getty service symlinks for multi-user.target
-      mkdir -p /etc/systemd/system/multi-user.target.wants
-      ${concatMapStringsSep "\n" (
-        ttyNumber:
-        let
-          ttyName = "tty${toString ttyNumber}";
-        in
-        ''
-          ln -sf ../getty@${ttyName}.service \
-                 /etc/systemd/system/multi-user.target.wants/getty@${ttyName}.service
-        ''
-      ) (range 1 cfg.ttyCount)}
-    '';
+  inputs = {
+    # TODO(adios-cutover): verify leaf path once the service-managers batch lands.
+    systemd.from = { root }: root."service-managers".systemd;
   };
+
+  assertions = [
+    {
+      verify = { options }: options.ttyCount > 0;
+      explain = { options }: "services.getty ttyCount must be positive, got ${toString options.ttyCount}";
+    }
+  ];
+
+  impl =
+    { options, inputs }:
+    if !options.enable then
+      { }
+    else
+      let
+        ttyNumbers = builtins.genList (i: 1 + i) options.ttyCount;
+        unitFor = ttyNumber: {
+          name = "systemd/system/getty@tty${toString ttyNumber}.service";
+          value = {
+            text = mkGettyUnit "tty${toString ttyNumber}";
+          };
+        };
+        wantFor = ttyNumber: {
+          name = "systemd/system/multi-user.target.wants/getty@tty${toString ttyNumber}.service";
+          value = {
+            # Placeholder - will be created by activation script
+            source = "/dev/null";
+          };
+        };
+      in
+      {
+        environment.etc = lib.merge.attrs.recursively {
+          mutators = [
+            (builtins.listToAttrs (builtins.map unitFor ttyNumbers))
+            (builtins.listToAttrs (builtins.map wantFor ttyNumbers))
+            {
+              "systemd/system/systemd-vconsole-setup.service".source =
+                "${inputs.systemd.package}/lib/systemd/system/systemd-vconsole-setup.service";
+
+              "systemd/system/systemd-user-sessions.service".source =
+                "${inputs.systemd.package}/lib/systemd/system/systemd-user-sessions.service";
+            }
+          ];
+        };
+
+        # TODO(adios-cutover): legacy ordering (after "etc") lost; plain script.
+        system.activationScripts.getty = ''
+          # Create getty service symlinks for multi-user.target
+          mkdir -p /etc/systemd/system/multi-user.target.wants
+          ${builtins.concatStringsSep "\n" (
+            builtins.map (
+              ttyNumber:
+              let
+                ttyName = "tty${toString ttyNumber}";
+              in
+              ''
+                ln -sf ../getty@${ttyName}.service \
+                       /etc/systemd/system/multi-user.target.wants/getty@${ttyName}.service
+              ''
+            ) ttyNumbers
+          )}
+        '';
+      };
 }

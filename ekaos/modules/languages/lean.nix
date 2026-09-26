@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/lean.nix.
 # Lean 4 programming language / theorem prover module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "lean";
-    defaultPackage = pkgs: pkgs.lean4;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "lean";
+  defaultPackage = pkgs: pkgs.lean4;
+}

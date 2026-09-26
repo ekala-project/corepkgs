@@ -1,18 +1,10 @@
-# Thunderbolt 3 device management daemon
-# Ported from nixpkgs/nixos/modules/services/hardware/bolt.nix
+# Adios port of ekaos/modules/services/hardware/bolt.nix.
+{ types, pkgs, ... }:
+
 {
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-let
-  cfg = config.services.hardware.bolt;
-in
-{
-  options.services.hardware.bolt = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
+  options = {
+    enable = {
+      type = types.bool;
       default = false;
       description = ''
         Whether to enable Bolt, a userspace daemon to enable
@@ -20,19 +12,23 @@ in
       '';
     };
 
-    package = lib.mkOption {
-      type = lib.types.package;
+    package = {
+      type = types.derivation;
       default = pkgs.bolt or (throw "bolt package not available");
-      defaultText = lib.literalExpression "pkgs.bolt";
       description = "The bolt package to use.";
     };
   };
 
-  config = lib.mkIf cfg.enable {
-    environment.systemPackages = [ cfg.package ];
-    services.udev.packages = [ cfg.package ];
+  impl =
+    { options, ... }:
+    if !options.enable then
+      { }
+    else
+      {
+        environment.systemPackages = [ options.package ];
+        services.udev.packages = [ options.package ];
 
-    # TODO: systemd.packages not yet available in ekaOS
-    # systemd.packages = [ cfg.package ];
-  };
+        # TODO: systemd.packages not yet available in ekaOS
+        # systemd.packages = [ options.package ];
+      };
 }

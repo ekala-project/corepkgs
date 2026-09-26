@@ -1,46 +1,42 @@
-# System-wide Git configuration
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+# Adios port of ekaos/modules/programs/git.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, pkgs, ... }:
 
 let
-  cfg = config.programs.git;
+  # Local `mapAttrsToList` (no nixpkgs lib allowed).
+  mapAttrsToList = f: set: builtins.map (n: f n set.${n}) (builtins.attrNames set);
 
   # Convert gitconfig attrs to INI format
   toGitINI =
     attrs:
-    concatStringsSep "\n" (
+    builtins.concatStringsSep "\n" (
       mapAttrsToList (
         section: values:
         "[${section}]\n"
-        + concatStringsSep "\n" (mapAttrsToList (key: value: "\t${key} = ${toString value}") values)
+        + builtins.concatStringsSep "\n" (
+          mapAttrsToList (key: value: "\t${key} = ${toString value}") values
+        )
       ) attrs
     )
     + "\n";
-
 in
 
 {
-  options.programs.git = {
-    enable = mkOption {
+  options = {
+    enable = {
       type = types.bool;
       default = false;
       description = "Whether to install and configure Git system-wide.";
     };
 
-    package = mkOption {
-      type = types.package;
+    package = {
+      type = types.derivation;
       default = pkgs.git;
       description = "Git package to use.";
     };
 
-    config = mkOption {
-      type = types.attrsOf (types.attrsOf types.anything);
+    config = {
+      type = types.attrsOf (types.attrsOf types.any);
       default = { };
       example = {
         init.defaultBranch = "main";
@@ -53,8 +49,8 @@ in
       '';
     };
 
-    attributes = mkOption {
-      type = types.lines;
+    attributes = {
+      type = types.string;
       default = "";
       example = ''
         *.pdf diff=pdf
@@ -66,35 +62,60 @@ in
     };
 
     lfs = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to install and configure Git LFS.";
+      description = "Git LFS configuration.";
+      options = {
+        enable = {
+          type = types.bool;
+          default = false;
+          description = "Whether to install and configure Git LFS.";
+        };
       };
     };
   };
 
-  config = mkIf cfg.enable {
-    environment.systemPackages = [ cfg.package ] ++ optional cfg.lfs.enable pkgs.git-lfs;
+  impl =
+    { options, ... }:
+    if !options.enable then
+      { }
+    else
+      {
+        environment.systemPackages = [
+          options.package
+        ]
+        ++ (if options.lfs.enable then [ pkgs.git-lfs ] else [ ]);
 
-    # System-wide gitconfig
-    environment.etc."gitconfig" = mkIf (cfg.config != { }) {
-      text = toGitINI (
-        cfg.config
-        // optionalAttrs cfg.lfs.enable {
-          filter.lfs = {
-            clean = "git-lfs clean -- %f";
-            smudge = "git-lfs smudge -- %f";
-            process = "git-lfs filter-process";
-            required = true;
-          };
-        }
-      );
-    };
-
-    # System-wide gitattributes
-    environment.etc."gitattributes" = mkIf (cfg.attributes != "") {
-      text = cfg.attributes;
-    };
-  };
+        # System-wide gitconfig / gitattributes (each emitted only when set).
+        environment.etc =
+          (
+            if options.config != { } then
+              {
+                gitconfig.text = toGitINI (
+                  options.config
+                  // (
+                    if options.lfs.enable then
+                      {
+                        filter.lfs = {
+                          clean = "git-lfs clean -- %f";
+                          smudge = "git-lfs smudge -- %f";
+                          process = "git-lfs filter-process";
+                          required = true;
+                        };
+                      }
+                    else
+                      { }
+                  )
+                );
+              }
+            else
+              { }
+          )
+          // (
+            if options.attributes != "" then
+              {
+                gitattributes.text = options.attributes;
+              }
+            else
+              { }
+          );
+      };
 }

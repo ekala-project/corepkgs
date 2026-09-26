@@ -1,23 +1,17 @@
-# Networking configuration
-# Handles basic network settings like hostname, domain, DNS
+# Adios port of ekaos/modules/networking.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
 {
-  config,
+  types,
   lib,
   pkgs,
   ...
 }:
 
-with lib;
-
-let
-  cfg = config.networking;
-
-in
-
 {
   options = {
-    networking.hostName = mkOption {
-      type = types.str;
+    # Legacy path: networking.hostName.
+    hostName = {
+      type = types.string;
       default = "ekaos";
       example = "myserver";
       description = ''
@@ -27,8 +21,9 @@ in
       '';
     };
 
-    networking.domain = mkOption {
-      type = types.nullOr types.str;
+    # Legacy path: networking.domain.
+    domain = {
+      type = types.nullOr types.string;
       default = null;
       example = "example.com";
       description = ''
@@ -38,8 +33,9 @@ in
       '';
     };
 
-    networking.nameservers = mkOption {
-      type = types.listOf types.str;
+    # Legacy path: networking.nameservers.
+    nameservers = {
+      type = types.listOf types.string;
       default = [ ];
       example = [
         "8.8.8.8"
@@ -52,8 +48,9 @@ in
       '';
     };
 
-    networking.search = mkOption {
-      type = types.listOf types.str;
+    # Legacy path: networking.search.
+    search = {
+      type = types.listOf types.string;
       default = [ ];
       example = [
         "example.com"
@@ -64,54 +61,58 @@ in
       '';
     };
 
-    networking.resolvconf = {
-      extraOptions = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        example = [
-          "single-request"
-          "edns0"
-        ];
-        description = ''
-          Options to append to the resolv.conf options line.
-          See resolv.conf(5) for available options.
-        '';
-      };
-
-      dnsSingleRequest = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to use single-request option to avoid some AAAA lookup issues.";
-      };
-
-      dnsExtensionMechanism = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Whether to enable EDNS0 extension mechanism.";
-      };
+    # Legacy path: networking.resolvconf.extraOptions.
+    resolvExtraOptions = {
+      type = types.listOf types.string;
+      default = [ ];
+      example = [
+        "single-request"
+        "edns0"
+      ];
+      description = ''
+        Options to append to the resolv.conf options line.
+        See resolv.conf(5) for available options.
+      '';
     };
 
-    networking.fqdn = mkOption {
-      type = types.str;
-      readOnly = true;
-      default = if cfg.domain != null then "${cfg.hostName}.${cfg.domain}" else cfg.hostName;
-      defaultText = literalExpression ''"''${networking.hostName}.''${networking.domain}"'';
+    # Legacy path: networking.resolvconf.dnsSingleRequest.
+    resolvDnsSingleRequest = {
+      type = types.bool;
+      default = false;
+      description = "Whether to use single-request option to avoid some AAAA lookup issues.";
+    };
+
+    # Legacy path: networking.resolvconf.dnsExtensionMechanism.
+    resolvDnsExtensionMechanism = {
+      type = types.bool;
+      default = true;
+      description = "Whether to enable EDNS0 extension mechanism.";
+    };
+
+    # Legacy path: networking.fqdn (read-only in legacy; readOnly dropped).
+    fqdn = {
+      type = types.string;
+      defaultFunc =
+        { options, ... }:
+        if options.domain != null then "${options.hostName}.${options.domain}" else options.hostName;
       description = ''
         The fully qualified domain name (FQDN) of the system.
 
-        Computed from hostName and domain. Read-only.
+        Computed from hostName and domain.
       '';
     };
 
-    networking.hosts = mkOption {
-      type = types.attrsOf (types.listOf types.str);
+    # Legacy path: networking.hosts.
+    hosts = {
+      type = types.attrsOf (types.listOf types.string);
       default = { };
-      example = literalExpression ''
-        {
-          "127.0.0.1" = [ "myhost" ];
-          "192.168.1.10" = [ "server.example.com" "server" ];
-        }
-      '';
+      example = {
+        "127.0.0.1" = [ "myhost" ];
+        "192.168.1.10" = [
+          "server.example.com"
+          "server"
+        ];
+      };
       description = ''
         Structured /etc/hosts entries.
 
@@ -120,8 +121,9 @@ in
       '';
     };
 
-    networking.extraHosts = mkOption {
-      type = types.lines;
+    # Legacy path: networking.extraHosts.
+    extraHosts = {
+      type = types.string;
       default = "";
       example = ''
         192.168.1.100 server1.example.com server1
@@ -132,68 +134,70 @@ in
       '';
     };
 
-    networking.enableIPv6 = mkOption {
+    # Legacy path: networking.enableIPv6.
+    enableIPv6 = {
       type = types.bool;
       default = true;
       description = "Whether to enable IPv6 support.";
     };
 
-    networking.proxy = {
-      default = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        example = "http://proxy.example.com:8080";
-        description = ''
-          Default proxy URL used for HTTP, HTTPS, and FTP.
-          Sets the http_proxy, https_proxy, and ftp_proxy environment variables.
-        '';
-      };
-
-      noProxy = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        example = "127.0.0.1,localhost,.example.com";
-        description = "Comma-separated list of domains/IPs that bypass the proxy.";
-      };
-
-      httpProxy = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        description = "HTTP proxy URL. Overrides networking.proxy.default for HTTP.";
-      };
-
-      httpsProxy = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        description = "HTTPS proxy URL. Overrides networking.proxy.default for HTTPS.";
-      };
+    # Legacy path: networking.proxy.default.
+    proxyDefault = {
+      type = types.nullOr types.string;
+      default = null;
+      example = "http://proxy.example.com:8080";
+      description = ''
+        Default proxy URL used for HTTP, HTTPS, and FTP.
+        Sets the http_proxy, https_proxy, and ftp_proxy environment variables.
+      '';
     };
 
-    networking.hostId = mkOption {
-      type = types.nullOr types.str;
+    # Legacy path: networking.proxy.noProxy.
+    proxyNoProxy = {
+      type = types.nullOr types.string;
+      default = null;
+      example = "127.0.0.1,localhost,.example.com";
+      description = "Comma-separated list of domains/IPs that bypass the proxy.";
+    };
+
+    # Legacy path: networking.proxy.httpProxy.
+    proxyHttpProxy = {
+      type = types.nullOr types.string;
+      default = null;
+      description = "HTTP proxy URL. Overrides networking.proxy.default for HTTP.";
+    };
+
+    # Legacy path: networking.proxy.httpsProxy.
+    proxyHttpsProxy = {
+      type = types.nullOr types.string;
+      default = null;
+      description = "HTTPS proxy URL. Overrides networking.proxy.default for HTTPS.";
+    };
+
+    # Legacy path: networking.hostId.
+    hostId = {
+      type = types.nullOr types.string;
       default = null;
       example = "a8c01e01";
       description = ''
         The 32-bit host ID of the machine, formatted as 8 hexadecimal characters.
 
-        Required by ZFS for safe pool import. Generate with:
-          head -c4 /dev/urandom | od -A none -t x4 | tr -d ' '
+        Required by ZFS for safe pool import.
       '';
     };
 
-    networking.usePredictableInterfaceNames = mkOption {
+    # Legacy path: networking.usePredictableInterfaceNames.
+    usePredictableInterfaceNames = {
       type = types.bool;
       default = true;
       description = ''
         Whether to use predictable network interface names (e.g. enp0s3)
         instead of classic names (e.g. eth0).
-
-        Uses systemd's predictable naming scheme based on firmware,
-        topology, and device path information.
       '';
     };
 
-    networking.useNetworkd = mkOption {
+    # Legacy path: networking.useNetworkd.
+    useNetworkd = {
       type = types.bool;
       default = false;
       description = ''
@@ -202,8 +206,9 @@ in
       '';
     };
 
-    networking.tempAddresses = mkOption {
-      type = types.enum [
+    # Legacy path: networking.tempAddresses.
+    tempAddresses = {
+      type = types.enum "ipv6TempAddresses" [
         "default"
         "enabled"
         "disabled"
@@ -218,8 +223,9 @@ in
       '';
     };
 
-    networking.timeServers = mkOption {
-      type = types.listOf types.str;
+    # Legacy path: networking.timeServers.
+    timeServers = {
+      type = types.listOf types.string;
       default = [
         "0.pool.ntp.org"
         "1.pool.ntp.org"
@@ -231,8 +237,9 @@ in
       '';
     };
 
-    networking.localCommands = mkOption {
-      type = types.lines;
+    # Legacy path: networking.localCommands.
+    localCommands = {
+      type = types.string;
       default = "";
       description = ''
         Shell commands to execute after all network interfaces have
@@ -240,7 +247,8 @@ in
       '';
     };
 
-    networking.useDHCP = mkOption {
+    # Legacy path: networking.useDHCP.
+    useDHCP = {
       type = types.bool;
       default = true;
       description = ''
@@ -251,8 +259,9 @@ in
       '';
     };
 
-    networking.defaultGateway = mkOption {
-      type = types.nullOr types.str;
+    # Legacy path: networking.defaultGateway.
+    defaultGateway = {
+      type = types.nullOr types.string;
       default = null;
       example = "192.168.1.1";
       description = ''
@@ -262,8 +271,9 @@ in
       '';
     };
 
-    networking.defaultGateway6 = mkOption {
-      type = types.nullOr types.str;
+    # Legacy path: networking.defaultGateway6.
+    defaultGateway6 = {
+      type = types.nullOr types.string;
       default = null;
       example = "fe80::1";
       description = ''
@@ -274,107 +284,154 @@ in
     };
   };
 
-  config = {
-    # hostname and hosts are already configured in etc.nix,
-    # but we ensure they use our values
-    environment.etc."hostname".text = mkForce cfg.hostName;
+  impl =
+    { options, ... }:
+    lib.merge.attrs.recursively {
+      mutators = [
+        {
+          # TODO(adios-cutover): priority lost (was mkForce).
+          environment.etc."hostname".text = options.hostName;
 
-    environment.etc."hosts".text = mkForce (
-      let
-        structuredHosts = concatStringsSep "\n" (
-          mapAttrsToList (ip: names: "${ip} ${concatStringsSep " " names}") cfg.hosts
-        );
-      in
-      ''
-        # Generated by ekaos networking module
-        127.0.0.1 localhost
-        ::1 localhost
-        127.0.1.1 ${cfg.fqdn} ${cfg.hostName}
+          # TODO(adios-cutover): priority lost (was mkForce).
+          environment.etc."hosts".text =
+            let
+              structuredHosts = builtins.concatStringsSep "\n" (
+                builtins.map (ip: "${ip} ${builtins.concatStringsSep " " options.hosts.${ip}}") (
+                  builtins.attrNames options.hosts
+                )
+              );
+            in
+            ''
+              # Generated by ekaos networking module
+              127.0.0.1 localhost
+              ::1 localhost
+              127.0.1.1 ${options.fqdn} ${options.hostName}
 
-        ${optionalString (structuredHosts != "") structuredHosts}
-        ${cfg.extraHosts}
-      ''
-    );
+              ${if structuredHosts != "" then structuredHosts else ""}
+              ${options.extraHosts}
+            '';
 
-    # Generate resolv.conf
-    environment.etc."resolv.conf" = mkIf (cfg.nameservers != [ ]) {
-      text =
-        let
-          resolvOptions =
-            cfg.resolvconf.extraOptions
-            ++ optional cfg.resolvconf.dnsSingleRequest "single-request"
-            ++ optional cfg.resolvconf.dnsExtensionMechanism "edns0";
-        in
-        ''
-          # Generated by ekaos networking module
-          ${optionalString (cfg.search != [ ]) "search ${concatStringsSep " " cfg.search}"}
-          ${concatMapStringsSep "\n" (ns: "nameserver ${ns}") cfg.nameservers}
-          ${optionalString (resolvOptions != [ ]) "options ${concatStringsSep " " resolvOptions}"}
-        '';
+          # Add networking utilities.
+          environment.systemPackages = with pkgs; [
+            iproute2
+            iputils
+            net-tools
+          ];
+
+          # TODO(adios-cutover): stringAfter [ "etc" ] ordering dropped.
+          system.activationScripts.hostname = ''
+            # Set system hostname
+            echo "Setting hostname to ${options.hostName}..."
+            ${pkgs.net-tools}/bin/hostname "${options.hostName}"
+          '';
+        }
+
+        (
+          if options.nameservers != [ ] then
+            {
+              environment.etc."resolv.conf".text =
+                let
+                  resolvOptions =
+                    options.resolvExtraOptions
+                    ++ (if options.resolvDnsSingleRequest then [ "single-request" ] else [ ])
+                    ++ (if options.resolvDnsExtensionMechanism then [ "edns0" ] else [ ]);
+                in
+                ''
+                  # Generated by ekaos networking module
+                  ${if options.search != [ ] then "search ${builtins.concatStringsSep " " options.search}" else ""}
+                  ${builtins.concatStringsSep "\n" (builtins.map (ns: "nameserver ${ns}") options.nameservers)}
+                  ${if resolvOptions != [ ] then "options ${builtins.concatStringsSep " " resolvOptions}" else ""}
+                '';
+            }
+          else
+            { }
+        )
+
+        (
+          if !options.enableIPv6 then
+            {
+              boot.kernel.sysctl = {
+                "net.ipv6.conf.all.disable_ipv6" = true;
+                "net.ipv6.conf.default.disable_ipv6" = true;
+              };
+            }
+          else
+            { }
+        )
+
+        (
+          if options.tempAddresses != "default" then
+            {
+              boot.kernel.sysctl = {
+                "net.ipv6.conf.all.use_tempaddr" = if options.tempAddresses == "enabled" then 2 else 0;
+                "net.ipv6.conf.default.use_tempaddr" = if options.tempAddresses == "enabled" then 2 else 0;
+              };
+            }
+          else
+            { }
+        )
+
+        (
+          if options.proxyDefault != null || options.proxyHttpProxy != null then
+            {
+              environment.variables.http_proxy = options.proxyHttpProxy or options.proxyDefault;
+            }
+          else
+            { }
+        )
+
+        (
+          if options.proxyDefault != null || options.proxyHttpsProxy != null then
+            {
+              environment.variables.https_proxy = options.proxyHttpsProxy or options.proxyDefault;
+            }
+          else
+            { }
+        )
+
+        (
+          if options.proxyNoProxy != null then
+            {
+              environment.variables.no_proxy = options.proxyNoProxy;
+            }
+          else
+            { }
+        )
+
+        (
+          if options.hostId != null then
+            {
+              environment.etc."hostid".source = pkgs.runCommand "gen-hostid" { } ''
+                ${pkgs.coreutils}/bin/printf "$(echo ${options.hostId} | ${pkgs.sed}/bin/sed 's/\(..\)/\\x\1/g')" > $out
+              '';
+            }
+          else
+            { }
+        )
+
+        (
+          if !options.usePredictableInterfaceNames then
+            {
+              boot.kernelParams = [
+                "net.ifnames=0"
+              ];
+            }
+          else
+            { }
+        )
+
+        (
+          if options.localCommands != "" then
+            {
+              # TODO(adios-cutover): stringAfter [ "etc" "hostname" ] ordering dropped.
+              system.activationScripts.network-local-commands = ''
+                echo "Running local network commands..."
+                ${options.localCommands}
+              '';
+            }
+          else
+            { }
+        )
+      ];
     };
-
-    # Disable IPv6 via sysctl if requested
-    boot.kernel.sysctl = mkMerge [
-      (mkIf (!cfg.enableIPv6) {
-        "net.ipv6.conf.all.disable_ipv6" = true;
-        "net.ipv6.conf.default.disable_ipv6" = true;
-      })
-      (mkIf (cfg.tempAddresses != "default") {
-        "net.ipv6.conf.all.use_tempaddr" = if cfg.tempAddresses == "enabled" then 2 else 0;
-        "net.ipv6.conf.default.use_tempaddr" = if cfg.tempAddresses == "enabled" then 2 else 0;
-      })
-    ];
-
-    # Set proxy environment variables
-    environment.variables = mkMerge [
-      (mkIf (cfg.proxy.default != null || cfg.proxy.httpProxy != null) {
-        http_proxy = cfg.proxy.httpProxy or cfg.proxy.default;
-      })
-      (mkIf (cfg.proxy.default != null || cfg.proxy.httpsProxy != null) {
-        https_proxy = cfg.proxy.httpsProxy or cfg.proxy.default;
-      })
-      (mkIf (cfg.proxy.noProxy != null) {
-        no_proxy = cfg.proxy.noProxy;
-      })
-    ];
-
-    # Add networking utilities
-    environment.systemPackages = with pkgs; [
-      iproute2
-      iputils
-      net-tools
-    ];
-
-    # Write /etc/hostid if networking.hostId is set
-    environment.etc."hostid" = mkIf (cfg.hostId != null) {
-      source = pkgs.runCommand "gen-hostid" { } ''
-        ${pkgs.coreutils}/bin/printf "$(echo ${cfg.hostId} | ${pkgs.sed}/bin/sed 's/\(..\)/\\x\1/g')" > $out
-      '';
-    };
-
-    # Predictable interface names
-    boot.kernelParams = mkIf (!cfg.usePredictableInterfaceNames) [
-      "net.ifnames=0"
-    ];
-
-    # Set hostname during activation
-    system.activationScripts.hostname = stringAfter [ "etc" ] ''
-      # Set system hostname
-      echo "Setting hostname to ${cfg.hostName}..."
-      ${pkgs.net-tools}/bin/hostname "${cfg.hostName}"
-    '';
-
-    # Run local network commands after setup
-    system.activationScripts.network-local-commands = mkIf (cfg.localCommands != "") (
-      stringAfter
-        [
-          "etc"
-          "hostname"
-        ]
-        ''
-          echo "Running local network commands..."
-          ${cfg.localCommands}
-        ''
-    );
-  };
 }

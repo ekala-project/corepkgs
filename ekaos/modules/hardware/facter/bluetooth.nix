@@ -1,18 +1,31 @@
-# Auto-detect Bluetooth hardware and load kernel modules
-{ lib, config, ... }:
-let
-  facterLib = import ./lib.nix lib;
-  inherit (config.hardware.facter) report;
-in
+# Adios port of ekaos/modules/hardware/facter/bluetooth.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, ... }:
+
 {
-  options.hardware.facter.detected.bluetooth.kernelModules = lib.mkOption {
-    type = lib.types.listOf lib.types.str;
-    default = lib.unique (facterLib.collectDrivers (report.hardware.bluetooth or [ ]));
-    defaultText = "hardware dependent";
-    description = "Kernel modules for Bluetooth hardware.";
+  options = {
+    kernelModules = {
+      type = types.listOf types.string;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          facterLib = import ./lib.nix { };
+        in
+        facterLib.unique (facterLib.collectDrivers (inputs.facter.report.hardware.bluetooth or [ ]));
+      description = "Kernel modules for Bluetooth hardware.";
+    };
   };
 
-  config = lib.mkIf config.hardware.facter.enable {
-    boot.initrd.availableKernelModules = config.hardware.facter.detected.bluetooth.kernelModules;
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
   };
+
+  impl =
+    { options, inputs }:
+    if inputs.facter.enable then
+      {
+        boot.initrd.availableKernelModules = options.kernelModules;
+      }
+    else
+      { };
 }

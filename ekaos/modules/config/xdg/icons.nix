@@ -1,51 +1,54 @@
+# Adios port of ekaos/modules/config/xdg/icons.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+#
 # XDG Icon Theme support
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
-
-let
-  cfg = config.xdg.icons;
-in
+{ types, pkgs, ... }:
 
 {
   options = {
-    xdg.icons = {
-      enable = mkOption {
-        type = types.bool;
-        default = true;
-        description = ''
-          Whether to install files to support the XDG Icon Theme specification.
-        '';
-      };
+    icons = {
+      options = {
+        enable = {
+          type = types.bool;
+          default = true;
+          description = ''
+            Whether to install files to support the XDG Icon Theme specification.
+          '';
+        };
 
-      fallbackCursorThemes = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = ''
-          Fallback cursor theme names, in order of preference.
-          Set to [] to disable the fallback entirely.
-        '';
+        fallbackCursorThemes = {
+          type = types.listOf types.string;
+          default = [ ];
+          description = ''
+            Fallback cursor theme names, in order of preference.
+            Set to [] to disable the fallback entirely.
+          '';
+        };
       };
+      description = "XDG icon theme settings.";
     };
   };
 
-  config = mkIf cfg.enable {
-    environment.systemPackages = mkIf (pkgs ? hicolor-icon-theme) [
-      pkgs.hicolor-icon-theme
-    ];
+  impl =
+    { options, ... }:
+    if !options.icons.enable then
+      { }
+    else
+      {
+        environment.systemPackages =
+          if (pkgs ? hicolor-icon-theme) then
+            [
+              pkgs.hicolor-icon-theme
+            ]
+          else
+            [ ];
 
-    environment.variables.XCURSOR_PATH = mkDefault (
-      concatStringsSep ":" [
-        "$HOME/.icons"
-        "$HOME/.local/share/icons"
-        "/run/current-system/sw/share/icons"
-        "/run/current-system/sw/share/pixmaps"
-      ]
-    );
-  };
+        # TODO(adios-cutover): priority lost (was mkDefault).
+        environment.variables.XCURSOR_PATH = builtins.concatStringsSep ":" [
+          "$HOME/.icons"
+          "$HOME/.local/share/icons"
+          "/run/current-system/sw/share/icons"
+          "/run/current-system/sw/share/pixmaps"
+        ];
+      };
 }

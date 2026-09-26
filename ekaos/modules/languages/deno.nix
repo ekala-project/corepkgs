@@ -1,20 +1,16 @@
+# Adios port of ekaos/modules/languages/deno.nix.
 # Deno JavaScript/TypeScript runtime module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "deno";
-    defaultPackage = pkgs: pkgs.deno;
-    environmentVariables = _: {
-      DENO_DIR = "$HOME/.cache/deno";
-    };
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "deno";
+  defaultPackage = pkgs: pkgs.deno;
+  environmentVariables = _: {
+    DENO_DIR = "$HOME/.cache/deno";
+  };
+}

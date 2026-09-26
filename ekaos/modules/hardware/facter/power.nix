@@ -1,48 +1,53 @@
-# Auto-detect battery and configure extended power management
-{
-  lib,
-  config,
-  ...
-}:
-let
-  facterLib = import ./lib.nix lib;
-  inherit (config.hardware.facter) report;
-  cfg = config.hardware.facter.detected.power;
-  isBaremetal = config.hardware.facter.detected.virtualisation.none.enable;
-  isLaptop = config.hardware.facter.detected.laptop.enable;
+# Adios port of ekaos/modules/hardware/facter/power.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, lib, ... }:
 
-  # Detect battery from facter report
-  batteries = report.hardware.battery or [ ];
-  hasBattery = builtins.length batteries > 0;
-
-  # Detect swap for hibernate readiness
-  swapDevices = report.swap or [ ];
-  hasSwap = builtins.length swapDevices > 0;
-in
 {
-  options.hardware.facter.detected.power = {
-    battery.enable = lib.mkEnableOption "Facter battery detection" // {
-      default = hasBattery || isLaptop;
-      defaultText = "hardware dependent";
+  options = {
+    batteryEnable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        builtins.length (inputs.facter.report.hardware.battery or [ ]) > 0 || inputs.laptop.enable;
+      description = "Whether to enable Facter battery detection.";
     };
 
-    hibernate.enable = lib.mkEnableOption "Facter hibernate readiness" // {
-      default = hasBattery && hasSwap && isBaremetal;
-      defaultText = "hardware dependent";
+    hibernateEnable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        builtins.length (inputs.facter.report.hardware.battery or [ ]) > 0
+        && builtins.length (inputs.facter.report.swap or [ ]) > 0
+        && inputs.virt.noneEnable;
+      description = "Whether to enable Facter hibernate readiness.";
     };
   };
 
-  config = lib.mkIf config.hardware.facter.enable (
-    lib.mkMerge [
-      # Battery detected: optimize for power saving
-      (lib.mkIf (cfg.battery.enable && isBaremetal) {
-        # SCSI link power management for battery life
-        power.scsiLinkPolicy = lib.mkDefault "med_power_with_dipm";
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
+    virt.from = { root }: root.hardware.facter.virtualisation;
+    laptop.from = { root }: root.hardware.facter.laptop;
+  };
 
-        # Enable power-profiles-daemon for D-Bus power profile switching
-        # (used by Quickshell power profile switcher)
-        services.power-profiles-daemon.enable = lib.mkDefault true;
-      })
-    ]
-  );
+  impl =
+    { options, inputs }:
+    lib.merge.attrs.recursively {
+      mutators = [
+        # Battery detected: optimize for power saving
+        (
+          if (options.batteryEnable && inputs.virt.noneEnable) then
+            {
+              # SCSI link power management for battery life
+              # TODO(adios-cutover): legacy mkDefault priority lost (both options).
+              power.scsiLinkPolicy = "med_power_with_dipm";
+
+              # Enable power-profiles-daemon for D-Bus power profile switching
+              # (used by Quickshell power profile switcher)
+              services.power-profiles-daemon.enable = true;
+            }
+          else
+            { }
+        )
+      ];
+    };
 }

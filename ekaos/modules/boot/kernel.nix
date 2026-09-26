@@ -1,38 +1,23 @@
-# Kernel package configuration for ekaos
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+# Adios port of ekaos/modules/boot/kernel.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, pkgs, ... }:
 
 {
   options = {
-    boot.kernelPackages = mkOption {
-      type = types.unspecified;
+    kernelPackages = {
+      # TODO(adios-cutover): legacy type is types.unspecified; korora has no equivalent.
+      type = types.any;
       default = pkgs.linux.pkgs;
-      defaultText = "pkgs.linux.pkgs (linux 6.12)";
-      example = literalExpression "pkgs.linux.v6_18.pkgs";
       description = ''
         Kernel package set to use for the system.
 
         This determines which Linux kernel version will be used
         and provides access to kernel modules.
-
-        Available kernel packages:
-        - pkgs.linux.pkgs - Default stable kernel (6.12) modules
-        - pkgs.linux.v6_18.pkgs - Specific version 6.18 modules
-        - pkgs.linux.v6_12.pkgs - Specific version 6.12 modules
-
-        Legacy aliases (pkgs.linuxPackages, pkgs.linuxPackages_6_18, etc.)
-        are still available for backward compatibility.
       '';
     };
 
-    boot.kernelParams = mkOption {
-      type = types.listOf types.str;
+    kernelParams = {
+      type = types.listOf types.string;
       default = [ ];
       example = [
         "quiet"
@@ -42,16 +27,11 @@ with lib;
         Kernel command line parameters.
 
         These are passed to the kernel at boot time.
-        Common parameters:
-        - quiet: Reduce boot messages
-        - splash: Show boot splash screen
-        - nomodeset: Disable kernel mode setting
-        - console=ttyS0,115200: Serial console
       '';
     };
 
-    boot.kernelModules = mkOption {
-      type = types.listOf types.str;
+    kernelModules = {
+      type = types.listOf types.string;
       default = [ ];
       example = [
         "kvm-intel"
@@ -64,10 +44,9 @@ with lib;
       '';
     };
 
-    boot.extraModulePackages = mkOption {
-      type = types.listOf types.package;
+    extraModulePackages = {
+      type = types.listOf types.derivation;
       default = [ ];
-      example = literalExpression "[ config.boot.kernelPackages.nvidia_x11 ]";
       description = ''
         Additional kernel module packages to include.
 
@@ -76,7 +55,7 @@ with lib;
       '';
     };
 
-    boot.consoleLogLevel = mkOption {
+    consoleLogLevel = {
       type = types.int;
       default = 4;
       example = 7;
@@ -89,17 +68,9 @@ with lib;
       '';
     };
 
-    boot.kernelPatches = mkOption {
+    kernelPatches = {
       type = types.listOf types.attrs;
       default = [ ];
-      example = literalExpression ''
-        [
-          {
-            name = "my-patch";
-            patch = ./my-fix.patch;
-          }
-        ]
-      '';
       description = ''
         Additional patches to apply to the kernel.
 
@@ -109,8 +80,8 @@ with lib;
       '';
     };
 
-    boot.resumeDevice = mkOption {
-      type = types.str;
+    resumeDevice = {
+      type = types.string;
       default = "";
       example = "/dev/sda3";
       description = ''
@@ -121,7 +92,7 @@ with lib;
       '';
     };
 
-    boot.hardwareScan = mkOption {
+    hardwareScan = {
       type = types.bool;
       default = true;
       description = ''
@@ -133,10 +104,12 @@ with lib;
       '';
     };
 
-    system.boot.loader.kernelFile = mkOption {
-      type = types.str;
-      internal = true;
-      default = config.boot.kernelPackages.kernel.target;
+    # Legacy path: system.boot.loader.kernelFile (internal option).
+    kernelFile = {
+      type = types.string;
+      # Legacy was internal = true; dropped (noted as load-bearing: consumers
+      # must not override this, it tracks the kernel package layout).
+      defaultFunc = { options, ... }: options.kernelPackages.kernel.target;
       description = ''
         Name of the kernel file in the kernel package.
         Usually "bzImage" for x86_64, "Image" for ARM.
@@ -144,15 +117,38 @@ with lib;
     };
   };
 
-  config = mkMerge [
-    # Set kernel console log level
-    (mkIf (config.boot.consoleLogLevel != 4) {
-      boot.kernelParams = [ "loglevel=${toString config.boot.consoleLogLevel}" ];
-    })
-
-    # Set resume device for hibernation
-    (mkIf (config.boot.resumeDevice != "") {
-      boot.kernelParams = [ "resume=${config.boot.resumeDevice}" ];
-    })
+  assertions = [
+    {
+      verify = { options, ... }: options.consoleLogLevel >= 0 && options.consoleLogLevel <= 7;
+      explain = { options, ... }: "consoleLogLevel must be 0-7, got ${toString options.consoleLogLevel}";
+    }
   ];
+
+  impl =
+    { options, ... }:
+    {
+      boot = {
+        # NOTE: kernelPackages is deliberately NOT part of the fragment: it
+        # is a giant package set containing repo-broken members, and merging
+        # it strictly would poison the whole config. Consumers read it via
+        # inputs (this module's option), never from merged config.
+        inherit (options)
+          kernelModules
+          extraModulePackages
+          kernelPatches
+          resumeDevice
+          hardwareScan
+          consoleLogLevel
+          ;
+        kernelParams =
+          options.kernelParams
+          ++ (
+            if options.consoleLogLevel != 4 then [ "loglevel=${toString options.consoleLogLevel}" ] else [ ]
+          )
+          ++ (if options.resumeDevice != "" then [ "resume=${options.resumeDevice}" ] else [ ]);
+      };
+      system.boot.loader = {
+        inherit (options) kernelFile;
+      };
+    };
 }

@@ -1,31 +1,33 @@
-# Auto-enable TrackPoint on ThinkPad systems
-{
-  lib,
-  config,
-  ...
-}:
-let
-  inherit (config.hardware.facter) report;
+# Adios port of ekaos/modules/hardware/facter/trackpoint.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, ... }:
 
-  # Detect ThinkPad by SMBIOS system product name
-  isThinkPad =
-    let
-      sysInfo = report.smbios.system or null;
-    in
-    sysInfo != null && lib.hasInfix "ThinkPad" (sysInfo.product_name or "");
-in
 {
-  options.hardware.facter.detected.trackpoint.enable =
-    lib.mkEnableOption "Facter TrackPoint detection"
-    // {
-      default = isThinkPad;
-      defaultText = "hardware dependent";
+  options = {
+    enable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          facterLib = import ./lib.nix { };
+        in
+        facterLib.isThinkPad inputs.facter.report;
+      description = "Whether to enable Facter TrackPoint detection.";
     };
+  };
 
-  config =
-    lib.mkIf (config.hardware.facter.enable && config.hardware.facter.detected.trackpoint.enable)
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
+  };
+
+  impl =
+    { options, inputs }:
+    if (inputs.facter.enable && options.enable) then
       {
-        hardware.trackpoint.enable = lib.mkDefault true;
-        hardware.trackpoint.emulateWheel = lib.mkDefault true;
-      };
+        # TODO(adios-cutover): legacy mkDefault priority lost (both options).
+        hardware.trackpoint.enable = true;
+        hardware.trackpoint.emulateWheel = true;
+      }
+    else
+      { };
 }

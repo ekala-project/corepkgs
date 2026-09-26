@@ -1,209 +1,33 @@
-# Systemd unit and session variable options
+# Adios port of ekaos/modules/config/systemd-units.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
 #
 # Provides the systemd.* and environment.sessionVariables options
 # consumed by desktop environment modules. The systemd service
 # manager translates these into unit files under /etc/systemd/.
 {
-  config,
+  types,
   lib,
   pkgs,
   ...
 }:
 
-with lib;
-
 let
-  cfg = config.systemd;
+  filterAttrs =
+    pred: set:
+    builtins.listToAttrs (
+      builtins.map (n: {
+        name = n;
+        value = set.${n};
+      }) (builtins.filter (n: pred n set.${n}) (builtins.attrNames set))
+    );
 
-  # Type for systemd unit configuration (serviceConfig, socketConfig, etc.)
-  unitConfigType = types.attrsOf (
-    types.oneOf [
-      types.str
-      types.int
-      types.bool
-      types.path
-      types.package
-    ]
-  );
+  optionalString = cond: s: if cond then s else "";
 
-  # Type for a systemd service unit
-  serviceOptions = {
-    options = {
-      enable = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Whether to enable this service.";
-      };
+  concatMapStringsSep =
+    sep: f: xs:
+    builtins.concatStringsSep sep (builtins.map f xs);
 
-      description = mkOption {
-        type = types.str;
-        default = "";
-        description = "Service description.";
-      };
-
-      after = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Units that must start before this service.";
-      };
-
-      before = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Units that must start after this service.";
-      };
-
-      wants = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Units wanted by this service.";
-      };
-
-      requires = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Units required by this service.";
-      };
-
-      bindsTo = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Units this service binds to.";
-      };
-
-      conflicts = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Units that conflict with this service.";
-      };
-
-      wantedBy = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Targets that want this service.";
-      };
-
-      requiredBy = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Targets that require this service.";
-      };
-
-      restartIfChanged = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Whether to restart on configuration change.";
-      };
-
-      environment = mkOption {
-        type = types.attrsOf types.str;
-        default = { };
-        description = "Environment variables for this service.";
-      };
-
-      path = mkOption {
-        type = types.listOf types.package;
-        default = [ ];
-        description = "Packages to add to the service PATH.";
-      };
-
-      script = mkOption {
-        type = types.nullOr types.lines;
-        default = null;
-        description = "Shell script to run as ExecStart.";
-      };
-
-      serviceConfig = mkOption {
-        type = unitConfigType;
-        default = { };
-        description = "Systemd [Service] section options.";
-      };
-    };
-  };
-
-  # Type for a systemd socket unit
-  socketOptions = {
-    options = {
-      description = mkOption {
-        type = types.str;
-        default = "";
-        description = "Socket description.";
-      };
-
-      wantedBy = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Targets that want this socket.";
-      };
-
-      listenStreams = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Stream socket addresses to listen on.";
-      };
-
-      socketConfig = mkOption {
-        type = unitConfigType;
-        default = { };
-        description = "Systemd [Socket] section options.";
-      };
-    };
-  };
-
-  # Type for a systemd target unit
-  targetOptions = {
-    options = {
-      description = mkOption {
-        type = types.str;
-        default = "";
-        description = "Target description.";
-      };
-
-      wants = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Units wanted by this target.";
-      };
-
-      requires = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Units required by this target.";
-      };
-
-      after = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Units that must start before this target.";
-      };
-    };
-  };
-
-  # Type for a systemd timer unit
-  timerOptions = {
-    options = {
-      description = mkOption {
-        type = types.str;
-        default = "";
-        description = "Timer description.";
-      };
-
-      wantedBy = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Targets that want this timer.";
-      };
-
-      timerConfig = mkOption {
-        type = unitConfigType;
-        default = { };
-        description = "Systemd [Timer] section options.";
-      };
-    };
-  };
-
-  # Session variable value type — accepts string or list of strings
-  sessionVarType = types.either types.str (types.listOf types.str);
+  mapAttrsToList = f: set: builtins.map (n: f n set.${n}) (builtins.attrNames set);
 
   # Generate a systemd service unit file from the service attrset
   mkServiceUnit =
@@ -231,15 +55,20 @@ let
 
       [Service]
       ${optionalString (svc.script != null) "ExecStart=${execStart}"}
-      ${concatStringsSep "\n" (
+      ${builtins.concatStringsSep "\n" (
         mapAttrsToList (k: v: "${k}=${toString v}") (
-          removeAttrs svc.serviceConfig [ "ExecStart" ]
-          // optionalAttrs (svc.script == null && svc.serviceConfig ? ExecStart) {
-            ExecStart = svc.serviceConfig.ExecStart;
-          }
+          builtins.removeAttrs svc.serviceConfig [ "ExecStart" ]
+          // (
+            if (svc.script == null && svc.serviceConfig ? ExecStart) then
+              {
+                ExecStart = svc.serviceConfig.ExecStart;
+              }
+            else
+              { }
+          )
         )
       )}
-      ${concatStringsSep "\n" envLines}
+      ${builtins.concatStringsSep "\n" envLines}
       ${pathStr}
 
       [Install]
@@ -256,7 +85,7 @@ let
 
       [Socket]
       ${concatMapStringsSep "\n" (s: "ListenStream=${s}") sock.listenStreams}
-      ${concatStringsSep "\n" (mapAttrsToList (k: v: "${k}=${toString v}") sock.socketConfig)}
+      ${builtins.concatStringsSep "\n" (mapAttrsToList (k: v: "${k}=${toString v}") sock.socketConfig)}
 
       [Install]
       ${concatMapStringsSep "\n" (t: "WantedBy=${t}") sock.wantedBy}
@@ -281,30 +110,27 @@ let
       ${optionalString (tmr.description != "") "Description=${tmr.description}"}
 
       [Timer]
-      ${concatStringsSep "\n" (mapAttrsToList (k: v: "${k}=${toString v}") tmr.timerConfig)}
+      ${builtins.concatStringsSep "\n" (mapAttrsToList (k: v: "${k}=${toString v}") tmr.timerConfig)}
 
       [Install]
       ${concatMapStringsSep "\n" (t: "WantedBy=${t}") tmr.wantedBy}
     '';
-
-  # Filter to enabled services
-  enabledSystemServices = filterAttrs (_: svc: svc.enable) cfg.services;
-  enabledUserServices = filterAttrs (_: svc: svc.enable) cfg.user.services;
-
 in
 
 {
   options = {
     # Alias for systemd.defaultTarget (used by some ekapkgs modules)
-    systemd.defaultUnit = mkOption {
-      type = types.str;
-      default = config.systemd.defaultTarget;
+    defaultUnit = {
+      # TODO(adios-cutover): legacy default followed config.systemd.defaultTarget,
+      # which is declared outside this batch; decoupled to a static default.
+      type = types.string;
+      default = "multi-user.target";
       description = "Alias for systemd.defaultTarget.";
     };
 
     # Packages that ship systemd unit files to be installed
-    systemd.packages = mkOption {
-      type = types.listOf types.package;
+    packages = {
+      type = types.listOf types.derivation;
       default = [ ];
       description = ''
         Packages whose systemd unit files are installed to /etc/systemd/.
@@ -314,65 +140,81 @@ in
     };
 
     # System services
-    systemd.services = mkOption {
-      type = types.attrsOf (types.submodule serviceOptions);
+    services = {
+      # TODO(adios-cutover): submodule validation lost. Legacy validated each
+      # service (enable, description, after/before/wants/requires/bindsTo/
+      # conflicts/wantedBy/requiredBy, restartIfChanged, environment, path,
+      # script, serviceConfig).
+      type = types.attrsOf types.attrs;
       default = { };
       description = "Systemd system service definitions.";
     };
 
     # Timers
-    systemd.timers = mkOption {
-      type = types.attrsOf (types.submodule timerOptions);
+    timers = {
+      # TODO(adios-cutover): submodule validation lost. Legacy validated each
+      # timer (description, wantedBy, timerConfig).
+      type = types.attrsOf types.attrs;
       default = { };
       description = "Systemd timer definitions.";
     };
 
     # Tmpfiles
-    systemd.tmpfiles = {
-      packages = mkOption {
-        type = types.listOf types.package;
-        default = [ ];
-        description = "Packages whose tmpfiles.d configuration should be installed.";
-      };
+    tmpfiles = {
+      options = {
+        packages = {
+          type = types.listOf types.derivation;
+          default = [ ];
+          description = "Packages whose tmpfiles.d configuration should be installed.";
+        };
 
-      settings = mkOption {
-        type = types.attrsOf types.anything;
-        default = { };
-        description = "Tmpfiles settings (name -> rule attrsets).";
+        settings = {
+          type = types.attrsOf types.any;
+          default = { };
+          description = "Tmpfiles settings (name -> rule attrsets).";
+        };
       };
+      description = "Tmpfiles settings.";
     };
 
     # User services, sockets, and targets
-    systemd.user = {
-      services = mkOption {
-        type = types.attrsOf (types.submodule serviceOptions);
-        default = { };
-        description = "Systemd user service definitions.";
-      };
+    user = {
+      options = {
+        services = {
+          # TODO(adios-cutover): submodule validation lost (same service
+          # schema as system services above).
+          type = types.attrsOf types.attrs;
+          default = { };
+          description = "Systemd user service definitions.";
+        };
 
-      sockets = mkOption {
-        type = types.attrsOf (types.submodule socketOptions);
-        default = { };
-        description = "Systemd user socket definitions.";
-      };
+        sockets = {
+          # TODO(adios-cutover): submodule validation lost. Legacy validated
+          # each socket (description, wantedBy, listenStreams, socketConfig).
+          type = types.attrsOf types.attrs;
+          default = { };
+          description = "Systemd user socket definitions.";
+        };
 
-      targets = mkOption {
-        type = types.attrsOf (types.submodule targetOptions);
-        default = { };
-        description = "Systemd user target definitions (drop-ins).";
+        targets = {
+          # TODO(adios-cutover): submodule validation lost. Legacy validated
+          # each target (description, wants, requires, after).
+          type = types.attrsOf types.attrs;
+          default = { };
+          description = "Systemd user target definitions (drop-ins).";
+        };
       };
+      description = "Systemd user units.";
     };
 
     # Session environment variables (set in user sessions via systemd environment.d)
-    environment.sessionVariables = mkOption {
-      type = types.attrsOf sessionVarType;
+    sessionVariables = {
+      type = types.attrsOf (types.either types.string (types.listOf types.string));
       default = { };
-      example = literalExpression ''
-        {
-          EDITOR = "vim";
-          GIO_EXTRA_MODULES = [ "''${pkgs.glib-networking}/lib/gio/modules" ];
-        }
-      '';
+      example = {
+        EDITOR = "vim";
+        GIO_EXTRA_MODULES = [ "\${pkgs.glib-networking}/lib/gio/modules" ];
+      };
       description = ''
         Environment variables set in user login sessions.
         Values can be strings or lists of strings (joined with `:` as separator).
@@ -380,151 +222,187 @@ in
     };
   };
 
-  config = {
-    # Sync defaultUnit → defaultTarget
-    systemd.defaultTarget = mkDefault cfg.defaultUnit;
+  impl =
+    { options, ... }:
+    let
+      # Filter to enabled services
+      enabledSystemServices = filterAttrs (_: svc: svc.enable) options.services;
+      enabledUserServices = filterAttrs (_: svc: svc.enable) options.user.services;
+    in
+    {
+      # Sync defaultUnit → defaultTarget
+      # TODO(adios-cutover): priority lost (was mkDefault).
+      systemd.defaultTarget = options.defaultUnit;
 
-    # Install unit files from systemd.packages
-    environment.etc = mkMerge [
-      # System units from packages
-      (listToAttrs (
-        concatMap (
-          pkg:
-          let
-            unitDir = "${pkg}/lib/systemd/system";
-          in
-          optional (builtins.pathExists unitDir) (
-            nameValuePair "systemd/system-packages/${pkg.name}" {
-              source = unitDir;
-            }
+      # Install unit files from packages and generated units
+      environment.etc = lib.merge.attrs.recursively {
+        mutators = [
+          # System units from packages
+          (builtins.listToAttrs (
+            builtins.concatMap (
+              pkg:
+              let
+                unitDir = "${pkg}/lib/systemd/system";
+              in
+              if builtins.pathExists unitDir then
+                [
+                  {
+                    name = "systemd/system-packages/${pkg.name}";
+                    value = {
+                      source = unitDir;
+                    };
+                  }
+                ]
+              else
+                [ ]
+            ) options.packages
+          ))
+
+          # User units from packages
+          (builtins.listToAttrs (
+            builtins.concatMap (
+              pkg:
+              let
+                unitDir = "${pkg}/lib/systemd/user";
+              in
+              if builtins.pathExists unitDir then
+                [
+                  {
+                    name = "systemd/user-packages/${pkg.name}";
+                    value = {
+                      source = unitDir;
+                    };
+                  }
+                ]
+              else
+                [ ]
+            ) options.packages
+          ))
+
+          # Tmpfiles from packages
+          (builtins.listToAttrs (
+            builtins.concatMap (
+              pkg:
+              let
+                tmpfilesDir = "${pkg}/lib/tmpfiles.d";
+              in
+              if builtins.pathExists tmpfilesDir then
+                [
+                  {
+                    name = "tmpfiles.d/${pkg.name}";
+                    value = {
+                      source = tmpfilesDir;
+                    };
+                  }
+                ]
+              else
+                [ ]
+            ) options.tmpfiles.packages
+          ))
+
+          # Generated system service units
+          (builtins.listToAttrs (
+            mapAttrsToList (name: svc: {
+              name = "systemd/system/${name}.service";
+              value = {
+                source = mkServiceUnit name svc;
+              };
+            }) enabledSystemServices
+          ))
+
+          # Generated system timer units
+          (builtins.listToAttrs (
+            mapAttrsToList (name: tmr: {
+              name = "systemd/system/${name}.timer";
+              value = {
+                source = mkTimerUnit name tmr;
+              };
+            }) options.timers
+          ))
+
+          # Generated user service units
+          (builtins.listToAttrs (
+            mapAttrsToList (name: svc: {
+              name = "systemd/user/${name}.service";
+              value = {
+                source = mkServiceUnit name svc;
+              };
+            }) enabledUserServices
+          ))
+
+          # Generated user socket units
+          (builtins.listToAttrs (
+            mapAttrsToList (name: sock: {
+              name = "systemd/user/${name}.socket";
+              value = {
+                source = mkSocketUnit name sock;
+              };
+            }) options.user.sockets
+          ))
+
+          # Generated user target drop-ins
+          (builtins.listToAttrs (
+            mapAttrsToList (name: tgt: {
+              name = "systemd/user/${name}.target.d/ekaos.conf";
+              value = {
+                source = mkTargetDropIn name tgt;
+              };
+            }) options.user.targets
+          ))
+
+          # Session variables via environment.d
+          (
+            if (options.sessionVariables != { }) then
+              {
+                "environment.d/50-ekaos.conf".text = builtins.concatStringsSep "\n" (
+                  mapAttrsToList (
+                    name: value:
+                    let
+                      strValue = if builtins.isList value then builtins.concatStringsSep ":" value else toString value;
+                    in
+                    "${name}=${strValue}"
+                  ) options.sessionVariables
+                );
+              }
+            else
+              { }
           )
-        ) cfg.packages
-      ))
+        ];
+      };
 
-      # User units from packages
-      (listToAttrs (
-        concatMap (
-          pkg:
-          let
-            unitDir = "${pkg}/lib/systemd/user";
-          in
-          optional (builtins.pathExists unitDir) (
-            nameValuePair "systemd/user-packages/${pkg.name}" {
-              source = unitDir;
-            }
-          )
-        ) cfg.packages
-      ))
+      # Activation script to link package unit files
+      system.activationScripts.systemd-units = {
+        deps = [ "etc" ];
+        text = ''
+          # Link systemd package units into the system/user directories
+          mkdir -p /etc/systemd/system /etc/systemd/user
 
-      # Tmpfiles from packages
-      (listToAttrs (
-        concatMap (
-          pkg:
-          let
-            tmpfilesDir = "${pkg}/lib/tmpfiles.d";
-          in
-          optional (builtins.pathExists tmpfilesDir) (
-            nameValuePair "tmpfiles.d/${pkg.name}" {
-              source = tmpfilesDir;
-            }
-          )
-        ) cfg.tmpfiles.packages
-      ))
+          for pkg_dir in /etc/systemd/system-packages/*/; do
+            [ -d "$pkg_dir" ] || continue
+            for unit in "$pkg_dir"/*; do
+              [ -f "$unit" ] || continue
+              ln -sf "$unit" "/etc/systemd/system/$(basename "$unit")" 2>/dev/null || true
+            done
+          done
 
-      # Generated system service units
-      (listToAttrs (
-        mapAttrsToList (
-          name: svc:
-          nameValuePair "systemd/system/${name}.service" {
-            source = mkServiceUnit name svc;
-          }
-        ) enabledSystemServices
-      ))
+          for pkg_dir in /etc/systemd/user-packages/*/; do
+            [ -d "$pkg_dir" ] || continue
+            for unit in "$pkg_dir"/*; do
+              [ -f "$unit" ] || continue
+              ln -sf "$unit" "/etc/systemd/user/$(basename "$unit")" 2>/dev/null || true
+            done
+          done
 
-      # Generated system timer units
-      (listToAttrs (
-        mapAttrsToList (
-          name: tmr:
-          nameValuePair "systemd/system/${name}.timer" {
-            source = mkTimerUnit name tmr;
-          }
-        ) cfg.timers
-      ))
-
-      # Generated user service units
-      (listToAttrs (
-        mapAttrsToList (
-          name: svc:
-          nameValuePair "systemd/user/${name}.service" {
-            source = mkServiceUnit name svc;
-          }
-        ) enabledUserServices
-      ))
-
-      # Generated user socket units
-      (listToAttrs (
-        mapAttrsToList (
-          name: sock:
-          nameValuePair "systemd/user/${name}.socket" {
-            source = mkSocketUnit name sock;
-          }
-        ) cfg.user.sockets
-      ))
-
-      # Generated user target drop-ins
-      (listToAttrs (
-        mapAttrsToList (
-          name: tgt:
-          nameValuePair "systemd/user/${name}.target.d/ekaos.conf" {
-            source = mkTargetDropIn name tgt;
-          }
-        ) cfg.user.targets
-      ))
-
-      # Session variables via environment.d
-      (mkIf (config.environment.sessionVariables != { }) {
-        "environment.d/50-ekaos.conf".text = concatStringsSep "\n" (
-          mapAttrsToList (
-            name: value:
-            let
-              strValue = if isList value then concatStringsSep ":" value else toString value;
-            in
-            "${name}=${strValue}"
-          ) config.environment.sessionVariables
-        );
-      })
-    ];
-
-    # Activation script to link package unit files
-    system.activationScripts.systemd-units = stringAfter [ "etc" ] ''
-      # Link systemd package units into the system/user directories
-      mkdir -p /etc/systemd/system /etc/systemd/user
-
-      for pkg_dir in /etc/systemd/system-packages/*/; do
-        [ -d "$pkg_dir" ] || continue
-        for unit in "$pkg_dir"/*; do
-          [ -f "$unit" ] || continue
-          ln -sf "$unit" "/etc/systemd/system/$(basename "$unit")" 2>/dev/null || true
-        done
-      done
-
-      for pkg_dir in /etc/systemd/user-packages/*/; do
-        [ -d "$pkg_dir" ] || continue
-        for unit in "$pkg_dir"/*; do
-          [ -f "$unit" ] || continue
-          ln -sf "$unit" "/etc/systemd/user/$(basename "$unit")" 2>/dev/null || true
-        done
-      done
-
-      # Link tmpfiles.d from packages
-      mkdir -p /etc/tmpfiles.d
-      for pkg_dir in /etc/tmpfiles.d/*/; do
-        [ -d "$pkg_dir" ] || continue
-        for conf in "$pkg_dir"/*; do
-          [ -f "$conf" ] || continue
-          ln -sf "$conf" "/etc/tmpfiles.d/$(basename "$conf")" 2>/dev/null || true
-        done
-      done
-    '';
-  };
+          # Link tmpfiles.d from packages
+          mkdir -p /etc/tmpfiles.d
+          for pkg_dir in /etc/tmpfiles.d/*/; do
+            [ -d "$pkg_dir" ] || continue
+            for conf in "$pkg_dir"/*; do
+              [ -f "$conf" ] || continue
+              ln -sf "$conf" "/etc/tmpfiles.d/$(basename "$conf")" 2>/dev/null || true
+            done
+          done
+        '';
+      };
+    };
 }

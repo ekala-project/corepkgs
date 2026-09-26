@@ -1,79 +1,71 @@
-# Hardware firmware configuration
-# Manages firmware blobs needed for hardware devices
+# Adios port of ekaos/modules/hardware/firmware.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
 {
-  config,
+  types,
   lib,
   pkgs,
   ...
 }:
 
-with lib;
-
-let
-  cfg = config.hardware;
-
-  # Combine all firmware into a single directory
-  combinedFirmware = pkgs.buildEnv {
-    name = "firmware";
-    paths = cfg.firmware;
-    pathsToLink = [ "/lib/firmware" ];
-    ignoreCollisions = true;
-  };
-
-in
-
 {
-  options.services.bluetooth = {
-    enable = mkOption {
+  options = {
+    # NOTE: the legacy module also declares options.services.bluetooth
+    # (flattened below with a `svcBluetooth` prefix to avoid colliding with
+    # the hardware.bluetooth leaves).
+    svcBluetoothEnable = {
       type = types.bool;
       default = false;
       description = "Whether to enable the Bluetooth service.";
     };
-    description = mkOption {
-      type = types.str;
+
+    svcBluetoothDescription = {
+      type = types.string;
       default = "Bluetooth Service";
       description = "Service description.";
     };
-    command = mkOption {
-      type = types.str;
-      internal = true;
+
+    svcBluetoothCommand = {
+      type = types.string;
+      # TODO(adios-cutover): legacy option is internal (set automatically); kept as a plain option.
       description = "Command to run (set automatically).";
     };
-    args = mkOption {
-      type = types.listOf types.str;
-      internal = true;
+
+    svcBluetoothArgs = {
+      type = types.listOf types.string;
       default = [ ];
+      # TODO(adios-cutover): legacy option is internal (set automatically); kept as a plain option.
       description = "Command arguments (set automatically).";
     };
-    user = mkOption {
-      type = types.str;
+
+    svcBluetoothUser = {
+      type = types.string;
       default = "root";
       description = "User to run service as.";
     };
-    restartPolicy = mkOption {
-      type = types.str;
+
+    svcBluetoothRestartPolicy = {
+      type = types.string;
       default = "always";
       description = "Restart policy.";
     };
-    systemd = mkOption {
-      type = types.attrsOf types.anything;
+
+    svcBluetoothSystemd = {
+      type = types.attrsOf types.any;
       default = { };
       description = "Systemd-specific options.";
     };
-  };
 
-  options.hardware = {
-    firmware = mkOption {
-      type = types.listOf types.package;
+    firmware = {
+      type = types.listOf types.derivation;
       default = [ ];
-      example = literalExpression "[ pkgs.linux-firmware ]";
+      example = [ pkgs.linux-firmware ];
       description = ''
         List of firmware packages to make available to the kernel.
         These are installed into /lib/firmware.
       '';
     };
 
-    enableRedistributableFirmware = mkOption {
+    enableRedistributableFirmware = {
       type = types.bool;
       default = false;
       description = ''
@@ -83,7 +75,7 @@ in
       '';
     };
 
-    enableAllFirmware = mkOption {
+    enableAllFirmware = {
       type = types.bool;
       default = false;
       description = ''
@@ -92,7 +84,7 @@ in
       '';
     };
 
-    ksm.enable = mkOption {
+    ksmEnable = {
       type = types.bool;
       default = false;
       description = ''
@@ -104,162 +96,205 @@ in
       '';
     };
 
-    bluetooth = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to enable Bluetooth support.";
-      };
-
-      powerOnBoot = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Whether to power on Bluetooth adapters at boot.";
-      };
-
-      package = mkOption {
-        type = types.package;
-        default = pkgs.bluez or (throw "bluez package not available");
-        defaultText = literalExpression "pkgs.bluez";
-        description = "The BlueZ package to use.";
-      };
-
-      settings = mkOption {
-        type = types.attrsOf (types.attrsOf types.anything);
-        default = { };
-        example = literalExpression ''
-          {
-            General = {
-              Enable = "Source,Sink,Media,Socket";
-            };
-          }
-        '';
-        description = "BlueZ configuration settings (INI format sections).";
-      };
+    bluetoothEnable = {
+      type = types.bool;
+      default = false;
+      description = "Whether to enable Bluetooth support.";
     };
 
-    graphics = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Whether to enable graphics/GPU support.
-
-          Installs Mesa drivers and enables DRI.
-        '';
-      };
-
-      enable32Bit = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to enable 32-bit graphics drivers (for Steam, Wine, etc.).";
-      };
-
-      extraPackages = mkOption {
-        type = types.listOf types.package;
-        default = [ ];
-        description = "Additional graphics driver packages.";
-      };
-
-      extraPackages32 = mkOption {
-        type = types.listOf types.package;
-        default = [ ];
-        description = "Additional 32-bit graphics driver packages.";
-      };
+    bluetoothPowerOnBoot = {
+      type = types.bool;
+      default = true;
+      description = "Whether to power on Bluetooth adapters at boot.";
     };
 
-    i2c = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Whether to enable I2C device access.
+    bluetoothPackage = {
+      type = types.derivation;
+      default = pkgs.bluez or (throw "bluez package not available");
+      description = "The BlueZ package to use.";
+    };
 
-          Loads the i2c-dev module and sets up udev rules.
-        '';
+    bluetoothSettings = {
+      type = types.attrsOf (types.attrsOf types.any);
+      default = { };
+      example = {
+        General = {
+          Enable = "Source,Sink,Media,Socket";
+        };
       };
+      description = "BlueZ configuration settings (INI format sections).";
+    };
 
-      group = mkOption {
-        type = types.str;
-        default = "i2c";
-        description = "Group allowed to access I2C devices.";
-      };
+    graphicsEnable = {
+      type = types.bool;
+      default = false;
+      description = ''
+        Whether to enable graphics/GPU support.
+
+        Installs Mesa drivers and enables DRI.
+      '';
+    };
+
+    graphicsEnable32Bit = {
+      type = types.bool;
+      default = false;
+      description = "Whether to enable 32-bit graphics drivers (for Steam, Wine, etc.).";
+    };
+
+    graphicsExtraPackages = {
+      type = types.listOf types.derivation;
+      default = [ ];
+      description = "Additional graphics driver packages.";
+    };
+
+    graphicsExtraPackages32 = {
+      type = types.listOf types.derivation;
+      default = [ ];
+      description = "Additional 32-bit graphics driver packages.";
+    };
+
+    i2cEnable = {
+      type = types.bool;
+      default = false;
+      description = ''
+        Whether to enable I2C device access.
+
+        Loads the i2c-dev module and sets up udev rules.
+      '';
+    };
+
+    i2cGroup = {
+      type = types.string;
+      default = "i2c";
+      description = "Group allowed to access I2C devices.";
     };
   };
 
-  config = mkMerge [
-    # enableAllFirmware implies enableRedistributableFirmware
-    (mkIf cfg.enableAllFirmware {
-      hardware.enableRedistributableFirmware = true;
-    })
+  inputs = {
+    facter.from = { parent }: parent.facter;
+  };
 
-    # When redistributable firmware is enabled without facter, add the
-    # combined linux-firmware meta-package as a fallback.  When facter is
-    # active, firmware-split.nix selects only the needed sub-packages.
-    (mkIf (cfg.enableRedistributableFirmware && !config.hardware.facter.enable && pkgs ? linux-firmware)
-      {
-        hardware.firmware = [ pkgs.linux-firmware ];
-      }
-    )
-
-    # KSM
-    (mkIf cfg.ksm.enable {
-      system.activationScripts.ksm = stringAfter [ "etc" ] ''
-        if [ -w /sys/kernel/mm/ksm/run ]; then
-          echo 1 > /sys/kernel/mm/ksm/run
-        fi
-      '';
-    })
-
-    # Bluetooth
-    (mkIf cfg.bluetooth.enable {
-      boot.kernelModules = [ "bluetooth" ];
-      environment.systemPackages = [ cfg.bluetooth.package ];
-
-      services.bluetooth = {
-        enable = true;
-        description = "Bluetooth Service";
-        command = "${cfg.bluetooth.package}/libexec/bluetooth/bluetoothd";
-        args = [ "--nodetach" ];
-        user = "root";
-        restartPolicy = "always";
-        systemd = {
-          after = [ "dbus.service" ];
-          wantedBy = [ "multi-user.target" ];
-        };
+  impl =
+    { options, inputs }:
+    let
+      # Combine all firmware into a single directory
+      combinedFirmware = pkgs.buildEnv {
+        name = "firmware";
+        paths = options.firmware;
+        pathsToLink = [ "/lib/firmware" ];
+        ignoreCollisions = true;
       };
+    in
+    lib.merge.attrs.recursively {
+      mutators = [
+        # enableAllFirmware implies enableRedistributableFirmware
+        (
+          if options.enableAllFirmware then
+            {
+              hardware.enableRedistributableFirmware = true;
+            }
+          else
+            { }
+        )
 
-      services.dbus.packages = [ cfg.bluetooth.package ];
-    })
+        # When redistributable firmware is enabled without facter, add the
+        # combined linux-firmware meta-package as a fallback.  When facter is
+        # active, firmware-split.nix selects only the needed sub-packages.
+        (
+          if (options.enableRedistributableFirmware && !inputs.facter.enable && pkgs ? linux-firmware) then
+            {
+              hardware.firmware = [ pkgs.linux-firmware ];
+            }
+          else
+            { }
+        )
 
-    # Graphics
-    (mkIf cfg.graphics.enable {
-      environment.systemPackages = cfg.graphics.extraPackages;
-    })
+        # KSM
+        # TODO(adios-cutover): legacy stringAfter [ "etc" ] ordering lost.
+        (
+          if options.ksmEnable then
+            {
+              system.activationScripts.ksm = ''
+                if [ -w /sys/kernel/mm/ksm/run ]; then
+                  echo 1 > /sys/kernel/mm/ksm/run
+                fi
+              '';
+            }
+          else
+            { }
+        )
 
-    # I2C
-    (mkIf cfg.i2c.enable {
-      boot.kernelModules = [ "i2c-dev" ];
-      users.groups.${cfg.i2c.group} = { };
-    })
+        # Bluetooth
+        (
+          if options.bluetoothEnable then
+            {
+              boot.kernelModules = [ "bluetooth" ];
+              environment.systemPackages = [ options.bluetoothPackage ];
 
-    # Install combined firmware and set up kernel firmware path
-    (mkIf (cfg.firmware != [ ]) {
-      system.activationScripts.firmware = stringAfter [ "etc" ] ''
-        # Set up firmware path for the kernel
-        mkdir -p /lib/firmware
-        for fwdir in ${combinedFirmware}/lib/firmware/*; do
-          fname=$(basename "$fwdir")
-          if [ ! -e "/lib/firmware/$fname" ]; then
-            ln -sf "$fwdir" "/lib/firmware/$fname"
-          fi
-        done
+              services.bluetooth = {
+                enable = true;
+                description = "Bluetooth Service";
+                command = "${options.bluetoothPackage}/libexec/bluetooth/bluetoothd";
+                args = [ "--nodetach" ];
+                user = "root";
+                restartPolicy = "always";
+                systemd = {
+                  after = [ "dbus.service" ];
+                  wantedBy = [ "multi-user.target" ];
+                };
+              };
 
-        # Tell the kernel where to find firmware
-        if [ -w /sys/module/firmware_class/parameters/path ]; then
-          echo "${combinedFirmware}/lib/firmware" > /sys/module/firmware_class/parameters/path
-        fi
-      '';
-    })
-  ];
+              services.dbus.packages = [ options.bluetoothPackage ];
+            }
+          else
+            { }
+        )
+
+        # Graphics
+        (
+          if options.graphicsEnable then
+            {
+              environment.systemPackages = options.graphicsExtraPackages;
+            }
+          else
+            { }
+        )
+
+        # I2C
+        (
+          if options.i2cEnable then
+            {
+              boot.kernelModules = [ "i2c-dev" ];
+              users.groups.${options.i2cGroup} = { };
+            }
+          else
+            { }
+        )
+
+        # Install combined firmware and set up kernel firmware path
+        # TODO(adios-cutover): legacy stringAfter [ "etc" ] ordering lost.
+        (
+          if (options.firmware != [ ]) then
+            {
+              system.activationScripts.firmware = ''
+                # Set up firmware path for the kernel
+                mkdir -p /lib/firmware
+                for fwdir in ${combinedFirmware}/lib/firmware/*; do
+                  fname=$(basename "$fwdir")
+                  if [ ! -e "/lib/firmware/$fname" ]; then
+                    ln -sf "$fwdir" "/lib/firmware/$fname"
+                  fi
+                done
+
+                # Tell the kernel where to find firmware
+                if [ -w /sys/module/firmware_class/parameters/path ]; then
+                  echo "${combinedFirmware}/lib/firmware" > /sys/module/firmware_class/parameters/path
+                fi
+              '';
+            }
+          else
+            { }
+        )
+      ];
+    };
 }

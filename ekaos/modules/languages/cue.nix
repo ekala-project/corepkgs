@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/cue.nix.
 # CUE data constraint language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "cue";
-    defaultPackage = pkgs: pkgs.cue;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "cue";
+  defaultPackage = pkgs: pkgs.cue;
+}

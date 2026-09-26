@@ -1,3 +1,4 @@
+# Adios port of ekaos/modules/languages/go.nix.
 # Go programming language module
 #
 # Provides languages.go options for system-wide and per-user configuration.
@@ -8,23 +9,18 @@
 #
 #   # Per-user:
 #   users.users.alice.languages.go.enable = true;
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "go";
-    defaultPackage = pkgs: pkgs.go;
-    environmentVariables = _: {
-      GOPATH = "$HOME/go";
-    };
-    sessionPath = _: [ "$HOME/go/bin" ];
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "go";
+  defaultPackage = pkgs: pkgs.go;
+  environmentVariables = _: {
+    GOPATH = "$HOME/go";
+  };
+  sessionPath = _: [ "$HOME/go/bin" ];
+}

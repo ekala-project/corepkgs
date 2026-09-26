@@ -1,69 +1,54 @@
-# Intel thermal management daemon
-# Ported from nixpkgs/nixos/modules/services/hardware/thermald.nix
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-let
-  cfg = config.services.thermald;
-in
-{
-  options.services.thermald = {
-    enable = lib.mkEnableOption "thermald, the temperature management daemon";
+# Adios port of ekaos/modules/services/hardware/thermald.nix.
+# TODO(adios-cutover): command/args were internal options set by the legacy
+# config; they are computed in impl, not user options.
+{ types, pkgs, ... }:
 
-    description = lib.mkOption {
-      type = lib.types.str;
+{
+  options = {
+    enable = {
+      type = types.bool;
+      default = false;
+      description = "Whether to enable thermald, the temperature management daemon.";
+    };
+
+    description = {
+      type = types.string;
       default = "Thermal Daemon Service";
       description = "Service description.";
     };
 
-    command = lib.mkOption {
-      type = lib.types.str;
-      internal = true;
-      description = "Command to run (set automatically).";
-    };
-
-    args = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      internal = true;
-      default = [ ];
-      description = "Command arguments (set automatically).";
-    };
-
-    user = lib.mkOption {
-      type = lib.types.str;
+    user = {
+      type = types.string;
       default = "root";
       description = "User to run service as.";
     };
 
-    restartPolicy = lib.mkOption {
-      type = lib.types.str;
+    restartPolicy = {
+      type = types.string;
       default = "always";
       description = "Restart policy.";
     };
 
-    systemd = lib.mkOption {
-      type = lib.types.attrsOf lib.types.anything;
+    systemd = {
+      type = types.attrsOf types.any;
       default = { };
       description = "Systemd-specific options.";
     };
 
-    debug = lib.mkOption {
-      type = lib.types.bool;
+    debug = {
+      type = types.bool;
       default = false;
       description = "Whether to enable debug logging.";
     };
 
-    ignoreCpuidCheck = lib.mkOption {
-      type = lib.types.bool;
+    ignoreCpuidCheck = {
+      type = types.bool;
       default = false;
       description = "Whether to ignore the cpuid check to allow running on unsupported platforms.";
     };
 
-    configFile = lib.mkOption {
-      type = lib.types.nullOr lib.types.path;
+    configFile = {
+      type = types.nullOr types.pathLike;
       default = null;
       description = ''
         The thermald manual configuration file.
@@ -73,37 +58,56 @@ in
       '';
     };
 
-    package = lib.mkOption {
-      type = lib.types.package;
-      default = pkgs.thermald or (throw "thermald package not available");
-      defaultText = lib.literalExpression "pkgs.thermald";
+    package = {
+      type = types.nullOr types.derivation;
+      default = pkgs.thermald or null;
       description = "The thermald package to use.";
     };
   };
 
-  config = lib.mkIf cfg.enable {
-    services.dbus.packages = [ cfg.package ];
+  assertions = [
+    {
+      verify = { options, ... }: (!options.enable) || (options.package != null);
+      explain =
+        { options, ... }: "package option must be set when enabled (thermald is not in core-pkgs)";
+    }
+  ];
 
-    services.thermald = {
-      command = "${cfg.package}/sbin/thermald";
-      args = [
-        "--no-daemon"
-        "--dbus-enable"
-      ]
-      ++ lib.optionals cfg.debug [ "--loglevel=debug" ]
-      ++ lib.optionals cfg.ignoreCpuidCheck [ "--ignore-cpuid-check" ]
-      ++ (
-        if cfg.configFile != null then
-          [
-            "--config-file"
-            (toString cfg.configFile)
+  impl =
+    { options, ... }:
+    if !options.enable then
+      { }
+    else
+      {
+        services.dbus.packages = [ options.package ];
+
+        services.thermald = {
+          inherit (options)
+            enable
+            description
+            user
+            restartPolicy
+            ;
+          command = "${options.package}/sbin/thermald";
+          args = [
+            "--no-daemon"
+            "--dbus-enable"
           ]
-        else
-          [ "--adaptive" ]
-      );
-      systemd = {
-        wantedBy = [ "multi-user.target" ];
+          ++ (if options.debug then [ "--loglevel=debug" ] else [ ])
+          ++ (if options.ignoreCpuidCheck then [ "--ignore-cpuid-check" ] else [ ])
+          ++ (
+            if options.configFile != null then
+              [
+                "--config-file"
+                (toString options.configFile)
+              ]
+            else
+              [ "--adaptive" ]
+          );
+          systemd = {
+            wantedBy = [ "multi-user.target" ];
+          }
+          // options.systemd;
+        };
       };
-    };
-  };
 }

@@ -1,162 +1,158 @@
-# Prometheus node exporter service module
-# The full Prometheus server is likely better suited for ekapkgs,
-# but the node exporter is fundamental system monitoring.
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
-
-let
-  cfgExporter = config.services.prometheus-node-exporter;
-
-in
+# Adios port of ekaos/modules/services/monitoring/prometheus.nix.
+# TODO(adios-cutover): command/args were internal options set by the legacy
+# config; they are computed in impl, not user options.
+{ types, pkgs, ... }:
 
 {
   options = {
-    services.prometheus-node-exporter = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Whether to enable the Prometheus node exporter.
+    enable = {
+      type = types.bool;
+      default = false;
+      description = ''
+        Whether to enable the Prometheus node exporter.
 
-          Exposes system metrics (CPU, memory, disk, network) for
-          Prometheus scraping.
-        '';
-      };
+        Exposes system metrics (CPU, memory, disk, network) for
+        Prometheus scraping.
+      '';
+    };
 
-      description = mkOption {
-        type = types.str;
-        default = "Prometheus Node Exporter";
-        description = "Service description.";
-      };
+    description = {
+      type = types.string;
+      default = "Prometheus Node Exporter";
+      description = "Service description.";
+    };
 
-      command = mkOption {
-        type = types.str;
-        internal = true;
-        description = "Command to run (set automatically).";
-      };
+    user = {
+      type = types.string;
+      default = "node-exporter";
+      description = "User to run service as.";
+    };
 
-      args = mkOption {
-        type = types.listOf types.str;
-        internal = true;
-        default = [ ];
-        description = "Command arguments (set automatically).";
-      };
+    restartPolicy = {
+      type = types.string;
+      default = "always";
+      description = "Restart policy.";
+    };
 
-      user = mkOption {
-        type = types.str;
-        default = "node-exporter";
-        description = "User to run service as.";
-      };
+    systemd = {
+      type = types.attrsOf types.any;
+      default = { };
+      description = "Systemd-specific options.";
+    };
 
-      restartPolicy = mkOption {
-        type = types.str;
-        default = "always";
-        description = "Restart policy.";
-      };
+    package = {
+      type = types.nullOr types.derivation;
+      default = pkgs.prometheus-node-exporter or null;
+      description = "The node exporter package to use.";
+    };
 
-      systemd = mkOption {
-        type = types.attrsOf types.anything;
-        default = { };
-        description = "Systemd-specific options.";
-      };
+    port = {
+      type = types.int;
+      default = 9100;
+      description = "Port for the node exporter to listen on.";
+    };
 
-      package = mkOption {
-        type = types.package;
-        default =
-          pkgs.prometheus-node-exporter
-            or (throw "prometheus-node-exporter package not available in core-pkgs");
-        defaultText = literalExpression "pkgs.prometheus-node-exporter";
-        description = "The node exporter package to use.";
-      };
+    listenAddress = {
+      type = types.string;
+      default = "0.0.0.0";
+      description = "Address for the node exporter to listen on.";
+    };
 
-      port = mkOption {
-        type = types.port;
-        default = 9100;
-        description = "Port for the node exporter to listen on.";
-      };
+    enabledCollectors = {
+      type = types.listOf types.string;
+      default = [ ];
+      description = ''
+        Additional collectors to enable beyond the defaults.
+      '';
+    };
 
-      listenAddress = mkOption {
-        type = types.str;
-        default = "0.0.0.0";
-        example = "127.0.0.1";
-        description = "Address for the node exporter to listen on.";
-      };
+    disabledCollectors = {
+      type = types.listOf types.string;
+      default = [ ];
+      description = ''
+        Default collectors to disable.
+      '';
+    };
 
-      enabledCollectors = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        example = [
-          "systemd"
-          "processes"
-        ];
-        description = ''
-          Additional collectors to enable beyond the defaults.
-        '';
-      };
-
-      disabledCollectors = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        example = [
-          "wifi"
-          "mdadm"
-        ];
-        description = ''
-          Default collectors to disable.
-        '';
-      };
-
-      extraFlags = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Extra command-line flags for the node exporter.";
-      };
+    extraFlags = {
+      type = types.listOf types.string;
+      default = [ ];
+      description = "Extra command-line flags for the node exporter.";
     };
   };
 
-  config = mkIf cfgExporter.enable {
-    services.prometheus-node-exporter = {
-      command = "${cfgExporter.package}/bin/node_exporter";
-      args = [
-        "--web.listen-address=${cfgExporter.listenAddress}:${toString cfgExporter.port}"
-      ]
-      ++ map (c: "--collector.${c}") cfgExporter.enabledCollectors
-      ++ map (c: "--no-collector.${c}") cfgExporter.disabledCollectors
-      ++ cfgExporter.extraFlags;
-      restartPolicy = "always";
-      systemd = {
-        after = [ "network.target" ];
-        wantedBy = [ "multi-user.target" ];
-      };
-    };
+  inputs = {
+    # TODO(adios-cutover): verify tree path once the monitoring batch lands
+    # (legacy reads config.monitoring.prometheus.enable, defined in
+    # monitoring/prometheus-scrape.nix).
+    monitoring.from = { root }: root.monitoring."prometheus-scrape";
+  };
 
-    users.users.node-exporter = {
-      uid = 9100;
-      group = "node-exporter";
-      description = "Prometheus Node Exporter";
-      isSystemUser = true;
-    };
+  assertions = [
+    {
+      verify = { options }: options.port >= 0 && options.port <= 65535;
+      explain = { options }: "node exporter port must be 0-65535, got ${toString options.port}";
+    }
+    {
+      verify = { options, ... }: (!options.enable) || (options.package != null);
+      explain =
+        { options, ... }:
+        "package option must be set when enabled (prometheus-node-exporter is not in core-pkgs)";
+    }
+  ];
 
-    users.groups.node-exporter = {
-      gid = 9100;
-    };
-
-    # Register as a Prometheus scrape target
-    monitoring.prometheus.extraScrapeConfigs = mkIf config.monitoring.prometheus.enable [
+  impl =
+    { options, inputs }:
+    if !options.enable then
+      { }
+    else
       {
-        job_name = "node";
-        static_configs = [
-          {
-            targets = [ "${cfgExporter.listenAddress}:${toString cfgExporter.port}" ];
+        services.prometheus-node-exporter = {
+          inherit (options)
+            enable
+            description
+            user
+            restartPolicy
+            ;
+          command = "${options.package}/bin/node_exporter";
+          args = [
+            "--web.listen-address=${options.listenAddress}:${toString options.port}"
+          ]
+          ++ builtins.map (c: "--collector.${c}") options.enabledCollectors
+          ++ builtins.map (c: "--no-collector.${c}") options.disabledCollectors
+          ++ options.extraFlags;
+          systemd = {
+            after = [ "network.target" ];
+            wantedBy = [ "multi-user.target" ];
           }
-        ];
-      }
-    ];
-  };
+          // options.systemd;
+        };
+
+        users.users.node-exporter = {
+          uid = 9100;
+          group = "node-exporter";
+          description = "Prometheus Node Exporter";
+          isSystemUser = true;
+        };
+
+        users.groups.node-exporter = {
+          gid = 9100;
+        };
+
+        # Register as a Prometheus scrape target when the server is enabled.
+        monitoring.prometheus.extraScrapeConfigs =
+          if (inputs.monitoring.prometheus.enable or false) then
+            [
+              {
+                job_name = "node";
+                static_configs = [
+                  {
+                    targets = [ "${options.listenAddress}:${toString options.port}" ];
+                  }
+                ];
+              }
+            ]
+          else
+            [ ];
+      };
 }

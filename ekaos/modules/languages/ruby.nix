@@ -1,24 +1,20 @@
+# Adios port of ekaos/modules/languages/ruby.nix.
 # Ruby programming language module
 #
 # Usage:
 #   languages.ruby.enable = true;
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "ruby";
-    defaultPackage = pkgs: pkgs.ruby;
-    environmentVariables = _: {
-      GEM_HOME = "$HOME/.gem";
-    };
-    sessionPath = _: [ "$HOME/.gem/bin" ];
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "ruby";
+  defaultPackage = pkgs: pkgs.ruby;
+  environmentVariables = _: {
+    GEM_HOME = "$HOME/.gem";
+  };
+  sessionPath = _: [ "$HOME/.gem/bin" ];
+}

@@ -1,13 +1,9 @@
+# Adios port of ekaos/modules/languages/haskell.nix.
 # Haskell programming language module (GHC)
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
+  langLib = import ./lib.nix { inherit types; };
 
   # GHC uses unusual variant names like v9_0_2_binary, v9_8_4_binary
   resolveGhcVersion =
@@ -25,17 +21,16 @@ let
           builtins.attrNames pkgs'.ghc
         );
       in
-      throw "languages.haskell: version \"${version}\" is not available. Known variants: ${lib.concatStringsSep ", " availableNames}";
-
-  mod = langLib.mkLanguageModule {
-    name = "haskell";
-    defaultPackage = pkgs: pkgs.ghc;
-    resolveVersion = resolveGhcVersion;
-    environmentVariables = _: {
-      CABAL_DIR = "$HOME/.cabal";
-    };
-    sessionPath = _: [ "$HOME/.cabal/bin" ];
-  };
+      throw "languages.haskell: version \"${version}\" is not available. Known variants: ${builtins.concatStringsSep ", " availableNames}";
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "haskell";
+  defaultPackage = pkgs: pkgs.ghc;
+  resolveVersion = resolveGhcVersion;
+  environmentVariables = _: {
+    CABAL_DIR = "$HOME/.cabal";
+  };
+  sessionPath = _: [ "$HOME/.cabal/bin" ];
+}

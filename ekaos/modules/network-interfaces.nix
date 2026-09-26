@@ -1,153 +1,18 @@
-# Network interface configuration
-# Handles interface-specific settings like static IPs, DHCP per-interface
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
-
-let
-  cfg = config.networking;
-
-  # Interface configuration type
-  interfaceOpts =
-    { name, ... }:
-    {
-      options = {
-        ipv4.addresses = mkOption {
-          type = types.listOf (
-            types.submodule {
-              options = {
-                address = mkOption {
-                  type = types.str;
-                  example = "192.168.1.100";
-                  description = "IPv4 address";
-                };
-                prefixLength = mkOption {
-                  type = types.ints.between 0 32;
-                  example = 24;
-                  description = "Subnet prefix length (CIDR notation)";
-                };
-              };
-            }
-          );
-          default = [ ];
-          description = ''
-            List of IPv4 addresses to assign to this interface.
-
-            Each address should include a prefix length for the subnet.
-          '';
-        };
-
-        ipv6.addresses = mkOption {
-          type = types.listOf (
-            types.submodule {
-              options = {
-                address = mkOption {
-                  type = types.str;
-                  example = "2001:db8::1";
-                  description = "IPv6 address";
-                };
-                prefixLength = mkOption {
-                  type = types.ints.between 0 128;
-                  example = 64;
-                  description = "Subnet prefix length (CIDR notation)";
-                };
-              };
-            }
-          );
-          default = [ ];
-          description = ''
-            List of IPv6 addresses to assign to this interface.
-
-            Each address should include a prefix length for the subnet.
-          '';
-        };
-
-        useDHCP = mkOption {
-          type = types.nullOr types.bool;
-          default = null;
-          example = false;
-          description = ''
-            Whether to use DHCP on this interface.
-
-            If null, inherits from networking.useDHCP.
-            If true, enables DHCP for this interface.
-            If false, disables DHCP for this interface.
-          '';
-        };
-
-        mtu = mkOption {
-          type = types.nullOr types.ints.positive;
-          default = null;
-          example = 9000;
-          description = ''
-            Maximum Transmission Unit (MTU) size for this interface.
-
-            Commonly used values:
-            - 1500: Standard Ethernet
-            - 9000: Jumbo frames
-          '';
-        };
-      };
-    };
-
-  # Generate systemd-networkd .network file content
-  mkNetworkUnit =
-    iface: icfg:
-    let
-      useDHCP = if icfg.useDHCP != null then icfg.useDHCP else cfg.useDHCP;
-      hasStaticAddrs = icfg.ipv4.addresses != [ ] || icfg.ipv6.addresses != [ ];
-    in
-    ''
-      [Match]
-      Name=${iface}
-
-      [Network]
-      ${optionalString useDHCP "DHCP=yes"}
-      ${concatMapStringsSep "\n" (
-        addr: "Address=${addr.address}/${toString addr.prefixLength}"
-      ) icfg.ipv4.addresses}
-      ${concatMapStringsSep "\n" (
-        addr: "Address=${addr.address}/${toString addr.prefixLength}"
-      ) icfg.ipv6.addresses}
-      ${optionalString (cfg.defaultGateway != null && hasStaticAddrs) "Gateway=${cfg.defaultGateway}"}
-      ${optionalString (cfg.defaultGateway6 != null && hasStaticAddrs) "Gateway=${cfg.defaultGateway6}"}
-
-      [Link]
-      ${optionalString (icfg.mtu != null) "MTUBytes=${toString icfg.mtu}"}
-      RequiredForOnline=no
-    '';
-
-  # Only generate configs for interfaces that have been explicitly configured
-  configuredInterfaces = filterAttrs (
-    name: icfg:
-    icfg.ipv4.addresses != [ ] || icfg.ipv6.addresses != [ ] || icfg.useDHCP != null || icfg.mtu != null
-  ) cfg.interfaces;
-
-in
+# Adios port of ekaos/modules/network-interfaces.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, lib, ... }:
 
 {
   options = {
-    networking.interfaces = mkOption {
-      type = types.attrsOf (types.submodule interfaceOpts);
+    # Legacy path: networking.interfaces.
+    interfaces = {
+      type = types.attrsOf types.attrs;
+      # TODO(adios-cutover): submodule validation lost. Each entry is a raw
+      # attrset supporting: ipv4.addresses / ipv6.addresses (lists of
+      # { address (string), prefixLength (int; v4 0-32, v6 0-128) }),
+      # useDHCP (null or bool, default null = inherit networking.useDHCP),
+      # mtu (null or positive int, default null).
       default = { };
-      example = literalExpression ''
-        {
-          eth0 = {
-            ipv4.addresses = [
-              { address = "192.168.1.100"; prefixLength = 24; }
-            ];
-            useDHCP = false;
-          };
-          eth1 = {
-            useDHCP = true;
-          };
-        }
-      '';
       description = ''
         Configuration for network interfaces.
 
@@ -157,33 +22,106 @@ in
     };
   };
 
-  config = mkIf (configuredInterfaces != { }) {
-    # Generate systemd-networkd .network files
-    environment.etc = mkMerge [
-      # Network configuration files
-      (listToAttrs (
-        mapAttrsToList (
-          iface: icfg:
-          nameValuePair "systemd/network/50-${iface}.network" {
-            text = mkNetworkUnit iface icfg;
-          }
-        ) configuredInterfaces
-      ))
-
-      # Symlink systemd-networkd service from systemd package
-      {
-        "systemd/system/systemd-networkd.service".source =
-          "${config.systemd.package}/lib/systemd/system/systemd-networkd.service";
-      }
-    ];
-
-    # Add activation script to enable systemd-networkd
-    system.activationScripts.networkd = stringAfter [ "etc" ] ''
-      # Enable systemd-networkd
-      echo "Enabling systemd-networkd..."
-      mkdir -p /etc/systemd/system/multi-user.target.wants
-      ln -sf ../systemd-networkd.service \
-             /etc/systemd/system/multi-user.target.wants/systemd-networkd.service
-    '';
+  inputs = {
+    networking.from = { root }: root.networking;
+    # TODO(adios-cutover): provides systemd.package (defined in
+    # ekaos/modules/system/toplevel.nix); flat leaf name pending the
+    # system/toplevel port — full legacy path used below.
+    systemd.from = { root }: root.system.toplevel;
   };
+
+  impl =
+    { options, inputs }:
+    let
+      # Generate systemd-networkd .network file content. `or` fallbacks
+      # reproduce the legacy submodule defaults (validation is lost, see TODO
+      # above).
+      mkNetworkUnit =
+        iface: icfg:
+        let
+          v4Addrs = (icfg.ipv4 or { }).addresses or [ ];
+          v6Addrs = (icfg.ipv6 or { }).addresses or [ ];
+          useDHCP = if (icfg.useDHCP or null) != null then icfg.useDHCP else inputs.networking.useDHCP;
+          hasStaticAddrs = v4Addrs != [ ] || v6Addrs != [ ];
+        in
+        ''
+          [Match]
+          Name=${iface}
+
+          [Network]
+          ${if useDHCP then "DHCP=yes" else ""}
+          ${builtins.concatStringsSep "\n" (
+            builtins.map (addr: "Address=${addr.address}/${toString addr.prefixLength}") v4Addrs
+          )}
+          ${builtins.concatStringsSep "\n" (
+            builtins.map (addr: "Address=${addr.address}/${toString addr.prefixLength}") v6Addrs
+          )}
+          ${
+            if inputs.networking.defaultGateway != null && hasStaticAddrs then
+              "Gateway=${inputs.networking.defaultGateway}"
+            else
+              ""
+          }
+          ${
+            if inputs.networking.defaultGateway6 != null && hasStaticAddrs then
+              "Gateway=${inputs.networking.defaultGateway6}"
+            else
+              ""
+          }
+
+          [Link]
+          ${if (icfg.mtu or null) != null then "MTUBytes=${toString icfg.mtu}" else ""}
+          RequiredForOnline=no
+        '';
+
+      filterAttrs =
+        pred: set:
+        builtins.listToAttrs (
+          builtins.map (n: {
+            name = n;
+            value = set.${n};
+          }) (builtins.filter (n: pred n set.${n}) (builtins.attrNames set))
+        );
+
+      # Only generate configs for interfaces that have been explicitly
+      # configured.
+      configuredInterfaces = filterAttrs (
+        name: icfg:
+        ((icfg.ipv4 or { }).addresses or [ ]) != [ ]
+        || ((icfg.ipv6 or { }).addresses or [ ]) != [ ]
+        || (icfg.useDHCP or null) != null
+        || (icfg.mtu or null) != null
+      ) options.interfaces;
+    in
+    if configuredInterfaces == { } then
+      { }
+    else
+      {
+        environment.etc = lib.merge.attrs.recursively {
+          mutators = [
+            (builtins.listToAttrs (
+              builtins.map (iface: {
+                name = "systemd/network/50-${iface}.network";
+                value = {
+                  text = mkNetworkUnit iface configuredInterfaces.${iface};
+                };
+              }) (builtins.attrNames configuredInterfaces)
+            ))
+
+            {
+              "systemd/system/systemd-networkd.service".source =
+                "${inputs.systemd.systemd.package}/lib/systemd/system/systemd-networkd.service";
+            }
+          ];
+        };
+
+        # TODO(adios-cutover): stringAfter [ "etc" ] ordering dropped.
+        system.activationScripts.networkd = ''
+          # Enable systemd-networkd
+          echo "Enabling systemd-networkd..."
+          mkdir -p /etc/systemd/system/multi-user.target.wants
+          ln -sf ../systemd-networkd.service \
+                 /etc/systemd/system/multi-user.target.wants/systemd-networkd.service
+        '';
+      };
 }

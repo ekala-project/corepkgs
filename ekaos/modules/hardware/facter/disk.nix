@@ -1,24 +1,38 @@
-# Auto-detect disk controller kernel modules
-{ lib, config, ... }:
-let
-  facterLib = import ./lib.nix lib;
-  inherit (config.hardware.facter) report;
-in
+# Adios port of ekaos/modules/hardware/facter/disk.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, ... }:
+
 {
-  options.hardware.facter.detected.boot.disk.kernelModules = lib.mkOption {
-    type = lib.types.listOf lib.types.str;
-    default = lib.unique (
-      facterLib.collectDrivers (
-        (report.hardware.firewire_controller or [ ])
-        ++ (report.hardware.disk or [ ])
-        ++ (report.hardware.storage_controller or [ ])
-      )
-    );
-    defaultText = "hardware dependent";
-    description = "Kernel modules needed to access disks.";
+  options = {
+    kernelModules = {
+      type = types.listOf types.string;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          facterLib = import ./lib.nix { };
+          report = inputs.facter.report;
+        in
+        facterLib.unique (
+          facterLib.collectDrivers (
+            (report.hardware.firewire_controller or [ ])
+            ++ (report.hardware.disk or [ ])
+            ++ (report.hardware.storage_controller or [ ])
+          )
+        );
+      description = "Kernel modules needed to access disks.";
+    };
   };
 
-  config = lib.mkIf config.hardware.facter.enable {
-    boot.initrd.availableKernelModules = config.hardware.facter.detected.boot.disk.kernelModules;
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
   };
+
+  impl =
+    { options, inputs }:
+    if inputs.facter.enable then
+      {
+        boot.initrd.availableKernelModules = options.kernelModules;
+      }
+    else
+      { };
 }

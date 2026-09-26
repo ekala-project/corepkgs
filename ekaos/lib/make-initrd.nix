@@ -3,7 +3,10 @@
 
 {
   pkgs,
-  lib,
+  # NOTE: nixpkgs lib is no longer required (adios modules must not use it).
+  # Only builtins are used below; the `lib` argument is kept for backwards
+  # compatibility with existing callers and ignored.
+  lib ? { },
   kernelPackages,
   availableKernelModules ? [ ],
   kernelModules ? [ ],
@@ -22,7 +25,8 @@
 }:
 
 let
-  inherit (lib) concatStringsSep optionalString;
+  concatStringsSep = builtins.concatStringsSep;
+  optionalString = cond: s: if cond then s else "";
 
   # Compression commands
   compressorExe =
@@ -87,12 +91,12 @@ let
         copy_bin_and_libs ${pkgs.util-linux}/bin/umount
 
         # Copy filesystem tools
-        ${optionalString (lib.elem "ext4" supportedFilesystems) ''
+        ${optionalString (builtins.elem "ext4" supportedFilesystems) ''
           copy_bin_and_libs ${pkgs.e2fsprogs}/bin/e2fsck
           ln -sf e2fsck $out/bin/fsck.ext4
         ''}
 
-        ${optionalString (lib.elem "vfat" supportedFilesystems) ''
+        ${optionalString (builtins.elem "vfat" supportedFilesystems) ''
           copy_bin_and_libs ${pkgs.dosfstools}/bin/fsck.vfat
         ''}
 
@@ -145,7 +149,7 @@ let
 
     # Unlock LUKS devices
     ${concatStringsSep "\n" (
-      lib.mapAttrsToList (name: dev: ''
+      builtins.map (name: dev: ''
         echo "Unlocking LUKS device ${dev.device}..."
         ${
           if dev.keyFile != null then
@@ -157,7 +161,7 @@ let
               if dev.name != "" then dev.name else name
             } ${optionalString dev.allowDiscards "--allow-discards"}"
         }
-      '') luks.devices
+      '') (builtins.attrNames luks.devices)
     )}
 
     ${postDeviceCommands}
