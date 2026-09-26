@@ -169,17 +169,17 @@ let
   # {
   #   allowUnfree = false;
   #   allowUnfreePredicate = (x: pkgs.lib.hasPrefix "vscode" x.name);
-  #   allowUnfreePackages = [ "steam" ];
+  #   licenses.accept = [ "steam" ];
   # }
-  # Defaults to allow all names defined in config.allowUnfreePackages, and all
+  # Defaults to allow all names defined in config.licenses.accept, and all
   # packages that match the unfree predicate function
   hasDeniedUnfreeLicense =
     if allowUnfree then
       _: false
     else
       let
-        listPredicate = pkg: elem (getName pkg) config.allowUnfreePackages;
-        definedListPredicate = config.allowUnfreePackages or [ ] != [ ];
+        listPredicate = pkg: elem (getName pkg) config.licenses.accept;
+        definedListPredicate = config.licenses.accept or [ ] != [ ];
 
         explicitPredicate = config.allowUnfreePredicate;
         # Be robust against misconfigured allowUnfreePredicate values such as null
