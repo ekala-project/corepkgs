@@ -5,6 +5,7 @@
     systems.url = "github:nix-systems/default";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     nix-lib.url = "github:ekala-project/nix-lib";
+    lladaios.url = "github:llakala/lladios";
   };
 
   outputs =
@@ -13,6 +14,7 @@
       systems,
       nix-lib,
       treefmt-nix,
+      lladaios,
       ...
     }:
     let
@@ -51,7 +53,8 @@
       };
       lib = nix-lib // {
         mkFlake = import ./lib/mk-flake.nix;
-        ekaosSystem = import ./ekaos;
+        ekaosSystem = args: import ./ekaos (args // { adios = lladaios; });
+        ekaosAdiosSystem = args: import ./ekaos (args // { adios = lladaios; });
       };
     };
 }

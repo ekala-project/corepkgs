@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/perl.nix.
 # Perl programming language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "perl";
-    defaultPackage = pkgs: pkgs.perl;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "perl";
+  defaultPackage = pkgs: pkgs.perl;
+}

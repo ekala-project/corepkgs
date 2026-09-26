@@ -1,63 +1,41 @@
-# System activation script framework
-# Builds and manages activation scripts that configure the system
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+# Adios port of ekaos/modules/system/activation.nix.
+#
+# Tree path: system/activation is parent.system.activation.
+# Reads the built /etc tree via inputs.etcBuild
+# (parent.system.etc, option buildEtc).
+# `stringAfter deps text` maps to { deps, text } per activationScriptType
+# ({ deps, text, supportsDryActivation }).
+# TODO(adios-cutover): activationScripts is types.attrsOf types.attrs;
+# per-script submodule validation lost (expected keys: deps list, text
+# lines, supportsDryActivation bool).
+# TODO(adios-cutover): impl returns both system.build.activationScript
+# (this module's read-only output) and the core system.activationScripts
+# entries; the tree must merge impl outputs back (NixOS module-merge
+# semantics). On key collision the user-provided script wins (legacy
+# merged submodule fields instead).
+{ types, pkgs, ... }:
 
 let
-  # Activation script type
-  activationScriptType = types.submodule {
-    options = {
-      deps = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "List of activation scripts this one depends on.";
-      };
-
-      text = mkOption {
-        type = types.lines;
-        description = "Shell script content for this activation script.";
-      };
-
-      supportsDryActivation = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether this script supports dry activation (testing mode).";
-      };
-    };
-  };
-
-  # Topologically sort activation scripts by dependencies
+  # Topologically sort activation scripts by dependencies (Kahn's algorithm)
   sortActivationScripts =
     scripts:
     let
-      # Create dependency graph
-      scriptNames = attrNames scripts;
-
-      # Simple topological sort (Kahn's algorithm)
+      scriptNames = builtins.attrNames scripts;
       sort =
         remaining: sorted:
         if remaining == [ ] then
           sorted
         else
           let
-            # Find scripts with no unsatisfied dependencies
-            ready = filter (
+            ready = builtins.filter (
               name:
               let
                 deps = scripts.${name}.deps or [ ];
-                unsatisfied = filter (d: elem d remaining) deps;
+                unsatisfied = builtins.filter (d: builtins.elem d remaining) deps;
               in
               unsatisfied == [ ]
             ) remaining;
-
-            # Remove ready scripts from remaining
-            newRemaining = filter (name: !(elem name ready)) remaining;
+            newRemaining = builtins.filter (name: !(builtins.elem name ready)) remaining;
           in
           if ready == [ ] then
             throw "Circular dependency in activation scripts: ${toString remaining}"
@@ -66,22 +44,21 @@ let
     in
     sort scriptNames [ ];
 
-  # Build the activation script
-  activationScript =
+  # Build the activation script from a merged script set + the /etc build.
+  buildActivationScriptBuilder =
+    { scripts, etcBuild }:
     let
-      sortedScripts = sortActivationScripts config.system.activationScripts;
-
-      scriptBodies = map (
+      sortedScripts = sortActivationScripts scripts;
+      scriptBodies = builtins.map (
         name:
         let
-          script = config.system.activationScripts.${name};
+          script = scripts.${name};
         in
         ''
           # Activation script: ${name}
           ${script.text}
         ''
       ) sortedScripts;
-
     in
     pkgs.writeScript "activate" ''
       #!${pkgs.runtimeShell}
@@ -96,51 +73,19 @@ let
       mkdir -p /run
       ln -sfn @out@ /run/current-system
 
-      ${concatStringsSep "\n" scriptBodies}
+      ${builtins.concatStringsSep "\n" scriptBodies}
 
       echo "Activation complete."
     '';
 
-in
-
-{
-  options = {
-    system.activationScripts = mkOption {
-      type = types.attrsOf activationScriptType;
-      default = { };
-      description = ''
-        Activation scripts that configure the system.
-
-        These scripts run during system activation (boot and switch).
-        They should be idempotent and handle being run multiple times.
-
-        Scripts are run in dependency order based on the 'deps' field.
-      '';
-      example = literalExpression ''
-        {
-          myScript = {
-            deps = [ "etc" ];
-            text = '''
-              echo "Setting up my component"
-              mkdir -p /var/lib/myservice
-            ''';
-          };
-        }
-      '';
-    };
-
-    system.build.activationScript = mkOption {
-      type = types.package;
-      internal = true;
-      description = "The system activation script.";
-    };
-  };
-
-  config = {
-    system.build.activationScript = activationScript;
-
-    # Core activation scripts
-    system.activationScripts = {
+  # Core activation scripts contributed by this module (legacy config
+  # section merged these with user-provided scripts).
+  buildCoreScripts =
+    { inputs }:
+    let
+      etcBuild = inputs.etcBuild.buildEtc;
+    in
+    {
       # Set up /etc
       etc = {
         deps = [ ];
@@ -150,7 +95,7 @@ in
           if [ -L /etc/static ]; then
             rm /etc/static
           fi
-          ln -sfn ${config.system.build.etc}/etc /etc/static
+          ln -sfn ${etcBuild}/etc /etc/static
 
           # For now, just ensure /etc exists
           # In a full implementation, we'd manage /etc overlays here
@@ -184,5 +129,64 @@ in
         supportsDryActivation = false;
       };
     };
+in
+
+{
+  options = {
+    activationScripts = {
+      type = types.attrsOf types.attrs;
+      default = { };
+      example = {
+        myScript = {
+          deps = [ "etc" ];
+          text = ''
+            echo "Setting up my component"
+            mkdir -p /var/lib/myservice
+          '';
+        };
+      };
+      description = ''
+        Activation scripts that configure the system.
+
+        These scripts run during system activation (boot and switch).
+        They should be idempotent and handle being run multiple times.
+
+        Scripts are run in dependency order based on the 'deps' field.
+      '';
+    };
+
+    # Exposed as an option (via defaultFunc) so sibling modules can consume it
+    # through adios inputs, which only see OPTIONS, never impl results.
+    buildActivationScript = {
+      type = types.derivation;
+      defaultFunc = { options, inputs }:
+        buildActivationScriptBuilder {
+          scripts = buildCoreScripts { inherit inputs; } // options.activationScripts;
+          etcBuild = inputs.etcBuild.buildEtc;
+        };
+      description = ''
+        The system activation script.
+        Read-only output; value comes from the defaultFunc.
+      '';
+    };
   };
+
+  inputs = {
+    etcBuild.from = { parent }: parent.etc;
+  };
+
+  impl =
+    { options, inputs }:
+    let
+      core = buildCoreScripts { inherit inputs; };
+    in
+    {
+      system.build.activationScript = buildActivationScriptBuilder {
+        scripts = core // options.activationScripts;
+        etcBuild = inputs.etcBuild.buildEtc;
+      };
+
+      # Core activation scripts contribution (tree merges with user scripts).
+      system.activationScripts = core;
+    };
 }

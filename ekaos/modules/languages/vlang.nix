@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/vlang.nix.
 # V programming language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "vlang";
-    defaultPackage = pkgs: pkgs.vlang;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "vlang";
+  defaultPackage = pkgs: pkgs.vlang;
+}

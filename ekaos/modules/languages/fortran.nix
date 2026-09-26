@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/fortran.nix.
 # Fortran programming language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "fortran";
-    defaultPackage = pkgs: pkgs.gfortran;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "fortran";
+  defaultPackage = pkgs: pkgs.gfortran;
+}

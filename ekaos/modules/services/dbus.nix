@@ -1,27 +1,11 @@
-# D-Bus system message bus
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
-
-let
-  cfg = config.services.dbus;
-
-  configDir = pkgs.makeDBusConf.override {
-    dbus = cfg.package;
-    suidHelper = "${config.security.wrapperDir or "/run/wrappers/bin"}/dbus-daemon-launch-helper";
-    serviceDirectories = cfg.packages;
-  };
-
-in
+# Adios port of ekaos/modules/services/dbus.nix.
+# TODO(adios-cutover): command/args were internal options set by the legacy
+# config; they are computed in impl, not user options.
+{ types, pkgs, ... }:
 
 {
-  options.services.dbus = {
-    enable = mkOption {
+  options = {
+    enable = {
       type = types.bool;
       default = false;
       description = ''
@@ -31,51 +15,38 @@ in
       '';
     };
 
-    description = mkOption {
-      type = types.str;
+    description = {
+      type = types.string;
       default = "D-Bus System Message Bus";
       description = "Service description.";
     };
 
-    command = mkOption {
-      type = types.str;
-      internal = true;
-      description = "Command to run (set automatically).";
-    };
-
-    args = mkOption {
-      type = types.listOf types.str;
-      internal = true;
-      default = [ ];
-      description = "Command arguments (set automatically).";
-    };
-
-    user = mkOption {
-      type = types.str;
+    user = {
+      type = types.string;
       default = "root";
       description = "User to run service as.";
     };
 
-    restartPolicy = mkOption {
-      type = types.str;
+    restartPolicy = {
+      type = types.string;
       default = "always";
       description = "Restart policy.";
     };
 
-    systemd = mkOption {
-      type = types.attrsOf types.anything;
+    systemd = {
+      type = types.attrsOf types.any;
       default = { };
       description = "Systemd-specific options.";
     };
 
-    package = mkOption {
-      type = types.package;
+    package = {
+      type = types.derivation;
       default = pkgs.dbus;
       description = "D-Bus package to use.";
     };
 
-    packages = mkOption {
-      type = types.listOf types.path;
+    packages = {
+      type = types.listOf types.pathLike;
       default = [ ];
       description = ''
         Packages whose D-Bus configuration files should be included.
@@ -85,50 +56,75 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
-    services.dbus = {
-      command = "${cfg.package}/bin/dbus-daemon";
-      args = [
-        "--system"
-        "--nofork"
-        "--nopidfile"
-        "--address=unix:path=/run/dbus/system_bus_socket"
-      ];
-
-      packages = [
-        cfg.package
-        config.system.path
-      ];
-
-      systemd = {
-        after = [ "local-fs.target" ];
-        wantedBy = [ "multi-user.target" ];
-      };
-    };
-
-    # Install D-Bus configuration directory
-    environment.etc."dbus-1".source = configDir;
-
-    environment.pathsToLink = [
-      "/etc/dbus-1"
-      "/share/dbus-1"
-    ];
-
-    # Create messagebus user and group
-    users.users.messagebus = {
-      isSystemUser = true;
-      group = "messagebus";
-      description = "D-Bus system message bus daemon user";
-    };
-    users.groups.messagebus = { };
-
-    # Add dbus tools to system packages
-    environment.systemPackages = [ cfg.package ];
-
-    # Create runtime directory
-    system.activationScripts.dbus = stringAfter [ "etc" "users" ] ''
-      mkdir -p /run/dbus
-      chmod 755 /run/dbus
-    '';
+  inputs = {
+    # TODO(adios-cutover): verify tree path once the security batch lands
+    # (legacy reads config.security.wrapperDir, defined in
+    # security/wrappers/default.nix).
+    security.from = { root }: root.security.wrappers;
+    # TODO(adios-cutover): verify tree path once the system batch lands
+    # (legacy reads config.system.path, defined in system/toplevel.nix).
+    system.from = { root }: root.system.toplevel;
   };
+
+  impl =
+    { options, inputs }:
+    if !options.enable then
+      { }
+    else
+      let
+        configDir = pkgs.makeDBusConf.override {
+          dbus = options.package;
+          suidHelper = "${inputs.security.wrapperDir or "/run/wrappers/bin"}/dbus-daemon-launch-helper";
+          serviceDirectories = options.packages;
+        };
+      in
+      {
+        services.dbus = {
+          inherit (options)
+            enable
+            description
+            user
+            restartPolicy
+            ;
+          command = "${options.package}/bin/dbus-daemon";
+          args = [
+            "--system"
+            "--nofork"
+            "--nopidfile"
+            "--address=unix:path=/run/dbus/system_bus_socket"
+          ];
+          # Legacy list-merge: user packages ++ config packages.
+          packages = options.packages ++ [
+            options.package
+            inputs.system.path
+          ];
+          systemd = {
+            after = [ "local-fs.target" ];
+            wantedBy = [ "multi-user.target" ];
+          }
+          // options.systemd;
+        };
+
+        environment.etc."dbus-1".source = configDir;
+
+        environment.pathsToLink = [
+          "/etc/dbus-1"
+          "/share/dbus-1"
+        ];
+
+        users.users.messagebus = {
+          isSystemUser = true;
+          group = "messagebus";
+          description = "D-Bus system message bus daemon user";
+        };
+        users.groups.messagebus = { };
+
+        environment.systemPackages = [ options.package ];
+
+        # TODO(adios-cutover): legacy ordering (after "etc" "users") lost; plain script.
+        system.activationScripts.dbus = ''
+          mkdir -p /run/dbus
+          chmod 755 /run/dbus
+        '';
+      };
 }

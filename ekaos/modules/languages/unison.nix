@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/unison.nix.
 # Unison programming language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "unison";
-    defaultPackage = pkgs: pkgs.unison-ucm;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "unison";
+  defaultPackage = pkgs: pkgs.unison-ucm;
+}

@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/idris.nix.
 # Idris2 programming language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "idris";
-    defaultPackage = pkgs: pkgs.idris2;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "idris";
+  defaultPackage = pkgs: pkgs.idris2;
+}

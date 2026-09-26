@@ -1,202 +1,203 @@
-# NetworkManager service module
-# Provides automatic network configuration via NetworkManager
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
-
-let
-  cfg = config.networking.networkmanager;
-
-  # Generate NetworkManager.conf
-  nmConf = pkgs.writeText "NetworkManager.conf" ''
-    [main]
-    plugins=keyfile
-    ${optionalString (cfg.dns != "default") "dns=${cfg.dns}"}
-    ${optionalString (cfg.unmanaged != [ ]) ''
-
-      [keyfile]
-      unmanaged-devices=${concatStringsSep ";" (map (d: "interface-name:${d}") cfg.unmanaged)}
-    ''}
-
-    ${optionalString cfg.wifi.enable ''
-      [device]
-      wifi.scan-rand-mac-address=${if cfg.wifi.macRandomization then "yes" else "no"}
-    ''}
-
-    ${cfg.extraConfig}
-  '';
-
-in
+# Adios port of ekaos/modules/services/networking/networkmanager.nix.
+#
+# The legacy module declares two namespaces (networking.networkmanager and
+# services.network-manager); both are modelled as sub-option groups here and
+# impl re-nests them into the legacy config shape.
+# TODO(adios-cutover): command/args of services.network-manager were internal
+# options set by the legacy config; they are computed in impl.
+{ types, pkgs, ... }:
 
 {
   options = {
-    networking.networkmanager = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Whether to enable NetworkManager for automatic network configuration.
-
-          NetworkManager manages network connections via D-Bus and provides
-          a unified interface for Ethernet, WiFi, and mobile broadband.
-        '';
-      };
-
-      package = mkOption {
-        type = types.package;
-        default = pkgs.networkmanager or (throw "networkmanager package not available in core-pkgs");
-        defaultText = literalExpression "pkgs.networkmanager";
-        description = "The NetworkManager package to use.";
-      };
-
-      dns = mkOption {
-        type = types.enum [
-          "default"
-          "none"
-          "systemd-resolved"
-          "dnsmasq"
-        ];
-        default = "default";
-        description = ''
-          DNS resolution backend for NetworkManager.
-
-          - default: NetworkManager manages /etc/resolv.conf directly
-          - none: NetworkManager does not touch DNS
-          - systemd-resolved: Use systemd-resolved
-          - dnsmasq: Use dnsmasq as local resolver
-        '';
-      };
-
-      unmanaged = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        example = [
-          "lo"
-          "docker0"
-          "br-*"
-        ];
-        description = ''
-          List of interface names (or patterns) that NetworkManager should not manage.
-        '';
-      };
-
-      wifi = {
-        enable = mkOption {
+    networkmanager = {
+      options = {
+        enable = {
           type = types.bool;
-          default = true;
-          description = "Whether to enable WiFi support in NetworkManager.";
+          default = false;
+          description = ''
+            Whether to enable NetworkManager for automatic network configuration.
+
+            NetworkManager manages network connections via D-Bus and provides
+            a unified interface for Ethernet, WiFi, and mobile broadband.
+          '';
         };
 
-        macRandomization = mkOption {
-          type = types.bool;
-          default = true;
-          description = "Whether to randomize MAC address during WiFi scanning.";
+        package = {
+          type = types.derivation;
+          default = pkgs.networkmanager or (throw "networkmanager package not available in core-pkgs");
+          description = "The NetworkManager package to use.";
         };
 
-        backend = mkOption {
-          type = types.enum [
-            "wpa_supplicant"
-            "iwd"
+        dns = {
+          type = types.enum "dns" [
+            "default"
+            "none"
+            "systemd-resolved"
+            "dnsmasq"
           ];
-          default = "wpa_supplicant";
-          description = "WiFi backend to use.";
+          default = "default";
+          description = ''
+            DNS resolution backend for NetworkManager.
+
+            - default: NetworkManager manages /etc/resolv.conf directly
+            - none: NetworkManager does not touch DNS
+            - systemd-resolved: Use systemd-resolved
+            - dnsmasq: Use dnsmasq as local resolver
+          '';
+        };
+
+        unmanaged = {
+          type = types.listOf types.string;
+          default = [ ];
+          description = ''
+            List of interface names (or patterns) that NetworkManager should not manage.
+          '';
+        };
+
+        wifi = {
+          options = {
+            enable = {
+              type = types.bool;
+              default = true;
+              description = "Whether to enable WiFi support in NetworkManager.";
+            };
+
+            macRandomization = {
+              type = types.bool;
+              default = true;
+              description = "Whether to randomize MAC address during WiFi scanning.";
+            };
+
+            backend = {
+              type = types.enum "backend" [
+                "wpa_supplicant"
+                "iwd"
+              ];
+              default = "wpa_supplicant";
+              description = "WiFi backend to use.";
+            };
+          };
+          description = "WiFi configuration.";
+        };
+
+        extraConfig = {
+          type = types.string;
+          default = "";
+          description = "Additional lines appended to NetworkManager.conf.";
         };
       };
-
-      extraConfig = mkOption {
-        type = types.lines;
-        default = "";
-        description = "Additional lines appended to NetworkManager.conf.";
-      };
+      description = "NetworkManager networking options.";
     };
 
-    # Service interface options for the cross-platform service manager
-    services.network-manager = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to enable the NetworkManager service.";
-      };
+    service = {
+      options = {
+        enable = {
+          type = types.bool;
+          default = false;
+          description = "Whether to enable the NetworkManager service.";
+        };
 
-      description = mkOption {
-        type = types.str;
-        default = "NetworkManager";
-        description = "Service description.";
-      };
+        description = {
+          type = types.string;
+          default = "NetworkManager";
+          description = "Service description.";
+        };
 
-      command = mkOption {
-        type = types.str;
-        internal = true;
-        description = "Command to run (set automatically).";
-      };
+        user = {
+          type = types.string;
+          default = "root";
+          description = "User to run service as.";
+        };
 
-      args = mkOption {
-        type = types.listOf types.str;
-        internal = true;
-        default = [ ];
-        description = "Command arguments (set automatically).";
-      };
+        restartPolicy = {
+          type = types.string;
+          default = "always";
+          description = "Restart policy.";
+        };
 
-      user = mkOption {
-        type = types.str;
-        default = "root";
-        description = "User to run service as.";
+        systemd = {
+          type = types.attrsOf types.any;
+          default = { };
+          description = "Systemd-specific options.";
+        };
       };
-
-      restartPolicy = mkOption {
-        type = types.str;
-        default = "always";
-        description = "Restart policy.";
-      };
-
-      systemd = mkOption {
-        type = types.attrsOf types.anything;
-        default = { };
-        description = "Systemd-specific options.";
-      };
+      description = "NetworkManager service interface options.";
     };
   };
 
-  config = mkIf cfg.enable {
-    # NetworkManager service
-    services.network-manager = {
-      enable = true;
-      command = "${cfg.package}/bin/NetworkManager";
-      args = [
-        "--no-daemon"
-        "--config=${nmConf}"
-      ];
-      user = "root";
-      restartPolicy = "always";
-      systemd = {
-        after = [
-          "dbus.service"
-          "network-pre.target"
-        ];
-        wantedBy = [ "multi-user.target" ];
+  impl =
+    { options, ... }:
+    if !(options.networkmanager.enable or false) then
+      { }
+    else
+      let
+        nm = options.networkmanager;
+        svc = options.service or { };
+        wifi = nm.wifi or { };
+
+        nmConf = pkgs.writeText "NetworkManager.conf" ''
+          [main]
+          plugins=keyfile
+          ${if (nm.dns or "default") != "default" then "dns=${nm.dns}" else ""}
+          ${
+            if (nm.unmanaged or [ ]) != [ ] then
+              ''
+                [keyfile]
+                unmanaged-devices=${
+                  builtins.concatStringsSep ";" (builtins.map (d: "interface-name:${d}") nm.unmanaged)
+                }
+              ''
+            else
+              ""
+          }
+
+          ${
+            if (wifi.enable or true) then
+              ''
+                [device]
+                wifi.scan-rand-mac-address=${if (wifi.macRandomization or true) then "yes" else "no"}
+              ''
+            else
+              ""
+          }
+
+          ${nm.extraConfig or ""}
+        '';
+      in
+      {
+        services.network-manager = {
+          enable = true;
+          description = svc.description or "NetworkManager";
+          command = "${nm.package}/bin/NetworkManager";
+          args = [
+            "--no-daemon"
+            "--config=${nmConf}"
+          ];
+          user = svc.user or "root";
+          restartPolicy = svc.restartPolicy or "always";
+          systemd = {
+            after = [
+              "dbus.service"
+              "network-pre.target"
+            ];
+            wantedBy = [ "multi-user.target" ];
+          }
+          // (svc.systemd or { });
+        };
+
+        services.dbus.packages = [ nm.package ];
+
+        environment.etc."NetworkManager/NetworkManager.conf".source = nmConf;
+        environment.systemPackages = [ nm.package ];
+
+        # TODO(adios-cutover): legacy mkDefault priority lost; plain value.
+        networking.useDHCP = false;
+
+        # TODO(adios-cutover): legacy ordering (after "etc" "users") lost; plain script.
+        system.activationScripts.networkmanager = ''
+          mkdir -p /etc/NetworkManager/system-connections
+          mkdir -p /var/lib/NetworkManager
+          chmod 700 /etc/NetworkManager/system-connections
+        '';
       };
-    };
-
-    # D-Bus is required for NetworkManager
-    services.dbus.packages = [ cfg.package ];
-
-    # Install NetworkManager config and utilities
-    environment.etc."NetworkManager/NetworkManager.conf".source = nmConf;
-    environment.systemPackages = [ cfg.package ];
-
-    # Ensure NetworkManager does not conflict with manual networking
-    networking.useDHCP = mkDefault false;
-
-    # Add nm-online dispatcher to wait for network
-    system.activationScripts.networkmanager = stringAfter [ "etc" "users" ] ''
-      mkdir -p /etc/NetworkManager/system-connections
-      mkdir -p /var/lib/NetworkManager
-      chmod 700 /etc/NetworkManager/system-connections
-    '';
-  };
 }

@@ -1,176 +1,117 @@
-# Binary format (binfmt_misc) support
-# Allows running foreign-architecture binaries via QEMU or other interpreters
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
-
-let
-  cfg = config.boot.binfmt;
-
-  # Registration submodule
-  registrationOpts =
-    { name, config, ... }:
-    {
-      options = {
-        recognitionType = mkOption {
-          type = types.enum [
-            "magic"
-            "extension"
-          ];
-          default = "magic";
-          description = "Whether to recognize executables by magic number or extension.";
-        };
-
-        offset = mkOption {
-          type = types.nullOr types.int;
-          default = null;
-          description = "Byte offset of the magic number used for recognition.";
-        };
-
-        magicOrExtension = mkOption {
-          type = types.str;
-          description = "The magic number or file extension to match on.";
-        };
-
-        mask = mkOption {
-          type = types.nullOr types.str;
-          default = null;
-          description = "Mask to AND with the byte sequence before matching.";
-        };
-
-        interpreter = mkOption {
-          type = types.path;
-          description = "The interpreter to invoke to run the program.";
-        };
-
-        preserveArgvZero = mkOption {
-          type = types.bool;
-          default = false;
-          description = "Whether to pass the original argv[0] to the interpreter.";
-        };
-
-        fixBinary = mkOption {
-          type = types.bool;
-          default = false;
-          description = ''
-            Whether to open the interpreter at registration time rather
-            than when a binary is invoked. Useful for chroot/container
-            scenarios.
-          '';
-        };
-
-        matchCredentials = mkOption {
-          type = types.bool;
-          default = false;
-          description = ''
-            Whether to launch with the credentials of the binary
-            rather than the interpreter (e.g. setuid bits).
-          '';
-        };
-
-        openBinary = mkOption {
-          type = types.bool;
-          default = config.matchCredentials;
-          defaultText = literalExpression "config.matchCredentials";
-          description = ''
-            Whether to pass the binary as an open file descriptor
-            instead of a path.
-          '';
-        };
-      };
-    };
-
-  # Format a registration for binfmt_misc
-  mkRegistration =
-    name: reg:
-    let
-      type = if reg.recognitionType == "magic" then "M" else "E";
-      offset = optionalString (reg.offset != null) (toString reg.offset);
-      flags =
-        optionalString reg.preserveArgvZero "P"
-        + optionalString reg.openBinary "O"
-        + optionalString reg.matchCredentials "C"
-        + optionalString reg.fixBinary "F";
-    in
-    ":${name}:${type}:${offset}:${reg.magicOrExtension}:${reg.mask or ""}:${reg.interpreter}:${flags}";
-
-in
+# Adios port of ekaos/modules/boot/binfmt.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, lib, ... }:
 
 {
   options = {
-    boot.binfmt = {
-      registrations = mkOption {
-        type = types.attrsOf (types.submodule registrationOpts);
-        default = { };
-        description = ''
-          Extra binary formats to register with the kernel via binfmt_misc.
+    registrations = {
+      type = types.attrsOf types.attrs;
+      # TODO(adios-cutover): submodule validation lost. Each entry is a raw
+      # attrset supporting: recognitionType ("magic"/"extension",
+      # default "magic"), offset (null or int, default null),
+      # magicOrExtension (string, required), mask (null or string,
+      # default null), interpreter (path, required), preserveArgvZero,
+      # fixBinary, matchCredentials (bool, default false), openBinary
+      # (bool, default = the entry's matchCredentials).
+      default = { };
+      description = ''
+        Extra binary formats to register with the kernel via binfmt_misc.
 
-          See https://www.kernel.org/doc/html/latest/admin-guide/binfmt-misc.html
-        '';
-      };
+        See https://www.kernel.org/doc/html/latest/admin-guide/binfmt-misc.html
+      '';
+    };
 
-      emulatedSystems = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        example = [
-          "aarch64-linux"
-          "armv7l-linux"
-        ];
-        description = ''
-          List of systems to emulate via QEMU user-mode emulation.
+    emulatedSystems = {
+      type = types.listOf types.string;
+      default = [ ];
+      example = [
+        "aarch64-linux"
+        "armv7l-linux"
+      ];
+      description = ''
+        List of systems to emulate via QEMU user-mode emulation.
 
-          Automatically registers binfmt entries for the specified
-          architectures using qemu-user. Also configures Nix to
-          support building for these platforms.
-        '';
-      };
+        Automatically registers binfmt entries for the specified
+        architectures using qemu-user. Also configures Nix to
+        support building for these platforms.
+      '';
+    };
 
-      preferStaticEmulators = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Whether to use statically-linked emulators when available.
+    preferStaticEmulators = {
+      type = types.bool;
+      default = false;
+      description = ''
+        Whether to use statically-linked emulators when available.
 
-          Static emulators can be preloaded by the kernel, removing
-          the need to make them available inside chroots and sandboxes.
-        '';
-      };
+        Static emulators can be preloaded by the kernel, removing
+        the need to make them available inside chroots and sandboxes.
+      '';
     };
   };
 
-  config = mkMerge [
-    # Register explicit binfmt entries
-    (mkIf (cfg.registrations != { }) {
-      environment.etc."binfmt.d/ekaos.conf".text = concatStringsSep "\n" (
-        mapAttrsToList mkRegistration cfg.registrations
-      );
+  impl =
+    { options, ... }:
+    let
+      # Format a registration for binfmt_misc. `or` fallbacks reproduce the
+      # legacy submodule defaults (validation itself is lost, see TODO above).
+      mkRegistration =
+        name: reg:
+        let
+          recognitionType = reg.recognitionType or "magic";
+          type = if recognitionType == "magic" then "M" else "E";
+          offset = if (reg.offset or null) != null then toString reg.offset else "";
+          matchCredentials = reg.matchCredentials or false;
+          flags =
+            (if (reg.preserveArgvZero or false) then "P" else "")
+            + (if (reg.openBinary or matchCredentials) then "O" else "")
+            + (if matchCredentials then "C" else "")
+            + (if (reg.fixBinary or false) then "F" else "");
+        in
+        ":${name}:${type}:${offset}:${reg.magicOrExtension}:${reg.mask or ""}:${reg.interpreter}:${flags}";
+    in
+    lib.merge.attrs.recursively {
+      mutators = [
+        (
+          if options.registrations != { } then
+            {
+              environment.etc."binfmt.d/ekaos.conf".text = builtins.concatStringsSep "\n" (
+                builtins.map (n: mkRegistration n options.registrations.${n}) (
+                  builtins.attrNames options.registrations
+                )
+              );
 
-      system.activationScripts.binfmt = stringAfter [ "etc" ] ''
-        # Mount binfmt_misc if not already mounted
-        if [ ! -d /proc/sys/fs/binfmt_misc ]; then
-          mkdir -p /proc/sys/fs/binfmt_misc
-        fi
-        if ! mountpoint -q /proc/sys/fs/binfmt_misc; then
-          mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc || true
-        fi
+              # TODO(adios-cutover): stringAfter [ "etc" ] ordering dropped.
+              system.activationScripts.binfmt = ''
+                # Mount binfmt_misc if not already mounted
+                if [ ! -d /proc/sys/fs/binfmt_misc ]; then
+                  mkdir -p /proc/sys/fs/binfmt_misc
+                fi
+                if ! mountpoint -q /proc/sys/fs/binfmt_misc; then
+                  mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc || true
+                fi
 
-        # Register formats
-        if [ -f /etc/binfmt.d/ekaos.conf ]; then
-          while IFS= read -r line; do
-            [ -n "$line" ] && echo "$line" > /proc/sys/fs/binfmt_misc/register 2>/dev/null || true
-          done < /etc/binfmt.d/ekaos.conf
-        fi
-      '';
-    })
+                # Register formats
+                if [ -f /etc/binfmt.d/ekaos.conf ]; then
+                  while IFS= read -r line; do
+                    [ -n "$line" ] && echo "$line" > /proc/sys/fs/binfmt_misc/register 2>/dev/null || true
+                  done < /etc/binfmt.d/ekaos.conf
+                fi
+              '';
+            }
+          else
+            { }
+        )
 
-    # Set up QEMU user-mode emulation for emulated systems
-    (mkIf (cfg.emulatedSystems != [ ]) {
-      nix.settings.extra-platforms = cfg.emulatedSystems;
-    })
-  ];
+        (
+          if options.emulatedSystems != [ ] then
+            {
+              nix.settings.extra-platforms = options.emulatedSystems;
+            }
+          else
+            { }
+        )
+      ];
+    };
+  # Note: legacy config never consumes preferStaticEmulators; it is accepted
+  # and exposed for other modules but has no effect here (same as legacy).
 }

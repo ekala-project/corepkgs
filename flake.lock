@@ -1,5 +1,20 @@
 {
   "nodes": {
+    "lladaios": {
+      "locked": {
+        "lastModified": 1790278685,
+        "narHash": "sha256-3Lo77+rVZDZ2MPsV3c7vsCVmz2ISWx5HJfKZleCbR5I=",
+        "owner": "llakala",
+        "repo": "lladios",
+        "rev": "00160d01ce821f74028037d2ef6629abe784e126",
+        "type": "github"
+      },
+      "original": {
+        "owner": "llakala",
+        "repo": "lladios",
+        "type": "github"
+      }
+    },
     "nix-lib": {
       "locked": {
         "lastModified": 1787401631,
@@ -33,6 +48,7 @@
     },
     "root": {
       "inputs": {
+        "lladaios": "lladaios",
         "nix-lib": "nix-lib",
         "systems": "systems",
         "treefmt-nix": "treefmt-nix"

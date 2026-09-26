@@ -1,31 +1,37 @@
+# Adios port of ekaos/modules/config/xdg/sounds.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+#
 # XDG Sound Theme support
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
-
-let
-  cfg = config.xdg.sounds;
-in
+{ types, pkgs, ... }:
 
 {
   options = {
-    xdg.sounds.enable = mkOption {
-      type = types.bool;
-      default = true;
-      description = ''
-        Whether to install files to support the XDG Sound Theme specification.
-      '';
+    sounds = {
+      options = {
+        enable = {
+          type = types.bool;
+          default = true;
+          description = ''
+            Whether to install files to support the XDG Sound Theme specification.
+          '';
+        };
+      };
+      description = "XDG sound theme settings.";
     };
   };
 
-  config = mkIf cfg.enable {
-    environment.systemPackages = mkIf (pkgs ? sound-theme-freedesktop) [
-      pkgs.sound-theme-freedesktop
-    ];
-  };
+  impl =
+    { options, ... }:
+    if !options.sounds.enable then
+      { }
+    else
+      {
+        environment.systemPackages =
+          if (pkgs ? sound-theme-freedesktop) then
+            [
+              pkgs.sound-theme-freedesktop
+            ]
+          else
+            [ ];
+      };
 }

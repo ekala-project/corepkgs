@@ -1,59 +1,85 @@
-# Podman container runtime
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+# Adios port of ekaos/modules/virtualisation/podman.nix.
+#
+# Tree path: virtualisation/podman is parent.virtualisation.podman.
+# Self-contained; no cross-module reads. Config-file derivations and the
+# docker-compat shim are built by top-level-let functions closing over
+# pkgs (impl only sees { options, inputs }).
+# TODO(adios-cutover): timers.podman-prune write targets the timers
+# module's namespace (parent.tasks.timers); merged by the tree. The entry
+# keeps its legacy shape (no `enable` key — legacy commonTimerOptions
+# defaulted it to false).
+{ types, pkgs, ... }:
 
 let
-  cfg = config.virtualisation.podman;
-
   # Build containers storage.conf
-  storageConf = pkgs.writeText "storage.conf" ''
-    [storage]
-    driver = "${cfg.storage.driver}"
-    graphroot = "${cfg.storage.graphRoot}"
-    runroot = "${cfg.storage.runRoot}"
+  mkStorageConf =
+    {
+      driver,
+      graphRoot,
+      runRoot,
+    }:
+    pkgs.writeText "storage.conf" ''
+      [storage]
+      driver = "${driver}"
+      graphroot = "${graphRoot}"
+      runroot = "${runRoot}"
 
-    [storage.options]
-    ${optionalString (cfg.storage.driver == "overlay") ''
-      [storage.options.overlay]
-      mount_program = "${pkgs.fuse-overlayfs}/bin/fuse-overlayfs"
-    ''}
-  '';
+      [storage.options]
+      ${
+        if driver == "overlay" then
+          ''
+            [storage.options.overlay]
+            mount_program = "${pkgs.fuse-overlayfs}/bin/fuse-overlayfs"
+          ''
+        else
+          ""
+      }
+    '';
 
   # Build containers.conf
-  containersConf = pkgs.writeText "containers.conf" ''
-    [containers]
-    log_driver = "${cfg.containers.logDriver}"
+  mkContainersConf =
+    { logDriver, runtime }:
+    pkgs.writeText "containers.conf" ''
+      [containers]
+      log_driver = "${logDriver}"
 
-    [engine]
-    runtime = "${cfg.runtime}/bin/${if cfg.runtime.pname or "" == "crun" then "crun" else "runc"}"
+      [engine]
+      runtime = "${runtime}/bin/${if runtime.pname or "" == "crun" then "crun" else "runc"}"
 
-    [network]
-    network_backend = "netavark"
-    ${optionalString (pkgs ? aardvark-dns) ''
-      dns_bind_port = 53
-    ''}
-  '';
+      [network]
+      network_backend = "netavark"
+      ${
+        if (pkgs ? aardvark-dns) then
+          ''
+            dns_bind_port = 53
+          ''
+        else
+          ""
+      }
+    '';
 
   # Build registries.conf
-  registriesConf = pkgs.writeText "registries.conf" ''
-    [registries.search]
-    registries = [${concatMapStringsSep ", " (r: "'${r}'") cfg.registries.search}]
+  mkRegistriesConf =
+    { search, block }:
+    pkgs.writeText "registries.conf" ''
+      [registries.search]
+      registries = [${builtins.concatStringsSep ", " (builtins.map (r: "'${r}'") search)}]
 
-    [registries.block]
-    registries = [${concatMapStringsSep ", " (r: "'${r}'") cfg.registries.block}]
-  '';
+      [registries.block]
+      registries = [${builtins.concatStringsSep ", " (builtins.map (r: "'${r}'") block)}]
+    '';
 
+  mkDockerCompat =
+    package:
+    pkgs.runCommand "podman-docker-compat" { } ''
+      mkdir -p $out/bin
+      ln -s ${package}/bin/podman $out/bin/docker
+    '';
 in
 
 {
-  options.virtualisation.podman = {
-    enable = mkOption {
+  options = {
+    enable = {
       type = types.bool;
       default = false;
       description = ''
@@ -62,156 +88,182 @@ in
       '';
     };
 
-    package = mkOption {
-      type = types.package;
+    package = {
+      type = types.derivation;
       default = pkgs.podman;
       description = "The Podman package to use.";
     };
 
-    runtime = mkOption {
-      type = types.package;
+    runtime = {
+      type = types.derivation;
       default = pkgs.crun;
       description = "OCI runtime for containers (crun or runc).";
     };
 
-    dockerCompat = mkOption {
+    dockerCompat = {
       type = types.bool;
       default = false;
       description = "Create a 'docker' alias pointing to podman.";
     };
 
     storage = {
-      driver = mkOption {
-        type = types.enum [
-          "overlay"
-          "vfs"
-          "btrfs"
-          "zfs"
-        ];
-        default = "overlay";
-        description = "Storage driver for container images.";
-      };
+      description = "Container image storage configuration.";
+      options = {
+        driver = {
+          type = types.enum "podman-storage-driver" [
+            "overlay"
+            "vfs"
+            "btrfs"
+            "zfs"
+          ];
+          default = "overlay";
+          description = "Storage driver for container images.";
+        };
 
-      graphRoot = mkOption {
-        type = types.str;
-        default = "/var/lib/containers/storage";
-        description = "Root directory for container storage.";
-      };
+        graphRoot = {
+          type = types.string;
+          default = "/var/lib/containers/storage";
+          description = "Root directory for container storage.";
+        };
 
-      runRoot = mkOption {
-        type = types.str;
-        default = "/run/containers/storage";
-        description = "Runtime directory for temporary container data.";
+        runRoot = {
+          type = types.string;
+          default = "/run/containers/storage";
+          description = "Runtime directory for temporary container data.";
+        };
       };
     };
 
     containers = {
-      logDriver = mkOption {
-        type = types.enum [
-          "k8s-file"
-          "journald"
-          "none"
-        ];
-        default = "journald";
-        description = "Default log driver for containers.";
+      description = "Container engine behaviour.";
+      options = {
+        logDriver = {
+          type = types.enum "podman-log-driver" [
+            "k8s-file"
+            "journald"
+            "none"
+          ];
+          default = "journald";
+          description = "Default log driver for containers.";
+        };
       };
     };
 
     registries = {
-      search = mkOption {
-        type = types.listOf types.str;
-        default = [
-          "docker.io"
-          "quay.io"
-        ];
-        description = "Container registries to search by default.";
-      };
+      description = "Container registry configuration.";
+      options = {
+        search = {
+          type = types.listOf types.string;
+          default = [
+            "docker.io"
+            "quay.io"
+          ];
+          description = "Container registries to search by default.";
+        };
 
-      block = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Container registries to block.";
+        block = {
+          type = types.listOf types.string;
+          default = [ ];
+          description = "Container registries to block.";
+        };
       };
     };
 
     autoPrune = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Periodically prune unused containers, images, and volumes.";
-      };
+      description = "Periodic pruning of unused podman data.";
+      options = {
+        enable = {
+          type = types.bool;
+          default = false;
+          description = "Periodically prune unused containers, images, and volumes.";
+        };
 
-      schedule = mkOption {
-        type = types.str;
-        default = "weekly";
-        description = "How often to run auto-prune.";
-      };
+        schedule = {
+          type = types.string;
+          default = "weekly";
+          description = "How often to run auto-prune.";
+        };
 
-      flags = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        example = [ "--all" ];
-        description = "Additional flags passed to 'podman system prune'.";
+        flags = {
+          type = types.listOf types.string;
+          default = [ ];
+          example = [ "--all" ];
+          description = "Additional flags passed to 'podman system prune'.";
+        };
       };
     };
   };
 
-  config = mkIf cfg.enable {
-    environment.systemPackages = [
-      cfg.package
-      cfg.runtime
-      pkgs.conmon
-      pkgs.skopeo
-      pkgs.slirp4netns
-      pkgs.fuse-overlayfs
-    ]
-    ++ optional (pkgs ? netavark) pkgs.netavark
-    ++ optional (pkgs ? aardvark-dns) pkgs.aardvark-dns
-    ++ optional cfg.dockerCompat (
-      pkgs.runCommand "podman-docker-compat" { } ''
-        mkdir -p $out/bin
-        ln -s ${cfg.package}/bin/podman $out/bin/docker
-      ''
-    );
+  impl =
+    { options, inputs }:
+    if !options.enable then
+      { }
+    else
+      {
+        environment.systemPackages = [
+          options.package
+          options.runtime
+          pkgs.conmon
+          pkgs.skopeo
+          pkgs.slirp4netns
+          pkgs.fuse-overlayfs
+        ]
+        ++ (if (pkgs ? netavark) then [ pkgs.netavark ] else [ ])
+        ++ (if (pkgs ? aardvark-dns) then [ pkgs.aardvark-dns ] else [ ])
+        ++ (if options.dockerCompat then [ (mkDockerCompat options.package) ] else [ ]);
 
-    # Container configuration files
-    environment.etc = {
-      "containers/storage.conf".source = storageConf;
-      "containers/containers.conf".source = containersConf;
-      "containers/registries.conf".source = registriesConf;
+        # Container configuration files
+        environment.etc = {
+          "containers/storage.conf".source = mkStorageConf {
+            inherit (options.storage) driver graphRoot runRoot;
+          };
+          "containers/containers.conf".source = mkContainersConf {
+            logDriver = options.containers.logDriver;
+            runtime = options.runtime;
+          };
+          "containers/registries.conf".source = mkRegistriesConf {
+            inherit (options.registries) search block;
+          };
 
-      # Policy: allow all images by default
-      "containers/policy.json".text = builtins.toJSON {
-        default = [
-          {
-            type = "insecureAcceptAnything";
-          }
+          # Policy: allow all images by default
+          "containers/policy.json".text = builtins.toJSON {
+            default = [
+              {
+                type = "insecureAcceptAnything";
+              }
+            ];
+          };
+        };
+
+        # Enable kernel features
+        boot.kernelModules = [
+          "overlay"
+          "br_netfilter"
         ];
-      };
-    };
 
-    # Enable kernel features
-    boot.kernelModules = [
-      "overlay"
-      "br_netfilter"
-    ];
-
-    # Create required directories
-    system.activationScripts.podman = stringAfter [ "etc" ] ''
-      mkdir -p ${cfg.storage.graphRoot}
-      mkdir -p ${cfg.storage.runRoot}
-      mkdir -p /etc/containers
-    '';
-
-    # Auto-prune timer
-    timers = mkIf cfg.autoPrune.enable {
-      podman-prune = {
-        description = "Podman system prune";
-        schedule.calendar = cfg.autoPrune.schedule;
-        script = ''
-          ${cfg.package}/bin/podman system prune -f ${concatStringsSep " " cfg.autoPrune.flags}
-        '';
-      };
-    };
-  };
+        # Create required directories
+        system.activationScripts.podman = {
+          deps = [ "etc" ];
+          text = ''
+            mkdir -p ${options.storage.graphRoot}
+            mkdir -p ${options.storage.runRoot}
+            mkdir -p /etc/containers
+          '';
+        };
+      }
+      // (
+        if options.autoPrune.enable then
+          {
+            # Auto-prune timer
+            timers.podman-prune = {
+              description = "Podman system prune";
+              schedule.calendar = options.autoPrune.schedule;
+              script = ''
+                ${options.package}/bin/podman system prune -f ${builtins.concatStringsSep " " options.autoPrune.flags}
+              '';
+            };
+          }
+        else
+          { }
+      );
 }

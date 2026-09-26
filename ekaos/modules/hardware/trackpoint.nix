@@ -1,44 +1,36 @@
-# ThinkPad TrackPoint configuration
-# Ported from nixpkgs/nixos/modules/tasks/trackpoint.nix
+# Adios port of ekaos/modules/hardware/trackpoint.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, ... }:
+
 {
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-let
-  cfg = config.hardware.trackpoint;
-  boolToStr = val: if val then "1" else "0";
-in
-{
-  options.hardware.trackpoint = {
-    enable = lib.mkOption {
+  options = {
+    enable = {
+      type = types.bool;
       default = false;
-      type = lib.types.bool;
       description = "Enable sensitivity and speed configuration for TrackPoints.";
     };
 
-    sensitivity = lib.mkOption {
+    sensitivity = {
+      type = types.int;
       default = 128;
-      type = lib.types.int;
       description = "TrackPoint sensitivity (0-255).";
     };
 
-    speed = lib.mkOption {
+    speed = {
+      type = types.int;
       default = 97;
-      type = lib.types.int;
       description = "Speed of the TrackPoint cursor (0-255).";
     };
 
-    emulateWheel = lib.mkOption {
+    emulateWheel = {
+      type = types.bool;
       default = false;
-      type = lib.types.bool;
       description = "Enable scrolling while holding the middle mouse button.";
     };
 
-    device = lib.mkOption {
+    device = {
+      type = types.string;
       default = "TPPS/2 IBM TrackPoint";
-      type = lib.types.str;
       description = ''
         The device name of the TrackPoint.
         Some newer devices use "TPPS/2 Elan TrackPoint".
@@ -46,22 +38,42 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable {
-    # Configure TrackPoint sensitivity and speed via udev
-    services.udev.extraRules = ''
-      ACTION=="add|change", SUBSYSTEM=="input", ATTR{name}=="${cfg.device}", \
-        ATTR{device/sensitivity}="${toString cfg.sensitivity}", \
-        ATTR{device/speed}="${toString cfg.speed}"
-    '';
+  assertions = [
+    {
+      verify = { options }: options.sensitivity >= 0 && options.sensitivity <= 255;
+      explain = { options }: "sensitivity must be 0-255, got ${toString options.sensitivity}";
+    }
+    {
+      verify = { options }: options.speed >= 0 && options.speed <= 255;
+      explain = { options }: "speed must be 0-255, got ${toString options.speed}";
+    }
+  ];
 
-    # Set TrackPoint parameters via sysfs at activation
-    system.activationScripts.trackpoint = lib.stringAfter [ "etc" ] ''
-      for tp in /sys/devices/platform/i8042/serio1/serio2 /sys/devices/rmi4-00/rmi4-00.fn03; do
-        if [ -d "$tp" ]; then
-          [ -w "$tp/sensitivity" ] && echo "${toString cfg.sensitivity}" > "$tp/sensitivity" 2>/dev/null || true
-          [ -w "$tp/speed" ] && echo "${toString cfg.speed}" > "$tp/speed" 2>/dev/null || true
-        fi
-      done
-    '';
-  };
+  impl =
+    { options, ... }:
+    let
+      boolToStr = val: if val then "1" else "0";
+    in
+    if options.enable then
+      {
+        # Configure TrackPoint sensitivity and speed via udev
+        services.udev.extraRules = ''
+          ACTION=="add|change", SUBSYSTEM=="input", ATTR{name}=="${options.device}", \
+            ATTR{device/sensitivity}="${toString options.sensitivity}", \
+            ATTR{device/speed}="${toString options.speed}"
+        '';
+
+        # Set TrackPoint parameters via sysfs at activation
+        # TODO(adios-cutover): legacy stringAfter [ "etc" ] ordering lost.
+        system.activationScripts.trackpoint = ''
+          for tp in /sys/devices/platform/i8042/serio1/serio2 /sys/devices/rmi4-00/rmi4-00.fn03; do
+            if [ -d "$tp" ]; then
+              [ -w "$tp/sensitivity" ] && echo "${toString options.sensitivity}" > "$tp/sensitivity" 2>/dev/null || true
+              [ -w "$tp/speed" ] && echo "${toString options.speed}" > "$tp/speed" 2>/dev/null || true
+            fi
+          done
+        '';
+      }
+    else
+      { };
 }

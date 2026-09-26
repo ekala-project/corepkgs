@@ -1,41 +1,65 @@
-# Auto-configure CPU microcode and frequency scaling
+# Adios port of ekaos/modules/hardware/facter/cpu.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, lib, ... }:
+
 {
-  lib,
-  config,
-  ...
-}:
-let
-  facterLib = import ./lib.nix lib;
-  inherit (config.hardware.facter) report;
-  cfg = config.hardware.facter.detected.cpu;
-  isBaremetal = config.hardware.facter.detected.virtualisation.none.enable;
-in
-{
-  options.hardware.facter.detected.cpu = {
-    amd.enable = lib.mkEnableOption "Facter AMD CPU detection" // {
-      default = facterLib.hasAmdCpu report;
-      defaultText = "hardware dependent";
+  options = {
+    amdEnable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          facterLib = import ./lib.nix { };
+        in
+        if inputs.facter.report == { } then false else facterLib.hasAmdCpu inputs.facter.report;
+      description = "Whether to enable Facter AMD CPU detection.";
     };
 
-    intel.enable = lib.mkEnableOption "Facter Intel CPU detection" // {
-      default = facterLib.hasIntelCpu report;
-      defaultText = "hardware dependent";
+    intelEnable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          facterLib = import ./lib.nix { };
+        in
+        if inputs.facter.report == { } then false else facterLib.hasIntelCpu inputs.facter.report;
+      description = "Whether to enable Facter Intel CPU detection.";
     };
   };
 
-  config = lib.mkIf config.hardware.facter.enable (
-    lib.mkMerge [
-      # AMD microcode updates
-      (lib.mkIf (cfg.amd.enable && isBaremetal) {
-        hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-        # amd-pstate active mode for modern frequency scaling (kernel 6.3+)
-        boot.kernelParams = [ "amd_pstate=active" ];
-      })
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
+    virt.from = { root }: root.hardware.facter.virtualisation;
+    hw.from = { root }: root.hardware.firmware;
+  };
 
-      # Intel microcode updates
-      (lib.mkIf (cfg.intel.enable && isBaremetal) {
-        hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-      })
-    ]
-  );
+  impl =
+    { options, inputs }:
+    lib.merge.attrs.recursively {
+      mutators = [
+        # AMD microcode updates
+        (
+          if (options.amdEnable && inputs.virt.noneEnable) then
+            {
+              # TODO(adios-cutover): legacy mkDefault priority lost.
+              hardware.cpu.amd.updateMicrocode = inputs.hw.enableRedistributableFirmware;
+              # amd-pstate active mode for modern frequency scaling (kernel 6.3+)
+              boot.kernelParams = [ "amd_pstate=active" ];
+            }
+          else
+            { }
+        )
+
+        # Intel microcode updates
+        (
+          if (options.intelEnable && inputs.virt.noneEnable) then
+            {
+              # TODO(adios-cutover): legacy mkDefault priority lost.
+              hardware.cpu.intel.updateMicrocode = inputs.hw.enableRedistributableFirmware;
+            }
+          else
+            { }
+        )
+      ];
+    };
 }

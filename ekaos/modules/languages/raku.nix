@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/raku.nix.
 # Raku programming language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "raku";
-    defaultPackage = pkgs: pkgs.rakudo;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "raku";
+  defaultPackage = pkgs: pkgs.rakudo;
+}

@@ -1,18 +1,10 @@
-# Power Profiles Daemon — D-Bus daemon for user-selected power profiles
-# Ported from nixpkgs/nixos/modules/services/hardware/power-profiles-daemon.nix
+# Adios port of ekaos/modules/services/hardware/power-profiles-daemon.nix.
+{ types, pkgs, ... }:
+
 {
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-let
-  cfg = config.services.power-profiles-daemon;
-in
-{
-  options.services.power-profiles-daemon = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
+  options = {
+    enable = {
+      type = types.bool;
       default = false;
       description = ''
         Whether to enable power-profiles-daemon, a D-Bus daemon that allows
@@ -20,20 +12,24 @@ in
       '';
     };
 
-    package = lib.mkOption {
-      type = lib.types.package;
+    package = {
+      type = types.derivation;
       default = pkgs.power-profiles-daemon or (throw "power-profiles-daemon package not available");
-      defaultText = lib.literalExpression "pkgs.power-profiles-daemon";
       description = "The power-profiles-daemon package to use.";
     };
   };
 
-  config = lib.mkIf cfg.enable {
-    environment.systemPackages = [ cfg.package ];
-    services.dbus.packages = [ cfg.package ];
-    services.udev.packages = [ cfg.package ];
+  impl =
+    { options, ... }:
+    if !options.enable then
+      { }
+    else
+      {
+        environment.systemPackages = [ options.package ];
+        services.dbus.packages = [ options.package ];
+        services.udev.packages = [ options.package ];
 
-    # TODO: systemd.packages not yet available in ekaOS
-    # systemd.packages = [ cfg.package ];
-  };
+        # TODO: systemd.packages not yet available in ekaOS
+        # systemd.packages = [ options.package ];
+      };
 }

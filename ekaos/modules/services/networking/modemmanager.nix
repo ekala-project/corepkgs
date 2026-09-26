@@ -1,154 +1,142 @@
-# ModemManager service module
-# Provides WWAN modem management, typically used with NetworkManager
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
-
-let
-  cfg = config.networking.modemmanager;
-in
+# Adios port of ekaos/modules/services/networking/modemmanager.nix.
+#
+# The legacy module declares two namespaces (networking.modemmanager and
+# services.modem-manager); both are modelled as sub-option groups here and
+# impl re-nests them into the legacy config shape.
+# TODO(adios-cutover): command/args of services.modem-manager were internal
+# options set by the legacy config; they are computed in impl.
+{ types, pkgs, ... }:
 
 {
   options = {
-    networking.modemmanager = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Whether to enable ModemManager for managing modem devices.
+    modemmanager = {
+      options = {
+        enable = {
+          type = types.bool;
+          default = false;
+          description = ''
+            Whether to enable ModemManager for managing modem devices.
 
-          ModemManager is typically used by NetworkManager but can also
-          be used standalone for non-IP modem connectivity (e.g. GPS).
-        '';
+            ModemManager is typically used by NetworkManager but can also
+            be used standalone for non-IP modem connectivity (e.g. GPS).
+          '';
+        };
+
+        package = {
+          type = types.derivation;
+          default = pkgs.modemmanager;
+          description = "The ModemManager package to use.";
+        };
+
+        fccUnlockScripts = {
+          # TODO(adios-cutover): submodule validation lost (id, path per entry).
+          type = types.listOf types.attrs;
+          default = [ ];
+          description = ''
+            List of FCC unlock scripts to enable on the system.
+          '';
+        };
       };
+      description = "ModemManager networking options.";
+    };
 
-      package = mkOption {
-        type = types.package;
-        default = pkgs.modemmanager;
-        defaultText = literalExpression "pkgs.modemmanager";
-        description = "The ModemManager package to use.";
+    service = {
+      options = {
+        enable = {
+          type = types.bool;
+          default = false;
+          description = "Whether to enable the ModemManager service.";
+        };
+
+        description = {
+          type = types.string;
+          default = "ModemManager";
+          description = "Service description.";
+        };
+
+        user = {
+          type = types.string;
+          default = "root";
+          description = "User to run service as.";
+        };
+
+        restartPolicy = {
+          type = types.string;
+          default = "always";
+          description = "Restart policy.";
+        };
+
+        systemd = {
+          type = types.attrsOf types.any;
+          default = { };
+          description = "Systemd-specific options.";
+        };
       };
+      description = "ModemManager service interface options.";
+    };
+  };
 
-      fccUnlockScripts = mkOption {
-        type = types.listOf (
-          types.submodule {
-            options = {
-              id = mkOption {
-                type = types.str;
-                description = "vid:pid of the PCI or USB vendor and product ID.";
-              };
-              path = mkOption {
-                type = types.path;
-                description = "Path to the unlock script.";
-              };
+  impl =
+    { options, ... }:
+    if !(options.modemmanager.enable or false) then
+      { }
+    else
+      let
+        mm = options.modemmanager;
+        svc = options.service or { };
+      in
+      {
+        environment.etc = builtins.listToAttrs (
+          builtins.map (e: {
+            name = "ModemManager/fcc-unlock.d/${e.id}";
+            value = {
+              source = e.path;
             };
-          }
+          }) (mm.fccUnlockScripts or [ ])
         );
-        default = [ ];
-        description = ''
-          List of FCC unlock scripts to enable on the system.
+
+        services.modem-manager = {
+          enable = true;
+          description = svc.description or "ModemManager";
+          command = "${mm.package}/bin/ModemManager";
+          args = [ "--no-daemon" ];
+          user = svc.user or "root";
+          restartPolicy = svc.restartPolicy or "always";
+          systemd = {
+            after = [
+              "dbus.service"
+              "polkit.service"
+            ];
+            wantedBy = [ "multi-user.target" ];
+          }
+          // (svc.systemd or { });
+        };
+
+        environment.systemPackages = [
+          mm.package
+        ]
+        ++ (
+          if (mm.fccUnlockScripts or [ ]) != [ ] then
+            [
+              pkgs.libqmi
+              pkgs.libmbim
+            ]
+          else
+            [ ]
+        );
+
+        services.dbus.packages = [ mm.package ];
+        services.udev.packages = [ mm.package ];
+
+        security.polkit.enable = true;
+        security.polkit.extraConfig = ''
+          polkit.addRule(function(action, subject) {
+            if (
+              subject.isInGroup("networkmanager")
+              && action.id.indexOf("org.freedesktop.ModemManager") == 0
+              )
+                { return polkit.Result.YES; }
+          });
         '';
       };
-    };
-
-    # Service interface options
-    services.modem-manager = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to enable the ModemManager service.";
-      };
-
-      description = mkOption {
-        type = types.str;
-        default = "ModemManager";
-        description = "Service description.";
-      };
-
-      command = mkOption {
-        type = types.str;
-        internal = true;
-        description = "Command to run (set automatically).";
-      };
-
-      args = mkOption {
-        type = types.listOf types.str;
-        internal = true;
-        default = [ ];
-        description = "Command arguments (set automatically).";
-      };
-
-      user = mkOption {
-        type = types.str;
-        default = "root";
-        description = "User to run service as.";
-      };
-
-      restartPolicy = mkOption {
-        type = types.str;
-        default = "always";
-        description = "Restart policy.";
-      };
-
-      systemd = mkOption {
-        type = types.attrsOf types.anything;
-        default = { };
-        description = "Systemd-specific options.";
-      };
-    };
-  };
-
-  config = mkIf cfg.enable {
-    environment.etc = listToAttrs (
-      map (
-        e:
-        nameValuePair "ModemManager/fcc-unlock.d/${e.id}" {
-          source = e.path;
-        }
-      ) cfg.fccUnlockScripts
-    );
-
-    services.modem-manager = {
-      enable = true;
-      command = "${cfg.package}/bin/ModemManager";
-      args = [ "--no-daemon" ];
-      user = "root";
-      restartPolicy = "always";
-
-      systemd = {
-        after = [
-          "dbus.service"
-          "polkit.service"
-        ];
-        wantedBy = [ "multi-user.target" ];
-      };
-    };
-
-    environment.systemPackages = [
-      cfg.package
-    ]
-    ++ optionals (cfg.fccUnlockScripts != [ ]) [
-      pkgs.libqmi
-      pkgs.libmbim
-    ];
-
-    services.dbus.packages = [ cfg.package ];
-    services.udev.packages = [ cfg.package ];
-
-    security.polkit.enable = true;
-    security.polkit.extraConfig = ''
-      polkit.addRule(function(action, subject) {
-        if (
-          subject.isInGroup("networkmanager")
-          && action.id.indexOf("org.freedesktop.ModemManager") == 0
-          )
-            { return polkit.Result.YES; }
-      });
-    '';
-  };
 }

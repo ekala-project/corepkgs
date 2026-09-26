@@ -1,88 +1,97 @@
-# Stage-2 boot initialization
-# This init script mounts filesystems, runs activation, and starts systemd
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+# Adios port of ekaos/modules/boot/stage-2.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, pkgs, ... }:
 
 let
-  # The stage-2 init script
-  bootStage2 = pkgs.writeScript "stage-2-init" ''
-    #!${pkgs.runtimeShell}
-    set -e
+  # The stage-2 init script. Shared by the `bootStage2` option (so adios
+  # inputs can read it) and by impl (for the merged config fragment).
+  buildStage2Script =
+    {
+      options,
+      inputs ? { },
+    }:
+    pkgs.writeScript "stage-2-init" ''
+      #!${pkgs.runtimeShell}
+      set -e
 
-    echo "${config.boot.stage2Greeting}"
+      echo "${options.stage2Greeting}"
 
-    # Get the system configuration path
-    systemConfig="@systemConfig@"
+      # Get the system configuration path
+      systemConfig="@systemConfig@"
 
-    # Mount special filesystems if not already mounted
-    specialMount() {
-      local device="$1"
-      local mountPoint="$2"
-      local options="$3"
-      local fsType="$4"
+      # Mount special filesystems if not already mounted
+      specialMount() {
+        local device="$1"
+        local mountPoint="$2"
+        local options="$3"
+        local fsType="$4"
 
-      if ! mountpoint -q "$mountPoint"; then
-        mkdir -p "$mountPoint"
-        mount -t "$fsType" -o "$options" "$device" "$mountPoint"
+        if ! mountpoint -q "$mountPoint"; then
+          mkdir -p "$mountPoint"
+          mount -t "$fsType" -o "$options" "$device" "$mountPoint"
+        fi
+      }
+
+      echo "Mounting special filesystems..."
+      specialMount "proc" "/proc" "nosuid,noexec,nodev" "proc"
+      specialMount "sysfs" "/sys" "nosuid,noexec,nodev" "sysfs"
+      specialMount "devtmpfs" "/dev" "mode=0755,nosuid,size=${options.devSize}" "devtmpfs"
+      specialMount "devpts" "/dev/pts" "mode=0620,gid=3,nosuid,noexec" "devpts"
+      specialMount "tmpfs" "/run" "mode=0755,nosuid,nodev,size=${options.runSize}" "tmpfs"
+      specialMount "tmpfs" "/dev/shm" "mode=1777,nosuid,nodev,size=${options.devShmSize}" "tmpfs"
+
+      # Make /nix/store a bind mount with configured options
+      if [ -d /nix/store ] && ! mountpoint -q /nix/store; then
+        mount --bind /nix/store /nix/store
+        mount -o remount,bind,${builtins.concatStringsSep "," options.nixStoreMountOpts} /nix/store
       fi
-    }
 
-    echo "Mounting special filesystems..."
-    specialMount "proc" "/proc" "nosuid,noexec,nodev" "proc"
-    specialMount "sysfs" "/sys" "nosuid,noexec,nodev" "sysfs"
-    specialMount "devtmpfs" "/dev" "mode=0755,nosuid,size=${config.boot.devSize}" "devtmpfs"
-    specialMount "devpts" "/dev/pts" "mode=0620,gid=3,nosuid,noexec" "devpts"
-    specialMount "tmpfs" "/run" "mode=0755,nosuid,nodev,size=${config.boot.runSize}" "tmpfs"
-    specialMount "tmpfs" "/dev/shm" "mode=1777,nosuid,nodev,size=${config.boot.devShmSize}" "tmpfs"
+      # Create essential directories
+      mkdir -p /tmp /var/log /var/tmp
+      chmod 1777 /tmp /var/tmp
 
-    # Make /nix/store a bind mount with configured options
-    if [ -d /nix/store ] && ! mountpoint -q /nix/store; then
-      mount --bind /nix/store /nix/store
-      mount -o remount,bind,${concatStringsSep "," config.boot.nixStoreMountOpts} /nix/store
-    fi
+      # Run the activation script
+      echo "Running activation script..."
+      if [ -x "$systemConfig/activate" ]; then
+        "$systemConfig/activate"
+      else
+        echo "Warning: No activation script found at $systemConfig/activate"
+      fi
 
-    # Create essential directories
-    mkdir -p /tmp /var/log /var/tmp
-    chmod 1777 /tmp /var/tmp
+      # Record the booted system
+      mkdir -p /run
+      ln -sfn "$systemConfig" /run/booted-system
 
-    # Run the activation script
-    echo "Running activation script..."
-    if [ -x "$systemConfig/activate" ]; then
-      "$systemConfig/activate"
-    else
-      echo "Warning: No activation script found at $systemConfig/activate"
-    fi
+      # Run post-boot commands
+      ${
+        if options.postBootCommands != "" then
+          ''
+            echo "Running post-boot commands..."
+            ${options.postBootCommands}
+          ''
+        else
+          ""
+      }
 
-    # Record the booted system
-    mkdir -p /run
-    ln -sfn "$systemConfig" /run/booted-system
-
-    # Run post-boot commands
-    ${optionalString (config.boot.postBootCommands != "") ''
-      echo "Running post-boot commands..."
-      ${config.boot.postBootCommands}
-    ''}
-
-    # Start systemd as PID 1
-    echo "Starting systemd..."
-    ${optionalString (config.boot.extraSystemdUnitPaths != [ ]) ''
-      export SYSTEMD_UNIT_PATH="''${SYSTEMD_UNIT_PATH:+$SYSTEMD_UNIT_PATH:}${concatStringsSep ":" config.boot.extraSystemdUnitPaths}"
-    ''}
-    exec ${config.systemd.package}/lib/systemd/systemd
-  '';
-
+      # Start systemd as PID 1
+      echo "Starting systemd..."
+      ${
+        if options.extraSystemdUnitPaths != [ ] then
+          ''
+            export SYSTEMD_UNIT_PATH="''${SYSTEMD_UNIT_PATH:+$SYSTEMD_UNIT_PATH:}${builtins.concatStringsSep ":" options.extraSystemdUnitPaths}"
+          ''
+        else
+          ""
+      }
+      exec ${(inputs.systemd.systemd.package or pkgs.systemd)}/lib/systemd/systemd
+    '';
 in
 
 {
   options = {
-    boot.postBootCommands = mkOption {
-      type = types.lines;
+    # Legacy path: boot.postBootCommands.
+    postBootCommands = {
+      type = types.string;
       default = "";
       example = ''
         # Import ZFS pools
@@ -96,8 +105,9 @@ in
       '';
     };
 
-    boot.stage2Greeting = mkOption {
-      type = types.str;
+    # Legacy path: boot.stage2Greeting.
+    stage2Greeting = {
+      type = types.string;
       default = "<<< ekaos Stage 2 >>>";
       example = "<<< My Custom System >>>";
       description = ''
@@ -105,8 +115,9 @@ in
       '';
     };
 
-    boot.devSize = mkOption {
-      type = types.str;
+    # Legacy path: boot.devSize.
+    devSize = {
+      type = types.string;
       default = "5%";
       example = "32m";
       description = ''
@@ -116,8 +127,9 @@ in
       '';
     };
 
-    boot.devShmSize = mkOption {
-      type = types.str;
+    # Legacy path: boot.devShmSize.
+    devShmSize = {
+      type = types.string;
       default = "50%";
       example = "256m";
       description = ''
@@ -127,8 +139,9 @@ in
       '';
     };
 
-    boot.runSize = mkOption {
-      type = types.str;
+    # Legacy path: boot.runSize.
+    runSize = {
+      type = types.string;
       default = "25%";
       example = "256m";
       description = ''
@@ -138,8 +151,9 @@ in
       '';
     };
 
-    boot.nixStoreMountOpts = mkOption {
-      type = types.listOf types.str;
+    # Legacy path: boot.nixStoreMountOpts.
+    nixStoreMountOpts = {
+      type = types.listOf types.string;
       default = [
         "ro"
         "nodev"
@@ -153,8 +167,9 @@ in
       '';
     };
 
-    boot.extraSystemdUnitPaths = mkOption {
-      type = types.listOf types.str;
+    # Legacy path: boot.extraSystemdUnitPaths.
+    extraSystemdUnitPaths = {
+      type = types.listOf types.string;
       default = [ ];
       description = ''
         Additional paths appended to the SYSTEMD_UNIT_PATH environment
@@ -162,17 +177,31 @@ in
       '';
     };
 
-    system.build.bootStage2 = mkOption {
-      type = types.package;
-      internal = true;
+    # Exposed as an option (not only in impl) so system/toplevel can consume
+    # it through an adios input: inputs see sibling OPTIONS, never impl
+    # results.
+    bootStage2 = {
+      type = types.derivation;
+      defaultFunc = { options, inputs }: buildStage2Script { inherit options inputs; };
       description = ''
-        The stage-2 init script that mounts filesystems,
-        runs activation, and starts systemd.
+        The stage-2 init script.
+
+        Read-only output; value comes from the defaultFunc.
       '';
     };
   };
 
-  config = {
-    system.build.bootStage2 = bootStage2;
+  inputs = {
+    # TODO(adios-cutover): provides systemd.package (defined in
+    # ekaos/modules/system/toplevel.nix); flat leaf name pending the
+    # system/toplevel port — full legacy path used below.
+    systemd.from = { root }: root.system.toplevel;
   };
+
+  impl =
+    { options, inputs }:
+    {
+      # Legacy internal option system.build.bootStage2.
+      system.build.bootStage2 = buildStage2Script { inherit options inputs; };
+    };
 }

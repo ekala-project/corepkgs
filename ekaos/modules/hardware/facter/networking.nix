@@ -1,43 +1,33 @@
-# Auto-configure network interfaces for DHCP based on detected hardware
-{ config, lib, ... }:
-let
-  # Filter to physical network interfaces suitable for DHCP
-  physicalInterfaces = lib.filter (
-    iface:
-    let
-      validTypes = [
-        "Ethernet"
-        "WLAN"
-        "USB-Link"
-        "Network Interface"
-      ];
-    in
-    lib.elem (iface.sub_class.name or "") validTypes
-  ) (config.hardware.facter.report.hardware.network_interface or [ ]);
+# Adios port of ekaos/modules/hardware/facter/networking.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, ... }:
 
-  detectedInterfaceNames = lib.concatMap (iface: iface.unix_device_names or [ ]) physicalInterfaces;
-  interfaceNames = config.hardware.facter.detected.dhcp.interfaces;
-
-  perInterfaceConfig = lib.listToAttrs (
-    lib.map (name: {
-      inherit name;
-      value = {
-        useDHCP = lib.mkDefault true;
-      };
-    }) interfaceNames
-  );
-in
 {
-  options.hardware.facter.detected.dhcp = {
-    enable = lib.mkEnableOption "Facter DHCP auto-configuration" // {
-      default = builtins.length (config.hardware.facter.report.hardware.network_interface or [ ]) > 0;
-      defaultText = "hardware dependent";
+  options = {
+    enable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        builtins.length (inputs.facter.report.hardware.network_interface or [ ]) > 0;
+      description = "Whether to enable Facter DHCP auto-configuration.";
     };
 
-    interfaces = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = detectedInterfaceNames;
-      defaultText = "auto-detected from facter report";
+    interfaces = {
+      type = types.listOf types.string;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          validTypes = [
+            "Ethernet"
+            "WLAN"
+            "USB-Link"
+            "Network Interface"
+          ];
+          physicalInterfaces = builtins.filter (
+            iface: builtins.elem (iface.sub_class.name or "") validTypes
+          ) (inputs.facter.report.hardware.network_interface or [ ]);
+        in
+        builtins.concatMap (iface: iface.unix_device_names or [ ]) physicalInterfaces;
       description = "Network interfaces to configure with DHCP.";
       example = [
         "eth0"
@@ -46,8 +36,25 @@ in
     };
   };
 
-  config = lib.mkIf (config.hardware.facter.enable && config.hardware.facter.detected.dhcp.enable) {
-    networking.useDHCP = lib.mkDefault true;
-    networking.interfaces = perInterfaceConfig;
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
   };
+
+  impl =
+    { options, inputs }:
+    if (inputs.facter.enable && options.enable) then
+      {
+        # TODO(adios-cutover): legacy mkDefault priority lost (both options).
+        networking.useDHCP = true;
+        networking.interfaces = builtins.listToAttrs (
+          builtins.map (name: {
+            inherit name;
+            value = {
+              useDHCP = true;
+            };
+          }) options.interfaces
+        );
+      }
+    else
+      { };
 }

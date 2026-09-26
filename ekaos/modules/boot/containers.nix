@@ -1,16 +1,11 @@
-# Container detection and support
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+# Adios port of ekaos/modules/boot/containers.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, lib, ... }:
 
 {
   options = {
-    boot.isContainer = mkOption {
+    # Legacy path: boot.isContainer.
+    isContainer = {
       type = types.bool;
       default = false;
       description = ''
@@ -22,7 +17,8 @@ with lib;
       '';
     };
 
-    boot.containers.enable = mkOption {
+    # Legacy path: boot.containers.enable.
+    enable = {
       type = types.bool;
       default = false;
       description = ''
@@ -32,17 +28,41 @@ with lib;
     };
   };
 
-  config = mkMerge [
-    # When running as a container, disable hardware-related boot settings
-    (mkIf config.boot.isContainer {
-      boot.kernelModules = mkForce [ ];
-      boot.initrd.enable = mkDefault false;
-      boot.loader.systemd-boot.enable = mkDefault false;
-    })
+  inputs = {
+    # TODO(adios-cutover): provides systemd.package (defined in
+    # ekaos/modules/system/toplevel.nix); flat leaf name pending the
+    # system/toplevel port — full legacy path used below.
+    systemd.from = { root }: root.system.toplevel;
+  };
 
-    # When enabling container hosting support
-    (mkIf config.boot.containers.enable {
-      environment.systemPackages = [ config.systemd.package ];
-    })
-  ];
+  impl =
+    { options, inputs }:
+    lib.merge.attrs.recursively {
+      mutators = [
+        (
+          if options.isContainer then
+            {
+              boot = {
+                # TODO(adios-cutover): priority lost (was mkForce).
+                kernelModules = [ ];
+                # TODO(adios-cutover): priority lost (was mkDefault).
+                initrd.enable = false;
+                # TODO(adios-cutover): priority lost (was mkDefault).
+                loader.systemd-boot.enable = false;
+              };
+            }
+          else
+            { }
+        )
+
+        (
+          if options.enable then
+            {
+              environment.systemPackages = [ inputs.systemd.systemd.package ];
+            }
+          else
+            { }
+        )
+      ];
+    };
 }

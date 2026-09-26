@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/opentofu.nix.
 # OpenTofu infrastructure-as-code module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "opentofu";
-    defaultPackage = pkgs: pkgs.opentofu;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "opentofu";
+  defaultPackage = pkgs: pkgs.opentofu;
+}

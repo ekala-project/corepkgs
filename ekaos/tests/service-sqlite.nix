@@ -120,7 +120,7 @@ in
         environment.systemPackages = with pkgs; [
           sqlite
           coreutils
-          gnugrep
+          grep
         ];
 
         # Enable the service

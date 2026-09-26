@@ -1,111 +1,32 @@
-# User-scoped service definitions
-# Services defined here run in each user's service manager instance
-# (e.g., systemd --user) rather than as system services.
-{ lib, ... }:
-
-with lib;
-
-let
-  userServiceOpts =
-    { name, ... }:
-    {
-      options = {
-        enable = mkOption {
-          type = types.bool;
-          default = false;
-          description = "Whether to enable this user service.";
-        };
-
-        description = mkOption {
-          type = types.str;
-          default = name;
-          description = "Service description.";
-        };
-
-        command = mkOption {
-          type = types.nullOr types.str;
-          default = null;
-          description = "Command to run.";
-        };
-
-        args = mkOption {
-          type = types.listOf types.str;
-          default = [ ];
-          description = "Command arguments.";
-        };
-
-        environment = mkOption {
-          type = types.attrsOf types.str;
-          default = { };
-          description = "Environment variables for the service.";
-        };
-
-        restartPolicy = mkOption {
-          type = types.enum [
-            "always"
-            "on-failure"
-            "never"
-          ];
-          default = "always";
-          description = "Restart policy for the service.";
-        };
-
-        preStart = mkOption {
-          type = types.lines;
-          default = "";
-          description = "Script to run before starting the service.";
-        };
-
-        postStart = mkOption {
-          type = types.lines;
-          default = "";
-          description = "Script to run after the service starts.";
-        };
-
-        postStop = mkOption {
-          type = types.lines;
-          default = "";
-          description = "Script to run after the service stops.";
-        };
-
-        workingDirectory = mkOption {
-          type = types.nullOr types.str;
-          default = null;
-          description = "Working directory for the service.";
-        };
-
-        systemd = mkOption {
-          type = types.attrsOf types.anything;
-          default = { };
-          description = ''
-            Systemd-specific options for user units.
-            Default wantedBy is ["default.target"].
-          '';
-        };
-
-        runit = mkOption {
-          type = types.attrsOf types.anything;
-          default = { };
-          description = "Runit-specific options for user services.";
-        };
-      };
-    };
-
-in
+# Adios port of ekaos/modules/config/user-services.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+#
+# User-scoped service definitions: services defined here run in each user's
+# service manager instance (e.g., systemd --user) rather than as system
+# services. This module declares options only; it has no config section.
+{ types, ... }:
 
 {
-  options.users.services = mkOption {
-    type = types.attrsOf (types.submodule userServiceOpts);
-    default = { };
-    description = ''
-      Per-user service definitions.
+  options = {
+    services = {
+      # TODO(adios-cutover): submodule validation lost. Legacy validated each
+      # service (enable, description defaulting to the service name, command,
+      # args, environment, restartPolicy always/on-failure/never, preStart,
+      # postStart, postStop, workingDirectory, systemd and runit attrsets).
+      type = types.attrsOf types.attrs;
+      default = { };
+      description = ''
+        Per-user service definitions.
 
-      These services run in each user's service manager instance
-      (e.g., systemd user units at /etc/systemd/user/) rather than
-      as system-level services. They apply to all users at login.
+        These services run in each user's service manager instance
+        (e.g., systemd user units at /etc/systemd/user/) rather than
+        as system-level services. They apply to all users at login.
 
-      Same interface as services.* but without user/group fields
-      (the service runs as the logged-in user).
-    '';
+        Same interface as services.* but without user/group fields
+        (the service runs as the logged-in user).
+      '';
+    };
   };
+
+  impl = { ... }: { };
 }

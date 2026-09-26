@@ -1,137 +1,123 @@
-# nftables ruleset management
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+# Adios port of ekaos/modules/networking/nftables.nix.
+#
+# Tree path: networking/nftables is parent.networking.nftables.
+# Self-contained; no cross-module reads.
+# TODO(adios-cutover): tables is types.attrsOf types.attrs; legacy
+# submodule validation lost (expected keys per table: family enum
+# ip/ip6/inet/arp/bridge/netdev, content lines).
+# TODO(adios-cutover): checkRuleset is kept for shape parity but has no
+# consumer in impl (same as legacy).
+{ types, pkgs, ... }:
 
 let
-  cfg = config.networking.nftables;
+  mapAttrsToList = f: attrs: builtins.map (n: f n attrs.${n}) (builtins.attrNames attrs);
 in
 
 {
   options = {
-    networking.nftables = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Whether to use nftables as the firewall backend.
+    enable = {
+      type = types.bool;
+      default = false;
+      description = ''
+        Whether to use nftables as the firewall backend.
 
-          When enabled, the nftables ruleset is loaded at boot.
-          This is an alternative to iptables-based firewall management.
-        '';
-      };
+        When enabled, the nftables ruleset is loaded at boot.
+        This is an alternative to iptables-based firewall management.
+      '';
+    };
 
-      ruleset = mkOption {
-        type = types.lines;
-        default = "";
-        example = ''
-          table inet filter {
-            chain input {
-              type filter hook input priority 0; policy drop;
-              ct state established,related accept
-              iif lo accept
-              tcp dport { 22, 80, 443 } accept
-            }
-            chain forward {
-              type filter hook forward priority 0; policy drop;
-            }
-            chain output {
-              type filter hook output priority 0; policy accept;
-            }
+    ruleset = {
+      type = types.string;
+      default = "";
+      example = ''
+        table inet filter {
+          chain input {
+            type filter hook input priority 0; policy drop;
+            ct state established,related accept
+            iif lo accept
+            tcp dport { 22, 80, 443 } accept
           }
-        '';
-        description = ''
-          The nftables ruleset to load.
-
-          When set, this replaces the full firewall configuration.
-          Use networking.firewall for a higher-level interface.
-        '';
-      };
-
-      rulesetFile = mkOption {
-        type = types.nullOr types.path;
-        default = null;
-        description = "Path to an nftables ruleset file to load instead of ruleset.";
-      };
-
-      flushRuleset = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Whether to flush the existing ruleset before loading.";
-      };
-
-      checkRuleset = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Whether to validate the ruleset at build time.";
-      };
-
-      tables = mkOption {
-        type = types.attrsOf (
-          types.submodule {
-            options = {
-              family = mkOption {
-                type = types.enum [
-                  "ip"
-                  "ip6"
-                  "inet"
-                  "arp"
-                  "bridge"
-                  "netdev"
-                ];
-                description = "Address family for this table.";
-              };
-
-              content = mkOption {
-                type = types.lines;
-                description = "nftables rules inside this table.";
-              };
-            };
+          chain forward {
+            type filter hook forward priority 0; policy drop;
           }
-        );
-        default = { };
-        description = "Named nftables tables with their content.";
-      };
+          chain output {
+            type filter hook output priority 0; policy accept;
+          }
+        }
+      '';
+      description = ''
+        The nftables ruleset to load.
+
+        When set, this replaces the full firewall configuration.
+        Use networking.firewall for a higher-level interface.
+      '';
+    };
+
+    rulesetFile = {
+      type = types.nullOr types.pathLike;
+      default = null;
+      description = "Path to an nftables ruleset file to load instead of ruleset.";
+    };
+
+    flushRuleset = {
+      type = types.bool;
+      default = true;
+      description = "Whether to flush the existing ruleset before loading.";
+    };
+
+    checkRuleset = {
+      type = types.bool;
+      default = true;
+      description = "Whether to validate the ruleset at build time.";
+    };
+
+    tables = {
+      type = types.attrsOf types.attrs;
+      default = { };
+      description = "Named nftables tables with their content.";
     };
   };
 
-  config = mkIf cfg.enable {
-    environment.systemPackages = [ pkgs.nftables ];
+  impl =
+    { options, inputs }:
+    if !options.enable then
+      { }
+    else
+      {
+        environment.systemPackages = [ pkgs.nftables ];
 
-    environment.etc."nftables.conf".text =
-      let
-        tablesContent = concatStringsSep "\n" (
-          mapAttrsToList (name: table: ''
-            table ${table.family} ${name} {
-              ${table.content}
-            }
-          '') cfg.tables
-        );
+        environment.etc."nftables.conf".text =
+          let
+            tablesContent = builtins.concatStringsSep "\n" (
+              mapAttrsToList (name: table: ''
+                table ${table.family} ${name} {
+                  ${table.content}
+                }
+              '') options.tables
+            );
 
-        rulesetContent =
-          if cfg.rulesetFile != null then
-            "include \"${cfg.rulesetFile}\""
-          else
-            ''
-              ${optionalString cfg.flushRuleset "flush ruleset"}
-              ${cfg.ruleset}
-              ${tablesContent}
-            '';
-      in
-      ''
-        #!/usr/bin/env nft -f
-        # Generated by ekaos nftables module
-        ${rulesetContent}
-      '';
+            rulesetContent =
+              if options.rulesetFile != null then
+                "include \"${options.rulesetFile}\""
+              else
+                ''
+                  ${if options.flushRuleset then "flush ruleset" else ""}
+                  ${options.ruleset}
+                  ${tablesContent}
+                '';
+          in
+          ''
+            #!/usr/bin/env nft -f
+            # Generated by ekaos nftables module
+            ${rulesetContent}
+          '';
 
-    system.activationScripts.nftables = stringAfter [ "etc" ] ''
-      echo "Loading nftables ruleset..."
-      ${pkgs.nftables}/bin/nft -f /etc/nftables.conf || true
-    '';
-  };
+        system.activationScripts.nftables = {
+          deps = [ "etc" ];
+          text = ''
+            echo "Loading nftables ruleset..."
+            ${pkgs.nftables}/bin/nft -f /etc/nftables.conf || true
+          '';
+        };
+      };
 }

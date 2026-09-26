@@ -1,20 +1,16 @@
+# Adios port of ekaos/modules/languages/scala.nix.
 # Scala programming language module
 #
 # Usage:
 #   languages.scala.enable = true;
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "scala";
-    defaultPackage = pkgs: pkgs.scala;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "scala";
+  defaultPackage = pkgs: pkgs.scala;
+}

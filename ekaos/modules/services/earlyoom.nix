@@ -1,159 +1,152 @@
-# Earlyoom — early OOM daemon
-# Kills processes when memory runs low to prevent system lockups
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
-
-let
-  cfg = config.services.earlyoom;
-
-in
+# Adios port of ekaos/modules/services/earlyoom.nix.
+# TODO(adios-cutover): command/args were internal options set by the legacy
+# config; they are computed in impl, not user options.
+{ types, pkgs, ... }:
 
 {
   options = {
-    services.earlyoom = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Whether to enable earlyoom, the early OOM daemon.
+    enable = {
+      type = types.bool;
+      default = false;
+      description = ''
+        Whether to enable earlyoom, the early OOM daemon.
 
-          earlyoom monitors memory and swap usage and kills the largest
-          process when thresholds are exceeded, preventing the system
-          from becoming unresponsive due to OOM conditions.
-        '';
-      };
+        earlyoom monitors memory and swap usage and kills the largest
+        process when thresholds are exceeded, preventing the system
+        from becoming unresponsive due to OOM conditions.
+      '';
+    };
 
-      package = mkOption {
-        type = types.package;
-        default = pkgs.earlyoom or (throw "earlyoom package not available in core-pkgs");
-        defaultText = literalExpression "pkgs.earlyoom";
-        description = "The earlyoom package to use.";
-      };
+    package = {
+      type = types.nullOr types.derivation;
+      default = pkgs.earlyoom or null;
+      description = "The earlyoom package to use.";
+    };
 
-      description = mkOption {
-        type = types.str;
-        default = "Early OOM Daemon";
-        description = "Service description.";
-      };
+    description = {
+      type = types.string;
+      default = "Early OOM Daemon";
+      description = "Service description.";
+    };
 
-      command = mkOption {
-        type = types.str;
-        internal = true;
-        description = "Command to run (set automatically).";
-      };
+    user = {
+      type = types.string;
+      default = "root";
+      description = "User to run service as.";
+    };
 
-      args = mkOption {
-        type = types.listOf types.str;
-        internal = true;
-        default = [ ];
-        description = "Command arguments (set automatically).";
-      };
+    restartPolicy = {
+      type = types.string;
+      default = "always";
+      description = "Restart policy.";
+    };
 
-      user = mkOption {
-        type = types.str;
-        default = "root";
-        description = "User to run service as.";
-      };
+    systemd = {
+      type = types.attrsOf types.any;
+      default = { };
+      description = "Systemd-specific options.";
+    };
 
-      restartPolicy = mkOption {
-        type = types.str;
-        default = "always";
-        description = "Restart policy.";
-      };
+    freeMemThreshold = {
+      type = types.int;
+      default = 10;
+      description = ''
+        Minimum percentage of free memory before earlyoom starts killing.
+      '';
+    };
 
-      systemd = mkOption {
-        type = types.attrsOf types.anything;
-        default = { };
-        description = "Systemd-specific options.";
-      };
+    freeSwapThreshold = {
+      type = types.int;
+      default = 10;
+      description = ''
+        Minimum percentage of free swap before earlyoom starts killing.
+      '';
+    };
 
-      freeMemThreshold = mkOption {
-        type = types.int;
-        default = 10;
-        example = 5;
-        description = ''
-          Minimum percentage of free memory before earlyoom starts killing.
-        '';
-      };
+    freeMemKillThreshold = {
+      type = types.nullOr types.int;
+      default = null;
+      description = ''
+        Send SIGKILL when free memory drops below this percentage.
+        Defaults to half of freeMemThreshold.
+      '';
+    };
 
-      freeSwapThreshold = mkOption {
-        type = types.int;
-        default = 10;
-        example = 5;
-        description = ''
-          Minimum percentage of free swap before earlyoom starts killing.
-        '';
-      };
+    freeSwapKillThreshold = {
+      type = types.nullOr types.int;
+      default = null;
+      description = ''
+        Send SIGKILL when free swap drops below this percentage.
+        Defaults to half of freeSwapThreshold.
+      '';
+    };
 
-      freeMemKillThreshold = mkOption {
-        type = types.nullOr types.int;
-        default = null;
-        example = 5;
-        description = ''
-          Send SIGKILL when free memory drops below this percentage.
-          Defaults to half of freeMemThreshold.
-        '';
-      };
+    enableNotifications = {
+      type = types.bool;
+      default = false;
+      description = "Whether to send D-Bus notifications on kills.";
+    };
 
-      freeSwapKillThreshold = mkOption {
-        type = types.nullOr types.int;
-        default = null;
-        example = 5;
-        description = ''
-          Send SIGKILL when free swap drops below this percentage.
-          Defaults to half of freeSwapThreshold.
-        '';
-      };
-
-      enableNotifications = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to send D-Bus notifications on kills.";
-      };
-
-      extraArgs = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        example = [
-          "--prefer"
-          "(^|/)(java|chrome)$"
-        ];
-        description = "Additional arguments passed to earlyoom.";
-      };
+    extraArgs = {
+      type = types.listOf types.string;
+      default = [ ];
+      description = "Additional arguments passed to earlyoom.";
     };
   };
 
-  config = mkIf cfg.enable {
-    services.earlyoom = {
-      command = "${cfg.package}/bin/earlyoom";
-      args = [
-        "-m"
-        (toString cfg.freeMemThreshold)
-        "-s"
-        (toString cfg.freeSwapThreshold)
-      ]
-      ++ optionals (cfg.freeMemKillThreshold != null) [
-        "-M"
-        (toString cfg.freeMemKillThreshold)
-      ]
-      ++ optionals (cfg.freeSwapKillThreshold != null) [
-        "-S"
-        (toString cfg.freeSwapKillThreshold)
-      ]
-      ++ optional cfg.enableNotifications "-n"
-      ++ cfg.extraArgs;
-      user = "root";
-      restartPolicy = "always";
-      systemd = {
-        after = [ "multi-user.target" ];
-        wantedBy = [ "multi-user.target" ];
+  assertions = [
+    {
+      verify = { options, ... }: (!options.enable) || (options.package != null);
+      explain =
+        { options, ... }: "package option must be set when enabled (earlyoom is not in core-pkgs)";
+    }
+  ];
+
+  impl =
+    { options, ... }:
+    if !options.enable then
+      { }
+    else
+      {
+        services.earlyoom = {
+          inherit (options)
+            enable
+            description
+            user
+            restartPolicy
+            ;
+          command = "${options.package}/bin/earlyoom";
+          args = [
+            "-m"
+            (toString options.freeMemThreshold)
+            "-s"
+            (toString options.freeSwapThreshold)
+          ]
+          ++ (
+            if options.freeMemKillThreshold != null then
+              [
+                "-M"
+                (toString options.freeMemKillThreshold)
+              ]
+            else
+              [ ]
+          )
+          ++ (
+            if options.freeSwapKillThreshold != null then
+              [
+                "-S"
+                (toString options.freeSwapKillThreshold)
+              ]
+            else
+              [ ]
+          )
+          ++ (if options.enableNotifications then [ "-n" ] else [ ])
+          ++ options.extraArgs;
+          systemd = {
+            after = [ "multi-user.target" ];
+            wantedBy = [ "multi-user.target" ];
+          }
+          // options.systemd;
+        };
       };
-    };
-  };
 }

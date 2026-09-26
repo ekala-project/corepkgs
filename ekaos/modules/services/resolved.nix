@@ -1,88 +1,48 @@
-# systemd-resolved DNS resolver daemon
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
-
-let
-  cfg = config.services.resolved;
-
-  toResolvedValue =
-    v:
-    if isBool v then
-      (if v then "yes" else "no")
-    else if isList v then
-      concatStringsSep " " v
-    else
-      toString v;
-
-  resolvedConf = pkgs.writeText "resolved.conf" (
-    "[Resolve]\n"
-    + concatStringsSep "\n" (
-      mapAttrsToList (k: v: if v == null then "" else "${k}=${toResolvedValue v}") cfg.settings
-    )
-    + "\n"
-  );
-
-in
+# Adios port of ekaos/modules/services/resolved.nix.
+# TODO(adios-cutover): command/args were internal options set by the legacy
+# config; they are computed in impl, not user options.
+{ types, pkgs, ... }:
 
 {
-  options.services.resolved = {
-    enable = mkOption {
+  options = {
+    enable = {
       type = types.bool;
       default = false;
       description = "Whether to enable the systemd DNS resolver daemon (systemd-resolved).";
     };
 
-    description = mkOption {
-      type = types.str;
+    description = {
+      type = types.string;
       default = "Network Name Resolution";
       description = "Service description.";
     };
 
-    command = mkOption {
-      type = types.str;
-      internal = true;
-      description = "Command to run (set automatically).";
-    };
-
-    args = mkOption {
-      type = types.listOf types.str;
-      internal = true;
-      default = [ ];
-      description = "Command arguments (set automatically).";
-    };
-
-    user = mkOption {
-      type = types.str;
+    user = {
+      type = types.string;
       default = "systemd-resolve";
       description = "User to run service as.";
     };
 
-    restartPolicy = mkOption {
-      type = types.str;
+    restartPolicy = {
+      type = types.string;
       default = "always";
       description = "Restart policy.";
     };
 
-    systemd = mkOption {
-      type = types.attrsOf types.anything;
+    systemd = {
+      type = types.attrsOf types.any;
       default = { };
       description = "Systemd-specific options.";
     };
 
-    settings = mkOption {
+    settings = {
       type = types.attrsOf (
         types.nullOr (
-          types.oneOf [
+          types.union [
             types.bool
             types.int
-            types.str
-            (types.listOf types.str)
+            types.string
+            (types.listOf types.string)
           ]
         )
       );
@@ -93,8 +53,8 @@ in
       '';
     };
 
-    fallbackDns = mkOption {
-      type = types.listOf types.str;
+    fallbackDns = {
+      type = types.listOf types.string;
       default = [
         "1.1.1.1"
         "8.8.8.8"
@@ -104,11 +64,10 @@ in
       description = "Fallback DNS servers when no others are configured.";
     };
 
-    dnssec = mkOption {
-      type = types.enum [
-        true
-        false
-        "allow-downgrade"
+    dnssec = {
+      type = types.union [
+        types.bool
+        (types.enum "dnssec" [ "allow-downgrade" ])
       ];
       default = false;
       description = ''
@@ -119,11 +78,10 @@ in
       '';
     };
 
-    dnsOverTls = mkOption {
-      type = types.enum [
-        true
-        false
-        "opportunistic"
+    dnsOverTls = {
+      type = types.union [
+        types.bool
+        (types.enum "dnsOverTls" [ "opportunistic" ])
       ];
       default = false;
       description = ''
@@ -134,11 +92,10 @@ in
       '';
     };
 
-    llmnr = mkOption {
-      type = types.enum [
-        true
-        false
-        "resolve"
+    llmnr = {
+      type = types.union [
+        types.bool
+        (types.enum "llmnr" [ "resolve" ])
       ];
       default = true;
       description = ''
@@ -150,53 +107,95 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
-    # Merge structured options into settings
-    services.resolved.settings = {
-      DNS = mkDefault (config.networking.nameservers or [ ]);
-      FallbackDNS = mkDefault cfg.fallbackDns;
-      Domains = mkDefault (config.networking.search or [ ]);
-      DNSSEC = mkDefault cfg.dnssec;
-      DNSOverTLS = mkDefault cfg.dnsOverTls;
-      LLMNR = mkDefault cfg.llmnr;
-    };
-
-    # Define the resolved service
-    services.resolved = {
-      command = "${config.systemd.package}/lib/systemd/systemd-resolved";
-      args = [ ];
-
-      systemd = {
-        wantedBy = [ "sysinit.target" ];
-        after = [ "systemd-networkd.service" ];
-        before = [ "network-online.target" ];
-      };
-    };
-
-    # Install resolved configuration
-    environment.etc."systemd/resolved.conf".source = resolvedConf;
-
-    # Point resolv.conf to the stub resolver
-    environment.etc."resolv.conf".source = mkForce "/run/systemd/resolve/stub-resolv.conf";
-
-    # Add resolve to NSS hosts database
-    system.nssDatabases.hosts = mkOrder 501 [
-      "resolve [!UNAVAIL=return]"
-    ];
-
-    # Create resolve user
-    users.users.${cfg.user} = {
-      isSystemUser = true;
-      group = cfg.user;
-      description = "systemd Resolver";
-    };
-    users.groups.${cfg.user} = { };
-
-    # Ensure state directory exists
-    system.activationScripts.resolved = stringAfter [ "etc" "users" ] ''
-      mkdir -p /run/systemd/resolve
-    '';
-
-    environment.systemPackages = [ config.systemd.package ];
+  inputs = {
+    networking.from = { root }: root.networking;
+    # TODO(adios-cutover): verify leaf path once the service-managers batch
+    # lands (legacy reads config.systemd.package).
+    systemd.from = { root }: root."service-managers".systemd;
   };
+
+  impl =
+    { options, inputs }:
+    if !options.enable then
+      { }
+    else
+      let
+        toResolvedValue =
+          v:
+          if builtins.isBool v then
+            (if v then "yes" else "no")
+          else if builtins.isList v then
+            builtins.concatStringsSep " " v
+          else
+            toString v;
+
+        mergedSettings = {
+          # TODO(adios-cutover): legacy mkDefault priority lost; user settings
+          # win on conflict, approximating mkDefault semantics.
+          DNS = inputs.networking.nameservers or [ ];
+          FallbackDNS = options.fallbackDns;
+          Domains = inputs.networking.search or [ ];
+          DNSSEC = options.dnssec;
+          DNSOverTLS = options.dnsOverTls;
+          LLMNR = options.llmnr;
+        }
+        // options.settings;
+
+        resolvedConf = pkgs.writeText "resolved.conf" (
+          "[Resolve]\n"
+          + builtins.concatStringsSep "\n" (
+            builtins.map (
+              k:
+              let
+                v = mergedSettings.${k};
+              in
+              if v == null then "" else "${k}=${toResolvedValue v}"
+            ) (builtins.attrNames mergedSettings)
+          )
+          + "\n"
+        );
+      in
+      {
+        services.resolved = {
+          inherit (options)
+            enable
+            description
+            user
+            restartPolicy
+            ;
+          command = "${inputs.systemd.package}/lib/systemd/systemd-resolved";
+          args = [ ];
+          settings = mergedSettings;
+          systemd = {
+            wantedBy = [ "sysinit.target" ];
+            after = [ "systemd-networkd.service" ];
+            before = [ "network-online.target" ];
+          }
+          // options.systemd;
+        };
+
+        environment.etc."systemd/resolved.conf".source = resolvedConf;
+
+        # TODO(adios-cutover): legacy mkForce priority lost; plain value.
+        environment.etc."resolv.conf".source = "/run/systemd/resolve/stub-resolv.conf";
+
+        # TODO(adios-cutover): legacy mkOrder priority lost; plain value.
+        system.nssDatabases.hosts = [
+          "resolve [!UNAVAIL=return]"
+        ];
+
+        users.users.${options.user} = {
+          isSystemUser = true;
+          group = options.user;
+          description = "systemd Resolver";
+        };
+        users.groups.${options.user} = { };
+
+        # TODO(adios-cutover): legacy ordering (after "etc" "users") lost; plain script.
+        system.activationScripts.resolved = ''
+          mkdir -p /run/systemd/resolve
+        '';
+
+        environment.systemPackages = [ inputs.systemd.package ];
+      };
 }

@@ -1,21 +1,11 @@
-# Automatic root partition growing
-# Expands the root partition to fill available disk space on boot
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
-
-let
-  cfg = config.boot.growPartition;
-in
+# Adios port of ekaos/modules/boot/grow-partition.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, pkgs, ... }:
 
 {
   options = {
-    boot.growPartition = mkOption {
+    # Legacy path: boot.growPartition.
+    growPartition = {
       type = types.bool;
       default = false;
       description = ''
@@ -27,86 +17,86 @@ in
       '';
     };
 
-    services.grow-partition = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to enable the grow-partition service.";
-      };
+    # Legacy path: services.grow-partition.enable.
+    enable = {
+      type = types.bool;
+      default = false;
+      description = "Whether to enable the grow-partition service.";
+    };
 
-      description = mkOption {
-        type = types.str;
-        default = "Grow Root Partition";
-        description = "Service description.";
-      };
+    # Legacy path: services.grow-partition.description.
+    description = {
+      type = types.string;
+      default = "Grow Root Partition";
+      description = "Service description.";
+    };
 
-      command = mkOption {
-        type = types.str;
-        internal = true;
-        description = "Command to run (set automatically).";
-      };
+    # Legacy paths services.grow-partition.command / .args were internal
+    # options always set by config; they are folded into impl below.
 
-      args = mkOption {
-        type = types.listOf types.str;
-        internal = true;
-        default = [ ];
-        description = "Command arguments (set automatically).";
-      };
+    # Legacy path: services.grow-partition.user.
+    user = {
+      type = types.string;
+      default = "root";
+      description = "User to run service as.";
+    };
 
-      user = mkOption {
-        type = types.str;
-        default = "root";
-        description = "User to run service as.";
-      };
+    # Legacy path: services.grow-partition.restartPolicy.
+    restartPolicy = {
+      type = types.string;
+      default = "never";
+      description = "Restart policy.";
+    };
 
-      restartPolicy = mkOption {
-        type = types.str;
-        default = "never";
-        description = "Restart policy.";
-      };
-
-      systemd = mkOption {
-        type = types.attrsOf types.anything;
-        default = { };
-        description = "Systemd-specific options.";
-      };
+    # Legacy path: services.grow-partition.systemd.
+    systemd = {
+      type = types.attrsOf types.any;
+      default = { };
+      description = "Systemd-specific options.";
     };
   };
 
-  config = mkIf cfg {
-    services.grow-partition = {
-      enable = true;
-      description = "Grow Root Partition";
-      command = "${pkgs.runtimeShell}";
-      args = [
-        "-c"
-        ''
-          set -eu
-          ROOT_DEV=$(findmnt -n -o SOURCE /)
-          # Extract the disk and partition number
-          DISK=$(lsblk -no PKNAME "$ROOT_DEV" | head -1)
-          PARTNUM=$(cat /sys/class/block/$(basename "$ROOT_DEV")/partition 2>/dev/null || echo "")
-          if [ -n "$DISK" ] && [ -n "$PARTNUM" ]; then
-            echo "Growing partition $PARTNUM on /dev/$DISK..."
-            ${pkgs.cloud-utils or pkgs.busybox}/bin/growpart "/dev/$DISK" "$PARTNUM" || true
-            # Resize the filesystem
-            FSTYPE=$(findmnt -n -o FSTYPE /)
-            case "$FSTYPE" in
-              ext*) resize2fs "$ROOT_DEV" ;;
-              xfs) xfs_growfs / ;;
-              btrfs) btrfs filesystem resize max / ;;
-              *) echo "Cannot resize filesystem type: $FSTYPE" ;;
-            esac
-          fi
-        ''
-      ];
-      user = "root";
-      restartPolicy = "never";
-      systemd = {
-        wantedBy = [ "multi-user.target" ];
-        before = [ "multi-user.target" ];
-        serviceConfig.Type = "oneshot";
+  impl =
+    { options, ... }:
+    if !options.growPartition then
+      { }
+    else
+      {
+        # Note: legacy config hardcodes the service definition below and does
+        # not consume the services.grow-partition.* options (same here).
+        services.grow-partition = {
+          enable = true;
+          description = "Grow Root Partition";
+          command = "${pkgs.runtimeShell}";
+          args = [
+            "-c"
+            ''
+              set -eu
+              ROOT_DEV=$(findmnt -n -o SOURCE /)
+              # Extract the disk and partition number
+              DISK=$(lsblk -no PKNAME "$ROOT_DEV" | head -1)
+              PARTNUM=$(cat /sys/class/block/$(basename "$ROOT_DEV")/partition 2>/dev/null || echo "")
+              if [ -n "$DISK" ] && [ -n "$PARTNUM" ]; then
+                echo "Growing partition $PARTNUM on /dev/$DISK..."
+                ${pkgs.cloud-utils or pkgs.busybox}/bin/growpart "/dev/$DISK" "$PARTNUM" || true
+                # Resize the filesystem
+                FSTYPE=$(findmnt -n -o FSTYPE /)
+                case "$FSTYPE" in
+                  ext*) resize2fs "$ROOT_DEV" ;;
+                  xfs) xfs_growfs / ;;
+                  btrfs) btrfs filesystem resize max / ;;
+                  *) echo "Cannot resize filesystem type: $FSTYPE" ;;
+                esac
+              fi
+            ''
+          ];
+          user = "root";
+          restartPolicy = "never";
+          systemd = {
+            wantedBy = [ "multi-user.target" ];
+            before = [ "multi-user.target" ];
+            serviceConfig.Type = "oneshot";
+          };
+        };
       };
-    };
-  };
 }

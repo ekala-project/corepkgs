@@ -1,138 +1,154 @@
-# Timezone, locale, and console configuration
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+# Adios port of ekaos/modules/config/locale.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, pkgs, ... }:
 
 let
   tzdir = "${pkgs.tzdata}/share/zoneinfo";
-  cfg = config.time;
-  i18nCfg = config.i18n;
-  consoleCfg = config.console;
 in
 
 {
   options = {
     time = {
-      timeZone = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        example = "America/New_York";
-        description = ''
-          IANA time zone for the system. null defaults to UTC.
-          See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-        '';
-      };
+      options = {
+        timeZone = {
+          type = types.nullOr types.string;
+          default = null;
+          example = "America/New_York";
+          description = ''
+            IANA time zone for the system. null defaults to UTC.
+            See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+          '';
+        };
 
-      hardwareClockInLocalTime = mkOption {
-        type = types.bool;
-        default = false;
-        description = "If set, the hardware clock is kept in local time instead of UTC.";
+        hardwareClockInLocalTime = {
+          type = types.bool;
+          default = false;
+          description = "If set, the hardware clock is kept in local time instead of UTC.";
+        };
       };
+      description = "System time and time zone settings.";
     };
 
     i18n = {
-      defaultLocale = mkOption {
-        type = types.str;
-        default = "C.UTF-8";
-        example = "en_US.UTF-8";
-        description = ''
-          The default locale. Determines language for program messages,
-          date/time format, sort order, etc.
-        '';
-      };
-
-      extraLocaleSettings = mkOption {
-        type = types.attrsOf types.str;
-        default = { };
-        example = {
-          LC_TIME = "de_DE.UTF-8";
-          LC_MONETARY = "de_DE.UTF-8";
+      options = {
+        defaultLocale = {
+          type = types.string;
+          default = "C.UTF-8";
+          example = "en_US.UTF-8";
+          description = ''
+            The default locale. Determines language for program messages,
+            date/time format, sort order, etc.
+          '';
         };
-        description = ''
-          Per-category locale overrides. Keys are LC_* variable names.
-        '';
-      };
 
-      supportedLocales = mkOption {
-        type = types.listOf types.str;
-        default = [ "all" ];
-        example = [
-          "en_US.UTF-8/UTF-8"
-          "de_DE.UTF-8/UTF-8"
-        ];
-        description = ''
-          List of locales to generate. Use [ "all" ] to generate all locales.
-        '';
-      };
+        extraLocaleSettings = {
+          type = types.attrsOf types.string;
+          default = { };
+          example = {
+            LC_TIME = "de_DE.UTF-8";
+            LC_MONETARY = "de_DE.UTF-8";
+          };
+          description = ''
+            Per-category locale overrides. Keys are LC_* variable names.
+          '';
+        };
 
-      glibcLocales = mkOption {
-        type = types.nullOr types.package;
-        default = null;
-        description = ''
-          Override the glibc locales package. When null, the default
-          locales are built from supportedLocales.
-        '';
+        supportedLocales = {
+          type = types.listOf types.string;
+          default = [ "all" ];
+          example = [
+            "en_US.UTF-8/UTF-8"
+            "de_DE.UTF-8/UTF-8"
+          ];
+          description = ''
+            List of locales to generate. Use [ "all" ] to generate all locales.
+          '';
+        };
+
+        glibcLocales = {
+          type = types.nullOr types.derivation;
+          default = null;
+          description = ''
+            Override the glibc locales package. When null, the default
+            locales are built from supportedLocales.
+          '';
+        };
       };
+      description = "Internationalisation (locale) settings.";
     };
 
     console = {
-      keyMap = mkOption {
-        type = types.str;
-        default = "us";
-        example = "de";
-        description = "Virtual console keyboard layout.";
-      };
+      options = {
+        keyMap = {
+          type = types.string;
+          default = "us";
+          example = "de";
+          description = "Virtual console keyboard layout.";
+        };
 
-      font = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        example = "Lat2-Terminus16";
-        description = "Console font. null uses the kernel default.";
+        font = {
+          type = types.nullOr types.string;
+          default = null;
+          example = "Lat2-Terminus16";
+          description = "Console font. null uses the kernel default.";
+        };
       };
+      description = "Virtual console keymap and font settings.";
     };
   };
 
-  config = {
-    # Timezone: symlink /etc/localtime to the zoneinfo file
-    environment.etc."localtime" = mkIf (cfg.timeZone != null) {
-      source = "${tzdir}/${cfg.timeZone}";
-    };
+  impl =
+    { options, ... }:
+    let
+      optionalString = cond: s: if cond then s else "";
+      escapeShellArg = s: "'${builtins.replaceStrings [ "'" ] [ "'\\''" ] (toString s)}'";
+      lcVars = builtins.map (name: "${name}=${options.i18n.extraLocaleSettings.${name}}") (
+        builtins.attrNames options.i18n.extraLocaleSettings
+      );
+    in
+    {
+      # Timezone: symlink /etc/localtime to the zoneinfo file
+      environment.etc."localtime" =
+        if options.time.timeZone != null then
+          {
+            source = "${tzdir}/${options.time.timeZone}";
+          }
+        else
+          { };
 
-    environment.etc."timezone" = mkIf (cfg.timeZone != null) {
-      text = cfg.timeZone;
-    };
+      environment.etc."timezone" =
+        if options.time.timeZone != null then
+          {
+            text = options.time.timeZone;
+          }
+        else
+          { };
 
-    # Locale: set LANG and LC_* in /etc/locale.conf
-    environment.etc."locale.conf".text =
-      let
-        lcVars = mapAttrsToList (name: value: "${name}=${value}") i18nCfg.extraLocaleSettings;
-      in
-      ''
-        LANG=${i18nCfg.defaultLocale}
-        ${concatStringsSep "\n" lcVars}
+      # Locale: set LANG and LC_* in /etc/locale.conf
+      environment.etc."locale.conf".text = ''
+        LANG=${options.i18n.defaultLocale}
+        ${builtins.concatStringsSep "\n" lcVars}
       '';
 
-    # Console keymap and font
-    system.activationScripts.console = stringAfter [ "etc" ] ''
-      # Load console keymap
-      if [ -e /dev/tty1 ] && command -v loadkeys >/dev/null 2>&1; then
-        loadkeys ${escapeShellArg consoleCfg.keyMap} 2>/dev/null || true
-      fi
+      # Console keymap and font
+      system.activationScripts.console = {
+        deps = [ "etc" ];
+        text = ''
+          # Load console keymap
+          if [ -e /dev/tty1 ] && command -v loadkeys >/dev/null 2>&1; then
+            loadkeys ${escapeShellArg options.console.keyMap} 2>/dev/null || true
+          fi
 
-      ${optionalString (consoleCfg.font != null) ''
-        # Set console font
-        if command -v setfont >/dev/null 2>&1; then
-          setfont ${escapeShellArg consoleCfg.font} 2>/dev/null || true
-        fi
-      ''}
-    '';
+          ${optionalString (options.console.font != null) ''
+            # Set console font
+            if command -v setfont >/dev/null 2>&1; then
+              setfont ${escapeShellArg options.console.font} 2>/dev/null || true
+            fi
+          ''}
+        '';
+      };
 
-    # Add tzdata to system packages
-    environment.systemPackages = [ pkgs.tzdata ];
-  };
+      # Add tzdata to system packages
+      environment.systemPackages = [ pkgs.tzdata ];
+    };
 }

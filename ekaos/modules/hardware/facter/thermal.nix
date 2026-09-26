@@ -1,26 +1,29 @@
-# Auto-enable thermal management for Intel CPUs on bare-metal
-{
-  lib,
-  config,
-  ...
-}:
-let
-  facterLib = import ./lib.nix lib;
-  inherit (config.hardware.facter) report;
-  isBaremetal = config.hardware.facter.detected.virtualisation.none.enable;
-  isIntel = config.hardware.facter.detected.cpu.intel.enable;
-in
-{
-  options.hardware.facter.detected.thermal.enable =
-    lib.mkEnableOption "Facter thermal management"
-    // {
-      default = isIntel && isBaremetal;
-      defaultText = "hardware dependent";
-    };
+# Adios port of ekaos/modules/hardware/facter/thermal.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, ... }:
 
-  config =
-    lib.mkIf (config.hardware.facter.enable && config.hardware.facter.detected.thermal.enable)
+{
+  options = {
+    enable = {
+      type = types.bool;
+      defaultFunc = { inputs, ... }: inputs.cpu.intelEnable && inputs.virt.noneEnable;
+      description = "Whether to enable Facter thermal management.";
+    };
+  };
+
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
+    virt.from = { root }: root.hardware.facter.virtualisation;
+    cpu.from = { root }: root.hardware.facter.cpu;
+  };
+
+  impl =
+    { options, inputs }:
+    if (inputs.facter.enable && options.enable) then
       {
-        services.thermald.enable = lib.mkDefault true;
-      };
+        # TODO(adios-cutover): legacy mkDefault priority lost.
+        services.thermald.enable = true;
+      }
+    else
+      { };
 }

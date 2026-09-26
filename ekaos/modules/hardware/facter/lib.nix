@@ -1,8 +1,100 @@
-# Internal library functions for hardware.facter modules
-# Helpers for querying nixos-facter reports
-lib:
+# Adios helper ported from ekaos/modules/hardware/facter/lib.nix.
+#
+# The legacy file is a plain helper (a function taking nixpkgs `lib`, no
+# `options`/`config` keys), consumed via `import ./lib.nix lib`. It is
+# rewritten here without nixpkgs lib (builtins + small locals only) at the
+# same relative path.
+#
+# Calling convention: `(import ./lib.nix { })`. All arguments default to
+# null because adios `defaultFunc` bodies only receive `{ inputs, options }`
+# and therefore cannot pass `lib`/`types` in; the implementation below is
+# fully self-contained and ignores its arguments.
+#
+# NOTE: adds `hexToInt` and `unique` beyond the legacy API. `hexToInt` fixes
+# a latent legacy bug (facter/nvidia.nix `slotToBusId` references
+# `facterLib.hexToInt`, which the legacy lib.nix never defined; that helper
+# was dead code there). `unique` is an order-preserving dedup used in place
+# of nixpkgs `lib.unique`.
+{
+  types ? null,
+  lib ? null,
+  ...
+}:
 let
-  inherit (lib) assertMsg;
+  # Local reimplementation of nixpkgs `lib.assertMsg` (returns bool for `assert`).
+  assertMsg = cond: msg: cond;
+
+  stringToCharacters = s: builtins.genList (i: builtins.substring i 1 s) (builtins.stringLength s);
+
+  hasPrefix = pref: str: builtins.substring 0 (builtins.stringLength pref) str == pref;
+
+  escapeRegexChar =
+    c:
+    if
+      builtins.elem c [
+        "\\"
+        "."
+        "*"
+        "+"
+        "?"
+        "("
+        ")"
+        "["
+        "]"
+        "{"
+        "}"
+        "^"
+        "$"
+        "|"
+      ]
+    then
+      "\\${c}"
+    else
+      c;
+
+  escapeRegex = s: builtins.concatStringsSep "" (builtins.map escapeRegexChar (stringToCharacters s));
+
+  hasInfix = needle: haystack: builtins.match ".*${escapeRegex needle}.*" haystack != null;
+
+  # Local reimplementation of nixpkgs `lib.toHexString` (lowercase).
+  toHexString =
+    n:
+    let
+      digits = "0123456789abcdef";
+      go = q: if q == 0 then "" else go (q / 16) + builtins.substring (builtins.bitAnd q 15) 1 digits;
+    in
+    if n == 0 then "0" else go n;
+
+  hexDigitValues = {
+    "0" = 0;
+    "1" = 1;
+    "2" = 2;
+    "3" = 3;
+    "4" = 4;
+    "5" = 5;
+    "6" = 6;
+    "7" = 7;
+    "8" = 8;
+    "9" = 9;
+    "a" = 10;
+    "b" = 11;
+    "c" = 12;
+    "d" = 13;
+    "e" = 14;
+    "f" = 15;
+    "A" = 10;
+    "B" = 11;
+    "C" = 12;
+    "D" = 13;
+    "E" = 14;
+    "F" = 15;
+  };
+
+  hexToInt =
+    s: builtins.foldl' (acc: c: acc * 16 + (hexDigitValues.${c} or 0)) 0 (stringToCharacters s);
+
+  # Order-preserving dedup (replaces nixpkgs `lib.unique`).
+  unique = list: builtins.foldl' (acc: x: if builtins.elem x acc then acc else acc ++ [ x ]) [ ] list;
 
   # Query if a facter report contains a CPU with the given vendor name
   hasCpu =
@@ -26,10 +118,10 @@ let
     ) cpus;
 
   # Extract all driver_modules from a list of hardware entries
-  collectDrivers = list: lib.foldl' (lst: value: lst ++ value.driver_modules or [ ]) [ ] list;
+  collectDrivers = list: builtins.foldl' (lst: value: lst ++ value.driver_modules or [ ]) [ ] list;
 
   # Deduplicate a list of strings
-  stringSet = list: builtins.attrNames (builtins.groupBy lib.id list);
+  stringSet = list: builtins.attrNames (builtins.groupBy (x: x) list);
 
   # Query if a facter report contains a GPU with the given PCI vendor ID
   hasGpuVendor =
@@ -77,7 +169,7 @@ let
   toZeroPaddedHex =
     n:
     let
-      hex = lib.toHexString n;
+      hex = toHexString n;
       len = builtins.stringLength hex;
     in
     if len == 1 then
@@ -88,6 +180,7 @@ let
       "0${hex}"
     else
       hex;
+
   # SMBIOS vendor/product matching for device quirks
   hasManufacturer =
     name:
@@ -95,7 +188,7 @@ let
       smbios ? { },
       ...
     }:
-    lib.hasInfix name ((smbios.system or { }).manufacturer or "");
+    hasInfix name ((smbios.system or { }).manufacturer or "");
 
   hasProduct =
     pattern:
@@ -103,7 +196,7 @@ let
       smbios ? { },
       ...
     }:
-    lib.hasInfix pattern ((smbios.system or { }).product_name or "");
+    hasInfix pattern ((smbios.system or { }).product_name or "");
 
   isDevice =
     {
@@ -198,7 +291,7 @@ let
       hardware ? { },
       ...
     }:
-    builtins.any (entry: builtins.any (m: lib.hasPrefix driverPrefix m) (entry.driver_modules or [ ])) (
+    builtins.any (entry: builtins.any (m: hasPrefix driverPrefix m) (entry.driver_modules or [ ])) (
       hardware.${category} or [ ]
     );
 in
@@ -218,6 +311,10 @@ in
     isConvertibleChassis
     hasNetworkVendor
     hasDriver
+    hexToInt
+    unique
+    hasPrefix
+    hasInfix
     ;
 
   hasAmdCpu = hasCpu "AuthenticAMD";

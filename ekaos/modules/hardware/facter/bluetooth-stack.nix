@@ -1,24 +1,30 @@
-# Auto-enable Bluetooth userspace stack when hardware is detected
-{
-  lib,
-  config,
-  ...
-}:
-let
-  inherit (config.hardware.facter) report;
-  isBaremetal = config.hardware.facter.detected.virtualisation.none.enable;
-in
-{
-  options.hardware.facter.detected.bluetooth.stack.enable =
-    lib.mkEnableOption "Facter Bluetooth stack"
-    // {
-      default = builtins.length (report.hardware.bluetooth or [ ]) > 0 && isBaremetal;
-      defaultText = "hardware dependent";
-    };
+# Adios port of ekaos/modules/hardware/facter/bluetooth-stack.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, ... }:
 
-  config =
-    lib.mkIf (config.hardware.facter.enable && config.hardware.facter.detected.bluetooth.stack.enable)
+{
+  options = {
+    stackEnable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        builtins.length (inputs.facter.report.hardware.bluetooth or [ ]) > 0 && inputs.virt.noneEnable;
+      description = "Whether to enable Facter Bluetooth stack.";
+    };
+  };
+
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
+    virt.from = { root }: root.hardware.facter.virtualisation;
+  };
+
+  impl =
+    { options, inputs }:
+    if (inputs.facter.enable && options.stackEnable) then
       {
-        hardware.bluetooth.enable = lib.mkDefault true;
-      };
+        # TODO(adios-cutover): legacy mkDefault priority lost.
+        hardware.bluetooth.enable = true;
+      }
+    else
+      { };
 }

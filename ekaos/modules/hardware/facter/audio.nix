@@ -1,75 +1,94 @@
-# Auto-detect audio hardware and configure sound device support
+# Adios port of ekaos/modules/hardware/facter/audio.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, lib, ... }:
+
 {
-  lib,
-  config,
-  ...
-}:
-let
-  facterLib = import ./lib.nix lib;
-  inherit (config.hardware.facter) report;
-  cfg = config.hardware.facter.detected.audio;
-  isBaremetal = config.hardware.facter.detected.virtualisation.none.enable;
-
-  soundDevices = report.hardware.sound or [ ];
-  driverModules = facterLib.collectDrivers soundDevices;
-
-  # Detect Intel SOF (Sound Open Firmware) audio by driver module names
-  hasSofDriver = builtins.any (
-    m: lib.hasPrefix "snd_sof" m || lib.hasPrefix "snd-sof" m
-  ) driverModules;
-
-  # Detect Intel HDA audio
-  hasHdaDriver = builtins.any (
-    m: lib.hasPrefix "snd_hda" m || lib.hasPrefix "snd-hda" m
-  ) driverModules;
-in
-{
-  options.hardware.facter.detected.audio = {
-    enable = lib.mkEnableOption "Facter audio hardware detection" // {
-      default = builtins.length soundDevices > 0;
-      defaultText = "hardware dependent";
+  options = {
+    enable = {
+      type = types.bool;
+      defaultFunc = { inputs, ... }: builtins.length (inputs.facter.report.hardware.sound or [ ]) > 0;
+      description = "Whether to enable Facter audio hardware detection.";
     };
 
-    kernelModules = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = lib.unique driverModules;
-      defaultText = "hardware dependent";
+    kernelModules = {
+      type = types.listOf types.string;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          facterLib = import ./lib.nix { };
+        in
+        facterLib.unique (facterLib.collectDrivers (inputs.facter.report.hardware.sound or [ ]));
       description = "Kernel modules for detected audio hardware.";
     };
 
-    sof.enable = lib.mkEnableOption "Facter Intel SOF audio detection" // {
-      default = hasSofDriver;
-      defaultText = "hardware dependent";
+    sofEnable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          facterLib = import ./lib.nix { };
+          driverModules = facterLib.collectDrivers (inputs.facter.report.hardware.sound or [ ]);
+        in
+        builtins.any (m: facterLib.hasPrefix "snd_sof" m || facterLib.hasPrefix "snd-sof" m) driverModules;
+      description = "Whether to enable Facter Intel SOF audio detection.";
     };
 
-    hda.enable = lib.mkEnableOption "Facter Intel HDA audio detection" // {
-      default = hasHdaDriver;
-      defaultText = "hardware dependent";
+    hdaEnable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        let
+          facterLib = import ./lib.nix { };
+          driverModules = facterLib.collectDrivers (inputs.facter.report.hardware.sound or [ ]);
+        in
+        builtins.any (m: facterLib.hasPrefix "snd_hda" m || facterLib.hasPrefix "snd-hda" m) driverModules;
+      description = "Whether to enable Facter Intel HDA audio detection.";
     };
   };
 
-  config = lib.mkIf config.hardware.facter.enable (
-    lib.mkMerge [
-      # Load audio driver modules
-      (lib.mkIf cfg.enable {
-        boot.initrd.availableKernelModules = cfg.kernelModules;
-      })
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
+  };
 
-      # Intel SOF audio: load additional SOF-specific modules
-      (lib.mkIf (cfg.enable && cfg.sof.enable) {
-        boot.kernelModules = [
-          "snd_sof"
-          "snd_sof_pci"
-          "snd_sof_intel_hda_common"
-        ];
-      })
+  impl =
+    { options, inputs }:
+    lib.merge.attrs.recursively {
+      mutators = [
+        # Load audio driver modules
+        (
+          if options.enable then
+            {
+              boot.initrd.availableKernelModules = options.kernelModules;
+            }
+          else
+            { }
+        )
 
-      # Intel HDA audio
-      (lib.mkIf (cfg.enable && cfg.hda.enable) {
-        boot.kernelModules = [
-          "snd_hda_intel"
-        ];
-      })
-    ]
-  );
+        # Intel SOF audio: load additional SOF-specific modules
+        (
+          if (options.enable && options.sofEnable) then
+            {
+              boot.kernelModules = [
+                "snd_sof"
+                "snd_sof_pci"
+                "snd_sof_intel_hda_common"
+              ];
+            }
+          else
+            { }
+        )
+
+        # Intel HDA audio
+        (
+          if (options.enable && options.hdaEnable) then
+            {
+              boot.kernelModules = [
+                "snd_hda_intel"
+              ];
+            }
+          else
+            { }
+        )
+      ];
+    };
 }

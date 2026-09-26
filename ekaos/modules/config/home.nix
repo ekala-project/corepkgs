@@ -1,5 +1,7 @@
-# Per-user home configuration
-# Provides declarative management of user dotfiles, packages, environment
+# Adios port of ekaos/modules/config/home.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+#
+# Per-user home configuration: declarative dotfiles, packages, environment
 # variables, shell aliases, and per-user activation scripts.
 #
 # Usage in ekaos system configuration:
@@ -8,92 +10,48 @@
 #     sessionVariables.EDITOR = "vim";
 #     home.file.".bashrc".text = "PS1='$ '";
 #   };
-#
-# The combined home activation package is available at:
-#   config.system.build.home
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+{ types, pkgs, ... }:
 
 let
-  # Submodule for individual home-managed files
-  homeFileOpts =
-    { name, ... }:
-    {
-      options = {
-        enable = mkOption {
-          type = types.bool;
-          default = true;
-          description = "Whether this file should be managed.";
-        };
+  filterAttrs =
+    pred: set:
+    builtins.listToAttrs (
+      builtins.map (n: {
+        name = n;
+        value = set.${n};
+      }) (builtins.filter (n: pred n set.${n}) (builtins.attrNames set))
+    );
 
-        target = mkOption {
-          type = types.str;
-          default = name;
-          description = "Path relative to the user's home directory.";
-        };
+  optionalString = cond: s: if cond then s else "";
 
-        source = mkOption {
-          type = types.nullOr types.path;
-          default = null;
-          description = "Source file or directory to link.";
-        };
+  concatMapStringsSep =
+    sep: f: xs:
+    builtins.concatStringsSep sep (builtins.map f xs);
 
-        text = mkOption {
-          type = types.nullOr types.lines;
-          default = null;
-          description = "Text content of the file.";
-        };
+  mapAttrsToList = f: set: builtins.map (n: f n set.${n}) (builtins.attrNames set);
 
-        executable = mkOption {
-          type = types.bool;
-          default = false;
-          description = "Whether the file should be executable.";
-        };
-      };
-    };
-
-  # Submodule for per-user activation scripts
-  homeActivationOpts = {
-    options = {
-      deps = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "List of activation scripts this one depends on.";
-      };
-
-      text = mkOption {
-        type = types.lines;
-        description = "Shell script content.";
-      };
-    };
-  };
+  escapeShellArg = s: "'${builtins.replaceStrings [ "'" ] [ "'\\''" ] (toString s)}'";
 
   # Topologically sort activation scripts (same algorithm as system activation)
   sortActivationScripts =
     scripts:
     let
-      scriptNames = attrNames scripts;
+      scriptNames = builtins.attrNames scripts;
       sort =
         remaining: sorted:
         if remaining == [ ] then
           sorted
         else
           let
-            ready = filter (
+            ready = builtins.filter (
               name:
               let
                 deps = scripts.${name}.deps or [ ];
-                unsatisfied = filter (d: elem d remaining) deps;
+                unsatisfied = builtins.filter (d: builtins.elem d remaining) deps;
               in
               unsatisfied == [ ]
             ) remaining;
-            newRemaining = filter (name: !(elem name ready)) remaining;
+            newRemaining = builtins.filter (name: !(builtins.elem name ready)) remaining;
           in
           if ready == [ ] then
             throw "Circular dependency in home activation scripts: ${toString remaining}"
@@ -116,7 +74,7 @@ let
   mkHomeFiles =
     userName: userCfg:
     let
-      enabledFiles = filter (f: f.enable) (attrValues userCfg.home.file);
+      enabledFiles = builtins.filter (f: f.enable) (builtins.attrValues userCfg.home.file);
     in
     pkgs.runCommand "home-files-${userName}"
       {
@@ -133,10 +91,10 @@ let
                 file.source
               else if file.text != null then
                 let
-                  textFile = pkgs.writeText (baseNameOf file.target) file.text;
+                  textFile = pkgs.writeText (builtins.baseNameOf file.target) file.text;
                 in
                 if file.executable then
-                  pkgs.runCommand (baseNameOf file.target) { } ''
+                  pkgs.runCommand (builtins.baseNameOf file.target) { } ''
                     cp ${textFile} $out
                     chmod +x $out
                   ''
@@ -172,18 +130,21 @@ let
     userName: userCfg:
     let
       pathEntries =
-        (optional (userCfg.packages != [ ]) "$HOME/.ekaos-profile/bin") ++ userCfg.sessionPath;
+        (if (userCfg.packages != [ ]) then [ "$HOME/.ekaos-profile/bin" ] else [ ]) ++ userCfg.sessionPath;
 
       pathPrefix =
-        if pathEntries != [ ] then ''export PATH="${concatStringsSep ":" pathEntries}:$PATH"'' else "";
+        if pathEntries != [ ] then
+          ''export PATH="${builtins.concatStringsSep ":" pathEntries}:$PATH"''
+        else
+          "";
 
-      envVars = concatStringsSep "\n" (
+      envVars = builtins.concatStringsSep "\n" (
         mapAttrsToList (
           name: value: "export ${name}=${escapeShellArg (toString value)}"
         ) userCfg.sessionVariables
       );
 
-      aliases = concatStringsSep "\n" (
+      aliases = builtins.concatStringsSep "\n" (
         mapAttrsToList (name: value: "alias ${name}=${escapeShellArg value}") userCfg.shellAliases
       );
     in
@@ -198,8 +159,8 @@ let
   mkManifest =
     userName: userCfg:
     let
-      enabledFiles = filter (f: f.enable) (attrValues userCfg.home.file);
-      targets = map (f: f.target) enabledFiles;
+      enabledFiles = builtins.filter (f: f.enable) (builtins.attrValues userCfg.home.file);
+      targets = builtins.map (f: f.target) enabledFiles;
     in
     pkgs.writeText "home-files-manifest-${userName}" (builtins.toJSON targets);
 
@@ -314,11 +275,9 @@ let
           --replace '#!${pkgs.runtimeShell}' '#!${pkgs.runtimeShell}'
       '';
 
-  # All users that have home configuration
-  usersWithHome = filterAttrs (_: userCfg: hasHomeConfig userCfg) config.users.users;
-
-  # Combined home derivation containing all user activation packages
-  combinedHome =
+  # Build the combined home derivation for all users with home config
+  mkCombinedHome =
+    usersWithHome:
     pkgs.runCommand "ekaos-home"
       {
         preferLocalBuild = true;
@@ -327,7 +286,7 @@ let
       ''
         mkdir -p $out/users
 
-        ${concatStringsSep "\n" (
+        ${builtins.concatStringsSep "\n" (
           mapAttrsToList (userName: userCfg: ''
             ln -s ${userCfg.home.activationPackage} $out/users/${userName}
           '') usersWithHome
@@ -338,7 +297,7 @@ let
         #!${pkgs.runtimeShell}
         set -e
         echo "ekaos home: activating all user homes..."
-        ${concatStringsSep "\n" (
+        ${builtins.concatStringsSep "\n" (
           mapAttrsToList (userName: userCfg: ''
             echo "  Activating home for ${userName}..."
             su - ${userName} -c "${userCfg.home.activationPackage}/activate" 2>&1 || \
@@ -349,148 +308,75 @@ let
         ACTIVATE
         chmod +x $out/activate
       '';
-
 in
 
 {
-  options.users.users = mkOption {
-    type = types.attrsOf (
-      types.submodule (
-        { name, config, ... }:
-        {
-          options = {
-            home.file = mkOption {
-              type = types.attrsOf (types.submodule homeFileOpts);
-              default = { };
-              description = ''
-                Files to manage in the user's home directory.
+  options = {
+    users = {
+      # TODO(adios-cutover): submodule validation lost. Legacy extended each
+      # users.users entry with home.file (attrsOf submodule:
+      # enable/target/source/text/executable), home.stateVersion,
+      # home.activation (attrsOf submodule: deps/text, topologically
+      # sorted), home.activationPackage (computed via mkIf hasHomeConfig),
+      # packages, sessionVariables, sessionPath, shellAliases.
+      # TODO(adios-cutover): home.activationPackage was computed per-user by
+      # the legacy module; adios consumers must provide it explicitly
+      # (e.g. via mkHomeActivationPackage-equivalent) or impl lookups below
+      # fail at eval.
+      type = types.attrsOf types.attrs;
+      default = { };
+      description = ''
+        User account configuration, extended with per-user home management
+        (home.file, home.activation, packages, sessionVariables,
+        sessionPath, shellAliases).
+      '';
+    };
 
-                Each attribute defines a file relative to $HOME.
-                Files are symlinked from the nix store during activation.
-              '';
-              example = literalExpression ''
-                {
-                  ".bashrc".text = "PS1='$ '";
-                  ".config/git/config".source = ./dotfiles/gitconfig;
-                }
-              '';
-            };
+    buildHome = {
+      type = types.nullOr types.derivation;
+      default = null;
+      description = ''
+        Combined home activation package for all configured users.
 
-            home.stateVersion = mkOption {
-              type = types.str;
-              default = "24.11";
-              description = "Home configuration state version for compatibility tracking.";
-            };
+        Contains per-user activation packages under users/<name>/ and
+        a top-level activate script that runs all of them.
 
-            home.activation = mkOption {
-              type = types.attrsOf (types.submodule homeActivationOpts);
-              default = { };
-              description = ''
-                Per-user activation scripts that run during home activation.
-
-                Scripts are topologically sorted by the deps field and
-                run as the user (no root privileges).
-              '';
-              example = literalExpression ''
-                {
-                  setupVim = {
-                    deps = [];
-                    text = "mkdir -p $HOME/.vim/undo";
-                  };
-                }
-              '';
-            };
-
-            home.activationPackage = mkOption {
-              type = types.package;
-              internal = true;
-              description = "The built home activation package for this user.";
-            };
-
-            packages = mkOption {
-              type = types.listOf types.package;
-              default = [ ];
-              description = "Packages to install in the user's environment.";
-              example = literalExpression "[ pkgs.git pkgs.vim pkgs.ripgrep ]";
-            };
-
-            sessionVariables = mkOption {
-              type = types.attrsOf types.str;
-              default = { };
-              description = "Environment variables to set in the user's session.";
-              example = literalExpression ''
-                {
-                  EDITOR = "vim";
-                  PAGER = "less";
-                }
-              '';
-            };
-
-            sessionPath = mkOption {
-              type = types.listOf types.str;
-              default = [ ];
-              description = "Directories to prepend to the user's PATH.";
-              example = [
-                "$HOME/.local/bin"
-                "$HOME/go/bin"
-              ];
-            };
-
-            shellAliases = mkOption {
-              type = types.attrsOf types.str;
-              default = { };
-              description = "Shell aliases for the user.";
-              example = literalExpression ''
-                {
-                  ll = "ls -la";
-                  gs = "git status";
-                }
-              '';
-            };
-          };
-
-          config = mkIf (hasHomeConfig config) {
-            home.activationPackage = mkHomeActivationPackage name config;
-          };
-        }
-      )
-    );
-  };
-
-  options.system.build.home = mkOption {
-    type = types.package;
-    description = ''
-      Combined home activation package for all configured users.
-
-      Contains per-user activation packages under users/<name>/ and
-      a top-level activate script that runs all of them.
-
-      Build with: nix-build -A config.system.build.home
-    '';
-  };
-
-  config = {
-    system.build.home = combinedHome;
-
-    # System activation script that activates home configs during boot/switch
-    system.activationScripts.home = {
-      deps = [ "users" ];
-      text =
-        if usersWithHome != { } then
-          ''
-            echo "Activating per-user home configurations..."
-            ${concatStringsSep "\n" (
-              mapAttrsToList (userName: userCfg: ''
-                echo "  Activating home for ${userName}..."
-                su - ${userName} -c "${userCfg.home.activationPackage}/activate" 2>&1 || \
-                  echo "  WARNING: home activation failed for ${userName}"
-              '') usersWithHome
-            )}
-          ''
-        else
-          ''
-            # No users with home configuration
-          '';
+        Build with: nix-build -A config.system.build.home
+      '';
     };
   };
+
+  impl =
+    { options, ... }:
+    let
+      # All users that have home configuration
+      usersWithHome = filterAttrs (_: userCfg: hasHomeConfig userCfg) options.users;
+
+      # Combined home derivation containing all user activation packages
+      combinedHome = mkCombinedHome usersWithHome;
+    in
+    {
+      system.build.home = combinedHome;
+
+      # System activation script that activates home configs during boot/switch
+      system.activationScripts.home = {
+        deps = [ "users" ];
+        text =
+          if usersWithHome != { } then
+            ''
+              echo "Activating per-user home configurations..."
+              ${builtins.concatStringsSep "\n" (
+                mapAttrsToList (userName: userCfg: ''
+                  echo "  Activating home for ${userName}..."
+                  su - ${userName} -c "${userCfg.home.activationPackage}/activate" 2>&1 || \
+                    echo "  WARNING: home activation failed for ${userName}"
+                '') usersWithHome
+              )}
+            ''
+          else
+            ''
+              # No users with home configuration
+            '';
+      };
+    };
 }

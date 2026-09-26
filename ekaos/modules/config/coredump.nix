@@ -1,27 +1,27 @@
-# Systemd coredump configuration
+# Adios port of ekaos/modules/config/coredump.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
 {
-  config,
+  types,
   lib,
   pkgs,
   ...
 }:
 
-with lib;
-
 let
-  cfg = config.systemd.coredump;
-
-  coredumpConf = pkgs.writeText "coredump.conf" (
-    "[Coredump]\n"
-    + concatStringsSep "\n" (mapAttrsToList (k: v: "${k}=${toString v}") cfg.settings)
-    + "\n"
-  );
-
+  mkCoredumpConf =
+    settings:
+    pkgs.writeText "coredump.conf" (
+      "[Coredump]\n"
+      + builtins.concatStringsSep "\n" (
+        builtins.map (k: "${k}=${toString settings.${k}}") (builtins.attrNames settings)
+      )
+      + "\n"
+    );
 in
 
 {
-  options.systemd.coredump = {
-    enable = mkOption {
+  options = {
+    enable = {
       type = types.bool;
       default = true;
       description = ''
@@ -31,10 +31,10 @@ in
       '';
     };
 
-    settings = mkOption {
+    settings = {
       type = types.attrsOf (
-        types.oneOf [
-          types.str
+        types.union [
+          types.string
           types.int
           types.bool
         ]
@@ -58,13 +58,31 @@ in
     };
   };
 
-  config = mkMerge [
-    (mkIf cfg.enable {
-      environment.etc."systemd/coredump.conf".source = coredumpConf;
-    })
+  impl =
+    { options, ... }:
+    let
+      coredumpConf = mkCoredumpConf options.settings;
+    in
+    lib.merge.attrs.recursively {
+      mutators = [
+        (
+          if options.enable then
+            {
+              environment.etc."systemd/coredump.conf".source = coredumpConf;
+            }
+          else
+            { }
+        )
 
-    (mkIf (!cfg.enable) {
-      boot.kernel.sysctl."kernel.core_pattern" = mkDefault "core";
-    })
-  ];
+        (
+          if (!options.enable) then
+            {
+              # TODO(adios-cutover): priority lost (was mkDefault).
+              boot.kernel.sysctl."kernel.core_pattern" = "core";
+            }
+          else
+            { }
+        )
+      ];
+    };
 }

@@ -1,26 +1,26 @@
-# Auto-detect scanner hardware for SANE enablement
-{
-  lib,
-  config,
-  ...
-}:
-let
-  inherit (config.hardware.facter) report;
-  isBaremetal = config.hardware.facter.detected.virtualisation.none.enable;
+# Adios port of ekaos/modules/hardware/facter/scanner.nix.
+# TODO(adios-cutover) notes below mark semantics changed in translation.
+{ types, ... }:
 
-  scannerDevices = report.hardware.scanner or [ ];
-  hasScanner = builtins.length scannerDevices > 0;
-in
 {
-  options.hardware.facter.detected.scanner.enable = lib.mkEnableOption "Facter scanner detection" // {
-    default = hasScanner && isBaremetal;
-    defaultText = "hardware dependent";
+  options = {
+    enable = {
+      type = types.bool;
+      defaultFunc =
+        { inputs, ... }:
+        builtins.length (inputs.facter.report.hardware.scanner or [ ]) > 0 && inputs.virt.noneEnable;
+      description = "Whether to enable Facter scanner detection.";
+    };
   };
 
-  config =
-    lib.mkIf (config.hardware.facter.enable && config.hardware.facter.detected.scanner.enable)
-      {
-        # TODO(corepkgs): Port hardware.sane module (sane-backends), then enable:
-        # hardware.sane.enable = lib.mkDefault true;
-      };
+  inputs = {
+    facter.from = { root }: root.hardware.facter;
+    virt.from = { root }: root.hardware.facter.virtualisation;
+  };
+
+  # TODO(adios-cutover): legacy impl body is only a TODO comment (no
+  # hardware.sane module ported yet); impl returns an empty fragment.
+  # TODO(corepkgs): Port hardware.sane module (sane-backends), then enable:
+  # hardware.sane.enable = lib.mkDefault true;
+  impl = { ... }: { };
 }

@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/terraform.nix.
 # Terraform infrastructure-as-code module (uses OpenTofu, the open-source fork)
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "terraform";
-    defaultPackage = pkgs: pkgs.opentofu;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "terraform";
+  defaultPackage = pkgs: pkgs.opentofu;
+}

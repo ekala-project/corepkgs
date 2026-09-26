@@ -1,231 +1,158 @@
-# WireGuard VPN interface configuration
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+# Adios port of ekaos/modules/networking/wireguard.nix.
+#
+# Tree path: networking/wireguard is parent.networking.wireguard.
+# Self-contained; no cross-module reads. The wg-quick config builder and
+# the wireguard-tools package close over pkgs in the top-level let.
+# TODO(adios-cutover): interfaces is types.attrsOf types.attrs; legacy
+# interface/peer submodule validation lost. Per-interface defaults
+# (ips=[], privateKeyFile=null, generatePrivateKeyFile=false,
+# listenPort=null, peers=[], pre/postSetup/Shutdown="", table=null) and
+# per-peer optionals are applied via `or` fallbacks in impl.
+{ types, pkgs, ... }:
 
 let
-  cfg = config.networking.wireguard;
+  mapAttrsToList = f: attrs: builtins.map (n: f n attrs.${n}) (builtins.attrNames attrs);
 
-  peerSubmodule = {
-    options = {
-      publicKey = mkOption {
-        type = types.str;
-        example = "xTIBA5rboUvnH4htodjb6e697QjLERt1NAB4mZqp8Dg=";
-        description = "Base64 public key of the peer.";
-      };
-
-      presharedKeyFile = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        description = "Path to file containing the preshared key.";
-      };
-
-      allowedIPs = mkOption {
-        type = types.listOf types.str;
-        example = [
-          "10.0.0.0/24"
-          "192.168.1.0/24"
-        ];
-        description = "IP ranges routed to this peer.";
-      };
-
-      endpoint = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        example = "vpn.example.com:51820";
-        description = "Endpoint address:port of the peer.";
-      };
-
-      persistentKeepalive = mkOption {
-        type = types.nullOr types.int;
-        default = null;
-        example = 25;
-        description = "Seconds between keepalive packets. null disables.";
-      };
-    };
-  };
-
-  interfaceSubmodule =
-    { name, config, ... }:
-    {
-      options = {
-        ips = mkOption {
-          type = types.listOf types.str;
-          default = [ ];
-          example = [ "10.0.0.1/24" ];
-          description = "IP addresses to assign to the WireGuard interface.";
-        };
-
-        privateKeyFile = mkOption {
-          type = types.nullOr types.str;
-          default = null;
-          example = "/etc/wireguard/private.key";
-          description = "Path to the private key file.";
-        };
-
-        generatePrivateKeyFile = mkOption {
-          type = types.bool;
-          default = false;
-          description = "Auto-generate a private key if the file doesn't exist.";
-        };
-
-        listenPort = mkOption {
-          type = types.nullOr types.port;
-          default = null;
-          example = 51820;
-          description = "UDP port for WireGuard to listen on.";
-        };
-
-        peers = mkOption {
-          type = types.listOf (types.submodule peerSubmodule);
-          default = [ ];
-          description = "List of WireGuard peers.";
-        };
-
-        preSetup = mkOption {
-          type = types.lines;
-          default = "";
-          description = "Commands to run before interface setup.";
-        };
-
-        postSetup = mkOption {
-          type = types.lines;
-          default = "";
-          description = "Commands to run after interface setup.";
-        };
-
-        preShutdown = mkOption {
-          type = types.lines;
-          default = "";
-          description = "Commands to run before interface teardown.";
-        };
-
-        postShutdown = mkOption {
-          type = types.lines;
-          default = "";
-          description = "Commands to run after interface teardown.";
-        };
-
-        table = mkOption {
-          type = types.nullOr types.str;
-          default = null;
-          example = "auto";
-          description = "Routing table for WireGuard routes. null uses the main table.";
-        };
-      };
-    };
-
-  enabledInterfaces = filterAttrs (_: _: true) cfg.interfaces;
+  wireguardTools = pkgs.callPackage ../../../../pkgs/wireguard-tools { };
 
   # Generate a wg-quick config file
   mkWgConfig =
     name: ifCfg:
     let
-      peerLines = concatMapStringsSep "\n\n" (peer: ''
-        [Peer]
-        PublicKey = ${peer.publicKey}
-        AllowedIPs = ${concatStringsSep ", " peer.allowedIPs}
-        ${optionalString (peer.endpoint != null) "Endpoint = ${peer.endpoint}"}
-        ${optionalString (
-          peer.persistentKeepalive != null
-        ) "PersistentKeepalive = ${toString peer.persistentKeepalive}"}
-        ${optionalString (peer.presharedKeyFile != null) "PresharedKey = ${peer.presharedKeyFile}"}
-      '') ifCfg.peers;
+      peers = ifCfg.peers or [ ];
+      peerLines = builtins.concatStringsSep "\n\n" (
+        builtins.map (peer: ''
+          [Peer]
+          PublicKey = ${peer.publicKey}
+          AllowedIPs = ${builtins.concatStringsSep ", " peer.allowedIPs}
+          ${if (peer.endpoint or null) != null then "Endpoint = ${peer.endpoint}" else ""}
+          ${
+            if (peer.persistentKeepalive or null) != null then
+              "PersistentKeepalive = ${toString peer.persistentKeepalive}"
+            else
+              ""
+          }
+          ${if (peer.presharedKeyFile or null) != null then "PresharedKey = ${peer.presharedKeyFile}" else ""}
+        '') peers
+      );
+      privateKeyFile = ifCfg.privateKeyFile or null;
+      ips = ifCfg.ips or [ ];
+      listenPort = ifCfg.listenPort or null;
+      table = ifCfg.table or null;
+      preSetup = ifCfg.preSetup or "";
+      postSetup = ifCfg.postSetup or "";
+      preShutdown = ifCfg.preShutdown or "";
+      postShutdown = ifCfg.postShutdown or "";
     in
     ''
       [Interface]
-      ${optionalString (
-        ifCfg.privateKeyFile != null
-      ) "PostUp = wg set %i private-key ${ifCfg.privateKeyFile}"}
-      ${concatMapStringsSep "\n" (ip: "Address = ${ip}") ifCfg.ips}
-      ${optionalString (ifCfg.listenPort != null) "ListenPort = ${toString ifCfg.listenPort}"}
-      ${optionalString (ifCfg.table != null) "Table = ${ifCfg.table}"}
-      ${optionalString (ifCfg.preSetup != "") "PreUp = ${ifCfg.preSetup}"}
-      ${optionalString (ifCfg.postSetup != "") "PostUp = ${ifCfg.postSetup}"}
-      ${optionalString (ifCfg.preShutdown != "") "PreDown = ${ifCfg.preShutdown}"}
-      ${optionalString (ifCfg.postShutdown != "") "PostDown = ${ifCfg.postShutdown}"}
+      ${if privateKeyFile != null then "PostUp = wg set %i private-key ${privateKeyFile}" else ""}
+      ${builtins.concatStringsSep "\n" (builtins.map (ip: "Address = ${ip}") ips)}
+      ${if listenPort != null then "ListenPort = ${toString listenPort}" else ""}
+      ${if table != null then "Table = ${table}" else ""}
+      ${if preSetup != "" then "PreUp = ${preSetup}" else ""}
+      ${if postSetup != "" then "PostUp = ${postSetup}" else ""}
+      ${if preShutdown != "" then "PreDown = ${preShutdown}" else ""}
+      ${if postShutdown != "" then "PostDown = ${postShutdown}" else ""}
 
       ${peerLines}
     '';
-
-  wireguardTools = pkgs.callPackage ../../../pkgs/wireguard-tools { };
-
 in
 
 {
-  options.networking.wireguard = {
-    enable = mkOption {
+  options = {
+    enable = {
       type = types.bool;
-      default = enabledInterfaces != { };
-      defaultText = "true if any interfaces are defined";
+      # Legacy: default = enabledInterfaces != { } ("true if any interfaces
+      # are defined").
+      defaultFunc = { inputs, options }: options.interfaces != { };
       description = "Whether to enable WireGuard VPN.";
     };
 
-    interfaces = mkOption {
-      type = types.attrsOf (types.submodule interfaceSubmodule);
+    interfaces = {
+      type = types.attrsOf types.attrs;
       default = { };
-      example = literalExpression ''
-        {
-          wg0 = {
-            ips = [ "10.0.0.1/24" ];
-            listenPort = 51820;
-            privateKeyFile = "/etc/wireguard/private.key";
-            generatePrivateKeyFile = true;
-            peers = [
-              {
-                publicKey = "xTIBA5rboUvnH4htodjb6e697QjLERt1NAB4mZqp8Dg=";
-                allowedIPs = [ "10.0.0.0/24" ];
-                endpoint = "vpn.example.com:51820";
-                persistentKeepalive = 25;
-              }
-            ];
-          };
-        }
+      example = {
+        wg0 = {
+          ips = [ "10.0.0.1/24" ];
+          listenPort = 51820;
+          privateKeyFile = "/etc/wireguard/private.key";
+          generatePrivateKeyFile = true;
+          peers = [
+            {
+              publicKey = "xTIBA5rboUvnH4htodjb6e697QjLERt1NAB4mZqp8Dg=";
+              allowedIPs = [ "10.0.0.0/24" ];
+              endpoint = "vpn.example.com:51820";
+              persistentKeepalive = 25;
+            }
+          ];
+        };
+      };
+      description = ''
+        WireGuard interface definitions. Each interface may set ips,
+        privateKeyFile, generatePrivateKeyFile, listenPort, peers
+        (publicKey, allowedIPs, endpoint, persistentKeepalive,
+        presharedKeyFile), preSetup, postSetup, preShutdown,
+        postShutdown, table.
       '';
-      description = "WireGuard interface definitions.";
     };
   };
 
-  config = mkIf cfg.enable {
-    boot.kernelModules = [ "wireguard" ];
+  impl =
+    { options, inputs }:
+    let
+      # Legacy: filterAttrs (_: _: true) — identity over all interfaces.
+      enabledInterfaces = options.interfaces;
+    in
+    if !options.enable then
+      { }
+    else
+      {
+        boot.kernelModules = [ "wireguard" ];
 
-    environment.systemPackages = [ wireguardTools ];
+        environment.systemPackages = [ wireguardTools ];
 
-    # Generate wg-quick config files
-    environment.etc = listToAttrs (
-      mapAttrsToList (
-        name: ifCfg:
-        nameValuePair "wireguard/${name}.conf" {
-          text = mkWgConfig name ifCfg;
-          mode = "0600";
-        }
-      ) enabledInterfaces
-    );
+        # Generate wg-quick config files
+        environment.etc = builtins.listToAttrs (
+          mapAttrsToList (name: ifCfg: {
+            name = "wireguard/${name}.conf";
+            value = {
+              text = mkWgConfig name ifCfg;
+              mode = "0600";
+            };
+          }) enabledInterfaces
+        );
 
-    # Set up WireGuard interfaces during activation
-    system.activationScripts.wireguard = stringAfter [ "etc" "modprobe" ] ''
-      ${concatStringsSep "\n" (
-        mapAttrsToList (name: ifCfg: ''
-          # WireGuard interface: ${name}
-          ${optionalString ifCfg.generatePrivateKeyFile ''
-            if [ ! -f "${ifCfg.privateKeyFile}" ]; then
-              echo "Generating WireGuard private key for ${name}..."
-              mkdir -p $(dirname "${ifCfg.privateKeyFile}")
-              ${wireguardTools}/bin/wg genkey > "${ifCfg.privateKeyFile}"
-              chmod 600 "${ifCfg.privateKeyFile}"
-            fi
-          ''}
-          echo "Setting up WireGuard interface ${name}..."
-          ${wireguardTools}/bin/wg-quick up /etc/wireguard/${name}.conf 2>/dev/null || \
-            ${wireguardTools}/bin/wg-quick down ${name} 2>/dev/null; \
-            ${wireguardTools}/bin/wg-quick up /etc/wireguard/${name}.conf || true
-        '') enabledInterfaces
-      )}
-    '';
-  };
+        # Set up WireGuard interfaces during activation
+        system.activationScripts.wireguard = {
+          deps = [
+            "etc"
+            "modprobe"
+          ];
+          text = ''
+            ${builtins.concatStringsSep "\n" (
+              mapAttrsToList (name: ifCfg: ''
+                # WireGuard interface: ${name}
+                ${
+                  if (ifCfg.generatePrivateKeyFile or false) then
+                    ''
+                      if [ ! -f "${ifCfg.privateKeyFile}" ]; then
+                        echo "Generating WireGuard private key for ${name}..."
+                        mkdir -p $(dirname "${ifCfg.privateKeyFile}")
+                        ${wireguardTools}/bin/wg genkey > "${ifCfg.privateKeyFile}"
+                        chmod 600 "${ifCfg.privateKeyFile}"
+                      fi
+                    ''
+                  else
+                    ""
+                }
+                echo "Setting up WireGuard interface ${name}..."
+                ${wireguardTools}/bin/wg-quick up /etc/wireguard/${name}.conf 2>/dev/null || \
+                  ${wireguardTools}/bin/wg-quick down ${name} 2>/dev/null; \
+                  ${wireguardTools}/bin/wg-quick up /etc/wireguard/${name}.conf || true
+              '') enabledInterfaces
+            )}
+          '';
+        };
+      };
 }

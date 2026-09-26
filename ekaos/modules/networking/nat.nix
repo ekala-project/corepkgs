@@ -1,74 +1,39 @@
-# Network Address Translation (NAT/masquerading)
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+# Adios port of ekaos/modules/networking/nat.nix.
+#
+# Tree path: networking/nat is parent.networking.nat.
+# Self-contained; no cross-module reads. The nat.nft derivation is built
+# in the top-level let (pkgs available there; impl only sees
+# { options, inputs }).
+# TODO(adios-cutover): forwardPorts is types.listOf types.attrs; legacy
+# submodule validation lost (sourcePort was either port or a
+# { from, to } range submodule; proto defaults to "tcp"). Element defaults
+# are applied via `or` fallbacks in impl.
+# TODO(adios-cutover): externalIP, externalIPv6, internalIPs,
+# internalIPv6s, internalInterfaces, dmzHost, extraStopCommands are kept
+# for shape parity but have no consumer in impl (same as legacy).
+{ types, pkgs, ... }:
 
 let
-  cfg = config.networking.nat;
-
-  # Port forwarding submodule
-  forwardPortOpts = {
-    options = {
-      sourcePort = mkOption {
-        type = types.either types.port (
-          types.submodule {
-            options = {
-              from = mkOption {
-                type = types.port;
-                description = "Start of port range.";
-              };
-              to = mkOption {
-                type = types.port;
-                description = "End of port range.";
-              };
-            };
-          }
-        );
-        description = "Source port or port range to forward.";
-      };
-
-      destination = mkOption {
-        type = types.str;
-        example = "192.168.1.10:80";
-        description = "Destination address:port to forward to.";
-      };
-
-      proto = mkOption {
-        type = types.enum [
-          "tcp"
-          "udp"
-        ];
-        default = "tcp";
-        description = "Protocol for the port forward.";
-      };
-
-      loopbackIPs = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "IPs for which hairpin NAT is set up.";
-      };
-    };
-  };
-
-  # Generate nftables NAT rules
-  natRules =
+  mkNatRules =
+    {
+      enableIPv6,
+      externalInterface,
+      forwardPorts,
+    }:
     let
-      forwardRules = concatMapStringsSep "\n" (
-        fwd:
-        let
-          sport =
-            if builtins.isInt fwd.sourcePort then
-              toString fwd.sourcePort
-            else
-              "${toString fwd.sourcePort.from}-${toString fwd.sourcePort.to}";
-        in
-        "    ${fwd.proto} dport ${sport} dnat to ${fwd.destination}"
-      ) cfg.forwardPorts;
+      forwardRules = builtins.concatStringsSep "\n" (
+        builtins.map (
+          fwd:
+          let
+            sport =
+              if builtins.isInt fwd.sourcePort then
+                toString fwd.sourcePort
+              else
+                "${toString fwd.sourcePort.from}-${toString fwd.sourcePort.to}";
+          in
+          "    ${fwd.proto or "tcp"} dport ${sport} dnat to ${fwd.destination}"
+        ) forwardPorts
+      );
     in
     pkgs.writeText "nat.nft" ''
       table ip nat {
@@ -79,125 +44,136 @@ let
 
         chain postrouting {
           type nat hook postrouting priority srcnat; policy accept;
-          ${optionalString (
-            cfg.externalInterface != null
-          ) "oifname \"${cfg.externalInterface}\" masquerade"}
+          ${if externalInterface != null then "oifname \"${externalInterface}\" masquerade" else ""}
         }
       }
-      ${optionalString cfg.enableIPv6 ''
-        table ip6 nat {
-          chain postrouting {
-            type nat hook postrouting priority srcnat; policy accept;
-            ${optionalString (
-              cfg.externalInterface != null
-            ) "oifname \"${cfg.externalInterface}\" masquerade"}
-          }
-        }
-      ''}
+      ${
+        if enableIPv6 then
+          ''
+            table ip6 nat {
+              chain postrouting {
+                type nat hook postrouting priority srcnat; policy accept;
+                ${if externalInterface != null then "oifname \"${externalInterface}\" masquerade" else ""}
+              }
+            }
+          ''
+        else
+          ""
+      }
     '';
-
 in
 
 {
   options = {
-    networking.nat = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Whether to enable Network Address Translation (NAT/masquerading).
+    enable = {
+      type = types.bool;
+      default = false;
+      description = ''
+        Whether to enable Network Address Translation (NAT/masquerading).
 
-          Allows internal network hosts to access the internet through
-          this machine.
-        '';
-      };
+        Allows internal network hosts to access the internet through
+        this machine.
+      '';
+    };
 
-      enableIPv6 = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to enable IPv6 NAT.";
-      };
+    enableIPv6 = {
+      type = types.bool;
+      default = false;
+      description = "Whether to enable IPv6 NAT.";
+    };
 
-      externalInterface = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        example = "eth0";
-        description = "The external (WAN) network interface.";
-      };
+    externalInterface = {
+      type = types.nullOr types.string;
+      default = null;
+      example = "eth0";
+      description = "The external (WAN) network interface.";
+    };
 
-      externalIP = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        description = "External IPv4 address for SNAT (instead of masquerade).";
-      };
+    externalIP = {
+      type = types.nullOr types.string;
+      default = null;
+      description = "External IPv4 address for SNAT (instead of masquerade).";
+    };
 
-      externalIPv6 = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        description = "External IPv6 address for SNAT.";
-      };
+    externalIPv6 = {
+      type = types.nullOr types.string;
+      default = null;
+      description = "External IPv6 address for SNAT.";
+    };
 
-      internalInterfaces = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        example = [ "eth1" ];
-        description = "Internal (LAN) interfaces to NAT.";
-      };
+    internalInterfaces = {
+      type = types.listOf types.string;
+      default = [ ];
+      example = [ "eth1" ];
+      description = "Internal (LAN) interfaces to NAT.";
+    };
 
-      internalIPs = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        example = [ "192.168.1.0/24" ];
-        description = "Internal IP ranges to NAT (CIDR notation).";
-      };
+    internalIPs = {
+      type = types.listOf types.string;
+      default = [ ];
+      example = [ "192.168.1.0/24" ];
+      description = "Internal IP ranges to NAT (CIDR notation).";
+    };
 
-      internalIPv6s = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Internal IPv6 ranges to NAT (CIDR notation).";
-      };
+    internalIPv6s = {
+      type = types.listOf types.string;
+      default = [ ];
+      description = "Internal IPv6 ranges to NAT (CIDR notation).";
+    };
 
-      forwardPorts = mkOption {
-        type = types.listOf (types.submodule forwardPortOpts);
-        default = [ ];
-        description = "Port forwarding rules (DNAT).";
-      };
+    forwardPorts = {
+      type = types.listOf types.attrs;
+      default = [ ];
+      description = "Port forwarding rules (DNAT).";
+    };
 
-      dmzHost = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        example = "192.168.1.10";
-        description = "DMZ host — all incoming traffic is forwarded to this IP.";
-      };
+    dmzHost = {
+      type = types.nullOr types.string;
+      default = null;
+      example = "192.168.1.10";
+      description = "DMZ host — all incoming traffic is forwarded to this IP.";
+    };
 
-      extraCommands = mkOption {
-        type = types.lines;
-        default = "";
-        description = "Extra nftables/iptables commands to run after NAT setup.";
-      };
+    extraCommands = {
+      type = types.string;
+      default = "";
+      description = "Extra nftables/iptables commands to run after NAT setup.";
+    };
 
-      extraStopCommands = mkOption {
-        type = types.lines;
-        default = "";
-        description = "Extra commands to run when NAT is torn down.";
-      };
+    extraStopCommands = {
+      type = types.string;
+      default = "";
+      description = "Extra commands to run when NAT is torn down.";
     };
   };
 
-  config = mkIf cfg.enable {
-    # Enable IP forwarding
-    boot.kernel.sysctl = {
-      "net.ipv4.ip_forward" = true;
-    }
-    // optionalAttrs cfg.enableIPv6 { "net.ipv6.conf.all.forwarding" = true; };
+  impl =
+    { options, inputs }:
+    if !options.enable then
+      { }
+    else
+      {
+        # Enable IP forwarding
+        boot.kernel.sysctl = {
+          "net.ipv4.ip_forward" = true;
+        }
+        // (if options.enableIPv6 then { "net.ipv6.conf.all.forwarding" = true; } else { });
 
-    # Load NAT rules
-    environment.etc."nftables/nat.nft".source = natRules;
+        # Load NAT rules
+        environment.etc."nftables/nat.nft".source = mkNatRules {
+          inherit (options) enableIPv6 externalInterface forwardPorts;
+        };
 
-    system.activationScripts.nat = stringAfter [ "etc" "firewall" ] ''
-      echo "Loading NAT rules..."
-      ${pkgs.nftables}/bin/nft -f /etc/nftables/nat.nft || true
-      ${cfg.extraCommands}
-    '';
-  };
+        system.activationScripts.nat = {
+          deps = [
+            "etc"
+            "firewall"
+          ];
+          text = ''
+            echo "Loading NAT rules..."
+            ${pkgs.nftables}/bin/nft -f /etc/nftables/nat.nft || true
+            ${options.extraCommands}
+          '';
+        };
+      };
 }

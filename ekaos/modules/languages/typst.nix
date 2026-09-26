@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/typst.nix.
 # Typst typesetting language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "typst";
-    defaultPackage = pkgs: pkgs.typst;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "typst";
+  defaultPackage = pkgs: pkgs.typst;
+}

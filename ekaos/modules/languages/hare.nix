@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/hare.nix.
 # Hare programming language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "hare";
-    defaultPackage = pkgs: pkgs.hare;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "hare";
+  defaultPackage = pkgs: pkgs.hare;
+}

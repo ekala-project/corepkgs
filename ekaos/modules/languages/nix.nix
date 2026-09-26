@@ -1,17 +1,13 @@
+# Adios port of ekaos/modules/languages/nix.nix.
 # Nix language module
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ types, pkgs, ... }:
 
 let
-  langLib = import ./lib.nix { inherit lib; };
-  mod = langLib.mkLanguageModule {
-    name = "nix";
-    defaultPackage = pkgs: pkgs.nix;
-  };
+  langLib = import ./lib.nix { inherit types; };
 in
+langLib.mkLanguageModule {
+  inherit pkgs;
 
-mod { inherit config lib pkgs; }
+  name = "nix";
+  defaultPackage = pkgs: pkgs.nix;
+}

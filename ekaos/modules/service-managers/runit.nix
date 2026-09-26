@@ -1,26 +1,33 @@
-# Runit service manager for ekaos
-# Consumes services.* definitions and generates runit service directories
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-with lib;
+# Adios port of ekaos/modules/service-managers/runit.nix.
+#
+# Tree path: service-managers/runit is parent.runit.
+# Consumes service definitions and generates runit service directories
+# under /etc/sv/ (system) and /etc/sv-user/ (user). Derivation builders
+# close over pkgs in the top-level let (impl only sees
+# { options, inputs }).
+# TODO(adios-cutover): AGGREGATION GAP (load-bearing). Legacy filters
+# enabled services out of ALL of config.services / config.users.services
+# via the global fixpoint. Adios inputs resolve to whatever the tree
+# wires at parent.services / parent.config."user-services"; arbitrary
+# service modules outside the tree are invisible and their units are
+# silently missing.
+# TODO(adios-cutover): mutual-exclusion assertions are guarded by
+# `!options.enable || ...` (legacy evaluated them only when enabled).
+# TODO(adios-cutover): makeBinPath has no adios.lib equivalent; smallest
+# local reimplementation below.
+{ types, pkgs, ... }:
 
 let
-  cfg = config.serviceManager.runit;
-
-  # Filter to only include enabled services with command set
-  enabledServices = filterAttrs (
-    name: service: (service.enable or false) == true && (service.command or null) != null
-  ) config.services;
-
-  # Filter to only include enabled user services with command set
-  enabledUserServices = filterAttrs (
-    name: service: service.enable == true && service.command != null
-  ) config.users.services;
+  filterAttrs =
+    pred: set:
+    builtins.listToAttrs (
+      builtins.map (n: {
+        name = n;
+        value = set.${n};
+      }) (builtins.filter (n: pred n set.${n}) (builtins.attrNames set))
+    );
+  mapAttrsToList = f: attrs: builtins.map (n: f n attrs.${n}) (builtins.attrNames attrs);
+  makeBinPath = packages: builtins.concatStringsSep ":" (builtins.map (p: "${p}/bin") packages);
 
   # Generate a runit service directory for a service
   mkRunitService =
@@ -31,18 +38,22 @@ let
         if (serviceCfg.args or [ ]) == [ ] then
           serviceCfg.command
         else
-          "${serviceCfg.command} ${concatStringsSep " " serviceCfg.args}";
+          "${serviceCfg.command} ${builtins.concatStringsSep " " serviceCfg.args}";
 
       # Environment setup
-      envSetup = concatStringsSep "\n" (
+      envSetup = builtins.concatStringsSep "\n" (
         mapAttrsToList (k: v: "export ${k}=\"${v}\"") (serviceCfg.environment or { })
       );
 
       # PATH setup
       pathPackages = serviceCfg.path or [ ];
-      pathSetup = optionalString (pathPackages != [ ]) ''
-        export PATH="${makeBinPath pathPackages}:$PATH"
-      '';
+      pathSetup =
+        if pathPackages != [ ] then
+          ''
+            export PATH="${makeBinPath pathPackages}:$PATH"
+          ''
+        else
+          "";
 
       # User/group switching
       userGroup =
@@ -56,12 +67,11 @@ let
         else
           null;
 
-      chpstCmd = optionalString (userGroup != null) "${pkgs.runit}/bin/chpst -u ${userGroup} ";
+      chpstCmd = if userGroup != null then "${pkgs.runit}/bin/chpst -u ${userGroup} " else "";
 
       # Working directory
-      cdCmd = optionalString (
-        (serviceCfg.workingDirectory or null) != null
-      ) "cd ${serviceCfg.workingDirectory}";
+      cdCmd =
+        if ((serviceCfg.workingDirectory or null) != null) then "cd ${serviceCfg.workingDirectory}" else "";
 
       # Runit-specific options
       runitCfg = serviceCfg.runit or { };
@@ -115,30 +125,42 @@ let
       chmod +x $out/run
 
       # Create finish script if needed
-      ${optionalString (finishScript != null) ''
-        cp ${finishScript} $out/finish
-        chmod +x $out/finish
-      ''}
+      ${
+        if finishScript != null then
+          ''
+            cp ${finishScript} $out/finish
+            chmod +x $out/finish
+          ''
+        else
+          ""
+      }
 
       # Create log directory and script if needed
-      ${optionalString (logScript != null) ''
-        mkdir -p $out/log
-        cp ${logScript} $out/log/run
-        chmod +x $out/log/run
-      ''}
+      ${
+        if logScript != null then
+          ''
+            mkdir -p $out/log
+            cp ${logScript} $out/log/run
+            chmod +x $out/log/run
+          ''
+        else
+          ""
+      }
 
       # Create check script if defined
-      ${optionalString ((runitCfg.extraConfig.checkScript or "") != "") ''
-                cat > $out/check <<'EOF'
-        #!/bin/sh
-        ${runitCfg.extraConfig.checkScript}
-        EOF
-                chmod +x $out/check
-      ''}
+      ${
+        if ((runitCfg.extraConfig.checkScript or "") != "") then
+          ''
+                      cat > $out/check <<'EOF'
+            #!/bin/sh
+            ${runitCfg.extraConfig.checkScript}
+            EOF
+                    chmod +x $out/check
+          ''
+        else
+          ""
+      }
     '';
-
-  # Generate all runit services
-  runitServices = mapAttrs mkRunitService enabledServices;
 
   # Generate a runit user service directory
   mkRunitUserService =
@@ -148,13 +170,13 @@ let
         if serviceCfg.args == [ ] then
           serviceCfg.command
         else
-          "${serviceCfg.command} ${concatStringsSep " " serviceCfg.args}";
+          "${serviceCfg.command} ${builtins.concatStringsSep " " serviceCfg.args}";
 
-      envSetup = concatStringsSep "\n" (
+      envSetup = builtins.concatStringsSep "\n" (
         mapAttrsToList (k: v: "export ${k}=\"${v}\"") serviceCfg.environment
       );
 
-      cdCmd = optionalString (serviceCfg.workingDirectory != null) "cd ${serviceCfg.workingDirectory}";
+      cdCmd = if serviceCfg.workingDirectory != null then "cd ${serviceCfg.workingDirectory}" else "";
 
       runitCfg = serviceCfg.runit;
 
@@ -199,97 +221,130 @@ let
       cp ${runScript} $out/run
       chmod +x $out/run
 
-      ${optionalString (finishScript != null) ''
-        cp ${finishScript} $out/finish
-        chmod +x $out/finish
-      ''}
+      ${
+        if finishScript != null then
+          ''
+            cp ${finishScript} $out/finish
+            chmod +x $out/finish
+          ''
+        else
+          ""
+      }
 
-      ${optionalString (logScript != null) ''
-        mkdir -p $out/log
-        cp ${logScript} $out/log/run
-        chmod +x $out/log/run
-      ''}
+      ${
+        if logScript != null then
+          ''
+            mkdir -p $out/log
+            cp ${logScript} $out/log/run
+            chmod +x $out/log/run
+          ''
+        else
+          ""
+      }
     '';
-
-  # Generate all runit user services
-  runitUserServices = mapAttrs mkRunitUserService enabledUserServices;
-
 in
 
 {
-  options.serviceManager.runit = {
-    enable = mkOption {
+  options = {
+    enable = {
       type = types.bool;
       default = false;
       description = "Enable runit as the service manager";
     };
 
-    package = mkOption {
-      type = types.package;
+    package = {
+      type = types.derivation;
       default = pkgs.runit;
       description = "The runit package to use.";
     };
 
-    serviceDir = mkOption {
-      type = types.str;
+    serviceDir = {
+      type = types.string;
       default = "/service";
       description = "The runit service directory where services are supervised from.";
     };
   };
 
-  config = mkIf cfg.enable (mkMerge [
-    # Mutual exclusion assertions
+  inputs = {
+    services.from = { root }: root.services;
+    userServices.from = { root }: root.config."user-services";
+    systemdMgr.from = { parent }: parent.systemd;
+    launchdMgr.from = { parent }: parent.launchd;
+    rcdMgr.from = { parent }: parent.rcd;
+  };
+
+  assertions = [
     {
-      assertions = [
-        {
-          assertion = !(config.serviceManager.systemd.enable or false);
-          message = "Cannot enable both runit and systemd service managers. Only one service manager can be enabled at a time.";
-        }
-        {
-          assertion = !(config.serviceManager.launchd.enable or false);
-          message = "Cannot enable both runit and launchd service managers. Only one service manager can be enabled at a time.";
-        }
-        {
-          assertion = !(config.serviceManager.rcd.enable or false);
-          message = "Cannot enable both runit and rcd service managers. Only one service manager can be enabled at a time.";
-        }
-      ];
+      verify = { options, inputs }: !options.enable || !(inputs.systemdMgr.enable or false);
+      explain =
+        { options, inputs }:
+        "Cannot enable both runit and systemd service managers. Only one service manager can be enabled at a time.";
     }
-
-    # Runit configuration
     {
-      # Install runit service directories to /etc/sv/
-      environment.etc = mkMerge [
-        # Install system runit service directories to /etc/sv/
-        (listToAttrs (
-          map (
-            name:
-            nameValuePair "sv/${name}" {
-              source = runitServices.${name};
-            }
-          ) (attrNames runitServices)
-        ))
-
-        # Install user runit service directories to /etc/sv-user/
-        (listToAttrs (
-          map (
-            name:
-            nameValuePair "sv-user/${name}" {
-              source = runitUserServices.${name};
-            }
-          ) (attrNames runitUserServices)
-        ))
-      ];
-
-      # TODO: Modify stage-2 init to use runsvdir instead of systemd
-      # This would require changes to boot/stage-2.nix to check which
-      # service manager is enabled and exec the appropriate init system
-
-      # For now, we just install the service directories
-      # A complete implementation would need:
-      # 1. boot.init.command = "${cfg.package}/bin/runsvdir ${cfg.serviceDir}";
-      # 2. Symlinks from /etc/sv/* to ${cfg.serviceDir}/*
-      # 3. Proper runit stage-1/stage-2/stage-3 scripts
+      verify = { options, inputs }: !options.enable || !(inputs.launchdMgr.enable or false);
+      explain =
+        { options, inputs }:
+        "Cannot enable both runit and launchd service managers. Only one service manager can be enabled at a time.";
     }
-  ]);
+    {
+      verify = { options, inputs }: !options.enable || !(inputs.rcdMgr.enable or false);
+      explain =
+        { options, inputs }:
+        "Cannot enable both runit and rcd service managers. Only one service manager can be enabled at a time.";
+    }
+  ];
+
+  impl =
+    { options, inputs }:
+    let
+      # Filter to only include enabled services with command set
+      enabledServices = filterAttrs (
+        name: service: (service.enable or false) == true && (service.command or null) != null
+      ) inputs.services;
+
+      # Filter to only include enabled user services with command set
+      enabledUserServices = filterAttrs (
+        name: service: service.enable == true && service.command != null
+      ) inputs.userServices.users.services;
+
+      # Generate all runit services
+      runitServices = builtins.mapAttrs mkRunitService enabledServices;
+
+      # Generate all runit user services
+      runitUserServices = builtins.mapAttrs mkRunitUserService enabledUserServices;
+    in
+    if !options.enable then
+      { }
+    else
+      {
+        # Install runit service directories to /etc/sv/
+        environment.etc =
+          # Install system runit service directories to /etc/sv/
+          builtins.listToAttrs (
+            builtins.map (name: {
+              name = "sv/${name}";
+              value = {
+                source = runitServices.${name};
+              };
+            }) (builtins.attrNames runitServices)
+          )
+          // builtins.listToAttrs (
+            builtins.map (name: {
+              name = "sv-user/${name}";
+              value = {
+                source = runitUserServices.${name};
+              };
+            }) (builtins.attrNames runitUserServices)
+          );
+
+        # TODO: Modify stage-2 init to use runsvdir instead of systemd
+        # This would require changes to boot/stage-2.nix to check which
+        # service manager is enabled and exec the appropriate init system
+
+        # For now, we just install the service directories
+        # A complete implementation would need:
+        # 1. boot.init.command = "${options.package}/bin/runsvdir ${options.serviceDir}";
+        # 2. Symlinks from /etc/sv/* to ${options.serviceDir}/*
+        # 3. Proper runit stage-1/stage-2/stage-3 scripts
+      };
 }
