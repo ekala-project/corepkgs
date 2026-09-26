@@ -1,5 +1,7 @@
 # Enumerates every package in the repository: each top-level attribute, plus
-# every variant of each `pkgs-many` package.
+# every variant of each `pkgs-many` package, plus every derivation reachable
+# through attribute sets marked with `recurseIntoAttrs` (i.e. those that set
+# `recurseForDerivations = true`).
 #
 # Variants live one level down (`cmake.v4`), so enumerating attribute names
 # alone reaches only the default one. Their names come from the `variants`
@@ -109,14 +111,68 @@ let
     "texliveTeTeX"
   ];
 
+  # Recursively collect named pairs from an attrset whose
+  # `recurseForDerivations` is true, using a dotted prefix for names.
+  collectRecursive =
+    prefix: attrs:
+    lib.concatMap (
+      name:
+      let
+        fullName = "${prefix}.${name}";
+        raw = builtins.tryEval attrs.${name};
+      in
+      if !raw.success then
+        [ ]
+      else if lib.isDerivation raw.value then
+        [
+          {
+            name = fullName;
+            value = raw.value;
+          }
+        ]
+      else if
+        builtins.isAttrs raw.value
+        && (builtins.tryEval (raw.value.recurseForDerivations or false)).value or false
+      then
+        collectRecursive fullName raw.value
+      else
+        [ ]
+    ) (builtins.attrNames attrs);
+
   names = builtins.filter (n: !builtins.elem n texliveSchemes) (builtins.attrNames pkgs);
   manyVariantNames = builtins.attrNames (builtins.readDir ../pkgs-many);
 
   # Build named pairs { name; value; } for top-level attrs and variants.
-  topLevel = map (name: {
-    inherit name;
-    value = pkgs.${name};
-  }) names;
+  # When an attribute is not a derivation but has `recurseForDerivations = true`
+  # (set by `lib.recurseIntoAttrs`), recurse into it to collect the derivations
+  # it contains.
+  topLevel = lib.concatMap (
+    name:
+    let
+      raw = builtins.tryEval pkgs.${name};
+    in
+    if !raw.success then
+      [ ]
+    else if lib.isDerivation raw.value then
+      [
+        {
+          inherit name;
+          value = raw.value;
+        }
+      ]
+    else if
+      builtins.isAttrs raw.value
+      && (builtins.tryEval (raw.value.recurseForDerivations or false)).value or false
+    then
+      collectRecursive name raw.value
+    else
+      [
+        {
+          inherit name;
+          value = raw.value;
+        }
+      ]
+  ) names;
 
   variantPairs = lib.concatMap (
     name:
