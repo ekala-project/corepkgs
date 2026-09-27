@@ -35,13 +35,13 @@ in
 stdenv.mkDerivation rec {
   pname = "aws-sdk-cpp";
   # nixpkgs-update: no auto update
-  version = "1.11.647";
+  version = "1.11.901";
 
   src = fetchFromGitHub {
     owner = "aws";
     repo = "aws-sdk-cpp";
     tag = version;
-    hash = "sha256-RJKR0xw3HTNItaLGyYCjibmfK3UBDA4hfAZzQ0xYg9U=";
+    hash = "sha256-caBLM8cMbW+raVUOz24e41kwtmiZATRoYI9Bnl4yIH8=";
   };
 
   postPatch = ''
