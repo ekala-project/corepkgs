@@ -1,9 +1,17 @@
 { cctools }:
 rec {
-  unwrapped-all-targets = v2_44 // {
+  unwrapped-all-targets = v2_46 // {
     variant = "unwrapped-all-targets";
     unwrapped = true;
     withAllTargets = true;
+  };
+  v2_46 = {
+    variant = "v2_46";
+    implementation = "upstream";
+    unwrapped = false;
+    withAllTargets = false;
+    version = "2.46.1";
+    hash = "sha256-5t/jYBJt8l/+sgE1k7lFcqxxKhQz8h4ZxEytnkDTbNU=";
   };
   v2_44 = {
     variant = "v2_44";
