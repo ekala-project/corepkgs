@@ -34,6 +34,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     cmake
     ninja
+    llvmPkgs.llvm.dev
   ];
 
   buildInputs = [
