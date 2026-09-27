@@ -61,6 +61,8 @@ stdenv.mkDerivation (finalAttrs: {
     moveToOutput lib/libaom.a "$static"
     # Fix cmake export files to reference the static output for libaom.a
     sed -i "s|$out/lib/libaom.a|$static/lib/libaom.a|g" "$dev"/lib/cmake/AOM/AOMTargets*.cmake
+    # Fix INTERFACE_INCLUDE_DIRECTORIES: headers live in $dev, not $out
+    sed -i 's|"''${_IMPORT_PREFIX}/include"|"'"$dev"'/include"|g' "$dev"/lib/cmake/AOM/AOMTargets.cmake
   ''
   + lib.optionalString stdenv.hostPlatform.isStatic ''
     ln -s $static $out
