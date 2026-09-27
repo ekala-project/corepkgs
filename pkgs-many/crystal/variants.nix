@@ -6,8 +6,8 @@
   };
 
   v1_21 = rec {
-    version = "1.21.0";
+    version = "1.21.1";
     src-url = "https://github.com/crystal-lang/crystal/releases/download/${version}/crystal-${version}-1-linux-x86_64.tar.gz";
-    src-hash = "sha256-dEVh7jzuGwbRBs+a6ZuAZLTgF1GKxBTW3SPPr+NlYMk=";
+    src-hash = "sha256-CLV3nfjPKAxKeZWZhiu+TUIQO6CCqnNClWJxPIqfO0M=";
   };
 }
