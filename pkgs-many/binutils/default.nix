@@ -5,12 +5,12 @@
   stdenvNoCC,
   noSysDirs,
   wrap ? true,
-  variant ? if stdenvNoCC.targetPlatform.isDarwin then "darwin" else "v2_44",
+  variant ? if stdenvNoCC.targetPlatform.isDarwin then "darwin" else "v2_46",
 }:
 mkManyVariants {
   variants = ./variants.nix;
   aliases = {
-    real = "v2_44";
+    real = "v2_46";
   };
   name = "binutils";
   defaultSelector = p: p.${variant};
