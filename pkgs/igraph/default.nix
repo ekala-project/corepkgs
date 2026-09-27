@@ -56,6 +56,10 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals stdenv.cc.isClang [ llvmPackages.openmp ];
 
+  # The cmake setup-hook's parseShareDocName fails on igraph's multiline
+  # project() declaration, causing a build failure under inherit_errexit.
+  env.shareDocName = "igraph";
+
   cmakeEntries = {
     IGRAPH_USE_INTERNAL_BLAS = false;
     IGRAPH_USE_INTERNAL_LAPACK = false;

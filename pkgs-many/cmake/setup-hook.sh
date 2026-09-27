@@ -89,7 +89,7 @@ parseShareDocName() {
     local cmakeLists="$cmakeDir/CMakeLists.txt"
     if [[ -f "$cmakeLists" ]]; then
         local shareDocName
-        shareDocName="$(grep --only-matching --perl-regexp --ignore-case '\bproject\s*\(\s*"?\K([^[:space:]")]+)' <"$cmakeLists" | head -n1)"
+        shareDocName="$(grep --only-matching --perl-regexp --ignore-case '\bproject\s*\(\s*"?\K([^[:space:]")]+)' <"$cmakeLists" | head -n1 || true)"
     fi
     # The argument sometimes contains garbage or variable interpolation.
     # When that is the case, let's fall back to the derivation name.
