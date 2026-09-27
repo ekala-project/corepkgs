@@ -82,6 +82,13 @@ let
     ];
     buildInputs = [ docutils ];
 
+    postPatch = ''
+      # docutils 0.23 renamed roman to _roman_numerals
+      substituteInPlace doc/hgmanpage.py \
+        --replace-fail "from docutils.utils import roman" \
+                       "from docutils.utils import _roman_numerals as roman"
+    '';
+
     makeFlags = [ "PREFIX=$(out)" ] ++ lib.optional rustSupport "PURE=--rust";
 
     postInstall =
