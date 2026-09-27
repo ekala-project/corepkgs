@@ -67,6 +67,12 @@ stdenv.mkDerivation (finalAttrs: {
     (if withGtk3 then "--with-gtk=3" else "--disable-gtk")
     "--disable-dumper"
     "--disable-scrollkeeper"
+  ]
+  # gtk3 in this repo is built without introspection, so Gtk-3.0.gir
+  # is unavailable; disable gir/vala to avoid the missing-include error.
+  ++ lib.optionals withGtk3 [
+    "--disable-introspection"
+    "--disable-vala"
   ];
 
   installFlags = [
