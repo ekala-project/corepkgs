@@ -14,11 +14,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libtasn1";
-  version = "4.20.0";
+  version = "4.21.0";
 
   src = fetchurl {
     url = "mirror://gnu/libtasn1/libtasn1-${finalAttrs.version}.tar.gz";
-    sha256 = "sha256-kuDjvUwC1K7udgNrLd2D8McyukzaXLcdWDJysjWHp2w=";
+    sha256 = "sha256-HYpESiI8xUZCQHdzRuEl3lHY5qvwuLrHQqyEYJFn3Ic=";
   };
 
   outputs = [
