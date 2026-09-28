@@ -3,7 +3,7 @@
   stdenv,
   buildPythonPackage,
   fetchPypi,
-  fetchpatch,
+
   pythonOlder,
 
   # build-system, dependencies
@@ -21,22 +21,14 @@
 
 buildPythonPackage rec {
   pname = "meson-python";
-  version = "0.20.0";
+  version = "0.22.0";
   pyproject = true;
 
   src = fetchPypi {
     inherit version;
     pname = "meson_python";
-    hash = "sha256-bZcmrmzTfiLyEMdLNkswGApowgRC6X/wnzxWakFK9zg=";
+    hash = "sha256-nIGdDU76dG7a36rkZjwOnHVlkYbvflurEjML/iKWTfw=";
   };
-
-  patches = [
-    (fetchpatch {
-      # TODO: Remove in 0.19.0
-      url = "https://github.com/mesonbuild/meson-python/commit/1e69e7a23f2b24d688dc4220e93de6f0e2bcf9d2.patch";
-      hash = "sha256-FC2ll/OrLV1R0CDB6UkrknVASJQ7rSU+sApdAk75x44=";
-    })
-  ];
 
   build-system = [
     meson
@@ -62,7 +54,6 @@ buildPythonPackage rec {
   # meson-python respectes MACOSX_DEPLOYMENT_TARGET, but compares it with the
   # actual platform version during tests, which mismatches.
   # https://github.com/mesonbuild/meson-python/issues/760
-  # FIXME: drop in 0.19.0
   preCheck =
     if stdenv.hostPlatform.isDarwin then
       ''
