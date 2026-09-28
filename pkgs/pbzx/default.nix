@@ -8,14 +8,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "pbzx";
-  version = "1.0.2";
+  version = "1.1.0";
   src = fetchFromGitHub {
     owner = "NiklasRosenstein";
     repo = "pbzx";
     rev = "v${finalAttrs.version}";
-    sha256 = "0bwd7wmnhpz1n5p39mh6asfyccj4cm06hwigslcwbb3pdwmvxc90";
+    sha256 = "sha256-chc6Yk/EYUlYEE8VETYKMpAl+cyaYEJ9Pd+iyIdtjS8=";
   };
-  patches = [ ./stdin.patch ];
   buildInputs = [
     xz
     xar
