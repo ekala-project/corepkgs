@@ -2,24 +2,24 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
-  hatchling,
+  setuptools,
   pytest-cov-stub ? null,
   pytestCheckHook,
 }:
 
 buildPythonPackage rec {
   pname = "wcwidth";
-  version = "0.8.3";
+  version = "0.9.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "jquast";
     repo = "wcwidth";
     tag = version;
-    hash = "sha256-4GzYqoXdYqZjyB/iIsuOnwSjJGSKY9LitVKVDT2aUCo=";
+    hash = "sha256-tH96gjq8dTDdogdZYj4r+BTLw8/CX4ebBWLTJAYUfUE=";
   };
 
-  build-system = [ hatchling ];
+  build-system = [ setuptools ];
 
   doCheck = false;
 
