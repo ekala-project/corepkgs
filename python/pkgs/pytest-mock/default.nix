@@ -11,14 +11,14 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "pytest-mock";
-  version = "3.15.1";
+  version = "3.16.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "pytest-dev";
     repo = "pytest-mock";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-9h5/cssWs4F0LKnFLjWDsEjB2AYczLvnSjiUdsaEcBQ=";
+    hash = "sha256-EsK+zQ03VM5eFZiBKCDVSIBfY+K7IdGHq+ImoG3h8Yo=";
   };
 
   build-system = [
