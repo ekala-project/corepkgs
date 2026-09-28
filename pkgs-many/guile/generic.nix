@@ -182,7 +182,7 @@ builder (
           ./patches/3.0/gcov-file-name.patch
       )
       # 2.0 only fetchpatch for stability
-      ++ lib.optionals (packageBetween "2.0" "2.2") [
+      ++ lib.optionals (packageBetween "2.0" "2.0.14") [
         # Fixes stability issues with 00-repl-server.test
         (fetchpatch {
           url = "https://git.savannah.gnu.org/cgit/guile.git/patch/?id=2fbde7f02adb8c6585e9baf6e293ee49cd23d4c4";
