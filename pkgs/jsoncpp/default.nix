@@ -9,7 +9,7 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "jsoncpp";
-  version = "1.9.7";
+  version = "1.9.8";
 
   strictDeps = true;
 
@@ -22,7 +22,7 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "open-source-parsers";
     repo = "jsoncpp";
     rev = finalAttrs.version;
-    hash = "sha256-rf8d2UNTVEZhuiyChK2XnUbfGDvsfXnKADhaSp8qBwQ=";
+    hash = "sha256-5cH9G4/TVCM5HX6QSk3P4m5+cwuK4x8hP9FohBcmjik=";
   };
 
   # During darwin bootstrap, cp may not understand --reflink=auto
