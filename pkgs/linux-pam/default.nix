@@ -31,13 +31,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "linux-pam";
-  version = "1.7.2";
+  version = "1.7.3";
 
   src = fetchFromGitHub {
     owner = "linux-pam";
     repo = "linux-pam";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-V3XQqolinh+MqUefMDYJF9zP4fBJTHc7YKN+NEGjx1g=";
+    hash = "sha256-K/LgnUNQSInQRNOxkw46yOOXhjd7zIV2T6GB1KrYZso=";
 
   };
 
