@@ -15,14 +15,14 @@
 }:
 
 stdenv.mkDerivation (finalAttrs: {
-  version = "2.5.3";
+  version = "2.5.4";
   pname = "ppp";
 
   src = fetchFromGitHub {
     owner = "ppp-project";
     repo = "ppp";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-dl0mjiCFpeJwJC7UmJc0vx6K0FOrN4ORTIXEKG5Ykrg=";
+    hash = "sha256-UPYWsu6yEWRZ7SwFjINF4xbK/gmSvNEEC1vw7wfXsn8=";
   };
 
   configureFlags = [
