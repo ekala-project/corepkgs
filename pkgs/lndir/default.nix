@@ -9,7 +9,7 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   name = "lndir";
-  version = "0.1.1-unstable-2026-05-30";
+  version = "0.1.1";
 
   src = fetchFromGitHub {
     owner = "jonringer";
