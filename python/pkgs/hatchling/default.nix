@@ -22,12 +22,12 @@
 
 buildPythonPackage rec {
   pname = "hatchling";
-  version = "1.32.0";
+  version = "1.32.4";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-C9veSlKwbDfj7KOV+Fp2K/DvBv43T9iuQp3GvhAjD18=";
+    hash = "sha256-xEaPcxRMBU0qq07w8DeMQ7mHi/B/j/1reWkOlw03Xwc=";
   };
 
   # listed in backend/pyproject.toml
