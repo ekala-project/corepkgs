@@ -31,13 +31,13 @@ in
 
 stdenv.mkDerivation rec {
   pname = "shadow";
-  version = "4.20.2";
+  version = "4.20.3";
 
   src = fetchFromGitHub {
     owner = "shadow-maint";
     repo = "shadow";
     rev = version;
-    hash = "sha256-uZQHIRjuXl1QQE5VCbdT6c+NEhFzb06WbjhH2wplU1E=";
+    hash = "sha256-BD0EWOhpFyNeb4WDcLQNmUYWcXthe4o7WV4sG8kJB7E=";
   };
 
   outputs = [
