@@ -12,17 +12,17 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "tree-sitter";
-  version = "0.26.9";
+  version = "0.27.0";
 
   src = fetchFromGitHub {
     owner = "tree-sitter";
     repo = "tree-sitter";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-ohVhW4AEKX5VspqBePtfxbJGkjmJnNkf5ntU3RUxF+0=";
+    hash = "sha256-X5Hd0zcw7hxj7w7Jp1QBxLzsRSH9NgV2KquEvGdo3pE=";
     fetchSubmodules = true;
   };
 
-  cargoHash = "sha256-3egxdusYHQs8PadxGZ44+VWtlTcGBrcqlWMUyUzpWnY=";
+  cargoHash = "sha256-sQetVibUhzCV8bbiqP7ihiAav0BRQo5KxtRC+hU8rek=";
 
   nativeBuildInputs = [
     rustPlatform.bindgenHook
