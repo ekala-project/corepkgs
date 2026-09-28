@@ -6,8 +6,8 @@
   };
 
   v2_0 = {
-    version = "2.0.13";
-    src-hash = "sha256-N0TyrdwoKg3mJ6rvBI8GKYK0RWTVSsMf9SF5clKe2Is=";
+    version = "2.0.14";
+    src-hash = "sha256-6EQlZiVuG+FOUfwYg5zXmblmvFsWxqHXp8NRVahhnYI=";
     setupHook = ./setup-hook-2.0.sh;
   };
 
