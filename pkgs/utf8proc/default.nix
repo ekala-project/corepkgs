@@ -7,7 +7,7 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "utf8proc";
-  version = "2.11.3";
+  version = "2.12.0";
 
   outputs = [
     "out"
@@ -19,7 +19,7 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "JuliaStrings";
     repo = "utf8proc";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-DF2//R8Oc/+IEJuiG9+rTxQ7nltPcPqdCkzR4T7pUes=";
+    hash = "sha256-+MLxHKgssEM/q4eEHYnbpNTwz/5xZ72ut6AozaLNwo0=";
   };
 
   nativeBuildInputs = [
