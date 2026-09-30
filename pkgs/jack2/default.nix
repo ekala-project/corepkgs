@@ -9,8 +9,15 @@
   libsamplerate,
   waf,
 
+  # Darwin Dependencies
+  aften ? null,
+
+  # BSD Dependencies
+  freebsd ? { },
+
   dbus ? null,
   expat,
+  libffado ? null,
   alsa-lib ? null,
 
   prefix ? "",
@@ -25,6 +32,7 @@ let
 
   optDbus = if stdenv.hostPlatform.isDarwin then null else shouldUsePkg dbus;
   optPythonDBus = if libOnly then null else shouldUsePkg dbus-python;
+  optLibffado = if libOnly then null else shouldUsePkg libffado;
   optAlsaLib = if libOnly then null else shouldUsePkg alsa-lib;
 in
 stdenv.mkDerivation (finalAttrs: {
@@ -54,9 +62,16 @@ stdenv.mkDerivation (finalAttrs: {
     libsamplerate
     optDbus
     optPythonDBus
+    optLibffado
     optAlsaLib
   ]
-  ++ lib.optionals (optDbus != null) [ expat ];
+  ++ lib.optionals (optDbus != null) [ expat ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    aften
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isFreeBSD [
+    freebsd.libsysinfo
+  ];
 
   patches = [
     (fetchpatch2 {
@@ -76,6 +91,7 @@ stdenv.mkDerivation (finalAttrs: {
     "--autostart=${if (optDbus != null) then "dbus" else "classic"}"
   ]
   ++ lib.optional (optDbus != null) "--dbus"
+  ++ lib.optional (optLibffado != null) "--firewire"
   ++ lib.optional (optAlsaLib != null) "--alsa"
   ++ lib.optional (
     stdenv.hostPlatform != stdenv.buildPlatform

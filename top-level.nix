@@ -431,6 +431,7 @@ final: prev: with final; {
   json-schema-for-humans = with python3Packages; toPythonApplication json-schema-for-humans;
 
   libGLU = mesa_glu;
+  libjack2 = jack2.override { prefix = "lib"; };
   libdbusmenu-gtk3 = libdbusmenu.gtk3;
   libglut = freeglut;
   libva-minimal = callPackage ./pkgs/libva { minimal = true; };
