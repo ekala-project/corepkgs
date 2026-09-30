@@ -1168,7 +1168,6 @@ final: prev: with final; {
   gtk3 = callPackage ./pkgs/gtk/3.x.nix {
     trackerSupport = false;
     cupsSupport = false;
-    withIntrospection = false;
   };
   gtk4 = callPackage ./pkgs/gtk/4.x.nix { };
 
