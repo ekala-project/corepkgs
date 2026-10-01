@@ -32,6 +32,9 @@
   # User services (users.services.*) module tests
   user-services = import ./user-services.nix { inherit pkgs; };
 
+  # Home module tests (home.users namespace, eval-home, backward compat)
+  home = import ./home.nix { inherit pkgs; };
+
   # Facter hardware auto-detection tests (pure eval, no VM)
   facter = import ./facter.nix { inherit pkgs; };
 }

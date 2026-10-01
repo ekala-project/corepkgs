@@ -93,13 +93,19 @@ let
       description = "Environment variables collected by language modules.";
     };
 
-    # Stub for per-user options (languages modules extend users.users)
-    # In devshell context per-user config is unused, but the options must
-    # exist so the module evaluates without errors.
+    # Stubs for per-user options (language modules extend both users.users
+    # and home.users). In devshell context per-user config is unused, but
+    # the options must exist so the modules evaluate without errors.
     options.users.users = lib.mkOption {
       type = lib.types.attrsOf (lib.types.submodule { });
       default = { };
       description = "Stub for per-user options (unused in devshell context).";
+    };
+
+    options.home.users = lib.mkOption {
+      type = lib.types.attrsOf (lib.types.submodule { });
+      default = { };
+      description = "Stub for home.users options (unused in devshell context).";
     };
   };
 

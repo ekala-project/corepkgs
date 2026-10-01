@@ -62,7 +62,11 @@
   ./config/nix-daemon.nix
   ./config/nixpkgs.nix
   ./config/user-services.nix
-  ./config/home.nix
+
+  # Home configuration (top-level home.* namespace)
+  ./home/options.nix
+  ./home/build.nix
+  ./home/bridge.nix
   ./networking.nix
   ./network-interfaces.nix
   ./networking/firewall.nix
