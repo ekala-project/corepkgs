@@ -70,11 +70,13 @@ let
     ../ekaos/modules/languages/zig.nix
   ];
 
-  # Stub module providing the options that language modules write to.
-  # In the full ekaos system these are defined by toplevel.nix and
-  # shell-environment.nix; in the devshell context we provide lightweight
-  # stubs and extract the collected values after evaluation.
-  languageStubModule = {
+  # Base module providing all option namespaces for single-pass evaluation.
+  # Language modules write to environment.*, users.users, and home.users.
+  # Service modules write to services.*. Devshell feature modules define
+  # their own options. This module provides stubs for the options that are
+  # defined elsewhere in the system/home evaluators.
+  devshellBaseModule = {
+    # Options that language modules write to
     options.environment.packages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [ ];
@@ -107,6 +109,9 @@ let
       default = { };
       description = "Stub for home.users options (unused in devshell context).";
     };
+
+    # Services option — defined here so user modules can set services.*
+    options.services = serviceLib.mkServicesOption;
   };
 
   # Devshell feature modules (dotenv, scripts, etc.)
@@ -163,19 +168,18 @@ in
     }@args:
 
     let
-      # Evaluate the service modules (check = false ignores language options)
-      servicesEval = lib.evalModules {
-        modules = [
-          { _module.check = false; }
-          {
-            options.services = serviceLib.mkServicesOption;
-          }
-        ]
-        ++ modules;
+      # Single-pass evaluation: all modules evaluated together.
+      # The base module provides option stubs for every namespace that
+      # language, service, and devshell feature modules write to.
+      eval = lib.evalModules {
+        modules = [ devshellBaseModule ] ++ languageModuleFiles ++ devshellModuleFiles ++ modules;
+        specialArgs = {
+          inherit lib pkgs;
+        };
       };
 
       # Extract enabled services
-      services = servicesEval.config.services or { };
+      services = eval.config.services;
       enabledServices = lib.filterAttrs (_: cfg: cfg.enable or false) services;
 
       # Build the process-compose configuration
@@ -191,32 +195,18 @@ in
         inherit (processCompose) tui logDir dataDir;
       };
 
-      # Evaluate language + devshell feature modules (check = false ignores service options)
-      languagesEval = lib.evalModules {
-        modules = [
-          { _module.check = false; }
-          languageStubModule
-        ]
-        ++ languageModuleFiles
-        ++ devshellModuleFiles
-        ++ modules;
-        specialArgs = {
-          inherit lib pkgs;
-        };
-      };
-
-      # Extract packages and environment variables from language evaluation
-      langPackages = languagesEval.config.environment.packages;
-      langVariables = languagesEval.config.environment.variables;
+      # Extract packages and environment variables from language modules
+      langPackages = eval.config.environment.packages;
+      langVariables = eval.config.environment.variables;
 
       # Extract devshell feature config
-      dotenvCfg = languagesEval.config.dotenv or { enable = false; };
-      scriptsCfg = languagesEval.config.scripts or { };
-      treefmtCfg = languagesEval.config.treefmt or { enable = false; };
-      enterShellCode = languagesEval.config.enterShell or "";
-      envVars = languagesEval.config.env or { };
-      modulePackages = languagesEval.config.packages or [ ];
-      filesCfg = languagesEval.config.files or { };
+      dotenvCfg = eval.config.dotenv or { enable = false; };
+      scriptsCfg = eval.config.scripts or { };
+      treefmtCfg = eval.config.treefmt or { enable = false; };
+      enterShellCode = eval.config.enterShell or "";
+      envVars = eval.config.env or { };
+      modulePackages = eval.config.packages or [ ];
+      filesCfg = eval.config.files or { };
 
       # Build script wrappers from scripts config
       scriptPackages = lib.mapAttrsToList (name: body: pkgs.writeShellScriptBin name body) scriptsCfg;
