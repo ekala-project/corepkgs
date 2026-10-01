@@ -5,6 +5,7 @@
   db,
   lib,
   makeScopeWithSplicing',
+  mkManyVariants,
   pythonPackagesExtensions ? [ ],
   stdenv,
 }:
@@ -24,20 +25,28 @@
         ;
     };
 
-    sources = {
-      python313 = {
-        sourceVersion = {
-          major = "3";
-          minor = "13";
-          patch = "9";
-          suffix = "";
-        };
-        hash = "sha256-7V7zTNo2z6Lzo0DwfKx+eBT5HH88QR9tNWIyOoZsXGY=";
-      };
-    };
+    cpython = callPackage (mkManyVariants {
+      variants = ./cpython-variants.nix;
+      aliases = { };
+      name = "cpython";
+      eol = { };
+      removed = { };
+      defaultSelector = (p: p.v3_13);
+      genericBuilder = ./cpython-generic.nix;
+      inherit callPackage;
+    }) { };
 
   in
   {
+
+    # CPython interpreters
+    python310 = cpython.v3_10;
+    python311 = cpython.v3_11;
+    python312 = cpython.v3_12;
+    python313 = cpython.v3_13;
+    python314 = cpython.v3_14;
+    python315 = cpython.v3_15;
+    python3Minimal = cpython.minimal;
 
     python27 = callPackage ./cpython/2.7 {
       self = __splicedPackages.python27;
@@ -50,91 +59,6 @@
       hash = "sha256-RuEgfpags9wJm9Xe0daotqUx4knABEUc7DvtgnQXEfE=";
       inherit passthruFun;
     };
-
-    python310 = callPackage ./cpython {
-      self = __splicedPackages.python310;
-      sourceVersion = {
-        major = "3";
-        minor = "10";
-        patch = "19";
-        suffix = "";
-      };
-      hash = "sha256-yPSlllciAdgd19+R9w4XfhmnDx1ImWi1S1+78pqXwHY=";
-      inherit passthruFun;
-    };
-
-    python311 = callPackage ./cpython {
-      self = __splicedPackages.python311;
-      sourceVersion = {
-        major = "3";
-        minor = "11";
-        patch = "14";
-        suffix = "";
-      };
-      hash = "sha256-jT7Y7FyIwclfXlWGEqclRQ0kUoE92tXlj9saU7Egm3g=";
-      inherit passthruFun;
-    };
-
-    python312 = callPackage ./cpython {
-      self = __splicedPackages.python312;
-      sourceVersion = {
-        major = "3";
-        minor = "12";
-        patch = "12";
-        suffix = "";
-      };
-      hash = "sha256-+4WhNBSwKMSboYu9UjwtBVowtWsYuSzkVOosUe3GVsQ=";
-      inherit passthruFun;
-    };
-
-    python313 = callPackage ./cpython (
-      {
-        self = __splicedPackages.python313;
-        inherit passthruFun;
-      }
-      // sources.python313
-    );
-
-    python314 = callPackage ./cpython {
-      self = __splicedPackages.python314;
-      sourceVersion = {
-        major = "3";
-        minor = "14";
-        patch = "0";
-        suffix = "";
-      };
-      hash = "sha256-Ipna5ULTlc44g6ygDTyRAwfNaOCy9zNgmMjnt+7p8+k=";
-      inherit passthruFun;
-    };
-
-    python315 = callPackage ./cpython {
-      self = __splicedPackages.python315;
-      sourceVersion = {
-        major = "3";
-        minor = "15";
-        patch = "0";
-        suffix = "a2";
-      };
-      hash = "sha256-2KCi9Kfz1wkM8ZXoGBTv6V9wVUlVVX9A4UnYaUpmJ1E=";
-      inherit passthruFun;
-    };
-
-    # Minimal versions of Python (built without optional dependencies)
-    python3Minimal =
-      (callPackage ./cpython (
-        {
-          self = __splicedPackages.python3Minimal;
-          inherit passthruFun;
-          pythonAttr = "python3Minimal";
-          # strip down that python version as much as possible
-          withMinimalDeps = true;
-        }
-        // sources.python313
-      )).overrideAttrs
-        (old: {
-          # TODO(@Artturin): Add this to the main cpython expr
-          pname = "python3-minimal";
-        });
 
     pypy27 = callPackage ./pypy {
       self = __splicedPackages.pypy27;
