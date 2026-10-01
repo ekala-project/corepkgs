@@ -174,6 +174,33 @@ in
 
       envVars = environmentVariables cfg;
       paths = sessionPath cfg;
+
+      # Per-user language submodule: shared between users.users and home.users
+      perUserSubmodule =
+        { config, ... }:
+        let
+          uCfg = config.languages.${name};
+          uPkgs = [ uCfg.package ] ++ optional (uCfg.lsp.enable && uCfg.lsp.package != null) uCfg.lsp.package;
+          uEnvVars = environmentVariables uCfg;
+          uPaths = sessionPath uCfg;
+        in
+        {
+          options.languages.${name} = mkLanguageOptions pkgs;
+
+          config = mkMerge [
+            # Per-user version resolution
+            (mkIf (uCfg.enable && uCfg.version != null) {
+              languages.${name}.package = mkDefault (resolveVersion pkgs uCfg.version);
+            })
+
+            # Per-user packages and environment
+            (mkIf uCfg.enable {
+              packages = uPkgs;
+              sessionVariables = builtins.mapAttrs (_: toString) uEnvVars;
+              sessionPath = uPaths;
+            })
+          ];
+        };
     in
 
     {
@@ -184,34 +211,14 @@ in
       # Extend per-user options with the same language options, and wire
       # per-user config within the submodule to avoid infinite recursion.
       options.users.users = mkOption {
-        type = types.attrsOf (
-          types.submodule (
-            { config, ... }:
-            let
-              uCfg = config.languages.${name};
-              uPkgs = [ uCfg.package ] ++ optional (uCfg.lsp.enable && uCfg.lsp.package != null) uCfg.lsp.package;
-              uEnvVars = environmentVariables uCfg;
-              uPaths = sessionPath uCfg;
-            in
-            {
-              options.languages.${name} = mkLanguageOptions pkgs;
+        type = types.attrsOf (types.submodule perUserSubmodule);
+      };
 
-              config = mkMerge [
-                # Per-user version resolution
-                (mkIf (uCfg.enable && uCfg.version != null) {
-                  languages.${name}.package = mkDefault (resolveVersion pkgs uCfg.version);
-                })
-
-                # Per-user packages and environment
-                (mkIf uCfg.enable {
-                  packages = uPkgs;
-                  sessionVariables = builtins.mapAttrs (_: toString) uEnvVars;
-                  sessionPath = uPaths;
-                })
-              ];
-            }
-          )
-        );
+      # Also extend home.users with the same language options so that
+      # home.users.<name>.languages.<lang>.enable works in both the
+      # standalone home evaluator and the full system evaluator.
+      options.home.users = mkOption {
+        type = types.attrsOf (types.submodule perUserSubmodule);
       };
 
       config = mkMerge [
