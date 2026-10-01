@@ -544,6 +544,299 @@ let
       '';
     };
 
+  # ── Per-user program module tests ───────────────────────────────────
+
+  programTests =
+    let
+      # Evaluate all programs in standalone home context
+      progResult = evalHome [
+        {
+          home.users.alice = {
+            programs.bash = {
+              enable = true;
+              initExtra = "eval \"$(direnv hook bash)\"";
+              historySize = 50000;
+              historyControl = [
+                "ignoredups"
+                "erasedups"
+              ];
+              shellOptions = [
+                "histappend"
+                "globstar"
+                "cdspell"
+              ];
+              profileExtra = "export GPG_TTY=$(tty)";
+            };
+            programs.git = {
+              enable = true;
+              settings = {
+                user.name = "Alice";
+                user.email = "alice@example.com";
+                init.defaultBranch = "main";
+                pull.rebase = true;
+              };
+              signing = {
+                key = "0xABCDEF";
+                signByDefault = true;
+              };
+              aliases.st = "status";
+              includes = [
+                {
+                  condition = "gitdir:~/work/";
+                  path = "~/.config/git/work-config";
+                }
+              ];
+              lfs.enable = true;
+            };
+            programs.ssh = {
+              enable = true;
+              forwardAgent = true;
+              addKeysToAgent = "yes";
+              serverAliveInterval = 60;
+              matchBlocks.work = {
+                hostname = "dev.example.com";
+                user = "alice";
+                identityFile = "~/.ssh/work_ed25519";
+                forwardAgent = true;
+              };
+              matchBlocks."github.com" = {
+                identityFile = "~/.ssh/github_ed25519";
+              };
+            };
+            programs.gpg-agent = {
+              enable = true;
+              enableSshSupport = true;
+              defaultCacheTtl = 3600;
+              maxCacheTtl = 7200;
+            };
+          };
+        }
+      ];
+      u = progResult.config.home.users.alice;
+      bashrc = u.file.".bashrc".text;
+      bashProfile = u.file.".bash_profile".text;
+      gitconfig = u.file.".config/git/config".text;
+      sshconfig = u.file.".ssh/config".text;
+      gpgconf = u.file.".gnupg/gpg-agent.conf".text;
+
+      # Test disabled programs produce no files
+      disabledResult = evalHome [
+        {
+          home.users.bob = {
+            programs.bash.enable = false;
+            programs.git.enable = false;
+            programs.ssh.enable = false;
+            programs.gpg-agent.enable = false;
+            sessionVariables.X = "1"; # give bob something so he exists
+          };
+        }
+      ];
+      bobFiles = disabledResult.config.home.users.bob.file;
+
+    in
+    {
+      all = pkgs.runCommand "home-program-tests" { } ''
+        mkdir -p $out
+        results=$out/test-results.txt
+
+        pass=0
+        fail=0
+
+        check_contains() {
+          local name="$1" text="$2" pattern="$3"
+          if echo "$text" | grep -qF "$pattern"; then
+            echo "PASS: $name" >> "$results"
+            pass=$((pass + 1))
+          else
+            echo "FAIL: $name (expected '$pattern')" >> "$results"
+            fail=$((fail + 1))
+          fi
+        }
+
+        check_not_contains() {
+          local name="$1" text="$2" pattern="$3"
+          if ! echo "$text" | grep -qF "$pattern"; then
+            echo "PASS: $name" >> "$results"
+            pass=$((pass + 1))
+          else
+            echo "FAIL: $name (should NOT contain '$pattern')" >> "$results"
+            fail=$((fail + 1))
+          fi
+        }
+
+        echo "=== Per-user program module tests ===" > "$results"
+        echo "" >> "$results"
+
+        # ── Bash tests ──
+        bashrc=${lib.escapeShellArg bashrc}
+        bash_profile=${lib.escapeShellArg bashProfile}
+
+        check_contains "bash: sources session-vars.sh" \
+          "$bashrc" "session-vars.sh"
+
+        check_contains "bash: HISTSIZE" \
+          "$bashrc" "HISTSIZE=50000"
+
+        check_contains "bash: HISTCONTROL erasedups" \
+          "$bashrc" "HISTCONTROL=ignoredups:erasedups"
+
+        check_contains "bash: shopt histappend" \
+          "$bashrc" "shopt -s histappend"
+
+        check_contains "bash: shopt cdspell" \
+          "$bashrc" "shopt -s cdspell"
+
+        check_contains "bash: initExtra" \
+          "$bashrc" 'eval "$(direnv hook bash)"'
+
+        check_contains "bash: profile sources bashrc" \
+          "$bash_profile" ".bashrc"
+
+        check_contains "bash: profileExtra" \
+          "$bash_profile" 'export GPG_TTY=$(tty)'
+
+        # ── Git tests ──
+        gitconfig=${lib.escapeShellArg gitconfig}
+
+        check_contains "git: user.name" \
+          "$gitconfig" "name = Alice"
+
+        check_contains "git: user.email" \
+          "$gitconfig" "email = alice@example.com"
+
+        check_contains "git: init.defaultBranch" \
+          "$gitconfig" "defaultBranch = main"
+
+        check_contains "git: signing key" \
+          "$gitconfig" "signingkey = 0xABCDEF"
+
+        check_contains "git: commit gpgsign" \
+          "$gitconfig" "gpgsign = true"
+
+        check_contains "git: alias" \
+          "$gitconfig" "st = status"
+
+        check_contains "git: lfs filter" \
+          "$gitconfig" '[filter "lfs"]'
+
+        check_contains "git: lfs clean" \
+          "$gitconfig" "clean = git-lfs clean"
+
+        check_contains "git: includeIf" \
+          "$gitconfig" 'includeIf "gitdir:~/work/"'
+
+        check_contains "git: include path" \
+          "$gitconfig" "path = ~/.config/git/work-config"
+
+        # ── SSH tests ──
+        sshconfig=${lib.escapeShellArg sshconfig}
+
+        check_contains "ssh: ForwardAgent" \
+          "$sshconfig" "ForwardAgent yes"
+
+        check_contains "ssh: AddKeysToAgent" \
+          "$sshconfig" "AddKeysToAgent yes"
+
+        check_contains "ssh: Host work" \
+          "$sshconfig" "Host work"
+
+        check_contains "ssh: HostName" \
+          "$sshconfig" "HostName dev.example.com"
+
+        check_contains "ssh: User alice" \
+          "$sshconfig" "User alice"
+
+        check_contains "ssh: IdentityFile work" \
+          "$sshconfig" "IdentityFile ~/.ssh/work_ed25519"
+
+        check_contains "ssh: Host github" \
+          "$sshconfig" "Host github.com"
+
+        check_contains "ssh: IdentityFile github" \
+          "$sshconfig" "IdentityFile ~/.ssh/github_ed25519"
+
+        # ── GPG agent tests ──
+        gpgconf=${lib.escapeShellArg gpgconf}
+
+        check_contains "gpg: enable-ssh-support" \
+          "$gpgconf" "enable-ssh-support"
+
+        check_contains "gpg: default-cache-ttl" \
+          "$gpgconf" "default-cache-ttl 3600"
+
+        check_contains "gpg: max-cache-ttl" \
+          "$gpgconf" "max-cache-ttl 7200"
+
+        # ── Disabled programs produce no files ──
+        ${
+          let
+            hasBashrc = bobFiles ? ".bashrc";
+            hasGitconfig = bobFiles ? ".config/git/config";
+            hasSshconfig = bobFiles ? ".ssh/config";
+            hasGpgconf = bobFiles ? ".gnupg/gpg-agent.conf";
+          in
+          ''
+            ${
+              if !hasBashrc then
+                ''
+                  echo "PASS: disabled: no .bashrc" >> "$results"
+                  pass=$((pass + 1))
+                ''
+              else
+                ''
+                  echo "FAIL: disabled: .bashrc should not exist" >> "$results"
+                  fail=$((fail + 1))
+                ''
+            }
+            ${
+              if !hasGitconfig then
+                ''
+                  echo "PASS: disabled: no .config/git/config" >> "$results"
+                  pass=$((pass + 1))
+                ''
+              else
+                ''
+                  echo "FAIL: disabled: .config/git/config should not exist" >> "$results"
+                  fail=$((fail + 1))
+                ''
+            }
+            ${
+              if !hasSshconfig then
+                ''
+                  echo "PASS: disabled: no .ssh/config" >> "$results"
+                  pass=$((pass + 1))
+                ''
+              else
+                ''
+                  echo "FAIL: disabled: .ssh/config should not exist" >> "$results"
+                  fail=$((fail + 1))
+                ''
+            }
+            ${
+              if !hasGpgconf then
+                ''
+                  echo "PASS: disabled: no .gnupg/gpg-agent.conf" >> "$results"
+                  pass=$((pass + 1))
+                ''
+              else
+                ''
+                  echo "FAIL: disabled: .gnupg/gpg-agent.conf should not exist" >> "$results"
+                  fail=$((fail + 1))
+                ''
+            }
+          ''
+        }
+
+        echo "" >> "$results"
+        echo "Program results: $pass passed, $fail failed" >> "$results"
+
+        if [ "$fail" -gt 0 ]; then
+          cat "$results" >&2
+          exit 1
+        fi
+      '';
+    };
+
   # ── Devshell integration tests ─────────────────────────────────────
 
   devshellTests =
@@ -619,6 +912,7 @@ in
 {
   standalone = standaloneTests;
   backward-compat = backwardCompatTests;
+  programs = programTests;
   devshell = devshellTests;
 
   # Run all tests
@@ -632,6 +926,9 @@ in
     echo "" >> $out/test-results.txt
 
     cat ${backwardCompatTests.all}/test-results.txt >> $out/test-results.txt
+    echo "" >> $out/test-results.txt
+
+    cat ${programTests.all}/test-results.txt >> $out/test-results.txt
     echo "" >> $out/test-results.txt
 
     cat ${devshellTests.all}/test-results.txt >> $out/test-results.txt

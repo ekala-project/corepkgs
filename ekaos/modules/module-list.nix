@@ -67,6 +67,10 @@
   ./home/options.nix
   ./home/build.nix
   ./home/bridge.nix
+  ./home/programs/bash.nix
+  ./home/programs/git.nix
+  ./home/programs/ssh.nix
+  ./home/programs/gpg-agent.nix
   ./networking.nix
   ./network-interfaces.nix
   ./networking/firewall.nix
