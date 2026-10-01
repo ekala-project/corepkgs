@@ -11,6 +11,12 @@
   # Stubs for options that language modules write to in system context
   ./home/language-stubs.nix
 
+  # Per-user program modules
+  ./home/programs/bash.nix
+  ./home/programs/git.nix
+  ./home/programs/ssh.nix
+  ./home/programs/gpg-agent.nix
+
   # Assertions (home-compatible version)
   ./misc/assertions-home.nix
 
