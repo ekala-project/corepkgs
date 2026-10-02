@@ -17,6 +17,7 @@ in
 
     description = mkOption {
       type = types.str;
+      default = "";
       example = "Example web server";
       description = ''
         A short, human-readable description of the service.
@@ -25,7 +26,8 @@ in
     };
 
     command = mkOption {
-      type = serviceTypes.command;
+      type = types.nullOr serviceTypes.command;
+      default = null;
       example = literalExpression ''"''${pkgs.nginx}/bin/nginx"'';
       description = ''
         The main command to execute for this service.
