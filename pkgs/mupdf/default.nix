@@ -4,6 +4,7 @@
   fetchurl,
   buildPackages,
   pkg-config,
+  fixDarwinDylibNames,
   freetype,
   harfbuzz,
   openjpeg,
@@ -13,6 +14,10 @@
   enableCurl ? true,
   curl,
   openssl,
+  enableOcr ? false,
+  enableCxx ? false,
+  enablePython ? false,
+  enableBarcode ? false,
   python3,
 }:
 
@@ -45,6 +50,9 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     pkg-config
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    fixDarwinDylibNames
   ];
 
   buildInputs = [
@@ -88,7 +96,12 @@ stdenv.mkDerivation rec {
     EOF
 
     moveToOutput "bin" "$bin"
-  '';
+  ''
+  + (lib.optionalString stdenv.hostPlatform.isDarwin ''
+    for exe in $bin/bin/*; do
+      install_name_tool -change build/shared-release/libmupdf.dylib $out/lib/libmupdf.dylib "$exe"
+    done
+  '');
 
   env.USE_SONAME = lib.boolToYesNo (!stdenv.hostPlatform.isDarwin);
 
