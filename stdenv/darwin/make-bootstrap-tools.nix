@@ -14,7 +14,7 @@ let
   custom-bootstrap = lib.optionalAttrs (bootstrapFiles != null) {
     config.replaceBootstrapFiles = _: bootstrapFiles;
   };
-  lib = import ../../lib.nix;
+  lib = import ../../lib.nix { };
 
   pkgs = import pkgspath ({ inherit localSystem; } // cross // custom-bootstrap);
 

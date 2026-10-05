@@ -2,7 +2,7 @@
   defaultConfig ? null,
 }@args:
 let
-  lib = import ../../lib.nix;
+  lib = import ../../lib.nix { };
 
   # By taking defaultConfig early, we can cache the result of calling
   # make-derivation.nix with config, which leads to more memoisation between

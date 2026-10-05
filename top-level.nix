@@ -4,6 +4,10 @@
 
 final: prev: with final; {
 
+  # Pin sources resolved to store paths.  Useful for rendering offline pin
+  # files (see ekaos/modules/system/pins.nix).
+  pins = builtins.mapAttrs (_: v: v.outPath) (import ./pins.nix);
+
   tests = { };
 
   # Nix's builtin fetcher

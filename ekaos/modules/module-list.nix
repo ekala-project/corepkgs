@@ -30,6 +30,7 @@
 
   # System modules
   ./system/toplevel.nix
+  ./system/pins.nix
   ./system/package-manifest.nix
   ./system/activation.nix
   ./system/etc.nix

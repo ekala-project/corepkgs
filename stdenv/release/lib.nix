@@ -15,7 +15,7 @@
 }:
 
 let
-  lib = import ../../lib.nix;
+  lib = import ../../lib.nix { };
 
   inherit (lib)
     addMetaAttrs
