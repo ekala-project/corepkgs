@@ -21,6 +21,11 @@
 */
 
 {
+  # Pre-resolved pin sources, as returned by `import ./pins.nix`.  Passing an
+  # attrset of store paths here (e.g. from a rendered `pins-offline.nix`)
+  # allows evaluation without network access.
+  pins ? import ./pins.nix,
+
   # The platform packages are built on -- the "build" platform, in GNU
   # Autotools parlance. See `lib.systems` for the division of labour between
   # these two `*System`s and the three `*Platform`s they elaborate into.
@@ -69,7 +74,7 @@ let
   # A function returning the list of bootstrapping stages to fold into the
   # final package set. `stages` below shows the arguments it is given.
   stdenvStages = import ./stdenv;
-  pristineLib = import ./lib.nix;
+  pristineLib = import ./lib.nix { inherit pins; };
   lib =
     if __allowFileset then
       pristineLib

@@ -30,7 +30,7 @@
 }:
 
 let
-  lib = import ../lib.nix;
+  lib = import ../lib.nix { };
 
   pkgs = import ../. {
     config = {

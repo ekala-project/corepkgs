@@ -1,5 +1,7 @@
+{
+  pins ? import ./pins.nix,
+}:
 let
-  pins = import ./pins.nix;
   lib = import pins.lib;
 in
 lib.extend (
