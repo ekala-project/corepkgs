@@ -548,6 +548,8 @@ final: prev: with final; {
 
   buildGoModule = go.buildModule;
 
+  buildZigPackage = zig.buildZigPackage;
+
   rPackages = callPackage ./r { inherit config; };
 
   buildNpmPackage = nodejs.buildNpmPackage;
