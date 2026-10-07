@@ -83,6 +83,9 @@ stdenv.mkDerivation (finalAttrs: {
     ekapkgs-update.semver-strategy = "patch";
     hook = callPackage ./setup-hook.nix { zig = finalAttrs.finalPackage; };
     fetchDeps = callPackage ./fetcher.nix { zig = finalAttrs.finalPackage; };
+    tests = {
+      minizign = callPackage ./test-minizign.nix { zig = finalAttrs.finalPackage; };
+    };
   };
 
   meta = {

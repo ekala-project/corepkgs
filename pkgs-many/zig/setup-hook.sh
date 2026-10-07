@@ -9,6 +9,7 @@ zigConfigurePhase() {
 
     export ZIG_GLOBAL_CACHE_DIR="$TMPDIR/zig-cache"
     export ZIG_LOCAL_CACHE_DIR="$TMPDIR/zig-local-cache"
+    mkdir -p "$ZIG_GLOBAL_CACHE_DIR"
 
     runHook postConfigure
 }
