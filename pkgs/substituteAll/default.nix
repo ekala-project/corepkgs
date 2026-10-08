@@ -40,16 +40,33 @@ args@{
   ...
 }:
 
+let
+  # Attrs consumed by the builder script or mkDerivation — not substitution variables.
+  builderAttrs = [
+    "src"
+    "name"
+    "isExecutable"
+    "dir"
+    "preInstall"
+    "postInstall"
+  ];
+in
+
 stdenvNoCC.mkDerivation (
   {
     name = if args ? name then args.name else baseNameOf (toString src);
     inherit src;
     preferLocalBuild = true;
     allowSubstitutes = false;
-    # structuredAttrs breaks the traditional substituteAll approach since
-    # variables aren't exported to the environment. Disable it here.
-    __structuredAttrs = false;
     builder = ./substitute-all-builder.sh;
+
+    # Substitution variables go through `env` so they are exported and
+    # visible to the `substituteAll` bash function under structuredAttrs.
+    env = builtins.removeAttrs args builderAttrs;
   }
-  // builtins.removeAttrs args [ "src" ]
+  # Pass through optional builder attrs (dir, isExecutable, etc.)
+  // lib.optionalAttrs (args ? dir) { inherit (args) dir; }
+  // lib.optionalAttrs (args ? isExecutable) { inherit (args) isExecutable; }
+  // lib.optionalAttrs (args ? preInstall) { inherit (args) preInstall; }
+  // lib.optionalAttrs (args ? postInstall) { inherit (args) postInstall; }
 )

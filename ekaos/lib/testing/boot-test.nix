@@ -126,7 +126,6 @@ let
   testInitrd =
     pkgs.runCommand "boot-test-initrd"
       {
-        __structuredAttrs = false;
         nativeBuildInputs = [
           pkgs.cpio
           pkgs.gzip
