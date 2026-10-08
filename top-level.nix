@@ -983,6 +983,11 @@ final: prev: with final; {
 
   perlPackages = perl.pkgs;
 
+  # BEAM (Erlang/Elixir) package scope — builders, fetchers, hooks, and tools
+  # parameterized by the default erlang version. For other versions:
+  # erlang.v28.beamPackages, erlang.v29.beamPackages, etc.
+  beamPackages = lib.dontRecurseIntoAttrs erlang.beamPackages;
+
   # On non-GNU systems we need GNU Gettext for libintl.
   libintl = if stdenv.hostPlatform.libc != "glibc" then gettext else null;
 

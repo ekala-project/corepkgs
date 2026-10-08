@@ -45,6 +45,9 @@
   wxGTK32 ? null,
   libx11,
   zlib,
+  callPackage,
+  generateSplicesForMkScope,
+  makeScopeWithSplicing',
 }:
 let
   inherit (lib)
@@ -78,7 +81,7 @@ let
     sed
   ];
 in
-stdenv.mkDerivation {
+stdenv.mkDerivation (finalAttrs: {
   pname = "erlang" + optionalString javacSupport "_javac" + optionalString odbcSupport "_odbc";
   inherit version;
 
@@ -150,6 +153,11 @@ stdenv.mkDerivation {
   '';
 
   passthru = {
+    beamPackages = callPackage ../../beam {
+      erlang = finalAttrs.finalPackage;
+      inherit generateSplicesForMkScope makeScopeWithSplicing';
+    };
+
     updateScript = nix-update-script {
       extraArgs = [
         "--version-regex"
@@ -182,4 +190,4 @@ stdenv.mkDerivation {
       product = "erlang%2fotp";
     };
   };
-}
+})
