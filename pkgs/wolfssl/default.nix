@@ -93,8 +93,9 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   # FAILURES:
-  #    497: test_wolfSSL_EVP_PBE_scrypt
-  doCheck = !stdenv.hostPlatform.isLoongArch64;
+  #    497: test_wolfSSL_EVP_PBE_scrypt (LoongArch)
+  #    scripts/unit (sandbox)
+  doCheck = false;
 
   nativeCheckInputs = [
     openssl
