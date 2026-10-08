@@ -9,12 +9,19 @@
 { pkgs, lib, ... }:
 
 let
+  inherit (lib) mkOption types;
+
   rendered = lib.concatStringsSep "\n" (
     lib.mapAttrsToList (name: path: "  ${name} = ${path};") pkgs.pins
   );
 in
 {
-  system.build.pinsFile = pkgs.writeText "pins-offline.nix" ''
+  options.system.build.pinsFile = mkOption {
+    type = types.package;
+    description = "Rendered offline pins file mapping pin names to store paths.";
+  };
+
+  config.system.build.pinsFile = pkgs.writeText "pins-offline.nix" ''
     # Auto-rendered offline pins — store paths only, no network access needed.
     # Pass to: import <core-pkgs> { pins = import ./pins-offline.nix; }
     {
