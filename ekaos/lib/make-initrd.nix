@@ -43,7 +43,6 @@ let
   extraUtils =
     pkgs.runCommand "initrd-utils"
       {
-        __structuredAttrs = false;
         nativeBuildInputs = [
           pkgs.buildPackages.nukeReferences
           pkgs.buildPackages.patchelf

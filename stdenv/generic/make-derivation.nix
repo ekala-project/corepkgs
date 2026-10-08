@@ -934,6 +934,15 @@ let
       ...
     }@attrs:
 
+    assert
+      __structuredAttrs
+      || throw ''
+        __structuredAttrs = false is no longer supported by mkDerivation.
+        ${if attrs ? name then "Derivation '${attrs.name}'" else "A derivation"}
+        must use __structuredAttrs = true (the default).
+        Move environment variables into the `env` attrset instead.
+      '';
+
     # Policy on acceptable hash types in nixpkgs
     assert
       attrs ? outputHash
