@@ -23,6 +23,7 @@ Read the guide matching the package's build system or language.
 | Porting from nixpkgs (copy, strip maintainers/updateScript, TODO missing deps) | [porting](.agents/skills/porting/SKILL.md) |
 | Bash phases under structured attrs (array iteration, env attrset, substituteAll) | [structured-attrs](.agents/skills/structured-attrs/SKILL.md) |
 | ekaos service module (services.*, cross-platform interface, systemd/launchd/runit) | [services](services/AGENTS.md) |
+| Installing agent skills (installAgentSkills, installSkill, SKILL.md, dontInstallAgentSkills) | [pkgs/installAgentSkills](pkgs/installAgentSkills/setup-hook.sh) |
 
 ## Fixing Build Failures
 
@@ -30,6 +31,7 @@ Read the guide matching the error symptom. Start with [validation](.agents/skill
 
 | Symptom | Guide |
 |---------|-------|
+| Fix all broken builds across the repo (background build + iterative fix loop) | [fix-builds](.agents/skills/fix-builds/SKILL.md) |
 | Eval or build error — validation workflow, nix-instantiate, nix-build, nix fmt | [validation](.agents/skills/validation/SKILL.md) |
 | "Reversed patch" / "Hunk FAILED" — obsolete fetchpatch entries after version bump | [obsolete-patches](docs/common-issues/obsolete-patches.md) |
 | Python build-system switch, setuptools-scm pin, Cython conflict, missing conftest.py | [python-issues](docs/common-issues/python-packages.md) |
