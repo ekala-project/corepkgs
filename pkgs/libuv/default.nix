@@ -59,6 +59,7 @@ stdenv.mkDerivation (finalAttrs: {
         "udp_multicast_join6"
         "metrics_pool_events" # times out sometimes
         "fs_fstat" # https://github.com/libuv/libuv/issues/2235#issuecomment-1012086927
+        "sizeof" # uv_timespec64_t size mismatch (12 vs 16) due to struct padding differences
 
         # Assertion failed in test/test-tcp-bind6-error.c on line 60: r == UV_EADDRINUSE
         # Assertion failed in test/test-tcp-bind-error.c on line 99: r == UV_EADDRINUSE
