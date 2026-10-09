@@ -128,6 +128,19 @@ let
             { }
         );
 
+      # Resolve include entries: generate file paths for inline contents
+      resolvedIncludes = lib.imap0 (
+        i: inc:
+        if inc.contents != null then {
+          inherit (inc) condition;
+          path = "~/.config/git/include-${toString i}";
+          generatedContent = toGitINI inc.contents;
+        } else {
+          inherit (inc) condition path;
+          generatedContent = null;
+        }
+      ) cfg.includes;
+
       # Generate includeIf directives
       includeLines = concatStringsSep "\n" (
         map (
@@ -136,7 +149,7 @@ let
             condition = if inc.condition != null then "[includeIf \"${inc.condition}\"]" else "[include]";
           in
           "${condition}\n\tpath = ${inc.path}"
-        ) cfg.includes
+        ) resolvedIncludes
       );
 
       gitconfigContent =
@@ -226,9 +239,31 @@ let
                 };
 
                 path = mkOption {
-                  type = types.str;
+                  type = types.nullOr types.str;
+                  default = null;
                   example = "~/.config/git/work-config";
-                  description = "Path to the included git config file.";
+                  description = ''
+                    Path to the included git config file.
+                    Mutually exclusive with contents.
+                  '';
+                };
+
+                contents = mkOption {
+                  type = types.nullOr (types.attrsOf (types.attrsOf types.anything));
+                  default = null;
+                  example = literalExpression ''
+                    {
+                      user = {
+                        name = "Work Name";
+                        email = "work@example.com";
+                      };
+                    }
+                  '';
+                  description = ''
+                    Git configuration as nested attribute sets.
+                    When set, a config file is generated automatically
+                    and included. Mutually exclusive with path.
+                  '';
                 };
               };
             }
@@ -238,7 +273,12 @@ let
             [
               {
                 condition = "gitdir:~/work/";
-                path = "~/.config/git/work-config";
+                contents = {
+                  user = {
+                    name = "Work Name";
+                    email = "work@example.com";
+                  };
+                };
               }
             ]
           '';
@@ -256,7 +296,18 @@ let
 
       config = mkIf cfg.enable {
         packages = [ cfg.package ] ++ optional cfg.lfs.enable pkgs.git-lfs;
-        file.".config/git/config".text = gitconfigContent;
+        file = {
+          ".config/git/config".text = gitconfigContent;
+        } // lib.listToAttrs (
+          lib.concatMap (
+            inc:
+            if inc.generatedContent != null then [
+              (lib.nameValuePair
+                (lib.removePrefix "~/" inc.path)
+                { text = inc.generatedContent; })
+            ] else []
+          ) resolvedIncludes
+        );
       };
     };
 in

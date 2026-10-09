@@ -109,42 +109,78 @@ let
           type = types.listOf (
             types.submodule {
               options = {
-                bind.port = mkOption { type = types.port; };
+                bind.port = mkOption {
+                  type = types.nullOr types.port;
+                  default = null;
+                  description = "Bind port (for TCP forwards).";
+                };
                 bind.address = mkOption {
                   type = types.str;
                   default = "localhost";
+                  description = "Bind address (for TCP) or socket path (for Unix socket forwards).";
                 };
-                host.port = mkOption { type = types.port; };
+                host.port = mkOption {
+                  type = types.nullOr types.port;
+                  default = null;
+                  description = "Host port (for TCP forwards).";
+                };
                 host.address = mkOption {
                   type = types.str;
                   default = "localhost";
+                  description = "Host address (for TCP) or socket path (for Unix socket forwards).";
                 };
               };
             }
           );
           default = [ ];
-          description = "Local port forwards.";
+          description = ''
+            Local port forwards. Supports both TCP (address:port) and
+            Unix socket (path) forwards.
+          '';
         };
 
         remoteForwards = mkOption {
           type = types.listOf (
             types.submodule {
               options = {
-                bind.port = mkOption { type = types.port; };
+                bind.port = mkOption {
+                  type = types.nullOr types.port;
+                  default = null;
+                  description = "Bind port (for TCP forwards).";
+                };
                 bind.address = mkOption {
                   type = types.str;
                   default = "localhost";
+                  description = "Bind address (for TCP) or socket path (for Unix socket forwards).";
                 };
-                host.port = mkOption { type = types.port; };
+                host.port = mkOption {
+                  type = types.nullOr types.port;
+                  default = null;
+                  description = "Host port (for TCP forwards).";
+                };
                 host.address = mkOption {
                   type = types.str;
                   default = "localhost";
+                  description = "Host address (for TCP) or socket path (for Unix socket forwards).";
                 };
               };
             }
           );
           default = [ ];
-          description = "Remote port forwards.";
+          description = ''
+            Remote port forwards. Supports both TCP (address:port) and
+            Unix socket (path) forwards.
+          '';
+          example = literalExpression ''
+            [
+              # TCP forward
+              { bind.address = "localhost"; bind.port = 8080;
+                host.address = "localhost"; host.port = 80; }
+              # Unix socket forward
+              { bind.address = "/run/user/1000/gnupg/S.gpg-agent";
+                host.address = "/run/user/1000/gnupg/S.gpg-agent.extra"; }
+            ]
+          '';
         };
 
         extraOptions = mkOption {
@@ -180,11 +216,19 @@ let
       ++ optional (block.proxyCommand != null) "  ProxyCommand ${block.proxyCommand}"
       ++ map (
         fwd:
-        "  LocalForward ${fwd.bind.address}:${toString fwd.bind.port} ${fwd.host.address}:${toString fwd.host.port}"
+        let
+          bind = if fwd.bind.port != null then "${fwd.bind.address}:${toString fwd.bind.port}" else fwd.bind.address;
+          host = if fwd.host.port != null then "${fwd.host.address}:${toString fwd.host.port}" else fwd.host.address;
+        in
+        "  LocalForward ${bind} ${host}"
       ) block.localForwards
       ++ map (
         fwd:
-        "  RemoteForward ${fwd.bind.address}:${toString fwd.bind.port} ${fwd.host.address}:${toString fwd.host.port}"
+        let
+          bind = if fwd.bind.port != null then "${fwd.bind.address}:${toString fwd.bind.port}" else fwd.bind.address;
+          host = if fwd.host.port != null then "${fwd.host.address}:${toString fwd.host.port}" else fwd.host.address;
+        in
+        "  RemoteForward ${bind} ${host}"
       ) block.remoteForwards
       ++ mapAttrsToList (k: v: "  ${k} ${v}") block.extraOptions;
     in
