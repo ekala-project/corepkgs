@@ -131,14 +131,17 @@ let
       # Resolve include entries: generate file paths for inline contents
       resolvedIncludes = lib.imap0 (
         i: inc:
-        if inc.contents != null then {
-          inherit (inc) condition;
-          path = "~/.config/git/include-${toString i}";
-          generatedContent = toGitINI inc.contents;
-        } else {
-          inherit (inc) condition path;
-          generatedContent = null;
-        }
+        if inc.contents != null then
+          {
+            inherit (inc) condition;
+            path = "~/.config/git/include-${toString i}";
+            generatedContent = toGitINI inc.contents;
+          }
+        else
+          {
+            inherit (inc) condition path;
+            generatedContent = null;
+          }
       ) cfg.includes;
 
       # Generate includeIf directives
@@ -298,14 +301,16 @@ let
         packages = [ cfg.package ] ++ optional cfg.lfs.enable pkgs.git-lfs;
         file = {
           ".config/git/config".text = gitconfigContent;
-        } // lib.listToAttrs (
+        }
+        // lib.listToAttrs (
           lib.concatMap (
             inc:
-            if inc.generatedContent != null then [
-              (lib.nameValuePair
-                (lib.removePrefix "~/" inc.path)
-                { text = inc.generatedContent; })
-            ] else []
+            if inc.generatedContent != null then
+              [
+                (lib.nameValuePair (lib.removePrefix "~/" inc.path) { text = inc.generatedContent; })
+              ]
+            else
+              [ ]
           ) resolvedIncludes
         );
       };

@@ -36,8 +36,10 @@ let
 
       # Resolve pinentry binary name: explicit flavor > meta.mainProgram > "pinentry"
       pinentryBin =
-        if cfg.pinentryFlavor != null then cfg.pinentryFlavor
-        else cfg.pinentryPackage.meta.mainProgram or "pinentry";
+        if cfg.pinentryFlavor != null then
+          cfg.pinentryFlavor
+        else
+          cfg.pinentryPackage.meta.mainProgram or "pinentry";
 
       # Build gpg-agent.conf
       agentConfContent = concatStringsSep "\n" (

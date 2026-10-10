@@ -217,16 +217,20 @@ let
       ++ map (
         fwd:
         let
-          bind = if fwd.bind.port != null then "${fwd.bind.address}:${toString fwd.bind.port}" else fwd.bind.address;
-          host = if fwd.host.port != null then "${fwd.host.address}:${toString fwd.host.port}" else fwd.host.address;
+          bind =
+            if fwd.bind.port != null then "${fwd.bind.address}:${toString fwd.bind.port}" else fwd.bind.address;
+          host =
+            if fwd.host.port != null then "${fwd.host.address}:${toString fwd.host.port}" else fwd.host.address;
         in
         "  LocalForward ${bind} ${host}"
       ) block.localForwards
       ++ map (
         fwd:
         let
-          bind = if fwd.bind.port != null then "${fwd.bind.address}:${toString fwd.bind.port}" else fwd.bind.address;
-          host = if fwd.host.port != null then "${fwd.host.address}:${toString fwd.host.port}" else fwd.host.address;
+          bind =
+            if fwd.bind.port != null then "${fwd.bind.address}:${toString fwd.bind.port}" else fwd.bind.address;
+          host =
+            if fwd.host.port != null then "${fwd.host.address}:${toString fwd.host.port}" else fwd.host.address;
         in
         "  RemoteForward ${bind} ${host}"
       ) block.remoteForwards
