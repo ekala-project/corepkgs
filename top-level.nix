@@ -1576,7 +1576,7 @@ final: prev: with final; {
   buildPgrxExtension = callPackage ./pkgs/cargo-pgrx/buildPgrxExtension.nix { };
 
   # PGXS builder for PostgreSQL extensions. Pairs with postgresql.pg_config.
-  postgresqlBuildExtension = callPackage ./pkgs/postgresql/postgresqlBuildExtension.nix { };
+  postgresqlBuildExtension = postgresql.buildExtension;
 
   rust-bindgen-unwrapped = callPackage ./pkgs/rust-bindgen/unwrapped.nix { };
 
