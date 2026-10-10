@@ -1,4 +1,5 @@
 {
+  buildPackages,
   lib,
   stdenv,
   fetchFromGitHub,
@@ -189,6 +190,19 @@ stdenv.mkDerivation (finalAttrs: {
   passthru = {
     dlSuffix = stdenv.hostPlatform.extensions.sharedLibrary;
     psqlSchema = lib.versions.major finalAttrs.version;
+
+    # A relocatable `pg_config` built from this derivation's own
+    # `nix-support/pg_config.env`. Extensions (PGXS, pgrx) read this to locate
+    # the server's headers, libraries and PGXS makefile. See pg_config.nix.
+    pg_config = buildPackages.callPackage ./pg_config.nix {
+      postgresql = finalAttrs.finalPackage;
+    };
+
+    # PGXS builder bound to this postgresql. Nixpkgs pairs these in the
+    # postgresql.pkgs scope; here they are passthru attrs on the package.
+    buildExtension = buildPackages.callPackage ./postgresqlBuildExtension.nix {
+      postgresql = finalAttrs.finalPackage;
+    };
   };
 
   meta = {
