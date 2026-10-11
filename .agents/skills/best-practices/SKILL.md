@@ -89,6 +89,12 @@ When using `buildGoModule`:
 - `fetchFromGitHub`/`fetchFromGitLab` should use `tag`, not `rev` with a tag value
 - Hash should be SRI format (`sha256-...`), not bare hex
 
+### Commits
+
+- Each commit should be one logical change
+- Fixup commits (`fixup!`, `squash!`, or small corrections to a previous commit in the same PR) should be squashed into the commit they fix before merge
+- Standalone fixup commits are only acceptable when they address an existing issue in an already-merged commit
+
 ### Testing
 
 - Prefer `passthru.tests` over in-build `doCheck = true`

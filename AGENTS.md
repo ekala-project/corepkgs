@@ -6,6 +6,7 @@
 - **Version updates:** `<pkg>: <old version> -> <new version>`
 - **ekaos modules:** `ekaos/<module>: init | <succinct message>`
 - **Do not** add AI attribution (e.g., `Co-Authored-By`) to commit messages
+- **One logical change per commit** — squash small linting fixes and trivial corrections into the commit they belong to rather than creating separate fixup commits
 
 ## Writing Packages
 
@@ -17,7 +18,7 @@ Read the guide matching the package's build system or language.
 | Nix expression basics (stdenv.mkDerivation, finalAttrs, meta, deps, fetchers, patches, outputs, passthru, package organization, top-level.nix) | [packaging](.agents/skills/packaging/SKILL.md) |
 | Python (buildPythonPackage, pyproject, build-system, testPaths, disabledTests, pythonImportsCheck) | [python](.agents/skills/python/SKILL.md) |
 | Rust (buildRustPackage, cargoHash, cargoBuildFlags, checkFlags) | [rust](.agents/skills/rust/SKILL.md) |
-| Go (buildGoModule, vendorHash, ldflags, subPackages) | [go](.agents/skills/go/SKILL.md) |
+| Go (buildGoModule, vendorHash, ldflags, CGO_ENABLED, tags, subPackages, version pinning) | [go](.agents/skills/go/SKILL.md) |
 | CMake project (cmake.configurePhaseHook, cmakeEntries) | [cmake](.agents/skills/cmake/SKILL.md) |
 | Meson project (meson.configurePhaseHook, mesonEntries, mesonFeatures) | [meson](.agents/skills/meson/SKILL.md) |
 | Multi-version package in pkgs-many/ (mkManyVariants, variants.nix) | [mk-many-variants](.agents/skills/mk-many-variants/SKILL.md) |

@@ -8,7 +8,7 @@ directory containing a `SKILL.md` whose front matter declares when to load it.
 - **[best-practices](best-practices/SKILL.md)** - Review package expressions for best-practices compliance
 - **[cmake](cmake/SKILL.md)** - CMake build system
 - **[fix-builds](fix-builds/SKILL.md)** - Fix all broken package builds in the repo
-- **[go](go/SKILL.md)** - Go modules (`buildGoModule`)
+- **[go](go/SKILL.md)** - Go modules (`buildGoModule`, version pinning, ldflags, CGO, tags)
 - **[meson](meson/SKILL.md)** - Meson build system
 - **[mk-many-variants](mk-many-variants/SKILL.md)** - Multi-version packages in `pkgs-many`
 - **[packaging](packaging/SKILL.md)** - Packaging conventions and package organization
