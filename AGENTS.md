@@ -13,6 +13,7 @@ Read the guide matching the package's build system or language.
 
 | Task | Guide |
 |------|-------|
+| Review package for best practices (meta completeness, build-system idioms, dependency placement, PR feedback) | [best-practices](.agents/skills/best-practices/SKILL.md) |
 | Nix expression basics (stdenv.mkDerivation, finalAttrs, meta, deps, fetchers, patches, outputs, passthru, package organization, top-level.nix) | [packaging](.agents/skills/packaging/SKILL.md) |
 | Python (buildPythonPackage, pyproject, build-system, testPaths, disabledTests, pythonImportsCheck) | [python](.agents/skills/python/SKILL.md) |
 | Rust (buildRustPackage, cargoHash, cargoBuildFlags, checkFlags) | [rust](.agents/skills/rust/SKILL.md) |

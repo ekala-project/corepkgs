@@ -5,6 +5,7 @@ directory containing a `SKILL.md` whose front matter declares when to load it.
 
 ## Available Skills
 
+- **[best-practices](best-practices/SKILL.md)** - Review package expressions for best-practices compliance
 - **[cmake](cmake/SKILL.md)** - CMake build system
 - **[fix-builds](fix-builds/SKILL.md)** - Fix all broken package builds in the repo
 - **[go](go/SKILL.md)** - Go modules (`buildGoModule`)
