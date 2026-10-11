@@ -818,9 +818,12 @@ final: prev: with final; {
   python2Packages = lib.dontRecurseIntoAttrs python27.pkgs;
   python3Packages = lib.dontRecurseIntoAttrs python3.pkgs;
 
-  pypy = pypy2;
+  # pypy is auto-imported from pkgs-many/pypy/ via mkManyVariants (default: v2_7)
   pypy2 = pypy27;
   pypy3 = pypy311;
+  pypy27 = pypy.pypy27;
+  pypy310 = pypy.pypy310;
+  pypy311 = pypy.pypy311;
 
   # Python interpreter that is build with all modules, including tkinter.
   # These are for compatibility and should not be used inside Nixpkgs.
@@ -863,9 +866,6 @@ final: prev: with final; {
   pythonInterpreters = callPackage ./python { inherit config; };
   inherit (pythonInterpreters)
     python27
-    pypy27
-    pypy310
-    pypy311
     ;
 
   # Python package sets.
