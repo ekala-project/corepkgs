@@ -33,29 +33,24 @@ stdenv.mkDerivation (
 
     configurePhase =
       args.configurePhase or ''
-        runHook preConfigure
 
         # Set up Maven cache
         export M2_HOME=${maven}
         export MAVEN_OPTS="-Dmaven.repo.local=$TMPDIR/.m2/repository"
 
-        runHook postConfigure
       '';
 
     buildPhase =
       args.buildPhase or ''
-        runHook preBuild
 
         mvn package ${mvnParameters} \
           -Dmaven.test.skip=true \
           -Dmaven.repo.local=$TMPDIR/.m2/repository
 
-        runHook postBuild
       '';
 
     installPhase =
       args.installPhase or ''
-        runHook preInstall
 
         mkdir -p $out/share/java $out/bin
 
@@ -72,7 +67,6 @@ stdenv.mkDerivation (
             chmod +x $out/bin/${pname}
         ''}
 
-        runHook postInstall
       '';
 
     meta = args.meta or { } // {

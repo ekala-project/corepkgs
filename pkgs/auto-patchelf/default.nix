@@ -18,19 +18,15 @@ stdenv.mkDerivation {
   src = ./source;
 
   buildPhase = ''
-    runHook preBuild
 
     substituteInPlace auto-patchelf.py --replace-fail "@defaultBintools@" "$NIX_BINTOOLS"
 
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
 
     install -Dm755 auto-patchelf.py $out/bin/auto-patchelf
 
-    runHook postInstall
   '';
 
   meta = {

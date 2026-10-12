@@ -83,7 +83,6 @@ let
     allowSubstitutes = false;
 
     buildPhase = ''
-      runHook preBuild
 
       target=$out
       if test -n "$dir"; then
@@ -97,7 +96,6 @@ let
           chmod +x $target
       fi
 
-      runHook postBuild
     '';
 
     # Look for Nix identifiers surrounded by `@` that aren't substituted.
@@ -108,14 +106,12 @@ let
         regex = lib.escapeShellArg "@${lookahead}[a-zA-Z_][0-9A-Za-z_'-]*@";
       in
       ''
-        runHook preCheck
         if grep -Pqe ${regex} "$target"; then
           echo The following look like unsubstituted Nix identifiers that remain in "$target":
           grep -Poe ${regex} "$target"
           echo Use the more precise '`substitute`' function if this check is in error.
           exit 1
         fi
-        runHook postCheck
       '';
   };
 in

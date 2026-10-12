@@ -54,14 +54,12 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       ext = if lib.versionOlder finalAttrs.version "11" then "cjs" else "mjs";
     in
     ''
-      runHook preInstall
 
       install -d $out/{bin,libexec}
       cp -R . $out/libexec/pnpm
       ln -s $out/libexec/pnpm/bin/pnpm.${ext} $out/bin/pnpm
       ln -s $out/libexec/pnpm/bin/pnpx.${ext} $out/bin/pnpx
 
-      runHook postInstall
     '';
 
   postInstall =

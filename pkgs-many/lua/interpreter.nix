@@ -120,7 +120,6 @@ stdenv.mkDerivation (
     ];
 
     configurePhase = ''
-      runHook preConfigure
 
       makeFlagsArray+=(CFLAGS='-O2 -fPIC${lib.optionalString compat compatFlags} $(${
         if lib.versionAtLeast luaversion "5.2" then "SYSCFLAGS" else "MYCFLAGS"
@@ -144,7 +143,6 @@ stdenv.mkDerivation (
             )
         }" )
 
-      runHook postConfigure
     '';
     inherit postConfigure;
 

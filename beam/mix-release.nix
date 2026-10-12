@@ -122,7 +122,6 @@ lib.extendMkDerivation {
 
       configurePhase =
         attrs.configurePhase or ''
-          runHook preConfigure
 
           mix deps.compile --no-deps-check --skip-umbrella-children
 
@@ -141,12 +140,10 @@ lib.extendMkDerivation {
             ln -s "$MIX_DEPS_PATH" ./deps
           ''}
 
-          runHook postConfigure
         '';
 
       buildPhase =
         attrs.buildPhase or ''
-          runHook preBuild
 
           mix compile --no-deps-check ${lib.concatStringsSep " " compileFlags}
 
@@ -154,12 +151,10 @@ lib.extendMkDerivation {
             mix escript.build --no-deps-check
           ''}
 
-          runHook postBuild
         '';
 
       installPhase =
         attrs.installPhase or ''
-          runHook preInstall
 
           ${
             if (escriptBinName != null) then
@@ -173,7 +168,6 @@ lib.extendMkDerivation {
               ''
           }
 
-          runHook postInstall
         '';
 
       postFixup = ''

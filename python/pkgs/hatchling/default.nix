@@ -58,9 +58,7 @@ buildPythonPackage (finalAttrs: {
   '';
 
   checkPhase = ''
-    runHook preCheck
     ${python.interpreter} tests/downstream/integrate.py
-    runHook postCheck
   '';
 
   meta = {

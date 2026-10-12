@@ -39,13 +39,11 @@ stdenv.mkDerivation {
   doInstallCheck = true;
 
   installPhase = ''
-    runHook preInstall;
     install -m 644 -D usbrelayd $out/bin/usbrelayd
     install -m 644 -D usbrelayd.service $out/lib/systemd/system/usbrelayd.service
     install -m 644 -D 50-usbrelay.rules $out/lib/udev/rules.d/50-usbrelay.rules
     install -m 644 -D usbrelayd.conf $out/etc/usbrelayd.conf # include this as an example
     installManPage usbrelayd.8
-    runHook postInstall
   '';
 
   meta = {

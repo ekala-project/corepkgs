@@ -27,13 +27,11 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p ${modDestDir}
     find . -name '*.ko' -exec cp --parents {} ${modDestDir} \;
     find ${modDestDir} -name '*.ko' -exec xz -f {} \;
 
-    runHook postInstall
   '';
 
   passthru.updateScript = unstableGitUpdater { hardcodeZeroVersion = true; };

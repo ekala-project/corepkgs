@@ -21,7 +21,6 @@ buildPythonPackage (finalAttrs: {
   # Ignored file https://github.com/pytest-dev/pytest/pull/5605#issuecomment-522243929
   # test_missing_required_plugins will emit deprecation warning which is treated as error
   checkPhase = ''
-    runHook preCheck
     ${pytest.out}/bin/pytest -x testing/ \
       --ignore=testing/test_junitxml.py \
       --ignore=testing/test_argcomplete.py \
@@ -32,6 +31,5 @@ buildPythonPackage (finalAttrs: {
     # specifically testing/test_assertion.py and testing/test_assertrewrite.py leave behind those:
     find $out/lib -name "*opt-2.pyc" -delete
 
-    runHook postCheck
   '';
 })

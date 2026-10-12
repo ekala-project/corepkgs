@@ -29,7 +29,6 @@ stdenv.mkDerivation (
     doInstallCheck = true;
 
     installPhase = ''
-      runHook preInstall
 
       binDir="$out/lib/modules/${kernel.modDirVersion}/kernel/drivers/hid"
       mkdir -p "$binDir"
@@ -47,7 +46,6 @@ stdenv.mkDerivation (
         --replace "PATH='/sbin:/bin:/usr/sbin:/usr/bin'" "" \
         --replace plugdev openrazer
 
-      runHook postInstall
     '';
 
     meta = common.meta // {

@@ -16,10 +16,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   };
 
   installPhase = ''
-    runHook preInstall
     mkdir -p $out/lib/firmware
     cp -r intel-ucode $out/lib/firmware/
-    runHook postInstall
   '';
 
   meta = {

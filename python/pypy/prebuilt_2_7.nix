@@ -94,7 +94,6 @@ stdenv.mkDerivation {
   nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out/lib
     echo "Moving files to $out"
@@ -110,7 +109,6 @@ stdenv.mkDerivation {
     # Include a sitecustomize.py file
     cp ${../sitecustomize.py} $out/${sitePackages}/sitecustomize.py
 
-    runHook postInstall
   '';
 
   preFixup =

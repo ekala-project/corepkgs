@@ -22,12 +22,10 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out
     cp -r include/fortify $out/include
 
-    runHook postInstall
   '';
 
   meta = {

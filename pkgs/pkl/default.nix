@@ -36,9 +36,7 @@ stdenv.mkDerivation {
   dontPatchELF = true;
 
   installPhase = ''
-    runHook preInstall
     install -Dm755 $src $out/libexec/pkl
-    runHook postInstall
   '';
 
   # GraalVM native images have a non-standard ELF layout that patchelf corrupts

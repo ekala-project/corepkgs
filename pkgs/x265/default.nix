@@ -123,11 +123,9 @@ stdenv.mkDerivation (finalAttrs: {
   doCheck = unittestsSupport;
 
   checkPhase = ''
-    runHook preCheck
 
     ./test/TestBench
 
-    runHook postCheck
   '';
 
   postInstall = ''

@@ -73,26 +73,20 @@ let
         };
 
         configurePhase = ''
-          runHook preConfigure
           ${lib.optionalString (checkouts != null) "cp --no-preserve=all -R ${checkouts}/_checkouts ."}
-          runHook postConfigure
         '';
 
         buildPhase = ''
-          runHook preBuild
           HOME=. DEBUG=1 rebar3 as ${profile} ${if releaseType == "escript" then "escriptize" else "release"}
-          runHook postBuild
         '';
 
         installPhase = ''
-          runHook preInstall
           dir=${if releaseType == "escript" then "bin" else "rel"}
           mkdir -p "$out/$dir" "$out/bin"
           cp -R --preserve=mode "_build/${profile}/$dir" "$out"
           ${lib.optionalString (
             releaseType == "release"
           ) "find $out/rel/*/bin -type f -executable -exec ln -s -t $out/bin {} \\;"}
-          runHook postInstall
         '';
 
         postInstall = lib.optionalString (releaseType == "escript") ''

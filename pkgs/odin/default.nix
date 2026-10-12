@@ -47,7 +47,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out/bin
     cp odin $out/bin/odin
@@ -73,7 +72,6 @@ stdenv.mkDerivation (finalAttrs: {
     make -C "$out/share/vendor/stb/src/"
     make -C "$out/share/vendor/miniaudio/src/"
 
-    runHook postInstall
   '';
 
   meta = {

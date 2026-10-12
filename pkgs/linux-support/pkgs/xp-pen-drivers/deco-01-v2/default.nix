@@ -54,7 +54,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out/{opt,bin}
     cp -r App/usr/lib/pentablet/{PenTablet,resource.rcc,conf} $out/opt
@@ -62,7 +61,6 @@ stdenv.mkDerivation (finalAttrs: {
     cp -r App/lib $out/lib
     sed -i 's#usr/lib/pentablet#${dataDir}#g' $out/opt/PenTablet
 
-    runHook postInstall
   '';
 
   postFixup = ''

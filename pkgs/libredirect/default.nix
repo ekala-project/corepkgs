@@ -40,7 +40,6 @@ else
     libName = "libredirect" + stdenv.hostPlatform.extensions.sharedLibrary;
 
     buildPhase = ''
-      runHook preBuild
 
       ${
         if stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64 then
@@ -79,7 +78,6 @@ else
           -O3 test.c -o test
       fi
 
-      runHook postBuild
     '';
 
     # We want to retain debugging info to be able to use GDB on libredirect.so
@@ -88,7 +86,6 @@ else
     dontStrip = true;
 
     installPhase = ''
-      runHook preInstall
 
       install -vD "$libName" "$out/lib/$libName"
 
@@ -116,7 +113,6 @@ else
       }
       SETUP_HOOK
 
-      runHook postInstall
     '';
 
     doInstallCheck = true;

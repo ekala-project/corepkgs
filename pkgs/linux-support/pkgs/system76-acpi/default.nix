@@ -26,13 +26,11 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
-    runHook preInstall
 
     install -D system76_acpi.ko $out/lib/modules/${kernel.modDirVersion}/misc/system76_acpi.ko
     mkdir -p $out/lib/udev/hwdb.d
     mv lib/udev/hwdb.d/* $out/lib/udev/hwdb.d
 
-    runHook postInstall
   '';
 
   # GCC 14 makes this an error by default, remove when fixed upstream

@@ -21,14 +21,12 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
-    runHook preInstall
     mkdir -p $out/bin $dev/include
     mkdir -p $out/{usr/bin,usr/include/sys}
     make install DESTDIR=$out
     mv $out/usr/bin/* $out/bin
     mv $out/usr/include/* $dev/include/
     rm -rf $out/usr/
-    runHook postInstall
   '';
 
   meta = {

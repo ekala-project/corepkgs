@@ -71,10 +71,8 @@ buildPythonPackage (finalAttrs: {
       );
     in
     ''
-      runHook preCheck
       export HOME="$NIX_BUILD_TOP"
       ${python.interpreter} runtests.py ${commandline}
-      runHook postCheck
     '';
 
   passthru.tests =

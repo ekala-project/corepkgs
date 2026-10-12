@@ -124,7 +124,6 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
 
   checkPhase = lib.concatStringsSep "\n" (
     [
-      "runHook preCheck"
       ''
         patchShebangs 'test cases'
         substituteInPlace \
@@ -163,7 +162,6 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
       ''HOME="$TMPDIR" ${
         if python3.isPyPy then python3.interpreter else "python"
       } ./run_project_tests.py''
-      "runHook postCheck"
     ]
   );
 

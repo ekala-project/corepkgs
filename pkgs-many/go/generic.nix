@@ -116,7 +116,6 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   buildPhase = ''
-    runHook preBuild
     export GOCACHE=$TMPDIR/go-cache
     if [ -f "$NIX_CC/nix-support/dynamic-linker" ]; then
       export GO_LDSO=$(cat $NIX_CC/nix-support/dynamic-linker)
@@ -140,7 +139,6 @@ stdenv.mkDerivation (finalAttrs: {
     pushd src
     ./make.bash
     popd
-    runHook postBuild
   '';
 
   preInstall = ''
@@ -181,12 +179,10 @@ stdenv.mkDerivation (finalAttrs: {
   );
 
   installPhase = ''
-    runHook preInstall
     mkdir -p $out/share/go
     cp -a bin pkg src lib misc api doc go.env VERSION $out/share/go
     mkdir -p $out/bin
     ln -s $out/share/go/bin/* $out/bin
-    runHook postInstall
   '';
 
   disallowedReferences = [ goBootstrap ];

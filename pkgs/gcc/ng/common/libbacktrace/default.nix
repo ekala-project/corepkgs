@@ -53,7 +53,6 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p "$out/lib"
     cp .libs/*.a "$out/lib"
@@ -62,7 +61,6 @@ stdenv.mkDerivation (finalAttrs: {
     mkdir -p "$dev/include"
     cp backtrace-supported.h "$dev/include"
 
-    runHook postInstall
   '';
 
   doCheck = true;

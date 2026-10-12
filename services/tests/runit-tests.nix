@@ -143,7 +143,6 @@ let
 
       # Run the test script (Python)
       checkPhase = ''
-                runHook preCheck
 
                 # Write Python test script to file
                 cat > /build/test-script.py <<'PYTHON_TEST_SCRIPT'
@@ -153,7 +152,6 @@ let
                 # Run Python test driver, capturing output to log file
                 python3 -m runit_test_driver --testscript /build/test-script.py 2>&1 | tee "$RUNIT_LOG_DIR/test-driver.log"
 
-                runHook postCheck
       '';
 
       # postCheck hook (includes runitTestStop from hook)

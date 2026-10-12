@@ -52,7 +52,6 @@ stdenv.mkDerivation {
   dontBuild = true;
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out
     cp -r * $out/
@@ -80,7 +79,6 @@ stdenv.mkDerivation {
         ]
       }
 
-    runHook postInstall
   '';
 
   passthru = {

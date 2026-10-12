@@ -28,11 +28,9 @@ let
     ];
 
     installPhase = ''
-      runHook preInstall
 
       install userspace/monitor_cpu -Dm755 -t $out/bin
 
-      runHook postInstall
     '';
   };
 in
@@ -50,12 +48,10 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
-    runHook preInstall
 
     install ryzen_smu.ko -Dm444 -t $out/lib/modules/${kernel.modDirVersion}/kernel/drivers/ryzen_smu
     install ${monitor-cpu}/bin/monitor_cpu -Dm755 -t $out/bin
 
-    runHook postInstall
   '';
 
   meta = {

@@ -16,23 +16,17 @@ stdenv.mkDerivation {
   };
 
   buildPhase = ''
-    runHook preBuild
     ./buildlib ${lib.optionalString (!stdenv.hostPlatform.isStatic) "-shared"}
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
     prefix="/" DESTDIR=$out ./installlib ${
       if stdenv.hostPlatform.isStatic then "-static" else "-shared"
     }
-    runHook postInstall
   '';
 
   checkPhase = ''
-    runHook preCheck
     ./checktests
-    runHook postCheck
   '';
 
   doCheck = false; # hasdescriptor.c test fails, hrm.

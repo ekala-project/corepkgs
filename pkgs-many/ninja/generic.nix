@@ -73,7 +73,6 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   buildPhase = ''
-    runHook preBuild
 
     # for list of env vars
     # see https://github.com/ninja-build/ninja/blob/v1.11.1/configure.py#L264
@@ -94,11 +93,9 @@ stdenv.mkDerivation (finalAttrs: {
   ''
   + ''
 
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
 
     install -Dm555 -t $out/bin ninja
     installShellCompletion --name ninja \
@@ -110,7 +107,6 @@ stdenv.mkDerivation (finalAttrs: {
   ''
   + ''
 
-    runHook postInstall
   '';
 
   setupHook = ./setup-hook.sh;

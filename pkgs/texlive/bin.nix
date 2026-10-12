@@ -655,11 +655,9 @@ rec {
     doCheck = false;
 
     installPhase = ''
-      runHook preInstall
 
       install -D ./scripts/pygmentex/pygmentex.py "$out"/bin/pygmentex
 
-      runHook postInstall
     '';
 
     meta = {

@@ -165,11 +165,7 @@ lib.extendMkDerivation {
 
       patches = cargoPatches ++ patches;
 
-      configurePhase =
-        args.configurePhase or ''
-          runHook preConfigure
-          runHook postConfigure
-        '';
+      configurePhase = args.configurePhase or "";
 
       doCheck = args.doCheck or false;
 

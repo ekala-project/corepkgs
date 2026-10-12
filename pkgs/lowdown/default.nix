@@ -52,12 +52,10 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   configurePhase = ''
-    runHook preConfigure
     ./configure PREFIX=''${!outputDev} \
                 BINDIR=''${!outputBin}/bin \
                 LIBDIR=''${!outputLib}/lib \
                 MANDIR=''${!outputMan}/share/man
-    runHook postConfigure
   '';
 
   # Fix rpath change on darwin to avoid failure like:
@@ -83,12 +81,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   doInstallCheck = !stdenv.hostPlatform.isDarwin || !enableDarwinSandbox;
   installCheckPhase = ''
-    runHook preInstallCheck
 
     echo '# TEST' > test.md
     $out/bin/lowdown test.md
 
-    runHook postInstallCheck
   '';
 
   doCheck = !stdenv.hostPlatform.isDarwin || !enableDarwinSandbox;

@@ -205,7 +205,6 @@ stdenv.mkDerivation (finalAttrs: {
   # validate dynamic linkage
   doInstallCheck = true;
   installCheckPhase = ''
-    runHook preInstallCheck
 
     $out/bin/gs --version
     $out/bin/gsx --version
@@ -223,7 +222,6 @@ stdenv.mkDerivation (finalAttrs: {
     done
     popd # examples
 
-    runHook postInstallCheck
   '';
 
   passthru.tests = {

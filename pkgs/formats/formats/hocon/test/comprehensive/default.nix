@@ -81,21 +81,17 @@ stdenvNoCC.mkDerivation {
 
   doCheck = true;
   checkPhase = ''
-    runHook preCheck
 
     diff -U3 ${./expected.txt} ${hocon-test-conf}
 
-    runHook postCheck
   '';
 
   installPhase = ''
-    runHook preInstall
 
     mkdir $out
     cp ${./expected.txt} $out/expected.txt
     cp ${hocon-test-conf} $out/hocon-test.conf
     cp ${hocon-test-conf.passthru.json} $out/hocon-test.json
 
-    runHook postInstall
   '';
 }

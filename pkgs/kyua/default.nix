@@ -98,9 +98,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeInstallCheckInputs = [ sqlite ];
 
   installCheckPhase = ''
-    runHook preInstallCheck
     HOME=$TMPDIR PATH=$out/bin:$PATH kyua test
-    runHook postInstallCheck
   '';
 
   meta = {

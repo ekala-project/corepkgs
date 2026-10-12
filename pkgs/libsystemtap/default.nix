@@ -27,12 +27,10 @@ stdenv.mkDerivation {
   buildInputs = [ elfutils ];
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out/include
     cp -r includes/* $out/include/
 
-    runHook postInstall
   '';
 
   meta = {

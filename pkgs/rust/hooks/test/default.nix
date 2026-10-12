@@ -54,7 +54,6 @@
     ];
     buildPhase = ''
       cargo build --profile release --target ${stdenv.hostPlatform.rust.rustcTarget}
-      runHook postBuild
     '';
   };
 
@@ -70,7 +69,6 @@
     ];
     buildPhase = ''
       cargo build --profile release --target ${stdenv.hostPlatform.rust.rustcTarget}
-      runHook postBuild
     '';
     installPhase = ''
       mkdir -p $out/bin
@@ -92,7 +90,6 @@
     ];
     buildPhase = ''
       cargo build --profile release --target ${stdenv.hostPlatform.rust.rustcTarget}
-      runHook postBuild
     '';
     installPhase = ''
       mkdir -p $out/bin

@@ -84,12 +84,10 @@ stdenv.mkDerivation (finalAttrs: {
   nativeCheckInputs = [ file ];
   inherit doCheck;
   checkPhase = ''
-    runHook preCheck
     # Patch shebangs for playTests
     patchShebangs ../programs/zstdgrep
     # local binaries do not have the correct rpath
     # ctest -R playTests # The only relatively fast test.
-    runHook postCheck
   '';
 
   preInstall = ''

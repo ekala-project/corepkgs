@@ -183,7 +183,6 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   buildPhase = ''
-    runHook preBuild
 
     ${pythonForPypy.interpreter} rpython/bin/rpython \
       --make-jobs="$NIX_BUILD_CORES" \
@@ -192,11 +191,9 @@ stdenv.mkDerivation (finalAttrs: {
       pypy/goal/targetpypystandalone.py \
       ${lib.optionalString ((toString optimizationLevel) == "1") "--withoutmod-cpyext"}
 
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out/{bin,lib/${libPrefix}}
 
@@ -218,7 +215,6 @@ stdenv.mkDerivation (finalAttrs: {
       if isPy38OrNewer then sitePackages else "lib/${libPrefix}/${sitePackages}"
     }/sitecustomize.py
 
-    runHook postInstall
   '';
 
   preFixup =

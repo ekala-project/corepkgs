@@ -37,9 +37,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   installPhase = ''
-    runHook preInstall
     install -D lkrg.ko $out/lib/modules/${kernel.modDirVersion}/extra/lkrg.ko
-    runHook postInstall
   '';
 
   meta = {

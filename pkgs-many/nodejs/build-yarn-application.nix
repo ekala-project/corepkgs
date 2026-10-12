@@ -84,11 +84,9 @@ stdenv.mkDerivation (
           null
         else
           ''
-            runHook preBuild
             if grep -q "\"${yarnBuildScript}\"" package.json 2>/dev/null; then
               yarn --offline ${yarnBuildScript} ${lib.escapeShellArgs yarnBuildFlags}
             fi
-            runHook postBuild
           ''
       );
 
@@ -100,7 +98,6 @@ stdenv.mkDerivation (
           null
         else
           ''
-            runHook preInstall
 
             mkdir -p $out/lib/node_modules/${yarnPackName}
             cp -r . $out/lib/node_modules/${yarnPackName}/
@@ -124,7 +121,6 @@ stdenv.mkDerivation (
               done
             fi
 
-            runHook postInstall
           ''
       );
 

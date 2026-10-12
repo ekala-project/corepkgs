@@ -20,22 +20,18 @@ let
         nativeBuildInputs = [ makeWrapper ];
 
         buildPhase = ''
-          runHook preBuild
 
           PYTHONPATH="${flit-core}/${python.sitePackages}" \
             ${python.interpreter} -m flit_core.wheel
 
-          runHook postBuild
         '';
 
         installPhase = ''
-          runHook preInstall
 
           PYTHONPATH="${installer}/${python.sitePackages}" \
             ${python.interpreter} -m installer \
               --destdir "$out" --prefix "" dist/*.whl
 
-          runHook postInstall
         '';
       }
       // attrs
@@ -58,7 +54,6 @@ buildBootstrapPythonModule build {
   # This would happen whenever the package to build has a dependency on
   #   another version of a package that is also a dependency of pyproject-build.
   installPhase = ''
-    runHook preInstall
 
     PYTHONPATH="${installer}/${python.sitePackages}" \
       ${python.interpreter} -m installer \
@@ -70,6 +65,5 @@ buildBootstrapPythonModule build {
       --prefix PYTHONPATH : "${bootstrap-packaging}/${sitePkgs}" \
       --prefix PYTHONPATH : "${bootstrap-tomli}/${sitePkgs}"
 
-    runHook postInstall
   '';
 }

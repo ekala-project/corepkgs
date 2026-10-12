@@ -20,11 +20,9 @@ stdenv.mkDerivation {
   dontStrip = stdenv.hostPlatform.isDarwin;
 
   installPhase = ''
-    runHook preInstall
     mkdir -p $out/share/go $out/bin
     cp -r . $out/share/go
     ln -s $out/share/go/bin/go $out/bin/go
-    runHook postInstall
   '';
 
   meta = {

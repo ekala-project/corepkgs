@@ -12,12 +12,10 @@ glibc.overrideAttrs (oldAttrs: {
   pname = "glibc-mtrace";
 
   buildPhase = ''
-    runHook preBuild
 
     mkdir malloc
     make -C ../glibc-${glibc.minorRelease}/malloc objdir=`pwd` `pwd`/malloc/mtrace;
 
-    runHook postBuild
   '';
 
   installPhase = ''

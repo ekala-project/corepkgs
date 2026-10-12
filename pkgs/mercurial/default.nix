@@ -278,7 +278,6 @@ self.overridePythonAttrs (origAttrs: {
         doCheck = false;
 
         installPhase = ''
-          runHook preInstall
 
           mkdir -p $out/bin
 
@@ -290,15 +289,12 @@ self.overridePythonAttrs (origAttrs: {
 
           ln -s ${self}/share $out/share
 
-          runHook postInstall
         '';
 
         installCheckPhase = ''
-          runHook preInstallCheck
 
           $out/bin/hg help >/dev/null || exit 1
 
-          runHook postInstallCheck
         '';
       };
 

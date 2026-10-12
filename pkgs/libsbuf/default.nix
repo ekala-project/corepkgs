@@ -45,7 +45,6 @@ bootstrapStdenv.mkDerivation (finalAttrs: {
   sourceRoot = "source";
 
   unpackPhase = ''
-    runHook preUnpack
 
     mkdir "$sourceRoot"
     for src in "''${srcs[@]}"; do
@@ -53,7 +52,6 @@ bootstrapStdenv.mkDerivation (finalAttrs: {
       cp "$src" "$sourceRoot/''${src#*-}"
     done
 
-    runHook postUnpack
   '';
 
   patches = [

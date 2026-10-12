@@ -99,12 +99,10 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
-    runHook preInstall
     install -Dt "$out/lib/firmware/ath9k_htc/" target_firmware/*.fw
     # make symlinks so that firmware will be automatically found
     ln -s htc_7010.fw "$out/lib/firmware/ath9k_htc/htc_7010-${stableVersion}.fw"
     ln -s htc_9271.fw "$out/lib/firmware/ath9k_htc/htc_9271-${stableVersion}.fw"
-    runHook postInstall
   '';
 
   passthru = {

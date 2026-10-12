@@ -38,11 +38,9 @@ stdenv.mkDerivation (finalAttr: {
   '';
 
   installPhase = ''
-    runHook preInstall
 
     install *.ko -Dm444 -t $out/lib/modules/${kernel.modDirVersion}/kernel/drivers/xpad-noone
 
-    runHook postInstall
   '';
 
   meta = {

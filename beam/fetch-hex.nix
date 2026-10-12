@@ -39,11 +39,9 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
-    runHook preInstall
     mkdir "$out"
     cp -Hrt "$out" .
     success=1
-    runHook postInstall
   '';
 
   inherit meta;

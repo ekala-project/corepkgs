@@ -90,7 +90,6 @@ stdenv.mkDerivation (finalAttrs: {
   # - as they are linked via symlinks, the relative location of them on the filesystem should be maintained
   # - Update: Now we're copying everything over due to broken symlink errors
   installPhase = ''
-    runHook preInstall
     mkdir -p $out/{bin,lib}
     mv packages/~vitest-pool-workers packages/vitest-pool-workers
     cp -r {fixtures,packages,node_modules} $out/lib
@@ -103,7 +102,6 @@ stdenv.mkDerivation (finalAttrs: {
       --prefix-each NODE_PATH : "$${NODE_PATH_ARRAY[@]}" \
       --add-flags $out/lib/packages/wrangler/bin/wrangler.js \
       --set-default SSL_CERT_FILE "${cacert}/etc/ssl/certs/ca-bundle.crt" # https://github.com/cloudflare/workers-sdk/issues/3264
-    runHook postInstall
   '';
   doInstallCheck = true;
   nativeInstallCheckInputs = [

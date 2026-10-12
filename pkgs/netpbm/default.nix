@@ -59,7 +59,6 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   configurePhase = ''
-    runHook preConfigure
 
     cp config.mk.in config.mk
 
@@ -91,9 +90,7 @@ stdenv.mkDerivation (finalAttrs: {
     echo "NETPBMLIBTYPE = dylib" >> config.mk
     echo "NETPBMLIBSUFFIX = dylib" >> config.mk
   ''
-  + ''
-    runHook postConfigure
-  '';
+  + "";
 
   env = {
     STRIPPROG = "${lib.getBin stdenv.cc.bintools.bintools}/bin/${stdenv.cc.targetPrefix}strip";
@@ -103,7 +100,6 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   installPhase = ''
-    runHook preInstall
 
     make package pkgdir=$out
 
@@ -119,7 +115,6 @@ stdenv.mkDerivation (finalAttrs: {
         wrapProgram "''${!outputBin}/bin/$prog" --prefix PATH : "''${!outputBin}/bin"
     done
 
-    runHook postInstall
   '';
 
   meta = {

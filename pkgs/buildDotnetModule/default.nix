@@ -57,7 +57,6 @@ stdenvNoCC.mkDerivation (
 
     configurePhase =
       remainingArgs.configurePhase or ''
-        runHook preConfigure
         export DOTNET_CLI_TELEMETRY_OPTOUT=1
         export DOTNET_NOLOGO=1
         ${lib.optionalString (nugetDeps != null) ''
@@ -65,23 +64,19 @@ stdenvNoCC.mkDerivation (
             ${lib.concatStringsSep " " dotnetFlags} \
             ${lib.concatStringsSep " " dotnetRestoreFlags}
         ''}
-        runHook postConfigure
       '';
 
     buildPhase =
       remainingArgs.buildPhase or ''
-        runHook preBuild
         dotnet build ${projectFlag} \
           -c ${buildType} \
           --no-restore \
           ${lib.concatStringsSep " " dotnetFlags} \
           ${lib.concatStringsSep " " dotnetBuildFlags}
-        runHook postBuild
       '';
 
     installPhase =
       remainingArgs.installPhase or ''
-        runHook preInstall
         dotnet publish ${projectFlag} \
           -c ${buildType} \
           -o $out/lib/${pname} \
@@ -94,7 +89,6 @@ stdenvNoCC.mkDerivation (
             lib.toList executables
           )}
         ''}
-        runHook postInstall
       '';
   }
 )

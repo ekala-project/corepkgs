@@ -24,7 +24,6 @@ mkAppleDerivation (finalAttrs: {
   nativeBuildInputs = [ unifdef ];
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p "$out/bin" "$out/libexec" "$out/share/availability"
 
@@ -94,7 +93,6 @@ mkAppleDerivation (finalAttrs: {
 
     patchShebangs "$out/bin"
 
-    runHook postInstall
   '';
 
   meta = {

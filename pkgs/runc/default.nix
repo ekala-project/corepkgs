@@ -52,19 +52,15 @@ buildGoModule (finalAttrs: {
   ];
 
   buildPhase = ''
-    runHook preBuild
     patchShebangs .
     make ${toString finalAttrs.makeFlags} runc man
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
     install -Dm755 runc $out/bin/runc
     installManPage man/*/*.[1-9]
     wrapProgram $out/bin/runc \
       --prefix PATH : /run/current-system/systemd/bin
-    runHook postInstall
   '';
 
   passthru.tests = {

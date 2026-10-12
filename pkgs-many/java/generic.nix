@@ -109,7 +109,6 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out
     cp -r * $out/
@@ -117,7 +116,6 @@ stdenv.mkDerivation (finalAttrs: {
     # Remove demo and sample directories to reduce closure size
     rm -rf $out/demo $out/sample || true
 
-    runHook postInstall
   '';
 
   postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''

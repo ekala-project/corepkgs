@@ -137,7 +137,6 @@ lib.extendMkDerivation {
         ++ lib.optionals useFakeRustfmt [ fakeRustfmt ];
 
       buildPhase = ''
-        runHook preBuild
 
         echo "Executing cargo-pgrx buildPhase"
         ${preBuildAndTest}
@@ -154,13 +153,11 @@ lib.extendMkDerivation {
 
         ${maybeLeaveBuildAndTestSubdir}
 
-        runHook postBuild
       '';
 
       preCheck = preBuildAndTest + args.preCheck or "";
 
       installPhase = ''
-        runHook preInstall
 
         echo "Executing buildPgrxExtension install"
 
@@ -173,7 +170,6 @@ lib.extendMkDerivation {
 
         ${maybeLeaveBuildAndTestSubdir}
 
-        runHook postInstall
       '';
 
       PGRX_PG_SYS_SKIP_BINDING_REWRITE = "1";

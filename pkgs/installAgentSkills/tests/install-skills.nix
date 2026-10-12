@@ -21,24 +21,20 @@ stdenvNoCC.mkDerivation {
 
   # build phase happens before the hook is called to install the skills
   buildPhase = ''
-    runHook preBuild
 
     for skill in xyz abc nix; do
       mkdir -p "skill-$skill"
       echo "This is skill $skill" > "skill-$skill/SKILL.md"
     done
 
-    runHook postBuild
   '';
 
   installCheckPhase = ''
-    runHook preInstallCheck
 
     for skill in xyz abc nix; do
       cmp "skill-$skill/SKILL.md" "$out/share/skills/$pname/skill-$skill/SKILL.md"
     done
 
-    runHook postInstallCheck
   '';
   doInstallCheck = true;
 

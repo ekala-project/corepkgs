@@ -29,7 +29,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out
     cp --no-preserve=mode --recursive \
@@ -37,7 +36,6 @@ stdenv.mkDerivation (finalAttrs: {
       include \
       $out/
 
-    runHook postInstall
   '';
 
   postFixup = ''

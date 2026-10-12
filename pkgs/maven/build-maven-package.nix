@@ -60,7 +60,6 @@ let
           impureEnvVars = lib.fetchers.proxyImpureEnvVars;
 
           buildPhase = ''
-            runHook preBuild
 
             MAVEN_EXTRA_ARGS="-B"
 
@@ -99,13 +98,10 @@ let
           + lib.optionalString (!buildOffline) ''
             mvn $MAVEN_EXTRA_ARGS package -Dmaven.repo.local=$out/.m2 ${mvnSkipTests} ${mvnParameters}
           ''
-          + ''
-            runHook postBuild
-          '';
+          + "";
 
           # keep only *.{pom,jar,sha1,nbm} and delete all ephemeral files with lastModified timestamps inside
           installPhase = ''
-            runHook preInstall
 
             find $out -type f \( \
               -name \*.lastUpdated \
@@ -113,7 +109,6 @@ let
               -o -name _remote.repositories \) \
               -delete
 
-            runHook postInstall
           '';
 
           # don't do any fixup
@@ -139,13 +134,11 @@ let
         };
 
         buildPhase = ''
-          runHook preBuild
 
           mvnDeps=$(cp -dpR ${fetchedMavenDeps}/.m2 ./ && chmod +w -R .m2 && pwd)
           runHook afterDepsSetup
           mvn package -o -nsu "-Dmaven.repo.local=$mvnDeps/.m2" ${mvnSkipTests} ${mvnParameters}
 
-          runHook postBuild
         '';
 
         meta = args.meta or { } // {

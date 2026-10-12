@@ -19,23 +19,17 @@ stdenv.mkDerivation (
     ];
 
     configurePhase = ''
-      runHook preConfigure
       export MAKEFLAGS+="''${enableParallelBuilding:+-j$NIX_BUILD_CORES}"
       export R_LIBS_SITE="$R_LIBS_SITE''${R_LIBS_SITE:+:}$out/library"
-      runHook postConfigure
     '';
 
-    buildPhase = ''
-      runHook preBuild
-      runHook postBuild
-    '';
+    buildPhase = "";
 
     installFlags = if attrs.doCheck or false then [ ] else [ "--no-test-load" ];
 
     rCommand = "R";
 
     installPhase = ''
-      runHook preInstall
       mkdir -p "$out/library"
 
       # R expands configure arguments through a shell, so quote each array
@@ -51,7 +45,6 @@ stdenv.mkDerivation (
         "''${installFlags[@]}" \
         -l "$out/library" \
         .
-      runHook postInstall
     '';
 
     postFixup = ''

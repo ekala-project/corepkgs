@@ -839,13 +839,11 @@ stdenv.mkDerivation (finalAttrs: {
   # check udev rules exposed by systemd
   # can't use `udevCheckHook` here as that would introduce infinite recursion
   installCheckPhase = ''
-    runHook preInstallCheck
 
     ${lib.optionalString (
       !buildLibsOnly
     ) "$out/bin/udevadm verify --resolve-names=late --no-style $out/lib/udev/rules.d"}
 
-    runHook postInstallCheck
   '';
 
   # Avoid *.EFI binary stripping.

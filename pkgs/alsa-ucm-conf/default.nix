@@ -19,7 +19,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   dontBuild = true;
 
   installPhase = ''
-    runHook preInstall
 
     substituteInPlace ucm2/lib/card-init.conf \
       --replace-fail "/bin/rm" "${coreutils}/bin/rm" \
@@ -34,7 +33,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     mkdir -p $out/share/alsa
     cp -r ucm ucm2 $out/share/alsa
 
-    runHook postInstall
   '';
 
   passthru.updateScript = directoryListingUpdater {

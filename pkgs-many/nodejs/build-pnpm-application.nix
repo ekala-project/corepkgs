@@ -104,13 +104,11 @@ stdenv.mkDerivation (
           null
         else
           ''
-            runHook preBuild
             ${lib.optionalString (pnpmRoot != null) "pushd ${pnpmRoot}"}
             if grep -q "\"${pnpmBuildScript}\"" package.json 2>/dev/null; then
               pnpm run ${workspaceFlags} ${pnpmBuildScript} ${lib.escapeShellArgs pnpmBuildFlags}
             fi
             ${lib.optionalString (pnpmRoot != null) "popd"}
-            runHook postBuild
           ''
       );
 
@@ -122,7 +120,6 @@ stdenv.mkDerivation (
           null
         else
           ''
-            runHook preInstall
 
             mkdir -p $out/lib/node_modules/${pnpmPackName}
             cp -r . $out/lib/node_modules/${pnpmPackName}/
@@ -146,7 +143,6 @@ stdenv.mkDerivation (
               done
             fi
 
-            runHook postInstall
           ''
       );
 

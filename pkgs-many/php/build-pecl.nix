@@ -37,12 +37,10 @@ stdenv.mkDerivation (
     inherit makeFlags;
 
     installPhase = ''
-      runHook preInstall
 
       mkdir -p $out/lib/php/extensions
       cp modules/*.so $out/lib/php/extensions/
 
-      runHook postInstall
     '';
 
     meta = args.meta or { } // {

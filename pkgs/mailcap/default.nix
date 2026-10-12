@@ -21,7 +21,6 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   installPhase = ''
-    runHook preInstall
 
     substituteInPlace mailcap --replace "/usr/bin/" ""
     sh generate-nginx-mimetypes.sh < mime.types > nginx-mime.types
@@ -30,7 +29,6 @@ stdenv.mkDerivation (finalAttrs: {
     install -D -m0644 -t $out/etc mailcap mime.types
     install -D -m0644 -t $out/share/man/man5 mailcap.5
 
-    runHook postInstall
   '';
 
   passthru = lib.optionalAttrs (nix-update != null) {

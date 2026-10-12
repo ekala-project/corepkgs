@@ -21,7 +21,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   nativeBuildInputs = [ makeWrapper ];
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out/maven
     cp -r apache-maven-${finalAttrs.version}/* $out/maven
@@ -31,7 +30,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     makeWrapper $out/maven/bin/mvnDebug $out/bin/mvnDebug \
       --set-default JAVA_HOME "${java}"
 
-    runHook postInstall
   '';
 
   passthru =

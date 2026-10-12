@@ -319,7 +319,6 @@ lib.makeOverridable (
     '';
 
     configurePhase = ''
-      runHook preConfigure
 
       mkdir build
       export buildRoot="$(pwd)/build"
@@ -335,7 +334,6 @@ lib.makeOverridable (
       # reads the existing .config file and prompts the user for options in
       # the current kernel source that are not found in the file.
       make "''${makeFlags[@]}" oldconfig
-      runHook postConfigure
 
       make "''${makeFlags[@]}" prepare
       actualModDirVersion="$(cat $buildRoot/include/config/kernel.release)"

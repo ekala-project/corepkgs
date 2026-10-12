@@ -96,23 +96,17 @@ in
 
               nativeBuildInputs = [ libconfig-generator ];
               buildPhase = ''
-                runHook preBuild
                 printf "%s" "$json" | libconfig-generator > output.cfg
-                runHook postBuild
               '';
 
               doCheck = true;
               nativeCheckInputs = [ libconfig-validator ];
               checkPhase = ''
-                runHook preCheck
                 libconfig-validator output.cfg
-                runHook postCheck
               '';
 
               installPhase = ''
-                runHook preInstall
                 mv output.cfg $out
-                runHook postInstall
               '';
 
               passthru.json = writeText "${finalAttrs.name}.json" finalAttrs.json;

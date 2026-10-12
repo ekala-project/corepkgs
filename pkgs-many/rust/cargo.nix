@@ -104,9 +104,7 @@ rustPlatform.buildRustPackage.override
 
     doInstallCheck = !stdenv.hostPlatform.isStatic && stdenv.hostPlatform.isElf;
     installCheckPhase = ''
-      runHook preInstallCheck
       ${stdenv.cc.targetPrefix}readelf -a $out/bin/.cargo-wrapped | grep -F 'Shared library: [libcurl.so'
-      runHook postInstallCheck
     '';
 
     # Make sure our build rustc/cargo never make it into our runtime closure

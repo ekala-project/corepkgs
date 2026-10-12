@@ -28,13 +28,11 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
-    runHook preInstall
     mkdir -p "$out/_checkouts"
     for i in ./_build/default/lib/* ; do
        echo "$i"
        cp -R "$i" "$out/_checkouts"
     done
-    runHook postInstall
   '';
 
   outputHashAlgo = "sha256";

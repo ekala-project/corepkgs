@@ -30,17 +30,13 @@ stdenv.mkDerivation (finalAttrs: {
     '';
 
   buildPhase = ''
-    runHook preBuild
     make -C $moduleRoot/blackmagic-$bmVersion -j$NIX_BUILD_CORES
     make -C $moduleRoot/blackmagic-io-$bmVersion -j$NIX_BUILD_CORES
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
     make -C $KERNELDIR M=$moduleRoot/blackmagic-$bmVersion modules_install
     make -C $KERNELDIR M=$moduleRoot/blackmagic-io-$bmVersion modules_install
-    runHook postInstall
   '';
 
   meta = {

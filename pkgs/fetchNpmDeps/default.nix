@@ -45,7 +45,6 @@ stdenvNoCC.mkDerivation (
     ];
 
     buildPhase = ''
-      runHook preBuild
 
       if [[ ! -e package-lock.json ]]; then
         echo
@@ -62,7 +61,6 @@ stdenvNoCC.mkDerivation (
 
       prefetch-npm-deps package-lock.json $out
 
-      runHook postBuild
     '';
 
     dontInstall = true;

@@ -135,7 +135,6 @@ lib.makeOverridable (
 
       unpackPhase =
         attrs.unpackPhase or ''
-          runHook preUnpack
 
           if [[ -f $src && $src == *.gem ]]; then
             if [[ -z "''${dontBuild-}" ]]; then
@@ -160,7 +159,6 @@ lib.makeOverridable (
             preUnpack="" postUnpack="" unpackPhase
           fi
 
-          runHook postUnpack
         '';
 
       # As of ruby 3.0, ruby headers require -fdeclspec when building with clang
@@ -178,7 +176,6 @@ lib.makeOverridable (
 
       buildPhase =
         attrs.buildPhase or ''
-          runHook preBuild
 
           if [[ "$gemType" == "gem" ]]; then
             if [[ -z "$gemspec" ]]; then
@@ -203,7 +200,6 @@ lib.makeOverridable (
             git add .
           fi
 
-          runHook postBuild
         '';
 
       # Note:
@@ -212,7 +208,6 @@ lib.makeOverridable (
       #   See https://github.com/bundler/bundler/issues/3327
       installPhase =
         attrs.installPhase or ''
-          runHook preInstall
 
           export GEM_HOME=$out/${ruby.gemPath}
           mkdir -p $GEM_HOME
@@ -292,7 +287,6 @@ lib.makeOverridable (
             patchShebangs --update --host -- "$GEM_HOME"/bin
           fi
 
-          runHook postInstall
         '';
 
       propagatedBuildInputs = gemPath ++ propagatedBuildInputs;

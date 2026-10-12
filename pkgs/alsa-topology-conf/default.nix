@@ -16,12 +16,10 @@ stdenv.mkDerivation (finalAttrs: {
   dontBuild = true;
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out/share/alsa
     cp -r topology $out/share/alsa
 
-    runHook postInstall
   '';
 
   meta = {

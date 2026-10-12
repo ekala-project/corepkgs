@@ -313,11 +313,9 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
   ];
 
   checkPhase = ''
-    runHook preCheck
 
     make test
 
-    runHook postCheck
   '';
 
   passthru.tests = {

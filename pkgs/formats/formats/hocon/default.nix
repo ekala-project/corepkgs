@@ -150,23 +150,17 @@ in
 
               nativeBuildInputs = [ hocon-generator ];
               buildPhase = ''
-                runHook preBuild
                 printf '%s' "$json" | hocon-generator > output.conf
-                runHook postBuild
               '';
 
               inherit doCheck;
               nativeCheckInputs = [ hocon-validator ];
               checkPhase = ''
-                runHook preCheck
                 hocon-validator output.conf
-                runHook postCheck
               '';
 
               installPhase = ''
-                runHook preInstall
                 mv output.conf $out
-                runHook postInstall
               '';
 
               passthru.json = writeText "${name}.json" finalAttrs.json;

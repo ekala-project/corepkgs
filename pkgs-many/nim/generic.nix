@@ -43,18 +43,15 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   buildPhase = ''
-    runHook preBuild
 
     # Build Nim compiler
     sh build.sh
     ./bin/nim c -d:release koch
     ./koch boot -d:release
 
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
 
     # Install binaries
     install -Dt $out/bin bin/*
@@ -72,7 +69,6 @@ stdenv.mkDerivation (finalAttrs: {
     wrapProgram $out/bin/nim \
       --prefix PATH : ${lib.makeBinPath [ stdenv.cc ]}
 
-    runHook postInstall
   '';
 
   passthru = {

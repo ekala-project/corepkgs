@@ -85,7 +85,6 @@ let
       ++ nativeBuildInputs;
 
       buildPhase = ''
-        runHook preBuild
 
         if [ -n "''${cargoRoot-}" ]; then
           cd "$cargoRoot"
@@ -93,7 +92,6 @@ let
 
         fetch-cargo-vendor-util create-vendor-staging ./Cargo.lock "$out"
 
-        runHook postBuild
       '';
 
       dontConfigure = true;

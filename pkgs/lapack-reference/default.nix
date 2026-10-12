@@ -77,9 +77,7 @@ stdenv.mkDerivation (finalAttrs: {
   ctestArgs = lib.optionalString stdenv.hostPlatform.isDarwin "-E '^(CBLAS-(x[sdcz]cblat[23]))$'";
 
   checkPhase = ''
-    runHook preCheck
     ctest ${finalAttrs.ctestArgs}
-    runHook postCheck
   '';
 
   passthru.tests = {

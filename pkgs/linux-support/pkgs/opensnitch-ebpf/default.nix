@@ -41,13 +41,11 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   installPhase = ''
-    runHook preInstall
 
     for file in opensnitch*.o; do
       install -Dm644 "$file" "$out/etc/opensnitchd/$file"
     done
 
-    runHook postInstall
   '';
 
   postFixup = ''

@@ -29,12 +29,10 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
-    runHook preInstall
 
     find . -name '*.ko' -exec xz -f {} \;
     install -Dm444 -t $out/lib/modules/${kernel.modDirVersion}/kernel/drivers/platform/x86 *.ko.xz
 
-    runHook postInstall
   '';
 
   meta = {

@@ -33,30 +33,25 @@ stdenv.mkDerivation (
 
     configurePhase =
       args.configurePhase or ''
-        runHook preConfigure
 
         # Set up Gradle cache
         export GRADLE_USER_HOME=$TMPDIR/.gradle
         export JAVA_HOME=${java}
 
-        runHook postConfigure
       '';
 
     buildPhase =
       args.buildPhase or ''
-        runHook preBuild
 
         gradle ${gradleBuildTask} \
           --no-daemon \
           --offline \
           --gradle-user-home=$GRADLE_USER_HOME
 
-        runHook postBuild
       '';
 
     installPhase =
       args.installPhase or ''
-        runHook preInstall
 
         mkdir -p $out/share/java $out/bin
 
@@ -73,7 +68,6 @@ stdenv.mkDerivation (
             chmod +x $out/bin/${pname}
         ''}
 
-        runHook postInstall
       '';
 
     meta = args.meta or { } // {

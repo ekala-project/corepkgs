@@ -114,12 +114,10 @@ stdenv.mkDerivation (finalAttrs: {
     else
       null;
   installCheckPhase = ''
-    runHook preInstallCheck
 
     export TZDIR=${tzdata}/share/zoneinfo
     ctest --output-on-failure
 
-    runHook postInstallCheck
   '';
 
   meta = {
