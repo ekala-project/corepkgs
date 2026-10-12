@@ -1251,8 +1251,6 @@ unpackFile() {
 
 
 unpackPhase() {
-    runHook preUnpack
-
     if [ -z "${srcs:-}" ]; then
         if [ -z "${src:-}" ]; then
             # shellcheck disable=SC2016
@@ -1320,12 +1318,10 @@ unpackPhase() {
         chmod -R u+w -- "$sourceRoot"
     fi
 
-    runHook postUnpack
 }
 
 
 patchPhase() {
-    runHook prePatch
 
     local -a patchesArray
     concatTo patchesArray patches
@@ -1356,7 +1352,6 @@ patchPhase() {
         $uncompress < "$i" 2>&1 | patch "${flagsArray[@]}"
     done
 
-    runHook postPatch
 }
 
 
@@ -1377,8 +1372,6 @@ fixLibtool() {
 
 
 configurePhase() {
-    runHook preConfigure
-
     # set to empty if unset
     : "${configureScript=}"
 
@@ -1455,12 +1448,10 @@ configurePhase() {
         echo "no configure script, doing nothing"
     fi
 
-    runHook postConfigure
 }
 
 
 buildPhase() {
-    runHook preBuild
 
     if [[ -z "${makeFlags-}" && -z "${makefile:-}" && ! ( -e Makefile || -e makefile || -e GNUmakefile ) ]]; then
         echo "no Makefile or custom buildPhase, doing nothing"
@@ -1479,16 +1470,13 @@ buildPhase() {
         unset flagsArray
     fi
 
-    runHook postBuild
 }
 
 
 checkPhase() {
-    runHook preCheck
 
     if [[ -z "${foundMakefile:-}" ]]; then
         echo "no Makefile or custom checkPhase, doing nothing"
-        runHook postCheck
         return
     fi
 
@@ -1519,17 +1507,13 @@ checkPhase() {
         unset flagsArray
     fi
 
-    runHook postCheck
 }
 
 
 installPhase() {
-    runHook preInstall
-
     # Dont reuse 'foundMakefile' set in buildPhase, a makefile may have been created in buildPhase
     if [[ -z "${makeFlags-}" && -z "${makefile:-}" && ! ( -e Makefile || -e makefile || -e GNUmakefile ) ]]; then
         echo "no Makefile or custom installPhase, doing nothing"
-        runHook postInstall
         return
     else
         foundMakefile=1
@@ -1551,7 +1535,6 @@ installPhase() {
     make ${makefile:+-f $makefile} "${flagsArray[@]}"
     unset flagsArray
 
-    runHook postInstall
 }
 
 
@@ -1565,8 +1548,6 @@ fixupPhase() {
         # for set*id bits see #300635
         if [ -e "${!output}" ]; then chmod -R u+w,u-s,g-s "${!output}"; fi
     done
-
-    runHook preFixup
 
     # Apply fixup to each output.
     local output
@@ -1606,13 +1587,10 @@ fixupPhase() {
         printWords "${propagatedUserEnvPkgs[@]}" > "${!outputBin}/nix-support/propagated-user-env-packages"
     fi
 
-    runHook postFixup
 }
 
 
 installCheckPhase() {
-    runHook preInstallCheck
-
     if [[ -z "${foundMakefile:-}" ]]; then
         echo "no Makefile or custom installCheckPhase, doing nothing"
     #TODO(@oxij): should flagsArray influence make -n?
@@ -1635,13 +1613,10 @@ installCheckPhase() {
         unset flagsArray
     fi
 
-    runHook postInstallCheck
 }
 
 
 distPhase() {
-    runHook preDist
-
     local flagsArray=()
     concatTo flagsArray distFlags distFlagsArray distTarget=dist
 
@@ -1657,7 +1632,6 @@ distPhase() {
         cp -pvd ${tarballs[*]:-*.tar.gz} "$out/tarballs"
     fi
 
-    runHook postDist
 }
 
 
@@ -1703,15 +1677,25 @@ runPhase() {
     if [[ "$curPhase" = installCheckPhase && -z "${doInstallCheck:-}" ]]; then return; fi
     if [[ "$curPhase" = distPhase && -z "${doDist:-}" ]]; then return; fi
 
+    # Derive pre/post hook names from the phase name.
+    # E.g. buildPhase -> preBuild / postBuild
+    local phaseName="${curPhase%Phase}"
+    local preHook="pre${phaseName^}"
+    local postHook="post${phaseName^}"
+
     showPhaseHeader "$curPhase"
     dumpVars
 
     local startTime endTime
     startTime=$(date +"%s")
 
+    runHook "$preHook"
+
     # Evaluate the variable named $curPhase if it exists, otherwise the
     # function named $curPhase.
     eval "${!curPhase:-$curPhase}"
+
+    runHook "$postHook"
 
     endTime=$(date +"%s")
 

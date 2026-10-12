@@ -1,8 +1,6 @@
 # shellcheck shell=bash disable=SC2206
 
 sconsBuildPhase() {
-    runHook preBuild
-
     if [ -n "$prefix" ]; then
         mkdir -p "$prefix"
     fi
@@ -18,13 +16,9 @@ sconsBuildPhase() {
 
     echoCmd 'scons build flags' "${flagsArray[@]}"
     scons "${flagsArray[@]}"
-
-    runHook postBuild
 }
 
 sconsInstallPhase() {
-    runHook preInstall
-
     if [ -n "$prefix" ]; then
         mkdir -p "$prefix"
     fi
@@ -40,13 +34,9 @@ sconsInstallPhase() {
 
     echoCmd 'scons install flags' "${flagsArray[@]}"
     scons "${flagsArray[@]}"
-
-    runHook postInstall
 }
 
 sconsCheckPhase() {
-    runHook preCheck
-
     if [ -z "${checkTarget:-}" ]; then
         if scons -n check >/dev/null 2>&1; then
             checkTarget="check"
@@ -66,8 +56,6 @@ sconsCheckPhase() {
         echoCmd 'scons check flags' "${flagsArray[@]}"
         scons "${flagsArray[@]}"
     fi
-
-    runHook postCheck
 }
 
 if [ -z "${dontUseSconsBuild-}" ] && [ -z "${buildPhase-}" ]; then

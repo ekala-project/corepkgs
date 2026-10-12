@@ -25,6 +25,14 @@ changes differ significantly from whath one would expct with Nixpkgs.
 
 ## Package paradigms
 
+- `runPhase` automatically calls `runHook preFoo` / `runHook postFoo` around
+  each phase, so phase functions no longer need to call them manually.
+  - Hook names are derived from the phase name: `buildPhase` →
+    `preBuild` / `postBuild`.
+  - When a phase is skipped via its toggle (`dontBuild`, `dontConfigure`, etc.),
+    the corresponding pre/post hooks are also skipped.
+  - Custom phases inserted via `prePhases`, `preBuildPhases`, etc. also get
+    automatic pre/post hooks if they follow the `fooPhase` naming convention.
 - `__structuredAttrs = true` is the default — derivation attributes are arrays, not space-separated strings.
 - setupHooks for build managers are now explicit and opt-in.
   - `meson.configurePhaseHook` and `cmake.configurePhaseHook` now needs to be specified.

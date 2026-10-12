@@ -5,7 +5,6 @@ echo "Sourcing unittest-check-hook"
 
 unittestCheckPhase() {
     echo "Executing unittestCheckPhase"
-    runHook preCheck
 
     local -a flagsArray=()
 
@@ -16,7 +15,6 @@ unittestCheckPhase() {
     echoCmd 'unittest flags' "${flagsArray[@]}"
     @pythonCheckInterpreter@ -m unittest discover "${flagsArray[@]}"
 
-    runHook postCheck
     echo "Finished executing unittestCheckPhase"
 }
 

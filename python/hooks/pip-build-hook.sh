@@ -5,7 +5,6 @@ echo "Sourcing pip-build-hook"
 
 pipBuildPhase() {
     echo "Executing pipBuildPhase"
-    runHook preBuild
 
     mkdir -p dist
 
@@ -24,7 +23,6 @@ pipBuildPhase() {
     @pythonInterpreter@ -m pip wheel "${flagsArray[@]}" .
     echo "Finished creating a wheel..."
 
-    runHook postBuild
     echo "Finished executing pipBuildPhase"
 }
 

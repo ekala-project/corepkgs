@@ -45,13 +45,13 @@ rustPlatform.buildRustPackage.override
       cmake
       installShellFiles
       makeWrapper
+      python3
       (lib.getDev pkgsHostHost.curl)
       zlib
     ];
     buildInputs = [
       file
       curl
-      python3
       openssl
       zlib
     ];

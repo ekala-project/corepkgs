@@ -3,8 +3,6 @@
 cargoNextestHook() {
     echo "Executing cargoNextestHook"
 
-    runHook preCheck
-
     if [[ -n "${buildAndTestSubdir-}" ]]; then
         pushd "${buildAndTestSubdir}"
     fi
@@ -44,8 +42,6 @@ cargoNextestHook() {
     fi
 
     echo "Finished cargoNextestHook"
-
-    runHook postCheck
 }
 
 if [ -z "${dontCargoCheck-}" ] && [ -z "${checkPhase-}" ]; then

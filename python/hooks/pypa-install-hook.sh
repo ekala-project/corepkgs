@@ -3,7 +3,6 @@ echo "Sourcing pypa-install-hook"
 
 pypaInstallPhase() {
     echo "Executing pypaInstallPhase"
-    runHook preInstall
 
     pushd dist >/dev/null
 
@@ -16,7 +15,6 @@ pypaInstallPhase() {
 
     export PYTHONPATH="$out/@pythonSitePackages@:$PYTHONPATH"
 
-    runHook postInstall
     echo "Finished executing pypaInstallPhase"
 }
 

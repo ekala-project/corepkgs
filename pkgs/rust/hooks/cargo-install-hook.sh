@@ -17,8 +17,6 @@ cargoInstallPostBuildHook() {
 cargoInstallHook() {
     echo "Executing cargoInstallHook"
 
-    runHook preInstall
-
     # rename the output dir to a architecture independent one
 
     releaseDir=target/@targetSubdirectory@/$cargoBuildType
@@ -42,7 +40,6 @@ cargoInstallHook() {
     find "${releaseDir}" -maxdepth 1 -name '*.dSYM' -exec cp -RLt $out/bin/ {} +
 
     rmdir --ignore-fail-on-non-empty $out/lib $out/bin
-    runHook postInstall
 
     echo "Finished cargoInstallHook"
 }

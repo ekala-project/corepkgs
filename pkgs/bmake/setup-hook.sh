@@ -9,8 +9,6 @@ addMakeFlags() {
 }
 
 bmakeBuildPhase() {
-    runHook preBuild
-
     local flagsArray=(
         ${enableParallelBuilding:+-j${NIX_BUILD_CORES}}
         SHELL="$SHELL"
@@ -19,13 +17,9 @@ bmakeBuildPhase() {
 
     nixInfoLog "${FUNCNAME[0]}: flagsArray: ${flagsArray[@]}"
     bmake ${makefile:+-f $makefile} "${flagsArray[@]}"
-
-    runHook postBuild
 }
 
 bmakeCheckPhase() {
-    runHook preCheck
-
     if [ -z "${checkTarget:-}" ]; then
         #TODO(@oxij): should flagsArray influence make -n?
         if bmake -n ${makefile:+-f $makefile} check >/dev/null 2>&1; then
@@ -47,13 +41,9 @@ bmakeCheckPhase() {
         nixInfoLog "${FUNCNAME[0]}: flagsArray: ${flagsArray[@]}"
         bmake ${makefile:+-f $makefile} "${flagsArray[@]}"
     fi
-
-    runHook postCheck
 }
 
 bmakeInstallPhase() {
-    runHook preInstall
-
     if [ -n "$prefix" ]; then
         mkdir -p "$prefix"
     fi
@@ -66,13 +56,9 @@ bmakeInstallPhase() {
 
     nixInfoLog "${FUNCNAME[0]}: flagsArray: ${flagsArray[@]}"
     bmake ${makefile:+-f $makefile} "${flagsArray[@]}"
-
-    runHook postInstall
 }
 
 bmakeDistPhase() {
-    runHook preDist
-
     if [ -n "$prefix" ]; then
         mkdir -p "$prefix"
     fi
@@ -90,8 +76,6 @@ bmakeDistPhase() {
         # wildcards in there.
         cp -pvd ${tarballs:-*.tar.gz} "$out/tarballs"
     fi
-
-    runHook postDist
 }
 
 preConfigureHooks+=(addMakeFlags)

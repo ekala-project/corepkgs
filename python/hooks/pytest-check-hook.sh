@@ -22,7 +22,6 @@ function _pytestIncludeExcludeExpr() {
 
 function pytestCheckPhase() {
     echo "Executing pytestCheckPhase"
-    runHook preCheck
 
     # Compose arguments
     local -a flagsArray=(-m pytest)
@@ -90,7 +89,6 @@ EOF
     echoCmd 'pytest flags' "${flagsArray[@]}"
     @pythonCheckInterpreter@ "${flagsArray[@]}"
 
-    runHook postCheck
     echo "Finished executing pytestCheckPhase"
 }
 
