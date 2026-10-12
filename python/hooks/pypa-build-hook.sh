@@ -5,7 +5,6 @@ echo "Sourcing pypa-build-hook"
 
 pypaBuildPhase() {
     echo "Executing pypaBuildPhase"
-    runHook preBuild
 
     local -a flagsArray=(
         --no-isolation
@@ -19,7 +18,6 @@ pypaBuildPhase() {
     @build@/bin/pyproject-build "${flagsArray[@]}"
     echo "Finished creating a wheel..."
 
-    runHook postBuild
     echo "Finished executing pypaBuildPhase"
 }
 

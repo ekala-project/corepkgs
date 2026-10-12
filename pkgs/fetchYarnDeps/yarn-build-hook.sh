@@ -1,5 +1,4 @@
 yarnBuildHook() {
-    runHook preBuild
     echo "Executing yarnBuildHook"
 
     if [ -z "${yarnBuildScript-}" ]; then
@@ -16,7 +15,6 @@ yarnBuildHook() {
     yarn --offline "$yarnBuildScript" $yarnBuildFlags
 
     echo "finished yarnBuildHook"
-    runHook postBuild
 }
 
 if [[ -z "${dontYarnBuild-}" && -z "${buildPhase-}" ]]; then

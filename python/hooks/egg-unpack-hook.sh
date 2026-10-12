@@ -3,11 +3,8 @@ echo "Sourcing egg setup hook"
 
 eggUnpackPhase() {
     echo "Executing eggUnpackPhase"
-    runHook preUnpack
 
     cp "$src" "$(stripHash "$src")"
-
-    # runHook postUnpack # Calls find...?
     echo "Finished executing eggUnpackPhase"
 }
 

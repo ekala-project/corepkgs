@@ -91,8 +91,6 @@ concatMesonEntryFlagsTo() {
 }
 
 mesonConfigurePhase() {
-    runHook preConfigure
-
     : ${mesonBuildDir:=build}
 
     local flagsArray=()
@@ -147,12 +145,9 @@ mesonConfigurePhase() {
         installPhase=mesonInstallPhase
     fi
 
-    runHook postConfigure
 }
 
 mesonCheckPhase() {
-    runHook preCheck
-
     local flagsArray=()
     concatTo flagsArray mesonCheckFlags mesonCheckFlagsArray
 
@@ -171,12 +166,9 @@ mesonCheckPhase() {
     echoCmd 'mesonCheckPhase flags' "${flagsArray[@]}"
     meson test --no-rebuild --print-errorlogs --max-lines=1000000 "${flagsArray[@]}"
 
-    runHook postCheck
 }
 
 mesonInstallPhase() {
-    runHook preInstall
-
     local flagsArray=()
 
     if [[ -n "$mesonInstallTags" ]]; then
@@ -187,7 +179,6 @@ mesonInstallPhase() {
     echoCmd 'mesonInstallPhase flags' "${flagsArray[@]}"
     meson install --no-rebuild "${flagsArray[@]}"
 
-    runHook postInstall
 }
 
 if [ -z "${dontUseMesonConfigure-}" ] && [ -z "${configurePhase-}" ]; then

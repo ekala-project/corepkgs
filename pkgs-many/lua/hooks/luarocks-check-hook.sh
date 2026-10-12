@@ -3,11 +3,9 @@ echo "Sourcing luarocks-check-hook.sh"
 
 luarocksCheckPhase () {
     echo "Executing luarocksCheckPhase"
-    runHook preCheck
 
     luarocks test
 
-    runHook postCheck
     echo "Finished executing luarocksCheckPhase"
 }
 

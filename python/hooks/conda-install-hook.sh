@@ -3,7 +3,6 @@ echo "Sourcing conda install hook"
 
 condaInstallPhase() {
     echo "Executing condaInstallPhase"
-    runHook preInstall
 
     # There are two different formats of conda packages.
     # It either contains only a site-packages directory
@@ -17,7 +16,6 @@ condaInstallPhase() {
         rm $out/env-vars
     fi
 
-    runHook postInstall
     echo "Finished executing condaInstallPhase"
 }
 

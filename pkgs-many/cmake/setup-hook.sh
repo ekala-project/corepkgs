@@ -104,8 +104,6 @@ parseShareDocName() {
 }
 
 cmakeConfigurePhase() {
-    runHook preConfigure
-
     # default to CMake defaults if unset
     : ${cmakeBuildDir:=build}
 
@@ -216,7 +214,6 @@ cmakeConfigurePhase() {
         echo "cmake: enabled parallel installing"
     fi
 
-    runHook postConfigure
 }
 
 _fixCmakeIncludeDir() {

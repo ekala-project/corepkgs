@@ -4,7 +4,6 @@ echo "Sourcing busted-check-hook.sh"
 
 bustedCheckPhase () {
     echo "Executing bustedCheckPhase"
-    runHook preCheck
 
     if command -v nlua && [ -z "${bustedNoNlua-}" ]; then
       bustedFlags+=("--lua=nlua")
@@ -12,7 +11,6 @@ bustedCheckPhase () {
 
     busted "${bustedFlags[@]}"
 
-    runHook postCheck
     echo "Finished executing bustedCheckPhase"
 }
 

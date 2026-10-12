@@ -3,14 +3,10 @@
 mixCompileHook() {
   echo "Executing mixCompileHook"
 
-  runHook preBuild
-
   local flagsArray=()
   concatTo flagsArray mixCompileFlags
 
   mix compile --no-deps-check "${flagsArray[@]}"
-
-  runHook postBuild
 
   echo "Finished mixCompileHook"
 }

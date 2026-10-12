@@ -1,8 +1,6 @@
 # shellcheck shell=bash disable=SC2206
 
 wafConfigurePhase() {
-    runHook preConfigure
-
     if [ -f "${wafPath:=./waf}" ]; then
         patchShebangs --build "${wafPath}"
     else
@@ -32,25 +30,17 @@ wafConfigurePhase() {
         enableParallelInstalling=1
         echo "waf: enabled parallel installing"
     fi
-
-    runHook postConfigure
 }
 
 wafBuildPhase () {
-    runHook preBuild
-
     local flagsArray=( ${enableParallelBuilding:+-j ${NIX_BUILD_CORES}} )
     concatTo flagsArray wafFlags wafFlagsArray wafBuildFlags wafBuildFlagsArray wafBuildTargets=build
 
     echoCmd 'waf build flags' "${flagsArray[@]}"
     "$wafPath" "${flagsArray[@]}"
-
-    runHook postBuild
 }
 
 wafInstallPhase() {
-    runHook preInstall
-
     if [ -n "$prefix" ]; then
         mkdir -p "$prefix"
     fi
@@ -60,8 +50,6 @@ wafInstallPhase() {
 
     echoCmd 'waf install flags' "${flagsArray[@]}"
     "$wafPath" "${flagsArray[@]}"
-
-    runHook postInstall
 }
 
 if [ -z "${dontUseWafConfigure-}" ] && [ -z "${configurePhase-}" ]; then

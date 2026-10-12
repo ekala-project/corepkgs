@@ -3,8 +3,6 @@
 yarnInstallHook() {
     echo "Executing yarnInstallHook"
 
-    runHook preInstall
-
     local -r packageOut="$out/lib/node_modules/$(@jq@ --raw-output '.name' ./package.json)"
     mkdir -p "$packageOut"
 
@@ -68,8 +66,6 @@ yarnInstallHook() {
 
         cp -r node_modules "$nodeModulesPath"
     fi
-
-    runHook postInstall
 
     echo "Finished yarnInstallHook"
 }

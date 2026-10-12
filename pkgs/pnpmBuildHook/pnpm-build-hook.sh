@@ -45,11 +45,7 @@ pnpmBuildHook() {
 }
 
 pnpmBuildPhase() {
-  runHook preBuild
-
   pnpmBuildHook
-
-  runHook postBuild
 }
 
 if [ -z "${dontPnpmBuild-}" ] && [ -z "${buildPhase-}" ]; then

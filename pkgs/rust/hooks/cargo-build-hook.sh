@@ -3,8 +3,6 @@
 cargoBuildHook() {
     echo "Executing cargoBuildHook"
 
-    runHook preBuild
-
     # Let stdenv handle stripping, for consistency and to not break
     # separateDebugInfo.
     export "CARGO_PROFILE_${cargoBuildType@U}_STRIP"=false
@@ -43,8 +41,6 @@ cargoBuildHook() {
     if [ -n "${buildAndTestSubdir-}" ]; then
         popd
     fi
-
-    runHook postBuild
 
     echo "Finished cargoBuildHook"
 }

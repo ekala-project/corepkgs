@@ -35,23 +35,14 @@ gradle() {
 }
 
 gradleBuildPhase() {
-    runHook preBuild
-
     gradle ${enableParallelBuilding:+--parallel} ${gradleBuildTask:-assemble}
-
-    runHook postBuild
 }
 
 gradleCheckPhase() {
-    runHook preCheck
-
     gradle ${enableParallelChecking:+--parallel} ${gradleCheckTask:-test}
-
-    runHook postCheck
 }
 
 gradleUpdateScript() {
-    runHook preBuild
     runHook preGradleUpdate
 
     gradle ${enableParallelUpdating:+--parallel} ${gradleUpdateTask:-nixDownloadDeps}

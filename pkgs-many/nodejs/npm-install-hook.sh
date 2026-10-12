@@ -6,8 +6,6 @@
 npmInstallHook() {
     echo "Executing npmInstallHook"
 
-    runHook preInstall
-
     if [ -z "${dontNpmInstall-}" ]; then
         local dest="$out/lib/node_modules/${pname}"
 
@@ -54,8 +52,6 @@ npmInstallHook() {
             fi
         fi
     fi
-
-    runHook postInstall
 
     echo "npmInstallHook completed"
 }

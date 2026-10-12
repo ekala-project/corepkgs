@@ -3,8 +3,6 @@
 cargoCheckHook() {
     echo "Executing cargoCheckHook"
 
-    runHook preCheck
-
     if [[ -n "${buildAndTestSubdir-}" ]]; then
         pushd "${buildAndTestSubdir}"
     fi
@@ -44,8 +42,6 @@ cargoCheckHook() {
     fi
 
     echo "Finished cargoCheckHook"
-
-    runHook postCheck
 }
 
 if [ -z "${dontCargoCheck-}" ] && [ -z "${checkPhase-}" ]; then

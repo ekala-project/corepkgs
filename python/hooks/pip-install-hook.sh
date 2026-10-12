@@ -5,7 +5,6 @@ echo "Sourcing pip-install-hook"
 
 pipInstallPhase() {
     echo "Executing pipInstallPhase"
-    runHook preInstall
 
     # shellcheck disable=SC2154
     mkdir -p "$out/@pythonSitePackages@"
@@ -24,7 +23,6 @@ pipInstallPhase() {
     @pythonInterpreter@ -m pip install ./*.whl "${flagsArray[@]}"
     popd || return 1
 
-    runHook postInstall
     echo "Finished executing pipInstallPhase"
 }
 

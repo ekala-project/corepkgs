@@ -3,9 +3,7 @@ echo "Sourcing egg-build-hook"
 
 eggBuildPhase() {
     echo "Executing eggBuildPhase"
-    runHook preBuild
 
-    runHook postBuild
     echo "Finished executing eggBuildPhase"
 }
 

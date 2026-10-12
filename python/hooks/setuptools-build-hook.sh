@@ -6,7 +6,6 @@ echo "Sourcing setuptools-build-hook"
 setuptoolsBuildPhase() {
     echo "Executing setuptoolsBuildPhase"
     local setuptools_has_parallel=@setuptools_has_parallel@
-    runHook preBuild
 
     cp -f @setuppy@ nix_run_setup
     local -a flagsArray=()
@@ -25,7 +24,6 @@ setuptoolsBuildPhase() {
     echoCmd 'setup.py build flags' "${flagsArray[@]}"
     @pythonInterpreter@ nix_run_setup "${flagsArray[@]}" bdist_wheel
 
-    runHook postBuild
     echo "Finished executing setuptoolsBuildPhase"
 }
 

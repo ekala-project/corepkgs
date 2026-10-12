@@ -5,18 +5,12 @@ readonly zigDefaultCpuFlag=@zigDefaultCpuFlag@
 readonly zigDefaultOptimizeFlag=@zigDefaultOptimizeFlag@
 
 zigConfigurePhase() {
-    runHook preConfigure
-
     export ZIG_GLOBAL_CACHE_DIR="$TMPDIR/zig-cache"
     export ZIG_LOCAL_CACHE_DIR="$TMPDIR/zig-local-cache"
     mkdir -p "$ZIG_GLOBAL_CACHE_DIR"
-
-    runHook postConfigure
 }
 
 zigBuildPhase() {
-    runHook preBuild
-
     local buildCores=1
 
     if [ "${enableParallelBuilding-1}" ]; then
@@ -36,13 +30,9 @@ zigBuildPhase() {
 
     echoCmd 'zig build flags' "${flagsArray[@]}"
     TERM=dumb zig build "${flagsArray[@]}" --verbose
-
-    runHook postBuild
 }
 
 zigCheckPhase() {
-    runHook preCheck
-
     local buildCores=1
 
     if [ "${enableParallelChecking-1}" ]; then
@@ -62,13 +52,9 @@ zigCheckPhase() {
 
     echoCmd 'zig check flags' "${flagsArray[@]}"
     TERM=dumb zig build test "${flagsArray[@]}" --verbose
-
-    runHook postCheck
 }
 
 zigInstallPhase() {
-    runHook preInstall
-
     local buildCores=1
 
     if [ "${enableParallelInstalling-1}" ]; then
@@ -95,8 +81,6 @@ zigInstallPhase() {
 
     echoCmd 'zig install flags' "${flagsArray[@]}"
     TERM=dumb zig build install "${flagsArray[@]}" --verbose
-
-    runHook postInstall
 }
 
 if [ -z "${dontUseZigConfigure-}" ] && [ -z "${configurePhase-}" ]; then
