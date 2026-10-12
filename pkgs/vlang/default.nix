@@ -92,7 +92,6 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out/{bin,lib,share}
     cp -r examples $out/share
@@ -118,7 +117,6 @@ stdenv.mkDerivation {
     $out/lib/v -v $out/lib/cmd/tools/vvet
     $out/lib/v -v $out/lib/cmd/tools/vcreate
 
-    runHook postInstall
   '';
 
   meta = {

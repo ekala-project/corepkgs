@@ -99,7 +99,6 @@ lib.makeOverridable (
             lib.fetchers.proxyImpureEnvVars ++ [ "NIX_NPM_REGISTRY" ] ++ args.impureEnvVars or [ ];
 
           installPhase = ''
-            runHook preInstall
 
             versionAtLeast () {
                 local cur_version=$1 min_version=$2
@@ -160,11 +159,9 @@ lib.makeOverridable (
               echo ${toString fetcherVersion} > $out/.fetcher-version
             fi
 
-            runHook postInstall
           '';
 
           fixupPhase = ''
-            runHook preFixup
 
             # Remove timestamp and sort the json files
             rm -rf $storePath/{v3,v10,v11}/tmp
@@ -211,7 +208,6 @@ lib.makeOverridable (
               )
             fi
 
-            runHook postFixup
           '';
 
           passthru = args.passthru or { } // {

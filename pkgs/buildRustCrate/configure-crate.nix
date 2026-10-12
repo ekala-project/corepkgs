@@ -70,7 +70,6 @@ in
     noisily cd "$cargo_toml_dir"
   ''}
 
-  runHook preConfigure
 
   symlink_dependency() {
     # $1 is the nix-store path of a dependency
@@ -255,5 +254,4 @@ in
                   /^cargo:/ { sub(/^cargo::?/, \"\", \$1); gsub(/-/, \"_\", \$1); print \"export \" toupper(\"DEP_$(echo $CRATENAME)_\" \$1) \"=\" \"\\\"\"\$2\"\\\"\"; print \"export \" toupper(\"DEP_$(echo $CRATENAME)_$(echo $CRATEVERSION)_\" \$1) \"=\" \"\\\"\"\$2\"\\\"\"; next }" > target/env
      set -e
   fi
-  runHook postConfigure
 ''

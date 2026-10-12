@@ -29,11 +29,9 @@ buildPerlPackage rec {
   '';
 
   checkPhase = ''
-    runHook preCheck
 
     ./scripts/yath test -j $NIX_BUILD_CORES
 
-    runHook postCheck
   '';
 
   propagatedBuildInputs = [

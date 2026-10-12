@@ -33,11 +33,9 @@ stdenv.mkDerivation (finalAttrs: {
   strictDeps = true;
 
   configurePhase = ''
-    runHook preConfigure
 
     python waf-light configure
 
-    runHook postConfigure
   '';
 
   buildPhase =
@@ -47,7 +45,6 @@ stdenv.mkDerivation (finalAttrs: {
       ) "--tools=\"${lib.concatStringsSep "," extraTools}\"";
     in
     ''
-      runHook preBuild
 
       python waf-light build ${extraToolsList}
 
@@ -55,18 +52,15 @@ stdenv.mkDerivation (finalAttrs: {
         --replace "w = test(i + '/lib/' + dirname)" \
                   "w = test('$out/${python3.sitePackages}')"
 
-      runHook postBuild
     '';
 
   installPhase = ''
-    runHook preInstall
 
     install -D waf "$out"/bin/waf
     wrapProgram "$out"/bin/waf --prefix PYTHONPATH : "$out"/${python3.sitePackages}
     mkdir -p "$out"/${python3.sitePackages}/
     cp -r waflib "$out"/${python3.sitePackages}/
 
-    runHook postInstall
   '';
 
   passthru = {

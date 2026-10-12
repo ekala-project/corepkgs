@@ -26,9 +26,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
-    runHook preInstall
     install -D hid-ite8291r3.ko -t $out/lib/modules/${kernel.modDirVersion}/extra
-    runHook postInstall
   '';
 
   passthru.updateScript = nix-update-script {

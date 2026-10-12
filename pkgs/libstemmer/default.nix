@@ -30,11 +30,9 @@ stdenv.mkDerivation (finalAttrs: {
   makeTarget = "libstemmer.a";
 
   installPhase = ''
-    runHook preInstall
     install -Dt $out/lib libstemmer.a
     install -Dt $out/include include/libstemmer.h
     install -Dt $out/bin {snowball,stemwords}
-    runHook postInstall
   '';
 
   meta = {

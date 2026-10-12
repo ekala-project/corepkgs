@@ -58,7 +58,6 @@ stdenv.mkDerivation (
 
     configurePhase =
       args.configurePhase or ''
-        runHook preConfigure
 
         export HOME=$TMPDIR
         export npm_config_cache=$TMPDIR/.npm
@@ -75,12 +74,10 @@ stdenv.mkDerivation (
           chmod -R +w $npm_config_cache || true
         ''}
 
-        runHook postConfigure
       '';
 
     buildPhase =
       args.buildPhase or ''
-        runHook preBuild
 
         # Install dependencies
         ${
@@ -108,7 +105,6 @@ stdenv.mkDerivation (
           fi
         ''}
 
-        runHook postBuild
       '';
 
     # installPhase is handled by npmInstallHook

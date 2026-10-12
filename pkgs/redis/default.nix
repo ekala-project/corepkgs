@@ -75,7 +75,6 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals stdenv.hostPlatform.isStatic [ getconf ];
   checkPhase = ''
-    runHook preCheck
 
     # disable test "Connect multiple replicas at the same time": even
     # upstream find this test too timing-sensitive
@@ -104,7 +103,6 @@ stdenv.mkDerivation (finalAttrs: {
       --skiptest "Check MEMORY USAGE for embedded key strings with jemalloc"
       # ^ breaks due to unexpected and varying address space sizes that jemalloc gets built with
 
-    runHook postCheck
   '';
 
   doInstallCheck = true;

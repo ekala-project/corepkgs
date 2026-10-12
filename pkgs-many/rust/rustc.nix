@@ -285,7 +285,6 @@ stdenv.mkDerivation (finalAttrs: {
   buildPhase =
     if fastCross then
       ''
-        runHook preBuild
 
         mkdir -p build/${stdenv.hostPlatform.rust.rustcTargetSpec}/stage{0,1}-{std,rustc}/${stdenv.hostPlatform.rust.rustcTargetSpec}/release/
         ln -s ${rustc.unwrapped}/lib/rustlib/${stdenv.hostPlatform.rust.rustcTargetSpec}/libstd-*.so build/${stdenv.hostPlatform.rust.rustcTargetSpec}/stage0-std/${stdenv.hostPlatform.rust.rustcTargetSpec}/release/libstd.so
@@ -296,7 +295,6 @@ stdenv.mkDerivation (finalAttrs: {
         touch build/${stdenv.hostPlatform.rust.rustcTargetSpec}/stage{0,1}-rustc/${stdenv.hostPlatform.rust.rustcTargetSpec}/release/.librustc-stamp
         python ./x.py --keep-stage=0 --stage=1 build library
 
-        runHook postBuild
       ''
     else
       null;
@@ -304,7 +302,6 @@ stdenv.mkDerivation (finalAttrs: {
   installPhase =
     if fastCross then
       ''
-        runHook preInstall
 
         python ./x.py --keep-stage=0 --stage=1 install library/std
         mkdir -v $doc $man
@@ -316,7 +313,6 @@ stdenv.mkDerivation (finalAttrs: {
         lndir ${rustc.doc} $doc
         lndir ${rustc.man} $man
 
-        runHook postInstall
       ''
     else
       null;

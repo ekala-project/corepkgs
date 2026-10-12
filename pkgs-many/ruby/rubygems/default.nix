@@ -21,9 +21,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
-    runHook preInstall
     cp -r . $out
-    runHook postInstall
   '';
 
   passthru.updateScript = gitUpdater {

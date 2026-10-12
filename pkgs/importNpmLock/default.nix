@@ -200,12 +200,10 @@ lib.fix (self: {
         packageLock = toJSON packageLock;
 
         installPhase = ''
-          runHook preInstall
           mkdir $out
           cp package.json $out/
           cp package-lock.json $out/
           [[ -d node_modules ]] && mv node_modules $out/
-          runHook postInstall
         '';
       }
       // derivationArgs

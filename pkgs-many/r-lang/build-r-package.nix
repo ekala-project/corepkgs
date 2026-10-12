@@ -23,23 +23,15 @@ stdenv.mkDerivation (
 
     buildInputs = [ r-lang ] ++ buildInputs;
 
-    configurePhase = ''
-      runHook preConfigure
-      runHook postConfigure
-    '';
+    configurePhase = "";
 
-    buildPhase = ''
-      runHook preBuild
-      runHook postBuild
-    '';
+    buildPhase = "";
 
     installPhase = ''
-      runHook preInstall
 
       mkdir -p $out/library
       R CMD INSTALL --library=$out/library .
 
-      runHook postInstall
     '';
 
     meta = args.meta or { } // {

@@ -50,21 +50,17 @@ buildGoModule (finalAttrs: {
   ];
 
   buildPhase = ''
-    runHook preBuild
     patchShebangs .
     make bin/skopeo docs
   ''
   + lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
     make completions
   ''
-  + ''
-    runHook postBuild
-  '';
+  + "";
 
   # Test binaries embed Go compiler paths; tests run via passthru.tests.build
 
   installPhase = ''
-    runHook preInstall
     PREFIX=${placeholder "out"} make install-binary install-docs
   ''
   + lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
@@ -77,9 +73,7 @@ buildGoModule (finalAttrs: {
     wrapProgram $out/bin/skopeo \
       --prefix PATH : ${lib.makeBinPath [ fuse-overlayfs ]}
   ''
-  + ''
-    runHook postInstall
-  '';
+  + "";
 
   passthru = {
     policy = runCommand "policy" { } ''

@@ -196,10 +196,8 @@ rustPlatform.buildRustPackage {
 
   doInstallCheck = canExecute;
   installCheckPhase = lib.optionalString canExecute ''
-    runHook preInstallCheck
     $out/bin/deno --help
     $out/bin/deno --version | grep "deno ${version}"
-    runHook postInstallCheck
   '';
 
   passthru = {

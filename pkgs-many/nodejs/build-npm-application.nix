@@ -67,11 +67,9 @@ stdenv.mkDerivation (
           null
         else
           ''
-            runHook preBuild
             if grep -q "\"${npmBuildScript}\"" package.json 2>/dev/null; then
               npm run ${npmBuildScript} --offline
             fi
-            runHook postBuild
           ''
       );
 
@@ -83,7 +81,6 @@ stdenv.mkDerivation (
           null
         else
           ''
-            runHook preInstall
 
             mkdir -p $out/lib/node_modules/${npmPackName}
             cp -r . $out/lib/node_modules/${npmPackName}/
@@ -107,7 +104,6 @@ stdenv.mkDerivation (
               done
             fi
 
-            runHook postInstall
           ''
       );
 

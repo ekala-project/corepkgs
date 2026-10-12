@@ -52,19 +52,15 @@ buildGoModule (finalAttrs: {
   ];
 
   buildPhase = ''
-    runHook preBuild
     patchShebangs .
     make bin/buildah
     make -C docs GOMD2MAN="go-md2man"
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
     install -Dm755 bin/buildah $out/bin/buildah
     installShellCompletion --bash contrib/completions/bash/buildah
     make -C docs install PREFIX="$man"
-    runHook postInstall
   '';
 
   doInstallCheck = true;

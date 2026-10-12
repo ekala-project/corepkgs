@@ -98,13 +98,11 @@ stdenv.mkDerivation (finalAttrs: {
   versionCheckProgramArg = "--version";
 
   installCheckPhase = ''
-    runHook preInstallCheck
 
     [ -d "$bin/share/man/man1" ]
     [ -d "$bin/share/man/man5" ]
     echo "man pages exist"
 
-    runHook postInstallCheck
   '';
 
   passthru = {

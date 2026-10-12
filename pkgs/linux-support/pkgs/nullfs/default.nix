@@ -30,10 +30,8 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   installPhase = ''
-    runHook preInstall
     mkdir -p "$out/lib/modules/${kernel.modDirVersion}/kernel/fs/nullfs/"
     install -p -m 644 nullfs.ko $out/lib/modules/${kernel.modDirVersion}/kernel/fs/nullfs/
-    runHook postInstall
   '';
 
   meta = {

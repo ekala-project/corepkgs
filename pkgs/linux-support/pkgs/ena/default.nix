@@ -29,20 +29,16 @@ stdenv.mkDerivation {
   env.KERNEL_BUILD_DIR = "${kernel.dev}/lib/modules/${kernel.modDirVersion}/build";
 
   configurePhase = ''
-    runHook preConfigure
     cd kernel/linux/ena
     export ENA_PHC_INCLUDE=1
-    runHook postConfigure
   '';
 
   installPhase = ''
-    runHook preInstall
     $STRIP -S ena.ko
     dest=$out/lib/modules/${kernel.modDirVersion}/misc
     mkdir -p $dest
     cp ena.ko $dest/
     xz $dest/ena.ko
-    runHook postInstall
   '';
 
   passthru.updateScript = gitUpdater {

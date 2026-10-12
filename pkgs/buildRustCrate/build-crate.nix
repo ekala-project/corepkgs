@@ -107,7 +107,6 @@ let
   '';
 in
 ''
-  runHook preBuild
 
   # configure & source common build functions
   RUSTC_DRIVER="${if useClippy then "clippy-driver" else "rustc"}"
@@ -276,5 +275,4 @@ in
 
   # Remove object files to avoid "wrong ELF type"
   find target -type f -name "*.o" -print0 | xargs -0 rm -f
-  runHook postBuild
 ''

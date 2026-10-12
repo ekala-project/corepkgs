@@ -21,7 +21,6 @@ stdenv.mkDerivation {
   };
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out/bin
 
@@ -51,7 +50,6 @@ stdenv.mkDerivation {
     substituteAll ${./wrapper} $out/bin/clangd
     chmod +x $out/bin/clangd
 
-    runHook postInstall
   '';
 
   passthru = {

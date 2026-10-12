@@ -64,7 +64,6 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   installPhase = ''
-    runHook preInstall
 
     install -vDm 644 libjbig/*.h -t "$out/include/"
     install -vDm 755 pbmtools/{jbgtopbm{,85},pbmtojbg{,85}} -t "$out/bin/"
@@ -81,9 +80,7 @@ stdenv.mkDerivation (finalAttrs: {
       ln -sv "$out/lib/$lib.${finalAttrs.version}" "$out/lib/$lib.0"
     done
   ''
-  + ''
-    runHook postInstall
-  '';
+  + "";
 
   # Testing deletes all files on each test, causes test failures.
   enableParallelChecking = false;

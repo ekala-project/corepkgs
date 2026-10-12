@@ -82,7 +82,6 @@ stdenvNoCC.mkDerivation (
         sdkMajor = lib.versions.major sdkVersion;
       in
       ''
-        runHook preInstall
 
         mkdir -p "$sdkpath"
 
@@ -95,7 +94,6 @@ stdenvNoCC.mkDerivation (
         mkdir -p "$platformPath/Developer/Library/PrivateFrameworks"
         mkdir -p "$platformPath/Developer/usr/lib"
 
-        runHook postInstall
       '';
 
     passthru = {

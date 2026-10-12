@@ -51,19 +51,13 @@ with self;
     buildPerlPackage (
       {
         buildPhase = ''
-          runHook preBuild
           perl Build.PL --prefix=$out; ./Build build
-          runHook postBuild
         '';
         installPhase = ''
-          runHook preInstall
           ./Build install
-          runHook postInstall
         '';
         checkPhase = ''
-          runHook preCheck
           ./Build test
-          runHook postCheck
         '';
       }
       // args

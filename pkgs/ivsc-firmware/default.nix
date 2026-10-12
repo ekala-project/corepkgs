@@ -18,7 +18,6 @@ stdenv.mkDerivation {
   dontBuild = true;
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out/lib/firmware/vsc
     cp --no-preserve=mode --recursive ./firmware/* $out/lib/firmware/vsc/
@@ -32,7 +31,6 @@ stdenv.mkDerivation {
       ln -sf "$file" "$out/lib/firmware/vsc/soc_a1_prod/$(basename "$file" .bin)_a1_prod.bin"
     done
 
-    runHook postInstall
   '';
 
   meta = {

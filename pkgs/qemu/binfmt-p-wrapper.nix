@@ -24,7 +24,6 @@ stdenv.mkDerivation {
   buildInputs = [ stdenv.cc.libc.static or null ];
 
   buildPhase = ''
-    runHook preBuild
 
     mkdir -p $out/bin
     $CC -o $out/bin/${name} -static -std=c99 -O2 \
@@ -32,6 +31,5 @@ stdenv.mkDerivation {
         ${lib.optionalString enableDebug "-DDEBUG"} \
         $src
 
-    runHook postBuild
   '';
 }

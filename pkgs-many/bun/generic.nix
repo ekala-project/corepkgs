@@ -61,12 +61,10 @@ stdenvNoCC.mkDerivation {
   dontBuild = true;
 
   installPhase = ''
-    runHook preInstall
 
     install -Dm 755 ./bun $out/bin/bun
     ln -s $out/bin/bun $out/bin/bunx
 
-    runHook postInstall
   '';
 
   postPhases = [ "postPatchelf" ];

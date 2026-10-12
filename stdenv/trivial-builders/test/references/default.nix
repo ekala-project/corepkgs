@@ -62,14 +62,12 @@ let
     dontBuild = true;
 
     installPhase = ''
-      runHook preInstall
       mkdir -p "$out/bin"
       substitute "$src" "$out/bin/${finalAttrs.meta.mainProgram}" \
         --replace "@SAMPLES@" ${lib.escapeShellArg (samplesToString samples)} \
         --replace "@CLOSURES@" ${lib.escapeShellArg (samplesToString closures)} \
         --replace "@DIRECT_REFS@" ${lib.escapeShellArg (samplesToString directReferences)} \
         --replace "@COLLECTIVE_CLOSURE@" ${lib.escapeShellArg collectiveClosure}
-      runHook postInstall
       chmod +x "$out/bin/${finalAttrs.meta.mainProgram}"
     '';
 
@@ -78,9 +76,7 @@ let
       shellcheck-minimal
     ];
     installCheckPhase = ''
-      runHook preInstallCheck
       shellcheck "$out/bin/${finalAttrs.meta.mainProgram}"
-      runHook postInstallCheck
     '';
 
     passthru = {

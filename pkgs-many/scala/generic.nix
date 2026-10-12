@@ -44,7 +44,6 @@ stdenv.mkDerivation (finalAttrs: {
   dontBuild = true;
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out
     cp -r bin lib $out/
@@ -77,7 +76,6 @@ stdenv.mkDerivation (finalAttrs: {
       fi
     done
 
-    runHook postInstall
   '';
 
   passthru = {

@@ -59,15 +59,12 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   unpackPhase = ''
-    runHook preUnpack
     unzip $src
     chmod +x displaylink-driver-${finalAttrs.version}.run
     ./displaylink-driver-${finalAttrs.version}.run --target . --noexec --nodiskspace
-    runHook postUnpack
   '';
 
   installPhase = ''
-    runHook preInstall
 
     install -Dt $out/lib/displaylink *.spkg
     install -Dm755 ${bins}/DisplayLinkManager $out/bin/DisplayLinkManager
@@ -83,7 +80,6 @@ stdenv.mkDerivation (finalAttrs: {
     # We introduce a dependency on the source file so that it need not be redownloaded everytime
     echo $src >> "$out/share/workspace_dependencies.pin"
 
-    runHook postInstall
   '';
 
   dontStrip = true;

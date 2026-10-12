@@ -22,7 +22,6 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [ makeWrapper ];
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out/share/llef
     cp -r llef.py arch commands common handlers $out/share/llef
@@ -30,7 +29,6 @@ stdenv.mkDerivation (finalAttrs: {
       --add-flags "-o 'settings set stop-disassembly-display never'" \
       --add-flags "-o \"command script import $out/share/llef/llef.py\""
 
-    runHook postInstall
   '';
 
   meta = {

@@ -35,21 +35,15 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs = [ elixir ];
 
   buildPhase = ''
-    runHook preBuild
     export HEX_OFFLINE=1
     export HEX_HOME=./
     export MIX_ENV=prod
     mix compile
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
-
     mkdir -p $out/lib/erlang/lib
     cp -r ./_build/prod/lib/hex $out/lib/erlang/lib/
-
-    runHook postInstall
   '';
 
   meta = {

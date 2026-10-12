@@ -43,7 +43,6 @@ stdenv.mkDerivation (finalAttrs: {
       ];
     in
     ''
-      runHook preInstall
 
       clojure_lib_dir=$out
       bin_dir=$out/bin
@@ -64,7 +63,6 @@ stdenv.mkDerivation (finalAttrs: {
       wrapProgram $bin_dir/clojure --prefix PATH : $out/bin:${binPath}
       wrapProgram $bin_dir/clj --prefix PATH : $out/bin:${binPath}
 
-      runHook postInstall
     '';
 
   passthru = {

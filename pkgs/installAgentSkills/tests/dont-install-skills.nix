@@ -23,17 +23,14 @@ stdenvNoCC.mkDerivation {
 
   # build phase happens before the hook is called to install the skills
   buildPhase = ''
-    runHook preBuild
 
     mkdir -p test-skill/
     touch test-skill/SKILL.md
 
-    runHook postBuild
   '';
 
   # if the skill file is created then the test should fail
   installCheckPhase = ''
-    runHook preInstallCheck
 
     if test -f $out/share/skills/$pname/test-skill/SKILL.md; then
       exit 1
@@ -41,7 +38,6 @@ stdenvNoCC.mkDerivation {
 
     touch $out
 
-    runHook postInstallCheck
   '';
   doInstallCheck = true;
 

@@ -24,9 +24,7 @@ buildPythonPackage (finalAttrs: {
   nativeCheckInputs = [ lxml ];
 
   checkPhase = ''
-    runHook preCheck
     ${python.interpreter} tests.py
-    runHook postCheck
   '';
 
   pythonImportsCheck = [ "defusedxml" ];

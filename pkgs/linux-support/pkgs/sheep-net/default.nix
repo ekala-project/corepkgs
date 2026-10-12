@@ -17,10 +17,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
-    runHook preInstall
     mkdir -p $out/lib/modules/${kernel.modDirVersion}/drivers/net
     install -Dm444 sheep_net.ko $out/lib/modules/${kernel.modDirVersion}/drivers/net/sheep_net.ko
-    runHook postInstall
   '';
 
   meta = {

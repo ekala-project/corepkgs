@@ -374,10 +374,8 @@ rec {
         in
         if checkPhase == null then
           ''
-            runHook preCheck
             ${stdenv.shellDryRun} "$target"
             ${shellcheckCommand}
-            runHook postCheck
           ''
         else
           checkPhase;

@@ -85,7 +85,6 @@ buildGoModule (finalAttrs: {
   };
 
   buildPhase = ''
-    runHook preBuild
 
     patchShebangs .
     ${
@@ -100,11 +99,9 @@ buildGoModule (finalAttrs: {
     }
     make docs
 
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
 
     ${
       if stdenv.hostPlatform.isDarwin then
@@ -122,7 +119,6 @@ buildGoModule (finalAttrs: {
     wrapProgram $out/bin/podman \
       --prefix PATH : ${lib.escapeShellArg finalAttrs.passthru.binPath}
 
-    runHook postInstall
   '';
 
   postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''

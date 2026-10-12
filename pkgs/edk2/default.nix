@@ -104,7 +104,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -vp $out
     mv -v BaseTools $out
@@ -115,7 +114,6 @@ stdenv.mkDerivation (finalAttrs: {
       patchShebangs --build "$i"
     done
 
-    runHook postInstall
   '';
 
   meta = {
@@ -168,22 +166,16 @@ stdenv.mkDerivation (finalAttrs: {
           '';
 
           configurePhase = ''
-            runHook preConfigure
             export WORKSPACE="$PWD"
             . ${buildPackages.edk2}/edksetup.sh BaseTools
-            runHook postConfigure
           '';
 
           buildPhase = ''
-            runHook preBuild
             build -a ${targetArch} -b ${attrs.buildConfig or "RELEASE"} -t ${buildType} -p ${projectDscPath} -n $NIX_BUILD_CORES "''${buildFlags[@]}"
-            runHook postBuild
           '';
 
           installPhase = ''
-            runHook preInstall
             mv -v Build/*/* $out
-            runHook postInstall
           '';
         }
         // removeAttrs attrs [

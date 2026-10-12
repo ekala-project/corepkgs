@@ -24,7 +24,6 @@ stdenv.mkDerivation (finalAttrs: {
   doCheck = false;
 
   installPhase = ''
-    runHook preInstall
 
     install -Dm755 pigz "$out/bin/pigz"
     ln -s pigz "$out/bin/unpigz"
@@ -32,7 +31,6 @@ stdenv.mkDerivation (finalAttrs: {
     ln -s pigz.1 "$out/share/man/man1/unpigz.1"
     install -Dm755 pigz.pdf "$out/share/doc/pigz/pigz.pdf"
 
-    runHook postInstall
   '';
 
   meta = {

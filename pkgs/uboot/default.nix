@@ -106,17 +106,14 @@ let
         ++ extraMakeFlags;
 
         configurePhase = ''
-          runHook preConfigure
 
           make -j$NIX_BUILD_CORES ${defconfig}
 
           printf '%s' "$extraConfig" >> .config
 
-          runHook postConfigure
         '';
 
         installPhase = ''
-          runHook preInstall
 
           mkdir -p ${installDir}
           cp ${
@@ -128,7 +125,6 @@ let
             echo "file binary-dist ${installDir}/${baseNameOf file}" >> "$out/nix-support/hydra-build-products"
           '') (filesToInstall ++ builtins.attrNames pythonScriptsToInstall)}
 
-          runHook postInstall
         '';
 
         dontStrip = true;

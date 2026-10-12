@@ -123,18 +123,14 @@ lib.extendMkDerivation {
 
             configurePhase =
               args.modConfigurePhase or ''
-                runHook preConfigure
                 export GOCACHE=$TMPDIR/go-cache
                 export GOPATH="$TMPDIR/go"
                 cd "$modRoot"
-                runHook postConfigure
               '';
 
             buildPhase =
               args.modBuildPhase or (
-                ''
-                  runHook preBuild
-                ''
+                ""
                 + lib.optionalString finalAttrs.deleteVendor ''
                   if [ ! -d vendor ]; then
                     echo "vendor folder does not exist, 'deleteVendor' is not needed"
@@ -167,13 +163,11 @@ lib.extendMkDerivation {
 
                   mkdir -p vendor
 
-                  runHook postBuild
                 ''
               );
 
             installPhase =
               args.modInstallPhase or ''
-                runHook preInstall
 
                 ${
                   if finalAttrs.proxyVendor then
@@ -192,7 +186,6 @@ lib.extendMkDerivation {
                   exit 10
                 fi
 
-                runHook postInstall
               '';
 
             dontFixup = true;
@@ -245,7 +238,6 @@ lib.extendMkDerivation {
       configurePhase =
         args.configurePhase or (
           ''
-            runHook preConfigure
 
             export GOCACHE=$TMPDIR/go-cache
             export GOPATH="$TMPDIR/go"
@@ -269,9 +261,7 @@ lib.extendMkDerivation {
                 ''
             }
           ''
-          + ''
-            runHook postConfigure
-          ''
+          + ""
         );
 
       buildPhase =
@@ -279,7 +269,6 @@ lib.extendMkDerivation {
           lib.warnIf (builtins.elem "-buildid=" ldflags)
             "`-buildid=` is set by default as ldflag by buildGoModule"
             ''
-              runHook preBuild
 
               exclude='\(/_\|examples\|Godeps\|testdata'
               local -a excludedArr
@@ -362,15 +351,12 @@ lib.extendMkDerivation {
               fi
             )
           ''
-          + ''
-            runHook postBuild
-          ''
+          + ""
         );
 
       doCheck = args.doCheck or false;
       checkPhase =
         args.checkPhase or ''
-          runHook preCheck
           # We do not set trimpath for tests, in case they reference test assets
           export GOFLAGS=''${GOFLAGS//-trimpath/}
 
@@ -378,18 +364,15 @@ lib.extendMkDerivation {
             buildGoDir test "$pkg"
           done
 
-          runHook postCheck
         '';
 
       installPhase =
         args.installPhase or ''
-          runHook preInstall
 
           mkdir -p $out
           dir="$GOPATH/bin"
           [ -e "$dir" ] && cp -r $dir $out
 
-          runHook postInstall
         '';
 
       inherit allowGoReference;

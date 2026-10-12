@@ -40,13 +40,11 @@ stdenv.mkDerivation (finalAttrs: {
   doCheck = false;
 
   checkPhase = ''
-    runHook preCheck
 
     pushd tests
     ./test_basic.sh
     popd
 
-    runHook postCheck
   '';
 
   passthru = {

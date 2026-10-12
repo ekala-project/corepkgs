@@ -19,11 +19,9 @@ stdenvNoCC.mkDerivation {
   dontBuild = true;
 
   installPhase = ''
-    runHook preInstall
 
     install -Dm0444 public_suffix_list.dat tests/test_psl.txt -t $out/share/publicsuffix
 
-    runHook postInstall
   '';
 
   passthru.updateScript = unstableGitUpdater { };

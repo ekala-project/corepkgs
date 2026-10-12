@@ -24,9 +24,7 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
-    runHook preInstall
     install -Dm644 -t $out/lib/modules/${kernel.modDirVersion}/extra tsme-test.ko
-    runHook postInstall
   '';
 
   meta = {

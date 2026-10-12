@@ -185,7 +185,6 @@ stdenv.mkDerivation (finalAttrs: {
 
     make oldconfig
 
-    runHook postConfigure
   '';
 
   postConfigure = lib.optionalString (useMusl && stdenv.hostPlatform.libc != "musl") ''

@@ -131,12 +131,10 @@ stdenv.mkDerivation (finalAttrs: {
       ];
     in
     ''
-      runHook preBuild
 
       sed -i 's|nss_dist_dir="$dist_dir"|nss_dist_dir="'$out'"|;s|nss_dist_obj_dir="$obj_dir"|nss_dist_obj_dir="'$out'"|' build.sh
       ./build.sh ${lib.concatStringsSep " " buildFlags}
 
-      runHook postBuild
     '';
 
   env.NIX_CFLAGS_COMPILE = toString (
@@ -161,7 +159,6 @@ stdenv.mkDerivation (finalAttrs: {
   );
 
   installPhase = ''
-    runHook preInstall
 
     rm -rf $out/private
     find $out -name "*.TOC" -delete
@@ -231,7 +228,6 @@ stdenv.mkDerivation (finalAttrs: {
       moveToOutput lib/libcrmf.a "$dev" # needed by firefox, for example
       rm -f "$out"/lib/*.a
 
-      runHook postInstall
     '';
 
   meta = {

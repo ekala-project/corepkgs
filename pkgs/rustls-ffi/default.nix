@@ -40,21 +40,15 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildPhase = ''
-    runHook preBuild
     ${buildPackages.rust.envVars.setEnv} cargo cbuild -j $NIX_BUILD_CORES --release --frozen --prefix=${placeholder "out"} --target ${stdenv.hostPlatform.rust.rustcTarget}
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
     ${buildPackages.rust.envVars.setEnv} cargo cinstall -j $NIX_BUILD_CORES --release --frozen --prefix=${placeholder "out"} --target ${stdenv.hostPlatform.rust.rustcTarget}
-    runHook postInstall
   '';
 
   checkPhase = ''
-    runHook preCheck
     ${buildPackages.rust.envVars.setEnv} cargo ctest -j $NIX_BUILD_CORES --release --frozen --prefix=${placeholder "out"} --target ${stdenv.hostPlatform.rust.rustcTarget}
-    runHook postCheck
   '';
 
   passthru.tests = {

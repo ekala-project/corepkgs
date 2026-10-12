@@ -82,27 +82,21 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   buildPhase = ''
-    runHook preBuild
 
     ./boot-strap --prefix=$out -o . op=build
 
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
 
     ./boot-strap --prefix=$out -o . op=install
 
-    runHook postInstall
   '';
 
   checkPhase = ''
-    runHook preCheck
 
     ./boot-strap -o . op=test
 
-    runHook postCheck
   '';
 
   setupHook = ./setup-hook.sh;

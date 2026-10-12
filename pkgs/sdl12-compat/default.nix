@@ -64,9 +64,7 @@ stdenv.mkDerivation (finalAttrs: {
   # Darwin fails with "Critical error: required built-in appearance SystemAppearance not found"
   doCheck = !stdenv.hostPlatform.isDarwin;
   checkPhase = ''
-    runHook preCheck
     ./test/testver
-    runHook postCheck
   '';
 
   postInstall = ''

@@ -60,7 +60,6 @@ stdenv.mkDerivation {
   noDumpEnvVars = true;
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out/share/doc/dotnet-runtime/${version}
     mv LICENSE.txt $out/share/doc/dotnet-runtime/${version}/
@@ -72,7 +71,6 @@ stdenv.mkDerivation {
     mkdir -p $out/bin
     ln -s $out/share/dotnet/dotnet $out/bin/dotnet
 
-    runHook postInstall
   '';
 
   postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''

@@ -295,12 +295,10 @@ rec {
       haddockPhase = ":";
       checkPhase = ":";
       installPhase = ''
-        runHook preInstall
         mkdir -p "$out"
         tar --format=ustar \
           -czf "$out/${drv.name}-docs.tar.gz" \
           -C dist/doc/html "${drv.name}-docs"
-        runHook postInstall
       '';
     });
 

@@ -34,7 +34,6 @@ stdenv.mkDerivation (finalAttrs: {
   dontBuild = true;
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out
     # The unzip extracts to kotlinc directory
@@ -53,7 +52,6 @@ stdenv.mkDerivation (finalAttrs: {
       fi
     done
 
-    runHook postInstall
   '';
 
   passthru = {

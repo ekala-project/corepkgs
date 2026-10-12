@@ -172,24 +172,20 @@ let
           in
           lib.recursiveUpdate generatedConfig luarocksConfig';
 
-        configurePhase = ''
-          runHook preConfigure
-        ''
-        + lib.optionalString (self.rockspecFilename == null) ''
-          rockspecFilename="${self.generatedRockspecFilename}"
-        ''
-        + lib.optionalString (self.knownRockspec != null) ''
-          # prevents the following type of error:
-          # Inconsistency between rockspec filename (42fm1b3d7iv6fcbhgm9674as3jh6y2sh-luv-1.22.0-1.rockspec) and its contents (luv-1.22.0-1.rockspec)
-          rockspecFilename="$TMP/$(stripHash ${self.knownRockspec})"
-          cp ${self.knownRockspec} "$rockspecFilename"
-        ''
-        + ''
-          runHook postConfigure
-        '';
+        configurePhase =
+          ""
+          + lib.optionalString (self.rockspecFilename == null) ''
+            rockspecFilename="${self.generatedRockspecFilename}"
+          ''
+          + lib.optionalString (self.knownRockspec != null) ''
+            # prevents the following type of error:
+            # Inconsistency between rockspec filename (42fm1b3d7iv6fcbhgm9674as3jh6y2sh-luv-1.22.0-1.rockspec) and its contents (luv-1.22.0-1.rockspec)
+            rockspecFilename="$TMP/$(stripHash ${self.knownRockspec})"
+            cp ${self.knownRockspec} "$rockspecFilename"
+          ''
+          + "";
 
         buildPhase = ''
-          runHook preBuild
 
           source ${lua}/nix-support/utils.sh
           nix_debug "Using LUAROCKS_CONFIG=$LUAROCKS_CONFIG"
@@ -199,7 +195,6 @@ let
               LUAROCKS_EXTRA_ARGS=" --verbose"
           fi
 
-          runHook postBuild
         '';
 
         postFixup =
@@ -209,7 +204,6 @@ let
           + attrs.postFixup or "";
 
         installPhase = ''
-          runHook preInstall
 
           # work around failing luarocks test for Write access
           mkdir -p $out
@@ -225,7 +219,6 @@ let
           nix_debug "ROCKSPEC $rockspecFilename"
           luarocks $LUAROCKS_EXTRA_ARGS make --deps-mode=all --tree=$out ''${rockspecFilename}
 
-          runHook postInstall
         '';
 
         shellHook = ''

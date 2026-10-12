@@ -173,11 +173,9 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   checkPhase = ''
-    runHook preCheck
 
     meson test --print-errorlogs --timeout-multiplier 0
 
-    runHook postCheck
   '';
 
   postCheck = ''

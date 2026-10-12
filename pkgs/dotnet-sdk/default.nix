@@ -69,13 +69,11 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out/share/dotnet $out/bin
     cp -r . $out/share/dotnet/
     ln -s $out/share/dotnet/dotnet $out/bin/dotnet
 
-    runHook postInstall
   '';
 
   # Add explicit .so references that autoPatchelfHook misses (dlopen'd at runtime)

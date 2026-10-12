@@ -35,13 +35,10 @@ stdenv.mkDerivation {
   ];
 
   buildPhase = ''
-    runHook preBuild
     ./bootstrap.sh
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
 
     ./b2 ${lib.optionalString (stdenv.cc.isClang) "toolset=clang "}install --prefix="$out"
 
@@ -49,7 +46,6 @@ stdenv.mkDerivation {
     # which we want to support building via useBoost.
     test -e "$out/bin/bjam" || ln -s b2 "$out/bin/bjam"
 
-    runHook postInstall
   '';
 
   meta = {

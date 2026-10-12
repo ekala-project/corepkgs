@@ -37,7 +37,6 @@ lib.fix (self: {
     buildInputs = [ nodejs-slim ];
 
     installPhase = ''
-      runHook preInstall
 
       mkdir -p $out/bin $out/libexec
 
@@ -55,7 +54,6 @@ lib.fix (self: {
           ]
         }
 
-      runHook postInstall
     '';
 
     passthru = { };
@@ -72,7 +70,6 @@ lib.fix (self: {
     buildInputs = [ nodejs-slim ];
 
     installPhase = ''
-      runHook preInstall
 
       mkdir -p $out/bin $out/libexec
 
@@ -84,7 +81,6 @@ lib.fix (self: {
       patchShebangs $out/libexec
       makeWrapper $out/libexec/fixup.js $out/bin/fixup-yarn-lock
 
-      runHook postInstall
     '';
 
     passthru = { };
@@ -136,13 +132,11 @@ lib.fix (self: {
             };
 
             buildPhase = ''
-              runHook preBuild
 
               yarnLock=''${yarnLock:=$PWD/yarn.lock}
               mkdir -p $out
               (cd $out; prefetch-yarn-deps --verbose --builder $yarnLock)
 
-              runHook postBuild
             '';
 
             outputHashMode = "recursive";

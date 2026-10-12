@@ -51,9 +51,7 @@ stdenv.mkDerivation {
   };
 
   unpackPhase = ''
-    runHook preUnpack
     cp "$src" "$(stripHash "$src")"
-    runHook postUnpack
   '';
 
   outputs = [

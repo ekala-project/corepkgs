@@ -53,9 +53,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   # locale_impermeability_test fails in the sandbox due to missing locale data
   checkPhase = ''
-    runHook preCheck
     ctest --force-new-ctest-process --exclude-regex locale_impermeability_test
-    runHook postCheck
   '';
 
   passthru.tests = {

@@ -39,7 +39,6 @@ let
       ];
 
       installPhase = ''
-        runHook preInstall
 
         mkdir -p $out/{bin,lib}
         install -m 755 app $out/bin
@@ -51,7 +50,6 @@ let
             ''--prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ sgx-psw ]}"''
           }
 
-        runHook postInstall
       '';
 
       # Breaks the signature of the enclaves
@@ -60,13 +58,11 @@ let
       # We don't have access to real SGX hardware during the build
       doInstallCheck = isSimulation;
       installCheckPhase = ''
-        runHook preInstallCheck
 
         pushd /
         echo a | $out/bin/app
         popd
 
-        runHook preInstallCheck
       '';
     };
 in
@@ -76,7 +72,6 @@ in
   cxx17SGXDemo = buildSample "Cxx17SGXDemo";
   localAttestation = (buildSample "LocalAttestation").overrideAttrs (old: {
     installPhase = ''
-      runHook preInstall
 
       mkdir -p $out/{bin,lib}
       install -m 755 bin/app* $out/bin
@@ -90,7 +85,6 @@ in
           }
       done
 
-      runHook postInstall
     '';
   });
   powerTransition = buildSample "PowerTransition";
@@ -127,7 +121,6 @@ in
     nativeBuildInputs = [ sgx-psw ] ++ old.nativeBuildInputs;
 
     installPhase = ''
-      runHook preInstall
 
       mkdir -p $out/{bin,lib}
       mv sample app
@@ -137,7 +130,6 @@ in
         --chdir "$out/lib" \
         --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ sgx-psw ]}"
 
-      runHook postInstall
     '';
   });
 

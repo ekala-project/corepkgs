@@ -585,7 +585,6 @@ lib.fix (
       ++ lib.optional (ghc.isHaLVM or false) "all";
 
     configurePhase = ''
-      runHook preConfigure
 
       echo configureFlags: $configureFlags "''${configureFlagsArray[@]}"
       ${setupCommand} configure $configureFlags "''${configureFlagsArray[@]}" 2>&1 | ${coreutils}/bin/tee "$NIX_BUILD_TOP/cabal-configure.log"
@@ -596,28 +595,24 @@ lib.fix (
         fi
       ''}
 
-      runHook postConfigure
     '';
 
-    buildPhase = ''
-      runHook preBuild
-    ''
-    + lib.optionalString (previousIntermediates != null) ''
-      mkdir -p dist;
-      rm -r dist/build
-      cp -r ${previousIntermediates}/${intermediatesDir}/build dist/build
-      find dist/build -exec chmod u+w {} +
-      find dist/build -exec touch -d '1970-01-01T00:00:00Z' {} +
-    ''
-    + ''
-      ${setupCommand} build ${buildTarget} "''${buildFlags[@]}"
-      runHook postBuild
-    '';
+    buildPhase =
+      ""
+      + lib.optionalString (previousIntermediates != null) ''
+        mkdir -p dist;
+        rm -r dist/build
+        cp -r ${previousIntermediates}/${intermediatesDir}/build dist/build
+        find dist/build -exec chmod u+w {} +
+        find dist/build -exec touch -d '1970-01-01T00:00:00Z' {} +
+      ''
+      + ''
+        ${setupCommand} build ${buildTarget} "''${buildFlags[@]}"
+      '';
 
     inherit doCheck;
 
     checkPhase = ''
-      runHook preCheck
       checkFlagsArray+=(
         "--show-details=streaming"
         "--test-wrapper=${testWrapperScript}"
@@ -627,7 +622,6 @@ lib.fix (
       local -a flagsArray
       concatTo flagsArray checkFlags checkFlagsArray
       ${setupCommand} test ${testTargetsString} "''${flagsArray[@]}"
-      runHook postCheck
     '';
 
     haddockPhase = ''
@@ -645,7 +639,6 @@ lib.fix (
     '';
 
     installPhase = ''
-      runHook preInstall
 
       ${
         if !isLibrary && buildTarget == "" then
@@ -685,7 +678,6 @@ lib.fix (
       ''}
       ${optionalString enableSeparateDataOutput "mkdir -p $data"}
 
-      runHook postInstall
     '';
 
     ${if doInstallIntermediates then "installIntermediatesPhase" else null} = ''

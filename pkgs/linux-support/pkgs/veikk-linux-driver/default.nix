@@ -28,12 +28,10 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
-    runHook preInstall
 
     mkdir -p $out/lib/modules/${kernel.modDirVersion}/kernel/drivers/veikk
     install -Dm755 veikk.ko $out/lib/modules/${kernel.modDirVersion}/kernel/drivers/veikk
 
-    runHook postInstall
   '';
 
   meta = {

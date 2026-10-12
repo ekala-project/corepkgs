@@ -48,7 +48,6 @@ stdenv.mkDerivation {
 
   installPhase = ''
     find . -type f -exec chmod -x {} \;
-    runHook postInstall
   '';
 
   postInstall = lib.optionalString (packageOlder "4.2") ''

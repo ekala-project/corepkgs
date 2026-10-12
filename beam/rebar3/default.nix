@@ -48,20 +48,16 @@ let
     '';
 
     buildPhase = ''
-      runHook preBuild
 
       escript bootstrap
 
-      runHook postBuild
     '';
 
     installPhase = ''
-      runHook preInstall
 
       mkdir -p $out/bin
       cp rebar3 $out/bin/rebar3
 
-      runHook postInstall
     '';
 
     meta = {

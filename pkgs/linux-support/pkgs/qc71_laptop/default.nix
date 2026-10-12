@@ -26,9 +26,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
-    runHook preInstall
     install -D qc71_laptop.ko -t $out/lib/modules/${kernel.modDirVersion}/extra
-    runHook postInstall
   '';
 
   passthru.updateScript = nix-update-script {

@@ -48,9 +48,7 @@ buildPythonPackage (finalAttrs: {
   pythonImportsCheck = [ "Stemmer" ];
 
   checkPhase = ''
-    runHook preCheck
     ${python.interpreter} runtests.py
-    runHook postCheck
   '';
 
   meta = {

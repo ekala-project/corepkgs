@@ -384,13 +384,10 @@ stdenv.mkDerivation {
   ++ [ (if enableIcu then "--with-icu=${icu.dev}" else "--without-icu") ];
 
   buildPhase = ''
-    runHook preBuild
     b2 ${b2Args}
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
 
     # boostbook is needed by some applications
     mkdir -p $dev/share/boostbook
@@ -399,7 +396,6 @@ stdenv.mkDerivation {
     # Let boost install everything else
     b2 ${b2Args} install
 
-    runHook postInstall
   '';
 
   postFixup = lib.optionalString stdenv.hostPlatform.isMinGW ''

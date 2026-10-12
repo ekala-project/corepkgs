@@ -2,7 +2,6 @@
 crateName: metadata: buildTests:
 if !buildTests then
   ''
-    runHook preInstall
     # always create $out even if we do not have binaries. We are detecting binary targets during compilation, if those are missing there is no way to only have $lib
     mkdir $out
     if [[ -s target/env ]]; then
@@ -30,12 +29,10 @@ if !buildTests then
         cp -rP target/bin/* $out/bin # */
       fi
     fi
-    runHook postInstall
   ''
 else
   # for tests we just put them all in the output. No execution.
   ''
-    runHook preInstall
 
     mkdir -p $out/tests
     if [ -e target/bin ]; then
@@ -55,5 +52,4 @@ else
       cp -rP target/cargo-bin-exe/* $out/bin
     fi
 
-    runHook postInstall
   ''

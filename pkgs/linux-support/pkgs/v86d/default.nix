@@ -40,11 +40,9 @@ stdenv.mkDerivation {
   ];
 
   configurePhase = ''
-    runHook preConfigure
 
     ./configure "''${configureFlags[@]}"
 
-    runHook postConfigure
   '';
 
   buildInputs = [ klibc ];

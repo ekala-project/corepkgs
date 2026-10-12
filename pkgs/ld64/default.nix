@@ -136,7 +136,6 @@ stdenv.mkDerivation (finalAttrs: {
   # The rebuild has to be a release build: ld64 has UB in its iteration implementations that
   # trips libc++ debug assertions by taking the address of the first element of an empty vector.
   installCheckPhase = ''
-    runHook preInstallCheck
 
     cd "$NIX_BUILD_TOP/$sourceRoot"
 
@@ -159,7 +158,6 @@ stdenv.mkDerivation (finalAttrs: {
         echo "LTO: not supported" && exit 1
     fi
 
-    runHook postInstallCheck
   '';
 
   postInstall = ''

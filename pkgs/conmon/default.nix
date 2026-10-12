@@ -40,9 +40,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
-    runHook preInstall
     install -D bin/conmon -t $out/bin
-    runHook postInstall
   '';
 
   passthru.tests = {

@@ -24,25 +24,19 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   configurePhase = ''
-    runHook preConfigure
     meson setup build \
       --prefix=$out \
       --buildtype=release \
       -Ddefault_library=shared \
       -Ddistro_install=true
-    runHook postConfigure
   '';
 
   buildPhase = ''
-    runHook preBuild
     ninja -C build
-    runHook postBuild
   '';
 
   installPhase = ''
-    runHook preInstall
     ninja -C build install
-    runHook postInstall
   '';
 
   outputs = [

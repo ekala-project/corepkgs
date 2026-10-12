@@ -25,9 +25,7 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
-    runHook preInstall
     install -D framework_laptop.ko -t $out/lib/modules/${kernel.modDirVersion}/extra
-    runHook postInstall
   '';
 
   passthru.updateScript = unstableGitUpdater { };

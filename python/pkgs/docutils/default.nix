@@ -27,9 +27,7 @@ buildPythonPackage (finalAttrs: {
   nativeCheckInputs = [ pillow ];
 
   checkPhase = ''
-    runHook preCheck
     ${python.interpreter} test/alltests.py
-    runHook postCheck
   '';
 
   # Create symlinks lacking a ".py" suffix, many programs depend on these names
