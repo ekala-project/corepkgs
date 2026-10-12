@@ -94,6 +94,7 @@ let
     "allowedReferences"
     "allowedRequisites"
     "allowedImpureDLLs"
+    "extensions"
   ];
 
   referenceCheckingAttrsToRemove = [
@@ -665,6 +666,8 @@ let
               # hostSuffix before the version, so we could contemplate removing
               # it again.
               staticMarker = stdenvStaticMarker;
+
+              extensionsSuffix = concatMapStrings (ext: "-${ext}") (attrs.extensions or [ ]);
             in
             sanitizeDerivationName (
               if attrs ? name then
@@ -673,7 +676,7 @@ let
                 # we cannot coerce null to a string below
                 assert
                   (attrs ? version && attrs.version != null) || throw "The `version` attribute cannot be null.";
-                "${attrs.pname}${staticMarker}${hostSuffix}-${attrs.version}"
+                "${attrs.pname}${extensionsSuffix}${staticMarker}${hostSuffix}-${attrs.version}"
             );
 
           builder = attrs.realBuilder or stdenvShell;
