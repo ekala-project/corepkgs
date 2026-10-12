@@ -7,6 +7,7 @@
 - **ekaos modules:** `ekaos/<module>: init | <succinct message>`
 - **Do not** add AI attribution (e.g., `Co-Authored-By`) to commit messages
 - **One logical change per commit** — squash small linting fixes and trivial corrections into the commit they belong to rather than creating separate fixup commits
+- **Prefer `finalAttrs` over `rec`** for package expressions — use the `finalAttrs` pattern (e.g., `stdenv.mkDerivation (finalAttrs: { ... })`) instead of `rec { ... }`
 
 ## Writing Packages
 
