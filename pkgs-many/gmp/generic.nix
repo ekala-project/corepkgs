@@ -30,7 +30,8 @@ let
 in
 
 stdenv.mkDerivation (finalAttrs: {
-  pname = "gmp${lib.optionalString withCxx "-with-cxx"}";
+  pname = "gmp";
+  extensions = lib.optionals withCxx [ "with-cxx" ];
   inherit version;
 
   src = fetchurl {
