@@ -35,7 +35,8 @@ let
   whenPatched = lib.optionalString apngSupport;
 in
 stdenv.mkDerivation (finalAttrs: {
-  pname = "libpng" + whenPatched "-apng";
+  pname = "libpng";
+  extensions = lib.optionals apngSupport [ "apng" ];
   inherit version;
 
   src = fetchurl {
