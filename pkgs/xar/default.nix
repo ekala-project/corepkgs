@@ -29,7 +29,8 @@
   makeWrapper,
 }:
 stdenv.mkDerivation (finalAttrs: {
-  pname = "xar${lib.optionalString (e2fsprogs == null) "-minimal"}";
+  pname = "xar";
+  extensions = lib.optionals (e2fsprogs == null) [ "minimal" ];
   version = "501";
 
   src = fetchFromGitHub {
