@@ -423,7 +423,8 @@ assert (withCuda || withCuvid || withNvdec || withNvenc) -> withNvcodec;
 stdenv.mkDerivation (
   finalAttrs:
   {
-    pname = "ffmpeg" + (optionalString (ffmpegVariant != "small") "-${ffmpegVariant}");
+    pname = "ffmpeg";
+    extensions = lib.optionals (ffmpegVariant != "small") [ ffmpegVariant ];
     inherit version;
     src = fetchgit {
       url = "https://git.ffmpeg.org/ffmpeg.git";
