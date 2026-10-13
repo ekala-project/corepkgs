@@ -59,11 +59,12 @@ let
   targetPrefix = optionalString (
     stdenv.targetPlatform != stdenv.hostPlatform
   ) "${stdenv.targetPlatform.config}-";
-  pname = targetPrefix + "gdb" + optionalString hostCpuOnly "-host-cpu-only";
+  pname = targetPrefix + "gdb";
 in
 
 stdenv.mkDerivation (finalAttrs: {
   inherit pname;
+  extensions = lib.optionals hostCpuOnly [ "host-cpu-only" ];
   version = "18.1";
 
   src = fetchurl {
