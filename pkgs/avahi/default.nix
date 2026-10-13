@@ -20,7 +20,8 @@
 }:
 
 stdenv.mkDerivation rec {
-  pname = "avahi${lib.optionalString withLibdnssdCompat "-compat"}";
+  pname = "avahi";
+  extensions = lib.optionals withLibdnssdCompat [ "compat" ];
   version = "0.8";
 
   src = fetchurl {
