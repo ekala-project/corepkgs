@@ -18,7 +18,8 @@
 }:
 
 stdenv.mkDerivation (finalAttrs: {
-  pname = "libva" + lib.optionalString minimal "-minimal";
+  pname = "libva";
+  extensions = lib.optionals minimal [ "minimal" ];
   version = "2.24.1";
 
   src = fetchFromGitHub {
