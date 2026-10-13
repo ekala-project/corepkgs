@@ -39,7 +39,8 @@ let
     ;
 
   self = python3Packages.buildPythonApplication rec {
-    pname = "mercurial${lib.optionalString fullBuild "-full"}";
+    pname = "mercurial";
+    extensions = lib.optionals fullBuild [ "full" ];
     version = "7.1";
 
     src = fetchurl {
@@ -262,7 +263,8 @@ self.overridePythonAttrs (origAttrs: {
         env = python.withPackages (ps: plugins);
       in
       stdenv.mkDerivation {
-        pname = "${self.pname}-with-extensions";
+        pname = self.pname;
+        extensions = (self.extensions or [ ]) ++ [ "with-extensions" ];
 
         inherit (self) src version meta;
 
