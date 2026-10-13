@@ -26,7 +26,8 @@ let
 in
 
 stdenv.mkDerivation rec {
-  pname = "sqlite${lib.optionalString interactive "-interactive"}";
+  pname = "sqlite";
+  extensions = lib.optionals interactive [ "interactive" ];
   version = "3.50.4";
 
   # nixpkgs-update: no auto update
