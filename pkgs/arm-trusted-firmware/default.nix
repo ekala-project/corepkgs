@@ -38,7 +38,8 @@ let
     stdenv.mkDerivation (
       rec {
 
-        pname = "arm-trusted-firmware${lib.optionalString (platform != null) "-${platform}"}";
+        pname = "arm-trusted-firmware";
+        extensions = lib.optionals (platform != null) [ platform ];
         version = "2.13.0";
 
         src = fetchFromGitHub {
