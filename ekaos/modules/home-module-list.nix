@@ -14,9 +14,11 @@
   # Per-user program modules
   ./home/programs/bash.nix
   ./home/programs/direnv.nix
+  ./home/programs/fzf.nix
   ./home/programs/git.nix
-  ./home/programs/ssh.nix
   ./home/programs/gpg-agent.nix
+  ./home/programs/htop.nix
+  ./home/programs/ssh.nix
 
   # Assertions (home-compatible version)
   ./misc/assertions-home.nix
