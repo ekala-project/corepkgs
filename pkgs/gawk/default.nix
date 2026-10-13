@@ -27,7 +27,8 @@
 assert (doCheck && stdenv.hostPlatform.isLinux) -> glibcLocales != null;
 
 stdenv.mkDerivation rec {
-  pname = "gawk" + lib.optionalString interactive "-interactive";
+  pname = "gawk";
+  extensions = lib.optionals interactive [ "interactive" ];
   version = "5.3.2";
 
   src = fetchurl {
