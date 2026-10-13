@@ -24,7 +24,8 @@
 }:
 
 stdenv.mkDerivation (finalAttrs: {
-  pname = "kbd" + lib.optionalString withVlock "-vlock";
+  pname = "kbd";
+  extensions = lib.optionals withVlock [ "vlock" ];
   version = "2.9.0";
 
   src = fetchgit {
