@@ -9,7 +9,8 @@
 }:
 
 rustPlatform.buildRustPackage {
-  pname = "rustfmt" + lib.optionalString asNightly "-nightly";
+  pname = "rustfmt";
+  extensions = lib.optionals asNightly [ "nightly" ];
   inherit (rustc) version src;
 
   # the rust source tarball already has all the dependencies vendored, no need to fetch them again
