@@ -49,7 +49,8 @@ let
   isCross = (stdenv.hostPlatform != stdenv.buildPlatform);
 in
 stdenv.mkDerivation rec {
-  pname = "coreutils" + (optionalString (!minimal) "-full");
+  pname = "coreutils";
+  extensions = lib.optionals (!minimal) [ "full" ];
   version = "9.9";
 
   src = fetchurl {
