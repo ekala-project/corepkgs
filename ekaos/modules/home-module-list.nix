@@ -13,6 +13,7 @@
 
   # Per-user program modules
   ./home/programs/bash.nix
+  ./home/programs/direnv.nix
   ./home/programs/git.nix
   ./home/programs/ssh.nix
   ./home/programs/gpg-agent.nix
