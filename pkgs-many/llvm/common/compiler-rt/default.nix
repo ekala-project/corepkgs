@@ -46,7 +46,8 @@ let
 in
 
 stdenv.mkDerivation (finalAttrs: {
-  pname = "compiler-rt${lib.optionalString haveLibc "-libc"}";
+  pname = "compiler-rt";
+  extensions = lib.optionals haveLibc [ "libc" ];
   inherit version;
 
   src =
