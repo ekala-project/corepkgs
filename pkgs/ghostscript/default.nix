@@ -67,7 +67,8 @@ let
 
 in
 stdenv.mkDerivation rec {
-  pname = "ghostscript${lib.optionalString x11Support "-with-X"}";
+  pname = "ghostscript";
+  extensions = lib.optionals x11Support [ "with-X" ];
   version = "10.06.0";
 
   src = fetchurl {
