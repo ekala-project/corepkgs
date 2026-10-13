@@ -1,4 +1,14 @@
 {
+  v8 = {
+    version = "8u504";
+    build = "b01";
+    # OpenJDK 8 (legacy)
+    src-hash = {
+      x86_64-linux = "sha256-nHDhAvUnrGdKwv6cfUe5oE4tGYQrpauOmzPzaLut+uo=";
+      aarch64-linux = "sha256-V7ftivnUhUK7Sf94lESAQLF76gpItBZ30R7K7GEpdo0=";
+    };
+  };
+
   v11 = {
     version = "11.0.25";
     build = "9";

@@ -28,20 +28,10 @@ let
   # Determine the major version for URL construction
   majorVersion = lib.versions.major version;
 
-  # Map Nix platform to Adoptium platform names
-  platform =
-    if stdenv.hostPlatform.system == "x86_64-linux" then
-      "linux-x64"
-    else if stdenv.hostPlatform.system == "aarch64-linux" then
-      "linux-aarch64"
-    else if stdenv.hostPlatform.system == "aarch64-darwin" then
-      "mac-aarch64"
-    else
-      throw "Unsupported platform: ${stdenv.hostPlatform.system}";
+  # JDK 8 uses a different versioning scheme (8u504-b01 vs 21.0.12+8)
+  isJdk8 = majorVersion == "8";
 
-  # Construct the download URL
-  # Format: https://github.com/adoptium/temurin{major}-binaries/releases/download/jdk-{version}+{build}/OpenJDK{major}U-jdk_{arch}_{os}_hotspot_{version}_{build}.tar.gz
-  archiveName = "OpenJDK${majorVersion}U-jdk_${
+  archPlatform =
     if stdenv.hostPlatform.isLinux then
       if stdenv.hostPlatform.isx86_64 then
         "x64_linux"
@@ -52,8 +42,19 @@ let
     else if stdenv.hostPlatform.isDarwin then
       if stdenv.hostPlatform.isAarch64 then "aarch64_mac" else throw "Unsupported macOS architecture"
     else
-      throw "Unsupported platform"
-  }_hotspot_${version}_${build}.tar.gz";
+      throw "Unsupported platform";
+
+  # JDK 8:  OpenJDK8U-jdk_x64_linux_hotspot_8u504b01.tar.gz
+  # JDK 11+: OpenJDK21U-jdk_x64_linux_hotspot_21.0.12_8.tar.gz
+  archiveName =
+    if isJdk8 then
+      "OpenJDK8U-jdk_${archPlatform}_hotspot_${version}${build}.tar.gz"
+    else
+      "OpenJDK${majorVersion}U-jdk_${archPlatform}_hotspot_${version}_${build}.tar.gz";
+
+  # JDK 8:  jdk8u504-b01
+  # JDK 11+: jdk-21.0.12%2B8
+  releaseTag = if isJdk8 then "jdk${version}-${build}" else "jdk-${version}%2B${build}";
 
 in
 stdenv.mkDerivation (finalAttrs: {
@@ -61,7 +62,9 @@ stdenv.mkDerivation (finalAttrs: {
   inherit version;
 
   src = fetchurl {
-    url = "https://github.com/adoptium/temurin${majorVersion}-binaries/releases/download/jdk-${version}%2B${build}/${archiveName}";
+    url = "https://github.com/adoptium/temurin${
+      if isJdk8 then "8" else majorVersion
+    }-binaries/releases/download/${releaseTag}/${archiveName}";
     hash =
       src-hash.${stdenv.hostPlatform.system}
         or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
@@ -147,11 +150,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Eclipse Temurin OpenJDK ${majorVersion} (Adoptium)";
     homepage = "https://adoptium.net/";
     license = lib.licenses.gpl2Plus; # GPLv2+ with Classpath exception
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "aarch64-darwin"
-    ];
+    platforms = builtins.attrNames src-hash;
     mainProgram = "java";
     identifiers.cpeParts = {
       vendor = "oracle";
