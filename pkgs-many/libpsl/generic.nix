@@ -26,7 +26,8 @@
 }:
 
 stdenv.mkDerivation (finalAttrs: {
-  pname = "libpsl" + lib.optionalString isMinimalBuild "-minimal";
+  pname = "libpsl";
+  extensions = lib.optionals isMinimalBuild [ "minimal" ];
   inherit version;
 
   src = fetchurl {
