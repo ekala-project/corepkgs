@@ -42,7 +42,8 @@ let
 in
 
 stdenv.mkDerivation {
-  pname = "texinfo${optionalString isInteractive "-interactive"}";
+  pname = "texinfo";
+  extensions = lib.optionals isInteractive [ "interactive" ];
   inherit version;
 
   src = fetchurl {
