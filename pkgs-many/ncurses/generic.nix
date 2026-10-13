@@ -23,7 +23,8 @@
 
 stdenv.mkDerivation (finalAttrs: {
   version = "6.6";
-  pname = "ncurses" + lib.optionalString (abiVersion == "5") "-abi5-compat";
+  pname = "ncurses";
+  extensions = lib.optionals (abiVersion == "5") [ "abi5-compat" ];
 
   src = fetchurl {
     url = "https://invisible-island.net/archives/ncurses/ncurses-${finalAttrs.version}.tar.gz";
