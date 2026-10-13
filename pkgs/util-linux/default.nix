@@ -38,7 +38,8 @@ let
   isMinimal = cryptsetupSupport == false && !nlsSupport && !ncursesSupport && !systemdSupport;
 in
 stdenv.mkDerivation (finalAttrs: {
-  pname = "util-linux" + lib.optionalString isMinimal "-minimal";
+  pname = "util-linux";
+  extensions = lib.optionals isMinimal [ "minimal" ];
   version = "2.41.2";
 
   src = fetchurl {
