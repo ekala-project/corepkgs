@@ -34,7 +34,8 @@ lib.warnIf (withDocs != null)
   ''
   stdenv.mkDerivation
   (fa: {
-    pname = "bash${lib.optionalString interactive "-interactive"}";
+    pname = "bash";
+    extensions = lib.optionals interactive [ "interactive" ];
     version = "5.3${fa.patch_suffix}";
     patch_suffix = "p${toString (builtins.length upstreamPatches)}";
 
