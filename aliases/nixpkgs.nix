@@ -206,6 +206,7 @@ mapAliases {
   jdk11 = renamed "jdk11" "java.v11" java.v11;
   jdk17 = renamed "jdk17" "java.v17" java.v17;
   jdk21 = renamed "jdk21" "java" java;
+  jdk8 = renamed "jdk8" "java.v8" java.v8;
   kernelPackagesExtensions = throw "kernelPackagesExtensions has been removed in ekapkgs. Use config.overlays.linux instead";
   kotlinc = renamed "kotlinc" "kotlin" kotlin;
   libcIconv = libc: callPackage ../pkgs-many/libiconv/libc.nix { inherit libc; };
@@ -279,6 +280,7 @@ mapAliases {
   nodejs_latest = renamed "nodejs_latest" "nodejs.v26" nodejs.v26;
   openjdk = renamed "openjdk" "java" java;
   openjdk11 = renamed "openjdk11" "java.v11" java.v11;
+  openjdk8 = renamed "openjdk8" "java.v8" java.v8;
   openssl_1_1 = renamed "openssl_1_1" "openssl.v1_1" openssl.v1_1;
   openssl_oqs = renamed "openssl_oqs" "openssl.oqs" openssl.oqs;
   patchelfUnstable = throw "patchelfUnstable was removed because it was older than patchelf and unneeded, use patchelf instead";
