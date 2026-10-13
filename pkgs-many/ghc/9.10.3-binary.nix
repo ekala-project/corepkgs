@@ -207,7 +207,10 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   inherit version;
-  pname = "ghc-binary${binDistUsed.variantSuffix}";
+  pname = "ghc-binary";
+  extensions = lib.optionals (binDistUsed.variantSuffix != "") [
+    (lib.removePrefix "-" binDistUsed.variantSuffix)
+  ];
 
   src = fetchurl binDistUsed.src;
 
