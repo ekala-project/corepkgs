@@ -42,7 +42,8 @@ let
   withTests = false;
 in
 stdenv.mkDerivation (finalAttrs: {
-  pname = "wayland" + lib.optionalString isScanner "-scanner";
+  pname = "wayland";
+  extensions = lib.optionals isScanner [ "scanner" ];
   inherit version;
 
   src = fetchurl {
