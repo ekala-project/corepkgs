@@ -20,13 +20,13 @@
   virtualenv,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "hatchling";
   version = "1.32.4";
   pyproject = true;
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-xEaPcxRMBU0qq07w8DeMQ7mHi/B/j/1reWkOlw03Xwc=";
   };
 
@@ -45,9 +45,6 @@ buildPythonPackage rec {
     "hatchling"
     "hatchling.build"
   ];
-
-  # tries to fetch packages from the internet
-  doCheck = false;
 
   # listed in /backend/tests/downstream/requirements.txt
   nativeCheckInputs = [
@@ -70,8 +67,8 @@ buildPythonPackage rec {
     description = "Modern, extensible Python build backend";
     mainProgram = "hatchling";
     homepage = "https://hatch.pypa.io/latest/";
-    changelog = "https://github.com/pypa/hatch/releases/tag/hatchling-v${version}";
+    changelog = "https://github.com/pypa/hatch/releases/tag/hatchling-v${finalAttrs.version}";
     license = lib.licenses.mit;
 
   };
-}
+})

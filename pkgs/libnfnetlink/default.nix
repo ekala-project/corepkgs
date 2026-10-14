@@ -5,12 +5,12 @@
   iptables,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libnfnetlink";
   version = "1.0.2";
 
   src = fetchurl {
-    url = "https://www.netfilter.org/projects/libnfnetlink/files/libnfnetlink-${version}.tar.bz2";
+    url = "https://www.netfilter.org/projects/libnfnetlink/files/libnfnetlink-${finalAttrs.version}.tar.bz2";
     sha256 = "0xn3rcrzxr6g82kfxzs9bqn2zvl2kf2yda30drwb9vr6sk1wfr5h";
   };
 
@@ -32,6 +32,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.netfilter.org/projects/libnfnetlink/index.html";
     license = lib.licenses.gpl2;
     platforms = lib.platforms.linux;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "netfilter" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "netfilter" finalAttrs.version;
   };
-}
+})

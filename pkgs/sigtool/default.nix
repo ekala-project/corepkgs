@@ -6,14 +6,14 @@
   openssl,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "sigtool";
   version = "0.1.3";
 
   src = fetchFromGitHub {
     owner = "thefloweringash";
     repo = "sigtool";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-K3VSFaqcZEomF7kROJz+AwxdW1MmxxEFDaRnWnzcw54=";
   };
 
@@ -34,4 +34,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     mainProgram = "sigtool";
   };
-}
+})

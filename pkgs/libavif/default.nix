@@ -13,7 +13,7 @@
   libyuv,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libavif";
   version = "1.4.2";
 
@@ -25,7 +25,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "AOMediaCodec";
     repo = "libavif";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-AMQ1TRPGpuBBW7tJ8xuLEVTAeOsLWTHuE0dFJjI7+W4=";
   };
 
@@ -62,6 +62,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/AOMediaCodec/libavif";
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "aomedia" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "aomedia" finalAttrs.version;
   };
-}
+})

@@ -6,8 +6,8 @@
   kernelModuleMakeFlags,
 }:
 
-stdenv.mkDerivation rec {
-  name = "liquidtux-${version}-${kernel.version}";
+stdenv.mkDerivation (finalAttrs: {
+  name = "liquidtux-${finalAttrs.version}-${kernel.version}";
   version = "0.1.0-unstable-2025-01-16";
 
   src = fetchFromGitHub {
@@ -42,4 +42,4 @@ stdenv.mkDerivation rec {
     ];
     broken = lib.versionOlder kernel.version "5.10";
   };
-}
+})

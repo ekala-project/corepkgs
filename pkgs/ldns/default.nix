@@ -9,12 +9,12 @@
   autoreconfHook,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "ldns";
   version = "1.8.4";
 
   src = fetchurl {
-    url = "https://www.nlnetlabs.nl/downloads/ldns/${pname}-${version}.tar.gz";
+    url = "https://www.nlnetlabs.nl/downloads/ldns/ldns-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-g4uQdZS6r/HNdn6VRmp3RZmK5kvHS+A43Mxi4t4uQkc=";
   };
 
@@ -49,7 +49,6 @@ stdenv.mkDerivation rec {
   ];
 
   nativeCheckInputs = [ which ];
-  doCheck = false; # fails. missing some files
 
   postInstall = ''
     # Only 'drill' stays in $out
@@ -66,4 +65,4 @@ stdenv.mkDerivation rec {
     mainProgram = "drill";
     platforms = lib.platforms.unix;
   };
-}
+})

@@ -12,7 +12,7 @@
   platformdirs,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "virtualenv";
   version = "20.33.1";
   format = "pyproject";
@@ -20,7 +20,7 @@ buildPythonPackage rec {
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-G0RHjZ4mGz+4uqXnSgyjvA4F8hqjYWe/nL+FDlQnZbg=";
   };
 
@@ -46,7 +46,6 @@ buildPythonPackage rec {
   # ]
   # ++ lib.optionals (!isPyPy) [ time-machine ];
 
-  doCheck = false;
   preCheck = ''
     export HOME=$(mktemp -d)
   '';
@@ -83,7 +82,7 @@ buildPythonPackage rec {
     description = "Tool to create isolated Python environments";
     mainProgram = "virtualenv";
     homepage = "http://www.virtualenv.org";
-    changelog = "https://github.com/pypa/virtualenv/blob/${version}/docs/changelog.rst";
+    changelog = "https://github.com/pypa/virtualenv/blob/${finalAttrs.version}/docs/changelog.rst";
     license = lib.licenses.mit;
   };
-}
+})

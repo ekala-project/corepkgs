@@ -8,8 +8,8 @@
   nukeReferences,
 }:
 
-stdenv.mkDerivation rec {
-  name = "rtl8189es-${kernel.version}-${version}";
+stdenv.mkDerivation (finalAttrs: {
+  name = "rtl8189es-${kernel.version}-${finalAttrs.version}";
   version = "2025-09-26";
 
   src = fetchFromGitHub {
@@ -59,4 +59,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
   };
-}
+})

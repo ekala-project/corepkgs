@@ -33,7 +33,7 @@
   wagtail ? null,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "beautifulsoup4";
   version = "4.15.0";
   pyproject = true;
@@ -44,7 +44,7 @@ buildPythonPackage rec {
   ];
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-KI48p9VLBvKsGRlwvCdcGTnLRtRQslW/ZxiwSqN6tPc=";
   };
 
@@ -68,7 +68,7 @@ buildPythonPackage rec {
   nativeCheckInputs = [
     pytestCheckHook
   ]
-  ++ lib.concatAttrValues optional-dependencies;
+  ++ lib.concatAttrValues finalAttrs.optional-dependencies;
 
   disabledTests = [
     # fail with latest libxml, by not actually rejecting
@@ -90,10 +90,10 @@ buildPythonPackage rec {
   };
 
   meta = {
-    changelog = "https://git.launchpad.net/beautifulsoup/tree/CHANGELOG?h=${version}";
+    changelog = "https://git.launchpad.net/beautifulsoup/tree/CHANGELOG?h=${finalAttrs.version}";
     description = "HTML and XML parser";
     homepage = "http://crummy.com/software/BeautifulSoup/bs4/";
     license = lib.licenses.mit;
 
   };
-}
+})

@@ -20,12 +20,12 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "bison";
   version = "3.8.2";
 
   src = fetchurl {
-    url = "mirror://gnu/${pname}/${pname}-${version}.tar.gz";
+    url = "mirror://gnu/bison/bison-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-BsnhO99+sk1M62tZIFpPZ8LH5yExGWREMP6C+9FKCrs=";
   };
 
@@ -50,10 +50,6 @@ stdenv.mkDerivation rec {
 
   # tests are flaky / timing sensitive on FreeBSD
   enableParallelChecking = !stdenv.hostPlatform.isFreeBSD;
-
-  # Normal check and install check largely execute the same test suite
-  doCheck = false;
-  doInstallCheck = false; # TODO: flip to true in passthru
 
   passthru.tests = {
     version = testers.testVersion {
@@ -100,6 +96,6 @@ stdenv.mkDerivation rec {
       to use Bison.
     '';
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" finalAttrs.version;
   };
-}
+})

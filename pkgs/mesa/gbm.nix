@@ -15,7 +15,7 @@
 let
   common = import ./common.nix { inherit lib fetchFromGitLab; };
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "mesa-libgbm";
 
   # We don't use the versions from common.nix, because libgbm is a world rebuild,
@@ -31,7 +31,7 @@ stdenv.mkDerivation rec {
     domain = "gitlab.freedesktop.org";
     owner = "mesa";
     repo = "mesa";
-    rev = "mesa-${version}";
+    rev = "mesa-${finalAttrs.version}";
     hash = "sha256-UlI+6OMUj5F6uVAw+Mg2wOZrjfdRq73d1qufaXVI/go";
   };
 
@@ -73,4 +73,4 @@ stdenv.mkDerivation rec {
   ];
 
   inherit (common) meta;
-}
+})

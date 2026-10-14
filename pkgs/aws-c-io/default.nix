@@ -9,7 +9,7 @@
   s2n-tls,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-c-io";
   # nixpkgs-update: no auto update
   version = "1.0.0";
@@ -23,7 +23,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-io";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-gdu1v6ui9y5Y+tp0K0fpbE2e2O4Ky/WPEekphWbhUDQ=";
   };
 
@@ -42,9 +42,6 @@ stdenv.mkDerivation rec {
     BUILD_SHARED_LIBS = true;
   };
 
-  # TODO(corepkgs): move to passthru
-  doCheck = false;
-
   passthru.tests = {
     inherit nix;
   };
@@ -54,6 +51,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/awslabs/aws-c-io";
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" finalAttrs.version;
   };
-}
+})

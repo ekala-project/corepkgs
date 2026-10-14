@@ -7,14 +7,14 @@
   fetchpatch,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "ddcci-driver";
   version = "0.4.5-unstable-2024-09-26";
-  name = "${pname}-${kernel.version}-${version}";
+  name = "${finalAttrs.pname}-${kernel.version}-${finalAttrs.version}";
 
   src = fetchFromGitLab {
-    owner = "${pname}-linux";
-    repo = "${pname}-linux";
+    owner = "${finalAttrs.pname}-linux";
+    repo = "${finalAttrs.pname}-linux";
     rev = "0233e1ee5eddb4b8a706464f3097bad5620b65f4";
     hash = "sha256-Osvojt8UE+cenOuMoSY+T+sODTAAKkvY/XmBa5bQX88=";
   };
@@ -54,4 +54,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     broken = kernel.kernelOlder "5.1";
   };
-}
+})

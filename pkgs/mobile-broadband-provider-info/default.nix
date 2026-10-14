@@ -8,12 +8,12 @@
   ninja,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "mobile-broadband-provider-info";
   version = "20240407";
 
   src = fetchurl {
-    url = "mirror://gnome/sources/${pname}/${version}/${pname}-${version}.tar.xz";
+    url = "mirror://gnome/sources/mobile-broadband-provider-info/${finalAttrs.version}/mobile-broadband-provider-info-${finalAttrs.version}.tar.xz";
     hash = "sha256-ib/v8hX0v/jpw/8uwlJQ/bCA0R6b+lnG/HGYKsAcgUo=";
   };
 
@@ -31,4 +31,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.publicDomain;
     platforms = lib.platforms.all;
   };
-}
+})

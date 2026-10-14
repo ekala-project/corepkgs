@@ -7,7 +7,7 @@
   callPackage,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "uv-build";
   version = "0.9.7";
   pyproject = true;
@@ -15,7 +15,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "astral-sh";
     repo = "uv";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-I0Oe6vaH7iQh+Ubp5RIk8Ol6Ni7OPu8HKX0fqLdewyk=";
   };
 
@@ -25,7 +25,7 @@ buildPythonPackage rec {
   ];
 
   cargoDeps = rustPlatform.fetchCargoVendor {
-    inherit pname version src;
+    inherit (finalAttrs) pname version src;
     hash = "sha256-K/RP7EA0VAAI8TGx+VwfKPmyT6+x4p3kekuoMZ0/egc=";
   };
 
@@ -35,9 +35,6 @@ buildPythonPackage rec {
   maturinBuildFlags = [ "--profile=minimal-size" ];
 
   pythonImportsCheck = [ "uv_build" ];
-
-  # The package has no tests
-  doCheck = false;
 
   # Run the tests of a package built by `uv_build`.
   passthru = {
@@ -51,4 +48,4 @@ buildPythonPackage rec {
     homepage = "https://docs.astral.sh/uv/reference/settings/#build-backend";
     inherit (pkgs.uv.meta) changelog license;
   };
-}
+})

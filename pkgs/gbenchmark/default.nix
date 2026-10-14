@@ -9,7 +9,7 @@
   prometheus-cpp ? null,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "gbenchmark";
   version = "1.9.5";
 
@@ -17,12 +17,11 @@ stdenv.mkDerivation rec {
     "out"
     "include"
   ];
-  outputInclude = "include";
 
   src = fetchFromGitHub {
     owner = "google";
     repo = "benchmark";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-Mm4pG7zMB00iof32CxreoNBFnduPZTMp3reHMCIAFPQ=";
   };
 
@@ -73,4 +72,4 @@ stdenv.mkDerivation rec {
       product = "benchmark";
     };
   };
-}
+})

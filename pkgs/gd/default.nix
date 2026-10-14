@@ -20,12 +20,12 @@
   libxpm,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "gd";
   version = "2.3.3";
 
   src = fetchurl {
-    url = "https://github.com/libgd/libgd/releases/download/${pname}-${version}/libgd-${version}.tar.xz";
+    url = "https://github.com/libgd/libgd/releases/download/gd-${finalAttrs.version}/libgd-${finalAttrs.version}.tar.xz";
     sha256 = "0qas3q9xz3wgw06dm2fj0i189rain6n60z1vyq50d5h7wbn25s1z";
   };
 
@@ -72,13 +72,11 @@ stdenv.mkDerivation rec {
     "out"
   ];
 
-  doCheck = false; # fails 2 tests
-
   meta = {
     homepage = "https://libgd.github.io/";
     description = "Dynamic image creation library";
     license = lib.licenses.free; # some custom license
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libgd" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libgd" finalAttrs.version;
   };
-}
+})

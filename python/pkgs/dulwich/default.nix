@@ -11,7 +11,7 @@
   urllib3,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "dulwich";
   version = "1.2.15";
   pyproject = true;
@@ -19,12 +19,12 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "jelmer";
     repo = "dulwich";
-    tag = "dulwich-${version}";
+    tag = "dulwich-${finalAttrs.version}";
     hash = "sha256-ZLTgVeY9seeElnRc0G7M+0bFx8b/9i5dMj4/61A/maY=";
   };
 
   cargoDeps = rustPlatform.fetchCargoVendor {
-    inherit pname version src;
+    inherit (finalAttrs) pname version src;
     hash = "sha256-X8sKVLTPQVjAcW+h1X/AsHW7UgwSOUbAa4VRZfhepM0=";
   };
 
@@ -43,9 +43,6 @@ buildPythonPackage rec {
     urllib3
   ];
 
-  # Disable tests as they require many dependencies not yet in core-pkgs
-  doCheck = false;
-
   pythonImportsCheck = [ "dulwich" ];
 
   meta = {
@@ -55,10 +52,10 @@ buildPythonPackage rec {
       does not depend on Git itself. All functionality is available in pure Python.
     '';
     homepage = "https://www.dulwich.io/";
-    changelog = "https://github.com/jelmer/dulwich/blob/dulwich-${src.tag}/NEWS";
+    changelog = "https://github.com/jelmer/dulwich/blob/dulwich-${finalAttrs.src.tag}/NEWS";
     license = with lib.licenses; [
       asl20
       gpl2Plus
     ];
   };
-}
+})

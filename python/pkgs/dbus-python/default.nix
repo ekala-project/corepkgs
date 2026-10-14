@@ -18,7 +18,7 @@
 
 lib.fix (
   finalPackage:
-  buildPythonPackage rec {
+  buildPythonPackage (finalAttrs: {
     pname = "dbus-python";
     version = "1.4.0";
     pyproject = true;
@@ -31,7 +31,7 @@ lib.fix (
     ];
 
     src = fetchPypi {
-      inherit pname version;
+      inherit (finalAttrs) pname version;
       hash = "sha256-mRZm5Jj2Db8+Sbi3Z49VWbimUDT99hquYs3s232Jx3A=";
     };
 
@@ -101,5 +101,5 @@ lib.fix (
       platforms = pkgsHostTarget.dbus.meta.platforms;
 
     };
-  }
+  })
 )

@@ -4,13 +4,13 @@
   buildRebar3,
 }:
 
-buildRebar3 rec {
+buildRebar3 (finalAttrs: {
   name = "pc";
   version = "1.15.0";
 
   src = fetchHex {
-    pkg = name;
-    inherit version;
+    pkg = finalAttrs.name;
+    inherit (finalAttrs) version;
     sha256 = "sha256-TA+tT2Q3yuNT1RfaIY/ng0e4/6RLmBeIdJTKquVFlbM=";
   };
 
@@ -19,4 +19,4 @@ buildRebar3 rec {
     license = lib.licenses.mit;
     homepage = "https://github.com/blt/port_compiler";
   };
-}
+})

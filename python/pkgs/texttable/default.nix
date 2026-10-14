@@ -5,13 +5,13 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "texttable";
   version = "1.7.0";
   format = "setuptools";
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-LSBo+1URWAfTrHekymj6SIA+hOuw7iNA+FgQejZSJjg=";
   };
 
@@ -26,4 +26,4 @@ buildPythonPackage rec {
     homepage = "https://github.com/foutaise/texttable";
     license = lib.licenses.mit;
   };
-}
+})

@@ -29,14 +29,14 @@ let
 
 in
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "shadow";
   version = "4.20.3";
 
   src = fetchFromGitHub {
     owner = "shadow-maint";
     repo = "shadow";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-BD0EWOhpFyNeb4WDcLQNmUYWcXthe4o7WV4sG8kJB7E=";
   };
 
@@ -128,4 +128,4 @@ stdenv.mkDerivation rec {
   passthru = {
     shellPath = "/bin/nologin";
   };
-}
+})

@@ -6,17 +6,17 @@
   kernelModuleMakeFlags,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "akvcam";
   version = "1.3.0";
 
   src = fetchFromGitHub {
     owner = "webcamoid";
     repo = "akvcam";
-    rev = version;
+    rev = finalAttrs.version;
     sha256 = "sha256-3fs+Kfafry77SQvsAidM29g9CcfjWirteS/VdNSWVCE=";
   };
-  sourceRoot = "${src.name}/src";
+  sourceRoot = "${finalAttrs.src.name}/src";
 
   nativeBuildInputs = kernel.moduleBuildDependencies;
   makeFlags = kernelModuleMakeFlags ++ [
@@ -33,4 +33,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     license = lib.licenses.gpl2Only;
   };
-}
+})

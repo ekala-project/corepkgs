@@ -33,7 +33,7 @@
   libwebp,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libwebp";
   version = "1.6.0";
 
@@ -46,7 +46,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "webmproject";
     repo = "libwebp";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-7i4fGBTsTjAkBzCjVqXqX4n22j6dLgF/0mz4ajNA45U=";
   };
 
@@ -117,6 +117,6 @@ stdenv.mkDerivation rec {
     ++ lib.optionals libwebpmuxSupport [
       "libwebpmux"
     ];
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "webmproject" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "webmproject" finalAttrs.version;
   };
-}
+})

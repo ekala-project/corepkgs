@@ -10,7 +10,7 @@
   tomlkit,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "poetry-dynamic-versioning";
   version = "1.10.0";
   format = "pyproject";
@@ -20,7 +20,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "mtkennerly";
     repo = "poetry-dynamic-versioning";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-sETUaOKFS0T4o++W1maKt7qsy0CdnmMQT7vegNKQCbk=";
   };
 
@@ -36,9 +36,6 @@ buildPythonPackage rec {
   nativeCheckInputs = [
     pytestCheckHook
   ];
-
-  # virtualenv: error: argument dest: the destination . is not write-able at /
-  doCheck = false;
 
   disabledTests = [
     # these require .git, but leaveDotGit = true doesn't help
@@ -56,8 +53,8 @@ buildPythonPackage rec {
     description = "Plugin for Poetry to enable dynamic versioning based on VCS tags";
     mainProgram = "poetry-dynamic-versioning";
     homepage = "https://github.com/mtkennerly/poetry-dynamic-versioning";
-    changelog = "https://github.com/mtkennerly/poetry-dynamic-versioning/blob/${src.tag}/CHANGELOG.md";
+    changelog = "https://github.com/mtkennerly/poetry-dynamic-versioning/blob/${finalAttrs.src.tag}/CHANGELOG.md";
     license = lib.licenses.mit;
 
   };
-}
+})

@@ -6,7 +6,7 @@
   kernelModuleMakeFlags,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "dpdk-kmods";
   version = "2023-02-05";
 
@@ -20,14 +20,14 @@ stdenv.mkDerivation rec {
   makeFlags = kernelModuleMakeFlags ++ [
     "INSTALL_MOD_PATH=${placeholder "out"}"
   ];
-  KSRC = "${kernel.dev}/lib/modules/${kernel.modDirVersion}/build";
+  env.KSRC = "${kernel.dev}/lib/modules/${kernel.modDirVersion}/build";
 
   nativeBuildInputs = kernel.moduleBuildDependencies;
 
   preBuild = "cd linux/igb_uio";
 
   installPhase = ''
-    make -C ${KSRC} M=$(pwd) modules_install "''${makeFlags[@]}"
+    make -C $KSRC M=$(pwd) modules_install "''${makeFlags[@]}"
   '';
 
   meta = {
@@ -36,4 +36,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
   };
-}
+})

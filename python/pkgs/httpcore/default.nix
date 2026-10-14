@@ -14,7 +14,7 @@
   httpx,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "httpcore";
   version = "1.0.9";
   pyproject = true;
@@ -22,7 +22,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "encode";
     repo = "httpcore";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-YtAbx0iXN7u8pMBXQBUydvAH6ilH+veklvxSh5EVFXo=";
   };
 
@@ -43,7 +43,6 @@ buildPythonPackage rec {
     # trio = [ trio ];
   };
 
-  doCheck = false;
   # nativeCheckInputs = [
   #   pytest-httpbin
   #   pytest-trio
@@ -60,9 +59,9 @@ buildPythonPackage rec {
   };
 
   meta = {
-    changelog = "https://github.com/encode/httpcore/blob/${version}/CHANGELOG.md";
+    changelog = "https://github.com/encode/httpcore/blob/${finalAttrs.version}/CHANGELOG.md";
     description = "Minimal low-level HTTP client";
     homepage = "https://github.com/encode/httpcore";
     license = lib.licenses.bsd3;
   };
-}
+})

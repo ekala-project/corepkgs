@@ -5,21 +5,18 @@
   setuptools,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "types-setuptools";
   version = "80.9.0.20250822";
   pyproject = true;
 
   src = fetchPypi {
     pname = "types_setuptools";
-    inherit version;
+    inherit (finalAttrs) version;
     hash = "sha256-Bw6ncWlo7GeoTH93aNmVL/JNKLZbZZR5ekZPGzBm+WU=";
   };
 
   nativeBuildInputs = [ setuptools ];
-
-  # Module doesn't have tests
-  doCheck = false;
 
   pythonImportsCheck = [ "setuptools-stubs" ];
 
@@ -28,4 +25,4 @@ buildPythonPackage rec {
     homepage = "https://github.com/python/typeshed";
     license = lib.licenses.asl20;
   };
-}
+})

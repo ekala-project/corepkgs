@@ -10,9 +10,9 @@
   rsync,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "ply";
-  version = "2.1.1-${lib.substring 0 7 src.rev}";
+  version = "2.1.1-${lib.substring 0 7 finalAttrs.src.rev}";
 
   nativeBuildInputs = [
     autoreconfHook
@@ -53,4 +53,4 @@ stdenv.mkDerivation rec {
     license = [ lib.licenses.gpl2Only ];
     platforms = lib.platforms.linux;
   };
-}
+})

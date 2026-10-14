@@ -15,7 +15,7 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "keyring";
   version = "25.7.0";
   pyproject = true;
@@ -23,7 +23,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "jaraco";
     repo = "keyring";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-v9s28vwx/5DJRa3dQyS/mdZppfvFcfBtafjBRi2c1oQ=";
   };
 
@@ -59,15 +59,12 @@ buildPythonPackage rec {
     "keyring.backend"
   ];
 
-  # Disable tests as they require pyfakefs and shtab
-  doCheck = false;
-
   meta = {
     description = "Store and access your passwords safely";
     homepage = "https://github.com/jaraco/keyring";
-    changelog = "https://github.com/jaraco/keyring/blob/${src.tag}/NEWS.rst";
+    changelog = "https://github.com/jaraco/keyring/blob/${finalAttrs.src.tag}/NEWS.rst";
     license = lib.licenses.mit;
     mainProgram = "keyring";
     platforms = lib.platforms.unix;
   };
-}
+})

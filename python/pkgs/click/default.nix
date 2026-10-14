@@ -14,7 +14,7 @@
   flit-core ? null,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "click";
   version = "8.5.0";
   pyproject = true;
@@ -22,7 +22,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "pallets";
     repo = "click";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-VYdaEN9l2MRVz42I8t8IDOpG5XeDM8bf34dLZy3yf10=";
   };
 
@@ -51,7 +51,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "click" ];
 
   meta = {
-    changelog = "https://github.com/pallets/click/blob/${src.tag}/CHANGES.rst";
+    changelog = "https://github.com/pallets/click/blob/${finalAttrs.src.tag}/CHANGES.rst";
     homepage = "https://click.palletsprojects.com/";
     description = "Create beautiful command line interfaces in Python";
     longDescription = ''
@@ -61,4 +61,4 @@ buildPythonPackage rec {
     license = lib.licenses.bsd3;
 
   };
-}
+})

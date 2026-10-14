@@ -13,12 +13,12 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libev";
   version = "4.33";
 
   src = fetchurl {
-    url = "http://dist.schmorp.de/libev/Attic/${pname}-${version}.tar.gz";
+    url = "http://dist.schmorp.de/libev/Attic/libev-${finalAttrs.version}.tar.gz";
     sha256 = "1sjs4324is7fp21an4aas2z4dwsvs6z4xwrmp72vwpq1s6wbfzjh";
   };
 
@@ -34,6 +34,6 @@ stdenv.mkDerivation rec {
     description = "High-performance event loop/event model with lots of features";
     platforms = lib.platforms.all;
     license = lib.licenses.bsd2; # or GPL2+
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libev_project" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libev_project" finalAttrs.version;
   };
-}
+})

@@ -6,13 +6,13 @@
   uv-build,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "cryptography-vectors";
   # The test vectors must have the same version as the cryptography package
   inherit (cryptography) version src;
   pyproject = true;
 
-  sourceRoot = "${src.name}/vectors";
+  sourceRoot = "${finalAttrs.src.name}/vectors";
 
   postPatch = ''
     substituteInPlace pyproject.toml \
@@ -20,9 +20,6 @@ buildPythonPackage rec {
   '';
 
   build-system = [ uv-build ];
-
-  # No tests included
-  doCheck = false;
 
   pythonImportsCheck = [ "cryptography_vectors" ];
 
@@ -35,4 +32,4 @@ buildPythonPackage rec {
       bsd3
     ];
   };
-}
+})

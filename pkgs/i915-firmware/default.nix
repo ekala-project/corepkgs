@@ -4,14 +4,14 @@
   fetchFromGitLab,
 }:
 
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "i915-firmware";
   version = "20260810";
 
   src = fetchFromGitLab {
     owner = "kernel-firmware";
     repo = "linux-firmware";
-    rev = "refs/tags/${version}";
+    rev = "refs/tags/${finalAttrs.version}";
     hash = "sha256-QSGWkqQEcJAVybZSUrbO9o//oJiqZpTSUTEXbpa64Vg=";
     sparseCheckout = [ "i915" ];
   };
@@ -27,4 +27,4 @@ stdenvNoCC.mkDerivation rec {
     license = lib.licenses.unfreeRedistributableFirmware;
     platforms = lib.platforms.linux;
   };
-}
+})

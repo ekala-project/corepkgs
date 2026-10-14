@@ -18,15 +18,15 @@
   pruneLibtoolFiles,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "cyrus-sasl";
   version = "2.1.28";
 
   src = fetchurl {
     urls = [
-      "https://github.com/cyrusimap/${pname}/releases/download/${pname}-${version}/${pname}-${version}.tar.gz"
-      "http://www.cyrusimap.org/releases/${pname}-${version}.tar.gz"
-      "http://www.cyrusimap.org/releases/old/${pname}-${version}.tar.gz"
+      "https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-${finalAttrs.version}/cyrus-sasl-${finalAttrs.version}.tar.gz"
+      "http://www.cyrusimap.org/releases/cyrus-sasl-${finalAttrs.version}.tar.gz"
+      "http://www.cyrusimap.org/releases/old/cyrus-sasl-${finalAttrs.version}.tar.gz"
     ];
     sha256 = "sha256-fM/Gq9Ae1nwaCSSzU+Um8bdmsh9C1FYu5jWo6/xbs4w=";
   };
@@ -95,6 +95,6 @@ stdenv.mkDerivation rec {
     description = "Library for adding authentication support to connection-based protocols";
     platforms = lib.platforms.unix;
     license = lib.licenses.bsdOriginal;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "cmu" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "cmu" finalAttrs.version;
   };
-}
+})

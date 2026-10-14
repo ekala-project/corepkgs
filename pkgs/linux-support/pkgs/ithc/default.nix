@@ -6,7 +6,7 @@
   kernelModuleMakeFlags,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "ithc";
   version = "unstable-2022-06-07";
 
@@ -20,7 +20,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = kernel.moduleBuildDependencies;
 
   makeFlags = kernelModuleMakeFlags ++ [
-    "VERSION=${version}"
+    "VERSION=${finalAttrs.version}"
     "KDIR=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
   ];
 
@@ -37,4 +37,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     broken = kernel.kernelOlder "5.9" || kernel.kernelAtLeast "6.10";
   };
-}
+})

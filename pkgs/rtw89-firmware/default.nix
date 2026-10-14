@@ -4,14 +4,14 @@
   fetchFromGitLab,
 }:
 
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "rtw89-firmware";
   version = "20260810";
 
   src = fetchFromGitLab {
     owner = "kernel-firmware";
     repo = "linux-firmware";
-    rev = "refs/tags/${version}";
+    rev = "refs/tags/${finalAttrs.version}";
     hash = "sha256-hBSMqTeoLo2JEb2Hvq5CHpLQSEQYBetMzsheG6NrX7A=";
     sparseCheckout = [ "rtw89" ];
   };
@@ -27,4 +27,4 @@ stdenvNoCC.mkDerivation rec {
     license = lib.licenses.unfreeRedistributableFirmware;
     platforms = lib.platforms.linux;
   };
-}
+})

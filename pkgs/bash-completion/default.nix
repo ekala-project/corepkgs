@@ -9,7 +9,7 @@
   bashInteractive,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "bash-completion";
   version = "2.18.0";
 
@@ -18,7 +18,7 @@ stdenv.mkDerivation rec {
   # test fixtures that are part of the repository.
   # See discussion in https://github.com/NixOS/nixpkgs/issues/107768
   src = fetchurl {
-    url = "https://github.com/scop/bash-completion/releases/download/${version}/bash-completion-${version}.tar.xz";
+    url = "https://github.com/scop/bash-completion/releases/download/${finalAttrs.version}/bash-completion-${finalAttrs.version}.tar.xz";
     hash = "sha256-iLz4UST3f3Ty8vi80WrEOC2AeoJ+3nQqZJQMcRauoz8=";
   };
 
@@ -30,9 +30,6 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ autoreconfHook ];
 
-  # tests are super flaky unfortunately, and regularly break.
-  # let's disable them for now.
-  doCheck = false;
   nativeCheckInputs = [
     # perl is assumed by perldoc completion
     perl
@@ -77,4 +74,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix;
   };
-}
+})

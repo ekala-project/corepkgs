@@ -13,12 +13,12 @@
   ninja,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "gsettings-desktop-schemas";
   version = "50.1";
 
   src = fetchurl {
-    url = "mirror://gnome/sources/gsettings-desktop-schemas/${lib.versions.major version}/gsettings-desktop-schemas-${version}.tar.xz";
+    url = "mirror://gnome/sources/gsettings-desktop-schemas/${lib.versions.major finalAttrs.version}/gsettings-desktop-schemas-${finalAttrs.version}.tar.xz";
     hash = "sha256-CiqiUIJnJYXRb82rYcew4z8DX7h0dlBceU8pVlr6SFs=";
   };
 
@@ -55,4 +55,4 @@ stdenv.mkDerivation rec {
     description = "Collection of GSettings schemas for settings shared by various components of a desktop";
     license = lib.licenses.lgpl21Plus;
   };
-}
+})

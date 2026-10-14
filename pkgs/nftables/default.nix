@@ -26,12 +26,12 @@
   ncurses,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   version = "1.1.6";
   pname = "nftables";
 
   src = fetchurl {
-    url = "https://netfilter.org/projects/nftables/files/${pname}-${version}.tar.xz";
+    url = "https://netfilter.org/projects/nftables/files/nftables-${finalAttrs.version}.tar.xz";
     hash = "sha256-NykxvahVazEGNqL5AgrccQ+bq2b0fv4M6Qv/gArCUww=";
   };
 
@@ -97,8 +97,6 @@ stdenv.mkDerivation rec {
   ++ lib.optional (!withDebugSymbols) "--disable-debug"
   ++ lib.optional withXtables "--with-xtables";
 
-  doCheck = false;
-
   passthru.tests = {
     version = testers.testVersion {
       package = nftables;
@@ -112,6 +110,6 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
     mainProgram = "nft";
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "netfilter" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "netfilter" finalAttrs.version;
   };
-}
+})

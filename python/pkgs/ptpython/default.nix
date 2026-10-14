@@ -9,13 +9,13 @@
   setuptools,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "ptpython";
   version = "3.0.32";
   pyproject = true;
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-EWUXeCNt6VxYK0JzcpTlCma6SiH6AcAJDqcIFa9Hj+A=";
   };
 
@@ -28,15 +28,12 @@ buildPythonPackage rec {
     pygments
   ];
 
-  # no tests to run
-  doCheck = false;
-
   pythonImportsCheck = [ "ptpython" ];
 
   meta = {
     description = "Advanced Python REPL";
     homepage = "https://github.com/prompt-toolkit/ptpython";
-    changelog = "https://github.com/prompt-toolkit/ptpython/blob/${version}/CHANGELOG";
+    changelog = "https://github.com/prompt-toolkit/ptpython/blob/${finalAttrs.version}/CHANGELOG";
     license = lib.licenses.bsd3;
   };
-}
+})

@@ -7,7 +7,7 @@
   kernelModuleMakeFlags,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "ipu6-drivers";
   version = "unstable-2025-09-16";
 
@@ -19,7 +19,7 @@ stdenv.mkDerivation rec {
   };
 
   patches = [
-    "${src}/patches/0001-v6.10-IPU6-headers-used-by-PSYS.patch"
+    "${finalAttrs.src}/patches/0001-v6.10-IPU6-headers-used-by-PSYS.patch"
   ];
 
   postPatch = ''
@@ -53,4 +53,4 @@ stdenv.mkDerivation rec {
     # requires 6.10
     broken = kernel.kernelOlder "6.10";
   };
-}
+})

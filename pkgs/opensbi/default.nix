@@ -8,14 +8,14 @@
   withFDT ? null,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "opensbi";
   version = "1.8.1";
 
   src = fetchFromGitHub {
     owner = "riscv-software-src";
     repo = "opensbi";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-nD22UZfH0rJECHMDwd9ATyLz44cFHqcFH7N6piK8hog=";
   };
 
@@ -44,6 +44,6 @@ stdenv.mkDerivation rec {
       "riscv64-linux"
       "riscv32-linux"
     ];
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "opensbi_project" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "opensbi_project" finalAttrs.version;
   };
-}
+})

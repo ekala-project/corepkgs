@@ -42,7 +42,7 @@ let
   system = "/run/current-system/sw";
   setuid = "/run/wrappers/bin";
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "polkit";
   version = "126";
 
@@ -56,7 +56,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "polkit-org";
     repo = "polkit";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-ZSqgW//q5DFIsmY17U93mJcK/CHSCHphKTHsTxp40q8=";
   };
 
@@ -210,6 +210,6 @@ stdenv.mkDerivation rec {
       # mandatory libpolkit-gobject shared library
       lib.systems.inspect.platformPatterns.isStatic
     ];
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "polkit_project" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "polkit_project" finalAttrs.version;
   };
-}
+})

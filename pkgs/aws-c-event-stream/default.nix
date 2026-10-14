@@ -12,7 +12,7 @@
   libexecinfo,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-c-event-stream";
   version = "1.0.0";
 
@@ -25,7 +25,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-event-stream";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-J8bcDIK6rEM2AyhTiRvPA2ikbv8gfDxEY8izuKLBNac=";
   };
 
@@ -56,6 +56,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/awslabs/aws-c-event-stream";
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" finalAttrs.version;
   };
-}
+})

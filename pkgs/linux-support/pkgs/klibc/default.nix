@@ -14,12 +14,12 @@ let
   ];
 in
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "klibc";
   version = "2.0.14";
 
   src = fetchurl {
-    url = "mirror://kernel/linux/libs/klibc/2.0/klibc-${version}.tar.xz";
+    url = "mirror://kernel/linux/libs/klibc/2.0/klibc-${finalAttrs.version}.tar.xz";
     hash = "sha256-KBv7aD4ZaBhBKvcLiWi3cmR1qA/xxL1nEZ5r9QWfkHU=";
   };
 
@@ -64,4 +64,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.bsd3;
     platforms = lib.platforms.linux;
   };
-}
+})

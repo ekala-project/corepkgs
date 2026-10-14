@@ -7,14 +7,14 @@
   gnome,
 }:
 
-python3.pkgs.buildPythonApplication rec {
+python3.pkgs.buildPythonApplication (finalAttrs: {
   pname = "gi-docgen";
   version = "2025.5";
 
   format = "other";
 
   src = fetchurl {
-    url = "mirror://gnome/sources/gi-docgen/${lib.versions.major version}/gi-docgen-${version}.tar.xz";
+    url = "mirror://gnome/sources/gi-docgen/${lib.versions.major finalAttrs.version}/gi-docgen-${finalAttrs.version}.tar.xz";
     hash = "sha256-JXmjP/h7Yi0Q0QLJG30OzlBjQLcONNu2UiFj4WyQrKM=";
   };
 
@@ -37,8 +37,6 @@ python3.pkgs.buildPythonApplication rec {
     typogrify
   ];
 
-  doCheck = false; # no tests
-
   postFixup = ''
     # Do not propagate Python
     substituteInPlace $out/nix-support/propagated-build-inputs \
@@ -57,4 +55,4 @@ python3.pkgs.buildPythonApplication rec {
     homepage = "https://gitlab.gnome.org/GNOME/gi-docgen";
     license = lib.licenses.asl20; # OR GPL-3.0-or-later
   };
-}
+})

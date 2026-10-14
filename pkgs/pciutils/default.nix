@@ -13,14 +13,14 @@
   testers,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "pciutils";
   version = "3.15.0"; # with release-date database
 
   src = fetchFromGitHub {
     owner = "pciutils";
     repo = "pciutils";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-fPtOhUz8Hlo0ajCZbNOwT4fiuL8HlFQ7NGk+nQpmKZM=";
   };
 
@@ -80,4 +80,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     mainProgram = "lspci";
   };
-}
+})

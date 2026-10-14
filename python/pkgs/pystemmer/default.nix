@@ -9,7 +9,7 @@
   libstemmer,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "pystemmer";
   version = "2.2.0.1";
   format = "setuptools";
@@ -18,7 +18,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "snowballstem";
     repo = "pystemmer";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-ngPx95ybgJmndpNPBwCa3BCNsozRg+dlEw+nhlIwI58=";
   };
 
@@ -63,4 +63,4 @@ buildPythonPackage rec {
     ];
     platforms = lib.platforms.unix;
   };
-}
+})

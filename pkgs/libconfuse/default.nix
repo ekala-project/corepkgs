@@ -6,13 +6,13 @@
   flex,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libconfuse";
   version = "3.4";
 
   src = fetchFromGitHub {
     sha256 = "sha256-sC8O6vcMKvRdRCTXpKl6lgmzFUVG8/LBE7XsGX8F9e4=";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     repo = "libconfuse";
     owner = "martinh";
   };
@@ -33,7 +33,7 @@ stdenv.mkDerivation rec {
   installCheckTarget = "check";
 
   meta = {
-    inherit (src.meta) homepage;
+    inherit (finalAttrs.src.meta) homepage;
     description = "Small configuration file parser library for C";
     longDescription = ''
       libConfuse (previously libcfg) is a configuration file parser library
@@ -47,6 +47,6 @@ stdenv.mkDerivation rec {
     '';
     license = lib.licenses.isc;
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libconfuse_project" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libconfuse_project" finalAttrs.version;
   };
-}
+})

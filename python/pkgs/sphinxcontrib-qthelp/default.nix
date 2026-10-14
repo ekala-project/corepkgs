@@ -6,7 +6,7 @@
   flit-core,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "sphinxcontrib-qthelp";
   version = "2.0.0";
   pyproject = true;
@@ -15,7 +15,7 @@ buildPythonPackage rec {
 
   src = fetchPypi {
     pname = "sphinxcontrib_qthelp";
-    inherit version;
+    inherit (finalAttrs) version;
     hash = "sha256-T+fQrI/BcQRb5iOro+Ko9hP4aCcx+RU7suQOzha5u6s=";
   };
 
@@ -23,7 +23,6 @@ buildPythonPackage rec {
 
   # Check is disabled due to circular dependency of sphinx
   dontCheckRuntimeDeps = true;
-  doCheck = false;
 
   pythonNamespaces = [ "sphinxcontrib" ];
 
@@ -35,4 +34,4 @@ buildPythonPackage rec {
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-qthelp";
     license = lib.licenses.bsd2;
   };
-}
+})

@@ -4,12 +4,12 @@
   fetchCrate,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "rust-audit-info";
   version = "0.5.2";
 
   src = fetchCrate {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-g7ElNehBAVSRRlqsxkNm20C0KOMkf310bXNs3EN+/NQ=";
   };
 
@@ -23,5 +23,6 @@ rustPlatform.buildRustPackage rec {
       mit # or
       asl20
     ];
+    platforms = lib.platforms.all;
   };
-}
+})

@@ -4,13 +4,13 @@
   fetchHex,
 }:
 
-buildRebar3 rec {
+buildRebar3 (finalAttrs: {
   name = "rebar3_proper";
   version = "0.12.1";
 
   src = fetchHex {
-    pkg = name;
-    inherit version;
+    pkg = finalAttrs.name;
+    inherit (finalAttrs) version;
     sha256 = "1f174fb6h2071wr7qbw9aqqvnglzsjlylmyi8215fhrmi38w94b6";
   };
 
@@ -19,4 +19,4 @@ buildRebar3 rec {
     license = lib.licenses.bsd3;
     homepage = "https://github.com/ferd/rebar3_proper";
   };
-}
+})

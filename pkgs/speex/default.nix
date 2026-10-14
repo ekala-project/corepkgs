@@ -9,12 +9,12 @@
   withFft ? !stdenv.hostPlatform.isMinGW,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "speex";
   version = "1.2.1";
 
   src = fetchurl {
-    url = "https://downloads.us.xiph.org/releases/speex/speex-${version}.tar.gz";
+    url = "https://downloads.us.xiph.org/releases/speex/speex-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-S0TU8rOKNwotmKeDKf78VqDPk9HBvnACkhe6rmYo/uo=";
   };
 
@@ -45,4 +45,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.bsd3;
     platforms = lib.platforms.unix ++ lib.platforms.windows;
   };
-}
+})

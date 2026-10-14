@@ -6,14 +6,14 @@
   dtc,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libyaml";
   version = "0.2.5";
 
   src = fetchFromGitHub {
     owner = "yaml";
     repo = "libyaml";
-    rev = version;
+    rev = finalAttrs.version;
     sha256 = "18zsnsxc53pans4a01cs4401a2cjk3qi098hi440pj4zijifgcsb";
   };
 
@@ -33,6 +33,6 @@ stdenv.mkDerivation rec {
     description = "YAML 1.1 parser and emitter written in C";
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "pyyaml" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "pyyaml" finalAttrs.version;
   };
-}
+})

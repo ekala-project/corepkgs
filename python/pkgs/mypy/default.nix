@@ -31,7 +31,7 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "mypy";
   version = "1.17.1";
   pyproject = true;
@@ -42,7 +42,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "python";
     repo = "mypy";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-FfONUCCMU1bJXHx3GHH46Tu+wYU5FLPOqeCSCi1bRSs=";
   };
 
@@ -122,11 +122,8 @@ buildPythonPackage rec {
     setuptools
     tomli
   ]
-  ++ lib.concatAttrValues optional-dependencies;
+  ++ lib.concatAttrValues finalAttrs.optional-dependencies;
 
-  # Fairly large test suit
-  # TODO(corepkgs): move to passthru.unittests
-  doCheck = false;
   disabledTests = [
     # fails with typing-extensions>=4.10
     # https://github.com/python/mypy/issues/17005
@@ -154,10 +151,10 @@ buildPythonPackage rec {
   meta = {
     description = "Optional static typing for Python";
     homepage = "https://www.mypy-lang.org";
-    changelog = "https://github.com/python/mypy/blob/${src.rev}/CHANGELOG.md";
+    changelog = "https://github.com/python/mypy/blob/${finalAttrs.src.rev}/CHANGELOG.md";
     downloadPage = "https://github.com/python/mypy";
     license = lib.licenses.mit;
     mainProgram = "mypy";
 
   };
-}
+})

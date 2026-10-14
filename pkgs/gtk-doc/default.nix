@@ -14,7 +14,7 @@
   dblatex ? null,
 }:
 
-python3.pkgs.buildPythonApplication rec {
+python3.pkgs.buildPythonApplication (finalAttrs: {
   pname = "gtk-doc";
   version = "1.35.1";
 
@@ -26,12 +26,12 @@ python3.pkgs.buildPythonApplication rec {
     domain = "gitlab.gnome.org";
     owner = "GNOME";
     repo = "gtk-doc";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-EqU7lnBnOn3gR3hT95yjdTUb3cqX2XJK5UAKsFw2Q10=";
   };
 
   patches = [
-    passthru.respect_xml_catalog_files_var_patch
+    finalAttrs.passthru.respect_xml_catalog_files_var_patch
   ];
 
   postPatch = ''
@@ -72,9 +72,6 @@ python3.pkgs.buildPythonApplication rec {
     yelp_manual = false;
   };
 
-  doCheck = false; # requires a lot of stuff
-  doInstallCheck = false; # fails
-
   postFixup = ''
     # Do not propagate Python
     substituteInPlace $out/nix-support/propagated-build-inputs \
@@ -95,4 +92,4 @@ python3.pkgs.buildPythonApplication rec {
     homepage = "https://gitlab.gnome.org/GNOME/gtk-doc";
     license = lib.licenses.gpl2Plus;
   };
-}
+})

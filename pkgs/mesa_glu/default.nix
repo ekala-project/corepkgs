@@ -8,12 +8,12 @@
   libGL,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "glu";
   version = "9.0.3";
 
   src = fetchurl {
-    url = "https://mesa.freedesktop.org/archive/glu/glu-${version}.tar.xz";
+    url = "https://mesa.freedesktop.org/archive/glu/glu-${finalAttrs.version}.tar.xz";
     hash = "sha256-vUP+EvN0sRkusV/iDkX/RWubwmq1fw7ukZ+Wyg+KMw8=";
   };
 
@@ -39,4 +39,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.sgi-b-20;
     platforms = lib.platforms.unix;
   };
-}
+})

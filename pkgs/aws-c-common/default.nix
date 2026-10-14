@@ -6,7 +6,7 @@
   nix,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-c-common";
   # nixpkgs-update: no auto update
   version = "1.0.1";
@@ -20,7 +20,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-common";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-QJauMpF3O6PMXlX5auWH9wgxpBSZ9AaQeqq/7GV+u74=";
   };
 
@@ -53,9 +53,6 @@ stdenv.mkDerivation rec {
       EOW
     '';
 
-  # TODO(corepkgs): move to passthru
-  doCheck = false;
-
   passthru.tests = {
     inherit nix;
   };
@@ -67,6 +64,6 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     # https://github.com/awslabs/aws-c-common/issues/1175
     badPlatforms = lib.platforms.bigEndian;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" finalAttrs.version;
   };
-}
+})

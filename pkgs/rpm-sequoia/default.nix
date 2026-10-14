@@ -7,14 +7,14 @@
   pkg-config,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "rpm-sequoia";
   version = "1.10.0";
 
   src = fetchFromGitHub {
     owner = "rpm-software-management";
     repo = "rpm-sequoia";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-/PdbCBpEWig+acLvrN5nhJ6ca+tAh2bpqDLTRJoFuWU=";
   };
 
@@ -62,7 +62,7 @@ rustPlatform.buildRustPackage rec {
       ''
     + lib.optionalString stdenv.hostPlatform.isDarwin ''
       install -d $out/lib
-      ln -s librpm_sequoia.dylib $out/lib/librpm_sequoia.${version}.dylib
+      ln -s librpm_sequoia.dylib $out/lib/librpm_sequoia.${finalAttrs.version}.dylib
     '';
 
   meta = {
@@ -70,4 +70,4 @@ rustPlatform.buildRustPackage rec {
     homepage = "https://sequoia-pgp.org/";
     license = lib.licenses.gpl2Plus;
   };
-}
+})

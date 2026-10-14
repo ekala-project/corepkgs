@@ -40,7 +40,7 @@ let
     let
       is_extension = gawkextlib != null;
     in
-    stdenv.mkDerivation rec {
+    stdenv.mkDerivation {
       pname = "gawkextlib-${name}";
       version = "unstable-2022-10-20";
 

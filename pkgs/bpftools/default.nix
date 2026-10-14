@@ -15,7 +15,7 @@
   flex,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "bpftools";
 
   inherit (linuxHeaders) version src;
@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
   ];
   buildInputs =
     (
-      if (lib.versionAtLeast version "5.20") then
+      if (lib.versionAtLeast finalAttrs.version "5.20") then
         [
           libopcodes
           libbfd
@@ -87,4 +87,4 @@ stdenv.mkDerivation rec {
     ];
     platforms = lib.platforms.linux;
   };
-}
+})

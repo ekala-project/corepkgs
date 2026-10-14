@@ -4,14 +4,14 @@
   fetchFromGitLab,
 }:
 
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "amdgpu-firmware";
   version = "20260810";
 
   src = fetchFromGitLab {
     owner = "kernel-firmware";
     repo = "linux-firmware";
-    rev = "refs/tags/${version}";
+    rev = "refs/tags/${finalAttrs.version}";
     hash = "sha256-SEx3WncWS3VlmUAajH2uS6kWZQ++7YCcVQs4LcXRKs4=";
     sparseCheckout = [ "amdgpu" ];
   };
@@ -27,4 +27,4 @@ stdenvNoCC.mkDerivation rec {
     license = lib.licenses.unfreeRedistributableFirmware;
     platforms = lib.platforms.linux;
   };
-}
+})

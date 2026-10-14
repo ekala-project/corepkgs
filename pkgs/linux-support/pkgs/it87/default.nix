@@ -6,8 +6,8 @@
   kernelModuleMakeFlags,
 }:
 
-stdenv.mkDerivation rec {
-  name = "it87-${version}-${kernel.version}";
+stdenv.mkDerivation (finalAttrs: {
+  name = "it87-${finalAttrs.version}-${kernel.version}";
   version = "unstable-2024-06-09";
 
   # Original is no longer maintained.
@@ -42,4 +42,4 @@ stdenv.mkDerivation rec {
       "i686-linux"
     ];
   };
-}
+})

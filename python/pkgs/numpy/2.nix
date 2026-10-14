@@ -58,7 +58,7 @@ let
     };
   };
 in
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "numpy";
   version = "2.5.3";
   pyproject = true;
@@ -68,7 +68,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "numpy";
     repo = "numpy";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     fetchSubmodules = true;
     hash = "sha256-gahiYESYSgq4MEn6w/J1Mo2CD+QC2lcjzFsw+gAquOg=";
   };
@@ -116,7 +116,6 @@ buildPythonPackage rec {
   '';
 
   # Avoid circular dependencies
-  doCheck = false;
   nativeCheckInputs = [
     hypothesis
     pytestCheckHook
@@ -182,10 +181,10 @@ buildPythonPackage rec {
   };
 
   meta = {
-    changelog = "https://github.com/numpy/numpy/releases/tag/${src.tag}";
+    changelog = "https://github.com/numpy/numpy/releases/tag/${finalAttrs.src.tag}";
     description = "Scientific tools for Python";
     homepage = "https://numpy.org/";
     license = lib.licenses.bsd3;
 
   };
-}
+})

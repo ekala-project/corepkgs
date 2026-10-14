@@ -18,14 +18,14 @@ let
   apparmorRulesFromClosure = libapparmor.passthru.apparmorRulesFromClosure;
 in
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "iputils";
   version = "20250605";
 
   src = fetchFromGitHub {
-    owner = pname;
-    repo = pname;
-    rev = version;
+    owner = "iputils";
+    repo = "iputils";
+    rev = finalAttrs.version;
     hash = "sha256-AJgNPIE90kALu4ihANELr9Dh28LhJ4camLksOIRV8Xo=";
   };
 
@@ -34,15 +34,11 @@ stdenv.mkDerivation rec {
     "apparmor"
   ];
 
-  # We don't have the required permissions inside the build sandbox:
-  # /build/source/build/ping/ping: socket: Operation not permitted
-  doCheck = false;
-
   mesonEntries = {
     NO_SETCAP_OR_SUID = true;
     systemdunitdir = "etc/systemd/system";
     INSTALL_SYSTEMD_UNITS = true;
-    SKIP_TESTS = !doCheck;
+    SKIP_TESTS = true;
     # Disable idn usage w/musl (https://github.com/iputils/iputils/pull/111):
     ${if stdenv.hostPlatform.isMusl then "USE_IDN" else null} = false;
   };
@@ -85,7 +81,7 @@ stdenv.mkDerivation rec {
 
   meta = {
     homepage = "https://github.com/iputils/iputils";
-    changelog = "https://github.com/iputils/iputils/releases/tag/${version}";
+    changelog = "https://github.com/iputils/iputils/releases/tag/${finalAttrs.version}";
     description = "Set of small useful utilities for Linux networking";
     longDescription = ''
       A set of small useful utilities for Linux networking including:
@@ -100,6 +96,6 @@ stdenv.mkDerivation rec {
       bsd3
     ];
     platforms = lib.platforms.linux;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "iputils_project" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "iputils_project" finalAttrs.version;
   };
-}
+})

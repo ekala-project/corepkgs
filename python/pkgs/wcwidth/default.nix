@@ -7,7 +7,7 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "wcwidth";
   version = "0.9.1";
   pyproject = true;
@@ -15,13 +15,11 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "jquast";
     repo = "wcwidth";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-tH96gjq8dTDdogdZYj4r+BTLw8/CX4ebBWLTJAYUfUE=";
   };
 
   build-system = [ setuptools ];
-
-  doCheck = false;
 
   nativeCheckInputs = [
     pytest-cov-stub
@@ -39,7 +37,7 @@ buildPythonPackage rec {
       no 3rd-party dependencies.
     '';
     homepage = "https://github.com/jquast/wcwidth";
-    changelog = "https://github.com/jquast/wcwidth/releases/tag/${src.tag}";
+    changelog = "https://github.com/jquast/wcwidth/releases/tag/${finalAttrs.src.tag}";
     license = lib.licenses.mit;
   };
-}
+})

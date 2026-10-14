@@ -38,7 +38,7 @@ let
 
   needsTexinfo = is2_5;
 in
-stdenv'.mkDerivation rec {
+stdenv'.mkDerivation (finalAttrs: {
   pname = "flex";
   inherit version;
 
@@ -89,8 +89,6 @@ stdenv'.mkDerivation rec {
 
   dontDisableStatic = stdenv.buildPlatform != stdenv.hostPlatform;
 
-  doCheck = false;
-
   postInstall = ''
     ln -s $out/bin/flex $out/bin/lex
   '';
@@ -108,4 +106,4 @@ stdenv'.mkDerivation rec {
     mainProgram = "flex";
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "westes" version;
   };
-}
+})

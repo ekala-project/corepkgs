@@ -32,7 +32,7 @@
 # configure: error: --enable-dmeventd requires --enable-cmdlib to be used as well
 assert enableDmeventd -> enableCmdlib;
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname =
     "lvm2"
     + lib.optionalString enableDmeventd "-with-dmeventd"
@@ -142,7 +142,6 @@ stdenv.mkDerivation rec {
     ./fix-manpage-reproducibility.patch
   ];
 
-  doCheck = false; # requires root
   doInstallCheck = true;
 
   makeFlags =

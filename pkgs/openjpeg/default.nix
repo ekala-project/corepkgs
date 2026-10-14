@@ -8,14 +8,14 @@
   zlib,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "openjpeg";
   version = "2.5.4";
 
   src = fetchFromGitHub {
     owner = "uclouvain";
     repo = "openjpeg";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-HSXGdpHUbwlYy5a+zKpcLo2d+b507Qf5nsaMghVBlZ8=";
   };
 
@@ -47,7 +47,7 @@ stdenv.mkDerivation rec {
   ];
 
   passthru = {
-    incDir = "openjpeg-${lib.versions.majorMinor version}";
+    incDir = "openjpeg-${lib.versions.majorMinor finalAttrs.version}";
   };
 
   meta = {
@@ -55,6 +55,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.openjpeg.org/";
     license = lib.licenses.bsd2;
     platforms = lib.platforms.all;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "uclouvain" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "uclouvain" finalAttrs.version;
   };
-}
+})

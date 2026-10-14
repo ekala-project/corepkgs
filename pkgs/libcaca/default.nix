@@ -12,14 +12,14 @@
   x11Support ? !stdenv.hostPlatform.isDarwin,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libcaca";
   version = "0.99.beta20";
 
   src = fetchFromGitHub {
     owner = "cacalabs";
     repo = "libcaca";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-N0Lfi0d4kjxirEbIjdeearYWvStkKMyV6lgeyNKXcVw=";
   };
 
@@ -82,4 +82,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.wtfpl;
     platforms = lib.platforms.unix;
   };
-}
+})

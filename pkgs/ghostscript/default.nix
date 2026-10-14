@@ -66,15 +66,15 @@ let
   };
 
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "ghostscript";
   extensions = lib.optionals x11Support [ "with-X" ];
   version = "10.06.0";
 
   src = fetchurl {
     url = "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs${
-      lib.replaceStrings [ "." ] [ "" ] version
-    }/ghostscript-${version}.tar.xz";
+      lib.replaceStrings [ "." ] [ "" ] finalAttrs.version
+    }/ghostscript-${finalAttrs.version}.tar.xz";
     hash = "sha256-ZDUmSMLAgcip+xoS3Bll4B6tfFf1i3LRtU9u8c7zxWE=";
   };
 
@@ -183,9 +183,6 @@ stdenv.mkDerivation rec {
     "-std=gnu17"
   ];
 
-  # make check does nothing useful
-  doCheck = false;
-
   # don't build/install statically linked bin/gs
   buildFlags = [
     "so"
@@ -198,7 +195,7 @@ stdenv.mkDerivation rec {
   postInstall = ''
     ln -s gsc "$out"/bin/gs
 
-    cp -r Resource "$out/share/ghostscript/${version}"
+    cp -r Resource "$out/share/ghostscript/${finalAttrs.version}"
 
     mkdir -p $fonts/share/fonts
     cp -rv ${fonts}/* "$fonts/share/fonts/"
@@ -255,6 +252,6 @@ stdenv.mkDerivation rec {
     license = lib.licenses.agpl3Plus;
     platforms = lib.platforms.all;
     mainProgram = "gs";
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "artifex" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "artifex" finalAttrs.version;
   };
-}
+})

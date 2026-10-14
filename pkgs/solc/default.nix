@@ -7,12 +7,12 @@
   cmake,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "solc";
   version = "0.8.37";
 
   src = fetchzip {
-    url = "https://github.com/ethereum/solidity/releases/download/v${version}/solidity_${version}.tar.gz";
+    url = "https://github.com/ethereum/solidity/releases/download/v${finalAttrs.version}/solidity_${finalAttrs.version}.tar.gz";
     hash = "sha256-RQmyCTM8Fzkh3J7vkMKd6ZGcTojmSM4RjALaPsJ0rDE=";
   };
 
@@ -34,4 +34,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3;
     platforms = lib.platforms.linux;
   };
-}
+})

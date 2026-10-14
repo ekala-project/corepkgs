@@ -7,7 +7,7 @@
   libusb1,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libusb-compat";
   version = "0.1.9";
 
@@ -20,7 +20,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "libusb";
     repo = "libusb-compat-0.1";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-F501lakQfJsqms0/531/jQmYoexMfROjvjEroy+ktZ0=";
   };
 
@@ -35,7 +35,7 @@ stdenv.mkDerivation rec {
 
   postFixup = ''
     find $out/lib -name \*.so\* -type f -exec \
-      patchelf --set-rpath ${lib.makeLibraryPath buildInputs} {} \;
+      patchelf --set-rpath ${lib.makeLibraryPath finalAttrs.buildInputs} {} \;
   '';
 
   meta = {
@@ -45,4 +45,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.lgpl2Plus;
     platforms = lib.platforms.unix;
   };
-}
+})

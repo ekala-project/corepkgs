@@ -20,12 +20,12 @@
   gitUpdater,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   version = "1.8.11";
   pname = "iptables";
 
   src = fetchurl {
-    url = "https://www.netfilter.org/projects/${pname}/files/${pname}-${version}.tar.xz";
+    url = "https://www.netfilter.org/projects/iptables/files/iptables-${finalAttrs.version}.tar.xz";
     sha256 = "2HMD1V74ySvK1N0/l4sm0nIBNkKwKUJXdfW60QCf57I=";
   };
 
@@ -97,6 +97,6 @@ stdenv.mkDerivation rec {
     mainProgram = "iptables";
     license = lib.licenses.gpl2Plus;
     downloadPage = "https://www.netfilter.org/projects/iptables/files/";
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "netfilter" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "netfilter" finalAttrs.version;
   };
-}
+})

@@ -8,14 +8,14 @@
 }:
 
 # OpenTofu's vendored grpc uses http2.TrailerPrefix removed in Go 1.27
-(buildGoModule.override { go = go.v1_26; }) rec {
+(buildGoModule.override { go = go.v1_26; }) (finalAttrs: {
   pname = "opentofu";
   version = "1.12.6";
 
   src = fetchFromGitHub {
     owner = "opentofu";
     repo = "opentofu";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-gtbgfjnGrB1J+7smGpFGavP6r/IDrcd5MgI0hS5FzHw=";
   };
 
@@ -42,4 +42,4 @@
     license = lib.licenses.mpl20;
     mainProgram = "tofu";
   };
-}
+})

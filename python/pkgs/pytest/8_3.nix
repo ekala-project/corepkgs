@@ -27,13 +27,13 @@
   xmlschema,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "pytest";
   version = "8.3.5";
   pyproject = true;
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-9O/nDMFOURVlrEdrV8J54SqFWxH0jyEq8QgO8iY9OEU=";
   };
 
@@ -75,7 +75,6 @@ buildPythonPackage rec {
     cp -R testing $testout/testing
   '';
 
-  doCheck = false;
   passthru.tests.pytest = callPackage ./tests.nix { };
 
   # Remove .pytest_cache when using py.test in a Nix build
@@ -104,7 +103,7 @@ buildPythonPackage rec {
   meta = {
     description = "Framework for writing tests";
     homepage = "https://docs.pytest.org";
-    changelog = "https://github.com/pytest-dev/pytest/releases/tag/${version}";
+    changelog = "https://github.com/pytest-dev/pytest/releases/tag/${finalAttrs.version}";
     license = lib.licenses.mit;
   };
-}
+})

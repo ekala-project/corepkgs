@@ -4,14 +4,14 @@
   fetchFromGitLab,
 }:
 
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "amd-microcode";
   version = "20260810";
 
   src = fetchFromGitLab {
     owner = "kernel-firmware";
     repo = "linux-firmware";
-    rev = "refs/tags/${version}";
+    rev = "refs/tags/${finalAttrs.version}";
     hash = "sha256-NguR9l9fwUWUB3iWa5s/BlwNBxdPBfc/6mylUHrnFe8=";
     sparseCheckout = [ "amd-ucode" ];
   };
@@ -27,4 +27,4 @@ stdenvNoCC.mkDerivation rec {
     license = lib.licenses.unfreeRedistributableFirmware;
     platforms = [ "x86_64-linux" ];
   };
-}
+})

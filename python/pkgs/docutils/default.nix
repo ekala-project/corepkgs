@@ -10,53 +10,48 @@
 # Note: this package is used to build LLVM’s documentation, which is part of the Darwin stdenv.
 # It cannot use `fetchgit` because that would pull curl into the bootstrap, which is disallowed.
 
-let
-  self = buildPythonPackage rec {
-    pname = "docutils";
-    version = "0.23";
-    pyproject = true;
+buildPythonPackage (finalAttrs: {
+  pname = "docutils";
+  version = "0.23";
+  pyproject = true;
 
-    src = fetchurl {
-      url = "mirror://sourceforge/docutils/docutils-${version}.tar.gz";
-      hash = "sha256-dG9QYDIlESgKHlDrdoRu1r8jQphLKsBNxCyqGo14eZ4=";
-    };
-
-    build-system = [ flit-core ];
-
-    # infinite recursion via sphinx and pillow
-    doCheck = false;
-    passthru.tests.pytest = self.overridePythonAttrs { doCheck = true; };
-
-    nativeCheckInputs = [ pillow ];
-
-    checkPhase = ''
-      runHook preCheck
-      ${python.interpreter} test/alltests.py
-      runHook postCheck
-    '';
-
-    # Create symlinks lacking a ".py" suffix, many programs depend on these names
-    postFixup = ''
-      for f in $out/bin/*.py; do
-        ln -s $(basename $f) $out/bin/$(basename $f .py)
-      done
-    '';
-
-    pythonImportsCheck = [ "docutils" ];
-
-    meta = {
-      description = "Python Documentation Utilities";
-      homepage = "http://docutils.sourceforge.net/";
-      changelog = "https://sourceforge.net/projects/docutils/files/docutils/${version}";
-      license = with lib.licenses; [
-        publicDomain
-        bsd2
-        psfl
-        gpl3Plus
-      ];
-
-      mainProgram = "docutils";
-    };
+  src = fetchurl {
+    url = "mirror://sourceforge/docutils/docutils-${finalAttrs.version}.tar.gz";
+    hash = "sha256-dG9QYDIlESgKHlDrdoRu1r8jQphLKsBNxCyqGo14eZ4=";
   };
-in
-self
+
+  build-system = [ flit-core ];
+
+  passthru.tests.pytest = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
+
+  nativeCheckInputs = [ pillow ];
+
+  checkPhase = ''
+    runHook preCheck
+    ${python.interpreter} test/alltests.py
+    runHook postCheck
+  '';
+
+  # Create symlinks lacking a ".py" suffix, many programs depend on these names
+  postFixup = ''
+    for f in $out/bin/*.py; do
+      ln -s $(basename $f) $out/bin/$(basename $f .py)
+    done
+  '';
+
+  pythonImportsCheck = [ "docutils" ];
+
+  meta = {
+    description = "Python Documentation Utilities";
+    homepage = "http://docutils.sourceforge.net/";
+    changelog = "https://sourceforge.net/projects/docutils/files/docutils/${finalAttrs.version}";
+    license = with lib.licenses; [
+      publicDomain
+      bsd2
+      psfl
+      gpl3Plus
+    ];
+
+    mainProgram = "docutils";
+  };
+})

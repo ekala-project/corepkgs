@@ -9,12 +9,12 @@
   testers,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "sed";
   version = "4.9";
 
   src = fetchurl {
-    url = "mirror://gnu/sed/sed-${version}.tar.xz";
+    url = "mirror://gnu/sed/sed-${finalAttrs.version}.tar.xz";
     sha256 = "sha256-biJrcy4c1zlGStaGK9Ghq6QteYKSLaelNRljHSSXUYE=";
   };
 
@@ -63,4 +63,4 @@ stdenv.mkDerivation rec {
       product = "sed";
     };
   };
-}
+})

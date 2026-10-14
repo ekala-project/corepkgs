@@ -17,12 +17,12 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "tar";
   version = "1.35";
 
   src = fetchurl {
-    url = "mirror://gnu/tar/tar-${version}.tar.xz";
+    url = "mirror://gnu/tar/tar-${finalAttrs.version}.tar.xz";
     sha256 = "sha256-TWL/NzQux67XSFNTI5MMfPlKz3HDWRiCsmp+pQ8+3BY=";
   };
 
@@ -65,9 +65,6 @@ stdenv.mkDerivation rec {
     else
       null;
 
-  doCheck = false; # fails
-  doInstallCheck = false; # fails
-
   passthru.tests = {
     version = testers.testVersion {
       package = tar;
@@ -109,4 +106,4 @@ stdenv.mkDerivation rec {
       product = "tar";
     };
   };
-}
+})

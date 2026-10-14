@@ -24,7 +24,7 @@
   static ? stdenv.hostPlatform.isStatic,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "gtest";
   version = "1.18.0";
 
@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "google";
     repo = "googletest";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-rXsn2L0xeWvfxTjMAoWEu0UFZ7xOSfYmhbKgRF5J9co=";
   };
 
@@ -61,4 +61,4 @@ stdenv.mkDerivation rec {
       product = "googletest";
     };
   };
-}
+})

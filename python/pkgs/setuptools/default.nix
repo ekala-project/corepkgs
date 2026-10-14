@@ -9,7 +9,7 @@
   distutils ? null,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "setuptools";
   version = "80.9.0";
   pyproject = true;
@@ -17,7 +17,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "pypa";
     repo = "setuptools";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-wueVQsV0ja/iPFRK7OKV27FQ7hYKF8cP3WH5wJeIXnI=";
   };
 
@@ -34,9 +34,6 @@ buildPythonPackage rec {
     export SETUPTOOLS_INSTALL_WINDOWS_SPECIFIC_FILES=0
   '';
 
-  # Requires pytest, causing infinite recursion.
-  doCheck = false;
-
   passthru.tests = { } // lib.optionalAttrs (distutils != null) { inherit distutils; };
 
   pythonImportsCheck = [
@@ -48,10 +45,10 @@ buildPythonPackage rec {
     description = "Utilities to facilitate the installation of Python packages";
     homepage = "https://github.com/pypa/setuptools";
     changelog = "https://setuptools.pypa.io/en/stable/history.html#v${
-      lib.replaceStrings [ "." ] [ "-" ] version
+      lib.replaceStrings [ "." ] [ "-" ] finalAttrs.version
     }";
     license = with lib.licenses; [ mit ];
     platforms = python.meta.platforms;
 
   };
-}
+})

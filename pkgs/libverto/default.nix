@@ -9,14 +9,14 @@
   pkg-config,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libverto";
   version = "0.3.2";
 
   src = fetchFromGitHub {
     owner = "latchset";
     repo = "libverto";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-csoJ0WdKyrza8kBSMKoaItKvcbijI6Wl8nWCbywPScQ=";
   };
 
@@ -37,4 +37,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
   };
-}
+})

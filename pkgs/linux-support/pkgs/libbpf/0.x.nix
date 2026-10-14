@@ -12,14 +12,14 @@
 # is still present: just disable it for 0.x:
 # nixpkgs-update: no auto update
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libbpf";
   version = "0.8.3";
 
   src = fetchFromGitHub {
     owner = "libbpf";
     repo = "libbpf";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-J5cUvfUYc+uLdkFa2jx/2bqBoZg/eSzc6SWlgKqcfIc=";
   };
 
@@ -55,4 +55,4 @@ stdenv.mkDerivation rec {
     ];
     platforms = lib.platforms.linux;
   };
-}
+})

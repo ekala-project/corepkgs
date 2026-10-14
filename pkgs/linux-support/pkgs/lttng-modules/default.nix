@@ -6,14 +6,14 @@
   kernelModuleMakeFlags,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "lttng-modules-${kernel.version}";
   version = "2.13.22";
 
   src = fetchFromGitHub {
     owner = "lttng";
     repo = "lttng-modules";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-0fHjJBG/nTjXX8MVArvKDvn2ho9GLEodqAv/DcHLWis=";
   };
 
@@ -43,4 +43,4 @@ stdenv.mkDerivation rec {
       (lib.versions.majorMinor kernel.modDirVersion) == "5.10"
       || (lib.versions.majorMinor kernel.modDirVersion) == "5.4";
   };
-}
+})

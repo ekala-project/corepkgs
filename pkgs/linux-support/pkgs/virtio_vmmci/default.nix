@@ -6,14 +6,14 @@
   kernelModuleMakeFlags,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   name = "virtio_vmmci";
   version = "0.6.2";
 
   src = fetchFromGitHub {
     owner = "voutilad";
     repo = "virtio_vmmci";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-h8yu4+vTgpAD+sKa1KnVD+qubiIlkYtG2nmQnXOi/sk=";
   };
 
@@ -40,5 +40,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
   };
-
-}
+})

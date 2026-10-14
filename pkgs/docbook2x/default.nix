@@ -16,12 +16,12 @@
   makeWrapper,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "docbook2X";
   version = "0.8.8";
 
   src = fetchurl {
-    url = "mirror://sourceforge/docbook2x/docbook2X-${version}.tar.gz";
+    url = "mirror://sourceforge/docbook2x/docbook2X-${finalAttrs.version}.tar.gz";
     sha256 = "0ifwzk99rzjws0ixzimbvs83x6cxqk1xzmg84wa1p7bs6rypaxs0";
   };
 
@@ -62,8 +62,6 @@ stdenv.mkDerivation rec {
       --replace '${"\$" + "{prefix}"}' "$out"
   '';
 
-  doCheck = false; # fails a lot of tests
-
   postInstall = ''
     perlPrograms="db2x_manxml db2x_texixml db2x_xsltproc
                   docbook2man docbook2texi";
@@ -99,4 +97,4 @@ stdenv.mkDerivation rec {
     homepage = "https://docbook2x.sourceforge.net/";
     platforms = lib.platforms.all;
   };
-}
+})

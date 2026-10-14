@@ -21,12 +21,12 @@
   python3,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   version = "1.27.2";
   pname = "mupdf";
 
   src = fetchurl {
-    url = "https://mupdf.com/downloads/archive/${pname}-${version}-source.tar.gz";
+    url = "https://mupdf.com/downloads/archive/mupdf-${finalAttrs.version}-source.tar.gz";
     hash = "sha256-VThnsTUwPcTCWrZ8XyNNjpAKDjbmboSE2ZrcBf4ehzc=";
   };
 
@@ -90,7 +90,7 @@ stdenv.mkDerivation rec {
 
     Name: mupdf
     Description: Library for rendering PDF documents
-    Version: ${version}
+    Version: ${finalAttrs.version}
     Libs: -L''${libdir} -lmupdf
     Cflags: -I''${includedir}
     EOF
@@ -112,4 +112,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     mainProgram = "mupdf";
   };
-}
+})

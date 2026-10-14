@@ -6,7 +6,7 @@
   flit-core,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "sphinxcontrib-applehelp";
   version = "2.0.0";
   pyproject = true;
@@ -15,7 +15,7 @@ buildPythonPackage rec {
 
   src = fetchPypi {
     pname = "sphinxcontrib_applehelp";
-    inherit version;
+    inherit (finalAttrs) version;
     hash = "sha256-LynvMxc1zpWO+kc0hz8ISUGXCJTGCQQIsHnGGy4cBtE=";
   };
 
@@ -23,7 +23,6 @@ buildPythonPackage rec {
 
   # Check is disabled due to circular dependency of sphinx
   dontCheckRuntimeDeps = true;
-  doCheck = false;
 
   pythonNamespaces = [ "sphinxcontrib" ];
 
@@ -35,4 +34,4 @@ buildPythonPackage rec {
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-applehelp";
     license = lib.licenses.bsd2;
   };
-}
+})

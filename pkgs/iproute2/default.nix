@@ -16,12 +16,12 @@
   pkgsStatic,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "iproute2";
   version = "6.17.0";
 
   src = fetchurl {
-    url = "mirror://kernel/linux/utils/net/${pname}/${pname}-${version}.tar.xz";
+    url = "mirror://kernel/linux/utils/net/iproute2/iproute2-${finalAttrs.version}.tar.xz";
     hash = "sha256-l4HllBCrfeqOn3m7EP8UiOY9EPy7cFA7lEJronqOLew=";
   };
 
@@ -52,7 +52,7 @@ stdenv.mkDerivation rec {
   makeFlags = [
     "PREFIX=$(out)"
     "SBINDIR=$(out)/sbin"
-    "DOCDIR=$(TMPDIR)/share/doc/${pname}" # Don't install docs
+    "DOCDIR=$(TMPDIR)/share/doc/${finalAttrs.pname}" # Don't install docs
     "HDRDIR=$(dev)/include/iproute2"
   ]
   ++ lib.optionals stdenv.hostPlatform.isStatic [
@@ -107,6 +107,6 @@ stdenv.mkDerivation rec {
     description = "Collection of utilities for controlling TCP/IP networking and traffic control in Linux";
     platforms = lib.platforms.linux;
     license = lib.licenses.gpl2Only;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "iproute2_project" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "iproute2_project" finalAttrs.version;
   };
-}
+})

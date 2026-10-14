@@ -11,12 +11,12 @@
   glib,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "dbus-glib";
   version = "0.114";
 
   src = fetchurl {
-    url = "${meta.homepage}/releases/dbus-glib/dbus-glib-${version}.tar.gz";
+    url = "${finalAttrs.meta.homepage}/releases/dbus-glib/dbus-glib-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-wJxcCFsqDjkbjufXg6HWP+RE6WcXzBgU1htej8KCenw=";
   };
 
@@ -50,8 +50,6 @@ stdenv.mkDerivation rec {
     stdenv.buildPlatform != stdenv.hostPlatform
   ) "--with-dbus-binding-tool=${buildPackages.dbus-glib.dev}/bin/dbus-binding-tool";
 
-  doCheck = false;
-
   passthru = { inherit dbus glib; };
 
   meta = {
@@ -64,4 +62,4 @@ stdenv.mkDerivation rec {
     mainProgram = "dbus-binding-tool";
     platforms = lib.platforms.unix;
   };
-}
+})

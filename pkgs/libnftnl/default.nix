@@ -8,12 +8,12 @@
   nftables,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   version = "1.3.1";
   pname = "libnftnl";
 
   src = fetchurl {
-    url = "https://netfilter.org/projects/${pname}/files/${pname}-${version}.tar.xz";
+    url = "https://netfilter.org/projects/libnftnl/files/libnftnl-${finalAttrs.version}.tar.xz";
     hash = "sha256-YH2ijbpm+97M+O8Tld3tkHfo0Z8plfmk1FqcLwvP+6g=";
   };
 
@@ -39,6 +39,6 @@ stdenv.mkDerivation rec {
     homepage = "https://netfilter.org/projects/libnftnl/";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "netfilter" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "netfilter" finalAttrs.version;
   };
-}
+})

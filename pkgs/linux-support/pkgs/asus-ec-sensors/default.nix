@@ -6,8 +6,8 @@
   kernelModuleMakeFlags,
 }:
 
-stdenv.mkDerivation rec {
-  name = "asus-ec-sensors-${version}-${kernel.version}";
+stdenv.mkDerivation (finalAttrs: {
+  name = "asus-ec-sensors-${finalAttrs.version}-${kernel.version}";
   version = "0.1.0-unstable-2025-12-11";
 
   src = fetchFromGitHub {
@@ -37,4 +37,4 @@ stdenv.mkDerivation rec {
     platforms = [ "x86_64-linux" ];
     broken = kernel.kernelOlder "5.11";
   };
-}
+})

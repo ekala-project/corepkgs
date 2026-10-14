@@ -5,20 +5,17 @@
   hatchling,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "soupsieve";
   version = "2.10";
   format = "pyproject";
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-Sek4DX0pBUY1g7r+KF6BjHNmqe17Ou4iHBrHnJBdi8A=";
   };
 
   nativeBuildInputs = [ hatchling ];
-
-  # Circular dependency on beautifulsoup4
-  doCheck = false;
 
   # Circular dependency on beautifulsoup4
   # pythonImportsCheck = [ "soupsieve" ];
@@ -29,4 +26,4 @@ buildPythonPackage rec {
     homepage = "https://github.com/facelessuser/soupsieve";
 
   };
-}
+})

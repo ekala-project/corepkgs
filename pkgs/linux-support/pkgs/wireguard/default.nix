@@ -11,12 +11,12 @@
 # wireguard upstreamed since 5.6 https://lists.zx2c4.com/pipermail/wireguard/2019-December/004704.html
 assert lib.versionOlder kernel.version "5.6";
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "wireguard";
   version = "1.0.20220627";
 
   src = fetchzip {
-    url = "https://git.zx2c4.com/wireguard-linux-compat/snapshot/wireguard-linux-compat-${version}.tar.xz";
+    url = "https://git.zx2c4.com/wireguard-linux-compat/snapshot/wireguard-linux-compat-${finalAttrs.version}.tar.xz";
     sha256 = "sha256-skbho3e49lZ/GLp/JDQpf/yXIEjes86aYtw/dn6e0Uo=";
   };
 
@@ -58,4 +58,4 @@ stdenv.mkDerivation rec {
     downloadPage = "https://git.zx2c4.com/wireguard-linux-compat/refs/";
     platforms = lib.platforms.linux;
   };
-}
+})

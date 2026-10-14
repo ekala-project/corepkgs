@@ -4,22 +4,19 @@
   fetchPypi,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "types-psutil";
   version = "7.2.2.20260906";
   format = "wheel";
 
   src = fetchPypi {
     pname = "types_psutil";
-    inherit version;
+    inherit (finalAttrs) version;
     format = "wheel";
     dist = "py3";
     python = "py3";
     hash = "sha256-2wC69/lsP2NCHE09aNNzkjCUoN/d8T6SLFxfvEJIgVk=";
   };
-
-  # Module doesn't have tests
-  doCheck = false;
 
   pythonImportsCheck = [ "psutil-stubs" ];
 
@@ -28,4 +25,4 @@ buildPythonPackage rec {
     homepage = "https://github.com/python/typeshed";
     license = lib.licenses.asl20;
   };
-}
+})

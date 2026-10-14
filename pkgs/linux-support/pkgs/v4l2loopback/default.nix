@@ -8,14 +8,14 @@
   nix-update-script,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "v4l2loopback";
   version = "0.15.3";
 
   src = fetchFromGitHub {
     owner = "umlaeute";
     repo = "v4l2loopback";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-KXJgsEJJTr4TG4Ww5HlF42v2F1J+AsHwrllUP1n/7g8=";
   };
 
@@ -61,4 +61,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     outputsToInstall = [ "out" ];
   };
-}
+})

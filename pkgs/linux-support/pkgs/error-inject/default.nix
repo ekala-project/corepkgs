@@ -10,12 +10,12 @@
 {
   edac-inject = rasdaemon.inject;
 
-  mce-inject = stdenv.mkDerivation rec {
+  mce-inject = stdenv.mkDerivation (finalAttrs: {
     pname = "mce-inject";
     version = "4cbe46321b4a81365ff3aafafe63967264dbfec5";
 
     src = fetchzip {
-      url = "https://git.kernel.org/pub/scm/utils/cpu/mce/mce-inject.git/snapshot/mce-inject-${version}.tar.gz";
+      url = "https://git.kernel.org/pub/scm/utils/cpu/mce/mce-inject.git/snapshot/mce-inject-${finalAttrs.version}.tar.gz";
       sha256 = "0gjapg2hrlxp8ssrnhvc19i3r1xpcnql7xv0zjgbv09zyha08g6z";
     };
 
@@ -39,14 +39,14 @@
       license = lib.licenses.gpl2Only;
       platforms = lib.platforms.linux;
     };
-  };
+  });
 
-  aer-inject = stdenv.mkDerivation rec {
+  aer-inject = stdenv.mkDerivation (finalAttrs: {
     pname = "aer-inject";
     version = "9bd5e2c7886fca72f139cd8402488a2235957d41";
 
     src = fetchzip {
-      url = "https://git.kernel.org/pub/scm/linux/kernel/git/gong.chen/aer-inject.git/snapshot/aer-inject-${version}.tar.gz";
+      url = "https://git.kernel.org/pub/scm/linux/kernel/git/gong.chen/aer-inject.git/snapshot/aer-inject-${finalAttrs.version}.tar.gz";
       sha256 = "0bh6mzpk2mr4xidkammmkfk21b4dbq793qjg25ryyxd1qv0c6cg4";
     };
 
@@ -71,5 +71,5 @@
       license = lib.licenses.gpl2Only;
       platforms = lib.platforms.linux;
     };
-  };
+  });
 }

@@ -14,7 +14,7 @@
   stdenv,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "cython";
   version = "3.3.0";
   pyproject = true;
@@ -22,7 +22,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "cython";
     repo = "cython";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-gIEqq8DAJF197gH1cMuq5JxI4rV/VHS70vg8hywXDqw=";
   };
 
@@ -40,10 +40,6 @@ buildPythonPackage rec {
   env = lib.optionalAttrs (!isPyPy) {
     LC_ALL = "en_US.UTF-8";
   };
-
-  # https://github.com/cython/cython/issues/2785
-  # Temporary solution
-  doCheck = false;
 
   checkPhase =
     let
@@ -123,10 +119,10 @@ buildPythonPackage rec {
       attributes. This allows the compiler to generate very efficient C code
       from Cython code.
     '';
-    changelog = "https://github.com/cython/cython/blob/${version}/CHANGES.rst";
+    changelog = "https://github.com/cython/cython/blob/${finalAttrs.version}/CHANGES.rst";
     license = lib.licenses.asl20;
     mainProgram = "cython";
 
   };
-}
+})
 # TODO: investigate recursive loop when doCheck is true

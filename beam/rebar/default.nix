@@ -5,14 +5,14 @@
   erlang,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "rebar";
   version = "2.6.4";
 
   src = fetchFromGitHub {
     owner = "rebar";
     repo = "rebar";
-    rev = version;
+    rev = finalAttrs.version;
     sha256 = "sha256-okvG7X2uHtZ1p+HUoFOmslrWvYjk0QWBAvAMAW2E40c=";
   };
 
@@ -32,4 +32,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     license = lib.licenses.asl20;
   };
-}
+})

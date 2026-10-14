@@ -5,14 +5,14 @@
   autoreconfHook,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libcpuid";
   version = "0.8.2";
 
   src = fetchFromGitHub {
     owner = "anrieff";
     repo = "libcpuid";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-RURoeuiElYT+abMsSjV8Wpn923CvSJW5/BSoUBPEHGA=";
   };
 
@@ -26,4 +26,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.bsd2;
     platforms = lib.platforms.x86;
   };
-}
+})

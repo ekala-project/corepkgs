@@ -10,12 +10,12 @@
   extraBuildInputs ? [ ],
   ...
 }:
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "patchutils";
   inherit version patches;
 
   src = fetchurl {
-    url = "http://cyberelk.net/tim/data/patchutils/stable/${pname}-${version}.tar.xz";
+    url = "http://cyberelk.net/tim/data/patchutils/stable/${finalAttrs.pname}-${finalAttrs.version}.tar.xz";
     inherit sha256;
   };
 
@@ -54,4 +54,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.all;
   };
-}
+})

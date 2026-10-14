@@ -5,7 +5,7 @@
   flit-core,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "wheel";
   version = "0.47.0";
   pyproject = true;
@@ -13,14 +13,11 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "pypa";
     repo = "wheel";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-/5OxFySesdsFsuUbhdhcgFPsry8RSy5ZshG0TWGncVY=";
   };
 
   nativeBuildInputs = [ flit-core ];
-
-  # No tests in archive
-  doCheck = false;
 
   pythonImportsCheck = [ "wheel" ];
 
@@ -42,4 +39,4 @@ buildPythonPackage rec {
     '';
     license = with lib.licenses; [ mit ];
   };
-}
+})

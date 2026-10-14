@@ -6,13 +6,13 @@
   python,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "lit";
   version = "18.1.8";
   pyproject = true;
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-R8F0oYaUGugw8E3tdqNERgC+Z9Xl+4KCw3g/umccTts=";
   };
 
@@ -23,12 +23,6 @@ buildPythonPackage rec {
     ekapkgs-update.semver-strategy = "minor";
   };
 
-  # Non-standard test suite. Needs custom checkPhase.
-  # Needs LLVM's `FileCheck` and `not`: `$out/bin/lit tests`
-  # There should be `llvmPackages.lit` since older LLVM versions may
-  # have the possibility of not correctly interfacing with newer lit versions
-  doCheck = false;
-
   pythonImportsCheck = [ "lit" ];
 
   meta = {
@@ -37,4 +31,4 @@ buildPythonPackage rec {
     homepage = "http://llvm.org/docs/CommandGuide/lit.html";
     license = lib.licenses.ncsa;
   };
-}
+})

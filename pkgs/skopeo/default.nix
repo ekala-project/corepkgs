@@ -16,12 +16,12 @@
   skopeo,
 }:
 
-buildGoModule rec {
+buildGoModule (finalAttrs: {
   pname = "skopeo";
   version = "1.24.1";
 
   src = fetchFromGitHub {
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     owner = "containers";
     repo = "skopeo";
     hash = "sha256-jLKbo6+xgHaMkMimbGIni5iZcVyeMF8wHTI594UkHQI=";
@@ -71,7 +71,7 @@ buildGoModule rec {
     PREFIX=${placeholder "out"} make install-completions
   ''
   + ''
-    install ${passthru.policy}/default-policy.json -Dt $out/etc/containers
+    install ${finalAttrs.passthru.policy}/default-policy.json -Dt $out/etc/containers
   ''
   + lib.optionalString stdenv.hostPlatform.isLinux ''
     wrapProgram $out/bin/skopeo \
@@ -83,7 +83,7 @@ buildGoModule rec {
 
   passthru = {
     policy = runCommand "policy" { } ''
-      install ${src}/default-policy.json -Dt $out
+      install ${finalAttrs.src}/default-policy.json -Dt $out
     '';
     tests.version = testers.testVersion {
       package = skopeo;
@@ -91,11 +91,11 @@ buildGoModule rec {
   };
 
   meta = {
-    changelog = "https://github.com/containers/skopeo/releases/tag/${src.rev}";
+    changelog = "https://github.com/containers/skopeo/releases/tag/${finalAttrs.src.rev}";
     description = "Command line utility for various operations on container images and image repositories";
     mainProgram = "skopeo";
     homepage = "https://github.com/containers/skopeo";
     license = lib.licenses.asl20;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "skopeo_project" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "skopeo_project" finalAttrs.version;
   };
-}
+})

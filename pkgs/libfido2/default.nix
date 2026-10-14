@@ -15,13 +15,13 @@
   openssh,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libfido2";
   version = "1.16.0";
 
   # releases on https://developers.yubico.com/libfido2/Releases/ are signed
   src = fetchurl {
-    url = "https://developers.yubico.com/${pname}/Releases/${pname}-${version}.tar.gz";
+    url = "https://developers.yubico.com/libfido2/Releases/libfido2-${finalAttrs.version}.tar.gz";
     hash = "sha256-jCtvsnm1tC6aySrecYMuSFhSZHtTYHxDuqr7vOzqBOQ=";
   };
 
@@ -72,6 +72,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/Yubico/libfido2";
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "yubico" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "yubico" finalAttrs.version;
   };
-}
+})
