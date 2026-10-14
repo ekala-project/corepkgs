@@ -14,7 +14,7 @@
   s2n-tls,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-c-s3";
   # nixpkgs-update: no auto update
   version = "1.2.0";
@@ -28,7 +28,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-s3";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-UGvRLn2DE37sXRzRo0akf9tcigtD7pNKdf06FogspQk=";
   };
 
@@ -62,6 +62,6 @@ stdenv.mkDerivation rec {
     license = lib.licenses.asl20;
     mainProgram = "s3";
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" finalAttrs.version;
   };
-}
+})

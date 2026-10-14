@@ -16,12 +16,13 @@
   which,
   debug ? false,
 }:
-stdenv.mkDerivation rec {
+let
+  versionTag = "2.25";
+in
+stdenv.mkDerivation (finalAttrs: {
   pname = "sgx-psw";
   # Version as given in se_version.h
   version = "2.25.100.3";
-  # Version as used in the Git tag
-  versionTag = "2.25";
 
   src = fetchFromGitHub {
     owner = "intel";
@@ -61,8 +62,8 @@ stdenv.mkDerivation rec {
     in
     ''
       # Make sure this is the right version of linux-sgx
-      grep -q '"${version}"' "$src/common/inc/internal/se_version.h" \
-        || (echo "Could not find expected version ${version} in linux-sgx source" >&2 && exit 1)
+      grep -q '"${finalAttrs.version}"' "$src/common/inc/internal/se_version.h" \
+        || (echo "Could not find expected version ${finalAttrs.version} in linux-sgx source" >&2 && exit 1)
 
       tar -xzvf ${ae.prebuilt}     -C $sourceRoot/
       tar -xzvf ${optlib.prebuilt} -C $sourceRoot/
@@ -265,4 +266,4 @@ stdenv.mkDerivation rec {
     platforms = [ "x86_64-linux" ];
     license = [ lib.licenses.bsd3 ];
   };
-}
+})

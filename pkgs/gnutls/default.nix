@@ -59,12 +59,12 @@ let
   inherit (stdenv.hostPlatform) isDarwin;
 in
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "gnutls";
   version = "3.8.10";
 
   src = fetchurl {
-    url = "mirror://gnupg/gnutls/v${lib.versions.majorMinor version}/gnutls-${version}.tar.xz";
+    url = "mirror://gnupg/gnutls/v${lib.versions.majorMinor finalAttrs.version}/gnutls-${finalAttrs.version}.tar.xz";
     hash = "sha256-23+rfM55Hncn677yM0MByCHXmlUOxVye8Ja2ELA+trc=";
   };
 
@@ -232,6 +232,6 @@ stdenv.mkDerivation rec {
     homepage = "https://gnutls.org/";
     license = lib.licenses.lgpl21Plus;
     platforms = lib.platforms.all;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" finalAttrs.version;
   };
-}
+})

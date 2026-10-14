@@ -9,12 +9,12 @@
   buildPackages,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "socat";
   version = "1.8.0.3";
 
   src = fetchurl {
-    url = "http://www.dest-unreach.org/socat/download/${pname}-${version}.tar.bz2";
+    url = "http://www.dest-unreach.org/socat/download/socat-${finalAttrs.version}.tar.bz2";
     hash = "sha256-AesBc2HZW7OmlB6EC1nkRjo/q/kt9BVO0CsWou1qAJU=";
   };
 
@@ -42,7 +42,6 @@ stdenv.mkDerivation rec {
     which
     net-tools
   ];
-  doCheck = false; # fails a bunch, hangs
 
   passthru.tests = lib.optionalAttrs stdenv.buildPlatform.isLinux {
     musl = buildPackages.pkgsMusl.socat;
@@ -54,6 +53,6 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     license = with lib.licenses; [ gpl2Only ];
     mainProgram = "socat";
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "socat_project" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "socat_project" finalAttrs.version;
   };
-}
+})

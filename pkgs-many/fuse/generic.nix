@@ -24,14 +24,14 @@
 let
   isFuse3 = packageBetween "3" "4";
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "fuse";
   inherit version;
 
   src = fetchFromGitHub {
     owner = "libfuse";
     repo = "libfuse";
-    rev = "${pname}-${version}";
+    rev = "${finalAttrs.pname}-${version}";
     hash = src-hash;
   };
 
@@ -113,8 +113,6 @@ stdenv.mkDerivation rec {
       --replace-fail '"su"' '"${lib.getBin shadow.su}/bin/su"'
   '';
 
-  # v2: no tests, v3: all tests get skipped in a sandbox
-  doCheck = false;
   doInstallCheck = true;
 
   # Drop `/etc/fuse.conf` because it is a no-op config and
@@ -149,4 +147,4 @@ stdenv.mkDerivation rec {
     outputsToInstall = [ "bin" ];
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "fuse_project" version;
   };
-}
+})

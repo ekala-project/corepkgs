@@ -16,7 +16,7 @@
   pytestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "jedi";
   version = "0.19.2";
   pyproject = true;
@@ -24,7 +24,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "davidhalter";
     repo = "jedi";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-2nDQJS6LIaq91PG3Av85OMFfs1ZwId00K/kvog3PGXE=";
     fetchSubmodules = true;
   };
@@ -32,9 +32,6 @@ buildPythonPackage rec {
   build-system = [ setuptools ];
 
   dependencies = [ parso ];
-
-  # TODO: corepkgs, move unit tests to passthru.tests
-  doCheck = false;
 
   nativeCheckInputs = [
     attrs
@@ -77,7 +74,7 @@ buildPythonPackage rec {
   meta = {
     description = "Autocompletion tool for Python that can be used for text editors";
     homepage = "https://github.com/davidhalter/jedi";
-    changelog = "https://github.com/davidhalter/jedi/blob/${version}/CHANGELOG.rst";
+    changelog = "https://github.com/davidhalter/jedi/blob/${finalAttrs.version}/CHANGELOG.rst";
     license = lib.licenses.mit;
   };
-}
+})

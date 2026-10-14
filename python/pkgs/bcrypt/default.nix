@@ -16,7 +16,7 @@
   twisted ? null,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "bcrypt";
   version = "5.0.0";
   pyproject = true;
@@ -24,13 +24,13 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "pyca";
     repo = "bcrypt";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-7Dp07xoq6h+fiP7d7/TRRoYszWsyQF1c4vuFUpZ7u6U=";
   };
 
   cargoRoot = "src/_bcrypt";
   cargoDeps = rustPlatform.fetchCargoVendor {
-    inherit
+    inherit (finalAttrs)
       pname
       version
       src
@@ -65,9 +65,9 @@ buildPythonPackage rec {
   };
 
   meta = {
-    changelog = "https://github.com/pyca/bcrypt/blob/${src.tag}/CHANGELOG.rst";
+    changelog = "https://github.com/pyca/bcrypt/blob/${finalAttrs.src.tag}/CHANGELOG.rst";
     description = "Modern password hashing for your software and your servers";
     homepage = "https://github.com/pyca/bcrypt/";
     license = lib.licenses.asl20;
   };
-}
+})

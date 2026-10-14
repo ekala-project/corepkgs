@@ -5,7 +5,7 @@
   cmake,
   unstableGitUpdater,
 }:
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "canokey-qemu";
   version = "0-unstable-2023-06-06";
   rev = "151568c34f5e92b086b7a3a62a11c43dd39f628b";
@@ -13,7 +13,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "canokeys";
     repo = "canokey-qemu";
-    inherit rev;
+    inherit (finalAttrs) rev;
     fetchSubmodules = true;
     hash = "sha256-4V/2UOgGWgL+tFJO/k90bCDjWSVyIpxw3nYi9NU/OxA=";
   };
@@ -62,4 +62,4 @@ stdenv.mkDerivation rec {
     # development since 2023.
     broken = true;
   };
-}
+})

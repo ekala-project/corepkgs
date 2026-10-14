@@ -10,13 +10,13 @@
   opensnitch ? throw "opensnitch-ebpf requires opensnitch",
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "opensnitch_ebpf";
   version = "${opensnitch.version}-${kernel.version}";
 
   inherit (opensnitch) src;
 
-  sourceRoot = "${src.name}/ebpf_prog";
+  sourceRoot = "${finalAttrs.src.name}/ebpf_prog";
 
   nativeBuildInputs = with llvmPackages; [
     bc
@@ -63,4 +63,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3Only;
     platforms = lib.platforms.linux;
   };
-}
+})

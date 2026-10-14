@@ -5,14 +5,14 @@
   git,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "nixfmt-rs";
   version = "0.5.3";
 
   src = fetchFromGitHub {
     owner = "Mic92";
-    repo = pname;
-    rev = version;
+    repo = "nixfmt-rs";
+    rev = finalAttrs.version;
     sha256 = "sha256-ELXgj/ij6m5aipXVb7vdzD/+77YHTyytVv900Bcp1yU=";
   };
 
@@ -20,10 +20,11 @@ rustPlatform.buildRustPackage rec {
 
   nativeCheckInputs = [ git ];
 
-  meta = with lib; {
+  meta = {
     description = "A from-scratch Rust reimplementation of nixfmt that produces byte-identical output to the Haskell original.";
     homepage = "https://github.com/Mic92/nixfmt-rs";
-    license = licenses.mpl20;
+    license = lib.licenses.mpl20;
     mainProgram = "nixfmt";
+    platforms = lib.platforms.all;
   };
-}
+})

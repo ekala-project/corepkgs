@@ -4,14 +4,14 @@
   fetchFromGitHub,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "p7zip";
   version = "17.05";
 
   src = fetchFromGitHub {
     owner = "p7zip-project";
     repo = "p7zip";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-z3qXgv/TkNRbb85Ew1OcJNxoyssfzHShc0b0/4NZOb0=";
   };
 
@@ -42,4 +42,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     mainProgram = "7z";
   };
-}
+})

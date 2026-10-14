@@ -6,14 +6,14 @@
   roman-numerals,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "roman-numerals-py";
   version = "4.1.0";
   pyproject = true;
 
   src = fetchPypi {
     pname = "roman_numerals_py";
-    inherit version;
+    inherit (finalAttrs) version;
     hash = "sha256-9deytMpS3YVe96uOs1kPQowLHqSAc2zjKwH+8qX42vk=";
   };
 
@@ -29,4 +29,4 @@ buildPythonPackage rec {
     license = lib.licenses.cc0;
     platforms = lib.platforms.all;
   };
-}
+})

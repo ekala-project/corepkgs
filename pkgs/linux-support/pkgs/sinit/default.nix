@@ -7,14 +7,14 @@
   rcreboot ? null,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "sinit";
   version = "1.1";
 
   src = fetchgit {
     url = "https://git.suckless.org/sinit/";
     sha256 = "sha256-VtXkgixgElKKOT26uKN9feXDVjjtSgTWvcgk5o5MLmw=";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
   };
   buildInputs = [
     (lib.getOutput "static" stdenv.cc.libc)
@@ -40,4 +40,4 @@ stdenv.mkDerivation rec {
     homepage = "https://tools.suckless.org/sinit";
     downloadPage = "https://git.suckless.org/sinit";
   };
-}
+})

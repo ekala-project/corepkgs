@@ -7,14 +7,14 @@
   sphinxcontrib-serializinghtml,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "sphinxcontrib-websupport";
   version = "2.0.0";
   format = "pyproject";
 
   src = fetchPypi {
     pname = "sphinxcontrib_websupport";
-    inherit version;
+    inherit (finalAttrs) version;
     hash = "sha256-C3Nn07rGRUsfl+QqqMTU1KG3VtUl/HJuu+VXHgM+ec0=";
   };
 
@@ -27,7 +27,6 @@ buildPythonPackage rec {
 
   # circular dependency on sphinx
   dontCheckRuntimeDeps = true;
-  doCheck = false;
 
   pythonNamespaces = [ "sphinxcontrib" ];
 
@@ -39,4 +38,4 @@ buildPythonPackage rec {
     homepage = "http://sphinx-doc.org/";
     license = lib.licenses.bsd2;
   };
-}
+})

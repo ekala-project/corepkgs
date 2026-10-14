@@ -26,13 +26,13 @@
 
 assert (doCheck && stdenv.hostPlatform.isLinux) -> glibcLocales != null;
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "gawk";
   extensions = lib.optionals interactive [ "interactive" ];
   version = "5.3.2";
 
   src = fetchurl {
-    url = "mirror://gnu/gawk/gawk-${version}.tar.xz";
+    url = "mirror://gnu/gawk/gawk-${finalAttrs.version}.tar.xz";
     hash = "sha256-+MNIZQnecFGSE4sA7ywAu73Q6Eww1cB9I/xzqdxMycw=";
   };
 
@@ -124,6 +124,6 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.unix ++ lib.platforms.windows;
     mainProgram = "gawk";
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" finalAttrs.version;
   };
-}
+})

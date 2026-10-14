@@ -5,18 +5,15 @@
   fetchPypi,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "snowballstemmer";
   version = "3.1.1";
   format = "setuptools";
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     sha256 = "sha256-4Hu8VKDXmP5gEKEjmEIuYqi/u6lcOU/QlW71jLTT4mA=";
   };
-
-  # No tests included
-  doCheck = false;
 
   propagatedBuildInputs = [ pystemmer ];
 
@@ -28,4 +25,4 @@ buildPythonPackage rec {
     license = lib.licenses.bsd3;
     platforms = lib.platforms.unix;
   };
-}
+})

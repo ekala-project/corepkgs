@@ -5,7 +5,7 @@
   autoreconfHook,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "mpdecimal";
   version = "4.0.1";
   outputs = [
@@ -16,7 +16,7 @@ stdenv.mkDerivation rec {
   ];
 
   src = fetchurl {
-    url = "https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-${version}.tar.gz";
+    url = "https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-${finalAttrs.version}.tar.gz";
     hash = "sha256-ltM6u0uwBwx74P7UJGzThBYYgyX4IEaCFEcZOFRbGsg=";
   };
 
@@ -54,4 +54,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix ++ lib.platforms.windows;
   };
-}
+})

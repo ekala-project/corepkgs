@@ -42,7 +42,7 @@
   sage ? null,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "pillow";
   version = "12.3.0";
   pyproject = true;
@@ -50,7 +50,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "python-pillow";
     repo = "pillow";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-kmUlgR+f75Y8DAKKPdEbchLLgg0m95oyVP53WTQni88=";
   };
 
@@ -117,7 +117,7 @@ buildPythonPackage rec {
       pytestCheckHook
       numpy
     ]
-    ++ lib.concatAttrValues optional-dependencies;
+    ++ lib.concatAttrValues finalAttrs.optional-dependencies;
 
   disabledTests = [
     # Code quality mismathch 9 vs 10
@@ -152,7 +152,7 @@ buildPythonPackage rec {
 
   meta = {
     homepage = "https://python-pillow.github.io/";
-    changelog = "https://pillow.readthedocs.io/en/stable/releasenotes/${version}.html";
+    changelog = "https://pillow.readthedocs.io/en/stable/releasenotes/${finalAttrs.version}.html";
     description = "Friendly PIL fork (Python Imaging Library)";
     longDescription = ''
       The Python Imaging Library (PIL) adds image processing
@@ -164,4 +164,4 @@ buildPythonPackage rec {
 
   };
 
-}
+})

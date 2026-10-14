@@ -6,12 +6,12 @@
   pkgsStatic,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "giflib";
   version = "6.1.3";
 
   src = fetchurl {
-    url = "mirror://sourceforge/giflib/giflib-${version}.tar.gz";
+    url = "mirror://sourceforge/giflib/giflib-${finalAttrs.version}.tar.gz";
     hash = "sha256-tltmuZ8EJLk1JfmHOG8i/F77naK/ySrUpTIkmq/7qw4=";
   };
 
@@ -58,6 +58,6 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix ++ lib.platforms.windows;
     license = lib.licenses.mit;
     branch = "6";
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "giflib_project" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "giflib_project" finalAttrs.version;
   };
-}
+})

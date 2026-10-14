@@ -21,7 +21,7 @@
   systemd,
 }:
 
-buildPythonApplication rec {
+buildPythonApplication (finalAttrs: {
   pname = "cpupower-gui";
   version = "1.0.0";
 
@@ -30,8 +30,8 @@ buildPythonApplication rec {
 
   src = fetchFromGitHub {
     owner = "vagnum08";
-    repo = pname;
-    rev = "v${version}";
+    repo = "cpupower-gui";
+    rev = "v${finalAttrs.version}";
     sha256 = "05lvpi3wgyi741sd8lgcslj8i7yi3wz7jwl7ca3y539y50hwrdas";
   };
 
@@ -105,4 +105,4 @@ buildPythonApplication rec {
     homepage = "https://github.com/vagnum08/cpupower-gui/";
     license = lib.licenses.gpl3Plus;
   };
-}
+})

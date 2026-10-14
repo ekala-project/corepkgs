@@ -25,12 +25,12 @@
   ncurses,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   version = "1.1.5";
   pname = "nftables";
 
   src = fetchurl {
-    url = "https://netfilter.org/projects/nftables/files/${pname}-${version}.tar.xz";
+    url = "https://netfilter.org/projects/nftables/files/nftables-${finalAttrs.version}.tar.xz";
     hash = "sha256-Ha8Q8yLhT9kKAXU4qvLANNfMHrHMQY3tR0RdcU6haNQ=";
   };
 
@@ -86,4 +86,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     mainProgram = "nft";
   };
-}
+})

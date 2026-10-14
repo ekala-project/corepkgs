@@ -22,13 +22,13 @@
   pika ? null,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "gevent";
   version = "26.9.0";
   pyproject = true;
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-TdRwPXFzekVsHJ31zUOoKTTlsQyHVJyqAklfSH0e8LE=";
   };
 
@@ -55,9 +55,6 @@ buildPythonPackage rec {
     NIX_CFLAGS_COMPILE = "-Wno-error=incompatible-pointer-types";
   };
 
-  # Bunch of failures.
-  doCheck = false;
-
   pythonImportsCheck = [
     "gevent"
     "gevent.events"
@@ -79,4 +76,4 @@ buildPythonPackage rec {
 
     platforms = lib.platforms.unix;
   };
-}
+})

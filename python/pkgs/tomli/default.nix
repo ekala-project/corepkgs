@@ -12,7 +12,7 @@
   setuptools-scm,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "tomli";
   version = "2.2.1";
   format = "pyproject";
@@ -20,7 +20,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "hukkin";
     repo = "tomli";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-4MWp9pPiUZZkjvGXzw8/gDele743NBj8uG4jvK2ohUM=";
   };
 
@@ -45,4 +45,4 @@ buildPythonPackage rec {
     homepage = "https://github.com/hukkin/tomli";
     license = lib.licenses.mit;
   };
-}
+})

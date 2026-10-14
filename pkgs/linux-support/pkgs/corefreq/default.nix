@@ -8,20 +8,20 @@
   extraFlags ? [ ],
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "corefreq";
   version = "2.0.9";
 
   src = fetchFromGitHub {
     owner = "cyring";
     repo = "CoreFreq";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-SD3/3j8kIpxRA3Z0zxnkKczkBqJUzn40cTbllwIFrgc=";
   };
 
   nativeBuildInputs = kernel.moduleBuildDependencies;
 
-  env.NIX_CFLAGS_COMPILE = "-I${src}/${stdenv.hostPlatform.qemuArch}";
+  env.NIX_CFLAGS_COMPILE = "-I${finalAttrs.src}/${stdenv.hostPlatform.qemuArch}";
   makeFlags = [
     "KERNELDIR=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
     "INSTALL_MOD_PATH=$(out)"
@@ -44,4 +44,4 @@ stdenv.mkDerivation rec {
       "aarch64-linux"
     ];
   };
-}
+})

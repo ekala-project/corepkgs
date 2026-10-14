@@ -6,14 +6,14 @@
   fetchFromGitHub,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "new-lg4ff";
   version = "0.5.0";
 
   src = fetchFromGitHub {
     owner = "berarma";
     repo = "new-lg4ff";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     sha256 = "sha256-nh5J89S3z0odzh2fDsAVVY1X6lr4ZUwoyu3UVOYQiq8=";
   };
 
@@ -42,4 +42,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     broken = stdenv.hostPlatform.isAarch64;
   };
-}
+})

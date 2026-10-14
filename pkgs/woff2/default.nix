@@ -8,15 +8,15 @@
   static ? stdenv.hostPlatform.isStatic,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "woff2";
   version = "1.0.2";
 
   src = fetchFromGitHub {
     owner = "google";
     repo = "woff2";
-    rev = "v${version}";
-    sha256 = "13l4g536h0pr84ww4wxs2za439s0xp1va55g6l478rfbb1spp44y";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-mFOFmtCFai77BXGM8KGSF+CSuMjVWmQDHEXqfEEcmKo=";
   };
 
   outputs = [
@@ -61,4 +61,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
   };
-}
+})

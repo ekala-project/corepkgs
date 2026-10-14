@@ -13,7 +13,7 @@
   sage ? null,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "importlib-metadata";
   version = "9.0.1";
   pyproject = true;
@@ -22,7 +22,7 @@ buildPythonPackage rec {
 
   src = fetchPypi {
     pname = "importlib_metadata";
-    inherit version;
+    inherit (finalAttrs) version;
     hash = "sha256-q4MFgLwO89thzo+ucWOJ5UYrZ+AzAYurbY+A7xcXL5k=";
   };
 
@@ -42,9 +42,6 @@ buildPythonPackage rec {
   ]
   ++ lib.optionals (pythonOlder "3.8") [ typing-extensions ];
 
-  # Cyclic dependencies due to pyflakefs
-  doCheck = false;
-
   pythonImportsCheck = [ "importlib_metadata" ];
 
   passthru.tests = { } // lib.optionalAttrs (sage != null) { inherit sage; };
@@ -55,4 +52,4 @@ buildPythonPackage rec {
     license = lib.licenses.asl20;
 
   };
-}
+})

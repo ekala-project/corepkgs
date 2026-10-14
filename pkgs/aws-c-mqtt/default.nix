@@ -12,7 +12,7 @@
   s2n-tls,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-c-mqtt";
   # nixpkgs-update: no auto update
   version = "1.0.0";
@@ -26,7 +26,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-mqtt";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-6k3Ca25fRPqV+QW0+VEUdbB0JUFjqvZo8R7eaiEby0c=";
   };
 
@@ -57,6 +57,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/awslabs/aws-c-mqtt";
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" finalAttrs.version;
   };
-}
+})

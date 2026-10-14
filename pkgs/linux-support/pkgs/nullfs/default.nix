@@ -5,14 +5,14 @@
   kernel,
   kernelModuleMakeFlags,
 }:
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "nullfs";
   version = "0.21";
 
   src = fetchFromGitHub {
     owner = "abbbi";
     repo = "nullfsvfs";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-csEfgXOXrFgWcyKmxEPKi33M7nVVI2hE+YGXMe4vdFE=";
   };
 
@@ -42,4 +42,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3;
     platforms = lib.platforms.linux;
   };
-}
+})

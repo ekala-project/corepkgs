@@ -7,7 +7,7 @@
   unittestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "pycparser";
   version = "3.00";
   pyproject = true;
@@ -15,7 +15,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "eliben";
     repo = "pycparser";
-    tag = "release_v${version}";
+    tag = "release_v${finalAttrs.version}";
     hash = "sha256-6eKc+p3xLyRPo3oCWP/dbMpHlkBXLy8XiGR0gTEHI2E=";
   };
 
@@ -35,10 +35,10 @@ buildPythonPackage rec {
   };
 
   meta = {
-    changelog = "https://github.com/eliben/pycparser/releases/tag/${src.tag}";
+    changelog = "https://github.com/eliben/pycparser/releases/tag/${finalAttrs.src.tag}";
     description = "C parser in Python";
     homepage = "https://github.com/eliben/pycparser";
     license = lib.licenses.bsd3;
 
   };
-}
+})

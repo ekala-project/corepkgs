@@ -12,14 +12,14 @@
   tracee ? null,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libbpf";
   version = "1.7.0";
 
   src = fetchFromGitHub {
     owner = "libbpf";
     repo = "libbpf";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-F92msxkYp4yZA3qUoSwS5GKUhcEO6DrYNln7w6U+jt0=";
   };
 
@@ -60,6 +60,6 @@ stdenv.mkDerivation rec {
       bsd2
     ];
     platforms = lib.platforms.linux;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "kernel" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "kernel" finalAttrs.version;
   };
-}
+})

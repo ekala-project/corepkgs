@@ -15,7 +15,7 @@
 
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "anyio";
   version = "4.15.1";
   pyproject = true;
@@ -23,7 +23,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "agronholm";
     repo = "anyio";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-cuTOVLyqLfp4LMuBd1BnFgey2gu3wehDk7VAb7yoqng=";
   };
 
@@ -36,7 +36,6 @@ buildPythonPackage rec {
     typing-extensions
   ];
 
-  doCheck = false;
   pytestFlags = [
     "-Wignore::trio.TrioDeprecationWarning"
     # DeprecationWarning for asyncio.iscoroutinefunction is propagated from uvloop used internally
@@ -91,9 +90,9 @@ buildPythonPackage rec {
   };
 
   meta = {
-    changelog = "https://github.com/agronholm/anyio/blob/${src.tag}/docs/versionhistory.rst";
+    changelog = "https://github.com/agronholm/anyio/blob/${finalAttrs.src.tag}/docs/versionhistory.rst";
     description = "High level compatibility layer for multiple asynchronous event loop implementations on Python";
     homepage = "https://github.com/agronholm/anyio";
     license = lib.licenses.mit;
   };
-}
+})

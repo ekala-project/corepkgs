@@ -11,7 +11,7 @@
   hypothesis,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "brotlicffi";
   version = "1.1.0.0";
   pyproject = true;
@@ -20,7 +20,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "python-hyper";
     repo = "brotlicffi";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-oW4y1WBJ7+4XwNwwSSR0qUqN03cZYXUYQ6EAwce9dzI=";
   };
 
@@ -41,9 +41,6 @@ buildPythonPackage rec {
     hypothesis
   ];
 
-  # Test data is only available from libbrotli git checkout, not brotli.src
-  doCheck = false;
-
   enabledTestPaths = [ "test/" ];
 
   pythonImportsCheck = [ "brotlicffi" ];
@@ -54,4 +51,4 @@ buildPythonPackage rec {
     license = lib.licenses.mit;
 
   };
-}
+})

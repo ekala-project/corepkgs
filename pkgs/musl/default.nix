@@ -55,12 +55,12 @@ let
       null;
 
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "musl";
   version = "1.2.5";
 
   src = fetchurl {
-    url = "https://musl.libc.org/releases/${pname}-${version}.tar.gz";
+    url = "https://musl.libc.org/releases/musl-${finalAttrs.version}.tar.gz";
     sha256 = "qaEYu+hNh2TaDqDSizqz+uhHf8fkCF2QECuFlvx8deQ=";
   };
 
@@ -174,7 +174,7 @@ stdenv.mkDerivation rec {
   meta = {
     description = "Efficient, small, quality libc implementation";
     homepage = "https://musl.libc.org/";
-    changelog = "https://git.musl-libc.org/cgit/musl/tree/WHATSNEW?h=v${version}";
+    changelog = "https://git.musl-libc.org/cgit/musl/tree/WHATSNEW?h=v${finalAttrs.version}";
     license = lib.licenses.mit;
     platforms = [
       "aarch64-linux"
@@ -203,6 +203,6 @@ stdenv.mkDerivation rec {
       # On 64-bit POWER, musl is ELFv2-only
       (lib.recursiveUpdate lib.systems.inspect.patterns.isPower64 lib.systems.inspect.patterns.isAbiElfv1)
     ];
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "musl-libc" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "musl-libc" finalAttrs.version;
   };
-}
+})

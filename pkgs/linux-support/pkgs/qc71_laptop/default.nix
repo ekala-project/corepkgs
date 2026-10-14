@@ -7,7 +7,7 @@
   nix-update-script,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "qc71_laptop";
   version = "0-unstable-2025-01-07";
 
@@ -21,7 +21,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = kernel.moduleBuildDependencies;
 
   makeFlags = kernelModuleMakeFlags ++ [
-    "VERSION=${version}"
+    "VERSION=${finalAttrs.version}"
     "KDIR=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
   ];
 
@@ -41,4 +41,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Only;
     platforms = [ "x86_64-linux" ];
   };
-}
+})

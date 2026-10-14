@@ -15,14 +15,14 @@
   pcsclite,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libusb";
   version = "1.0.30";
 
   src = fetchFromGitHub {
     owner = "libusb";
     repo = "libusb";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-qgs8h1vSqJg2muBDWN5nJlvaMjGYZnwMg1m07rqzHco=";
   };
 
@@ -84,4 +84,4 @@ stdenv.mkDerivation rec {
       product = "libusb";
     };
   };
-}
+})

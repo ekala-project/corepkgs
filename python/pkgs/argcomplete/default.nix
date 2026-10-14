@@ -7,7 +7,7 @@
   hatch-vcs,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "argcomplete";
   version = "3.7.2";
   pyproject = true;
@@ -17,7 +17,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "kislyuk";
     repo = "argcomplete";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-WKIhWlftH9xgdklljAOmW4XYMbclGrCFTtsxws2FRzg=";
   };
 
@@ -26,17 +26,14 @@ buildPythonPackage rec {
     hatch-vcs
   ];
 
-  # Tries to build and install test packages which fails
-  doCheck = false;
-
   pythonImportsCheck = [ "argcomplete" ];
 
   meta = {
     description = "Bash tab completion for argparse";
     homepage = "https://kislyuk.github.io/argcomplete/";
-    changelog = "https://github.com/kislyuk/argcomplete/blob/${src.tag}/Changes.rst";
+    changelog = "https://github.com/kislyuk/argcomplete/blob/${finalAttrs.src.tag}/Changes.rst";
     downloadPage = "https://github.com/kislyuk/argcomplete";
     license = lib.licenses.asl20;
 
   };
-}
+})

@@ -7,7 +7,7 @@
   nix,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-c-compression";
   version = "1.0.0";
 
@@ -20,7 +20,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-compression";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-JEByt04Rg3Yl/IgqTNSIzF+zb2TQpqkqKZgiKpnsoi0=";
   };
 
@@ -46,6 +46,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/awslabs/aws-c-compression";
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" finalAttrs.version;
   };
-}
+})

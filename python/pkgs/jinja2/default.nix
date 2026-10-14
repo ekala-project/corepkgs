@@ -13,7 +13,7 @@
   sage ? null,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "jinja2";
   version = "3.1.6";
   pyproject = true;
@@ -21,7 +21,7 @@ buildPythonPackage rec {
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-ATf7BZkNNfEnWlh+mu5tVtqCH8g0kaD7g4GDvkP2bW0=";
   };
 
@@ -47,14 +47,14 @@ buildPythonPackage rec {
   # See https://github.com/pallets/jinja/issues/1158
   doCheck = !stdenv.hostPlatform.is32bit;
 
-  nativeCheckInputs = [ pytestCheckHook ] ++ optional-dependencies.i18n;
+  nativeCheckInputs = [ pytestCheckHook ] ++ finalAttrs.optional-dependencies.i18n;
 
   passthru.tests = { } // lib.optionalAttrs (sage != null) { inherit sage; };
 
   pythonImportsCheck = [ "jinja2" ];
 
   meta = {
-    changelog = "https://github.com/pallets/jinja/blob/${version}/CHANGES.rst";
+    changelog = "https://github.com/pallets/jinja/blob/${finalAttrs.version}/CHANGES.rst";
     description = "Very fast and expressive template engine";
     downloadPage = "https://github.com/pallets/jinja";
     homepage = "https://jinja.palletsprojects.com";
@@ -66,4 +66,4 @@ buildPythonPackage rec {
     '';
 
   };
-}
+})

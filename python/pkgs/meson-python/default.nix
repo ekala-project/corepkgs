@@ -19,13 +19,13 @@
   pytest-mock,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "meson-python";
   version = "0.22.0";
   pyproject = true;
 
   src = fetchPypi {
-    inherit version;
+    inherit (finalAttrs) version;
     pname = "meson_python";
     hash = "sha256-nIGdDU76dG7a36rkZjwOnHVlkYbvflurEjML/iKWTfw=";
   };
@@ -62,16 +62,14 @@ buildPythonPackage rec {
     else
       null;
 
-  # TODO(corepkgs): move to passthru tests
-  doCheck = false;
   setupHooks = [ ./add-build-flags.sh ];
 
   pythonImportsCheck = [ "mesonpy" ];
 
   meta = {
-    changelog = "https://github.com/mesonbuild/meson-python/blob/${version}/CHANGELOG.rst";
+    changelog = "https://github.com/mesonbuild/meson-python/blob/${finalAttrs.version}/CHANGELOG.rst";
     description = "Meson Python build backend (PEP 517)";
     homepage = "https://github.com/mesonbuild/meson-python";
     license = [ lib.licenses.mit ];
   };
-}
+})

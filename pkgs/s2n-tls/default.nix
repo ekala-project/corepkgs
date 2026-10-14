@@ -7,14 +7,14 @@
   nix,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "s2n-tls";
   version = "1.7.10";
 
   src = fetchFromGitHub {
     owner = "aws";
     repo = "s2n-tls";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-Ux+CxRfGtDrV3kFbKcKEsEY+GOlzDWTUbXAQ0v5bxv0=";
   };
 
@@ -47,9 +47,6 @@ stdenv.mkDerivation rec {
     done
   '';
 
-  # TODO(corepkgs): move to passthru
-  doCheck = false;
-
   passthru.tests = {
     inherit nix;
   };
@@ -59,6 +56,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/aws/s2n-tls";
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" finalAttrs.version;
   };
-}
+})

@@ -9,7 +9,7 @@
   mock,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "installer";
   version = "0.7.0";
   format = "pyproject";
@@ -17,7 +17,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "pypa";
     repo = "installer";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-thHghU+1Alpay5r9Dc3v7ATRFfYKV8l9qR0nbGOOX/A=";
   };
 
@@ -29,14 +29,10 @@ buildPythonPackage rec {
 
   nativeBuildInputs = [ flit-core ];
 
-  # We need to disable tests because this package is part of the bootstrap chain
-  # and its test dependencies cannot be built yet when this is being built.
-  doCheck = false;
-
   passthru.tests = {
     pytest = buildPythonPackage {
-      pname = "${pname}-pytest";
-      inherit version;
+      pname = "${finalAttrs.pname}-pytest";
+      inherit (finalAttrs) version;
       format = "other";
 
       dontBuild = true;
@@ -55,8 +51,8 @@ buildPythonPackage rec {
   meta = {
     description = "Low-level library for installing a Python package from a wheel distribution";
     homepage = "https://github.com/pypa/installer";
-    changelog = "https://github.com/pypa/installer/blob/${src.rev}/docs/changelog.md";
+    changelog = "https://github.com/pypa/installer/blob/${finalAttrs.src.rev}/docs/changelog.md";
     license = lib.licenses.mit;
 
   };
-}
+})

@@ -13,12 +13,12 @@
   mc ? null,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libssh2";
   version = "1.11.1";
 
   src = fetchurl {
-    url = "https://www.libssh2.org/download/libssh2-${version}.tar.gz";
+    url = "https://www.libssh2.org/download/libssh2-${finalAttrs.version}.tar.gz";
     hash = "sha256-2ex2y+NNuY7sNTn+LImdJrDIN8s+tGalaw8QnKv2WPc=";
   };
 
@@ -49,6 +49,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.libssh2.org";
     platforms = lib.platforms.all;
     license = with lib.licenses; [ bsd3 ];
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libssh2" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libssh2" finalAttrs.version;
   };
-}
+})

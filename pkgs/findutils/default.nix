@@ -14,12 +14,12 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "findutils";
   version = "4.10.0";
 
   src = fetchurl {
-    url = "mirror://gnu/findutils/findutils-${version}.tar.xz";
+    url = "mirror://gnu/findutils/findutils-${finalAttrs.version}.tar.xz";
     sha256 = "sha256-E4fgtn/yR9Kr3pmPkN+/cMFJE5Glnd/suK5ph4nwpPU=";
   };
 
@@ -31,10 +31,6 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ];
   buildInputs = [ coreutils ]; # bin/updatedb script needs to call sort
-
-  # Since glibc-2.25 the i686 tests hang reliably right after test-sleep.
-  # !stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isFreeBSD && !(stdenv.hostPlatform.libc == "glibc" && stdenv.hostPlatform.isi686) && (stdenv.hostPlatform.libc != "musl") && !isCross;
-  doCheck = false; # TODO: move to passhru
 
   outputs = [
     "out"
@@ -109,6 +105,6 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.all;
     license = lib.licenses.gpl3Plus;
     mainProgram = "find";
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" finalAttrs.version;
   };
-}
+})

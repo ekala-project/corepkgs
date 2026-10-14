@@ -13,12 +13,12 @@
   static ? stdenv.hostPlatform.isStatic,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libevent";
   version = "2.1.12";
 
   src = fetchurl {
-    url = "https://github.com/libevent/libevent/releases/download/release-${version}-stable/libevent-${version}-stable.tar.gz";
+    url = "https://github.com/libevent/libevent/releases/download/release-${finalAttrs.version}-stable/libevent-${finalAttrs.version}-stable.tar.gz";
     sha256 = "1fq30imk8zd26x8066di3kpc5zyfc5z6frr3zll685zcx4dxxrlj";
   };
 
@@ -61,8 +61,6 @@ stdenv.mkDerivation rec {
   buildInputs =
     lib.optional sslSupport openssl ++ lib.optional stdenv.hostPlatform.isCygwin findutils;
 
-  doCheck = false; # needs the net
-
   postInstall = lib.optionalString sslSupport ''
     moveToOutput "lib/libevent_openssl*" "$openssl"
     substituteInPlace "$dev/lib/pkgconfig/libevent_openssl.pc" \
@@ -91,6 +89,6 @@ stdenv.mkDerivation rec {
     homepage = "https://libevent.org/";
     license = lib.licenses.bsd3;
     platforms = lib.platforms.all;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libevent_project" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "libevent_project" finalAttrs.version;
   };
-}
+})

@@ -5,7 +5,7 @@
   fetchFromGitHub,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "zenpower";
   version = "unstable-2025-06-17";
 
@@ -27,10 +27,10 @@ stdenv.mkDerivation rec {
   '';
 
   meta = {
-    inherit (src.meta) homepage;
+    inherit (finalAttrs.src.meta) homepage;
     description = "Linux kernel driver for reading temperature, voltage(SVI2), current(SVI2) and power(SVI2) for AMD Zen family CPUs";
     license = lib.licenses.gpl2Plus;
     platforms = [ "x86_64-linux" ];
     broken = lib.versionOlder kernel.version "4.14";
   };
-}
+})

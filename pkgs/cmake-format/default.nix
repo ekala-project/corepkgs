@@ -4,14 +4,15 @@
   python3,
 }:
 
-python3.pkgs.buildPythonApplication rec {
+python3.pkgs.buildPythonApplication (finalAttrs: {
   pname = "cmake-format";
   version = "0.6.13";
   # The source distribution does not build because of missing files.
   format = "wheel";
 
   src = fetchPypi {
-    inherit version format;
+    inherit (finalAttrs) version;
+    format = "wheel";
     python = "py3";
     pname = "cmakelang";
     sha256 = "0kmggnfbv6bba75l3zfzqwk0swi90brjka307m2kcz2w35kr8jvn";
@@ -26,8 +27,6 @@ python3.pkgs.buildPythonApplication rec {
     ]
   );
 
-  doCheck = false;
-
   meta = {
     description = "Source code formatter for cmake listfiles";
     homepage = "https://github.com/cheshirekow/cmake_format";
@@ -35,4 +34,4 @@ python3.pkgs.buildPythonApplication rec {
     mainProgram = "cmake-format";
     platforms = lib.platforms.all;
   };
-}
+})

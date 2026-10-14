@@ -4,14 +4,14 @@
   fetchpatch,
   python3Packages,
 }:
-python3Packages.buildPythonApplication rec {
+python3Packages.buildPythonApplication (finalAttrs: {
   pname = "scons";
   version = "4.11.1";
 
   src = fetchFromGitHub {
     owner = "Scons";
     repo = "scons";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-ZMNSudDOPRD37QT17a/odqm0wzIh4tqg5muIcB2CxYE=";
   };
 
@@ -43,4 +43,4 @@ python3Packages.buildPythonApplication rec {
     homepage = "https://scons.org/";
     license = lib.licenses.mit;
   };
-}
+})

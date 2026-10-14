@@ -7,13 +7,13 @@
   hatchling,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "libevdev";
   version = "0.13.1";
   pyproject = true;
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-3DNpzRQBdnueyxEXzWtz+rqQOOO9nhaVpxCp6dlBXo0=";
   };
 
@@ -32,4 +32,4 @@ buildPythonPackage rec {
     homepage = "https://gitlab.freedesktop.org/libevdev/python-libevdev";
     license = lib.licenses.mit;
   };
-}
+})

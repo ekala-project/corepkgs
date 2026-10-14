@@ -11,12 +11,12 @@
   testers,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "pcre2";
   version = "10.46";
 
   src = fetchurl {
-    url = "https://github.com/PhilipHazel/pcre2/releases/download/pcre2-${version}/pcre2-${version}.tar.bz2";
+    url = "https://github.com/PhilipHazel/pcre2/releases/download/pcre2-${finalAttrs.version}/pcre2-${finalAttrs.version}.tar.bz2";
     hash = "sha256-FfvFq6a+7gsXrssEYCrjlDI5OroevY45t8q/fbiDKZ8=";
   };
 
@@ -60,6 +60,6 @@ stdenv.mkDerivation rec {
       "libpcre2-16"
       "libpcre2-32"
     ];
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "pcre" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "pcre" finalAttrs.version;
   };
-}
+})

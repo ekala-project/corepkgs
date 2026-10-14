@@ -7,7 +7,7 @@
   nix,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-c-sdkutils";
   version = "1.0.0";
 
@@ -20,7 +20,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-sdkutils";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-SxEt4W5Bxdo+gJiP09FRKzGrqW/wO4NufRgBbWDph/g=";
   };
 
@@ -48,6 +48,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/awslabs/aws-c-sdkutils";
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" finalAttrs.version;
   };
-}
+})

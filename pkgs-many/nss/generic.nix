@@ -29,7 +29,7 @@
 let
   underscoreVersion = lib.replaceStrings [ "." ] [ "_" ] version;
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "nss";
   inherit version;
 
@@ -243,4 +243,4 @@ stdenv.mkDerivation rec {
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "mozilla" version;
   }
   // extraMeta;
-}
+})

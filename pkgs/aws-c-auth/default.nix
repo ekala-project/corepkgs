@@ -13,7 +13,7 @@
   s2n-tls,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "aws-c-auth";
   version = "1.0.0";
 
@@ -26,7 +26,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-auth";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-vVwKBnGYo8/2nRNoEAeJi1uCjnP2XBE3btgG/utQn98=";
   };
 
@@ -61,6 +61,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/awslabs/aws-c-auth";
     license = lib.licenses.asl20;
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "amazon" finalAttrs.version;
   };
-}
+})

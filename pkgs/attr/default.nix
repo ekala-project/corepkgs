@@ -11,12 +11,12 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "attr";
   version = "2.5.2";
 
   src = fetchurl {
-    url = "mirror://savannah/attr/attr-${version}.tar.gz";
+    url = "mirror://savannah/attr/attr-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-Ob9nRS+kHQlIwhl2AQU/SLPXigKTiXNDMqYwmmgMbIc=";
   };
 
@@ -48,6 +48,6 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     badPlatforms = lib.platforms.microblaze;
     license = lib.licenses.gpl2Plus;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "attr_project" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "attr_project" finalAttrs.version;
   };
-}
+})

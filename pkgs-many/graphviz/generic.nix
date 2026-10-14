@@ -35,7 +35,7 @@
 let
   inherit (lib) optional optionals optionalString;
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "graphviz";
   inherit version;
 
@@ -77,8 +77,6 @@ stdenv.mkDerivation rec {
 
   CPPFLAGS = optionalString (withXorg && stdenv.hostPlatform.isDarwin) "-I${cairo.dev}/include/cairo";
 
-  doCheck = false; # fails with "Graphviz test suite requires ksh93" which is not in nixpkgs
-
   preAutoreconf = ''
     ./autogen.sh
   '';
@@ -110,4 +108,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "graphviz" version;
   };
-}
+})

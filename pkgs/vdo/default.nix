@@ -9,14 +9,14 @@
   python3,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "vdo";
   version = "8.3.2.1";
 
   src = fetchFromGitHub {
     owner = "dm-vdo";
     repo = "vdo";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-y3u9f17jMV9dwhfJrsW/GOqszVNvPLDyETfku1t3Djo=";
   };
 
@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
     pyyaml
   ];
 
-  pythonPath = propagatedBuildInputs;
+  pythonPath = finalAttrs.propagatedBuildInputs;
 
   makeFlags = [
     "DESTDIR=${placeholder "out"}"
@@ -68,4 +68,4 @@ stdenv.mkDerivation rec {
     ];
     license = with lib.licenses; [ gpl2Plus ];
   };
-}
+})

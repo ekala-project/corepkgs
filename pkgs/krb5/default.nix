@@ -31,12 +31,12 @@
   staticOnly ? false,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "krb5";
   version = "1.22.1";
 
   src = fetchurl {
-    url = "https://kerberos.org/dist/krb5/${lib.versions.majorMinor version}/krb5-${version}.tar.gz";
+    url = "https://kerberos.org/dist/krb5/${lib.versions.majorMinor finalAttrs.version}/krb5-${finalAttrs.version}.tar.gz";
     hash = "sha256-GogyuMrZI+u/E5T2fi789B46SfRgKFpm41reyPoAU68=";
   };
 
@@ -109,7 +109,7 @@ stdenv.mkDerivation rec {
   ++ lib.optionals withLibedit [ libedit ]
   ++ lib.optionals withVerto [ libverto ];
 
-  sourceRoot = "krb5-${version}/src";
+  sourceRoot = "krb5-${finalAttrs.version}/src";
 
   postPatch = ''
     substituteInPlace config/shlib.conf \
@@ -156,8 +156,6 @@ stdenv.mkDerivation rec {
     }
   '';
 
-  doCheck = false; # fails with "No suitable file for testing purposes"
-
   outputChecks.lib.disallowedRequisites = [
     # bash cannot be here because of a dependency cycle
     bashNonInteractive
@@ -184,4 +182,4 @@ stdenv.mkDerivation rec {
       postgresql = postgresql.override { gssSupport = true; };
     };
   };
-}
+})

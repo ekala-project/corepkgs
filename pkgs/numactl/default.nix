@@ -6,14 +6,14 @@
   autoreconfHook,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "numactl";
   version = "2.0.19";
 
   src = fetchFromGitHub {
     owner = "numactl";
     repo = "numactl";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-88fxc7u7l7n0WLZ56vDmvdAoh8BaKTXUHWfqCycyoOw=";
   };
 
@@ -29,11 +29,6 @@ stdenv.mkDerivation rec {
     patchShebangs test
   '';
 
-  # You probably shouldn't ever run these! They will reconfigure Linux
-  # NUMA settings, which on my build machine makes the rest of package
-  # building ~5% slower until reboot. Ugh!
-  doCheck = false; # never ever!
-
   meta = {
     description = "Library and tools for non-uniform memory access (NUMA) machines";
     homepage = "https://github.com/numactl/numactl";
@@ -42,6 +37,6 @@ stdenv.mkDerivation rec {
       lgpl21
     ]; # libnuma is lgpl21
     platforms = lib.platforms.linux;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "numactl_project" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "numactl_project" finalAttrs.version;
   };
-}
+})

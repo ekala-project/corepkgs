@@ -5,14 +5,14 @@
   kernel,
 }:
 
-stdenv.mkDerivation rec {
-  name = "isgx-${version}-${kernel.version}";
+stdenv.mkDerivation (finalAttrs: {
+  name = "isgx-${finalAttrs.version}-${kernel.version}";
   version = "2.14";
 
   src = fetchFromGitHub {
     owner = "intel";
     repo = "linux-sgx-driver";
-    rev = "sgx_diver_${version}"; # Typo is upstream's.
+    rev = "sgx_diver_${finalAttrs.version}"; # Typo is upstream's.
     sha256 = "0kbbf2inaywp44lm8ig26mkb36jq3smsln0yp6kmrirdwc3c53mi";
   };
 
@@ -51,4 +51,4 @@ stdenv.mkDerivation rec {
     # deprecated by Intel)
     broken = kernel.kernelAtLeast "6.4";
   };
-}
+})

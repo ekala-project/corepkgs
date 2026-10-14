@@ -16,13 +16,13 @@ let
   ];
 
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "mwprocapture";
   subVersion = "1.3.4418";
-  version = "${subVersion}-${kernel.version}";
+  version = "${finalAttrs.subVersion}-${kernel.version}";
 
   src = fetchurl {
-    url = "https://www.magewell.com/files/drivers/ProCaptureForLinux_${subVersion}.tar.gz";
+    url = "https://www.magewell.com/files/drivers/ProCaptureForLinux_${finalAttrs.subVersion}.tar.gz";
     sha256 = "sha256-ZUqJkARhaMo9aZOtUMEdiHEbEq10lJO6MkGjEDnfx1g=";
   };
 
@@ -72,4 +72,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     broken = lib.versionAtLeast kernel.version "6.15";
   };
-}
+})

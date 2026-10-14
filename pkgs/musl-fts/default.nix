@@ -6,14 +6,14 @@
   pkg-config,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "musl-fts";
   version = "1.2.7";
 
   src = fetchFromGitHub {
     owner = "void-linux";
     repo = "musl-fts";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "Azw5qrz6OKDcpYydE6jXzVxSM5A8oYWAztrHr+O/DOE=";
   };
 
@@ -28,4 +28,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     license = lib.licenses.bsd3;
   };
-}
+})

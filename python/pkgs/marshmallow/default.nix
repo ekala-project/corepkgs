@@ -7,7 +7,7 @@
   packaging,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "marshmallow";
   version = "3.26.1";
   pyproject = true;
@@ -15,7 +15,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "marshmallow-code";
     repo = "marshmallow";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-l5pEhv8D6jRlU24SlsGQEkXda/b7KUdP9mAqrZCbl38=";
   };
 
@@ -23,16 +23,13 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ packaging ];
 
-  # Avoid simplejson
-  doCheck = false;
-
   pythonImportsCheck = [ "marshmallow" ];
 
   meta = {
     description = "Library for converting complex objects to and from simple Python datatypes";
     homepage = "https://github.com/marshmallow-code/marshmallow";
-    changelog = "https://github.com/marshmallow-code/marshmallow/blob/${version}/CHANGELOG.rst";
+    changelog = "https://github.com/marshmallow-code/marshmallow/blob/${finalAttrs.version}/CHANGELOG.rst";
     license = lib.licenses.mit;
 
   };
-}
+})

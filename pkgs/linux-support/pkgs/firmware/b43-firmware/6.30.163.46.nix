@@ -5,12 +5,12 @@
   b43FirmwareCutter,
 }:
 
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "b43-firmware";
   version = "6.30.163.46";
 
   src = fetchurl {
-    url = "http://www.lwfinger.com/b43-firmware/broadcom-wl-${version}.tar.bz2";
+    url = "http://www.lwfinger.com/b43-firmware/broadcom-wl-${finalAttrs.version}.tar.bz2";
     sha256 = "0baw6gcnrhxbb447msv34xg6rmlcj0gm3ahxwvdwfcvq4xmknz50";
   };
 
@@ -29,4 +29,4 @@ stdenvNoCC.mkDerivation rec {
     downloadPage = "http://www.lwfinger.com/b43-firmware";
     license = lib.licenses.unfree;
   };
-}
+})

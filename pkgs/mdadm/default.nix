@@ -11,12 +11,12 @@
   gitUpdater,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "mdadm";
   version = "4.4";
 
   src = fetchurl {
-    url = "mirror://kernel/linux/utils/raid/mdadm/mdadm-${version}.tar.xz";
+    url = "mirror://kernel/linux/utils/raid/mdadm/mdadm-${finalAttrs.version}.tar.xz";
     sha256 = "sha256-m0iPNe0VPfmZJLX+Qe7TgOhRLejxihGGKMrN1oGx1XM=";
   };
 
@@ -88,6 +88,6 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Plus;
     mainProgram = "mdadm";
     platforms = lib.platforms.linux;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "kernel" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "kernel" finalAttrs.version;
   };
-}
+})

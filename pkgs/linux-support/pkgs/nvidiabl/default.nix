@@ -5,8 +5,8 @@
   kernel,
 }:
 
-stdenv.mkDerivation rec {
-  name = "nvidiabl-${version}-${kernel.version}";
+stdenv.mkDerivation (finalAttrs: {
+  name = "nvidiabl-${finalAttrs.version}-${kernel.version}";
   version = "2020-10-01";
 
   # We use a fork which adds support for newer kernels -- upstream has been abandoned.
@@ -41,4 +41,4 @@ stdenv.mkDerivation rec {
     ];
     broken = kernel.kernelAtLeast "5.18";
   };
-}
+})

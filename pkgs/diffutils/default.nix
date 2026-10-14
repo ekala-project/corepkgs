@@ -15,12 +15,12 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "diffutils";
   version = "3.12";
 
   src = fetchurl {
-    url = "mirror://gnu/diffutils/diffutils-${version}.tar.xz";
+    url = "mirror://gnu/diffutils/diffutils-${finalAttrs.version}.tar.xz";
     hash = "sha256-fIt/n8hgkUH96pzs6FJJ0whiQ5H/Yd7a9Sj8szdyff0=";
   };
 
@@ -68,10 +68,6 @@ stdenv.mkDerivation rec {
       "gl_cv_func_strcasecmp_works=yes"
     ];
 
-  # Test failure on QEMU only (#300550)
-  doCheck = false; # TODO: enable in passhru
-  # doCheck = !stdenv.buildPlatform.isRiscV64;
-
   passthru.tests = {
     version = testers.testVersion {
       package = diffutils;
@@ -91,6 +87,6 @@ stdenv.mkDerivation rec {
     description = "Commands for showing the differences between files (diff, cmp, etc.)";
     license = lib.licenses.gpl3;
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" finalAttrs.version;
   };
-}
+})

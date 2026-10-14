@@ -4,14 +4,14 @@
   fetchFromGitHub,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "liburing";
   version = "2.15";
 
   src = fetchFromGitHub {
     owner = "axboe";
     repo = "liburing";
-    tag = "liburing-${version}";
+    tag = "liburing-${finalAttrs.version}";
     hash = "sha256-oBNu5DI2RMk0BPm6NT8qaYuyhk7+KIpFSsBsVwI7BO8=";
   };
 
@@ -55,6 +55,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/axboe/liburing";
     license = lib.licenses.lgpl21;
     platforms = lib.platforms.linux;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "kernel" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "kernel" finalAttrs.version;
   };
-}
+})

@@ -5,14 +5,14 @@
   perl,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "uthash";
   version = "2.3.0";
 
   src = fetchFromGitHub {
     owner = "troydhanson";
     repo = "uthash";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-F0M5ENT3bMn3dD16Oaq9mBFYOWzVliVWupAIrLc2nkQ=";
   };
 
@@ -22,7 +22,7 @@ stdenv.mkDerivation rec {
   preCheck = "cd tests";
 
   installPhase = ''
-    install -Dm644 $src/include/*.h -t $out/include
+    install -Dm644 ${finalAttrs.src}/include/*.h -t $out/include
   '';
 
   meta = {
@@ -31,4 +31,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.bsd2; # it's one-clause, actually, as it's source-only
     platforms = lib.platforms.all;
   };
-}
+})

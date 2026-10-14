@@ -6,14 +6,14 @@
   fetchFromGitHub,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "binaryen";
   version = "131";
 
   src = fetchFromGitHub {
     owner = "WebAssembly";
     repo = "binaryen";
-    rev = "version_${version}";
+    rev = "version_${finalAttrs.version}";
     hash = "sha256-7x4I34sWNJIz0X7orJtjU4BQ1CLbIFtkUTqdy5MrxX0=";
   };
 
@@ -33,4 +33,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.all;
     license = lib.licenses.asl20;
   };
-}
+})

@@ -14,7 +14,7 @@
   pkgsHostTarget,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "lxml";
   version = "7.0.0a3";
   pyproject = true;
@@ -22,7 +22,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "lxml";
     repo = "lxml";
-    tag = "lxml-${version}";
+    tag = "lxml-${finalAttrs.version}";
     hash = "sha256-SipCyfy7BX2KFQ8BErUz05E4Q+h0IA662DQlPXUP4oQ=";
   };
 
@@ -53,19 +53,16 @@ buildPythonPackage rec {
     NIX_CFLAGS_COMPILE = "-Wno-error=incompatible-function-pointer-types";
   };
 
-  # tests are meant to be ran "in-place" in the same directory as src
-  doCheck = false;
-
   pythonImportsCheck = [
     "lxml"
     "lxml.etree"
   ];
 
   meta = {
-    changelog = "https://github.com/lxml/lxml/blob/lxml-${version}/CHANGES.txt";
+    changelog = "https://github.com/lxml/lxml/blob/lxml-${finalAttrs.version}/CHANGES.txt";
     description = "Pythonic binding for the libxml2 and libxslt libraries";
     homepage = "https://lxml.de";
     license = lib.licenses.bsd3;
 
   };
-}
+})

@@ -32,12 +32,28 @@
 
 assert guiSupport -> !enableMinimal;
 
-stdenv.mkDerivation rec {
+let
+  # FreePG (https://freepg.org) is a set of commonly-used patches for GnuPG that
+  # have not been merged upstream. It is used by Arch Linux, Debian, Fedora and
+  # NixOS, and is maintained by Andrew Gallagher.
+  #
+  # The main purpose of including these patches in Nixpkgs is to maintain
+  # compatibility with OpenPGP.
+  #
+  freepgPatches = fetchFromGitLab {
+    domain = "gitlab.com";
+    owner = "freepg";
+    repo = "gnupg";
+    rev = "361c223eb00ca372fbf9506f5150ddbec193936f";
+    hash = "sha256-hRuwrB6G2vjp7Md6m+cwoi7g4GtW0sazAEN5RC+AKdg=";
+  };
+in
+stdenv.mkDerivation (finalAttrs: {
   pname = "gnupg";
   version = "2.4.8";
 
   src = fetchurl {
-    url = "mirror://gnupg/gnupg/${pname}-${version}.tar.bz2";
+    url = "mirror://gnupg/gnupg/gnupg-${finalAttrs.version}.tar.bz2";
     hash = "sha256-tYyA15sE0yQ/9JwcP8a1+DE46zeEaJVjvN0GBZUxhhY=";
   };
 
@@ -72,21 +88,6 @@ stdenv.mkDerivation rec {
     zlib
   ]
   ++ lib.optionals withTpm2Tss [ tpm2-tss ];
-
-  # FreePG (https://freepg.org) is a set of commonly-used patches for GnuPG that
-  # have not been merged upstream. It is used by Arch Linux, Debian, Fedora and
-  # NixOS, and is maintained by Andrew Gallagher.
-  #
-  # The main purpose of including these patches in Nixpkgs is to maintain
-  # compatibility with OpenPGP.
-  #
-  freepgPatches = fetchFromGitLab {
-    domain = "gitlab.com";
-    owner = "freepg";
-    repo = "gnupg";
-    rev = "361c223eb00ca372fbf9506f5150ddbec193936f";
-    hash = "sha256-hRuwrB6G2vjp7Md6m+cwoi7g4GtW0sazAEN5RC+AKdg=";
-  };
 
   patches = [
     # Without this, scdaemon isn't linked to libusb, causing smartcards to not work correctly
@@ -189,7 +190,7 @@ stdenv.mkDerivation rec {
 
   meta = {
     homepage = "https://gnupg.org";
-    changelog = "https://git.gnupg.org/cgi-bin/gitweb.cgi?p=${pname}.git;a=blob;f=NEWS;hb=refs/tags/${pname}-${version}";
+    changelog = "https://git.gnupg.org/cgi-bin/gitweb.cgi?p=gnupg.git;a=blob;f=NEWS;hb=refs/tags/gnupg-${finalAttrs.version}";
     description = "Modern release of the GNU Privacy Guard, a GPL OpenPGP implementation";
     license = lib.licenses.gpl3Plus;
     longDescription = ''
@@ -205,6 +206,6 @@ stdenv.mkDerivation rec {
     '';
     platforms = lib.platforms.all;
     mainProgram = "gpg";
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnupg" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnupg" finalAttrs.version;
   };
-}
+})

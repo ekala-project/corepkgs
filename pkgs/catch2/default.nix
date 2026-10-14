@@ -5,7 +5,7 @@
   cmake,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "catch2";
   version = "3.16.0";
 
@@ -18,7 +18,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "catchorg";
     repo = "Catch2";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-vvPZTQzLNGIcdDbuo0w6sQvxzLdKFCl2LNwcHu0d5I8=";
   };
 
@@ -47,4 +47,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.boost;
     platforms = with lib.platforms; unix ++ windows;
   };
-}
+})

@@ -12,11 +12,11 @@
 
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "pahole";
   version = "1.30";
   src = fetchzip {
-    url = "https://git.kernel.org/pub/scm/devel/pahole/pahole.git/snapshot/pahole-${version}.tar.gz";
+    url = "https://git.kernel.org/pub/scm/devel/pahole/pahole.git/snapshot/pahole-${finalAttrs.version}.tar.gz";
     hash = "sha256-JF4KnI05uOlPuunJuetX/fX3ZRT6TDXdjCNG9/ufkgI=";
   };
 
@@ -47,4 +47,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Only;
     platforms = lib.platforms.linux;
   };
-}
+})

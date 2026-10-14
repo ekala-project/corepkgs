@@ -9,12 +9,12 @@
 # cgit) that are needed here should be included directly in Nixpkgs as
 # files.
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "patchelf";
   version = "0.19.1";
 
   src = fetchurl {
-    url = "https://github.com/NixOS/${pname}/releases/download/${version}/${pname}-${version}.tar.bz2";
+    url = "https://github.com/NixOS/patchelf/releases/download/${finalAttrs.version}/patchelf-${finalAttrs.version}.tar.bz2";
     sha256 = "sha256-LM4B3pNlOCn2q2iiDC7CdeHACpRhEHBKJ+ko0ubohxY=";
   };
 
@@ -30,4 +30,4 @@ stdenv.mkDerivation rec {
     mainProgram = "patchelf";
     platforms = lib.platforms.all;
   };
-}
+})

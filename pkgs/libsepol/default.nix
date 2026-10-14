@@ -6,10 +6,12 @@
   libselinux,
 }:
 
-stdenv.mkDerivation rec {
+let
+  se_url = "https://github.com/SELinuxProject/selinux/releases/download";
+in
+stdenv.mkDerivation (finalAttrs: {
   pname = "libsepol";
   version = "3.11";
-  se_url = "https://github.com/SELinuxProject/selinux/releases/download";
 
   outputs = [
     "bin"
@@ -19,7 +21,7 @@ stdenv.mkDerivation rec {
   ];
 
   src = fetchurl {
-    url = "${se_url}/${version}/libsepol-${version}.tar.gz";
+    url = "${se_url}/${finalAttrs.version}/libsepol-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-efPSyI9Et+tc9U2XkuAyMil+F/l6F5Fj8nUAmaAPFk0=";
   };
 
@@ -55,6 +57,6 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     license = lib.licenses.gpl2Plus;
     pkgConfigModules = [ "libselinux" ];
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "selinuxproject" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "selinuxproject" finalAttrs.version;
   };
-}
+})

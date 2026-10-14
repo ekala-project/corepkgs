@@ -7,13 +7,13 @@
   unittestCheckHook,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "pytz";
   version = "2026.4";
   pyproject = true;
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-RkMDZFuvr9ckGImDaLJClFj3Cc8etqFTcvvMOWtk2mM=";
   };
 
@@ -41,4 +41,4 @@ buildPythonPackage rec {
     license = lib.licenses.mit;
 
   };
-}
+})

@@ -8,21 +8,21 @@
   hatchling,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "attrs";
   version = "26.1.0";
   disabled = pythonOlder "3.7";
   format = "pyproject";
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-0DzricsyKo/XBtT7kZQHN7ZkKqNpmP4TCpvJbJhe/zI=";
   };
 
   patches = [
     (replaceVars ./remove-hatch-plugins.patch {
       # hatch-vcs and hatch-fancy-pypi-readme depend on pytest, which depends on attrs
-      inherit version;
+      inherit (finalAttrs) version;
     })
   ];
 
@@ -41,10 +41,6 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "attr" ];
 
-  # pytest depends on attrs, so we can't do this out-of-the-box.
-  # Instead, we do this as a passthru.tests test.
-  doCheck = false;
-
   passthru.tests = {
     pytest = callPackage ./tests.nix { };
   };
@@ -52,8 +48,8 @@ buildPythonPackage rec {
   meta = {
     description = "Python attributes without boilerplate";
     homepage = "https://github.com/python-attrs/attrs";
-    changelog = "https://github.com/python-attrs/attrs/releases/tag/${version}";
+    changelog = "https://github.com/python-attrs/attrs/releases/tag/${finalAttrs.version}";
     license = lib.licenses.mit;
 
   };
-}
+})

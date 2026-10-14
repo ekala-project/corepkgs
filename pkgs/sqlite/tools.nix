@@ -17,15 +17,15 @@ let
       homepage,
       mainProgram,
     }:
-    stdenv.mkDerivation rec {
+    stdenv.mkDerivation (finalAttrs: {
       inherit pname;
       version = "3.50.4";
 
       # nixpkgs-update: no auto update
       src =
-        assert version == sqlite.version;
+        assert finalAttrs.version == sqlite.version;
         fetchurl {
-          url = "https://sqlite.org/2025/sqlite-src-${archiveVersion version}.zip";
+          url = "https://sqlite.org/2025/sqlite-src-${archiveVersion finalAttrs.version}.zip";
           hash = "sha256-t7TcBg82BTkC+2WzRLu+1ZLmSyKRomrAb+d+7Al4UOk=";
         };
 
@@ -42,7 +42,7 @@ let
         license = lib.licenses.publicDomain;
         platforms = lib.platforms.unix;
       };
-    };
+    });
 in
 {
   sqldiff = mkTool {

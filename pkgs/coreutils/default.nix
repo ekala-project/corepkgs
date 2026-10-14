@@ -48,13 +48,13 @@ let
     ;
   isCross = (stdenv.hostPlatform != stdenv.buildPlatform);
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "coreutils";
   extensions = lib.optionals (!minimal) [ "full" ];
   version = "9.9";
 
   src = fetchurl {
-    url = "mirror://gnu/coreutils/coreutils-${version}.tar.xz";
+    url = "mirror://gnu/coreutils/coreutils-${finalAttrs.version}.tar.xz";
     hash = "sha256-Gby2yoZxg8V9dxVerpRsXs7YgYMUO0XKUa19JsYoynU=";
   };
 
@@ -197,9 +197,6 @@ stdenv.mkDerivation rec {
   # and {Open,Free}BSD.
   # With non-standard storeDir: https://github.com/NixOS/nix/issues/512
 
-  # (!isCross) && (stdenv.hostPlatform.libc == "glibc" || stdenv.hostPlatform.libc == "musl") && !stdenv.hostPlatform.isAarch32;
-  doCheck = false; # TODO: enable in passhru
-
   # Prevents attempts of running 'help2man' on cross-built binaries.
   PERL = if isCross then "missing" else null;
 
@@ -275,6 +272,6 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl3Plus;
     platforms = with lib.platforms; unix ++ windows;
     priority = 10;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "gnu" finalAttrs.version;
   };
-}
+})

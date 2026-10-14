@@ -57,7 +57,7 @@ let
   outDispatchPath = "$out/default.script";
 in
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "busybox";
   version = "1.36.1";
 
@@ -65,7 +65,7 @@ stdenv.mkDerivation rec {
   # nix-build pkgs/stdenv/linux/make-bootstrap-tools.nix -A test
   # still builds after the update.
   src = fetchurl {
-    url = "https://busybox.net/downloads/${pname}-${version}.tar.bz2";
+    url = "https://busybox.net/downloads/busybox-${finalAttrs.version}.tar.bz2";
     sha256 = "sha256-uMwkyVdNgJ5yecO+NJeVxdXOtv3xnKcJ+AzeUOR94xQ=";
   };
 
@@ -212,8 +212,6 @@ stdenv.mkDerivation rec {
     stdenv.cc.libc.static
   ];
 
-  doCheck = false; # tries to access the net
-
   passthru = {
     shellPath = "/bin/ash";
     tests = {
@@ -231,6 +229,6 @@ stdenv.mkDerivation rec {
     mainProgram = "busybox";
     platforms = lib.platforms.linux;
     priority = 15; # below systemd (halt, init, poweroff, reboot) and coreutils
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "busybox" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "busybox" finalAttrs.version;
   };
-}
+})

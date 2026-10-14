@@ -25,12 +25,12 @@
   haskellPackages,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libpcap";
   version = "1.10.5";
 
   src = fetchurl {
-    url = "https://www.tcpdump.org/release/${pname}-${version}.tar.gz";
+    url = "https://www.tcpdump.org/release/libpcap-${finalAttrs.version}.tar.gz";
     hash = "sha256-N87ZChmjAqfzLkWCJKAMNlwReQXCzTWsVEtogKgUiPA=";
   };
 
@@ -97,6 +97,6 @@ stdenv.mkDerivation rec {
     mainProgram = "pcap-config";
     platforms = lib.platforms.unix;
     license = lib.licenses.bsd3;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "tcpdump" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "tcpdump" finalAttrs.version;
   };
-}
+})

@@ -30,7 +30,7 @@
 let
   patchDir = ./patches;
 in
-python3.pkgs.buildPythonApplication rec {
+python3.pkgs.buildPythonApplication (finalAttrs: {
   pname = "meson";
   inherit version;
   format = "setuptools";
@@ -216,4 +216,4 @@ python3.pkgs.buildPythonApplication rec {
     inherit (python3.meta) platforms;
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "mesonbuild" version;
   };
-}
+})

@@ -7,7 +7,7 @@
   freebsd,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libipt";
   version = "2.2";
 
@@ -15,12 +15,11 @@ stdenv.mkDerivation rec {
     "out"
     "include"
   ];
-  outputInclude = "include";
 
   src = fetchFromGitHub {
     owner = "intel";
     repo = "libipt";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "sha256-hSC00GbVllJStgt9iA9WT54U8NQRtgJHuyZyb5ougc8=";
   };
 
@@ -39,6 +38,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/intel/libipt";
     license = lib.licenses.bsd3;
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "intel" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "intel" finalAttrs.version;
   };
-}
+})

@@ -20,7 +20,7 @@
   zstandard,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "httpx";
   version = "0.28.1";
   pyproject = true;
@@ -28,7 +28,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "encode";
     repo = "httpx";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-tB8uZm0kPRnmeOvsDdrkrHcMVIYfGanB4l/xHsTKpgE=";
   };
 
@@ -55,9 +55,6 @@ buildPythonPackage rec {
     # socks = [ socksio ];
     zstd = [ zstandard ];
   };
-
-  # trustme uses pyopenssl
-  doCheck = false;
 
   # nativeCheckInputs = [
   #   chardet
@@ -101,10 +98,10 @@ buildPythonPackage rec {
   setupHook = ./setup-hook.sh;
 
   meta = {
-    changelog = "https://github.com/encode/httpx/blob/${src.rev}/CHANGELOG.md";
+    changelog = "https://github.com/encode/httpx/blob/${finalAttrs.src.rev}/CHANGELOG.md";
     description = "Next generation HTTP client";
     mainProgram = "httpx";
     homepage = "https://github.com/encode/httpx";
     license = lib.licenses.bsd3;
   };
-}
+})

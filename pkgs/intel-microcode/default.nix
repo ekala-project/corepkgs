@@ -4,14 +4,14 @@
   fetchFromGitHub,
 }:
 
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "intel-microcode";
   version = "20250512";
 
   src = fetchFromGitHub {
     owner = "intel";
     repo = "Intel-Linux-Processor-Microcode-Data-Files";
-    rev = "microcode-${version}";
+    rev = "microcode-${finalAttrs.version}";
     hash = "sha256-xasV1w6+8qnD+RLWsReMo+xm7a9nguV2st3IC4FURDU=";
   };
 
@@ -28,4 +28,4 @@ stdenvNoCC.mkDerivation rec {
     license = lib.licenses.unfreeRedistributableFirmware;
     platforms = [ "x86_64-linux" ];
   };
-}
+})

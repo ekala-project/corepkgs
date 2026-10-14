@@ -15,13 +15,13 @@
   pcsclite,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   version = "2.11";
 
   pname = "wpa_supplicant";
 
   src = fetchurl {
-    url = "https://w1.fi/releases/${pname}-${version}.tar.gz";
+    url = "https://w1.fi/releases/wpa_supplicant-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-kS6gb3TjCo42+7aAZNbN/yGNjVkdsPxddd7myBrH/Ao=";
   };
 
@@ -173,4 +173,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.bsd3;
     platforms = lib.platforms.linux;
   };
-}
+})

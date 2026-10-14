@@ -8,14 +8,14 @@
 let
   srcs = import ./srcs.nix { inherit fetchurl; };
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "mxu11x0";
 
   src = if lib.versionAtLeast kernel.version "5.0" then srcs.mxu11x0_5.src else srcs.mxu11x0_4.src;
   mxu_version =
     if lib.versionAtLeast kernel.version "5.0" then srcs.mxu11x0_5.version else srcs.mxu11x0_4.version;
 
-  version = mxu_version + "-${kernel.version}";
+  version = finalAttrs.mxu_version + "-${kernel.version}";
 
   nativeBuildInputs = kernel.moduleBuildDependencies;
 
@@ -42,4 +42,4 @@ stdenv.mkDerivation rec {
     # https://github.com/torvalds/linux/commit/94cc7aeaf6c0cff0b8aeb7cb3579cee46b923560
     broken = kernel.kernelAtLeast "5.14";
   };
-}
+})

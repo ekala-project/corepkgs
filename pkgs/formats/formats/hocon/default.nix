@@ -140,7 +140,7 @@ in
               hocon-validator,
               writeText,
             }:
-            stdenvNoCC.mkDerivation rec {
+            stdenvNoCC.mkDerivation (finalAttrs: {
               inherit name;
 
               dontUnpack = true;
@@ -169,8 +169,8 @@ in
                 runHook postInstall
               '';
 
-              passthru.json = writeText "${name}.json" json;
-            }
+              passthru.json = writeText "${name}.json" finalAttrs.json;
+            })
           )
           {
             hocon-generator = generator;

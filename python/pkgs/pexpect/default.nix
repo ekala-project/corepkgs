@@ -9,20 +9,17 @@
   sage ? null,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "pexpect";
   version = "4.9.0";
   pyproject = true;
 
   src = fetchPypi {
-    inherit pname version;
+    inherit (finalAttrs) pname version;
     hash = "sha256-7n1BEj88mREFDqLC2sEHVo3EOy07DHVXozISw5jq0w8=";
   };
 
   nativeBuildInputs = [ setuptools ];
-
-  # Wants to run pythonin a subprocess
-  doCheck = false;
 
   propagatedBuildInputs = [ ptyprocess ];
 
@@ -52,4 +49,4 @@ buildPythonPackage rec {
       any platform that supports the standard Python pty module.
     '';
   };
-}
+})

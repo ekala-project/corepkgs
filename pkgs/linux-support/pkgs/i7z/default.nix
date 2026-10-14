@@ -8,14 +8,14 @@
   qtbase,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "i7z";
   version = "0.27.4";
 
   src = fetchFromGitHub {
     owner = "DimitryAndric";
     repo = "i7z";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "00c4ng30ry88hcya4g1i9dngiqmz3cs31x7qh1a10nalxn1829xy";
   };
 
@@ -59,4 +59,4 @@ stdenv.mkDerivation rec {
     # broken on ARM
     platforms = [ "x86_64-linux" ];
   };
-}
+})

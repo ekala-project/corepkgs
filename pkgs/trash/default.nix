@@ -5,14 +5,14 @@
   perl,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   version = "0.9.2";
   pname = "trash";
 
   src = fetchFromGitHub {
     owner = "ali-rantakari";
     repo = "trash";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     sha256 = "1d3rc03vgz32faj7qi18iiggxvxlqrj9lsk5jkpa9r1mcs5d89my";
   };
 
@@ -38,4 +38,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.darwin;
     license = lib.licenses.mit;
   };
-}
+})

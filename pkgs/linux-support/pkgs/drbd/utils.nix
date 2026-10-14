@@ -23,12 +23,12 @@
   ocf-resource-agents,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "drbd";
   version = "9.33.0";
 
   src = fetchurl {
-    url = "https://pkg.linbit.com/downloads/drbd/utils/${pname}-utils-${version}.tar.gz";
+    url = "https://pkg.linbit.com/downloads/drbd/utils/${finalAttrs.pname}-utils-${finalAttrs.version}.tar.gz";
     hash = "sha256-Ij/gfQtkbpkbM7qepBRo+aZvkDVi59p2bdD8a06jPbk=";
   };
 
@@ -120,4 +120,4 @@ stdenv.mkDerivation rec {
       mirroring the content of block devices (hard disks, partitions, logical volumes etc.) between hosts.
     '';
   };
-}
+})

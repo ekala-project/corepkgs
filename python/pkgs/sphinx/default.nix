@@ -41,7 +41,7 @@
   breathe ? null,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "sphinx";
   version = "9.1.0";
   pyproject = true;
@@ -51,7 +51,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "sphinx-doc";
     repo = "sphinx";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     postFetch = ''
       # Change ä to æ in file names, since ä can be encoded multiple ways on different
       # filesystems, leading to different hashes on different platforms.
@@ -196,4 +196,4 @@ buildPythonPackage rec {
     changelog = "https://www.sphinx-doc.org/en/master/changes.html";
     license = lib.licenses.bsd3;
   };
-}
+})

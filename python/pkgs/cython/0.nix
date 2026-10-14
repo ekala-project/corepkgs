@@ -32,7 +32,7 @@ let
     "overflow_check_longlong"
   ];
 in
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "cython";
   version = "0.29.37.1";
   pyproject = true;
@@ -43,7 +43,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "cython";
     repo = "cython";
-    rev = "refs/tags/${version}";
+    rev = "refs/tags/${finalAttrs.version}";
     hash = "sha256-XsEy2NrG7hq+VXRCRbD4BRaBieU6mVoE0GT52L3mMhs=";
   };
 
@@ -89,18 +89,15 @@ buildPythonPackage rec {
   '';
 
   # https://github.com/cython/cython/issues/2785
-  # Temporary solution
-  doCheck = false;
-  # doCheck = !stdenv.hostPlatform.isDarwin;
 
   # force regeneration of generated code in source distributions
   # https://github.com/cython/cython/issues/5089
   setupHook = ./setup-hook.sh;
 
   meta = {
-    changelog = "https://github.com/cython/cython/blob/${version}/CHANGES.rst";
+    changelog = "https://github.com/cython/cython/blob/${finalAttrs.version}/CHANGES.rst";
     description = "Optimising static compiler for both the Python programming language and the extended Cython programming language";
     homepage = "https://cython.org";
     license = lib.licenses.asl20;
   };
-}
+})

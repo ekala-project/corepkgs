@@ -19,7 +19,7 @@
   wheel,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "build";
   version = "1.3.0";
   pyproject = true;
@@ -27,7 +27,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "pypa";
     repo = "build";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-w2YKQzni8e6rpnQJH2J0bHzRigjWOlWiI8Po5d3ZqS8=";
   };
 
@@ -41,14 +41,10 @@ buildPythonPackage rec {
   ]
   ++ lib.optionals (pythonOlder "3.11") [ tomli ];
 
-  # We need to disable tests because this package is part of the bootstrap chain
-  # and its test dependencies cannot be built yet when this is being built.
-  doCheck = false;
-
   passthru.tests = {
     pytest = buildPythonPackage {
-      pname = "${pname}-pytest";
-      inherit src version;
+      pname = "${finalAttrs.pname}-pytest";
+      inherit (finalAttrs) src version;
       format = "other";
 
       dontBuild = true;
@@ -102,8 +98,8 @@ buildPythonPackage rec {
       is a simple build tool and does not perform any dependency management.
     '';
     homepage = "https://github.com/pypa/build";
-    changelog = "https://github.com/pypa/build/blob/${src.tag}/CHANGELOG.rst";
+    changelog = "https://github.com/pypa/build/blob/${finalAttrs.src.tag}/CHANGELOG.rst";
     license = lib.licenses.mit;
 
   };
-}
+})

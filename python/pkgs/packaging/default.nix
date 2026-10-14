@@ -13,7 +13,7 @@
 }:
 
 let
-  packaging = buildPythonPackage rec {
+  packaging = buildPythonPackage (finalAttrs: {
     pname = "packaging";
     version = "25.0";
     pyproject = true;
@@ -21,7 +21,7 @@ let
     disabled = pythonOlder "3.7";
 
     src = fetchPypi {
-      inherit pname version;
+      inherit (finalAttrs) pname version;
       hash = "sha256-1EOHLJjWd79g9qHy+MHLdI6P52LSv50xSLVZkpWw/E8=";
     };
 
@@ -41,15 +41,12 @@ let
       "packaging.version"
     ];
 
-    # Prevent circular dependency with pytest
-    doCheck = false;
-
     passthru.tests = packaging.overridePythonAttrs (_: {
       doCheck = true;
     });
 
     meta = {
-      changelog = "https://github.com/pypa/packaging/blob/${version}/CHANGELOG.rst";
+      changelog = "https://github.com/pypa/packaging/blob/${finalAttrs.version}/CHANGELOG.rst";
       description = "Core utilities for Python packages";
       downloadPage = "https://github.com/pypa/packaging";
       homepage = "https://packaging.pypa.io/";
@@ -59,6 +56,6 @@ let
       ];
 
     };
-  };
+  });
 in
 packaging

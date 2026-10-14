@@ -12,14 +12,14 @@
   tracee ? null,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libbpf";
   version = "1.6.2";
 
   src = fetchFromGitHub {
     owner = "libbpf";
     repo = "libbpf";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-igjjwirg3O5mC3DzGCAO9OgrH2drnE/gV6NH7ZLNnFE=";
   };
 
@@ -67,4 +67,4 @@ stdenv.mkDerivation rec {
     ];
     platforms = lib.platforms.linux;
   };
-}
+})

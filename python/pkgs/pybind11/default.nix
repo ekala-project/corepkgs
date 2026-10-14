@@ -26,7 +26,7 @@ let
     };
   } ./setup-hook.sh;
 in
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "pybind11";
   version = "3.1.0";
   pyproject = true;
@@ -34,7 +34,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "pybind";
     repo = "pybind11";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-rzpe7CrgIa5Df2OrB/9mxIJd3X5DA7FX0C+w7TcmAoQ=";
   };
 
@@ -108,7 +108,7 @@ buildPythonPackage rec {
 
   meta = {
     homepage = "https://github.com/pybind/pybind11";
-    changelog = "https://github.com/pybind/pybind11/blob/${src.rev}/docs/changelog.rst";
+    changelog = "https://github.com/pybind/pybind11/blob/${finalAttrs.src.rev}/docs/changelog.rst";
     description = "Seamless operability between C++11 and Python";
     mainProgram = "pybind11-config";
     longDescription = ''
@@ -119,4 +119,4 @@ buildPythonPackage rec {
     license = lib.licenses.bsd3;
 
   };
-}
+})

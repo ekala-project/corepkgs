@@ -21,7 +21,7 @@
   tzdata,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "hypothesis";
   version = "6.152.9";
   pyproject = true;
@@ -31,7 +31,7 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "HypothesisWorks";
     repo = "hypothesis";
-    tag = "hypothesis-python-${version}";
+    tag = "hypothesis-python-${finalAttrs.version}";
     hash = "sha256-hwKkL+DmjQwHy3gF3dSTGMLE6bjeDfX3GZEVaTuuSBA=";
   };
 
@@ -64,8 +64,6 @@ buildPythonPackage rec {
     pytestCheckHook
   ]
   ++ lib.optionals isPyPy [ tzdata ];
-
-  doCheck = false;
 
   # tox.ini changes how pytest runs and breaks it.
   # Activate the CI profile (similar to setupHook below)
@@ -146,8 +144,8 @@ buildPythonPackage rec {
       # Forge look and feel of multi-output derivation as best as we can.
       #
       # Using 'outputs = [ "doc" ];' breaks a lot of assumptions.
-      name = "${pname}-${version}-doc";
-      inherit src pname version;
+      name = "${finalAttrs.pname}-${finalAttrs.version}-doc";
+      inherit (finalAttrs) src pname version;
 
       postInstallSphinx = ''
         mv $out/share/doc/* $out/share/doc/python$pythonVersion-$pname-$version
@@ -161,7 +159,7 @@ buildPythonPackage rec {
       ];
 
       inherit (python) pythonVersion;
-      inherit meta;
+      inherit (finalAttrs) meta;
     };
   };
 
@@ -170,9 +168,9 @@ buildPythonPackage rec {
     mainProgram = "hypothesis";
     homepage = "https://github.com/HypothesisWorks/hypothesis";
     changelog = "https://hypothesis.readthedocs.io/en/latest/changes.html#v${
-      lib.replaceStrings [ "." ] [ "-" ] version
+      lib.replaceStrings [ "." ] [ "-" ] finalAttrs.version
     }";
     license = lib.licenses.mpl20;
 
   };
-}
+})

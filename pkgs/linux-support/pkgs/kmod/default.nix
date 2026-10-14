@@ -28,7 +28,7 @@ let
   modulesDirs = lib.concatMapStringsSep ":" (x: "${x}/lib/modules") systems;
 
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "kmod";
   version = "31";
 
@@ -38,7 +38,7 @@ stdenv.mkDerivation rec {
   # Possibly this will be fixed in kmod 30?
   # https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git/commit/.gitignore?id=61a93a043aa52ad62a11ba940d4ba93cb3254e78
   src = fetchzip {
-    url = "https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git/snapshot/kmod-${version}.tar.gz";
+    url = "https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git/snapshot/kmod-${finalAttrs.version}.tar.gz";
     hash = "sha256-FNR015/AoYBbi7Eb1M2TXH3yxUuddKICCu+ot10CdeQ=";
   };
 
@@ -118,11 +118,11 @@ stdenv.mkDerivation rec {
     '';
     homepage = "https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git/";
     downloadPage = "https://www.kernel.org/pub/linux/utils/kernel/kmod/";
-    changelog = "https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git/plain/NEWS?h=v${version}";
+    changelog = "https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git/plain/NEWS?h=v${finalAttrs.version}";
     license = with lib.licenses; [
       lgpl21Plus
       gpl2Plus
     ]; # GPLv2+ for tools
     platforms = lib.platforms.linux;
   };
-}
+})

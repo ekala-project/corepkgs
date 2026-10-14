@@ -11,12 +11,12 @@
   newt,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "slang";
   version = "2.3.3";
 
   src = fetchurl {
-    url = "https://www.jedsoft.org/releases/slang/${pname}-${version}.tar.bz2";
+    url = "https://www.jedsoft.org/releases/slang/slang-${finalAttrs.version}.tar.bz2";
     sha256 = "sha256-+RRQVK4TGXPGEgjqgkhtXdEOPFza0jt8SgYXdDyPWhg=";
   };
 
@@ -76,7 +76,7 @@ stdenv.mkDerivation rec {
       # Expect the text in format of 'Version 2.3.3</td>'
       new_version="$(curl -s https://www.jedsoft.org/slang/ |
           pcregrep -o1 'Version ([0-9.]+)</td>')"
-      update-source-version ${pname} "$new_version"
+      update-source-version slang "$new_version"
     '';
   };
 
@@ -106,6 +106,6 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Plus;
     mainProgram = "slsh";
     platforms = lib.platforms.unix;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "jedsoft" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "jedsoft" finalAttrs.version;
   };
-}
+})

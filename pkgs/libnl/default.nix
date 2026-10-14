@@ -18,14 +18,14 @@
   python,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "libnl";
   version = "3.11.0";
 
   src = fetchFromGitHub {
     repo = "libnl";
     owner = "thom311";
-    rev = "libnl${lib.replaceStrings [ "." ] [ "_" ] version}";
+    rev = "libnl${lib.replaceStrings [ "." ] [ "_" ] finalAttrs.version}";
     hash = "sha256-GuYV2bUOhLedB/o9Rz6Py/G5HBK2iNefwrlkZJXgbnI=";
   };
 
@@ -75,6 +75,6 @@ stdenv.mkDerivation rec {
     description = "Linux Netlink interface library suite";
     license = lib.licenses.lgpl21;
     platforms = lib.platforms.linux;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "infradead" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "infradead" finalAttrs.version;
   };
-}
+})

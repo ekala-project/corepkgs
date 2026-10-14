@@ -70,10 +70,10 @@ let
   };
 
 in
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "bionic-prebuilt";
   version = "ndk-release-r23";
-  name = "${stdenv.hostPlatform.parsed.cpu.name}-${pname}-${version}";
+  name = "${stdenv.hostPlatform.parsed.cpu.name}-${finalAttrs.pname}-${finalAttrs.version}";
 
   src = fetchzip {
     url = "https://android.googlesource.com/platform/bionic/+archive/00e8ce1142d8823b0d2fc8a98b40119b0f1f02cd.tar.gz";
@@ -157,4 +157,4 @@ stdenvNoCC.mkDerivation rec {
     license = lib.licenses.mit;
     platforms = lib.platforms.linux;
   };
-}
+})

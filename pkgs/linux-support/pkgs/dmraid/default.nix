@@ -6,12 +6,12 @@
   lvm2,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "dmraid";
   version = "1.0.0.rc16";
 
   src = fetchurl {
-    url = "https://people.redhat.com/~heinzm/sw/dmraid/src/old/dmraid-${version}.tar.bz2";
+    url = "https://people.redhat.com/~heinzm/sw/dmraid/src/old/dmraid-${finalAttrs.version}.tar.bz2";
     sha256 = "0m92971gyqp61darxbiri6a48jz3wq3gkp8r2k39320z0i6w8jgq";
   };
 
@@ -65,4 +65,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     license = lib.licenses.gpl2Plus;
   };
-}
+})

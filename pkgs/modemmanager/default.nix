@@ -29,7 +29,7 @@
   withSystemd ? lib.meta.availableOn stdenv.hostPlatform systemd,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "modemmanager";
   version = "1.24.2";
 
@@ -37,7 +37,7 @@ stdenv.mkDerivation rec {
     domain = "gitlab.freedesktop.org";
     owner = "mobile-broadband";
     repo = "ModemManager";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-rBLOqpx7Y2BB6/xvhIw+rDEXsLtePhHLBvfpSuJzQik=";
   };
 
@@ -105,6 +105,6 @@ stdenv.mkDerivation rec {
     homepage = "https://www.freedesktop.org/wiki/Software/ModemManager/";
     license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.linux;
-    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "freedesktop" version;
+    identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "freedesktop" finalAttrs.version;
   };
-}
+})

@@ -106,10 +106,10 @@ in
   catches-simple-conflict =
     let
       # this build must fail due to conflicts
-      package = pythonPkgs.buildPythonPackage rec {
+      package = pythonPkgs.buildPythonPackage (finalAttrs: {
         pname = "catches-simple-conflict";
         version = "0.0.0";
-        src = projectSource pname;
+        src = projectSource finalAttrs.pname;
         pyproject = true;
         catchConflicts = true;
         buildInputs = [
@@ -121,7 +121,7 @@ in
           pythonPkgs.packaging
           (customize pythonPkgs.packaging)
         ];
-      };
+      });
     in
     expectFailure package "Found duplicated packages in closure for dependency 'packaging'";
 

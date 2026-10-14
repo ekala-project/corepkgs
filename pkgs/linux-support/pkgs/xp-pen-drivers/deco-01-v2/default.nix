@@ -20,13 +20,13 @@
 let
   dataDir = "var/lib/xppend1v2";
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "xp-pen-deco-01-v2-driver";
   version = "3.4.9-231023";
 
   src = fetchzip {
     url = "https://www.xp-pen.com/download/file/id/1936/pid/440/ext/gz.html#.tar.gz";
-    name = "xp-pen-deco-01-v2-driver-${version}.tar.gz";
+    name = "xp-pen-deco-01-v2-driver-${finalAttrs.version}.tar.gz";
     sha256 = "sha256-A/dv6DpelH0NHjlGj32tKv37S+9q3F8cYByiYlMuqLg=";
   };
 
@@ -79,4 +79,4 @@ stdenv.mkDerivation rec {
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     license = lib.licenses.unfree;
   };
-}
+})

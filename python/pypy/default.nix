@@ -78,7 +78,7 @@ let
 
 in
 with passthru;
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   inherit pname version;
 
   src = fetchurl {
@@ -135,10 +135,10 @@ stdenv.mkDerivation rec {
       NIX_CFLAGS_COMPILE = "-Wno-error=incompatible-function-pointer-types";
     }
     // {
-      C_INCLUDE_PATH = lib.makeSearchPathOutput "dev" "include" buildInputs;
-      LIBRARY_PATH = lib.makeLibraryPath buildInputs;
+      C_INCLUDE_PATH = lib.makeSearchPathOutput "dev" "include" finalAttrs.buildInputs;
+      LIBRARY_PATH = lib.makeLibraryPath finalAttrs.buildInputs;
       LD_LIBRARY_PATH = lib.makeLibraryPath (
-        builtins.filter (x: x.outPath != stdenv.cc.libc.outPath or "") buildInputs
+        builtins.filter (x: x.outPath != stdenv.cc.libc.outPath or "") finalAttrs.buildInputs
       );
     };
 
@@ -406,4 +406,4 @@ stdenv.mkDerivation rec {
     ];
     broken = optimizationLevel == "0"; # generates invalid code
   };
-}
+})

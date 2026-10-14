@@ -239,7 +239,7 @@ rec {
 
   texliveYear = year;
 
-  core = stdenv.mkDerivation rec {
+  core = stdenv.mkDerivation (finalAttrs: {
     pname = "texlive-bin";
     inherit version;
 
@@ -347,7 +347,10 @@ rec {
         rm "${placeholder "ptex"}"/bin/{pbibtex,pdvitype,ppltotf,ptftopl}
       '';
 
-    passthru = { inherit version buildInputs; };
+    passthru = {
+      inherit version;
+      inherit (finalAttrs) buildInputs;
+    };
 
     meta = {
       description = "Basic binaries for TeX Live";
@@ -355,7 +358,7 @@ rec {
       license = lib.licenses.gpl2Plus;
       platforms = lib.platforms.all;
     };
-  };
+  });
 
   inherit (core-big)
     metafont
@@ -560,15 +563,15 @@ rec {
       };
     };
 
-  dvisvgm = stdenv.mkDerivation rec {
+  dvisvgm = stdenv.mkDerivation (finalAttrs: {
     pname = "dvisvgm";
     version = "3.2.2";
 
     src =
-      assert lib.assertMsg (version == texlive.pkgs.dvisvgm.version)
-        "dvisvgm: TeX Live version (${texlive.pkgs.dvisvgm.version}) different from source (${version}), please update dvisvgm";
+      assert lib.assertMsg (finalAttrs.version == texlive.pkgs.dvisvgm.version)
+        "dvisvgm: TeX Live version (${texlive.pkgs.dvisvgm.version}) different from source (${finalAttrs.version}), please update dvisvgm";
       fetchurl {
-        url = "https://github.com/mgieseki/dvisvgm/releases/download/${version}/dvisvgm-${version}.tar.gz";
+        url = "https://github.com/mgieseki/dvisvgm/releases/download/${finalAttrs.version}/dvisvgm-${finalAttrs.version}.tar.gz";
         hash = "sha256-8GKL6lqjMUXXWwpqbdGPrYibdSc4y8AcGUGPNUc6HQA=";
       };
 
@@ -598,7 +601,7 @@ rec {
     ]
     ++ lib.optional (ttfautohint != null) ttfautohint;
 
-  };
+  });
 
   dvipng = stdenv.mkDerivation {
     pname = "dvipng";
@@ -635,12 +638,12 @@ rec {
 
   };
 
-  pygmentex = python3Packages.buildPythonApplication rec {
+  pygmentex = python3Packages.buildPythonApplication (finalAttrs: {
     pname = "pygmentex";
-    inherit (src) version;
+    inherit (finalAttrs.src) version;
     format = "other";
 
-    src = assertFixedHash pname texlive.pkgs.pygmentex.tex;
+    src = assertFixedHash "pygmentex" texlive.pkgs.pygmentex.tex;
 
     propagatedBuildInputs = with python3Packages; [
       pygments
@@ -672,7 +675,7 @@ rec {
       '';
       license = lib.licenses.lppl13c;
     };
-  };
+  });
 
   asymptote =
     if args ? asymptote && args.asymptote != null then

@@ -10,13 +10,13 @@ let
   cfg = import ./version.nix;
 in
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "batman-adv";
   version = "${cfg.version}-${kernel.version}";
 
   src = fetchurl {
-    url = "http://downloads.open-mesh.org/batman/releases/${pname}-${cfg.version}/${pname}-${cfg.version}.tar.gz";
-    sha256 = cfg.sha256.${pname};
+    url = "http://downloads.open-mesh.org/batman/releases/batman-adv-${cfg.version}/batman-adv-${cfg.version}.tar.gz";
+    sha256 = cfg.sha256.batman-adv;
   };
 
   nativeBuildInputs = kernel.moduleBuildDependencies;
@@ -37,4 +37,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.gpl2Only;
     platforms = with lib.platforms; linux;
   };
-}
+})

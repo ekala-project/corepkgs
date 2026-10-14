@@ -8,7 +8,7 @@
   qtbase,
 }:
 
-python3.pkgs.buildPythonApplication rec {
+python3.pkgs.buildPythonApplication (finalAttrs: {
   pname = "lenovo-legion-app";
   version = "0.0.20-unstable-2025-07-11";
   pyproject = true;
@@ -20,7 +20,7 @@ python3.pkgs.buildPythonApplication rec {
     hash = "sha256-WXGDlykH6aBUVotmDcGZ8Y/zC8iBAv57u3hXRnfTaSo=";
   };
 
-  sourceRoot = "${src.name}/python/legion_linux";
+  sourceRoot = "${finalAttrs.src.name}/python/legion_linux";
 
   build-system = with python3.pkgs; [
     setuptools
@@ -41,7 +41,7 @@ python3.pkgs.buildPythonApplication rec {
     # only fixup application (legion-linux-gui), service (legiond) currently not installed so do not fixup
     # version
     substituteInPlace ./setup.cfg \
-      --replace-fail "_VERSION" "${builtins.head (lib.splitString "-" version)}"
+      --replace-fail "_VERSION" "${builtins.head (lib.splitString "-" finalAttrs.version)}"
 
     # /etc
     substituteInPlace ./legion_linux/legion.py \
@@ -67,4 +67,4 @@ python3.pkgs.buildPythonApplication rec {
     platforms = [ "x86_64-linux" ];
     mainProgram = "legion_gui";
   };
-}
+})
