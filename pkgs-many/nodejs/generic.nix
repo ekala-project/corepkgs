@@ -81,7 +81,15 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   # Node.js build can be memory intensive
-  env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.cc.isClang "-Wno-error=unused-command-line-argument";
+  env.NIX_CFLAGS_COMPILE =
+    lib.optionalString stdenv.cc.isClang "-Wno-error=unused-command-line-argument"
+    # Work around GCC 14 ICE (segfault in ggc_set_mark during garbage collection)
+    + lib.optionalString stdenv.cc.isGNU " --param=ggc-min-expand=200 --param=ggc-min-heapsize=262144";
+
+  env.CXXFLAGS = lib.optionalString stdenv.cc.isGNU "--param=ggc-min-expand=200 --param=ggc-min-heapsize=262144";
+
+  # Limit parallelism to work around GCC 14 ICE in V8 compilation
+  enableParallelBuilding = !stdenv.cc.isGNU;
 
   # Ensure ICU libraries are linked properly
   env.NIX_LDFLAGS = "-licuuc -licudata";
