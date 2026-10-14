@@ -146,7 +146,7 @@ stdenv.mkDerivation (finalAttrs: {
   configurePlatforms = [ ];
 
   configureFlags = [
-    "CXXFLAGS=-Wno-elaborated-enum-base"
+    "CXXFLAGS=-Wno-elaborated-enum-base --param=ggc-min-expand=100"
     "--docdir=share/doc/${finalAttrs.pname}-${finalAttrs.version}"
   ]
   ++ (
