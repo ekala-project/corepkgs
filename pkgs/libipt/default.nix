@@ -2,7 +2,6 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  fetchpatch,
   cmake,
   freebsd,
 }:
@@ -10,11 +9,6 @@
 stdenv.mkDerivation (finalAttrs: {
   pname = "libipt";
   version = "2.2";
-
-  outputs = [
-    "out"
-    "include"
-  ];
 
   src = fetchFromGitHub {
     owner = "intel";
