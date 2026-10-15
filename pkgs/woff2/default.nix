@@ -16,7 +16,7 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "google";
     repo = "woff2";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-mFOFmtCFai77BXGM8KGSF+CSuMjVWmQDHEXqfEEcmKo=";
+    hash = "sha256-npB7dVjLZXQINa8UtcPtQKdB1Be6c8I5QfkCaEZ5hI4=";
   };
 
   outputs = [
