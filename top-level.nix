@@ -1575,6 +1575,8 @@ final: prev: with final; {
 
   buildPgrxExtension = callPackage ./pkgs/cargo-pgrx/buildPgrxExtension.nix { };
 
+  postgresqlPackages = postgresql.pkgs;
+
   # PGXS builder for PostgreSQL extensions. Pairs with postgresql.pg_config.
   postgresqlBuildExtension = postgresql.buildExtension;
 

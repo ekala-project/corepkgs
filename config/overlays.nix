@@ -80,6 +80,14 @@ in
       '';
     };
 
+    overlays.postgresql = mkOption {
+      type = types.listOf overlayType;
+      default = [ ];
+      description = ''
+        Overlays to be applied to the PostgreSQL extension scope (`postgresql.pkgs`).
+      '';
+    };
+
     overlays.writers = mkOption {
       type = types.listOf overlayType;
       default = [ ];
