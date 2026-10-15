@@ -146,7 +146,7 @@ stdenv.mkDerivation (finalAttrs: {
   configurePlatforms = [ ];
 
   configureFlags = [
-    "CXXFLAGS=-Wno-elaborated-enum-base --param=ggc-min-expand=100"
+    "CXXFLAGS=-Wno-elaborated-enum-base"
     "--docdir=share/doc/${finalAttrs.pname}-${finalAttrs.version}"
   ]
   ++ (
@@ -195,6 +195,8 @@ stdenv.mkDerivation (finalAttrs: {
   # The cause is a compiler warning `warning: argument unused during compilation: '-pie' [-Wunused-command-line-argument]`
   # interfering with the feature check.
   env.NIX_CFLAGS_COMPILE = "-Wno-unused-command-line-argument";
+  # Work around GCC 14 ICE (segfault in ggc_set_mark during garbage collection)
+  env.CXXFLAGS = lib.optionalString stdenv.cc.isGNU "--param=ggc-min-expand=100";
 
   # make install attempts to use the just-built cmake
   preInstall = lib.optionalString (stdenv.isCross) ''
