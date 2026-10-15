@@ -1,6 +1,8 @@
 {
   buildPackages,
+  config,
   lib,
+  newScope,
   stdenv,
   fetchFromGitHub,
   replaceVars,
@@ -198,11 +200,25 @@ stdenv.mkDerivation (finalAttrs: {
       postgresql = finalAttrs.finalPackage;
     };
 
-    # PGXS builder bound to this postgresql. Nixpkgs pairs these in the
-    # postgresql.pkgs scope; here they are passthru attrs on the package.
+    # PGXS builder bound to this postgresql.
     buildExtension = buildPackages.callPackage ./postgresqlBuildExtension.nix {
       postgresql = finalAttrs.finalPackage;
     };
+
+    # Extension scope (`postgresql.pkgs`). Kept out of `pkgs/` at the top level
+    # so names like `age` don't shadow unrelated top-level packages.
+    pkgs =
+      let
+        extensions = lib.composeManyExtensions (
+          [ (lib.packageSets.mkAutoCalledPackageDir ../../postgresql/pkgs) ] ++ config.overlays.postgresql
+        );
+      in
+      lib.makeScope newScope (
+        lib.extends extensions (_self: {
+          postgresql = finalAttrs.finalPackage;
+          postgresqlBuildExtension = finalAttrs.finalPackage.buildExtension;
+        })
+      );
   };
 
   meta = {

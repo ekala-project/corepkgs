@@ -1,0 +1,2 @@
+# PostgreSQL extensions live here, one directory per extension.
+# The postgresqlPackages scope in top-level.nix reads this directory.
