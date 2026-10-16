@@ -278,6 +278,8 @@ mapAliases {
   nodejs_22 = renamed "nodejs_22" "nodejs.v22" nodejs.v22;
   nodejs_23 = renamed "nodejs_23" "nodejs.v23" nodejs.v23;
   nodejs_latest = renamed "nodejs_latest" "nodejs.v26" nodejs.v26;
+  nss_esr = renamed "nss_esr" "nss" nss;
+  nss_latest = renamed "nss_latest" "nss.latest" nss.latest;
   openjdk = renamed "openjdk" "java" java;
   openjdk11 = renamed "openjdk11" "java.v11" java.v11;
   openjdk8 = renamed "openjdk8" "java.v8" java.v8;
