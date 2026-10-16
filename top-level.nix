@@ -1051,7 +1051,7 @@ final: prev: with final; {
     extensions = gawkextlib.full;
   };
   gawkextlib = callPackage ./pkgs/gawk/gawkextlib.nix { };
-  gawkInteractive = gawk.override { interactive = true; };
+  gawkInteractive = gawk.interactive;
 
   pam =
     if stdenv.hostPlatform.isLinux then

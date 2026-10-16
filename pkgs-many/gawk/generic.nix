@@ -1,11 +1,17 @@
 {
+  version,
+  src-hash,
+  interactive ? false,
+  ...
+}:
+
+{
   lib,
   stdenv,
   fetchurl,
   removeReferencesTo,
   runtimeShellPackage,
   texinfo,
-  interactive ? false,
   readline,
   autoreconfHook, # no-pma fix
   gawk,
@@ -29,11 +35,11 @@ assert (doCheck && stdenv.hostPlatform.isLinux) -> glibcLocales != null;
 stdenv.mkDerivation (finalAttrs: {
   pname = "gawk";
   extensions = lib.optionals interactive [ "interactive" ];
-  version = "5.3.2";
+  inherit version;
 
   src = fetchurl {
     url = "mirror://gnu/gawk/gawk-${finalAttrs.version}.tar.xz";
-    hash = "sha256-+MNIZQnecFGSE4sA7ywAu73Q6Eww1cB9I/xzqdxMycw=";
+    hash = src-hash;
   };
 
   patches = [ ./include-mach-o-dyld.patch ];
