@@ -15,7 +15,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   outputs = [
     "out"
-    "include"
+    "dev"
   ];
 
   src = fetchFromGitHub {
