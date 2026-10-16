@@ -460,6 +460,8 @@ final: prev: with final; {
 
   libjpeg = libjpeg_turbo;
 
+  pcre-cpp = pcre.cpp;
+
   # Less secure variant of lowdown for use inside Nix builds.
   lowdown-unsandboxed = lowdown.override {
     enableDarwinSandbox = false;

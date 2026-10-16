@@ -1,4 +1,11 @@
 {
+  version,
+  src-hash,
+  variant ? null,
+  ...
+}:
+
+{
   lib,
   stdenv,
   fetchurl,
@@ -8,25 +15,18 @@
   windows ? null,
   # Disable jit on Apple Silicon, https://github.com/zherczeg/sljit/issues/51
   enableJit ? !(stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64),
-  variant ? null,
 }:
-
-assert lib.elem variant [
-  null
-  "cpp"
-  "pcre32"
-];
 
 stdenv.mkDerivation (finalAttrs: {
   pname =
     "pcre"
     + lib.optionalString (variant == "cpp") "-cpp"
     + lib.optionalString (variant != "cpp" && variant != null) variant;
-  version = "8.45";
+  inherit version;
 
   src = fetchurl {
     url = "mirror://sourceforge/project/pcre/pcre/${finalAttrs.version}/pcre-${finalAttrs.version}.tar.bz2";
-    sha256 = "sha256-Ta5v3NK7C7bDe1+Xwzwr6VTadDmFNpzdrDVG4yGL/7g=";
+    sha256 = src-hash;
   };
 
   outputs = [
