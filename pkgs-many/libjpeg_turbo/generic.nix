@@ -1,13 +1,19 @@
 {
+  version,
+  src-hash,
+  enableJpeg7 ? false,
+  enableJpeg8 ? false,
+  ...
+}@variantArgs:
+
+{
   lib,
   stdenv,
   fetchFromGitHub,
   cmake,
   nasm,
   java,
-  enableJava ? false, # whether to build the java wrapper
-  enableJpeg7 ? false, # whether to build libjpeg with v7 compatibility
-  enableJpeg8 ? false, # whether to build libjpeg with v8 compatibility
+  enableJava ? false,
   enableStatic ? stdenv.hostPlatform.isStatic,
   enableShared ? !stdenv.hostPlatform.isStatic,
 
@@ -27,18 +33,18 @@
   nix-update-script,
 }:
 
-assert !(enableJpeg7 && enableJpeg8); # pick only one or none, not both
+assert !(enableJpeg7 && enableJpeg8);
 assert enableJava -> java != null;
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libjpeg-turbo";
-  version = "3.2.0";
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "libjpeg-turbo";
     repo = "libjpeg-turbo";
     tag = finalAttrs.version;
-    hash = "sha256-SPxWCDt9hFQ8uRaaKLkpWp9oPhfcRkDBm5MarTgdmV4=";
+    hash = src-hash;
   };
 
   patches =
