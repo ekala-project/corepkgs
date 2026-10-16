@@ -459,6 +459,7 @@ final: prev: with final; {
   };
 
   libjpeg = libjpeg_turbo;
+  libjpeg8 = libjpeg_turbo.jpeg8;
 
   pcre-cpp = pcre.cpp;
 
