@@ -89,17 +89,18 @@ stdenv.mkDerivation (finalAttrs: {
     );
 
     RUSTFLAGS = lib.concatStringsSep " " (
-      [
-        # Increase codegen units to introduce parallelism within the compiler.
-        "-Ccodegen-units=10"
-      ]
-      ++ lib.optionals (stdenv.hostPlatform.rust.rustcTargetSpec == "x86_64-unknown-linux-gnu") [
+      lib.optionals (stdenv.hostPlatform.rust.rustcTargetSpec == "x86_64-unknown-linux-gnu") [
         # Upstream defaults to lld on x86_64-unknown-linux-gnu, we want to use our linker
         "-Clinker-features=-lld"
         "-Clink-self-contained=-linker"
       ]
     );
     RUSTDOCFLAGS = "-A rustdoc::broken-intra-doc-links";
+    # Statically link lzma in the bootstrap binary so it doesn't need
+    # liblzma.so at runtime (which isn't in the sandbox's library path).
+    LZMA_API_STATIC = "1";
+    # Increase stack size to avoid stack overflows in the bootstrap compiler.
+    RUST_MIN_STACK = "16777216";
   };
 
   # We need rust to build rust. If we don't provide it, configure will try to download it.
