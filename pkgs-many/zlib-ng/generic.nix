@@ -1,4 +1,11 @@
 {
+  version,
+  src-hash,
+  withZlibCompat ? false,
+  ...
+}:
+
+{
   lib,
   stdenv,
   fetchFromGitHub,
@@ -6,18 +13,17 @@
   pkg-config,
   gtest,
   runUnitTests,
-  withZlibCompat ? false,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "zlib-ng";
-  version = "2.3.3";
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "zlib-ng";
     repo = "zlib-ng";
     tag = finalAttrs.version;
-    hash = "sha256-6GlHCnx9dQtmViPnvHnMS+l9Z+g6M8ynrSxLhLtmAKU=";
+    hash = src-hash;
   };
 
   outputs = [
