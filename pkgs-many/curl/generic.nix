@@ -33,7 +33,7 @@
   perl,
   autoreconfHook,
   brotli,
-  c-aresMinimal,
+  c-ares,
   gnutls,
   gsasl ? null,
   libkrb5,
@@ -166,7 +166,7 @@ stdenv.mkDerivation (finalAttrs: {
   # applications that use Curl.
   propagatedBuildInputs =
     lib.optional brotliSupport brotli
-    ++ lib.optional c-aresSupport c-aresMinimal
+    ++ lib.optional c-aresSupport c-ares
     ++ lib.optional gnutlsSupport gnutls
     ++ lib.optional gsaslSupport gsasl
     ++ lib.optional computedGssSupport libkrb5

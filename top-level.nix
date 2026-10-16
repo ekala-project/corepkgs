@@ -1142,8 +1142,6 @@ final: prev: with final; {
   # Variants: libxml2.v2_13, libxml2.v2_15 (default)
   libxml2_13 = prev.libxml2.v2_13;
 
-  c-aresMinimal = callPackage ./pkgs/c-ares { withCMake = false; };
-
   libkrb5 = krb5;
 
   ngtcp2-gnutls = callPackage ./pkgs/ngtcp2/gnutls.nix { };

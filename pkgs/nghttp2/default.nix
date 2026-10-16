@@ -7,7 +7,7 @@
 
   # Optional dependencies
   enableApp ? with stdenv.hostPlatform; !isWindows && !isStatic,
-  c-aresMinimal,
+  c-ares,
   libev,
   openssl,
   zlib,
@@ -64,7 +64,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs =
     lib.optionals enableApp [
-      c-aresMinimal
+      c-ares
       libev
       zlib
       openssl

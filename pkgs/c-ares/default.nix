@@ -2,8 +2,6 @@
   lib,
   stdenv,
   fetchurl,
-  updateAutotoolsGnuConfigScriptsHook,
-  withCMake ? true,
   cmake,
 
   # sensitive downstream packages
@@ -33,9 +31,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   nativeBuildInputs = [
-    updateAutotoolsGnuConfigScriptsHook
-  ]
-  ++ lib.optionals withCMake [
     cmake.minimal
     cmake.configurePhaseHook
   ];
@@ -50,7 +45,7 @@ stdenv.mkDerivation (finalAttrs: {
     curl = (curl.override { c-aresSupport = true; }).tests.withCheck;
   };
 
-  preFixup = lib.optionalString withCMake ''
+  preFixup = ''
     substituteInPlace $out/lib/pkgconfig/libcares.pc --replace-fail \''${prefix}/ ""
   '';
 
