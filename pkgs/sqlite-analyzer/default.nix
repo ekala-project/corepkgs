@@ -4,10 +4,11 @@
   fetchurl,
   unzip,
   tcl,
+  sqlite,
 }:
 
 let
-  archiveVersion = import ../sqlite/archive-version.nix lib;
+  inherit (sqlite) archiveVersion;
 in
 
 stdenv.mkDerivation (finalAttrs: {

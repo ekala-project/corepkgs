@@ -1,4 +1,12 @@
 {
+  version,
+  src-hash,
+  docs-hash,
+  interactive ? false,
+  ...
+}:
+
+{
   lib,
   stdenv,
   fetchurl,
@@ -14,9 +22,6 @@
   sqlite-rsync,
   tinysparql ? null,
 
-  # uses readline & ncurses for a better interactive experience if set to true
-  interactive ? false,
-
   gitUpdater,
   buildPackages,
 }:
@@ -28,17 +33,17 @@ in
 stdenv.mkDerivation (finalAttrs: {
   pname = "sqlite";
   extensions = lib.optionals interactive [ "interactive" ];
-  version = "3.50.4";
+  inherit version;
 
   # nixpkgs-update: no auto update
   # NB! Make sure to update ./tools.nix src (in the same directory).
   src = fetchurl {
     url = "https://sqlite.org/2025/sqlite-autoconf-${archiveVersion finalAttrs.version}.tar.gz";
-    hash = "sha256-o9tYehuS7l3awvZrPttBsm+chnJ1eC1Gw6CIl31qWxg=";
+    hash = src-hash;
   };
   docsrc = fetchurl {
     url = "https://sqlite.org/2025/sqlite-doc-${archiveVersion finalAttrs.version}.zip";
-    hash = "sha256-+KA89GFQAxDHp4XJ1vhhIayUZWAZgs3Kxt4MWYfb/C8=";
+    hash = docs-hash;
   };
 
   outputs = [
@@ -125,6 +130,8 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   passthru = {
+    inherit archiveVersion;
+
     tests = {
       inherit (python3Packages) sqlalchemy;
       inherit

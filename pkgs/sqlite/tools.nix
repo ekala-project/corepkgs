@@ -8,7 +8,7 @@
 }:
 
 let
-  archiveVersion = import ./archive-version.nix lib;
+  inherit (sqlite) archiveVersion;
   mkTool =
     {
       pname,
