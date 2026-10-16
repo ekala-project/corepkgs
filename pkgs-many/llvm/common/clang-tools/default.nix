@@ -11,12 +11,14 @@
 }:
 
 stdenv.mkDerivation {
-  unwrapped = clang-unwrapped;
-
   pname = "clang-tools";
   version = lib.getVersion clang-unwrapped;
   dontUnpack = true;
-  clang = if enableLibcxx then libcxxClang else clang;
+
+  env = {
+    unwrapped = clang-unwrapped;
+    clang = if enableLibcxx then libcxxClang else clang;
+  };
 
   installPhase = ''
     runHook preInstall
@@ -52,7 +54,11 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
-  passthru.ekapkgs-update.skip = true;
+  passthru = {
+    inherit clang-unwrapped;
+    clang = if enableLibcxx then libcxxClang else clang;
+    ekapkgs-update.skip = true;
+  };
 
   meta = llvm_meta // {
     description = "Standalone command line tools for C++ development";
