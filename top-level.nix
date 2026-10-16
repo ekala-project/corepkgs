@@ -450,7 +450,9 @@ final: prev: with final; {
 
   wrapQemuBinfmtP = callPackage ./pkgs/qemu/binfmt-p-wrapper.nix { };
 
-  libxcrypt = callPackage ./pkgs/libxcrypt {
+  libxcrypt-legacy = libxcrypt.legacy;
+
+  libxcrypt = prev.libxcrypt.override {
     fetchurl = fetchurl-bootstrap;
     perl = buildPackages.perl.override {
       enableCrypt = false;

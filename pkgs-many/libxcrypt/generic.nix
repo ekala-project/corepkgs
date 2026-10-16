@@ -1,10 +1,15 @@
 {
+  version,
+  src-hash,
+  enableHashes ? "strong",
+  ...
+}@variantArgs:
+
+{
   lib,
   stdenv,
   fetchurl,
   perl,
-  # Update the enabled crypt scheme ids in passthru when the enabled hashes change
-  enableHashes ? "strong",
   runCommand,
   python3,
   runUnitTests,
@@ -12,11 +17,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libxcrypt";
-  version = "4.5.2";
+  inherit version;
 
   src = fetchurl {
-    url = "https://github.com/besser82/libxcrypt/releases/download/v${finalAttrs.version}/libxcrypt-${finalAttrs.version}.tar.xz";
-    hash = "sha256-cVE6McAaQovM1TZ6Mv2V8RXW2sUPtbYMd51ceUKuwHE=";
+    url = "https://github.com/besser82/libxcrypt/releases/download/v${version}/libxcrypt-${version}.tar.xz";
+    hash = src-hash;
   };
 
   # this could be accomplished by updateAutotoolsGnuConfigScriptsHook, but that causes infinite recursion
@@ -86,7 +91,7 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   meta = {
-    changelog = "https://github.com/besser82/libxcrypt/blob/v${finalAttrs.version}/NEWS";
+    changelog = "https://github.com/besser82/libxcrypt/blob/v${version}/NEWS";
     description = "Extended crypt library for descrypt, md5crypt, bcrypt, and others";
     homepage = "https://github.com/besser82/libxcrypt/";
     platforms = lib.platforms.all;
