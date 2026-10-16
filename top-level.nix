@@ -1043,9 +1043,9 @@ final: prev: with final; {
     })
   );
 
-  sqlite = lib.lowPrio (callPackage ./pkgs/sqlite { });
+  sqlite = lib.lowPrio prev.sqlite;
   sqlar = callPackage ./pkgs/sqlite/sqlar.nix { };
-  sqlite-interactive = (sqlite.override { interactive = true; }).bin;
+  sqlite-interactive = sqlite.interactive.bin;
 
   gawk-with-extensions = callPackage ./pkgs/gawk/gawk-with-extensions.nix {
     extensions = gawkextlib.full;
