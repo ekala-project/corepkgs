@@ -75,6 +75,8 @@ stdenv.mkDerivation (finalAttrs: {
     "--disable-vala"
   ];
 
+  enableParallelInstalling = false;
+
   installFlags = [
     "sysconfdir=${placeholder "out"}/etc"
     "localstatedir=\${TMPDIR}"
