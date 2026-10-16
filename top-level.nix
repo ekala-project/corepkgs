@@ -403,7 +403,7 @@ final: prev: with final; {
     in
     lib.recurseIntoAttrs aliasSet;
 
-  zlib-ng-compat = zlib-ng.override { withZlibCompat = true; };
+  zlib-ng-compat = zlib-ng.compat;
 
   makeDBusConf = callPackage ./pkgs/dbus/make-dbus-conf.nix { };
 
