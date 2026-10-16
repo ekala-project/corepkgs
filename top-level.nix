@@ -438,7 +438,7 @@ final: prev: with final; {
   libjack2 = jack2.override { prefix = "lib"; };
   libdbusmenu-gtk3 = libdbusmenu.gtk3;
   libglut = freeglut;
-  libva-minimal = callPackage ./pkgs/libva { minimal = true; };
+  libva-minimal = libva.minimal;
   mesa_i686 = pkgsi686Linux.mesa;
   libgbm = callPackage ./pkgs/mesa/gbm.nix { };
   mesa-gl-headers = callPackage ./pkgs/mesa/headers.nix { };

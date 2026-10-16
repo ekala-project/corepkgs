@@ -1,4 +1,11 @@
 {
+  version,
+  src-hash,
+  minimal ? false,
+  ...
+}:
+
+{
   stdenv,
   lib,
   fetchFromGitHub,
@@ -7,7 +14,6 @@
   ninja,
   wayland-scanner,
   libdrm,
-  minimal ? false,
   libx11,
   libxcb,
   libxext,
@@ -20,13 +26,13 @@
 stdenv.mkDerivation (finalAttrs: {
   pname = "libva";
   extensions = lib.optionals minimal [ "minimal" ];
-  version = "2.24.1";
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "intel";
     repo = "libva";
     rev = finalAttrs.version;
-    sha256 = "sha256-kgFvqyUlBZApc8D2i3BX6bHkUVNon5bL4asZ9myhQEM=";
+    sha256 = src-hash;
   };
 
   outputs = [
