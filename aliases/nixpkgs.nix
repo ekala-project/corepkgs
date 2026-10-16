@@ -117,11 +117,13 @@ mapAliases {
   db6 = renamed "db6" "db.v6_0" db.v6_0;
   db60 = renamed "db60" "db.v6_0" db.v6_0;
   db62 = renamed "db62" "db.v6_2" db.v6_2;
+  dnsutils = renamed "dnsutils" "bind.utils" bind.utils;
   docbook_xml_dtd_412 = renamed "docbook_xml_dtd_412" "docbook-xml-dtd.v4_1_2" docbook-xml-dtd.v4_1_2;
   docbook_xml_dtd_42 = renamed "docbook_xml_dtd_42" "docbook-xml-dtd.v4_2" docbook-xml-dtd.v4_2;
   docbook_xml_dtd_43 = renamed "docbook_xml_dtd_43" "docbook-xml-dtd.v4_3" docbook-xml-dtd.v4_3;
   docbook_xml_dtd_44 = renamed "docbook_xml_dtd_44" "docbook-xml-dtd.v4_4" docbook-xml-dtd.v4_4;
   docbook_xml_dtd_45 = renamed "docbook_xml_dtd_45" "docbook-xml-dtd.v4_5" docbook-xml-dtd.v4_5;
+  docbook_xsl = renamed "docbook_xsl" "docbook-xsl" docbook-xsl;
   elixir_1_17 = renamed "elixir_1_17" "elixir.v1_17" elixir.v1_17;
   elixir_1_18 = renamed "elixir_1_18" "elixir" elixir;
   ffmpeg-full = renamed "ffmpeg-full" "ffmpeg.full" ffmpeg.full;
@@ -207,6 +209,8 @@ mapAliases {
   jdk17 = renamed "jdk17" "java.v17" java.v17;
   jdk21 = renamed "jdk21" "java" java;
   jdk8 = renamed "jdk8" "java.v8" java.v8;
+  jre = renamed "jre" "java" java;
+  jre_headless = renamed "jre_headless" "java" java;
   kernelPackagesExtensions = throw "kernelPackagesExtensions has been removed in ekapkgs. Use config.overlays.linux instead";
   kotlinc = renamed "kotlinc" "kotlin" kotlin;
   libcIconv = libc: callPackage ../pkgs-many/libiconv/libc.nix { inherit libc; };
@@ -221,8 +225,10 @@ mapAliases {
   libmpg123 = renamed "libmpg123" "mpg123" mpg123;
   libmysqlclient = renamed "libmysqlclient" "mariadb-connector-c" mariadb-connector-c;
   libnghttp2 = renamed "libnghttp2" "nghttp2" nghttp2;
+  libsoup_2_4 = throw "'libsoup_2_4' has been removed; use 'libsoup' (3.x) instead";
   libtool2 = renamed "libtool2" "libtool.v2_5" libtool.v2_5;
   libtool_1_5 = renamed "libtool_1_5" "libtool.v1_5" libtool.v1_5;
+  libxcb-renderutil = renamed "libxcb-renderutil" "xcbutilrenderutil" xcbutilrenderutil;
   libxml2Python = throw "libxml2Python is deprecated, please migrate to libxml2 or something else";
   linuxPackages = renamed "linuxPackages" "linux.pkgs" linux.pkgs;
   linuxPackages_5_10 = renamed "linuxPackages_5_10" "linux.v5_10.pkgs" linux.v5_10.pkgs;
@@ -273,6 +279,7 @@ mapAliases {
   ncurses6 = renamed "ncurses6" "ncurses.v6" ncurses.v6;
   nimble = renamed "nimble" "nim" nim;
   nixStatic = renamed "nixStatic" "pkgsStatic.nix" pkgsStatic.nix;
+  nixosTests = { }; # stub for packages that reference nixosTests
   nodejs_18 = renamed "nodejs_18" "nodejs.v18" nodejs.v18;
   nodejs_20 = renamed "nodejs_20" "nodejs.v20" nodejs.v20;
   nodejs_22 = renamed "nodejs_22" "nodejs.v22" nodejs.v22;
@@ -293,6 +300,7 @@ mapAliases {
   perl542 = renamed "perl542" "perl.v5_42" perl.v5_42;
   perl542Packages = renamed "perl542Packages" "perl.v5_42.pkgs" perl.v5_42.pkgs;
   phpExtensions = renamed "phpExtensions" "php.buildPecl" php.buildPecl;
+  pnpm_10 = renamed "pnpm_10" "pnpm" pnpm;
   pypy27Packages = renamed "pypy27Packages" "pypy27.pkgs" pypy27.pkgs;
   pypy2Packages = renamed "pypy2Packages" "pypy2.pkgs" pypy2.pkgs;
   pypy310Packages = renamed "pypy310Packages" "pypy310.pkgs" pypy310.pkgs;
@@ -440,6 +448,7 @@ mapAliases {
   xcodebuild = renamed "xcodebuild" "xcbuild" xcbuild;
   xorriso = renamed "xorriso" "libisoburn" libisoburn;
   xxHash = renamed "xxHash" "xxhash" xxhash;
+  yq = renamed "yq" "yq-go" yq-go;
   # keep-sorted end
 
   gst_all_1 = lib.warn "'gst_all_1' has been renamed to 'gstreamer' in ekapkgs" {
