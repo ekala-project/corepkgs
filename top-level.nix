@@ -74,7 +74,7 @@ final: prev: with final; {
   gstreamerPkgs = lib.recurseIntoAttrs gstreamer.pkgs;
 
   # nv-codec-headers version aliases for ffmpeg
-  nv-codec-headers-12 = nv-codec-headers.override { majorVersion = "12"; };
+  nv-codec-headers-12 = nv-codec-headers.v12;
 
   mpi = null; # fftwMpi, boost
 
