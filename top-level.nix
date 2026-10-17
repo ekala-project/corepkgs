@@ -813,14 +813,17 @@ final: prev: with final; {
 
   python = python3;
   python2 = python27;
-  python3 = python313;
+  # python3 is auto-imported from pkgs-many/python3/ via mkManyVariants
 
   python2Packages = lib.dontRecurseIntoAttrs python27.pkgs;
-  python3Packages = lib.dontRecurseIntoAttrs python313.pkgs;
+  python3Packages = lib.dontRecurseIntoAttrs python3.pkgs;
 
-  pypy = pypy2;
+  # pypy is auto-imported from pkgs-many/pypy/ via mkManyVariants (default: v2_7)
   pypy2 = pypy27;
   pypy3 = pypy311;
+  pypy27 = pypy.pypy27;
+  pypy310 = pypy.pypy310;
+  pypy311 = pypy.pypy311;
 
   # Python interpreter that is build with all modules, including tkinter.
   # These are for compatibility and should not be used inside Nixpkgs.
@@ -852,19 +855,17 @@ final: prev: with final; {
     enableGIL = false;
   };
 
+  python310 = python3.v3_10;
+  python311 = python3.v3_11;
+  python312 = python3.v3_12;
+  python313 = python3.v3_13;
+  python314 = python3.v3_14;
+  python315 = python3.v3_15;
+  python3Minimal = python3.minimal;
+
   pythonInterpreters = callPackage ./python { inherit config; };
   inherit (pythonInterpreters)
     python27
-    python310
-    python311
-    python312
-    python313
-    python314
-    python315
-    python3Minimal
-    pypy27
-    pypy310
-    pypy311
     ;
 
   # Python package sets.
