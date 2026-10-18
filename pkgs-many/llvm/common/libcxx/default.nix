@@ -16,7 +16,6 @@
   cxxabi ? if stdenv.hostPlatform.isFreeBSD then freebsd.libcxxrt else null,
   libunwind,
   enableShared ? stdenv.hostPlatform.hasSharedLibraries,
-  devExtraCmakeFlags ? [ ],
   substitute,
   fetchpatch,
 }:
@@ -95,8 +94,6 @@ in
 stdenv.mkDerivation (finalAttrs: {
   pname = "libcxx";
   inherit version cmakeEntries;
-
-  cmakeFlags = devExtraCmakeFlags;
 
   src =
     if monorepoSrc != null then

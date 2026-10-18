@@ -1,6 +1,5 @@
 {
   cmake,
-  devExtraCmakeFlags ? [ ],
   lib,
   llvm_meta,
   monorepoSrc ? null,
@@ -98,8 +97,6 @@ let
         "mlir"
       ];
     };
-
-    cmakeFlags = devExtraCmakeFlags;
 
     ninjaFlags = targets;
 

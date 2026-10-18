@@ -13,7 +13,6 @@
   libcxx,
   enableShared ? !stdenv.hostPlatform.isStatic,
   doFakeLibgcc ? stdenv.hostPlatform.useLLVM && !stdenv.hostPlatform.isStatic,
-  devExtraCmakeFlags ? [ ],
   getVersionFile,
 }:
 stdenv.mkDerivation (finalAttrs: {
@@ -56,8 +55,6 @@ stdenv.mkDerivation (finalAttrs: {
     LIBUNWIND_ENABLE_SHARED = enableShared;
     LLVM_ENABLE_RUNTIMES = "libunwind";
   };
-
-  cmakeFlags = devExtraCmakeFlags;
 
   postInstall =
     lib.optionalString (enableShared && !stdenv.hostPlatform.isDarwin && !stdenv.hostPlatform.isWindows)

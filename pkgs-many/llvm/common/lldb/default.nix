@@ -23,7 +23,6 @@
   src ? null,
   monorepoSrc ? null,
   enableManpages ? false,
-  devExtraCmakeFlags ? [ ],
   getVersionFile,
   fetchpatch,
   fetchpatch2,
@@ -128,8 +127,6 @@ stdenv.mkDerivation (
       ${if finalAttrs.finalPackage.doCheck then "LLDB_TEST_CXX_COMPILER" else null} =
         "${stdenv.cc}/bin/${stdenv.cc.targetPrefix}c++";
     };
-
-    cmakeFlags = devExtraCmakeFlags;
 
     doCheck = false;
     doInstallCheck = false;

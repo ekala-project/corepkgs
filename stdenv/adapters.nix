@@ -116,7 +116,9 @@ rec {
                 configureFlags = (args.configureFlags or [ ]) ++ [
                   "--disable-shared" # brrr...
                 ];
-                cmakeFlags = (args.cmakeFlags or [ ]) ++ [ "-DCMAKE_SKIP_INSTALL_RPATH=On" ];
+                cmakeEntries = (args.cmakeEntries or { }) // {
+                  CMAKE_SKIP_INSTALL_RPATH = true;
+                };
               }
             )
         );
@@ -140,7 +142,9 @@ rec {
         "--enable-static"
         "--disable-shared"
       ];
-      cmakeFlags = (args.cmakeFlags or [ ]) ++ [ "-DBUILD_SHARED_LIBS:BOOL=OFF" ];
+      cmakeEntries = (args.cmakeEntries or { }) // {
+        BUILD_SHARED_LIBS = false;
+      };
       mesonEntries = (args.mesonEntries or { }) // {
         default_library = "static";
         default_both_libraries = "static";

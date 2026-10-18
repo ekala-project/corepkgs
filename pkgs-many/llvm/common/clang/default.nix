@@ -16,7 +16,6 @@
   fixDarwinDylibNames,
   enableManpages ? false,
   enableClangToolsExtra ? true,
-  devExtraCmakeFlags ? [ ],
   replaceVars,
   getVersionFile,
   fetchpatch,
@@ -115,16 +114,11 @@ stdenv.mkDerivation (
         "${buildLlvmPackages.tblgen}/bin/clang-pseudo-gen";
     };
 
-    cmakeFlags = devExtraCmakeFlags;
-
     # GCC 14 ICEs (segfault in ggc_set_mark) on template-heavy TUs at -O3;
-    # override the CMake Release flags to use -O2 instead.  Must use
-    # cmakeFlagsArray (not cmakeFlags) because the value contains a space.
+    # override the CMake Release flags to use -O2 instead.
     preConfigure = lib.optionalString (!stdenv.hostPlatform.useLLVM) ''
-      cmakeFlagsArray+=(
-        "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG"
-        "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG"
-      )
+      setCMakeEntry CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG"
+      setCMakeEntry CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG"
     '';
 
     postPatch = ''

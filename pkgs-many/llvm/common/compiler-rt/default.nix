@@ -27,7 +27,6 @@
   # `libcompiler_rt` library, at least under certain configurations. Some
   # platforms still expect this, however, so we symlink one into place.
   forceLinkCompilerRt ? stdenv.hostPlatform.isOpenBSD,
-  devExtraCmakeFlags ? [ ],
   getVersionFile,
   fetchpatch,
 }:
@@ -38,7 +37,7 @@ let
   bareMetal = stdenv.hostPlatform.parsed.kernel.name == "none";
   haveLibc = stdenv.cc.libc != null;
   # TODO: Make this account for GCC having libstdcxx, which will help
-  # use clean up the `cmakeFlags` rats nest below.
+  # clean up the `cmakeEntries` rats nest below.
   haveLibcxx = stdenv.cc.libcxx != null;
   isDarwinStatic = stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isStatic;
   inherit (stdenv.hostPlatform) isMusl isAarch64 isWindows;
@@ -189,8 +188,6 @@ stdenv.mkDerivation (finalAttrs: {
         true;
     };
 
-  cmakeFlags = devExtraCmakeFlags;
-
   outputs = [
     "out"
     "dev"
@@ -233,10 +230,8 @@ stdenv.mkDerivation (finalAttrs: {
         '';
 
   preConfigure = lib.optionalString stdenv.hostPlatform.isDarwin ''
-    cmakeFlagsArray+=(
-      "-DDARWIN_macosx_CACHED_SYSROOT=$SDKROOT"
-      "-DDARWIN_macosx_OVERRIDE_SDK_VERSION=$(jq -r .Version "$SDKROOT/SDKSettings.json")"
-    )
+    setCMakeEntry DARWIN_macosx_CACHED_SYSROOT "$SDKROOT"
+    setCMakeEntry DARWIN_macosx_OVERRIDE_SDK_VERSION "$(jq -r .Version "$SDKROOT/SDKSettings.json")"
   '';
 
   # Hack around weird upstream RPATH bug

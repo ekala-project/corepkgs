@@ -33,7 +33,6 @@
     && !stdenv.hostPlatform.isAarch,
   enablePolly ? true,
   enableTerminfo ? true,
-  devExtraCmakeFlags ? [ ],
   getVersionFile,
   fetchpatch,
   # for tests
@@ -360,11 +359,8 @@ stdenv.mkDerivation (
         patchShebangs test/BugPoint/compile-custom.ll.py
       '';
 
-    # Workaround for configure flags that need to have spaces
     preConfigure = ''
-      cmakeFlagsArray+=(
-        -DLLVM_LIT_ARGS="--verbose -j''${NIX_BUILD_CORES}"
-      )
+      setCMakeEntry LLVM_LIT_ARGS "--verbose -j''${NIX_BUILD_CORES}"
     '';
 
     # Defensive check: some paths (that we make symlinks to) depend on the release
@@ -494,8 +490,6 @@ stdenv.mkDerivation (
           );
         }
       );
-
-    cmakeFlags = devExtraCmakeFlags;
 
     postInstall = ''
       mkdir -p $python/share

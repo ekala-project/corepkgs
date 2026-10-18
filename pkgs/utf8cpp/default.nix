@@ -21,9 +21,9 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "UTF8CPP_ENABLE_TESTS" false)
-  ];
+  cmakeEntries = {
+    UTF8CPP_ENABLE_TESTS = false;
+  };
 
   meta = {
     homepage = "https://github.com/nemtrif/utfcpp";

@@ -25,13 +25,11 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [ libogg ];
 
-  cmakeFlags = [
-    "-DINSTALL_MANPAGES=ON"
-    "-DBUILD_DOCS=OFF"
-  ]
-  ++ lib.optionals (!stdenv.hostPlatform.isStatic) [
-    "-DBUILD_SHARED_LIBS=ON"
-  ];
+  cmakeEntries = {
+    INSTALL_MANPAGES = true;
+    BUILD_DOCS = false;
+    ${if !stdenv.hostPlatform.isStatic then "BUILD_SHARED_LIBS" else null} = true;
+  };
 
   env = {
     CFLAGS = toString [
