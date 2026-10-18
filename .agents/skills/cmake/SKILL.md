@@ -1,6 +1,6 @@
 ---
 name: cmake
-description: Package a CMake-based project for corepkgs. Use when a source tree has a CMakeLists.txt — covers the minimal derivation, cmakeFlags, cross-compilation, and diagnosing CMake configure failures.
+description: Package a CMake-based project for corepkgs. Use when a source tree has a CMakeLists.txt — covers the minimal derivation, cmakeEntries, cross-compilation, and diagnosing CMake configure failures.
 ---
 
 # CMake Build System
@@ -42,6 +42,14 @@ stdenv.mkDerivation (finalAttrs: {
 
 **Always include** `cmake.configurePhaseHook` in `nativeBuildInputs`.
 
+- `cmake` alone provides the cmake binary and the setup hook (`setup-hook.sh`),
+  which defines all `cmakeEntries` helpers (`setCMakeEntry`, `prependCMakeEntry`,
+  `concatCMakeEntryFlagsTo`, etc.) and `cmakeConfigurePhase`.
+- `cmake.configurePhaseHook` replaces the default configure phase with
+  `cmakeConfigurePhase`, which assembles `cmakeEntries` + `cmakeFlags` into the
+  final cmake invocation. Without it, the configure phase is the generic
+  autotools-style one and cmake entries/flags are ignored.
+
 ## Common Patterns
 
 ### With Dependencies
@@ -72,21 +80,22 @@ cmakeEntries = {
 };
 ```
 
-### CMake Flags (Legacy)
+### CMake Flags (non-`-D` only)
 
-`cmakeFlags` still works for string-based flags and non-`-D` flags:
+`cmakeFlags` is reserved for non-`-D` flags (warning suppression, generator
+selection, source-dir overrides, unset flags). **All `-D` entries must use
+`cmakeEntries`.**
 
 ```nix
 cmakeFlags = [
-  "-DBUILD_SHARED_LIBS=ON"
-  "-DENABLE_TESTS=OFF"
-  "-DCMAKE_INSTALL_LIBDIR=lib"
+  "-Wno-dev"
+  "-H.."
+  "-UCMAKE_INSTALL_LIBDIR"  # unset (-U), not a -D flag
 ];
 ```
 
-Both can be used together. `cmakeFlags` values override `cmakeEntries` for the
-same key (cmake uses last-wins for `-D` flags). Use `cmakeFlags` for non-`-D`
-flags like `-Wno-dev` or `-GNinja`.
+Both can be used together. `cmakeEntries` entries are emitted first, then
+`cmakeFlags` / `cmakeFlagsArray` are appended.
 
 ### Cross-Compilation
 

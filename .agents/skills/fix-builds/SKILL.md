@@ -64,7 +64,7 @@ Read the relevant guide for each failure type before attempting a fix.
 ### CMake issues
 **Symptom:** CMake install errors, missing build targets, feature flag renames
 **Guide:** [cmake-packages](../../../docs/common-issues/cmake-packages.md)
-**Fix:** Add explicit `cmakeFlags` for install dirs or updated option names.
+**Fix:** Add explicit `cmakeEntries` for install dirs or updated option names.
 
 ### Compiler errors (-Werror)
 **Symptom:** `[-Werror=...]` errors

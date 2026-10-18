@@ -15,23 +15,13 @@ Or the package builds but outputs are empty or misplaced.
 
 ### Fix
 
-Add explicit install directory flags:
+Add explicit install directory entries:
 
 ```nix
-cmakeFlags = [
-  "-DCMAKE_INSTALL_INCLUDEDIR=include"
-  "-DCMAKE_INSTALL_LIBDIR=lib"
-];
-```
-
-For packages that already have `cmakeFlags`, append to the existing list:
-
-```nix
-cmakeFlags = [
-  "-H.."  # existing flag
-  "-DCMAKE_INSTALL_INCLUDEDIR=include"
-  "-DCMAKE_INSTALL_LIBDIR=lib"
-];
+cmakeEntries = {
+  CMAKE_INSTALL_INCLUDEDIR = "include";
+  CMAKE_INSTALL_LIBDIR = "lib";
+};
 ```
 
 ## Testing flags
@@ -39,9 +29,9 @@ cmakeFlags = [
 Some packages need testing explicitly enabled to build test infrastructure that other packages depend on:
 
 ```nix
-cmakeFlags = [
-  "-DBUILD_TESTING=ON"
-];
+cmakeEntries = {
+  BUILD_TESTING = true;
+};
 ```
 
 ## Feature flags changed between versions
