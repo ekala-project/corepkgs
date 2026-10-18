@@ -15,7 +15,6 @@
   pkg-config,
   python3,
   version,
-  devExtraCmakeFlags ? [ ],
   ompdSupport ? true,
   ompdGdbSupport ? ompdSupport,
   getVersionFile,
@@ -76,8 +75,6 @@ stdenv.mkDerivation (finalAttrs: {
     OPT_TOOL = "${llvm}/bin/opt";
     LINK_TOOL = "${llvm}/bin/llvm-link";
   };
-
-  cmakeFlags = devExtraCmakeFlags;
 
   doCheck = false;
 

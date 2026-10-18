@@ -69,6 +69,12 @@ stdenv.mkDerivation (finalAttrs: {
     ENABLE_PPA = ppaSupport;
     ENABLE_VTUNE = vtuneSupport;
     WARNINGS_AS_ERRORS = werrorSupport;
+    GIT_ARCHETYPE = true;
+    ENABLE_SHARED = !stdenv.hostPlatform.isStatic;
+    HIGH_BIT_DEPTH = false;
+    ENABLE_HDR10_PLUS = true;
+    ENABLE_CLI = cliSupport;
+    ENABLE_TESTS = unittestsSupport;
   }
   // lib.optionalAttrs stdenv.hostPlatform.isPower {
     ENABLE_ALTIVEC = false;
@@ -85,33 +91,23 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeBool "ENABLE_CLI" false)
     (lib.cmakeBool "ENABLE_SHARED" false)
     (lib.cmakeBool "EXPORT_C_API" false)
+    (lib.cmakeBool "ENABLE_TESTS" false)
   ]
   ++ lib.optionals isCross [
     (lib.cmakeBool "CROSS_COMPILE_ARM" stdenv.hostPlatform.isAarch32)
     (lib.cmakeBool "CROSS_COMPILE_ARM64" stdenv.hostPlatform.isAarch64)
   ];
 
-  preConfigure =
-    lib.optionalString multibitdepthSupport ''
-      cmake -B build-10bits "''${cmakeFlags[@]}" "''${cmakeFlagsArray[@]}" "''${cmakeStaticLibFlags[@]}"
-      cmake -B build-12bits "''${cmakeFlags[@]}" "''${cmakeFlagsArray[@]}" "''${cmakeStaticLibFlags[@]}" ${lib.cmakeBool "MAIN12" true}
-      cmakeFlagsArray+=(
-        ${lib.cmakeFeature "EXTRA_LIB" "\"x265-10.a;x265-12.a\""}
-        ${lib.cmakeFeature "EXTRA_LINK_FLAGS" "-L."}
-        ${lib.cmakeBool "LINKED_10BIT" true}
-        ${lib.cmakeBool "LINKED_12BIT" true}
-      )
-    ''
-    + ''
-      cmakeFlagsArray+=(
-        ${lib.cmakeBool "GIT_ARCHETYPE" true}
-        ${lib.cmakeBool "ENABLE_SHARED" (!stdenv.hostPlatform.isStatic)}
-        ${lib.cmakeBool "HIGH_BIT_DEPTH" false}
-        ${lib.cmakeBool "ENABLE_HDR10_PLUS" true}
-        ${lib.cmakeBool "ENABLE_CLI" cliSupport}
-        ${lib.cmakeBool "ENABLE_TESTS" unittestsSupport}
-      )
-    '';
+  preConfigure = lib.optionalString multibitdepthSupport ''
+    local entryFlags=()
+    concatCMakeEntryFlagsTo entryFlags
+    cmake -B build-10bits "''${cmakeFlags[@]}" "''${entryFlags[@]}" "''${cmakeStaticLibFlags[@]}"
+    cmake -B build-12bits "''${cmakeFlags[@]}" "''${entryFlags[@]}" "''${cmakeStaticLibFlags[@]}" ${lib.cmakeBool "MAIN12" true}
+    setCMakeEntry EXTRA_LIB "x265-10.a;x265-12.a"
+    setCMakeEntry EXTRA_LINK_FLAGS "-L."
+    setCMakeEntryBool LINKED_10BIT ON
+    setCMakeEntryBool LINKED_12BIT ON
+  '';
 
   preBuild = lib.optionalString multibitdepthSupport ''
     make -C ../build-10bits -j $NIX_BUILD_CORES

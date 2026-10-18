@@ -14,7 +14,6 @@
   python3,
   buildLlvmPackages,
   patches ? [ ],
-  devExtraCmakeFlags ? [ ],
   fetchpatch,
 }:
 
@@ -62,8 +61,6 @@ stdenv.mkDerivation (finalAttrs: {
   cmakeEntries = {
     LLVM_TABLEGEN_EXE = "${buildLlvmPackages.tblgen}/bin/llvm-tblgen";
   };
-
-  cmakeFlags = devExtraCmakeFlags;
 
   postUnpack = ''
     chmod -R u+w -- $sourceRoot/..

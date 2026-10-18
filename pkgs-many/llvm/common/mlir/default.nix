@@ -11,7 +11,6 @@
   libxml2,
   libllvm,
   version,
-  devExtraCmakeFlags ? [ ],
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -72,8 +71,6 @@ stdenv.mkDerivation (finalAttrs: {
     ${if stdenv.hostPlatform.isStatic then "LLVM_BUILD_STATIC" else null} = true;
     ${if stdenv.hostPlatform.isStatic then "LLVM_LINK_LLVM_DYLIB" else null} = false;
   };
-
-  cmakeFlags = devExtraCmakeFlags;
 
   outputs = [
     "out"

@@ -28,9 +28,9 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   preConfigure = ''
-    cmakeFlagsArray+=(
-      -DCMAKE_C_FLAGS=${
-        lib.escapeShellArg (
+    setCMakeEntry CMAKE_C_FLAGS ${
+      lib.escapeShellArg (
+        lib.concatStringsSep " " (
           [
             "-Wno-error=unused-but-set-parameter"
             "-Wno-error=unused-but-set-variable"
@@ -39,8 +39,8 @@ stdenv.mkDerivation (finalAttrs: {
             "-Wno-error=documentation"
           ]
         )
-      }
-    )
+      )
+    }
   '';
 
   outputs = [

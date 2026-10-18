@@ -116,10 +116,8 @@ stdenv.mkDerivation {
     cp -r ${driver} driver-src
     chmod -R +w driver-src
 
-    cmakeFlagsArray+=(
-      "-DFALCOSECURITY_LIBS_SOURCE_DIR=$(pwd)/libs"
-      "-DDRIVER_SOURCE_DIR=$(pwd)/driver-src/driver"
-    )
+    setCMakeEntry FALCOSECURITY_LIBS_SOURCE_DIR "$(pwd)/libs"
+    setCMakeEntry DRIVER_SOURCE_DIR "$(pwd)/driver-src/driver"
   '';
 
   cmakeEntries = {
@@ -145,7 +143,7 @@ stdenv.mkDerivation {
       echo "falcosecurity-libs checksum needs to be updated!"
       exit 1
     fi
-    cmakeFlagsArray+=(-DCMAKE_EXE_LINKER_FLAGS="-ltbb -lcurl -lzstd -labsl_synchronization")
+    setCMakeEntry CMAKE_EXE_LINKER_FLAGS "-ltbb -lcurl -lzstd -labsl_synchronization"
   ''
   + lib.optionalString (kernel != null) ''
     export INSTALL_MOD_PATH="$out"

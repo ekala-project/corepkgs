@@ -16,7 +16,6 @@
   version,
   python3,
   buildLlvmPackages,
-  devExtraCmakeFlags ? [ ],
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -78,8 +77,6 @@ stdenv.mkDerivation (finalAttrs: {
     LLVM_INCLUDE_EXAMPLES = false;
     FLANG_INCLUDE_TESTS = false;
   };
-
-  cmakeFlags = devExtraCmakeFlags;
 
   postUnpack = ''
     chmod -R u+w -- $sourceRoot/..

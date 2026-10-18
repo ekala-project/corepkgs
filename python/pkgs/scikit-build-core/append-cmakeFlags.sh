@@ -1,4 +1,6 @@
 scikitBuildFlagsHook() {
+  local flagsArray=()
+  concatCMakeEntryFlagsTo flagsArray
   concatTo flagsArray cmakeFlags cmakeFlagsArray
 
   for arg in "${flagsArray[@]}"; do

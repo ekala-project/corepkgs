@@ -110,7 +110,7 @@ stdenv.mkDerivation (finalAttrs: {
     # The test data directory needs to be writable during the test phase.
     mkdir -p $TMPDIR/testdata
     cp -r --no-preserve=mode ${testData}/* $TMPDIR/testdata
-    cmakeFlagsArray+=(-DTESTDATADIR=$TMPDIR/testdata)
+    setCMakeEntry TESTDATADIR "$TMPDIR/testdata"
   '';
 
   doCheck = true;
