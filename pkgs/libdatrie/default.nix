@@ -34,7 +34,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [ libiconv ];
 
-  preAutoreconf =
+  postPatch =
     let
       reports = "https://github.com/tlwg/libdatrie/issues";
     in

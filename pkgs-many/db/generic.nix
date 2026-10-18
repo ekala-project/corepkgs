@@ -56,17 +56,23 @@ stdenv.mkDerivation (
       "-Iaclocal_java"
     ];
 
-    preAutoreconf = ''
+    # Override autoreconfPhase directly to avoid double pre/post hook calls.
+    # runPhase already calls runHook preAutoreconf before autoreconfPhase,
+    # so putting logic in preAutoreconf would run it twice.
+    autoreconfPhase = ''
       pushd dist
+
       # Upstream's `dist/s_config` cats everything into `aclocal.m4`, but that doesn't work with
       # autoreconfHook, so cat `config.m4` to another file. Otherwise, it won't be found by `aclocal`.
       cat aclocal/config.m4 >> aclocal/options.m4
-    '';
 
-    # This isn't pretty. The version information is kept separate from the configure script.
-    # After the configure script is regenerated, the version information has to be replaced with the
-    # contents of `dist/RELEASE`.
-    postAutoreconf = ''
+      local flagsArray=()
+      concatTo flagsArray autoreconfFlags
+      autoreconf "''${flagsArray[@]}"
+
+      # The version information is kept separate from the configure script.
+      # After the configure script is regenerated, the version information has to be replaced with the
+      # contents of `dist/RELEASE`.
       (
         declare -a vars=(
           "DB_VERSION_FAMILY"
@@ -84,6 +90,7 @@ stdenv.mkDerivation (
           sed -e "s/__EDIT_''${var}__/''${!var}/g" -i configure
         done
       )
+
       popd
     '';
 
