@@ -165,7 +165,7 @@ lib.extendMkDerivation {
 
       patches = cargoPatches ++ patches;
 
-      configurePhase = args.configurePhase or "";
+      configurePhase = args.configurePhase or ":";
 
       doCheck = args.doCheck or false;
 
