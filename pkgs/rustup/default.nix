@@ -107,6 +107,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     wrapProgram $out/bin/rustup --prefix "LD_LIBRARY_PATH" : "${libPath}"
 
     # tries to create .rustup
+    mkdir -p "$HOME/.rustup"
+    echo 'version = "12"' > "$HOME/.rustup/settings.toml"
     mkdir -p "$out/share/"{bash-completion/completions,fish/vendor_completions.d,zsh/site-functions}
 
     ${lib.optionalString (stdenv.hostPlatform.emulatorAvailable buildPackages) (
