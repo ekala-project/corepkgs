@@ -33,6 +33,8 @@ stdenv.mkDerivation (finalAttrs: {
     })
   ];
 
+  doCheck = false;
+
   # Required to use the system `doctest` over upstream's submodule
   postPatch = lib.optionalString finalAttrs.finalPackage.doCheck ''
     substituteInPlace tests/*.{c,h}pp \
@@ -50,8 +52,6 @@ stdenv.mkDerivation (finalAttrs: {
     doctest
     nlohmann_json
   ];
-  doCheck = false;
-
   meta = {
     changelog = "https://github.com/ToruNiina/toml11/blob/${finalAttrs.src.tag}/docs/content.en/docs/changelog/_index.md";
     homepage = "https://github.com/ToruNiina/toml11";

@@ -182,12 +182,12 @@ stdenv.mkDerivation (
       install docs/man/lldb.1 -t $out/share/man/man1/
     '';
 
+    doCheck = false;
+
     postPatch = null;
     postInstall = null;
 
     outputs = [ "out" ];
-
-    doCheck = false;
 
     meta = llvm_meta // {
       description = "man pages for LLDB ${version}";

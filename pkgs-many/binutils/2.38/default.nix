@@ -226,9 +226,6 @@ stdenv.mkDerivation {
       ]
   );
 
-  # Fails
-  doCheck = false;
-
   # Remove on next bump. It's a vestige of past conditional. Stays here to avoid
   # mass rebuild.
   postFixup = "";
@@ -248,6 +245,8 @@ stdenv.mkDerivation {
     inherit targetPrefix;
     hasGold = enableGold;
     isGNU = true;
+    # tests.build = <self>.overrideAttrs { doCheck = true; };
+    # Tests disabled: Fails
   };
 
   meta = {

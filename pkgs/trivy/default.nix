@@ -38,8 +38,10 @@ go.v1_26.buildModule (finalAttrs: {
 
   nativeInstallCheckInputs = [ versionCheckHook ];
 
-  # Tests require network access
-  doCheck = false;
+  # passthru.tests = {
+  #   build = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+  # };
+  # Tests disabled: tests require network access
 
   postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
     installShellCompletion --cmd trivy \

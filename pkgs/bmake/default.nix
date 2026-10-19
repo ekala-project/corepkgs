@@ -67,9 +67,6 @@ stdenv.mkDerivation (finalAttrs: {
     ) "export"
   );
 
-  # TODO(corepkgs): move to passthru, majority of build time is tests
-  doCheck = false;
-
   # Make tests work with musl
   # * Disable deptgt-delete_on_error test (alpine does this too)
   # * Disable shell-ksh test (ksh doesn't compile with musl)
@@ -104,6 +101,8 @@ stdenv.mkDerivation (finalAttrs: {
   passthru = {
     tests = {
       bmakeMusl = pkgsMusl.bmake or null;
+      # build = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+      # Tests disabled: majority of build time is tests
     };
   };
 

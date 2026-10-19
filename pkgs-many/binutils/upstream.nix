@@ -306,9 +306,6 @@ stdenv.mkDerivation (finalAttrs: {
     done
   '';
 
-  # Fails
-  doCheck = false;
-
   # Break dependency on pkgsBuildBuild.gcc when building a cross-binutils
   stripDebugList =
     if stdenv.hostPlatform != stdenv.targetPlatform then
@@ -346,6 +343,10 @@ stdenv.mkDerivation (finalAttrs: {
     inherit targetPrefix;
     hasGold = enableGold;
     isGNU = true;
+    # tests = {
+    #   build = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+    # };
+    # Tests disabled: Fails
 
     # The plugin API is not a function of any targets. Expose it separately,
     # currently only used by LLVM for enabling BFD to do LTO with LLVM bitcode.

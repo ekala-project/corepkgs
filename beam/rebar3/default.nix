@@ -89,8 +89,8 @@ let
             ./global-plugins.patch
           ];
 
-          # our patches cause the tests to fail
-          doCheck = false;
+          # passthru.tests.build = <self>.overrideAttrs { doCheck = true; };
+          # Tests disabled: our patches cause the tests to fail
         })
       );
     in

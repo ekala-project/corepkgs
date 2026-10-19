@@ -240,8 +240,6 @@ stdenv.mkDerivation (
 
     outputs = [ "out" ];
 
-    doCheck = false;
-
     meta = llvm_meta // {
       description = "man page for Clang ${version}";
     };

@@ -54,8 +54,6 @@ stdenv.mkDerivation (finalAttrs: {
   configurePhase = "cmakeConfigurePhase";
   buildPhase = "ninjaBuildPhase";
 
-  doCheck = false;
-
   # Zig inspects /usr/bin/env as an ELF binary to detect the host dynamic
   # linker and glibc version.  In Nix's sandbox /usr/bin/env either doesn't
   # exist or doesn't carry the right info, so zig falls back to musl.

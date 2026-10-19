@@ -78,12 +78,12 @@ stdenv.mkDerivation (finalAttrs: {
   dontPatchShebangs = true;
   dontFixLibtool = true;
 
-  # XXX: The GNU ld wrapper does all sorts of nasty things wrt. RPATH, which
-  # leads to the failure of a number of tests.
-  doCheck = false;
-  doInstallCheck = false;
-
-  passthru.tests = { inherit readline; };
+  passthru.tests = {
+    # build = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+    # Tests disabled: The GNU ld wrapper does all sorts of nasty things wrt. RPATH,
+    # which leads to the failure of a number of tests.
+    inherit readline;
+  };
   passthru.ekapkgs-update.semver-strategy = "patch";
 
   meta = {

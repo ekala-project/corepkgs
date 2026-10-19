@@ -119,8 +119,11 @@ stdenv.mkDerivation (finalAttrs: {
     wrapProgram "$out/bin/swtpm_setup" --suffix PATH : "$out/bin"
   '';
 
-  # Test suite is the majority of the build time
-  # TODO(corepkgs): move unit tests to passthru.tests
+  # passthru.tests = {
+  #   build = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+  # };
+  # Tests disabled: test suite is the majority of the build time
+
   outputs = [
     "out"
     "man"

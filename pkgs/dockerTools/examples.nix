@@ -721,7 +721,6 @@ rec {
             configureFlags = prevAttrs.configureFlags or [ ] ++ [
               "--program-prefix=layeredImageWithFakeRootCommands-"
             ];
-            doCheck = false;
             versionCheckProgram = "${placeholder "out"}/bin/${finalAttrs.meta.mainProgram}";
             meta = prevAttrs.meta // {
               mainProgram = "layeredImageWithFakeRootCommands-patch";

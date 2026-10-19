@@ -45,11 +45,12 @@ stdenv.mkDerivation (finalAttrs: {
     sed -i -e 's/localhost/127.0.0.1/g' src/test*/*.[ch]
   '';
 
-  # Disabled because the tests can time-out.
-  doCheck = false;
-
   passthru = {
     ekapkgs-update.semver-strategy = "patch";
+    # tests = {
+    #   build = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+    # };
+    # Tests disabled: the tests can time-out
   };
 
   meta = {

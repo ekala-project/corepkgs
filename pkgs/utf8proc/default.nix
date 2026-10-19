@@ -32,8 +32,6 @@ stdenv.mkDerivation (finalAttrs: {
     UTF8PROC_ENABLE_TESTING = false;
   };
 
-  doCheck = false;
-
   meta = {
     description = "Clean C library for processing UTF-8 Unicode data";
     homepage = "https://juliastrings.github.io/utf8proc/";

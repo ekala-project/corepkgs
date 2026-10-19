@@ -65,9 +65,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   env.NIX_LDFLAGS = lib.optionalString stdenv.hostPlatform.isFreeBSD "-lexecinfo";
 
-  # darwin currently lacks a pure `pgrep` which is extensively used here
-  # TODO: re-enable tests as passthru
-  doCheck = false;
   nativeCheckInputs = [
     which
     tcl
@@ -112,6 +109,8 @@ stdenv.mkDerivation (finalAttrs: {
   passthru = {
     serverBin = "redis-server";
     updateScript = nix-update-script { };
+    # tests.build = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+    # Tests disabled: darwin currently lacks a pure pgrep which is extensively used here
   };
 
   meta = {

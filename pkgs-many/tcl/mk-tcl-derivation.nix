@@ -60,7 +60,6 @@ let
         TCLSH = "${getBin tcl}/bin/tclsh";
 
         # Run tests after install, at which point we've done all TCLLIBPATH setup
-        doCheck = false;
         doInstallCheck = attrs.doCheck or (attrs.doInstallCheck or false);
         installCheckInputs = checkInputs ++ (attrs.installCheckInputs or [ ]);
         nativeInstallCheckInputs = nativeCheckInputs ++ (attrs.nativeInstallCheckInputs or [ ]);

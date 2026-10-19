@@ -35,6 +35,8 @@ rustPlatform.buildRustPackage.override
     passthru = {
       rustc = rustc;
       inherit (rustc.unwrapped) tests;
+      # tests.build = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+      # Tests disabled: 4 tests fail
     };
 
     # changes hash of vendor directory otherwise
@@ -98,9 +100,6 @@ rustPlatform.buildRustPackage.override
       export CFG_DISABLE_CROSS_TESTS=1
       cargo test
     '';
-
-    # Disable check phase as there are failures (4 tests fail)
-    doCheck = false;
 
     doInstallCheck = !stdenv.hostPlatform.isStatic && stdenv.hostPlatform.isElf;
     installCheckPhase = ''

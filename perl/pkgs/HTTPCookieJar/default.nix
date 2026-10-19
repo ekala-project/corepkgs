@@ -21,8 +21,9 @@ buildPerlPackage {
     TestRequires
     URI
   ];
-  # Broken on Hydra since 2021-06-17: https://hydra.nixos.org/build/146507373
-  doCheck = false;
+  # passthru.tests.build = <self>.overrideAttrs { doCheck = true; };
+  # Tests disabled: Broken on Hydra since 2021-06-17: https://hydra.nixos.org/build/146507373
+
   meta = {
     description = "Minimalist HTTP user agent cookie jar";
     homepage = "https://github.com/dagolden/HTTP-CookieJar";
