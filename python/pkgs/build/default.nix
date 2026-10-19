@@ -45,7 +45,7 @@ buildPythonPackage (finalAttrs: {
     pytest = buildPythonPackage {
       pname = "${finalAttrs.pname}-pytest";
       inherit (finalAttrs) src version;
-      format = "other";
+      pyproject = false;
 
       dontBuild = true;
       dontInstall = true;

@@ -53,7 +53,7 @@ let
         variantSuffix = "";
         src = {
           url = "${downloadsUrl}/${version}/ghc-${version}-i386-deb9-linux.tar.xz";
-          sha256 = "fdeb9f8928fbe994064778a8e1e85bb1a58a6cd3dd7b724fcc2a1dcfda6cad47";
+          hash = "sha256-/eufiSj76ZQGR3io4ehbsaWKbNPde3JPzCodz9psrUc=";
         };
         exePathForLibraryCheck = "ghc/stage2/build/tmp/ghc-stage2";
         archSpecificLibraries = [
@@ -74,7 +74,7 @@ let
         variantSuffix = "";
         src = {
           url = "${downloadsUrl}/${version}/ghc-${version}-x86_64-deb10-linux.tar.xz";
-          sha256 = "5d0b9414b10cfb918453bcd01c5ea7a1824fe95948b08498d6780f20ba247afc";
+          hash = "sha256-XQuUFLEM+5GEU7zQHF6noYJP6VlIsISY1ngPILokevw=";
         };
         exePathForLibraryCheck = "ghc/stage2/build/tmp/ghc-stage2";
         archSpecificLibraries = [
@@ -96,7 +96,7 @@ let
         variantSuffix = "";
         src = {
           url = "${downloadsUrl}/${version}/ghc-${version}-aarch64-deb10-linux.tar.xz";
-          sha256 = "cb016344c70a872738a24af60bd15d3b18749087b9905c1b3f1b1549dc01f46d";
+          hash = "sha256-ywFjRMcKhyc4okr2C9FdOxh0kIe5kFwbPxsVSdwB9G0=";
         };
         exePathForLibraryCheck = "ghc/stage2/build/tmp/ghc-stage2";
         archSpecificLibraries = [
@@ -118,7 +118,7 @@ let
         variantSuffix = "";
         src = {
           url = "${downloadsUrl}/${version}/ghc-${version}-aarch64-apple-darwin.tar.xz";
-          sha256 = "b1fcab17fe48326d2ff302d70c12bc4cf4d570dfbbce68ab57c719cfec882b05";
+          hash = "sha256-sfyrF/5IMm0v8wLXDBK8TPTVcN+7zmirV8cZz+yIKwU=";
         };
         exePathForLibraryCheck = null; # we don't have a library check for darwin yet
         archSpecificLibraries = [
@@ -144,7 +144,7 @@ let
         variantSuffix = "-musl";
         src = {
           url = "${downloadsUrl}/${version}/ghc-${version}-x86_64-alpine3.12-linux-gmp.tar.xz";
-          sha256 = "5bb1e7192c2b9fcff68930dbdc65509d345138e9a43c5d447056a68decc05ec8";
+          hash = "sha256-W7HnGSwrn8/2iTDb3GVQnTRROOmkPF1EcFamjezAXsg=";
         };
         exePathForLibraryCheck = "bin/ghc";
         archSpecificLibraries = [
@@ -459,7 +459,6 @@ stdenv.mkDerivation {
     '';
 
   # TODO: ghc segfaults during install check, likely binary compatibility issue
-  doInstallCheck = false;
   installCheckPhase = ''
     # Sanity check, can ghc create executables?
     cd $TMP

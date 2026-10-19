@@ -14,7 +14,7 @@
 buildPythonPackage (finalAttrs: {
   pname = "pathspec";
   version = "1.1.1";
-  format = "pyproject";
+  pyproject = true;
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;

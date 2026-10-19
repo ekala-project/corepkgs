@@ -3,12 +3,15 @@
   buildPythonPackage,
   pystemmer,
   fetchPypi,
+  setuptools,
 }:
 
 buildPythonPackage (finalAttrs: {
   pname = "snowballstemmer";
   version = "3.1.1";
-  format = "setuptools";
+  pyproject = true;
+
+  build-system = [ setuptools ];
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;

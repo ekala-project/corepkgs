@@ -10,7 +10,7 @@ in
 buildPythonPackage {
   pname = "cmake";
   inherit (cmake) version;
-  format = "pyproject";
+  pyproject = true;
 
   src = ./stub;
 

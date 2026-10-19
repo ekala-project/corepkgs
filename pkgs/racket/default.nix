@@ -17,7 +17,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   src = fetchurl {
     url = "https://mirror.racket-lang.org/installers/${finalAttrs.version}/racket-minimal-${finalAttrs.version}-src.tgz";
-    sha256 = "19bdc4f9507737e7f4a11b6411d184683c336b5942d0700ddaf2f4c54d639146";
+    hash = "sha256-Gb3E+VB3N+f0oRtkEdGEaDwza1lC0HAN2vL0xU1jkUY=";
   };
 
   buildInputs = [

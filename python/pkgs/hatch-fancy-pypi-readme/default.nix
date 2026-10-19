@@ -13,7 +13,7 @@
 buildPythonPackage (finalAttrs: {
   pname = "hatch-fancy-pypi-readme";
   version = "25.1.0";
-  format = "pyproject";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 

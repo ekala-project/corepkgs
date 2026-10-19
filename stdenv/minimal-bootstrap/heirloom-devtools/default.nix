@@ -13,7 +13,7 @@ let
 
   src = fetchurl {
     url = "mirror://sourceforge/heirloom/heirloom-devtools/heirloom-devtools-${version}.tar.bz2";
-    sha256 = "9f233d8b78e4351fe9dd2d50d83958a0e5af36f54e9818521458a08e058691ba";
+    hash = "sha256-nyM9i3jkNR/p3S1Q2DlYoOWvNvVOmBhSFFigjgWGkbo=";
   };
 
   # Thanks to the live-bootstrap project!

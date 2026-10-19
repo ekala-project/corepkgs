@@ -27,7 +27,7 @@
 buildPythonPackage (finalAttrs: {
   pname = "black";
   version = "25.1.0";
-  format = "pyproject";
+  pyproject = true;
 
   disabled = pythonOlder "3.8";
 

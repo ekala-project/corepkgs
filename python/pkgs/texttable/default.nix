@@ -3,12 +3,15 @@
   buildPythonPackage,
   fetchPypi,
   pytestCheckHook,
+  setuptools,
 }:
 
 buildPythonPackage (finalAttrs: {
   pname = "texttable";
   version = "1.7.0";
-  format = "setuptools";
+  pyproject = true;
+
+  build-system = [ setuptools ];
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;

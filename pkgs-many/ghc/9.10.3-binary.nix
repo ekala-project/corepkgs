@@ -52,7 +52,7 @@ let
         variantSuffix = "";
         src = {
           url = "${downloadsUrl}/${version}/ghc-${version}-i386-deb10-linux.tar.xz";
-          sha256 = "dc4d941d2240b5a3cd0d2de7b91b2184f60afb27ab8c4a66a9fce82f8cae4c89";
+          hash = "sha256-3E2UHSJAtaPNDS3nuRshhPYK+yerjEpmqfzoL4yuTIk=";
         };
         exePathForLibraryCheck = "bin/ghc";
         archSpecificLibraries = [
@@ -70,7 +70,7 @@ let
         variantSuffix = "";
         src = {
           url = "${downloadsUrl}/${version}/ghc-${version}-x86_64-deb11-linux.tar.xz";
-          sha256 = "b6bbd3514e0cdb9db350812a003bb7c670c58d99779086fbe41092b019548924";
+          hash = "sha256-trvTUU4M252zUIEqADu3xnDFjZl3kIb75BCSsBlUiSQ=";
         };
         exePathForLibraryCheck = "bin/ghc";
         archSpecificLibraries = [
@@ -88,7 +88,7 @@ let
         variantSuffix = "";
         src = {
           url = "${downloadsUrl}/${version}/ghc-${version}-aarch64-deb11-linux.tar.xz";
-          sha256 = "052789dfe7f6fba6dc3822de0da272e8a5bd358c37adae17d8e82cff39bc1008";
+          hash = "sha256-BSeJ3+f2+6bcOCLeDaJy6KW9NYw3ra4X2Ogs/zm8EAg=";
         };
         exePathForLibraryCheck = "bin/ghc";
         archSpecificLibraries = [
@@ -106,7 +106,7 @@ let
         variantSuffix = "";
         src = {
           url = "${downloadsUrl}/${version}/ghc-${version}-aarch64-apple-darwin.tar.xz";
-          sha256 = "9f50ddd87be5cb994c719402778d6c7fdd341934fd4fbc0fcc3ecb40d49f860c";
+          hash = "sha256-n1Dd2Hvly5lMcZQCd41sf900GTT9T7wPzD7LQNSfhgw=";
         };
         exePathForLibraryCheck = null; # we don't have a library check for darwin yet
         archSpecificLibraries = [
@@ -131,7 +131,7 @@ let
         variantSuffix = "-musl";
         src = {
           url = "${downloadsUrl}/${version}/ghc-${version}-aarch64-alpine3_18-linux.tar.xz";
-          sha256 = "4866d3b241c59860f2f6eaa2a5e96632113e57100b911ff8aa936665cc0045fe";
+          hash = "sha256-SGbTskHFmGDy9uqipelmMhE+VxALkR/4qpNmZcwARf4=";
         };
         exePathForLibraryCheck = "bin/ghc";
         archSpecificLibraries = [
@@ -149,7 +149,7 @@ let
         variantSuffix = "-musl";
         src = {
           url = "${downloadsUrl}/${version}/ghc-${version}-x86_64-alpine3_12-linux.tar.xz";
-          sha256 = "0ad0335849dd69672fd8ac1c168237aa5a88e8890b25fe703942957961816067";
+          hash = "sha256-CtAzWEndaWcv2KwcFoI3qlqI6IkLJf5wOUKVeWGBYGc=";
         };
         exePathForLibraryCheck = "bin/ghc";
         archSpecificLibraries = [

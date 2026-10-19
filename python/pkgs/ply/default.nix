@@ -2,16 +2,19 @@
   lib,
   buildPythonPackage,
   fetchPypi,
+  setuptools,
 }:
 
 buildPythonPackage (finalAttrs: {
   pname = "ply";
   version = "3.11";
-  format = "setuptools";
+  pyproject = true;
+
+  build-system = [ setuptools ];
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;
-    sha256 = "00c7c1aaa88358b9c765b6d3000c6eec0ba42abca5351b095321aef446081da3";
+    hash = "sha256-AMfBqqiDWLnHZbbTAAxu7AukKrylNRsJUyGu9EYIHaM=";
   };
 
   meta = {

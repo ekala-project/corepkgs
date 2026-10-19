@@ -3,12 +3,15 @@
   fetchPypi,
   buildPythonPackage,
   pytestCheckHook,
+  setuptools,
 }:
 
 buildPythonPackage (finalAttrs: {
   pname = "semantic-version";
   version = "2.10.0";
-  format = "setuptools";
+  pyproject = true;
+
+  build-system = [ setuptools ];
 
   src = fetchPypi {
     pname = "semantic_version";
