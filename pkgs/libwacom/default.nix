@@ -25,7 +25,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "linuxwacom";
     repo = "libwacom";
-    rev = "libwacom-${finalAttrs.version}";
+    tag = "libwacom-${finalAttrs.version}";
     hash = "sha256-avMZsTNxBp2slpbpJ0VmcS6nKUKfnWMcTqrcFdVgZmA=";
   };
 

@@ -19,7 +19,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "OpenPrinting";
     repo = "libppd";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-8ofCv+tKgBk9GoGD4lmBPB/S4ABZ6cWGOk/KqDsEzNk=";
   };
 

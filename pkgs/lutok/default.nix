@@ -29,7 +29,7 @@ lib.fix (
         });
       }).overrideAttrs
         (_: {
-          # Assume Kyua’s install check phase will run when Kyua is built. Don’t run it again
+          # Assume Kyua's install check phase will run when Kyua is built. Don't run it again
           # while building Lutok because it can take four to five minutes to run.
           doInstallCheck = false;
         });
@@ -46,7 +46,7 @@ lib.fix (
     src = fetchFromGitHub {
       owner = "freebsd";
       repo = "lutok";
-      rev = "lutok-${finalAttrs.version}";
+      tag = "lutok-${finalAttrs.version}";
       hash = "sha256-awAFxx9q8dZ6JO1/mShjhJnOPTLn1wCT4VrB4rlgWyg=";
     };
 
@@ -63,7 +63,7 @@ lib.fix (
     enableParallelBuilding = true;
 
     makeFlags = [
-      # Lutok isn’t compatible with C++17, which is the default on current clang and GCC.
+      # Lutok isn't compatible with C++17, which is the default on current clang and GCC.
       "CXXFLAGS=-std=c++11"
     ];
 

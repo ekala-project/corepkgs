@@ -12,7 +12,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "illiliti";
     repo = "libudev-zero";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     sha256 = "sha256-kHTWoHxORizNF8614E0gfWeJgobDxqtoUpawQmEvtAQ=";
   };
 

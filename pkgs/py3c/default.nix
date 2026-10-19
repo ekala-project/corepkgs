@@ -12,7 +12,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "encukou";
     repo = "py3c";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     sha256 = "sha256-v8+0J56sZVbGdBlOotObUa10/zFMTvfXdMYRsKhyZaY=";
   };
 
@@ -26,8 +26,6 @@ stdenv.mkDerivation (finalAttrs: {
   makeFlags = [
     "prefix=${placeholder "out"}"
   ];
-
-  doCheck = false;
 
   meta = {
     homepage = "https://github.com/encukou/py3c";

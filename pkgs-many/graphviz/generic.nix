@@ -42,7 +42,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitLab {
     owner = "graphviz";
     repo = "graphviz";
-    rev = version;
+    tag = version;
     hash = src-hash;
   };
 

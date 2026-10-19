@@ -23,7 +23,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "google";
     repo = "re2";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-3cWbw8Wlnl1OMPIcbNlc3HnCsuL4VT7psuHWtldsWoQ=";
   };
 
@@ -53,8 +53,6 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   # There's a few very long tests
-  doCheck = false;
-
   passthru.tests = {
     inherit chromium grpc mercurial;
     inherit (python3Packages) google-re2;

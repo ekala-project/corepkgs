@@ -27,7 +27,7 @@ stdenv.mkDerivation (finalAttrs: {
     domain = "gitlab.freedesktop.org";
     owner = "mobile-broadband";
     repo = "libqrtr-glib";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     sha256 = "kHLrOXN6wgBrHqipo2KfAM5YejS0/bp7ziBSpt0s1i0=";
   };
 

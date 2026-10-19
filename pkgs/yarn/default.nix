@@ -11,7 +11,7 @@ let
   completion = fetchFromGitHub {
     owner = "dsifford";
     repo = "yarn-completion";
-    rev = "v0.17.0";
+    tag = "v0.17.0";
     hash = "sha256-z7KPXeYPPRuaEPxgY6YqsLt9n8cSsW3n2FhOzVde1HU=";
   };
 in

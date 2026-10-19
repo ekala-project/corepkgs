@@ -21,7 +21,7 @@ buildGoModule (finalAttrs: {
   version = "1.24.1";
 
   src = fetchFromGitHub {
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     owner = "containers";
     repo = "skopeo";
     hash = "sha256-jLKbo6+xgHaMkMimbGIni5iZcVyeMF8wHTI594UkHQI=";

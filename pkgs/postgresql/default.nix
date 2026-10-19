@@ -43,7 +43,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "postgres";
     repo = "postgres";
-    rev = "refs/tags/REL_17_11";
+    tag = "REL_17_11";
     hash = "sha256-pkVBg4Rxku3rEnNhPvVoAoab55vqrDqZfW1z+umealE=";
   };
 

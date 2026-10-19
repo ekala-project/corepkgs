@@ -31,7 +31,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "intel";
     repo = "libva";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     sha256 = src-hash;
   };
 

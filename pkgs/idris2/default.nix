@@ -19,7 +19,7 @@ let
   src = fetchFromGitHub {
     owner = "idris-lang";
     repo = "Idris2";
-    rev = "v${version}";
+    tag = "v${version}";
     hash = "sha256-MvFNSPpgONSTjACH3HGWEiNgz9aAeBPmyQwFe21+fe0=";
   };
 

@@ -11,7 +11,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   src = fetchFromGitLab {
     owner = "kernel-firmware";
     repo = "linux-firmware";
-    rev = "refs/tags/${finalAttrs.version}";
+    tag = finalAttrs.version;
     hash = "sha256-nG+XL/aetcZMLRhVY7HhmMaOC+/DsgAMKOEbibTk6MQ=";
     sparseCheckout = [ "mediatek" ];
   };

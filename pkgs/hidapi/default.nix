@@ -22,7 +22,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "libusb";
     repo = "hidapi";
-    rev = "hidapi-${finalAttrs.version}";
+    tag = "hidapi-${finalAttrs.version}";
     sha256 = "sha256-o6IZRG42kTa7EQib9eaV1HGyjaGgeCabk+8fyQTm/0s=";
   };
 

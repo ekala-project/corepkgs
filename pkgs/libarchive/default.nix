@@ -37,7 +37,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "libarchive";
     repo = "libarchive";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-/CoInUlOiFvR83mEeV3Tx+2SQGywWDQ4nY+NstE/cP4=";
   };
 

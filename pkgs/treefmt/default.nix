@@ -13,7 +13,7 @@ go.v1_26.buildModule (finalAttrs: {
   src = fetchFromGitHub {
     owner = "numtide";
     repo = "treefmt";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-WWAK8DxJNoNONDX/Lyak4PkvetVTKPtUtwg2LS7Qe6s=";
   };
 

@@ -182,7 +182,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "OpenMathLib";
     repo = "OpenBLAS";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-usCAvjNUua91vBd1aXjsTyx8YrpuAkKGOpiQ58fT8Hc=";
   };
 

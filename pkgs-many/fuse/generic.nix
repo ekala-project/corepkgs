@@ -31,7 +31,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "libfuse";
     repo = "libfuse";
-    rev = "${finalAttrs.pname}-${version}";
+    tag = "${finalAttrs.pname}-${version}";
     hash = src-hash;
   };
 

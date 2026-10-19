@@ -13,7 +13,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "voutilad";
     repo = "vmm_clock";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-XYRxrVixvImxr2j3qxBcv1df1LvPRKqKKgegW3HqUcQ=";
   };
 

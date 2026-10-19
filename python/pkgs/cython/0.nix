@@ -43,7 +43,7 @@ buildPythonPackage (finalAttrs: {
   src = fetchFromGitHub {
     owner = "cython";
     repo = "cython";
-    rev = "refs/tags/${finalAttrs.version}";
+    tag = finalAttrs.version;
     hash = "sha256-XsEy2NrG7hq+VXRCRbD4BRaBieU6mVoE0GT52L3mMhs=";
   };
 

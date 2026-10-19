@@ -13,7 +13,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "json-c";
     repo = "json-c";
-    rev = "json-c-${finalAttrs.version}";
+    tag = "json-c-${finalAttrs.version}";
     hash = "sha256-ZfwVOU6PJKHSj7XVZh5BUb3VJ+lHXZVMPdHh5fgrock=";
   };
 

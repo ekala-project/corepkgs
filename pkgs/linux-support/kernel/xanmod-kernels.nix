@@ -43,7 +43,7 @@ let
         src = fetchFromGitLab {
           owner = "xanmod";
           repo = "linux";
-          rev = modDirVersion;
+          tag = modDirVersion;
           inherit hash;
         };
 

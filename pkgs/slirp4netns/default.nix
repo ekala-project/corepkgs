@@ -19,7 +19,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "rootless-containers";
     repo = "slirp4netns";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     sha256 = "sha256-puLH2FtbtAYsBAbvOzGo/orBWMxLSr3VQ9+Lsq/aQVM=";
   };
 

@@ -36,7 +36,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "shadow-maint";
     repo = "shadow";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-BD0EWOhpFyNeb4WDcLQNmUYWcXthe4o7WV4sG8kJB7E=";
   };
 

@@ -34,7 +34,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "checkpoint-restore";
     repo = "criu";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-SfpJskXX7r3jbAwgZl2qpa7j1M4i8/sV6rlAWiUEoQs=";
   };
 
@@ -123,8 +123,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
   # dropping fortify here as well as package uses it by default:
   # command-line>:0:0: error: "_FORTIFY_SOURCE" redefined [-Werror]
-
-  doCheck = false;
 
   postFixup = ''
     wrapProgram $out/bin/criu \

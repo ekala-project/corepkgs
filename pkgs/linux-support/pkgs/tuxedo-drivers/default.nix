@@ -19,7 +19,7 @@ stdenv.mkDerivation (finalAttrs: {
     group = "tuxedocomputers";
     owner = "development/packages";
     repo = "tuxedo-drivers";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-TkzdFVffYpVYEKImhRj6nqeVTr4yvzh//wSSRqIrPyA=";
   };
 

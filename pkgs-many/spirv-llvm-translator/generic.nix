@@ -40,7 +40,7 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "KhronosGroup";
     repo = "SPIRV-LLVM-Translator";
-    rev = "v${version}";
+    tag = "v${version}";
     inherit hash;
   };
 
@@ -71,8 +71,6 @@ stdenv.mkDerivation {
     ${if packageAtLeast "19" then "BASE_LLVM_VERSION" else null} =
       "${lib.versions.majorMinor llvm.version}.0";
   };
-
-  doCheck = false;
 
   makeFlags = [
     "all"

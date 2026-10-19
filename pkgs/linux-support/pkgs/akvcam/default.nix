@@ -13,7 +13,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "webcamoid";
     repo = "akvcam";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     sha256 = "sha256-3fs+Kfafry77SQvsAidM29g9CcfjWirteS/VdNSWVCE=";
   };
   sourceRoot = "${finalAttrs.src.name}/src";

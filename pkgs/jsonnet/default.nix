@@ -12,7 +12,7 @@ stdenv.mkDerivation (finalAttrs: {
   version = "0.22.0";
 
   src = fetchFromGitHub {
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     owner = "google";
     repo = "jsonnet";
     sha256 = "sha256-3J1Rm5nDgE0casINMoEU7anuuoNmTYmuRorZwKefYSY=";

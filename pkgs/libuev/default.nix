@@ -13,7 +13,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "troglobit";
     repo = "libuev";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-x1Sk7IuhlBQPFL7Rq4tmEanBxI/WaQ2L5fpUyEWOoi8=";
   };
 

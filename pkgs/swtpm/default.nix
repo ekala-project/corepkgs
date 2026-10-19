@@ -31,7 +31,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "stefanberger";
     repo = "swtpm";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-iG4yiND/w0YZYm+wj89QPIahIFh1Y6gA4u+eADGkwn8=";
   };
 
@@ -121,8 +121,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   # Test suite is the majority of the build time
   # TODO(corepkgs): move unit tests to passthru.tests
-  doCheck = false;
-
   outputs = [
     "out"
     "man"

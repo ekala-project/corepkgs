@@ -15,7 +15,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "containers";
     repo = "fuse-overlayfs";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-Us7FKKJrZH5l+NRIEw2b3RTAGw08YfsIBauwH866P8E=";
   };
 

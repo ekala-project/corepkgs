@@ -11,7 +11,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   src = fetchFromGitLab {
     owner = "kernel-firmware";
     repo = "linux-firmware";
-    rev = "refs/tags/${finalAttrs.version}";
+    tag = finalAttrs.version;
     hash = "sha256-+s3vcjaby1y2H5bhY02WlmafXdgExtO5zQEpHoGZlz4=";
     sparseCheckout = [ "rtl_nic" ];
   };

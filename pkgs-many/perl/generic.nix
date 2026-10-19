@@ -455,7 +455,7 @@ let
         name = "perl-cross-${crossVersion}";
         owner = "arsv";
         repo = "perl-cross";
-        rev = crossVersion;
+        tag = crossVersion;
         hash = "sha256-Qcysy7f887XHlq23iE5U92PhxDhpgaluITZBSdcc9Ck=";
       };
 

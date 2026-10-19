@@ -18,7 +18,7 @@ buildPythonPackage (finalAttrs: {
   src = fetchFromGitHub {
     owner = "certifi";
     repo = "python-certifi";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-TSqBca42i7i59ERTrnPN0fLdLWToYMCq5cfFFsgZm5U=";
   };
 

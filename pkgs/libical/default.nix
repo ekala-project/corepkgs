@@ -34,7 +34,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "libical";
     repo = "libical";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     sha256 = "sha256-KIMqZ6QAh+fTcKEYrcLlxgip91CLAwL9rwjUdKzBsQk=";
   };
 
@@ -64,7 +64,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   # Avoid need for pygobject3
-  doInstallCheck = false;
   nativeInstallCheckInputs = [
     # running libical-glib tests
     (python3.pythonOnBuildForHost.withPackages (

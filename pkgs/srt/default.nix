@@ -19,7 +19,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "Haivision";
     repo = "srt";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     sha256 = "sha256-PMSwAfAafOd3UAfpVb6HD9VJgRtErUxElNPu7rkBC50=";
   };
 

@@ -29,7 +29,7 @@ stdenv.mkDerivation (finalAttrs: {
     domain = "gitlab.freedesktop.org";
     owner = "libinput";
     repo = "libinput";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-2l+YGD1AFTwJRouMg0d3nQX+2me6A4yOB4g2WE2H//g=";
   };
 

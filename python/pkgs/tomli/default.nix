@@ -15,12 +15,12 @@
 buildPythonPackage (finalAttrs: {
   pname = "tomli";
   version = "2.2.1";
-  format = "pyproject";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "hukkin";
     repo = "tomli";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-4MWp9pPiUZZkjvGXzw8/gDele743NBj8uG4jvK2ohUM=";
   };
 

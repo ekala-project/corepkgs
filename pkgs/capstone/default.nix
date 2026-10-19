@@ -19,7 +19,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "capstone-engine";
     repo = "capstone";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-77RNwlnbjv1EPTdorHSpr8hxVMxdbKPcdCj5jnkgXw4=";
   };
 

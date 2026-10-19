@@ -12,12 +12,12 @@
 buildPythonPackage (finalAttrs: {
   pname = "installer";
   version = "0.7.0";
-  format = "pyproject";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "pypa";
     repo = "installer";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-thHghU+1Alpay5r9Dc3v7ATRFfYKV8l9qR0nbGOOX/A=";
   };
 
@@ -33,7 +33,7 @@ buildPythonPackage (finalAttrs: {
     pytest = buildPythonPackage {
       pname = "${finalAttrs.pname}-pytest";
       inherit (finalAttrs) version;
-      format = "other";
+      pyproject = false;
 
       dontBuild = true;
       dontInstall = true;

@@ -16,7 +16,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitLab {
     owner = "ita1024";
     repo = "waf";
-    rev = "waf-${finalAttrs.version}";
+    tag = "waf-${finalAttrs.version}";
     hash = "sha256-myPGbJW/RkOtEas+qZ/vTL66bekwDBPhC6AmfXECkcw=";
   };
 

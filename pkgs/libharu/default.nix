@@ -20,7 +20,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "libharu";
     repo = "libharu";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-Uy16fOZgGC7z8eUtQ6Y0R0B9vXEJcSnyBGQQamkDkik=";
   };
 

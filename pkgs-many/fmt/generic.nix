@@ -34,7 +34,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "fmtlib";
     repo = "fmt";
-    rev = version;
+    tag = version;
     hash = src-hash;
   };
 

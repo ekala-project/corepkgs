@@ -17,7 +17,7 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "amzn";
     repo = "amzn-drivers";
-    rev = "${rev-prefix}${version}";
+    tag = "${rev-prefix}${version}";
     hash = "sha256-7gPo3wPMpKPOkmZJzzpt0GdCdX/1N/Xqty1Hg+fQQlU=";
   };
 

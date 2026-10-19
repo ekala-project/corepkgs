@@ -9,7 +9,7 @@ let
   moby-src = fetchFromGitHub {
     owner = "moby";
     repo = "moby";
-    rev = "docker-v${version}";
+    tag = "docker-v${version}";
     hash = "sha256-V8p+MDEEMERGqQ9sWKPE/jkUw43UcO0x3Z1XZ8DWM2E=";
   };
 in

@@ -15,7 +15,7 @@ buildPythonPackage (finalAttrs: {
   src = fetchFromGitHub {
     owner = "python-hyper";
     repo = "hpack";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-vbxfDlRDwMXuzkPO0oceCpSz1ekLNxLSj4iocdHo680=";
   };
 
