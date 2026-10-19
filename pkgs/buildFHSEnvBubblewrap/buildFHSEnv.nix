@@ -212,13 +212,11 @@ let
     name = "fhs-rootfs-bulder";
     src = ./rootfs-builder;
     cargoLock.lockFile = ./rootfs-builder/Cargo.lock;
-    doCheck = false;
   };
 
   rootfs =
     pkgs.runCommand "${name}-fhsenv-rootfs"
       {
-        __structuredAttrs = true;
         exportReferencesGraph.graph = lib.concatMap (p: p.paths) allPaths;
         inherit
           paths

@@ -7,7 +7,6 @@
 runCommandLocal "install-agent-skills--install-skill"
   {
     strictDeps = true;
-    __structuredAttrs = true;
 
     nativeBuildInputs = [ installAgentSkills ];
     meta.platforms = lib.platforms.all;

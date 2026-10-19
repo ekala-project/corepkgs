@@ -12,7 +12,6 @@ stdenvNoCC.mkDerivation {
   name = "install-agent-skills--install-skills";
 
   strictDeps = true;
-  __structuredAttrs = true;
 
   src = null;
   dontUnpack = true;
