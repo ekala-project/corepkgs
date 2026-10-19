@@ -51,7 +51,7 @@ stdenv.mkDerivation (finalAttrs: {
     domain = "gitlab.freedesktop.org";
     owner = "wlroots";
     repo = "wlroots";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = src-hash;
   };
 

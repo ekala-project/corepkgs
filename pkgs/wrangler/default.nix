@@ -23,7 +23,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "cloudflare";
     repo = "workers-sdk";
-    rev = "wrangler@${finalAttrs.version}";
+    tag = "wrangler@${finalAttrs.version}";
     hash = "sha256-o6ARRNObHtRqAD71j7L2HkpIalPwGWR+PyQQuHJBKZE=";
   };
 

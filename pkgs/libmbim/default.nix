@@ -32,7 +32,7 @@ stdenv.mkDerivation (finalAttrs: {
     domain = "gitlab.freedesktop.org";
     owner = "mobile-broadband";
     repo = "libmbim";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-NhSjW1ZK4XFv7L/IaoTjN5ojwjTDQa178k73zoaneuE=";
   };
 

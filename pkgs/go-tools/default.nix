@@ -12,7 +12,7 @@ buildGoModule (finalAttrs: {
   src = fetchFromGitHub {
     owner = "dominikh";
     repo = "go-tools";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     sha256 = "sha256-wellofnfLW4lQy68UQyFJfvrKCfrZ/EllLODX1g9taY=";
   };
 

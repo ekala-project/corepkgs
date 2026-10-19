@@ -37,7 +37,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "ninja-build";
     repo = "ninja";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = src-hash;
   };
 

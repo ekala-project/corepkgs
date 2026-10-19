@@ -12,7 +12,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "abbbi";
     repo = "nullfsvfs";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     sha256 = "sha256-csEfgXOXrFgWcyKmxEPKi33M7nVVI2hE+YGXMe4vdFE=";
   };
 

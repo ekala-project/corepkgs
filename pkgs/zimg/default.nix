@@ -12,7 +12,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "sekrit-twc";
     repo = "zimg";
-    rev = "release-${finalAttrs.version}";
+    tag = "release-${finalAttrs.version}";
     sha256 = "sha256-T+/wuTxPK+PLofqJm3dujGqGGXhpdGQLjAttTQPsgOI=";
   };
 

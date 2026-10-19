@@ -18,7 +18,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "catchorg";
     repo = "Catch2";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     sha256 = "sha256-vvPZTQzLNGIcdDbuo0w6sQvxzLdKFCl2LNwcHu0d5I8=";
   };
 

@@ -11,7 +11,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   src = fetchFromGitLab {
     owner = "kernel-firmware";
     repo = "linux-firmware";
-    rev = "refs/tags/${finalAttrs.version}";
+    tag = finalAttrs.version;
     hash = "sha256-TnvvkhVEQNruv375FkchmQQF5ws80s1n9Na67d9l+lg=";
     sparseCheckout = [ "intel/iwlwifi" ];
   };

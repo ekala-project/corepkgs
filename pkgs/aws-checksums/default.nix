@@ -20,7 +20,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-checksums";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     sha256 = "sha256-Yvv4NT90715zMBqBeJz7o2WTDRSjszPpBsFGMVTMc4I=";
   };
 

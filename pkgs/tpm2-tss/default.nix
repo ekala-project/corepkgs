@@ -36,7 +36,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "tpm2-software";
     repo = finalAttrs.pname;
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-BP28utEUI9g1VNv3lCXuiKrDtEImFQxxZfIjLiE3Wr8=";
   };
 
@@ -157,7 +157,6 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   # TODO(corepkgs): Move to passthru
-  doCheck = false;
   doInstallCheck = false;
   # doInstallCheck =
   #   stdenv.buildPlatform.canExecute stdenv.hostPlatform

@@ -35,7 +35,7 @@ stdenv.mkDerivation (finalAttrs: {
         domain = "gitlab.freedesktop.org";
         owner = "pulseaudio";
         repo = "webrtc-audio-processing";
-        rev = "v${version}";
+        tag = "v${version}";
         hash = src-hash;
       };
 

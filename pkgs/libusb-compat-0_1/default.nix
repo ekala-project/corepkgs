@@ -20,7 +20,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "libusb";
     repo = "libusb-compat-0.1";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     sha256 = "sha256-F501lakQfJsqms0/531/jQmYoexMfROjvjEroy+ktZ0=";
   };
 

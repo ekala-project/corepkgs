@@ -15,7 +15,7 @@ buildPythonPackage (finalAttrs: {
   src = fetchFromGitHub {
     owner = "hukkin";
     repo = "tomli-w";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-Du37ySvAL9iwGec5wbWxwLTYm+kcDSOs5OJ5Sw7R87g=";
   };
 

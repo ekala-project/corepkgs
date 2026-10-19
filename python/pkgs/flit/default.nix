@@ -26,12 +26,12 @@
 buildPythonPackage (finalAttrs: {
   pname = "flit";
   version = "3.12.0";
-  format = "pyproject";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "pypa";
     repo = "flit";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-oWV+KK22+iK99iCOCKCV1OCLq2Ef1bcYRKXT5GHwiL8=";
   };
 

@@ -22,7 +22,7 @@ stdenv.mkDerivation (finalAttrs: {
     domain = "gitlab.freedesktop.org";
     owner = "emersion";
     repo = "libdisplay-info";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     sha256 = "sha256-nXf2KGovNKvcchlHlzKBkAOeySMJXgxMpbi5z9gLrdc=";
   };
 

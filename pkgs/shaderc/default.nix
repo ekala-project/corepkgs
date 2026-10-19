@@ -26,7 +26,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "google";
     repo = "shaderc";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-OiBv18zxeE/gqY4zOMXTsCdkAEWo9BIehdu/adw0+cE=";
   };
 

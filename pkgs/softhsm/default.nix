@@ -14,7 +14,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "softhsm";
     repo = "SoftHSMv2";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-gwqdgGCVPQwPkE6gFlZxZdk6Ln/qZn3CmMfbcLm9p04=";
   };
 

@@ -32,7 +32,7 @@ stdenv.mkDerivation (finalAttrs: {
     domain = "gitlab.freedesktop.org";
     owner = "upower";
     repo = "upower";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-QdAJxaua43iGovQeRg+n1MypS5CS0Ro3gqF9Tv8eMBg=";
   };
 

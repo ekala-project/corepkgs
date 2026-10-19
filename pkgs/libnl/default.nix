@@ -25,7 +25,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     repo = "libnl";
     owner = "thom311";
-    rev = "libnl${lib.replaceStrings [ "." ] [ "_" ] finalAttrs.version}";
+    tag = "libnl${lib.replaceStrings [ "." ] [ "_" ] finalAttrs.version}";
     hash = "sha256-GuYV2bUOhLedB/o9Rz6Py/G5HBK2iNefwrlkZJXgbnI=";
   };
 

@@ -13,7 +13,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "cryptodev-linux";
     repo = "cryptodev-linux";
-    rev = "cryptodev-linux-${finalAttrs.version}";
+    tag = "cryptodev-linux-${finalAttrs.version}";
     hash = "sha256-N7fGOMEWrb/gm1MDiJgq2QyTOni6n9w2H52baXmRA1g=";
   };
 

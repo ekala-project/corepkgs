@@ -17,7 +17,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "NetworkConfiguration";
     repo = "dhcpcd";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-lrV6SaB/HmTptZigZ1Lf28eUPz0igxyT6omZwXDSuGM=";
   };
 

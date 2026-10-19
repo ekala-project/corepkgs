@@ -15,7 +15,7 @@ buildGoModule (finalAttrs: {
   src = fetchFromGitHub {
     owner = "evilmartians";
     repo = "lefthook";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-UknO4ka3fjldpsp9V+GPkPYvhmlF4e6nd6dW9Uwjc2o=";
   };
 

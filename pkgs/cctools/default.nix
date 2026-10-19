@@ -23,7 +23,7 @@ let
     name = "xnu-src";
     owner = "apple-oss-distributions";
     repo = "xnu";
-    rev = "xnu-7195.50.7.100.1";
+    tag = "xnu-7195.50.7.100.1";
     hash = "sha256-uHmAOm6k9ZXWfyqHiDSpm+tZqUbERlr6rXSJ4xNACkM=";
   };
 in
@@ -42,7 +42,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "apple-oss-distributions";
     repo = "cctools";
-    rev = "cctools-${finalAttrs.version}";
+    tag = "cctools-${finalAttrs.version}";
     hash = "sha256-JiKCP6U+xxR4mk4TXWv/mEo9Idg+QQqUYmB/EeRksCE=";
   };
 

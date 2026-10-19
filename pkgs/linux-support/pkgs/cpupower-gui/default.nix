@@ -31,7 +31,7 @@ buildPythonApplication (finalAttrs: {
   src = fetchFromGitHub {
     owner = "vagnum08";
     repo = "cpupower-gui";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     sha256 = "05lvpi3wgyi741sd8lgcslj8i7yi3wz7jwl7ca3y539y50hwrdas";
   };
 

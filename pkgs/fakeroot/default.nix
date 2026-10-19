@@ -18,7 +18,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitLab {
     owner = "clint";
     repo = "fakeroot";
-    rev = "upstream/${finalAttrs.version}";
+    tag = "upstream/${finalAttrs.version}";
     domain = "salsa.debian.org";
     hash = "sha256-tZn0YTTeY+sh1mRYZUDDwwD/t01Ssr+QMSandJ/LOGc=";
   };

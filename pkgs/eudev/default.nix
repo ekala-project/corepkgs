@@ -17,7 +17,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "eudev-project";
     repo = "eudev";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-dhMfdC/AOUsrd+QlhEnxTWDnt4jQRTtU/muTjY9F12M=";
   };
 

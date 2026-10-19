@@ -12,7 +12,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "rebar";
     repo = "rebar";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     sha256 = "sha256-okvG7X2uHtZ1p+HUoFOmslrWvYjk0QWBAvAMAW2E40c=";
   };
 

@@ -31,7 +31,7 @@ let
   src = fetchFromGitHub {
     owner = "abathur";
     repo = "binlore";
-    rev = "v0.3.0";
+    tag = "v0.3.0";
     hash = "sha256-4Fs6HThfDhKRskuDJx2+hucl8crMRm10K6949JdIwPY=";
   };
   /*

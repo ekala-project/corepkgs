@@ -38,7 +38,7 @@ stdenv.mkDerivation (finalAttrs: {
     domain = "gitlab.freedesktop.org";
     owner = "mobile-broadband";
     repo = "libqmi";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-bJbNfnKVJuhy/6EJgu5b7t6vxNTex/5heTzMzTzVREw=";
   };
 

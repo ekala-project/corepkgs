@@ -20,7 +20,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = "aws-c-sdkutils";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-SxEt4W5Bxdo+gJiP09FRKzGrqW/wO4NufRgBbWDph/g=";
   };
 

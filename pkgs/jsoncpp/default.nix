@@ -21,7 +21,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "open-source-parsers";
     repo = "jsoncpp";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-5cH9G4/TVCM5HX6QSk3P4m5+cwuK4x8hP9FohBcmjik=";
   };
 

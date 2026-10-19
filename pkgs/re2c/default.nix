@@ -20,7 +20,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "skvadrik";
     repo = "re2c";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-Ks6+67MpQOCYn4+GxTHA/7cG2Ayfa4S5cfSLd1U1kac=";
   };
 

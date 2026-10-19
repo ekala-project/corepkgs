@@ -11,13 +11,11 @@ buildGoModule (finalAttrs: {
   src = fetchFromGitHub {
     owner = "go-acme";
     repo = "lego";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-OeQ947WTnBPyfQcOS37bleQCjpUYoUJlt0YrG6jsHNg=";
   };
 
   vendorHash = "sha256-nCeJ3wkBVq4fi0hrTBmFa70HcZl016SD7GF6Xu93GQI=";
-
-  doCheck = false;
 
   subPackages = [ "." ];
 

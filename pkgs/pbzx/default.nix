@@ -12,7 +12,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "NiklasRosenstein";
     repo = "pbzx";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     sha256 = "sha256-chc6Yk/EYUlYEE8VETYKMpAl+cyaYEJ9Pd+iyIdtjS8=";
   };
   buildInputs = [

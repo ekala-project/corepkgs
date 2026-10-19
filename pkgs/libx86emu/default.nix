@@ -12,7 +12,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "wfeldt";
     repo = "libx86emu";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     sha256 = "sha256-ilAmGlkMeuG0FlygMdE3NreFPJJF6g/26C8C5grvjrk=";
   };
 

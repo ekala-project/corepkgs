@@ -11,7 +11,7 @@ buildGoModule (finalAttrs: {
   vendorHash = "sha256-aMLL/tmRLyGze3RSB9dKnoTv5ZK1eRtgV8fkajWEbU0=";
 
   src = fetchFromGitHub {
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     owner = "cpuguy83";
     repo = "go-md2man";
     sha256 = "sha256-DKqGvdidl6J4lPhIk3okhU4k6MvtSr+hJ9huU/JTai0=";

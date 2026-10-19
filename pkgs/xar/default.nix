@@ -36,7 +36,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "apple-oss-distributions";
     repo = "xar";
-    rev = "xar-${finalAttrs.version}";
+    tag = "xar-${finalAttrs.version}";
     hash = "sha256-Fq+Re0LCBIGhW2FR+pgV8SWtaDOEFgTh+rQ8JFWK/k0=";
   };
 

@@ -36,7 +36,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "nss-dev";
     repo = "nss";
-    rev = "NSS_${lib.replaceStrings [ "." ] [ "_" ] version}_RTM";
+    tag = "NSS_${lib.replaceStrings [ "." ] [ "_" ] version}_RTM";
     inherit hash;
   };
 

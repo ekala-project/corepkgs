@@ -19,7 +19,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "plougher";
     repo = "squashfs-tools";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-rQ69sXvi6wY8yRyuQzcJZ6MvVGBbIw7vG+kYVHvfQQ8=";
   };
 

@@ -30,7 +30,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "libuv";
     repo = "libuv";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-AC1LS6PfieP8IjGhoIwm0WcLNIsUgULyP7V4HuvSqbg=";
   };
 

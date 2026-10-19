@@ -4,19 +4,22 @@
   fetchFromGitHub,
   pytestCheckHook,
   pythonOlder,
+  setuptools,
 }:
 
 buildPythonPackage (finalAttrs: {
   pname = "pretend";
   version = "1.0.9";
-  format = "setuptools";
+  pyproject = true;
+
+  build-system = [ setuptools ];
 
   disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "alex";
     repo = "pretend";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-OqMfeIMFNBBLq6ejR3uOCIHZ9aA4zew7iefVlAsy1JQ=";
   };
 

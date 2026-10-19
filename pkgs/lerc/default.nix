@@ -20,7 +20,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "esri";
     repo = "lerc";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-ysD+0B5yMOdNOKe9MS2T8o0KgqygdxLYiLMr8XeG4JE=";
   };
 

@@ -49,7 +49,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "OpenPrinting";
     repo = "cups-filters";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-bLOl64bdeZ10JLcQ7GbU+VffJu3Lzo0ves7O7GQIOWY=";
   };
 

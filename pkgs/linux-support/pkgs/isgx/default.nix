@@ -12,7 +12,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "intel";
     repo = "linux-sgx-driver";
-    rev = "sgx_diver_${finalAttrs.version}"; # Typo is upstream's.
+    tag = "sgx_diver_${finalAttrs.version}"; # Typo is upstream's.
     sha256 = "0kbbf2inaywp44lm8ig26mkb36jq3smsln0yp6kmrirdwc3c53mi";
   };
 

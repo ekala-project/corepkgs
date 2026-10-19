@@ -14,7 +14,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "arminbiere";
     repo = "cadical";
-    rev = "rel-${finalAttrs.version}";
+    tag = "rel-${finalAttrs.version}";
     hash =
       {
         "3.0.1" = "sha256-oHebG9VBtEnxmBpfP6A/f/UNIx2AXbLPs0NHPoNlZfY=";

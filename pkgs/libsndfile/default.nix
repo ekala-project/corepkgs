@@ -23,7 +23,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "libsndfile";
     repo = "libsndfile";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-MOOX/O0UaoeMaQPW9PvvE0izVp+6IoE5VbtTx0RvMkI=";
   };
 

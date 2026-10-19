@@ -18,7 +18,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "Reference-LAPACK";
     repo = "lapack";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     sha256 = "sha256-SfKsvZ07v87tFFd9bnkIEdervyX/ucLfs/TOsl08aKQ=";
   };
 

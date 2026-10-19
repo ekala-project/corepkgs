@@ -20,7 +20,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "containers";
     repo = "bubblewrap";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-lR9ii3Dhwpy/s7RZglbJkHyfhzZNEl3t0tXf03YGBfI=";
   };
 
@@ -52,8 +52,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   # incompatible with Nix sandbox
-  doCheck = false;
-
   passthru.tests = {
     version = testers.testVersion {
       package = finalAttrs.finalPackage;

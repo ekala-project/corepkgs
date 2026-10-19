@@ -28,7 +28,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "liblouis";
     repo = "liblouis";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-ovDQ8wGOr2vw87DcVCI/RqA7jbZOhFB6Uc9IM2IKPDk=";
   };
 

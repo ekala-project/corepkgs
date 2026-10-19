@@ -22,7 +22,7 @@ stdenv.mkDerivation (finalAttrs: {
     domain = "gitlab.freedesktop.org";
     owner = "libdecor";
     repo = "libdecor";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-sUktv/k+4IdJ55uH3F6z8XqaAOTic6miuyZ9U+NhtQQ=";
   };
 

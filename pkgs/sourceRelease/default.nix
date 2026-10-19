@@ -17,7 +17,7 @@ in
 fetchFromGitHub {
   owner = "apple-oss-distributions";
   repo = name;
-  rev = lockinfo.rev or "${name}-${lockinfo.version}";
+  tag = lockinfo.rev or "${name}-${lockinfo.version}";
   inherit (lockinfo) hash;
 }
 // {

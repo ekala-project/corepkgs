@@ -12,7 +12,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   src = fetchFromGitHub {
     owner = "Mic92";
     repo = "nixfmt-rs";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     sha256 = "sha256-ELXgj/ij6m5aipXVb7vdzD/+77YHTyytVv900Bcp1yU=";
   };
 

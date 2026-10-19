@@ -13,7 +13,7 @@ buildPythonPackage (finalAttrs: {
   src = fetchFromGitHub {
     owner = "sphinx-doc";
     repo = "alabaster";
-    rev = "refs/tags/${finalAttrs.version}";
+    tag = finalAttrs.version;
     hash = "sha256-aQEhFZUJs0TptfpjQVoIVI9V9a+xKjE2OfStSaJKHGI=";
   };
 

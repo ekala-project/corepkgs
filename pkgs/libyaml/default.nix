@@ -13,7 +13,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "yaml";
     repo = "libyaml";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     sha256 = "18zsnsxc53pans4a01cs4401a2cjk3qi098hi440pj4zijifgcsb";
   };
 

@@ -35,7 +35,7 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "OpenPrinting";
     repo = "libcupsfilters";
-    rev = "2.1.1";
+    tag = "2.1.1";
     hash = "sha256-WEcg+NSsny/N1VAR1ejytM+3nOF3JlNuIUPf4w6N2ew=";
   };
 

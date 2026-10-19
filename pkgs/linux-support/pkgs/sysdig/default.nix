@@ -37,7 +37,7 @@ let
   valijson = fetchFromGitHub {
     owner = "tristanpenman";
     repo = "valijson";
-    rev = "v1.0.2";
+    tag = "v1.0.2";
     hash = "sha256-wvFdjsDtKH7CpbEpQjzWtLC4RVOU9+D2rSK0Xo1cJqo=";
   };
 
@@ -45,7 +45,7 @@ let
   driver = fetchFromGitHub {
     owner = "falcosecurity";
     repo = "libs";
-    rev = "8.0.0+driver";
+    tag = "8.0.0+driver";
     hash = "sha256-G5MMVNceNa1y7CczfoaRBektc//uUN6ijmcTMnnKMRA=";
   };
 

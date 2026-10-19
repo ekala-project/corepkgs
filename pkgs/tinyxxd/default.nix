@@ -14,7 +14,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     repo = "tinyxxd";
     owner = "xyproto";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-SaxjQFQ//xxRCIx4FMx1exGGOGEKN/evgABTquL92WM=";
   };
 

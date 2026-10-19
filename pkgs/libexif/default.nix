@@ -13,7 +13,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "libexif";
     repo = "libexif";
-    rev = "libexif-${builtins.replaceStrings [ "." ] [ "_" ] finalAttrs.version}-release";
+    tag = "libexif-${builtins.replaceStrings [ "." ] [ "_" ] finalAttrs.version}-release";
     sha256 = "sha256-H51RlMT3swWF8oLWu70eTnuumee5mRMSCWkMFX7mJSk=";
   };
 

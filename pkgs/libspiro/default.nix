@@ -13,7 +13,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "fontforge";
     repo = "libspiro";
-    rev = finalAttrs.version;
+    tag = finalAttrs.version;
     hash = "sha256-psEF1SWkire6ngEUcMU0xnGYaT8ktqDCBlBckToGUMg=";
   };
 

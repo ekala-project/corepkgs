@@ -47,7 +47,7 @@ let
         src = fetchFromGitHub {
           owner = "zen-kernel";
           repo = "zen-kernel";
-          rev = "v${version}-${suffix}";
+          tag = "v${version}-${suffix}";
           inherit sha256;
         };
 

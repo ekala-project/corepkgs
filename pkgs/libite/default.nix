@@ -14,7 +14,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "troglobit";
     repo = "libite";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     sha256 = "sha256-hm3cd7UnskfwEvcMRGHei8KLt0k+WlCzB1LMnZdYo+g=";
   };
 

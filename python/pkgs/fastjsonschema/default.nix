@@ -18,7 +18,7 @@ buildPythonPackage (finalAttrs: {
   src = fetchFromGitHub {
     owner = "horejsek";
     repo = "python-fastjsonschema";
-    rev = "v${finalAttrs.version}";
+    tag = "v${finalAttrs.version}";
     fetchSubmodules = true;
     hash = "sha256-H/jmvm5U4RB9KuD5EgCedbc499Fl8L2S9Y5SXy51JP0=";
   };

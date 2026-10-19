@@ -18,7 +18,7 @@ stdenv.mkDerivation (
     src = fetchFromGitHub {
       owner = "NVIDIA";
       repo = "open-gpu-kernel-modules";
-      rev = nvidia_x11.version;
+      tag = nvidia_x11.version;
       inherit hash;
     };
 

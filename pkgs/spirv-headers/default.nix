@@ -12,7 +12,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "KhronosGroup";
     repo = "SPIRV-Headers";
-    rev = "vulkan-sdk-${finalAttrs.version}";
+    tag = "vulkan-sdk-${finalAttrs.version}";
     hash = "sha256-aYKFJxRDoY/Cor8gYVoR/YSyXWSNtcRG0HK8BZH0Ztk=";
   };
 

@@ -52,7 +52,7 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "vlang";
     repo = "v";
-    rev = version;
+    tag = version;
     hash = "sha256-0PInqMmb4sNzJwVD9SMhTXzvxMdaC1uIJl7fpdXKESE=";
   };
 
