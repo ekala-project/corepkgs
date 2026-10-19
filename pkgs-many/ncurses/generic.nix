@@ -163,8 +163,6 @@ stdenv.mkDerivation (finalAttrs: {
     CFLAGS=-D_XOPEN_SOURCE_EXTENDED
   '';
 
-  doCheck = false;
-
   postInstall =
     let
       abiVersion-extension =

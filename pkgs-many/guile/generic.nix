@@ -261,11 +261,6 @@ builder (
         ''
     );
 
-    # make check doesn't work on darwin
-    # On Linuxes+Hydra the tests are flaky; feel free to investigate deeper.
-    doCheck = false;
-    doInstallCheck = false;
-
     # guile-3 uses ELF files to store bytecode. strip does not
     # always handle them correctly and destroys the image (3.0 only)
     dontStrip = packageAtLeast "3.0";
@@ -275,6 +270,8 @@ builder (
     passthru = rec {
       ekapkgs-update.semver-strategy = "patch";
       effectiveVersion = lib.versions.majorMinor version;
+      # tests.build = <self>.overrideAttrs { doCheck = true; };
+      # Tests disabled: make check doesn't work on darwin / On Linuxes+Hydra the tests are flaky
       siteCcacheDir =
         if packageOlder "2.0" then "lib/guile/site-ccache" else "lib/guile/${effectiveVersion}/site-ccache";
       siteDir = if packageOlder "2.0" then "share/guile/site" else "share/guile/site/${effectiveVersion}";

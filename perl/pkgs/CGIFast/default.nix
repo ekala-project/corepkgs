@@ -16,7 +16,6 @@ buildPerlPackage {
     CGI
     FCGI
   ];
-  doCheck = false;
   meta = {
     description = "CGI Interface for Fast CGI";
   };

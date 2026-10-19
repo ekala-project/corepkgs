@@ -48,8 +48,6 @@ go.v1_26.buildModule (finalAttrs: {
 
   vendorHash = "sha256-Wl3vMR122wn5ivQVbdS79nATQBlEHu44h0OZLGeEasU=";
 
-  doCheck = false;
-
   postInstall = ''
     installShellCompletion --cmd process-compose \
       --bash <($out/bin/process-compose completion bash) \

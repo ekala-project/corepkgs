@@ -83,8 +83,6 @@ stdenv.mkDerivation (finalAttrs: {
     ) disabledTests}
   '';
 
-  doCheck = false;
-
   passthru.tests = {
     version = testers.testVersion {
       package = finalAttrs.finalPackage;

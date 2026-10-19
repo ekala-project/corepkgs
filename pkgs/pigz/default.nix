@@ -21,8 +21,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   makeFlags = [ "CC=${stdenv.cc}/bin/${stdenv.cc.targetPrefix}cc" ];
 
-  doCheck = false;
-
   installPhase = ''
 
     install -Dm755 pigz "$out/bin/pigz"

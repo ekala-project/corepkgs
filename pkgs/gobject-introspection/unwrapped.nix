@@ -101,7 +101,6 @@ stdenv.mkDerivation (finalAttrs: {
     (python3.withPackages pythonModules)
   ];
 
-  doCheck = false;
   nativeCheckInputs = lib.optionals stdenv.hostPlatform.isDarwin [
     cctools # for otool
   ];

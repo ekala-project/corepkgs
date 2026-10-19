@@ -227,8 +227,6 @@ stdenv.mkDerivation (finalAttrs: {
       "--with-multilib-list="
     ];
 
-  doCheck = false;
-
   postInstall = ''
     moveToOutput "lib/gcc/${targetPlatform.config}/${version}/plugin/include" "''${!outputDev}"
   '';

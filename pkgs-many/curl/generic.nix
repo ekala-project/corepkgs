@@ -237,10 +237,6 @@ stdenv.mkDerivation (finalAttrs: {
   CXX = "${stdenv.cc.targetPrefix}c++";
   CXXCPP = "${stdenv.cc.targetPrefix}c++ -E";
 
-  # takes 14 minutes on a 24 core and because many other packages depend on curl
-  # they cannot be run concurrently and are a bottleneck
-  # tests are available in passthru.tests.withCheck
-  doCheck = false;
   preCheck = ''
     patchShebangs tests/
   ''

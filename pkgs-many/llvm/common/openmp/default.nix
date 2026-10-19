@@ -76,8 +76,6 @@ stdenv.mkDerivation (finalAttrs: {
     LINK_TOOL = "${llvm}/bin/llvm-link";
   };
 
-  doCheck = false;
-
   checkTarget = "check-openmp";
 
   preCheck = ''

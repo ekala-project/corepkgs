@@ -92,11 +92,6 @@ stdenv.mkDerivation (finalAttrs: {
     util-linux
   ];
 
-  # FAILURES:
-  #    497: test_wolfSSL_EVP_PBE_scrypt (LoongArch)
-  #    scripts/unit (sandbox)
-  doCheck = false;
-
   nativeCheckInputs = [
     openssl
     cacert
@@ -115,6 +110,8 @@ stdenv.mkDerivation (finalAttrs: {
       package = finalAttrs.finalPackage;
       command = "wolfssl-config --version";
     };
+    # build = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+    # Tests disabled: test_wolfSSL_EVP_PBE_scrypt fails on LoongArch; scripts/unit fails in sandbox
   };
 
   meta = {

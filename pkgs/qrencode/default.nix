@@ -37,8 +37,6 @@ stdenv.mkDerivation (finalAttrs: {
     libpng
   ];
 
-  doCheck = false;
-
   checkPhase = ''
 
     pushd tests

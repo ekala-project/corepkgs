@@ -373,8 +373,6 @@ stdenv.mkDerivation (finalAttrs: {
   '';
   preBuild = "cd build";
 
-  # tests can still timeout on slower systems
-  doCheck = false;
   nativeCheckInputs = [ socat ];
   preCheck = ''
     # time limits are a little meagre for a build machine that's
@@ -420,6 +418,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     qemu-system-i386 = "bin/qemu-system-i386";
+    # Tests can still timeout on slower systems
     tests = lib.optionalAttrs (!toolsOnly) {
       qemu-tests = finalAttrs.finalPackage.overrideAttrs (_: {
         doCheck = true;

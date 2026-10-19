@@ -15,9 +15,9 @@ buildPerlPackage {
     substituteInPlace lib/Path/Tiny.pm --replace 'use File::Spec 3.40' \
       'use File::Spec 3.39'
   '';
-  # This appears to be currently failing tests, though I don't know why.
-  # -- ocharles
-  doCheck = false;
+  # passthru.tests.build = <self>.overrideAttrs { doCheck = true; };
+  # Tests disabled: This appears to be currently failing tests, though I don't know why. -- ocharles
+
   meta = {
     description = "File path utility";
     homepage = "https://github.com/dagolden/Path-Tiny";

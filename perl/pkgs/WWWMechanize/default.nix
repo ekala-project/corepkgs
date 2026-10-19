@@ -25,7 +25,6 @@ buildPerlPackage {
     HTMLTree
     LWP
   ];
-  doCheck = false;
   buildInputs = [
     CGI
     HTTPServerSimple

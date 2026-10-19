@@ -51,12 +51,13 @@ stdenv.mkDerivation (finalAttrs: {
     libselinux
   ];
 
-  # incompatible with Nix sandbox
   passthru.tests = {
     version = testers.testVersion {
       package = finalAttrs.finalPackage;
       command = "bwrap --version";
     };
+    # build = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+    # Tests disabled: incompatible with Nix sandbox
   };
 
   meta = {

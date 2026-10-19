@@ -44,8 +44,10 @@ stdenv.mkDerivation (finalAttrs: {
     EIGEN_LEAVE_TEST_IN_ALL_TARGET = true; # Build tests in parallel
   };
 
-  # too many flaky tests
-  doCheck = false;
+  # passthru.tests = {
+  #   build = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+  # };
+  # Tests disabled: too many flaky tests
 
   meta = {
     homepage = "https://eigen.tuxfamily.org";

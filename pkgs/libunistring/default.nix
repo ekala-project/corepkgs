@@ -40,8 +40,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   configureFlags = [ "--with-libiconv-prefix=${libiconv'}" ];
 
-  doCheck = false;
-
   /*
     This seems to cause several random failures like these, which I assume
     is because of bad or missing target dependencies in their build system:

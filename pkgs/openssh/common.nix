@@ -144,7 +144,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildFlags = [ "SSH_KEYSIGN=ssh-keysign" ];
 
-  doCheck = false;
   enableParallelChecking = false;
   nativeCheckInputs = [
     openssl

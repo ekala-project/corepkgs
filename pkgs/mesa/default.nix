@@ -337,8 +337,6 @@ stdenv.mkDerivation {
     needNativeCLC && buildPackages.mesa ? cross_tools
   ) buildPackages.mesa.cross_tools;
 
-  doCheck = false;
-
   postInstall = ''
     moveToOutput bin/asahi_clc $cross_tools
     moveToOutput bin/intel_clc $cross_tools

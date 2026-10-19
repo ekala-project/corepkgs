@@ -23,8 +23,6 @@ luarocks_bootstrap.overrideAttrs (old: {
 
   patches = [ ];
 
-  doInstallCheck = false;
-
   meta = {
     inherit (old.meta)
       description

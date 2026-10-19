@@ -63,9 +63,10 @@ stdenv.mkDerivation (finalAttrs: {
       -e "s|-lnuma|-L$numalibdir -lnuma|g"
   '';
 
-  # Checks disabled because they're impure (hardware dependent) and
-  # fail on some build machines.
-  doCheck = false;
+  # passthru.tests = {
+  #   build = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+  # };
+  # Tests disabled: impure (hardware dependent) and fail on some build machines
 
   outputs = [
     "out"

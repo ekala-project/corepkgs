@@ -71,8 +71,6 @@ stdenv.mkDerivation (finalAttrs: {
   # - Regenerate for cross fix patch
   nativeBuildInputs = [ autoreconfHook ];
 
-  doCheck = false;
-
   passthru.tests = {
     inherit aprutil;
   };

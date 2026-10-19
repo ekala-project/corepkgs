@@ -35,8 +35,6 @@ stdenv.mkDerivation (finalAttrs: {
   # use.  (Checking stdenv.cc.isGNU causes infinite recursion.)
   hardeningDisable = [ "format" ];
 
-  doCheck = false;
-
   configureFlags = [
     "--with-syscmd-shell=${stdenv.shell}"
   ]

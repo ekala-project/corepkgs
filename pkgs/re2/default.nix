@@ -52,7 +52,7 @@ stdenv.mkDerivation (finalAttrs: {
     ${if !stdenv.hostPlatform.isStatic then "BUILD_SHARED_LIBS" else null} = true;
   };
 
-  # There's a few very long tests
+  # Note: there are a few very long tests in the check phase
   passthru.tests = {
     inherit chromium grpc mercurial;
     inherit (python3Packages) google-re2;

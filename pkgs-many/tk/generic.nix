@@ -119,8 +119,6 @@ matchedTcl.mkTclDerivation {
     libxft
   ];
 
-  doCheck = false;
-
   tcl = matchedTcl;
 
   passthru = rec {

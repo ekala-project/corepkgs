@@ -258,11 +258,6 @@ lib.makeOverridable
         export HOME=$TMPDIR
       '';
 
-      # fails with "16993 tests, 2229489 assertions, 105 failures, 14 errors, 89 skips"
-      # mostly TZ- and patch-related tests
-      # TZ- failures are caused by nix sandboxing, I didn't investigate others
-      doCheck = false;
-
       preInstall = ''
         # Ruby installs gems here itself now.
         mkdir -pv "$out/${finalAttrs.passthru.gemPath}"
@@ -346,8 +341,6 @@ lib.makeOverridable
         fi
       '';
       # TODO: installCheck fails because -std=gnu23 gets baked into rbconfig CC
-      doInstallCheck = false;
-
       disallowedRequisites = op (!jitSupport) stdenv.cc ++ op useBaseRuby baseRuby;
 
       meta = {
@@ -391,6 +384,11 @@ lib.makeOverridable
             ;
         }
         // {
+          # tests = {
+          #   build = finalAttrs.finalPackage.overrideAttrs { doCheck = true; };
+          # };
+          # Tests disabled: fails with "16993 tests, 2229489 assertions, 105 failures, 14 errors, 89 skips"
+          # mostly TZ- and patch-related tests; TZ- failures are caused by nix sandboxing
           ekapkgs-update.semver-strategy = "patch";
           rubyEngine = "ruby";
           libPath = "lib/ruby/${ver.libDir}";

@@ -112,8 +112,6 @@ stdenv.mkDerivation (finalAttrs: {
   # make: *** [build-outputs.mk:1316: install-serf-lib] Error 1
   enableParallelInstalling = false;
 
-  doCheck = false;
-
   meta = {
     description = "Version control system intended to be a compelling replacement for CVS in the open source community";
     license = lib.licenses.asl20;

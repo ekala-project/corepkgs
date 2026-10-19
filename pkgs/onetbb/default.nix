@@ -54,8 +54,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   # TODO(corepkgs): move to passthru
-  doCheck = false;
-
   dontUseNinjaCheck = true;
 
   # The memory leak test fails on static Linux, despite passing on
@@ -70,6 +68,8 @@ stdenv.mkDerivation (finalAttrs: {
     substituteInPlace test/CMakeLists.txt \
       --replace-fail 'tbb_add_test(SUBDIR conformance NAME conformance_resumable_tasks DEPENDENCIES TBB::tbb)' ""
   '';
+
+  doCheck = false;
 
   cmakeEntries = {
     TBB_DISABLE_HWLOC_AUTOMATIC_SEARCH = false;
