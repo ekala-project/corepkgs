@@ -15,14 +15,17 @@
   fetchurl,
   autoreconfHook,
   pkg-config,
-  asciidoc,
-  xmlto,
+  asciidoc ? null,
+  xmlto ? null,
   liburcu,
   numactl,
   python3,
   ...
 }:
 
+let
+  withManpages' = withManpages && asciidoc != null && xmlto != null;
+in
 stdenv.mkDerivation (finalAttrs: {
   pname = "lttng-ust";
   inherit version;
@@ -43,7 +46,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
   ]
   ++ lib.optionals useAutoreconf [ autoreconfHook ]
-  ++ lib.optionals withManpages [
+  ++ lib.optionals withManpages' [
     asciidoc
     xmlto
   ];
@@ -55,7 +58,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   propagatedBuildInputs = [ liburcu ];
 
-  postPatch = lib.optionalString withManpages ''
+  postPatch = lib.optionalString withManpages' ''
     substituteInPlace doc/man/Makefile.am \
       --replace-fail '$(XMLTO)' '$(XMLTO) --skip-validation'
   '';
@@ -68,6 +71,9 @@ stdenv.mkDerivation (finalAttrs: {
 
   configureFlags = [
     "--disable-examples"
+  ]
+  ++ lib.optionals (!withManpages') [
+    "--disable-man-pages"
   ]
   ++ lib.optionals (packageAtLeast "2.13" && stdenv.hostPlatform.isMusl) [
     "CFLAGS=-Wl,-z,stack-size=2097152"
