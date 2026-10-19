@@ -3,12 +3,15 @@
   buildPythonPackage,
   fetchPypi,
   pytest,
+  setuptools,
 }:
 
 buildPythonPackage (finalAttrs: {
   pname = "mccabe";
   version = "0.7.0";
-  format = "setuptools";
+  pyproject = true;
+
+  build-system = [ setuptools ];
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;

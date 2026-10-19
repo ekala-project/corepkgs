@@ -12,8 +12,7 @@
 buildPythonPackage (finalAttrs: {
   pname = "pystemmer";
   version = "2.2.0.1";
-  format = "setuptools";
-  pyproejct = true;
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "snowballstem";

@@ -4,12 +4,15 @@
   fetchPypi,
   pythonOlder,
   pytestCheckHook,
+  setuptools,
 }:
 
 buildPythonPackage (finalAttrs: {
   pname = "mock";
   version = "5.2.0";
-  format = "setuptools";
+  pyproject = true;
+
+  build-system = [ setuptools ];
 
   disabled = pythonOlder "3.6";
 

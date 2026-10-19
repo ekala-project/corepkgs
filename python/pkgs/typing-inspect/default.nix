@@ -5,12 +5,15 @@
   typing-extensions,
   mypy-extensions,
   pytestCheckHook,
+  setuptools,
 }:
 
 buildPythonPackage (finalAttrs: {
   pname = "typing-inspect";
   version = "0.9.0";
-  format = "setuptools";
+  pyproject = true;
+
+  build-system = [ setuptools ];
 
   src = fetchPypi {
     inherit (finalAttrs) version;

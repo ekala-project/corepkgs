@@ -8,7 +8,7 @@
 buildPythonPackage (finalAttrs: {
   pname = "soupsieve";
   version = "2.10";
-  format = "pyproject";
+  pyproject = true;
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;

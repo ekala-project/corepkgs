@@ -12,7 +12,7 @@ buildPythonPackage (finalAttrs: {
   pname = "attrs";
   version = "26.1.0";
   disabled = pythonOlder "3.7";
-  format = "pyproject";
+  pyproject = true;
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;

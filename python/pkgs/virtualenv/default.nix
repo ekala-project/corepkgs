@@ -15,7 +15,7 @@
 buildPythonPackage (finalAttrs: {
   pname = "virtualenv";
   version = "20.33.1";
-  format = "pyproject";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 

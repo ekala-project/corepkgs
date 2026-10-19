@@ -13,7 +13,7 @@
 buildPythonPackage (finalAttrs: {
   pname = "poetry-dynamic-versioning";
   version = "1.10.0";
-  format = "pyproject";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 

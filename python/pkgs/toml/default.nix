@@ -2,16 +2,19 @@
   lib,
   buildPythonPackage,
   fetchPypi,
+  setuptools,
 }:
 
 buildPythonPackage (finalAttrs: {
   pname = "toml";
   version = "0.10.2";
-  format = "setuptools";
+  pyproject = true;
+
+  build-system = [ setuptools ];
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;
-    sha256 = "b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f";
+    hash = "sha256-s72h0QjV3Zn0og0k2cNI6RxNt6sbdJIAve0vg5zL5o8=";
   };
 
   pythonImportsCheck = [ "toml" ];
