@@ -30,7 +30,7 @@ let
 in
 stdenv.mkDerivation {
   pname = "libcupsfilters";
-  version = "2.1.1";
+  version = "2.2.1";
 
   src = fetchFromGitHub {
     owner = "OpenPrinting";
