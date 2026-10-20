@@ -8,14 +8,14 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "nqp";
-  version = "2026.08";
+  version = "2026.09";
 
   src = fetchFromGitHub {
     owner = "Raku";
     repo = "nqp";
     tag = finalAttrs.version;
     fetchSubmodules = true;
-    hash = "sha256-T1iMw25Fukjvbv2TAi/kp/1dCHDe6kvHwckbpP3E3f8=";
+    hash = "sha256-TrzmnDQf+t6T+x7wB4mMyKDrQQqeUo6CyFJXHdVzlzA=";
   };
 
   configureScript = "${lib.getExe perl} ./Configure.pl";
