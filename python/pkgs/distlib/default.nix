@@ -8,12 +8,12 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "distlib";
-  version = "0.4.3";
+  version = "0.4.4";
   pyproject = true;
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;
-    hash = "sha256-8VIJciSgriS+Wg9rrhuTWa+CEzvOY/mKlfhsrhrt6e0=";
+    hash = "sha256-ykF1tKx/cSI8ww7XJIxF0rOMJDnY7m5JirZ+1jzzUI0=";
   };
 
   build-system = [ setuptools ];
