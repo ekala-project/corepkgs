@@ -9,14 +9,14 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "moarvm";
-  version = "2026.08";
+  version = "2026.09";
 
   src = fetchFromGitHub {
     owner = "MoarVM";
     repo = "MoarVM";
     tag = finalAttrs.version;
     fetchSubmodules = true;
-    hash = "sha256-OFL7v44Wd8MhNy9l11oW86mjMdFOBdM7TsAdKFz5/VI=";
+    hash = "sha256-GOtqY/A70sMvJQWUahgASpcn45RrLGxXu2ydJwgxo5E=";
   };
 
   nativeBuildInputs = [ pkg-config ];
