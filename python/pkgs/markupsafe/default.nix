@@ -19,7 +19,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "markupsafe";
-  version = "3.0.3";
+  version = "3.0.4";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
@@ -28,7 +28,7 @@ buildPythonPackage (finalAttrs: {
     owner = "pallets";
     repo = "markupsafe";
     tag = finalAttrs.version;
-    hash = "sha256-2d64cItemqVM25WJIKrjExKz6v4UW2wVxM6phH1g1sE=";
+    hash = "sha256-RDjYVW0YlYVlha5cBcB7zjNN3zO3xS92DUhYJsNusfk=";
   };
 
   build-system = [ setuptools ];
