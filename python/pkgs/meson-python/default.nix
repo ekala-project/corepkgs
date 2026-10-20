@@ -21,13 +21,13 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "meson-python";
-  version = "0.22.0";
+  version = "0.22.1";
   pyproject = true;
 
   src = fetchPypi {
     inherit (finalAttrs) version;
     pname = "meson_python";
-    hash = "sha256-nIGdDU76dG7a36rkZjwOnHVlkYbvflurEjML/iKWTfw=";
+    hash = "sha256-UsiGKLDlZxWS3CMGYT+19vNhX9JN7wWbmJTxQ7f5oTk=";
   };
 
   build-system = [
