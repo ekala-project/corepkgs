@@ -12,12 +12,12 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "filelock";
-  version = "4.0.5";
+  version = "4.2.4";
   pyproject = true;
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;
-    hash = "sha256-KxVfCYxPKF+0GVSiLGFsTooGNbeMGEM4ujAjwckaS00=";
+    hash = "sha256-xthmNTXhZQ7kMFB7T/use0ZN1kt2R+oBEqn0BkmdFj0=";
   };
 
   build-system = [
