@@ -9,11 +9,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "nano";
-  version = "8.7.1";
+  version = "9.2";
 
   src = fetchurl {
     url = "mirror://gnu/nano/nano-${finalAttrs.version}.tar.xz";
-    hash = "sha256-dvDcskjy4vElHU7NIP0w+0AKNgo6N8bDQOClLC0c3t8=";
+    hash = "sha256-Bey5kke3guils6Je1BAd0DSwI2kC90SbyXlbcXZC9+k=";
   };
 
   nativeBuildInputs = [
