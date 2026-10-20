@@ -17,14 +17,14 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "json-schema-for-humans";
-  version = "2.0.0";
+  version = "2.1.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "coveooss";
     repo = "json-schema-for-humans";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-sjk2Moq4xMIS5ZXQgEU9DSTe0QMIiNtYWLB6saHpnNA=";
+    hash = "sha256-gZPjHVpCja2NyKu9ZK+MYRVYoMgg9Psgo3J+91y/lsE=";
   };
 
   postPatch = ''
@@ -32,7 +32,10 @@ buildPythonPackage (finalAttrs: {
       --replace-fail 'markdown2 = "2.5.5"' 'markdown2 = "^2.4.1"'
   '';
 
-  pythonRelaxDeps = [ "dataclasses-json" ];
+  pythonRelaxDeps = [
+    "click"
+    "dataclasses-json"
+  ];
 
   build-system = [ poetry-core ];
 
