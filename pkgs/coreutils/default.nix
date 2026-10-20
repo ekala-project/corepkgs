@@ -51,15 +51,12 @@ in
 stdenv.mkDerivation (finalAttrs: {
   pname = "coreutils";
   extensions = lib.optionals (!minimal) [ "full" ];
-  version = "9.9";
+  version = "9.12";
 
   src = fetchurl {
     url = "mirror://gnu/coreutils/coreutils-${finalAttrs.version}.tar.xz";
-    hash = "sha256-Gby2yoZxg8V9dxVerpRsXs7YgYMUO0XKUa19JsYoynU=";
+    hash = "sha256-pIAZhVlzPps9qZnpBUOsb4iKLKpUTY1mTFofF+Uo4hA=";
   };
-
-  patches = [
-  ];
 
   postPatch = ''
     # The test tends to fail on btrfs, f2fs and maybe other unusual filesystems.
