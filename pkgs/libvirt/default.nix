@@ -89,14 +89,14 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libvirt";
-  version = "12.6.0";
+  version = "12.8.0";
 
   src = fetchFromGitLab {
     owner = "libvirt";
     repo = "libvirt";
     tag = "v${finalAttrs.version}";
     fetchSubmodules = true;
-    hash = "sha256-SEscELXhiEoFnDDcxV7Jb2LjyheNJbgPp7AnXix2GVU=";
+    hash = "sha256-eN03AyrtLp0+vhqwzpHOyY6MeHOU3J0SNGM+MN2w4eI=";
   };
 
   patches = [
