@@ -7,7 +7,7 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "catch2";
-  version = "3.16.0";
+  version = "3.16.1";
 
   outputs = [
     "out"
@@ -19,7 +19,7 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "catchorg";
     repo = "Catch2";
     tag = "v${finalAttrs.version}";
-    sha256 = "sha256-vvPZTQzLNGIcdDbuo0w6sQvxzLdKFCl2LNwcHu0d5I8=";
+    sha256 = "sha256-T7Wd3Fq2YwjXU7hKm0ej/CIXQtrorPr6qALzfF4UwJU=";
   };
 
   postPatch = ''
