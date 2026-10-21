@@ -9,14 +9,14 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "pycparser";
-  version = "3.00";
+  version = "3.11";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "eliben";
     repo = "pycparser";
     tag = "release_v${finalAttrs.version}";
-    hash = "sha256-6eKc+p3xLyRPo3oCWP/dbMpHlkBXLy8XiGR0gTEHI2E=";
+    hash = "sha256-Gtu9ZY5Zydu9LI6tMQiOLWj6hgyw1Tub7c989fDp2q0=";
   };
 
   build-system = [ setuptools ];
