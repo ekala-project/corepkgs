@@ -387,6 +387,13 @@ in
           )).overrideAttrs
             (a: {
 
+              # Work around an ICE in the minimal-bootstrap GCC 15.3.0 when
+              # compiling generated files (insn-recog.cc) at -O2 for i686.
+              # xgcc is a throwaway compiler so reduced optimization is fine.
+              buildFlags = (a.buildFlags or [ ]) ++ [
+                "CXXFLAGS=-g -O1"
+              ];
+
               # This signals to cc-wrapper (as overridden above in this file) to add `--sysroot`
               # to `$out/nix-support/cc-cflags`.
               passthru = a.passthru // {
