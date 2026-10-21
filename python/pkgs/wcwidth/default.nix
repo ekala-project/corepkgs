@@ -9,14 +9,14 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "wcwidth";
-  version = "0.9.1";
+  version = "0.9.3";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "jquast";
     repo = "wcwidth";
     tag = finalAttrs.version;
-    hash = "sha256-tH96gjq8dTDdogdZYj4r+BTLw8/CX4ebBWLTJAYUfUE=";
+    hash = "sha256-t67KTRvMWFod4K8spUeYrsoMVhbZIgQXyEIqx5o3lCk=";
   };
 
   build-system = [ setuptools ];
