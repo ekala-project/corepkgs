@@ -8,14 +8,14 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "rakudo";
-  version = "2026.08";
+  version = "2026.09";
 
   src = fetchFromGitHub {
     owner = "rakudo";
     repo = "rakudo";
     tag = finalAttrs.version;
     fetchSubmodules = true;
-    hash = "sha256-Nr4YyjXPAdGj+EXSFrfzFYgn3NQtR8GgVMv1eegAsxI=";
+    hash = "sha256-osbAAdIIz5xZTjHznl1+1pi9l3gDV6mSSTxRLdLUALs=";
   };
 
   postPatch = ''
