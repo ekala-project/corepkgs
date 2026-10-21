@@ -10,12 +10,12 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "pyudev";
-  version = "0.24.4";
+  version = "0.24.5";
   pyproject = true;
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;
-    hash = "sha256-54i7mDcAsahO/C6IhisKUa8qmV1bhryZl1RlBc97Nrw=";
+    hash = "sha256-Tn+q7EGbgakC0FdWgQGBn0SJcsDPRIu5wiID5Pxqjrk=";
   };
 
   postPatch = lib.optionalString stdenv.hostPlatform.isLinux ''
