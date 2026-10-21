@@ -12,7 +12,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "poetry-dynamic-versioning";
-  version = "1.10.0";
+  version = "1.10.1";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
@@ -21,7 +21,7 @@ buildPythonPackage (finalAttrs: {
     owner = "mtkennerly";
     repo = "poetry-dynamic-versioning";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-sETUaOKFS0T4o++W1maKt7qsy0CdnmMQT7vegNKQCbk=";
+    hash = "sha256-M9JduX1oeaDVDZXPKst77xUWgEcxcrL+CstCBH49M/Y=";
   };
 
   nativeBuildInputs = [ poetry-core ];
