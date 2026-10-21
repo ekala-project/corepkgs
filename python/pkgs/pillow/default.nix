@@ -44,14 +44,14 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "pillow";
-  version = "12.3.0";
+  version = "13.0.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "python-pillow";
     repo = "pillow";
     tag = finalAttrs.version;
-    hash = "sha256-kmUlgR+f75Y8DAKKPdEbchLLgg0m95oyVP53WTQni88=";
+    hash = "sha256-7FHwvgfT40qiHmvcJFZN/FlOECE0YiqOLBEYCMugk+4=";
   };
 
   build-system = [
