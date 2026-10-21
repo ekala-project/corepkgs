@@ -389,7 +389,11 @@ lib.makeOverridable
           # };
           # Tests disabled: fails with "16993 tests, 2229489 assertions, 105 failures, 14 errors, 89 skips"
           # mostly TZ- and patch-related tests; TZ- failures are caused by nix sandboxing
-          ekapkgs-update.semver-strategy = "patch";
+          ekapkgs-update = {
+            semver-strategy = "patch";
+            github-repo = "ruby/ruby";
+            keep = "patch";
+          };
           rubyEngine = "ruby";
           libPath = "lib/ruby/${ver.libDir}";
           gemPath = "lib/ruby/gems/${ver.libDir}";
