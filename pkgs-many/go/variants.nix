@@ -370,4 +370,8 @@
     version = "1.26.10";
     src-hash = "sha256-/WPog7ovK/ypPBZGsx6+9j4rHk0rMXyXidl2po2B828=";
   };
+  v1_27_2 = {
+    version = "1.27.2";
+    src-hash = "sha256-A0ldorpkiU1A9cSZLklFT6eLUGkGBP+Stq//UIG3bmI=";
+  };
 }
