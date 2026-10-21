@@ -196,6 +196,11 @@ stdenv.mkDerivation (finalAttrs: {
       go = finalAttrs.finalPackage;
       buildGoModule = finalAttrs.passthru.buildModule;
     };
+    ekapkgs-update = {
+      github-repo = "golang/go";
+      version-regex = "^go(.+)$";
+      keep = "patch";
+    };
   };
 
   meta = {
