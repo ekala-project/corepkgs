@@ -39,8 +39,8 @@ stdenv.mkDerivation (finalAttrs: {
     "bin"
     "out"
     "dev"
-    "devdoc"
-  ];
+  ]
+  ++ lib.optionals withManpages' [ "devdoc" ];
 
   nativeBuildInputs = [
     pkg-config
