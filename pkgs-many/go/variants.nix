@@ -362,4 +362,8 @@
 
     bootstrapGo = buildPackages: buildPackages.go.v1_26;
   };
+  v1_26_9 = {
+    version = "1.26.9";
+    src-hash = "sha256-lzXX3Ntls10/pXfwQGRzfAO4nPGitx5uaf4vPG+f1Mo=";
+  };
 }
