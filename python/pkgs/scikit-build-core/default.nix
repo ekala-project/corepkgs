@@ -19,14 +19,14 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "scikit-build-core";
-  version = "1.1.0";
+  version = "1.1.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "scikit-build";
     repo = "scikit-build-core";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-UO92Y2dpW6HyzRSJVyqkCAeRTN/aljX4ROBkRcLXtT8=";
+    hash = "sha256-Wk/F73JlZJhbkmfQXSMeoFBk4/4wckWHAzU4zrAPsvM=";
   };
 
   postPatch = lib.optionalString (pythonOlder "3.11") ''
