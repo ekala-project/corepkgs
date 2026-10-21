@@ -9,12 +9,12 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "pytz";
-  version = "2026.4";
+  version = "2026.5";
   pyproject = true;
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;
-    hash = "sha256-RkMDZFuvr9ckGImDaLJClFj3Cc8etqFTcvvMOWtk2mM=";
+    hash = "sha256-+iNyS5xIZUO5/1SjJ+51aayDreVLua/Q/BhnZiBAHIY=";
   };
 
   postPatch = ''
