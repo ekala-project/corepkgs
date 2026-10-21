@@ -196,4 +196,10 @@ in
     hash = "sha256-g30pno993yvjGiKaen4BnTVJeYJRF5iayzsysam+Jio=";
     cargoHash = cargoHash_4_0;
   };
+
+  v4_0_7 = {
+    version = rubyVersion "4" "0" "7" "";
+    hash = "sha256-kRrOIPkNBoyg5N2m0OTw+B5S5S8t1PQATHIeJTQS6C0=";
+    cargoHash = cargoHash_4_0;
+  };
 }
