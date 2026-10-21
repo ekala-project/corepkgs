@@ -7,12 +7,12 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "soupsieve";
-  version = "2.10";
+  version = "3.0.3";
   pyproject = true;
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;
-    hash = "sha256-Sek4DX0pBUY1g7r+KF6BjHNmqe17Ou4iHBrHnJBdi8A=";
+    hash = "sha256-fc9gIu7QOZ65k0p14CAUj3ogJMN7ffzTzyxVBdacNk4=";
   };
 
   nativeBuildInputs = [ hatchling ];
