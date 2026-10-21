@@ -13,16 +13,16 @@
 
 buildGoModule (finalAttrs: {
   pname = "yq-go";
-  version = "4.53.6";
+  version = "4.54.1";
 
   src = fetchFromGitHub {
     owner = "mikefarah";
     repo = "yq";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-BLd6NaYBEuTYSCe0mTX2FYER+ybT4KqGsHw86re7wiU=";
+    hash = "sha256-XuFeCF8oyURkcBuQsv2ePjRST/nZtHh+PnLFwD/GMCM=";
   };
 
-  vendorHash = "sha256-q/khSpZgo8D3K8adjI56Xj943vdWbGgnzG619NWrLY0=";
+  vendorHash = "sha256-CaglyW5YwmukObKYXMTsTiLY31gs2bgLwyTfxJUtTdY=";
 
   # TestFormatStringFromFilename expects "unknown" for unrecognized extensions,
   # but upstream changed the default to "yaml". Go's regexp engine has no
