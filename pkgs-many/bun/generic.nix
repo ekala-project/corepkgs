@@ -13,6 +13,7 @@
   installShellFiles,
   makeWrapper,
   openssl,
+  callPackage,
 }:
 
 let
@@ -76,6 +77,7 @@ stdenvNoCC.mkDerivation {
   '';
 
   passthru = {
+    buildPackage = callPackage ./build-package.nix { };
     ekapkgs-update.semver-strategy = "patch";
     ekapkgs-update.platform-hashes = [
       "x86_64-linux"
