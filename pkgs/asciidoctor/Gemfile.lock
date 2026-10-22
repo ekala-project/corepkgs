@@ -22,6 +22,7 @@ GEM
     css_parser (1.21.1)
       addressable
     hashery (2.1.2)
+    logger (1.7.0)
     matrix (0.4.3)
     pdf-core (0.9.0)
     pdf-reader (2.15.0)
@@ -62,6 +63,7 @@ PLATFORMS
 DEPENDENCIES
   asciidoctor
   asciidoctor-pdf
+  logger
   coderay
   pygments.rb
   rouge
