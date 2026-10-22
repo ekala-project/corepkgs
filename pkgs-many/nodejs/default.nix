@@ -10,7 +10,7 @@ mkManyVariants {
     v24 = "v24_20";
     v26 = "v26_8";
     # convenience aliases (must point to real variants, not other aliases)
-    nodejs = "v24_20";
+    nodejs = "v26_8";
     nodejs_latest = "v26_8";
     nodejs_18 = "v18_20";
     nodejs_20 = "v20_20";
@@ -22,7 +22,7 @@ mkManyVariants {
   removed = {
     v23 = "2025-06-01";
   };
-  defaultSelector = (p: p.v24); # Default to Node.js 24 LTS
+  defaultSelector = (p: p.v26); # Default to Node.js 26 LTS
   genericBuilder = ./generic.nix;
   inherit callPackage;
 }
