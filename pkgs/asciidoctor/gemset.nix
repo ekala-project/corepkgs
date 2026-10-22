@@ -93,6 +93,16 @@
     };
     version = "1.21.1";
   };
+  logger = {
+    groups = [ "default" ];
+    platforms = [ ];
+    source = {
+      remotes = [ "https://rubygems.org" ];
+      sha256 = "sha256-GW7ex8xEtmz7QPl1XOEbOS8h95Z2lq8V0nTd5+3/AgM=";
+      type = "gem";
+    };
+    version = "1.7.0";
+  };
   hashery = {
     groups = [ "default" ];
     platforms = [ ];
