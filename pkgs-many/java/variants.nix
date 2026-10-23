@@ -44,11 +44,21 @@
   v23 = {
     version = "23.0.1";
     build = "11";
-    # OpenJDK 23 (Latest)
+    # OpenJDK 23
     src-hash = {
       x86_64-linux = "sha256-JAAmfk6cD2rogKTXY69srxjGc3FL3uXev4OIsLXVKIY=";
       aarch64-linux = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
       aarch64-darwin = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    };
+  };
+
+  v25 = {
+    version = "25.0.1";
+    build = "8";
+    # OpenJDK 25 LTS
+    src-hash = {
+      x86_64-linux = "sha256-ja930arP/jjJiJaJvCJKE1V953VZ2aW7kZkeaimLqg0=";
+      aarch64-linux = "sha256-XIO30hIe1IL9BoMaHroWM9urgYq6at3d9I4HW5fm6bg=";
     };
   };
 }
