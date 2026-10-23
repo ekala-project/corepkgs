@@ -162,7 +162,7 @@ stdenv.mkDerivation (
         mv $out/bin/set-xcode-analyzer $python/bin
       fi
       mv $out/share/clang/*.py $python/share/clang
-      rm $out/bin/c-index-test
+      rm -f $out/bin/c-index-test
       patchShebangs $python/bin
 
       mkdir -p $dev/bin

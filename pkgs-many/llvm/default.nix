@@ -3,8 +3,8 @@
 mkManyVariants {
   variants = ./variants.nix;
   aliases = { };
-  # Default to v21 (LLVM 21.1.8)
-  defaultSelector = (p: p.v21);
+  # Default to v22 (LLVM 22.1.4)
+  defaultSelector = (p: p.v22);
   genericBuilder = ./generic.nix;
   inherit callPackage;
 }

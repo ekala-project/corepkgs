@@ -1365,7 +1365,7 @@ final: prev: with final; {
   # Package scopes accessible as: llvm.v18.pkgs, llvm.v19.pkgs, etc.
   # Old names like llvmPackages_18, clang_18, etc. are available via aliases/nixpkgs.nix
 
-  llvmPackages = if stdenv.hostPlatform.isDarwin then llvmPackages_21 else llvm.pkgs;
+  llvmPackages = if stdenv.hostPlatform.isDarwin then llvmPackages_22 else llvm.pkgs;
   llvm =
     if stdenv.hostPlatform.isDarwin then
       lib.makeOverridable (lib.mirrorFunctionArgs prev.llvm.override (
@@ -1428,6 +1428,14 @@ final: prev: with final; {
       callPackage (import ./pkgs-many/llvm/scope.nix (import ./pkgs-many/llvm/variants.nix).v21) { }
     else
       prev.llvm.v21.pkgs;
+  llvmPackages_22 =
+    if
+      stdenv.buildPlatform != stdenv.targetPlatform
+      && (stdenv.buildPlatform.isDarwin || stdenv.targetPlatform.isDarwin)
+    then
+      callPackage (import ./pkgs-many/llvm/scope.nix (import ./pkgs-many/llvm/variants.nix).v22) { }
+    else
+      prev.llvm.v22.pkgs;
   llvmPackages_git =
     if
       stdenv.buildPlatform != stdenv.targetPlatform

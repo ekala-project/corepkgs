@@ -1,0 +1,72 @@
+diff --git a/cmake/modules/AddClang.cmake b/cmake/modules/AddClang.cmake
+--- a/cmake/modules/AddClang.cmake
++++ b/cmake/modules/AddClang.cmake
+@@ -134,8 +134,8 @@ macro(add_clang_library name)
+         install(TARGETS ${lib}
+           COMPONENT ${lib}
+           ${export_to_clangtargets}
+-          LIBRARY DESTINATION lib${LLVM_LIBDIR_SUFFIX}
+-          ARCHIVE DESTINATION lib${LLVM_LIBDIR_SUFFIX}
++          LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}${LLVM_LIBDIR_SUFFIX}"
++          ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}${LLVM_LIBDIR_SUFFIX}"
+           RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+ 
+         if (NOT LLVM_ENABLE_IDE)
+diff --git a/tools/libclang/CMakeLists.txt b/tools/libclang/CMakeLists.txt
+--- a/tools/libclang/CMakeLists.txt
++++ b/tools/libclang/CMakeLists.txt
+@@ -244,7 +244,7 @@ foreach(PythonVersion ${CLANG_PYTHON_BINDINGS_VERSIONS})
+           COMPONENT
+             libclang-python-bindings
+           DESTINATION
+-            "lib${LLVM_LIBDIR_SUFFIX}/python${PythonVersion}/site-packages")
++            "${CMAKE_INSTALL_LIBDIR}${LLVM_LIBDIR_SUFFIX}/python${PythonVersion}/site-packages")
+ endforeach()
+ if(NOT LLVM_ENABLE_IDE)
+   add_custom_target(libclang-python-bindings)
+diff --git a/tools/scan-build-py/CMakeLists.txt b/tools/scan-build-py/CMakeLists.txt
+--- a/tools/scan-build-py/CMakeLists.txt
++++ b/tools/scan-build-py/CMakeLists.txt
+@@ -91,21 +91,21 @@ if(CLANG_INSTALL_SCANBUILDPY)
+     list(APPEND Depends ${CMAKE_BINARY_DIR}/lib/libscanbuild/${lib})
+     install(FILES lib/libscanbuild/${lib}
+-            DESTINATION lib/libscanbuild
++            DESTINATION "${CMAKE_INSTALL_LIBDIR}/libscanbuild"
+             COMPONENT scan-build-py)
+   endforeach()
+ 
+   foreach(resource ${LibScanbuildResources})
+     add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/lib/libscanbuild/resources/${resource}
+                        COMMAND ${CMAKE_COMMAND} -E make_directory
+                          ${CMAKE_BINARY_DIR}/lib
+                        COMMAND ${CMAKE_COMMAND} -E make_directory
+                          ${CMAKE_BINARY_DIR}/lib/libscanbuild
+                        COMMAND ${CMAKE_COMMAND} -E make_directory
+                          ${CMAKE_BINARY_DIR}/lib/libscanbuild/resources
+                        COMMAND ${CMAKE_COMMAND} -E copy
+                          ${CMAKE_CURRENT_SOURCE_DIR}/lib/libscanbuild/resources/${resource}
+                          ${CMAKE_BINARY_DIR}/lib/libscanbuild/resources
+                        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/lib/libscanbuild/resources/${resource})
+     list(APPEND Depends ${CMAKE_BINARY_DIR}/lib/libscanbuild/resources/${resource})
+     install(FILES lib/libscanbuild/resources/${resource}
+-            DESTINATION lib/libscanbuild/resources
++            DESTINATION "${CMAKE_INSTALL_LIBDIR}/libscanbuild/resources"
+             COMPONENT scan-build-py)
+   endforeach()
+ 
+   foreach(lib ${LibEar})
+     add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/lib/libear/${lib}
+                        COMMAND ${CMAKE_COMMAND} -E make_directory
+                          ${CMAKE_BINARY_DIR}/lib
+                        COMMAND ${CMAKE_COMMAND} -E make_directory
+                          ${CMAKE_BINARY_DIR}/lib/libear
+                        COMMAND ${CMAKE_COMMAND} -E copy
+                          ${CMAKE_CURRENT_SOURCE_DIR}/lib/libear/${lib}
+                          ${CMAKE_BINARY_DIR}/lib/libear/
+                        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/lib/libear/${lib})
+     list(APPEND Depends ${CMAKE_BINARY_DIR}/lib/libear/${lib})
+     install(FILES lib/libear/${lib}
+-            DESTINATION lib/libear
++            DESTINATION "${CMAKE_INSTALL_LIBDIR}/libear"
+             COMPONENT scan-build-py)
+   endforeach()
