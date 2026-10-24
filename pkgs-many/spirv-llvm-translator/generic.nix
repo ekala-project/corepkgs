@@ -14,24 +14,16 @@
   cmake,
   pkg-config,
   lit,
-  llvmPackages_18,
-  llvmPackages_19,
-  llvmPackages_20,
-  llvmPackages_21,
+  llvm ? null,
   spirv-headers,
   spirv-tools,
 }:
 
 let
-  llvmPackages =
-    {
-      "18" = llvmPackages_18;
-      "19" = llvmPackages_19;
-      "20" = llvmPackages_20;
-      "21" = llvmPackages_21;
-    }
-    .${llvmMajor};
-  llvm = llvmPackages.llvm;
+  # Look up the LLVM package scope matching the variant's major version.
+  # The llvm mkManyVariants package exposes each version as llvm.v<N>.
+  llvmPkgs = llvm."v${llvmMajor}".pkgs;
+  llvmLib = llvmPkgs.llvm;
 in
 stdenv.mkDerivation {
   pname = "SPIRV-LLVM-Translator";
@@ -50,26 +42,26 @@ stdenv.mkDerivation {
     pkg-config
     cmake
     cmake.configurePhaseHook
-    llvm.dev
+    llvmLib.dev
   ];
 
   buildInputs = [
     spirv-headers
     spirv-tools
-    llvm
+    llvmLib
   ];
 
   nativeCheckInputs = [ lit ];
 
   cmakeEntries = {
     LLVM_INCLUDE_TESTS = "ON";
-    LLVM_DIR = "${llvm.dev}";
+    LLVM_DIR = "${llvmLib.dev}";
     BUILD_SHARED_LIBS = "YES";
     LLVM_SPIRV_BUILD_EXTERNAL = "YES";
     CMAKE_SKIP_BUILD_RPATH = "ON";
     LLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR = "${spirv-headers.src}";
     ${if packageAtLeast "19" then "BASE_LLVM_VERSION" else null} =
-      "${lib.versions.majorMinor llvm.version}.0";
+      "${lib.versions.majorMinor llvmLib.version}.0";
   };
 
   makeFlags = [

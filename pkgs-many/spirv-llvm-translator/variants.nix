@@ -19,4 +19,9 @@
     llvmMajor = "21";
     hash = "sha256-kk8BbPl/UBW1gaO/cuOQ9OsiNTEk0TkvRDLKUAh6exk=";
   };
+  v22 = {
+    version = "22.1.4";
+    llvmMajor = "22";
+    hash = "sha256-V1Busaxxq5di+kGPNrqR2PwOMEdu1OCeaz3cTLojf60=";
+  };
 }
