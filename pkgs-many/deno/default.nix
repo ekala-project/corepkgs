@@ -3,7 +3,7 @@
 mkManyVariants {
   variants = ./variants.nix;
   aliases = { };
-  defaultSelector = (p: p.v2_6);
+  defaultSelector = (p: p.v2_9);
   genericBuilder = ./generic.nix;
   inherit callPackage;
 }
