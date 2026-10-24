@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 gem 'asciidoctor'
+gem 'logger'
 gem 'asciidoctor-pdf'
 gem 'coderay'
 gem 'pygments.rb'

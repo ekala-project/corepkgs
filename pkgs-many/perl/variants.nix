@@ -13,4 +13,9 @@
     version = "5.42.3";
     sha256 = "sha256-ETd0CYWDe1zfFfDPq5Miedy0NS+RL+1vwUTotPCCNic=";
   };
+
+  v5_44 = {
+    version = "5.44.0";
+    sha256 = "sha256-O4VQZrkkkctA6Gr/scpX0aOIqkPlG5HHgGoywvZflsM=";
+  };
 }

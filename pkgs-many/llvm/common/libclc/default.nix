@@ -99,7 +99,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
   buildInputs = [ llvm ];
 
-  postInstall = ''
+  postInstall = lib.optionalString (lib.versionOlder release_version "22") ''
     install -Dt $dev/bin prepare_builtins
   '';
 
@@ -108,7 +108,7 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     homepage = "http://libclc.llvm.org/";
     description = "Implementation of the library requirements of the OpenCL C programming language";
-    mainProgram = "prepare_builtins";
+    ${if lib.versionOlder release_version "22" then "mainProgram" else null} = "prepare_builtins";
     license = lib.licenses.mit;
     platforms = lib.platforms.all;
   };

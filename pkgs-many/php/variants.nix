@@ -19,7 +19,13 @@
 
   v84 = {
     version = "8.4.24";
-    # PHP 8.4 (Latest)
+    # PHP 8.4 (Active support)
     src-hash = "sha256-4Se+CahQb0Mnxc+nimFLANIQcUSE7CFc4AEbSgPABzE=";
+  };
+
+  v85 = {
+    version = "8.5.12";
+    # PHP 8.5 (Latest)
+    src-hash = "sha256-CLwuuipYhlSt4TVxdKpka3YVVshi3aBng0XuKe1IEgk=";
   };
 }

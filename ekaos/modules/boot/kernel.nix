@@ -13,7 +13,7 @@ with lib;
     boot.kernelPackages = mkOption {
       type = types.unspecified;
       default = pkgs.linux.pkgs;
-      defaultText = "pkgs.linux.pkgs (linux 6.12)";
+      defaultText = "pkgs.linux.pkgs (linux 6.18)";
       example = literalExpression "pkgs.linux.v6_18.pkgs";
       description = ''
         Kernel package set to use for the system.
@@ -22,7 +22,7 @@ with lib;
         and provides access to kernel modules.
 
         Available kernel packages:
-        - pkgs.linux.pkgs - Default stable kernel (6.12) modules
+        - pkgs.linux.pkgs - Default stable kernel (6.18) modules
         - pkgs.linux.v6_18.pkgs - Specific version 6.18 modules
         - pkgs.linux.v6_12.pkgs - Specific version 6.12 modules
 

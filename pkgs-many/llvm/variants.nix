@@ -27,6 +27,13 @@
     };
     gitRelease = null;
   };
+  v22 = {
+    version = "22.1.4";
+    officialRelease = {
+      sha256 = "sha256-7fo7XYmWAziRpwloM7HMBRAJh7X8aIEce+LilikXwug=";
+    };
+    gitRelease = null;
+  };
   git = {
     version = "22.0.0-git";
     officialRelease = null;
