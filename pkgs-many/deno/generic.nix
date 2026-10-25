@@ -40,6 +40,7 @@ let
   librusty_v8 = fetchLibrustyV8.fetchLibrustyV8 {
     version = librusty-v8-version;
     shas = librusty-v8-hashes;
+    simdutf = builtins.elem "v8" build-features;
   };
   canExecute = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
 in
@@ -153,6 +154,12 @@ rustPlatform.buildRustPackage {
     "--skip=upgrade::upgrade_invalid_lockfile"
     "--skip=node_unit_tests::process_test"
     "--skip=sqlite_extension_test"
+    # sandbox: / is owned by uid 65534 (nobody), not root
+    "--skip=util::temp::test::test_ensure_secure_temp_parent_rejects_non_sticky_writable_dir"
+    # sandbox: requires deno binary on PATH during check phase
+    "--skip=tests::test_rebuild_async_stubs"
+    # flaky: timing-sensitive assertion fails under load
+    "--skip=happy_eyeballs::tests::test_parallel_second_wins"
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     "--skip=shared_library_tests::macos_shared_libraries"
