@@ -39,6 +39,10 @@ stdenv.mkDerivation (finalAttrs: {
     python3
   ];
 
+  # Work around gcc 14.3.0 ICE (segfault in ggc_set_mark during template
+  # instantiation of unique_ptr) by reducing optimization level
+  env.NIX_CFLAGS_COMPILE = "-O1";
+
   cmakeEntries = {
     "SPIRV-Headers_SOURCE_DIR" = "${spirv-headers}";
     # Avoid blanket -Werror to evade build failures on less
