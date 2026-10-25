@@ -358,11 +358,11 @@ stdenv.mkDerivation (finalAttrs: {
   ++ optionals (pythonAtLeast "3.13") [
     ./3.13/virtualenv-permissions.patch
   ]
-  ++ optionals (mimetypesSupport && pythonOlder "3.15") [
+  ++ optionals (mimetypesSupport && (pythonOlder "3.15" || pythonAtLeast "3.16")) [
     # Make the mimetypes module refer to the right file
     ./mimetypes.patch
   ]
-  ++ optionals (mimetypesSupport && pythonAtLeast "3.15") [
+  ++ optionals (mimetypesSupport && pythonAtLeast "3.15" && pythonOlder "3.16") [
     # Python 3.15 wraps knownfiles in a sys.platform conditional
     ./3.15/mimetypes.patch
   ]

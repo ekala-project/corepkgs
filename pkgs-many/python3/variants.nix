@@ -29,6 +29,12 @@
     src-hash = "sha256-ZzrnIy2EyJRymILIJX0wDvLSZSORG/05F+yM5/Um+Zs=";
   };
 
+  v3_16 = {
+    version = "3.16.0a1";
+    suffix = "a1";
+    src-hash = "sha256-2XQPdgKAVPebwuAk6yaGqfGCV6yGeV7OVPQBj/LOooQ=";
+  };
+
   minimal = {
     withMinimalDeps = true;
     pythonAttr = "python3Minimal";
