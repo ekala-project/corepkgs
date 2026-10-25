@@ -869,8 +869,10 @@ final: prev: with final; {
     ;
 
   # Python package sets.
-  python312Packages = lib.recurseIntoAttrs python312.pkgs;
-  python313Packages = lib.recurseIntoAttrs python313.pkgs;
+  python312Packages = lib.dontRecurseIntoAttrs python.v3_12.pkgs;
+  python313Packages = lib.recurseIntoAttrs python.v3_13.pkgs;
+  python314Packages = lib.recurseIntoAttrs python.v3_14.pkgs;
+  python315Packages = lib.dontRecurseIntoAttrs python.v3_15.pkgs;
 
   pythonManylinuxPackages = callPackage ./python/manylinux { };
 

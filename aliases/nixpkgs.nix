@@ -307,11 +307,9 @@ mapAliases {
   pypy311Packages = renamed "pypy311Packages" "pypy311.pkgs" pypy311.pkgs;
   pypy3Packages = renamed "pypy3Packages" "pypy3.pkgs" pypy3.pkgs;
   pypyPackages = renamed "pypyPackages" "pypy.pkgs" pypy.pkgs;
-  python27Packages = renamed "python27Packages" "python27.pkgs" python27.pkgs;
-  python310Packages = renamed "python310Packages" "python310.pkgs" python310.pkgs;
-  python311Packages = renamed "python311Packages" "python311.pkgs" python311.pkgs;
-  python314Packages = renamed "python314Packages" "python314.pkgs" python314.pkgs;
-  python315Packages = renamed "python315Packages" "python315.pkgs" python315.pkgs;
+  python27Packages = renamed "python27Packages" "python.v2_7.pkgs" python.v2_7.pkgs;
+  python310Packages = renamed "python310Packages" "python.v3_10.pkgs" python.v3_10.pkgs;
+  python311Packages = renamed "python311Packages" "python.v3_11.pkgs" python.v3_11.pkgs;
   qemu-utils = renamed "qemu-utils" "qemu" qemu;
   r = renamed "r" "r-lang" r-lang;
   rLang = renamed "rLang" "r-lang" r-lang;
