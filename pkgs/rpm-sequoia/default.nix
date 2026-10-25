@@ -36,6 +36,12 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # - The output of the objdump differs and the parsing logic needs to be adapted
   doCheck = !stdenv.hostPlatform.isDarwin;
 
+  # policy::tests::signature expects BrainpoolP512 to be considered secure,
+  # but our nettle version's policy rejects it
+  checkFlags = [
+    "--skip=policy::tests::signature"
+  ];
+
   outputs = [
     "out"
     "dev"
