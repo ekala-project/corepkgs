@@ -1,22 +1,22 @@
 {
   v3_10 = {
     version = "3.10.22";
-    src-hash = "sha256-deD5XnPdyJGI0+rVJI8Usoozu+mJjdlOzGoJuyHMW8c=";
+    src-hash = "sha256-xh/psaGn7CoLA4jmZBh8N4pTJaieNgbSIKv1vfzLJUM=";
   };
 
   v3_11 = {
     version = "3.11.17";
-    src-hash = "sha256-Zb6dBdit1ewJlYJI6vuT7bumq3U2pA9rDKsicL0++vg=";
+    src-hash = "sha256-v7dK05764nzaUQ8TSrQI4A+ZksVoUc/Asc21ZG2hFZk=";
   };
 
   v3_12 = {
     version = "3.12.15";
-    src-hash = "sha256-p7vnoH2zho1ffwSmDZA9vp/QPWD6Q6/mHAp5WQlvVmc=";
+    src-hash = "sha256-wsQyGWH6sPuZnWbgzs9SHCqzmUx5koc+qZ4wbBCU/Vo=";
   };
 
   v3_13 = {
     version = "3.13.17";
-    src-hash = "sha256-TX3vXhrSVqhNQOgat4V45h0sMUYY8zRSBb8h3V8qC7Q=";
+    src-hash = "sha256-YCC9EK/zv0ghvhbwiOuxWRvre4EdzY+rHaj3wip7J+c=";
   };
 
   v3_14 = {
@@ -32,7 +32,7 @@
   v3_16 = {
     version = "3.16.0a1";
     suffix = "a1";
-    src-hash = "sha256-2XQPdgKAVPebwuAk6yaGqfGCV6yGeV7OVPQBj/LOooQ=";
+    src-hash = "sha256-3KqQKUNrcj4zQSxoyhfwEwvnMFjkejp8BJy4zfYDTuk=";
   };
 
   minimal = {
