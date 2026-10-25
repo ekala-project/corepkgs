@@ -68,6 +68,11 @@ rustPlatform.buildRustPackage {
     yq --inplace --input-format toml --output-format toml \
       '.workspace.dependencies.libffi = { "version": .workspace.dependencies.libffi, "features": ["system"] }' \
       Cargo.toml
+
+    # Disable LTO to work around rustc 1.98.0 ICE in rustc_metadata/src/creader.rs
+    yq --inplace --input-format toml --output-format toml \
+      '.profile.release.lto = false' \
+      Cargo.toml
   '';
 
   buildInputs = [
