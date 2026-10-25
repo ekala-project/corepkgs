@@ -256,7 +256,7 @@ let
     ++ optionals withExpat [
       expat
     ]
-    ++ optionals (passthru.pythonAtLeast "3.14") [
+    ++ optionals (passthru.pythonAtLeast "3.14" && (!withMinimalDeps)) [
       zstd
     ]
     ++ optionals bluezSupport [
