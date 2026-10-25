@@ -358,9 +358,13 @@ stdenv.mkDerivation (finalAttrs: {
   ++ optionals (pythonAtLeast "3.13") [
     ./3.13/virtualenv-permissions.patch
   ]
-  ++ optionals mimetypesSupport [
+  ++ optionals (mimetypesSupport && pythonOlder "3.15") [
     # Make the mimetypes module refer to the right file
     ./mimetypes.patch
+  ]
+  ++ optionals (mimetypesSupport && pythonAtLeast "3.15") [
+    # Python 3.15 wraps knownfiles in a sys.platform conditional
+    ./3.15/mimetypes.patch
   ]
   ++ optionals (pythonAtLeast "3.9" && pythonOlder "3.11" && stdenv.hostPlatform.isDarwin) [
     # Stop checking for TCL/TK in global macOS locations
