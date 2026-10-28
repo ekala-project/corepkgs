@@ -24,5 +24,6 @@ buildPythonPackage (finalAttrs: {
     description = "Typing stubs for setuptools";
     homepage = "https://github.com/python/typeshed";
     license = lib.licenses.asl20;
+    platforms = lib.platforms.all;
   };
 })

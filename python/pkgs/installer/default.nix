@@ -53,6 +53,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pypa/installer";
     changelog = "https://github.com/pypa/installer/blob/${finalAttrs.src.rev}/docs/changelog.md";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

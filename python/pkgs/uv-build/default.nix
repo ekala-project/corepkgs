@@ -47,5 +47,6 @@ buildPythonPackage (finalAttrs: {
     description = "Minimal build backend for uv";
     homepage = "https://docs.astral.sh/uv/reference/settings/#build-backend";
     inherit (pkgs.uv.meta) changelog license;
+    platforms = lib.platforms.unix;
   };
 })

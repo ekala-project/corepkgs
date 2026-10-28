@@ -52,5 +52,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/jonathanslenders/python-prompt-toolkit";
     changelog = "https://github.com/prompt-toolkit/python-prompt-toolkit/releases/tag/${finalAttrs.src.tag}";
     license = lib.licenses.bsd3;
+    platforms = lib.platforms.all;
   };
 })

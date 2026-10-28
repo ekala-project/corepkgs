@@ -76,5 +76,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/davidhalter/jedi";
     changelog = "https://github.com/davidhalter/jedi/blob/${finalAttrs.version}/CHANGELOG.rst";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

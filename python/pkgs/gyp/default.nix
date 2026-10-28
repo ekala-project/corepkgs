@@ -44,5 +44,6 @@ buildPythonPackage {
     mainProgram = "gyp";
     homepage = "https://gyp.gsrc.io";
     license = lib.licenses.bsd3;
+    platforms = lib.platforms.all;
   };
 }

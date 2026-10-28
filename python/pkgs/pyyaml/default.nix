@@ -41,6 +41,6 @@ buildPythonPackage (finalAttrs: {
     description = "Next generation YAML parser and emitter for Python";
     homepage = "https://github.com/yaml/pyyaml";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.unix;
   };
 })

@@ -33,5 +33,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     homepage = "https://github.com/chayleaf/mitm-cache#readme";
     license = lib.licenses.mit;
     mainProgram = "mitm-cache";
+    platforms = lib.platforms.all;
   };
 })

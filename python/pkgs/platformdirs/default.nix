@@ -31,6 +31,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://platformdirs.readthedocs.io/";
     changelog = "https://github.com/tox-dev/platformdirs/releases/tag/${finalAttrs.src.tag}";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

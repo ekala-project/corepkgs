@@ -37,5 +37,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pytoolz/toolz";
     description = "List processing tools and functional utilities";
     license = lib.licenses.bsd3;
+    platforms = lib.platforms.all;
   };
 })

@@ -14,7 +14,6 @@ stdenv.mkDerivation {
     "out"
     "include"
   ];
-  outputInclude = "include";
 
   src = fetchgit {
     url = "https://chromium.googlesource.com/libyuv/libyuv.git";

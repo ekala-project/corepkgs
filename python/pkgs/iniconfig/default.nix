@@ -31,6 +31,6 @@ buildPythonPackage (finalAttrs: {
     description = "Brain-dead simple parsing of ini files";
     homepage = "https://github.com/pytest-dev/iniconfig";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

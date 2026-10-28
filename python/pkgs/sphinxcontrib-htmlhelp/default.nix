@@ -33,5 +33,6 @@ buildPythonPackage (finalAttrs: {
     description = "Sphinx extension which renders HTML help files";
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-htmlhelp";
     license = lib.licenses.bsd2;
+    platforms = lib.platforms.all;
   };
 })

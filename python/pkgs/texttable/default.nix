@@ -28,5 +28,6 @@ buildPythonPackage (finalAttrs: {
     description = "Module to generate a formatted text table, using ASCII characters";
     homepage = "https://github.com/foutaise/texttable";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

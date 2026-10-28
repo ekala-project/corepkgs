@@ -33,5 +33,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/zopefoundation/zope.event";
     changelog = "https://github.com/zopefoundation/zope.event/blob/${finalAttrs.src.tag}/CHANGES.rst";
     license = lib.licenses.zpl21;
+    platforms = lib.platforms.all;
   };
 })

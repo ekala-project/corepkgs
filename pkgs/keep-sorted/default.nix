@@ -46,5 +46,6 @@ buildGoModule (finalAttrs: {
     homepage = "https://github.com/google/keep-sorted";
     license = lib.licenses.asl20;
     mainProgram = "keep-sorted";
+    platforms = lib.platforms.all;
   };
 })

@@ -652,8 +652,6 @@ rec {
 
     dontBuild = true;
 
-    doCheck = false;
-
     installPhase = ''
 
       install -D ./scripts/pygmentex/pygmentex.py "$out"/bin/pygmentex

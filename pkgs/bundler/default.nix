@@ -9,11 +9,14 @@
   nix-update-script,
 }:
 
-buildRubyGem rec {
-  inherit ruby;
-  name = "${gemName}-${version}";
+let
   gemName = "bundler";
   version = "2.7.2";
+in
+buildRubyGem {
+  inherit ruby;
+  name = "${gemName}-${version}";
+  inherit gemName version;
   source.sha256 = "sha256-Heyvni4ay5G2WGopJcjz9tojNKgnMaYv8t7RuDwoOHE=";
   dontPatchShebangs = true;
 

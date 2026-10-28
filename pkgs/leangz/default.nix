@@ -22,5 +22,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     homepage = "https://github.com/digama0/leangz";
     license = lib.licenses.asl20;
     mainProgram = "leantar";
+    platforms = lib.platforms.all;
   };
 })

@@ -48,5 +48,6 @@ buildPythonPackage (finalAttrs: {
     description = "HTTP/2 State-Machine based protocol implementation";
     homepage = "https://github.com/python-hyper/h2";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

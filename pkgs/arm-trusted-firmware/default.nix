@@ -35,12 +35,15 @@ let
       deleteHDCPBlobBeforeBuild = !platformCanUseHDCPBlob || !unfreeIncludeHDCPBlob;
     in
 
+    let
+      version = "2.13.0";
+    in
     stdenv.mkDerivation (
-      rec {
+      {
 
         pname = "arm-trusted-firmware";
         extensions = lib.optionals (platform != null) [ platform ];
-        version = "2.13.0";
+        inherit version;
 
         src = fetchFromGitHub {
           owner = "ARM-software";
@@ -153,67 +156,103 @@ in
     '';
   };
 
-  allwinner = buildArmTrustedFirmware rec {
-    platform = "sun50i_a64";
-    extraMeta.platforms = [ "aarch64-linux" ];
-    filesToInstall = [ "build/${platform}/release/bl31.bin" ];
-  };
+  allwinner =
+    let
+      platform = "sun50i_a64";
+    in
+    buildArmTrustedFirmware {
+      inherit platform;
+      extraMeta.platforms = [ "aarch64-linux" ];
+      filesToInstall = [ "build/${platform}/release/bl31.bin" ];
+    };
 
-  allwinnerH616 = buildArmTrustedFirmware rec {
-    platform = "sun50i_h616";
-    extraMeta.platforms = [ "aarch64-linux" ];
-    filesToInstall = [ "build/${platform}/release/bl31.bin" ];
-  };
+  allwinnerH616 =
+    let
+      platform = "sun50i_h616";
+    in
+    buildArmTrustedFirmware {
+      inherit platform;
+      extraMeta.platforms = [ "aarch64-linux" ];
+      filesToInstall = [ "build/${platform}/release/bl31.bin" ];
+    };
 
-  allwinnerH6 = buildArmTrustedFirmware rec {
-    platform = "sun50i_h6";
-    extraMeta.platforms = [ "aarch64-linux" ];
-    filesToInstall = [ "build/${platform}/release/bl31.bin" ];
-  };
+  allwinnerH6 =
+    let
+      platform = "sun50i_h6";
+    in
+    buildArmTrustedFirmware {
+      inherit platform;
+      extraMeta.platforms = [ "aarch64-linux" ];
+      filesToInstall = [ "build/${platform}/release/bl31.bin" ];
+    };
 
-  qemu = buildArmTrustedFirmware rec {
-    platform = "qemu";
-    extraMeta.platforms = [ "aarch64-linux" ];
-    filesToInstall = [
-      "build/${platform}/release/bl1.bin"
-      "build/${platform}/release/bl2.bin"
-      "build/${platform}/release/bl31.bin"
-    ];
-  };
+  qemu =
+    let
+      platform = "qemu";
+    in
+    buildArmTrustedFirmware {
+      inherit platform;
+      extraMeta.platforms = [ "aarch64-linux" ];
+      filesToInstall = [
+        "build/${platform}/release/bl1.bin"
+        "build/${platform}/release/bl2.bin"
+        "build/${platform}/release/bl31.bin"
+      ];
+    };
 
-  rk3328 = buildArmTrustedFirmware rec {
-    extraMakeFlags = [ "bl31" ];
-    platform = "rk3328";
-    extraMeta.platforms = [ "aarch64-linux" ];
-    filesToInstall = [ "build/${platform}/release/bl31/bl31.elf" ];
-  };
+  rk3328 =
+    let
+      platform = "rk3328";
+    in
+    buildArmTrustedFirmware {
+      extraMakeFlags = [ "bl31" ];
+      inherit platform;
+      extraMeta.platforms = [ "aarch64-linux" ];
+      filesToInstall = [ "build/${platform}/release/bl31/bl31.elf" ];
+    };
 
-  rk3399 = buildArmTrustedFirmware rec {
-    extraMakeFlags = [ "bl31" ];
-    platform = "rk3399";
-    extraMeta.platforms = [ "aarch64-linux" ];
-    filesToInstall = [ "build/${platform}/release/bl31/bl31.elf" ];
-    platformCanUseHDCPBlob = true;
-  };
+  rk3399 =
+    let
+      platform = "rk3399";
+    in
+    buildArmTrustedFirmware {
+      extraMakeFlags = [ "bl31" ];
+      inherit platform;
+      extraMeta.platforms = [ "aarch64-linux" ];
+      filesToInstall = [ "build/${platform}/release/bl31/bl31.elf" ];
+      platformCanUseHDCPBlob = true;
+    };
 
-  rk3568 = buildArmTrustedFirmware rec {
-    extraMakeFlags = [ "bl31" ];
-    platform = "rk3568";
-    extraMeta.platforms = [ "aarch64-linux" ];
-    filesToInstall = [ "build/${platform}/release/bl31/bl31.elf" ];
-  };
+  rk3568 =
+    let
+      platform = "rk3568";
+    in
+    buildArmTrustedFirmware {
+      extraMakeFlags = [ "bl31" ];
+      inherit platform;
+      extraMeta.platforms = [ "aarch64-linux" ];
+      filesToInstall = [ "build/${platform}/release/bl31/bl31.elf" ];
+    };
 
-  rk3588 = buildArmTrustedFirmware rec {
-    extraMakeFlags = [ "bl31" ];
-    platform = "rk3588";
-    extraMeta.platforms = [ "aarch64-linux" ];
-    filesToInstall = [ "build/${platform}/release/bl31/bl31.elf" ];
-  };
+  rk3588 =
+    let
+      platform = "rk3588";
+    in
+    buildArmTrustedFirmware {
+      extraMakeFlags = [ "bl31" ];
+      inherit platform;
+      extraMeta.platforms = [ "aarch64-linux" ];
+      filesToInstall = [ "build/${platform}/release/bl31/bl31.elf" ];
+    };
 
-  s905 = buildArmTrustedFirmware rec {
-    extraMakeFlags = [ "bl31" ];
-    platform = "gxbb";
-    extraMeta.platforms = [ "aarch64-linux" ];
-    filesToInstall = [ "build/${platform}/release/bl31.bin" ];
-  };
+  s905 =
+    let
+      platform = "gxbb";
+    in
+    buildArmTrustedFirmware {
+      extraMakeFlags = [ "bl31" ];
+      inherit platform;
+      extraMeta.platforms = [ "aarch64-linux" ];
+      filesToInstall = [ "build/${platform}/release/bl31.bin" ];
+    };
 }

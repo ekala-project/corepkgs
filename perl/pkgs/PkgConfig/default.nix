@@ -3,11 +3,14 @@
   fetchurl,
 }:
 
-buildPerlPackage rec {
-  pname = "PkgConfig";
+let
   version = "0.25026";
+in
+buildPerlPackage {
+  pname = "PkgConfig";
+  inherit version;
   src = fetchurl {
-    url = "mirror://cpan/authors/id/P/PL/PLICEASE/PkgConfig-0.25026.tar.gz";
+    url = "mirror://cpan/authors/id/P/PL/PLICEASE/PkgConfig-${version}.tar.gz";
     hash = "sha256-Tbpe08LWpoG5XF6/FLammVzmmRrkcZutfxqvOOmHwqA=";
   };
   # support cross-compilation by simplifying the way we get version during build

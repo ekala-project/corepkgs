@@ -30,5 +30,6 @@ buildPythonPackage (finalAttrs: {
     mainProgram = "lit";
     homepage = "http://llvm.org/docs/CommandGuide/lit.html";
     license = lib.licenses.ncsa;
+    platforms = lib.platforms.all;
   };
 })

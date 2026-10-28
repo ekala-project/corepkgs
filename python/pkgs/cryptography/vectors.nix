@@ -31,5 +31,6 @@ buildPythonPackage (finalAttrs: {
       asl20
       bsd3
     ];
+    platforms = lib.platforms.all;
   };
 })

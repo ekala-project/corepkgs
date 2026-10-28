@@ -39,6 +39,6 @@ buildPythonPackage (finalAttrs: {
     description = "World timezone definitions, modern and historical";
     homepage = "https://pythonhosted.org/pytz";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

@@ -54,5 +54,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     license = lib.licenses.gpl2Plus;
     mainProgram = "pijul";
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "pijul" finalAttrs.version;
+    platforms = lib.platforms.linux;
   };
 })

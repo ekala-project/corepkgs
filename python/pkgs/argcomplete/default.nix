@@ -34,6 +34,6 @@ buildPythonPackage (finalAttrs: {
     changelog = "https://github.com/kislyuk/argcomplete/blob/${finalAttrs.src.tag}/Changes.rst";
     downloadPage = "https://github.com/kislyuk/argcomplete";
     license = lib.licenses.asl20;
-
+    platforms = lib.platforms.all;
   };
 })

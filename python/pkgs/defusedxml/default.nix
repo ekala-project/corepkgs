@@ -34,6 +34,6 @@ buildPythonPackage (finalAttrs: {
     description = "Python module to defuse XML issues";
     homepage = "https://github.com/tiran/defusedxml";
     license = lib.licenses.psfl;
-
+    platforms = lib.platforms.all;
   };
 })

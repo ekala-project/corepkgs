@@ -48,6 +48,7 @@ let
         changelog = "https://github.com/pgcentralfoundation/pgrx/releases/tag/v${version}";
         license = lib.licenses.mit;
         mainProgram = "cargo-pgrx";
+        platforms = lib.platforms.unix;
       };
     };
 in

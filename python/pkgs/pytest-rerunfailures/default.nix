@@ -49,6 +49,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pytest-dev/pytest-rerunfailures";
     changelog = "https://github.com/pytest-dev/pytest-rerunfailures/blob/${finalAttrs.src.tag}/CHANGES.rst";
     license = lib.licenses.mpl20;
-
+    platforms = lib.platforms.all;
   };
 })

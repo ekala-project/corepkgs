@@ -48,5 +48,6 @@ buildPythonPackage (finalAttrs: {
     ];
 
     mainProgram = "readelf.py";
+    platforms = lib.platforms.all;
   };
 })

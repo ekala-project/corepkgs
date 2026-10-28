@@ -100,6 +100,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pypa/build";
     changelog = "https://github.com/pypa/build/blob/${finalAttrs.src.tag}/CHANGELOG.rst";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

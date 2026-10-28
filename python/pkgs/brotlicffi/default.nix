@@ -49,6 +49,6 @@ buildPythonPackage (finalAttrs: {
     description = "Python CFFI bindings to the Brotli library";
     homepage = "https://github.com/python-hyper/brotlicffi";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.unix;
   };
 })

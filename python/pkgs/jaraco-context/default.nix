@@ -36,5 +36,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/jaraco/jaraco.context";
     changelog = "https://github.com/jaraco/jaraco.context/blob/${finalAttrs.src.tag}/CHANGES.rst";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

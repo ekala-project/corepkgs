@@ -48,5 +48,6 @@ buildPythonPackage (finalAttrs: {
       does it require C extensions to be compiled. It should work on
       any platform that supports the standard Python pty module.
     '';
+    platforms = lib.platforms.all;
   };
 })

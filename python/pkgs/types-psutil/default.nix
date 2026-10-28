@@ -24,5 +24,6 @@ buildPythonPackage (finalAttrs: {
     description = "Typing stubs for psutil";
     homepage = "https://github.com/python/typeshed";
     license = lib.licenses.asl20;
+    platforms = lib.platforms.all;
   };
 })

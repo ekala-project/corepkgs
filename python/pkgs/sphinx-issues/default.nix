@@ -27,6 +27,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/sloria/sphinx-issues";
     description = "Sphinx extension for linking to your project's issue tracker";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

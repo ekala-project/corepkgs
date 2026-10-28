@@ -39,6 +39,6 @@ stdenv.mkDerivation (finalAttrs: {
       ruby
     ];
     mainProgram = "gem";
-
+    platforms = lib.platforms.all;
   };
 })

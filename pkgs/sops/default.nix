@@ -71,5 +71,6 @@ buildGoModule (finalAttrs: {
     mainProgram = "sops";
     license = lib.licenses.mpl20;
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "mozilla" finalAttrs.version;
+    platforms = lib.platforms.all;
   };
 })

@@ -33,5 +33,6 @@ buildPythonPackage (finalAttrs: {
     description = "Zope.Interface";
     homepage = "https://github.com/zopefoundation/zope.interface";
     license = lib.licenses.zpl21;
+    platforms = lib.platforms.unix;
   };
 })

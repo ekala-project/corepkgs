@@ -78,7 +78,7 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/coveooss/json-schema-for-humans";
     changelog = "https://github.com/coveooss/json-schema-for-humans/releases/tag/${finalAttrs.src.tag}";
     license = lib.licenses.asl20;
-
+    platforms = lib.platforms.all;
     mainProgram = "generate-schema-doc";
   };
 })

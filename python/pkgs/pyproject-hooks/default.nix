@@ -59,6 +59,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pypa/pyproject-hooks";
     changelog = "https://github.com/pypa/pyproject-hooks/blob/v${finalAttrs.version}/docs/changelog.rst";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

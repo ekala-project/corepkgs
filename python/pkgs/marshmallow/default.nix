@@ -30,6 +30,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/marshmallow-code/marshmallow";
     changelog = "https://github.com/marshmallow-code/marshmallow/blob/${finalAttrs.version}/CHANGELOG.rst";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

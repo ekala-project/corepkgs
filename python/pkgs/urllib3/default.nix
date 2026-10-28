@@ -70,5 +70,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/urllib3/urllib3";
     changelog = "https://github.com/urllib3/urllib3/blob/${finalAttrs.version}/CHANGES.rst";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

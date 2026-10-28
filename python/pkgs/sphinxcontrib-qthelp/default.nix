@@ -33,5 +33,6 @@ buildPythonPackage (finalAttrs: {
     description = "Sphinx extension which outputs QtHelp document";
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-qthelp";
     license = lib.licenses.bsd2;
+    platforms = lib.platforms.all;
   };
 })

@@ -57,6 +57,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/mtkennerly/dunamai";
     changelog = "https://github.com/mtkennerly/dunamai/blob/${finalAttrs.src.tag}/CHANGELOG.md";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

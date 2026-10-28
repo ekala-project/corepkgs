@@ -5,7 +5,7 @@
   stdenv,
 }:
 
-buildPerlPackage rec {
+buildPerlPackage {
   pname = "IO-Tty";
   version = "1.20";
   src = fetchurl {

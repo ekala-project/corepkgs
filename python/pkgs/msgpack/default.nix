@@ -43,6 +43,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/msgpack/msgpack-python";
     changelog = "https://github.com/msgpack/msgpack-python/blob/${finalAttrs.src.tag}/ChangeLog.rst";
     license = lib.licenses.asl20;
-
+    platforms = lib.platforms.unix;
   };
 })

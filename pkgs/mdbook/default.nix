@@ -40,5 +40,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     homepage = "https://github.com/rust-lang/mdBook";
     changelog = "https://github.com/rust-lang/mdBook/blob/v${finalAttrs.version}/CHANGELOG.md";
     license = [ lib.licenses.mpl20 ];
+    platforms = lib.platforms.all;
   };
 })

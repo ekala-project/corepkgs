@@ -63,6 +63,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pypa/setuptools_scm/";
     description = "Handles managing your python package versions in scm metadata";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

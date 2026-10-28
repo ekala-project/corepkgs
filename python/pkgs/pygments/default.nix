@@ -48,7 +48,7 @@ let
       description = "Generic syntax highlighter";
       mainProgram = "pygmentize";
       license = lib.licenses.bsd2;
-
+      platforms = lib.platforms.all;
     };
   });
 in

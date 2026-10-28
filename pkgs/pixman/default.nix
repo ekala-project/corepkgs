@@ -20,7 +20,6 @@ stdenv.mkDerivation (finalAttrs: {
     "out"
     "include"
   ];
-  outputInclude = "include";
 
   src = fetchFromGitLab {
     domain = "gitlab.freedesktop.org";

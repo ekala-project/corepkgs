@@ -47,5 +47,6 @@ buildPythonPackage (finalAttrs: {
     description = "Pathlib-compatible object wrapper for zip files";
     homepage = "https://github.com/jaraco/zipp";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

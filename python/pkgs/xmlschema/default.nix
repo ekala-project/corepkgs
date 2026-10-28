@@ -49,5 +49,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/sissaschool/xmlschema";
     changelog = "https://github.com/sissaschool/xmlschema/blob/${finalAttrs.src.tag}/CHANGELOG.rst";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

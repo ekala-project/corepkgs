@@ -33,5 +33,6 @@ buildPythonPackage (finalAttrs: {
       mit
       asl20
     ];
+    platforms = lib.platforms.all;
   };
 })

@@ -27,5 +27,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/ActiveState/appdirs";
     changelog = "https://github.com/ActiveState/appdirs/releases/tag/${finalAttrs.version}";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

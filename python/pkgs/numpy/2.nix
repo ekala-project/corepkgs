@@ -185,6 +185,6 @@ buildPythonPackage (finalAttrs: {
     description = "Scientific tools for Python";
     homepage = "https://numpy.org/";
     license = lib.licenses.bsd3;
-
+    platforms = lib.platforms.unix;
   };
 })

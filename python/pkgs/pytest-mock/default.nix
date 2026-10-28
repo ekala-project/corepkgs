@@ -48,6 +48,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pytest-dev/pytest-mock";
     changelog = "https://github.com/pytest-dev/pytest-mock/blob/${finalAttrs.src.tag}/CHANGELOG.rst";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

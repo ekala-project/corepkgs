@@ -122,5 +122,6 @@ buildPythonPackage (finalAttrs: {
     changelog = "https://pip.pypa.io/en/stable/news/#v${
       lib.replaceStrings [ "." ] [ "-" ] finalAttrs.version
     }";
+    platforms = lib.platforms.all;
   };
 })

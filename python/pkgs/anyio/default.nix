@@ -94,5 +94,6 @@ buildPythonPackage (finalAttrs: {
     description = "High level compatibility layer for multiple asynchronous event loop implementations on Python";
     homepage = "https://github.com/agronholm/anyio";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

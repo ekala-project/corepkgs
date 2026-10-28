@@ -42,6 +42,7 @@ stdenv.mkDerivation {
 
   meta = (lapackProvider'.meta or { }) // {
     description = "${lib.getName lapackProvider'} with just the LAPACK C and FORTRAN ABI";
+    platforms = lib.platforms.all;
   };
 
   passthru = {

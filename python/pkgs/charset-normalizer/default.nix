@@ -50,6 +50,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://charset-normalizer.readthedocs.io/";
     changelog = "https://github.com/jawah/charset_normalizer/blob/${finalAttrs.src.tag}/CHANGELOG.md";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.unix;
   };
 })

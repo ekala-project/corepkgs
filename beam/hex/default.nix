@@ -50,6 +50,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Package manager for the Erlang VM https://hex.pm";
     license = lib.licenses.mit;
     homepage = "https://github.com/hexpm/hex";
+    platforms = lib.platforms.unix;
   };
 
   passthru = {

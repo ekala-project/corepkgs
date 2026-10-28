@@ -41,5 +41,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/hukkin/tomli-w";
     changelog = "https://github.com/hukkin/tomli-w/blob/${finalAttrs.src.rev}/CHANGELOG.md";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

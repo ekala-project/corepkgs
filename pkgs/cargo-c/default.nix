@@ -53,5 +53,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     homepage = "https://github.com/lu-zero/cargo-c";
     changelog = "https://github.com/lu-zero/cargo-c/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.mit;
+    platforms = lib.platforms.unix;
   };
 })

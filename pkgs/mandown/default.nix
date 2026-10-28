@@ -22,5 +22,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
       mit
     ];
     mainProgram = "mandown";
+    platforms = lib.platforms.all;
   };
 })

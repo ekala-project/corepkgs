@@ -61,5 +61,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/sphinx-contrib/jquery";
     changelog = "https://github.com/sphinx-contrib/jquery/blob/v${finalAttrs.version}/CHANGES.rst";
     license = lib.licenses.bsd0;
+    platforms = lib.platforms.all;
   };
 })

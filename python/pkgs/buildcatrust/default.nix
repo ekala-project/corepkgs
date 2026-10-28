@@ -37,6 +37,6 @@ buildPythonPackage (finalAttrs: {
     mainProgram = "buildcatrust";
     homepage = "https://github.com/lukegb/buildcatrust";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

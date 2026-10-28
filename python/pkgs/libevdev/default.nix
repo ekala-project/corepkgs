@@ -31,5 +31,6 @@ buildPythonPackage (finalAttrs: {
     description = "Python wrapper around the libevdev C library";
     homepage = "https://gitlab.freedesktop.org/libevdev/python-libevdev";
     license = lib.licenses.mit;
+    platforms = lib.platforms.unix;
   };
 })

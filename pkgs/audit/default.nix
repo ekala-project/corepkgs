@@ -112,8 +112,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   pythonImportsCheck = [ "audit" ];
 
-  doCheck = false;
-
   postInstall = ''
     installShellCompletion --bash init.d/audit.bash_completion
   '';

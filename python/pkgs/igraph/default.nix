@@ -63,5 +63,6 @@ buildPythonPackage (finalAttrs: {
     mainProgram = "igraph";
     homepage = "https://igraph.org/python/";
     license = lib.licenses.gpl2Plus;
+    platforms = lib.platforms.unix;
   };
 })

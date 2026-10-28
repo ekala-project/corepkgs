@@ -28,5 +28,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/erocarrera/pefile";
     changelog = "https://github.com/erocarrera/pefile/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

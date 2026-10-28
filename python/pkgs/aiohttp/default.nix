@@ -174,6 +174,6 @@ buildPythonPackage (finalAttrs: {
     description = "Asynchronous HTTP Client/Server for Python and asyncio";
     license = lib.licenses.asl20;
     homepage = "https://github.com/aio-libs/aiohttp";
-
+    platforms = lib.platforms.unix;
   };
 })

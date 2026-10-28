@@ -39,6 +39,6 @@ buildPythonPackage (finalAttrs: {
     description = "Experimental type system extensions for programs checked with the mypy typechecker";
     homepage = "https://www.mypy-lang.org";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

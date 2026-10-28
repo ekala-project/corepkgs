@@ -34,5 +34,6 @@ buildPythonPackage (finalAttrs: {
     changelog = "https://github.com/python/typing_extensions/blob/${finalAttrs.version}/CHANGELOG.md";
     homepage = "https://github.com/python/typing";
     license = lib.licenses.psfl;
+    platforms = lib.platforms.all;
   };
 })

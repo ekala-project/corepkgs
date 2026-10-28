@@ -39,7 +39,7 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pypa/trove-classifiers";
     changelog = "https://github.com/pypa/trove-classifiers/releases/tag/${finalAttrs.version}";
     license = lib.licenses.asl20;
-
+    platforms = lib.platforms.all;
     mainProgram = "trove-classifiers";
   };
 })

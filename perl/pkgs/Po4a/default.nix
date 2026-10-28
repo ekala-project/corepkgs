@@ -24,9 +24,12 @@
   writeShellScriptBin,
 }:
 
-buildPerlPackage rec {
-  pname = "po4a";
+let
   version = "0.74";
+in
+buildPerlPackage {
+  pname = "po4a";
+  inherit version;
 
   src = fetchurl {
     url = "https://github.com/mquinson/po4a/releases/download/v${version}/po4a-${version}.tar.gz";
@@ -48,7 +51,7 @@ buildPerlPackage rec {
     # subtext.tex and article.cls to appropriate files, but doesn't find article-wrong.cls.
     let
       kpsewhich-stub = writeShellScriptBin "kpsewhich" ''
-        srcdir="$NIX_BUILD_TOP/${lib.strings.removeSuffix ".tar.gz" src.name}"
+        srcdir="$NIX_BUILD_TOP/po4a-${version}"
         [[ $1 = "article.cls" ]] && echo /dev/null
         [[ $1 = "subtext.tex" ]] && echo "$srcdir/t/fmt/tex/subtext.tex"
       '';

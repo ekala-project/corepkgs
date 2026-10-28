@@ -14,9 +14,12 @@
   YAMLTiny,
 }:
 
-buildPerlPackage rec {
-  pname = "Test2-Harness";
+let
   version = "1.000161";
+in
+buildPerlPackage {
+  pname = "Test2-Harness";
+  inherit version;
   src = fetchurl {
     url = "mirror://cpan/authors/id/E/EX/EXODIST/Test2-Harness-${version}.tar.gz";
     hash = "sha256-SXO3mx7tUwVxXuc9itySNtp5XH1AkNg7FQ6hMc1ltBQ=";

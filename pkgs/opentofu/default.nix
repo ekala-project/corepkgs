@@ -41,5 +41,6 @@
     homepage = "https://opentofu.org/";
     license = lib.licenses.mpl20;
     mainProgram = "tofu";
+    platforms = lib.platforms.all;
   };
 })

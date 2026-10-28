@@ -58,5 +58,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/PyO3/setuptools-rust";
     changelog = "https://github.com/PyO3/setuptools-rust/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

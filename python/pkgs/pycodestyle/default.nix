@@ -51,6 +51,6 @@ buildPythonPackage (finalAttrs: {
     mainProgram = "pycodestyle";
     homepage = "https://pycodestyle.pycqa.org/";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

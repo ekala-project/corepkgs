@@ -98,5 +98,6 @@ buildPythonPackage (finalAttrs: {
       bsd3
       psfl
     ];
+    platforms = lib.platforms.unix;
   };
 })

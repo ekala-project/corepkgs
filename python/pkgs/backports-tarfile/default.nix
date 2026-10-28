@@ -32,5 +32,6 @@ buildPythonPackage (finalAttrs: {
     description = "Backport of CPython tarfile module";
     homepage = "https://github.com/jaraco/backports.tarfile";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

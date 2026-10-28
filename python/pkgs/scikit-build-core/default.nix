@@ -88,6 +88,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/scikit-build/scikit-build-core";
     changelog = "https://github.com/scikit-build/scikit-build-core/blob/${finalAttrs.src.tag}/docs/about/changelog.md";
     license = with lib.licenses; [ asl20 ];
-
+    platforms = lib.platforms.all;
   };
 })

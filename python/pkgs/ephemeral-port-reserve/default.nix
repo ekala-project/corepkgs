@@ -39,5 +39,6 @@ buildPythonPackage (finalAttrs: {
     mainProgram = "ephemeral-port-reserve";
     homepage = "https://github.com/Yelp/ephemeral-port-reserve/";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

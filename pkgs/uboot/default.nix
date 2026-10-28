@@ -349,30 +349,34 @@ rec {
       '';
     };
 
-  ubootNanoPCT4 = buildUBoot rec {
-    rkbin = fetchFromGitHub {
-      owner = "armbian";
-      repo = "rkbin";
-      rev = "3bd0321cae5ef881a6005fb470009ad5a5d1462d";
-      sha256 = "09r4dzxsbs3pff4sh70qnyp30s3rc7pkc46v1m3152s7jqjasp31";
-    };
+  ubootNanoPCT4 =
+    let
+      nanopct4-rkbin = fetchFromGitHub {
+        owner = "armbian";
+        repo = "rkbin";
+        rev = "3bd0321cae5ef881a6005fb470009ad5a5d1462d";
+        sha256 = "09r4dzxsbs3pff4sh70qnyp30s3rc7pkc46v1m3152s7jqjasp31";
+      };
+    in
+    buildUBoot {
+      rkbin = nanopct4-rkbin;
 
-    defconfig = "nanopc-t4-rk3399_defconfig";
+      defconfig = "nanopc-t4-rk3399_defconfig";
 
-    extraMeta = {
-      platforms = [ "aarch64-linux" ];
-      license = lib.licenses.unfreeRedistributableFirmware;
+      extraMeta = {
+        platforms = [ "aarch64-linux" ];
+        license = lib.licenses.unfreeRedistributableFirmware;
+      };
+      BL31 = "${arm-trusted-firmware.rk3399}/bl31.elf";
+      filesToInstall = [
+        "u-boot.itb"
+        "idbloader.img"
+      ];
+      postBuild = ''
+        ./tools/mkimage -n rk3399 -T rksd -d ${nanopct4-rkbin}/rk33/rk3399_ddr_800MHz_v1.24.bin idbloader.img
+        cat ${nanopct4-rkbin}/rk33/rk3399_miniloader_v1.19.bin >> idbloader.img
+      '';
     };
-    BL31 = "${arm-trusted-firmware.rk3399}/bl31.elf";
-    filesToInstall = [
-      "u-boot.itb"
-      "idbloader.img"
-    ];
-    postBuild = ''
-      ./tools/mkimage -n rk3399 -T rksd -d ${rkbin}/rk33/rk3399_ddr_800MHz_v1.24.bin idbloader.img
-      cat ${rkbin}/rk33/rk3399_miniloader_v1.19.bin >> idbloader.img
-    '';
-  };
 
   ubootNanoPCT6 = buildUBoot {
     defconfig = "nanopc-t6-rk3588_defconfig";

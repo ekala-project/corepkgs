@@ -40,5 +40,6 @@ buildPythonPackage (finalAttrs: {
     description = "Expansion of the itertools module";
     downloadPage = "https://github.com/more-itertools/more-itertools";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

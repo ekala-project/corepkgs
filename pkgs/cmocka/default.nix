@@ -14,7 +14,6 @@ stdenv.mkDerivation (finalAttrs: {
     "out"
     "include"
   ];
-  outputInclude = "include";
 
   src = fetchurl {
     url = "https://cmocka.org/files/${lib.versions.majorMinor finalAttrs.version}/cmocka-${finalAttrs.version}.tar.xz";

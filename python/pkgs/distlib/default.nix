@@ -37,5 +37,6 @@ buildPythonPackage (finalAttrs: {
     description = "Low-level components of distutils2/packaging";
     homepage = "https://distlib.readthedocs.io";
     license = lib.licenses.psfl;
+    platforms = lib.platforms.all;
   };
 })

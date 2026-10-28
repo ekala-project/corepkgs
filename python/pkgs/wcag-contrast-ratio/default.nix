@@ -32,5 +32,6 @@ buildPythonPackage (finalAttrs: {
     description = "Library for computing contrast ratios, as required by WCAG 2.0";
     homepage = "https://github.com/gsnedders/wcag-contrast-ratio";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

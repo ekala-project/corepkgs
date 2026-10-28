@@ -83,5 +83,6 @@ buildGoModule (finalAttrs: {
     changelog = "https://github.com/containers/buildah/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.asl20;
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "buildah_project" finalAttrs.version;
+    platforms = lib.platforms.linux;
   };
 })

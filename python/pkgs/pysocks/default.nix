@@ -26,6 +26,6 @@ buildPythonPackage (finalAttrs: {
   meta = {
     description = "SOCKS module for Python";
     license = lib.licenses.bsd3;
-
+    platforms = lib.platforms.all;
   };
 })

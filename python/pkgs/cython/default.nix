@@ -120,7 +120,7 @@ buildPythonPackage (finalAttrs: {
     changelog = "https://github.com/cython/cython/blob/${finalAttrs.version}/CHANGES.rst";
     license = lib.licenses.asl20;
     mainProgram = "cython";
-
+    platforms = lib.platforms.unix;
   };
 })
 # TODO: investigate recursive loop when doCheck is true
