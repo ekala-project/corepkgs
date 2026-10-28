@@ -221,12 +221,26 @@
     in
     nixosTesting.simpleTest calledTest;
 
+  # === Structured namespaces ===
+
+  pkg-config = (callPackage ./pkg-config { }) // {
+    testLink = callPackage ./pkg-config-test-link { };
+    hasModules = callPackage ./hasPkgConfigModules/tester.nix { };
+  };
+
+  cmake = {
+    testLink = callPackage ./cmake-test-link { };
+    hasModules = callPackage ./hasCmakeConfigModules/tester.nix { };
+  };
+
+  # === Backward-compatible aliases ===
+
   hasPkgConfigModule =
     { moduleName, ... }@args:
     lib.warn
-      "testers.hasPkgConfigModule has been deprecated in favor of testers.hasPkgConfigModules. It accepts a list of strings via the moduleNames argument instead of a single moduleName."
+      "testers.hasPkgConfigModule has been deprecated in favor of testers.pkg-config.hasModules. It accepts a list of strings via the moduleNames argument instead of a single moduleName."
       (
-        testers.hasPkgConfigModules (
+        testers.pkg-config.hasModules (
           removeAttrs args [ "moduleName" ]
           // {
             moduleNames = [ moduleName ];
@@ -238,8 +252,6 @@
   hasCmakeConfigModules = callPackage ./hasCmakeConfigModules/tester.nix { };
 
   testMetaPkgConfig = callPackage ./testMetaPkgConfig/tester.nix { };
-
-  pkg-config = callPackage ./pkg-config { };
 
   shellcheck = callPackage ./shellcheck/tester.nix { };
 
