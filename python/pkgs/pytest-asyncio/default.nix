@@ -50,6 +50,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pytest-dev/pytest-asyncio";
     changelog = "https://github.com/pytest-dev/pytest-asyncio/blob/${finalAttrs.src.tag}/docs/reference/changelog.rst";
     license = lib.licenses.asl20;
-
+    platforms = lib.platforms.all;
   };
 })

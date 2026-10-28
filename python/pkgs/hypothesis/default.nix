@@ -171,6 +171,6 @@ buildPythonPackage (finalAttrs: {
       lib.replaceStrings [ "." ] [ "-" ] finalAttrs.version
     }";
     license = lib.licenses.mpl20;
-
+    platforms = lib.platforms.all;
   };
 })

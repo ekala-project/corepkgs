@@ -16,7 +16,6 @@ stdenv.mkDerivation (finalAttrs: {
     "out"
     "include"
   ];
-  outputInclude = "include";
 
   src = fetchFromGitHub {
     owner = "ToruNiina";

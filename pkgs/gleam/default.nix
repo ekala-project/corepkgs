@@ -42,5 +42,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     homepage = "https://gleam.run/";
     license = lib.licenses.asl20;
     mainProgram = "gleam";
+    platforms = lib.platforms.all;
   };
 })

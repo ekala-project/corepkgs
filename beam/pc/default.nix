@@ -18,5 +18,6 @@ buildRebar3 (finalAttrs: {
     description = "Rebar3 port compiler for native code";
     license = lib.licenses.mit;
     homepage = "https://github.com/blt/port_compiler";
+    platforms = lib.platforms.unix;
   };
 })

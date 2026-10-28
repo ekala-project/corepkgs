@@ -54,5 +54,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas";
     description = "Collection of GSettings schemas for settings shared by various components of a desktop";
     license = lib.licenses.lgpl21Plus;
+    platforms = lib.platforms.unix;
   };
 })

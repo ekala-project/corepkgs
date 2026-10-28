@@ -51,5 +51,6 @@ buildPythonPackage (finalAttrs: {
     ];
 
     mainProgram = "docutils";
+    platforms = lib.platforms.all;
   };
 })

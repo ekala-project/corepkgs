@@ -57,5 +57,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://gitlab.com/takluyver/jeepney";
     description = "Pure Python DBus interface";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

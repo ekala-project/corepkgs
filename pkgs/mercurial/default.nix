@@ -275,7 +275,6 @@ self.overridePythonAttrs (origAttrs: {
         dontPatch = true;
         dontConfigure = true;
         dontBuild = true;
-        doCheck = false;
 
         installPhase = ''
 

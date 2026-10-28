@@ -59,6 +59,6 @@ buildPythonPackage (finalAttrs: {
       composable way, with as little code as necessary.
     '';
     license = lib.licenses.bsd3;
-
+    platforms = lib.platforms.all;
   };
 })

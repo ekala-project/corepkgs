@@ -34,6 +34,6 @@ buildPythonPackage (finalAttrs: {
     mainProgram = "markdown_py";
     homepage = "https://github.com/Python-Markdown/markdown";
     license = lib.licenses.bsd3;
-
+    platforms = lib.platforms.all;
   };
 })

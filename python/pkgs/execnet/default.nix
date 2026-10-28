@@ -63,6 +63,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://execnet.readthedocs.io/";
     changelog = "https://github.com/pytest-dev/execnet/blob/v${finalAttrs.version}/CHANGELOG.rst";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

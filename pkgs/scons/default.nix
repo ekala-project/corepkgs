@@ -42,5 +42,6 @@ python3Packages.buildPythonApplication (finalAttrs: {
     '';
     homepage = "https://scons.org/";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

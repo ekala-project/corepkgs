@@ -45,5 +45,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
       asl20
     ];
     mainProgram = "rust-analyzer";
+    platforms = lib.platforms.all;
   };
 })

@@ -18,5 +18,6 @@ buildRebar3 (finalAttrs: {
     description = "rebar3 proper plugin";
     license = lib.licenses.bsd3;
     homepage = "https://github.com/ferd/rebar3_proper";
+    platforms = lib.platforms.unix;
   };
 })

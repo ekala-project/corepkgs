@@ -32,6 +32,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/testing-cabal/mock";
     changelog = "https://github.com/testing-cabal/mock/blob/${finalAttrs.version}/CHANGELOG.rst";
     license = lib.licenses.bsd2;
-
+    platforms = lib.platforms.all;
   };
 })

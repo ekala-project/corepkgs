@@ -27,6 +27,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pfmoore/editables";
     changelog = "https://github.com/pfmoore/editables/blob/${finalAttrs.version}/CHANGELOG.md";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

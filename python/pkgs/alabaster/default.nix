@@ -26,5 +26,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/sphinx-doc/alabaster";
     description = "Light, configurable Sphinx theme";
     license = lib.licenses.bsd3;
+    platforms = lib.platforms.all;
   };
 })

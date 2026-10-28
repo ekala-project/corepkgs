@@ -35,5 +35,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/prompt-toolkit/ptpython";
     changelog = "https://github.com/prompt-toolkit/ptpython/blob/${finalAttrs.version}/CHANGELOG";
     license = lib.licenses.bsd3;
+    platforms = lib.platforms.all;
   };
 })

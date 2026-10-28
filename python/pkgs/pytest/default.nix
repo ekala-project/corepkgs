@@ -105,5 +105,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://docs.pytest.org";
     changelog = "https://github.com/pytest-dev/pytest/releases/tag/${finalAttrs.version}";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

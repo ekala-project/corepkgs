@@ -161,7 +161,7 @@ buildPythonPackage (finalAttrs: {
       processing and graphics capabilities.
     '';
     license = lib.licenses.mit-cmu;
-
+    platforms = lib.platforms.unix;
   };
 
 })

@@ -57,5 +57,6 @@ buildPythonPackage (finalAttrs: {
       asl20
       gpl2Plus
     ];
+    platforms = lib.platforms.unix;
   };
 })

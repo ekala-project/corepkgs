@@ -24,6 +24,6 @@ buildPythonPackage (finalAttrs: {
     description = "CSS4 selector implementation for Beautiful Soup";
     license = lib.licenses.mit;
     homepage = "https://github.com/facelessuser/soupsieve";
-
+    platforms = lib.platforms.all;
   };
 })

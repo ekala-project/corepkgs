@@ -91,5 +91,6 @@ buildGoModule (finalAttrs: {
     homepage = "https://github.com/containers/skopeo";
     license = lib.licenses.asl20;
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "skopeo_project" finalAttrs.version;
+    platforms = lib.platforms.unix;
   };
 })

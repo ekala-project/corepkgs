@@ -182,5 +182,6 @@ buildGoModule (finalAttrs: {
     license = lib.licenses.asl20;
     mainProgram = "podman";
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "podman_project" finalAttrs.version;
+    platforms = lib.platforms.unix;
   };
 })

@@ -109,5 +109,6 @@ buildGoModule (finalAttrs: {
     changelog = "https://github.com/git-lfs/git-lfs/raw/v${finalAttrs.version}/CHANGELOG.md";
     license = lib.licenses.mit;
     mainProgram = "git-lfs";
+    platforms = lib.platforms.all;
   };
 })

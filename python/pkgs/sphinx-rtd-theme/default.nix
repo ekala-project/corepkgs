@@ -58,5 +58,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/readthedocs/sphinx_rtd_theme";
     changelog = "https://github.com/readthedocs/sphinx_rtd_theme/blob/${finalAttrs.version}/docs/changelog.rst";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

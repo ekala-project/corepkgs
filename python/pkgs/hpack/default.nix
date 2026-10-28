@@ -35,5 +35,6 @@ buildPythonPackage (finalAttrs: {
     description = "Pure-Python HPACK header compression";
     homepage = "https://github.com/python-hyper/hpack";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

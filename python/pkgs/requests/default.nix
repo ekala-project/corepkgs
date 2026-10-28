@@ -91,6 +91,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "http://docs.python-requests.org/";
     changelog = "https://github.com/psf/requests/blob/v${finalAttrs.version}/HISTORY.md";
     license = lib.licenses.asl20;
-
+    platforms = lib.platforms.all;
   };
 })

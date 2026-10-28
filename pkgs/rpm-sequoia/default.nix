@@ -75,5 +75,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     description = "OpenPGP backend for rpm using Sequoia PGP";
     homepage = "https://sequoia-pgp.org/";
     license = lib.licenses.gpl2Plus;
+    platforms = lib.platforms.unix;
   };
 })

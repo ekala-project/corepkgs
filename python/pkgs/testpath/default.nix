@@ -40,5 +40,6 @@ buildPythonPackage (finalAttrs: {
     description = "Test utilities for code working with files and commands";
     license = lib.licenses.mit;
     homepage = "https://github.com/jupyter/testpath";
+    platforms = lib.platforms.all;
   };
 })

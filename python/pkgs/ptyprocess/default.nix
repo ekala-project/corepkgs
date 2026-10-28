@@ -45,6 +45,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pexpect/ptyprocess";
     changelog = "https://github.com/pexpect/ptyprocess/releases/tag/${finalAttrs.version}";
     license = lib.licenses.isc;
-
+    platforms = lib.platforms.all;
   };
 })

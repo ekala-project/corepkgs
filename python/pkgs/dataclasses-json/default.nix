@@ -62,6 +62,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/lidatong/dataclasses-json";
     changelog = "https://github.com/lidatong/dataclasses-json/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

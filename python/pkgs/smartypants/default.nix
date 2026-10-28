@@ -50,7 +50,7 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/leohemsted/smartypants.py";
     changelog = "https://github.com/leohemsted/smartypants.py/blob/v${finalAttrs.version}/CHANGES.rst";
     license = lib.licenses.bsd3;
-
+    platforms = lib.platforms.all;
     mainProgram = "smartypants";
   };
 })

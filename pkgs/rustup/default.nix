@@ -161,5 +161,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
       mit
     ];
     mainProgram = "rustup";
+    platforms = lib.platforms.all;
   };
 })

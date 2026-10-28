@@ -71,5 +71,6 @@ buildPythonPackage (finalAttrs: {
     mainProgram = "flit";
     homepage = "https://github.com/pypa/flit";
     license = lib.licenses.bsd3;
+    platforms = lib.platforms.all;
   };
 })

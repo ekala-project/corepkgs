@@ -72,6 +72,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/giampaolo/psutil";
     changelog = "https://github.com/giampaolo/psutil/blob/${finalAttrs.src.tag}/HISTORY.rst";
     license = lib.licenses.bsd3;
-
+    platforms = lib.platforms.unix;
   };
 })

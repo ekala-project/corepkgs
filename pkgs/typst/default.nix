@@ -64,5 +64,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     homepage = "https://github.com/typst/typst";
     license = lib.licenses.asl20;
     mainProgram = "typst";
+    platforms = lib.platforms.all;
   };
 })

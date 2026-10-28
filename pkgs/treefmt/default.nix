@@ -73,5 +73,6 @@ go.v1_26.buildModule (finalAttrs: {
     homepage = "https://github.com/numtide/treefmt";
     license = lib.licenses.mit;
     mainProgram = "treefmt";
+    platforms = lib.platforms.all;
   };
 })

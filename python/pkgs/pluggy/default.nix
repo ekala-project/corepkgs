@@ -35,6 +35,6 @@ buildPythonPackage (finalAttrs: {
     description = "Plugin and hook calling mechanisms for Python";
     homepage = "https://github.com/pytest-dev/pluggy";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

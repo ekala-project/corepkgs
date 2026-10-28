@@ -4,10 +4,10 @@
   lib,
 }:
 
-buildPerlPackage rec {
+buildPerlPackage {
   pname = "Image-Magick";
   inherit (imagemagick) version src;
-  sourceRoot = "${src.name}/PerlMagick";
+  sourceRoot = "${imagemagick.src.name}/PerlMagick";
   buildInputs = [ imagemagick ];
   preConfigure = ''
     pushd ..

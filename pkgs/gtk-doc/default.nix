@@ -91,5 +91,6 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
     description = "Tools to extract documentation embedded in GTK and GNOME source code";
     homepage = "https://gitlab.gnome.org/GNOME/gtk-doc";
     license = lib.licenses.gpl2Plus;
+    platforms = lib.platforms.unix;
   };
 })

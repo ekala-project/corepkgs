@@ -33,5 +33,6 @@ buildPythonPackage (finalAttrs: {
     description = "Sphinxcontrib-applehelp is a sphinx extension which outputs Apple help books";
     homepage = "https://github.com/sphinx-doc/sphinxcontrib-applehelp";
     license = lib.licenses.bsd2;
+    platforms = lib.platforms.all;
   };
 })

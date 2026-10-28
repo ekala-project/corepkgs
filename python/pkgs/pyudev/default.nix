@@ -34,5 +34,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://pyudev.readthedocs.org/";
     changelog = "https://github.com/pyudev/pyudev/blob/v${finalAttrs.version}/CHANGES.rst";
     license = lib.licenses.lgpl21Plus;
+    platforms = lib.platforms.unix;
   };
 })

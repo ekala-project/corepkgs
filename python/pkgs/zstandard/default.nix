@@ -53,5 +53,6 @@ buildPythonPackage (finalAttrs: {
     description = "Zstandard bindings for Python";
     homepage = "https://github.com/indygreg/python-zstandard";
     license = lib.licenses.bsdOriginal;
+    platforms = lib.platforms.unix;
   };
 })

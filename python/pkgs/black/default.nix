@@ -139,6 +139,6 @@ buildPythonPackage (finalAttrs: {
     changelog = "https://github.com/psf/black/blob/${finalAttrs.version}/CHANGES.md";
     license = lib.licenses.mit;
     mainProgram = "black";
-
+    platforms = lib.platforms.all;
   };
 })

@@ -45,6 +45,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/agronholm/exceptiongroup";
     changelog = "https://github.com/agronholm/exceptiongroup/blob/${finalAttrs.version}/CHANGES.rst";
     license = with lib.licenses; [ mit ];
-
+    platforms = lib.platforms.all;
   };
 })

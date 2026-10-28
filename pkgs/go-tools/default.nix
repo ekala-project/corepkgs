@@ -34,5 +34,6 @@ buildGoModule (finalAttrs: {
     description = "Collection of tools and libraries for working with Go code, including linters and static analysis";
     homepage = "https://staticcheck.io";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

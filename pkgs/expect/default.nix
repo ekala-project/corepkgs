@@ -10,9 +10,12 @@
   replaceVars,
 }:
 
-tcl.mkTclDerivation rec {
-  pname = "expect";
+let
   version = "5.45.4";
+in
+tcl.mkTclDerivation {
+  pname = "expect";
+  inherit version;
 
   src = fetchurl {
     url = "mirror://sourceforge/expect/Expect/${version}/expect${version}.tar.gz";

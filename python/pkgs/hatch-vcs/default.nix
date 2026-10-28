@@ -48,6 +48,6 @@ buildPythonPackage (finalAttrs: {
     description = "Plugin for Hatch that uses your preferred version control system (like Git) to determine project versions";
     homepage = "https://github.com/ofek/hatch-vcs";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

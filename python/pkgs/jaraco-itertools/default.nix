@@ -41,5 +41,6 @@ buildPythonPackage (finalAttrs: {
     description = "Tools for working with iterables";
     homepage = "https://github.com/jaraco/jaraco.itertools";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

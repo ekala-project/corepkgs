@@ -47,6 +47,6 @@ buildPythonPackage (finalAttrs: {
     mainProgram = "chardetect";
     homepage = "https://github.com/chardet/chardet";
     license = lib.licenses.lgpl21Plus;
-
+    platforms = lib.platforms.all;
   };
 })

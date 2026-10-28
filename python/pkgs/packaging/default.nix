@@ -54,7 +54,7 @@ let
         bsd2
         asl20
       ];
-
+      platforms = lib.platforms.all;
     };
   });
 in

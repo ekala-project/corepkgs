@@ -62,6 +62,6 @@ buildPythonPackage (finalAttrs: {
     mainProgram = "hatch-fancy-pypi-readme";
     homepage = "https://github.com/hynek/hatch-fancy-pypi-readme";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

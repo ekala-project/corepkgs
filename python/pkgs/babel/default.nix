@@ -57,7 +57,7 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://babel.pocoo.org/";
     changelog = "https://github.com/python-babel/babel/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.bsd3;
-
+    platforms = lib.platforms.all;
     mainProgram = "pybabel";
   };
 })

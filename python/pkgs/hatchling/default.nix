@@ -67,6 +67,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://hatch.pypa.io/latest/";
     changelog = "https://github.com/pypa/hatch/releases/tag/hatchling-v${finalAttrs.version}";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

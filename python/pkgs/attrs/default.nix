@@ -50,6 +50,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/python-attrs/attrs";
     changelog = "https://github.com/python-attrs/attrs/releases/tag/${finalAttrs.version}";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

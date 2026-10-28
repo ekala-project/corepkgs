@@ -17,5 +17,6 @@ buildRebar3 (finalAttrs: {
     description = "nix integration for rebar3";
     license = lib.licenses.bsd3;
     homepage = "https://github.com/erlang-nix/rebar3_nix";
+    platforms = lib.platforms.unix;
   };
 })

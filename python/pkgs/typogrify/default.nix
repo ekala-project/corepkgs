@@ -43,5 +43,6 @@ buildPythonPackage (finalAttrs: {
     description = "Filters to enhance web typography, including support for Django & Jinja templates";
     homepage = "https://github.com/justinmayer/typogrify";
     license = lib.licenses.bsd3;
+    platforms = lib.platforms.all;
   };
 })

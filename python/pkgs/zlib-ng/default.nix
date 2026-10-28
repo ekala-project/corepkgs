@@ -74,5 +74,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pycompression/python-zlib-ng";
     changelog = "https://github.com/pycompression/python-zlib-ng/blob/${finalAttrs.src.rev}/CHANGELOG.rst";
     license = lib.licenses.psfl;
+    platforms = lib.platforms.unix;
   };
 })

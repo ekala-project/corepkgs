@@ -21,5 +21,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "http://www.dabeaz.com/ply/";
     description = "PLY (Python Lex-Yacc), an implementation of lex and yacc parsing tools for Python";
     license = lib.licenses.bsd3;
+    platforms = lib.platforms.all;
   };
 })

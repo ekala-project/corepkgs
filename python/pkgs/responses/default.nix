@@ -59,6 +59,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/getsentry/responses";
     changelog = "https://github.com/getsentry/responses/blob/${finalAttrs.src.tag}/CHANGES";
     license = lib.licenses.asl20;
-
+    platforms = lib.platforms.all;
   };
 })

@@ -38,5 +38,6 @@ buildPythonPackage (finalAttrs: {
       and as such there is no stable, public API.
     '';
     license = with lib.licenses; [ mit ];
+    platforms = lib.platforms.all;
   };
 })

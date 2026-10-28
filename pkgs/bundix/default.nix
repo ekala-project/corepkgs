@@ -8,12 +8,15 @@
   nix-prefetch-git,
 }:
 
-buildRubyGem rec {
+let
+  gemName = "bundix";
+  version = "2.5.2";
+in
+buildRubyGem {
   inherit (bundler) ruby;
 
   name = "${gemName}-${version}";
-  gemName = "bundix";
-  version = "2.5.2";
+  inherit gemName version;
 
   src = fetchFromGitHub {
     owner = "nix-community";
@@ -23,7 +26,7 @@ buildRubyGem rec {
   };
 
   buildInputs = [
-    ruby
+    bundler.ruby
     bundler
   ];
   nativeBuildInputs = [ makeWrapper ];

@@ -187,5 +187,6 @@ buildPythonPackage (finalAttrs: {
     mainProgram = "f2py";
     homepage = "https://numpy.org/";
     license = lib.licenses.bsd3;
+    platforms = lib.platforms.unix;
   };
 })

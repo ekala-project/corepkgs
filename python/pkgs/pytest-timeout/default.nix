@@ -36,6 +36,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pytest-dev/pytest-timeout/";
     changelog = "https://github.com/pytest-dev/pytest-timeout/tree/${finalAttrs.src.tag}#changelog";
     license = lib.licenses.mit;
-
+    platforms = lib.platforms.all;
   };
 })

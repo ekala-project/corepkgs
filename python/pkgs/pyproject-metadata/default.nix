@@ -35,5 +35,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/FFY00/python-pyproject-metadata";
     changelog = "https://github.com/FFY00/python-pyproject-metadata/blob/${finalAttrs.version}/CHANGELOG.rst";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

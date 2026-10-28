@@ -31,5 +31,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://parso.readthedocs.io/en/latest/";
     changelog = "https://github.com/davidhalter/parso/blob/${finalAttrs.src.tag}/CHANGELOG.rst";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

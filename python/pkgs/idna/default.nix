@@ -31,6 +31,6 @@ buildPythonPackage (finalAttrs: {
     changelog = "https://github.com/kjd/idna/releases/tag/${finalAttrs.src.tag}";
     description = "Internationalized Domain Names in Applications (IDNA)";
     license = lib.licenses.bsd3;
-
+    platforms = lib.platforms.all;
   };
 })

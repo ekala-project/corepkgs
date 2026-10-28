@@ -104,5 +104,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pyca/pyopenssl";
     changelog = "https://github.com/pyca/pyopenssl/blob/${finalAttrs.version}/CHANGELOG.rst";
     license = lib.licenses.asl20;
+    platforms = lib.platforms.unix;
   };
 })

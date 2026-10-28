@@ -24,6 +24,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/pypa/flit";
     changelog = "https://github.com/pypa/flit/blob/${finalAttrs.src.rev}/doc/history.rst";
     license = lib.licenses.bsd3;
-
+    platforms = lib.platforms.all;
   };
 })

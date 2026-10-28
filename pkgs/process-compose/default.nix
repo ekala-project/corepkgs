@@ -62,5 +62,6 @@ go.v1_26.buildModule (finalAttrs: {
     license = lib.licenses.asl20;
     mainProgram = "process-compose";
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "process-compose_project" finalAttrs.version;
+    platforms = lib.platforms.all;
   };
 })

@@ -84,5 +84,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "http://www.virtualenv.org";
     changelog = "https://github.com/pypa/virtualenv/blob/${finalAttrs.version}/docs/changelog.rst";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

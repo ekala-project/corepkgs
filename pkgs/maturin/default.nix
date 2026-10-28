@@ -73,5 +73,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
       mit
     ];
     mainProgram = "maturin";
+    platforms = lib.platforms.all;
   };
 })

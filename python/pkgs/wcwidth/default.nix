@@ -39,5 +39,6 @@ buildPythonPackage (finalAttrs: {
     homepage = "https://github.com/jquast/wcwidth";
     changelog = "https://github.com/jquast/wcwidth/releases/tag/${finalAttrs.src.tag}";
     license = lib.licenses.mit;
+    platforms = lib.platforms.all;
   };
 })

@@ -42,5 +42,6 @@ buildGoModule (finalAttrs: {
     homepage = "https://cuelang.org/";
     license = lib.licenses.asl20;
     mainProgram = "cue";
+    platforms = lib.platforms.all;
   };
 })
