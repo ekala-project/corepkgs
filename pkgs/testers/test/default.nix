@@ -56,6 +56,10 @@ lib.recurseIntoAttrs {
 
   hasCmakeConfigModules = pkgs.callPackage ../hasCmakeConfigModules/tests.nix { };
 
+  pkg-config-testLink = pkgs.callPackage ../pkg-config-test-link/tests.nix { };
+
+  cmake-testLink = pkgs.callPackage ../cmake-test-link/tests.nix { };
+
   shellcheck = pkgs.callPackage ../shellcheck/tests.nix { };
 
   shfmt = pkgs.callPackages ../shfmt/tests.nix { };
