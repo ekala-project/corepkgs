@@ -66,7 +66,10 @@ meta = {
 };
 
 passthru = {
-  # updateScript = gnome.updateScript { ... };  DELETE
+  # updateScript = gnome.updateScript { ... };  DELETE — ekapkgs-update
+  #   handles version discovery natively via src.url parsing.
+  #   Add passthru.ekapkgs-update hints only when auto-detection fails
+  #   (see packaging skill, "Automated Updates" section).
   tests = { ... }; # KEEP
 };
 ```
@@ -234,7 +237,7 @@ survived the cleanup.
 
 - [ ] Dependencies checked with `nix-instantiate -A <dep>`
 - [ ] Copied across and `package.nix` renamed to `default.nix`
-- [ ] `meta.maintainers`, `meta.teams`, and `updateScript` removed
+- [ ] `meta.maintainers`, `meta.teams`, and `updateScript` removed (add `passthru.ekapkgs-update` if auto-detection won't work)
 - [ ] Build-system configure hook added
 - [ ] Missing dependencies recorded as `TODO(corepkgs)` comments
 - [ ] License and any security patches preserved

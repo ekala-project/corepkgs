@@ -16,13 +16,13 @@ Read the guide matching the package's build system or language.
 | Task | Guide |
 |------|-------|
 | Review package for best practices (meta completeness, build-system idioms, dependency placement, PR feedback) | [best-practices](.agents/skills/best-practices/SKILL.md) |
-| Nix expression basics (stdenv.mkDerivation, finalAttrs, meta, deps, fetchers, patches, outputs, passthru, package organization, top-level.nix) | [packaging](.agents/skills/packaging/SKILL.md) |
+| Nix expression basics (stdenv.mkDerivation, finalAttrs, meta, deps, fetchers, patches, outputs, passthru, ekapkgs-update, package organization, top-level.nix) | [packaging](.agents/skills/packaging/SKILL.md) |
 | Python (buildPythonPackage, pyproject, build-system, testPaths, disabledTests, pythonImportsCheck) | [python](.agents/skills/python/SKILL.md) |
 | Rust (buildRustPackage, cargoHash, cargoBuildFlags, checkFlags) | [rust](.agents/skills/rust/SKILL.md) |
 | Go (buildGoModule, vendorHash, ldflags, CGO_ENABLED, tags, subPackages, version pinning) | [go](.agents/skills/go/SKILL.md) |
 | CMake project (cmake.configurePhaseHook, cmakeEntries) | [cmake](.agents/skills/cmake/SKILL.md) |
 | Meson project (meson.configurePhaseHook, mesonEntries, mesonFeatures) | [meson](.agents/skills/meson/SKILL.md) |
-| Multi-version package in pkgs-many/ (mkManyVariants, variants.nix) | [mk-many-variants](.agents/skills/mk-many-variants/SKILL.md) |
+| Multi-version package in pkgs-many/ (mkManyVariants, variants.nix, ekapkgs-update keep/semver-strategy) | [mk-many-variants](.agents/skills/mk-many-variants/SKILL.md) |
 | Porting from nixpkgs (copy, strip maintainers/updateScript, TODO missing deps) | [porting](.agents/skills/porting/SKILL.md) |
 | Bash phases under structured attrs (array iteration, env attrset, substituteAll) | [structured-attrs](.agents/skills/structured-attrs/SKILL.md) |
 | ekaos service module (services.*, cross-platform interface, systemd/launchd/runit) | [services](services/AGENTS.md) |

@@ -324,6 +324,57 @@ Don't use for:
 5. Choose default version with `defaultSelector`
 6. Test building: `nix-build -A <package>` (default) and `nix-build -A <package>.variants.v<version>`
 
+## Automated Updates (ekapkgs-update)
+
+The `ekapkgs-update` tool manages version updates for mkManyVariants packages. Set `passthru.ekapkgs-update` in `generic.nix` to control update behavior.
+
+**Typical configuration** — update each variant to its latest patch release:
+
+```nix
+passthru.ekapkgs-update = {
+  semver-strategy = "patch";
+};
+```
+
+**Retaining every version** — use `keep` to automatically create a new variant entry for each upstream patch/minor release:
+
+```nix
+passthru.ekapkgs-update = {
+  semver-strategy = "patch";
+  keep = "patch";    # one variant per patch release (v1_26_8, v1_26_9, ...)
+};
+```
+
+**Non-standard tags** — when upstream tags don't follow the `v1.2.3` convention:
+
+```nix
+passthru.ekapkgs-update = {
+  semver-strategy = "patch";
+  github-repo = "golang/go";
+  version-regex = "^go(.+)$";
+  keep = "patch";
+};
+```
+
+**Custom version source** — for packages not hosted on GitHub/GitLab/PyPI, provide an `update-script` that prints available versions (one per line):
+
+```nix
+passthru.ekapkgs-update = {
+  update-script = writeScript "list-openssl-releases" ''
+    ${curl}/bin/curl -s https://www.openssl.org/source/ \
+      | ${pcregrep}/bin/pcregrep -o1 'openssl-([0-9]+\.[0-9]+\.[0-9]+)\.tar' \
+      | sort -uV
+  '';
+  semver-strategy = "patch";
+};
+```
+
+**Sub-packages that inherit version** — skip them so the parent variant drives the update:
+
+```nix
+passthru.ekapkgs-update.skip = true;
+```
+
 ## Common Gotchas
 
 - **Don't forget `rec`** in variants.nix if using `${version}` in fields

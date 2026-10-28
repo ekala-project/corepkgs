@@ -272,10 +272,62 @@ passthru = {
 };
 ```
 
+## Automated Updates (ekapkgs-update)
+
+The `ekapkgs-update` tool discovers new upstream versions and updates package files automatically. It reads `passthru.ekapkgs-update` attributes to control its behavior.
+
+**When no configuration is needed:** packages using `fetchFromGitHub`, `fetchFromGitLab`, `fetchFromSourcehut`, or `fetchurl` from PyPI/GNU mirrors/SourceForge are auto-detected. No passthru is required.
+
+**When to add `ekapkgs-update` passthru:**
+
+| Situation | What to set |
+|-----------|-------------|
+| Non-standard tag format (e.g., `go1.25.1`) | `version-regex = "^go(.+)$";` |
+| Source URL not auto-detected (e.g., `fetchurl` from custom host) | `github-repo = "owner/repo";` |
+| Custom release listing (no GitHub/GitLab/PyPI) | `update-script = writeScript "list-versions" ''...''`; |
+| Component that inherits version from parent | `skip = true;` |
+| pkgs-many variant — pin to patch releases | `semver-strategy = "patch";` |
+
+### Basic configuration
+
+```nix
+passthru.ekapkgs-update = {
+  semver-strategy = "patch";  # "latest", "major", "minor", or "patch"
+};
+```
+
+### Explicit upstream repo
+
+For packages where `src.url` can't be auto-detected (e.g., `fetchurl` from a custom host):
+
+```nix
+passthru.ekapkgs-update = {
+  github-repo = "golang/go";
+  version-regex = "^go(.+)$";
+};
+```
+
+### Custom version-listing script
+
+For packages hosted outside GitHub/GitLab/PyPI where no auto-detection works, provide a script that prints available versions to stdout (one per line). ekapkgs-update handles the rest — semver filtering, hash updates, patch recovery, commits:
+
+```nix
+passthru.ekapkgs-update = {
+  update-script = writeScript "list-cmake-releases" ''
+    ${curl}/bin/curl -s https://cmake.org/files/ \
+      | ${pcregrep}/bin/pcregrep -o1 'v([0-9]+\.[0-9]+\.[0-9]+)/' \
+      | sort -u
+  '';
+  semver-strategy = "patch";
+};
+```
+
+The script only lists versions — it must **not** modify any files.
+
 ## Porting from nixpkgs
 
 **Remove:**
-- `updateScript` from passthru
+- `updateScript` from passthru (ekapkgs-update discovers versions natively via `src.url` parsing; add `passthru.ekapkgs-update` hints only when auto-detection fails — see above)
 - Maintainers list (set to `[ ]`)
 - nixpkgs-specific test infrastructure
 
