@@ -42,11 +42,11 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [
     libpthread-stubs
-    libxcb
     xtrans
   ];
 
   propagatedBuildInputs = [
+    libxcb
     xorgproto
   ];
 
