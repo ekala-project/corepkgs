@@ -78,7 +78,11 @@ stdenv.mkDerivation (finalAttrs: {
     freetype
   ];
 
-  propagatedBuildInputs = lib.optional withGraphite2 graphite2 ++ lib.optional withIcu icu;
+  propagatedBuildInputs = [
+    glib
+  ]
+  ++ lib.optional withGraphite2 graphite2
+  ++ lib.optional withIcu icu;
 
   passthru.tests = {
     pkg-config = testers.hasPkgConfigModules {
