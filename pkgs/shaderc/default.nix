@@ -80,9 +80,7 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = lib.platforms.all;
     mainProgram = "glslc";
     pkgConfigModules = [
-      "shaderc_combined"
       "shaderc"
-      "shaderc_static"
     ];
   };
 })
