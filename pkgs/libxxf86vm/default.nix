@@ -37,6 +37,9 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs = [
     libx11
     libxext
+  ];
+
+  propagatedBuildInputs = [
     xorgproto
   ];
 
