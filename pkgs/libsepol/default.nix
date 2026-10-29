@@ -58,7 +58,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "http://userspace.selinuxproject.org";
     platforms = lib.platforms.linux;
     license = lib.licenses.gpl2Plus;
-    pkgConfigModules = [ "libselinux" ];
+    pkgConfigModules = [ "libsepol" ];
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "selinuxproject" finalAttrs.version;
   };
 })
