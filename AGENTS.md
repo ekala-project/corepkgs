@@ -28,6 +28,13 @@ Read the guide matching the package's build system or language.
 | ekaos service module (services.*, cross-platform interface, systemd/launchd/runit) | [services](services/AGENTS.md) |
 | Installing agent skills (installAgentSkills, installSkill, SKILL.md, dontInstallAgentSkills) | [pkgs/installAgentSkills](pkgs/installAgentSkills/setup-hook.sh) |
 
+## Testing Packages
+
+| Task | Tester |
+|------|--------|
+| pkg-config: module discovery, path validation, compile+link verification (`hasModules`, `testInstall`, `testLink`) | [testers.pkg-config](pkgs/testers/pkg-config-test-link/default.nix) |
+| CMake: `find_package` discovery, compile+link via `target_link_libraries` (`hasModules`, `testLink`) | [testers.cmake](pkgs/testers/cmake-test-link/default.nix) |
+
 ## Fixing Build Failures
 
 Read the guide matching the error symptom. Start with [validation](.agents/skills/validation/SKILL.md) for the eval/build/format workflow.
