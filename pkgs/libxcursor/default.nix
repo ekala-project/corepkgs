@@ -36,10 +36,13 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
-    xorgproto
     libx11
     libxfixes
     libxrender
+  ];
+
+  propagatedBuildInputs = [
+    xorgproto
   ];
 
   passthru = {
