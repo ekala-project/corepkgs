@@ -146,6 +146,7 @@ stdenv.mkDerivation (finalAttrs: {
       static = pkgsStatic.audit or null;
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
       pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
+      testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
       # Broken on a hardened kernel
       package = finalAttrs.finalPackage.overrideAttrs (previousAttrs: {
         pname = previousAttrs.pname + "-test";

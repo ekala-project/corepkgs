@@ -7,6 +7,7 @@
   python3,
   xcb-proto,
   libxcb,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -35,6 +36,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   propagatedBuildInputs = [ libxcb ];
+
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   meta = {
     description = "XCB utility library that gives human readable names to error, event & request codes";

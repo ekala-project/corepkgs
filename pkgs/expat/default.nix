@@ -65,6 +65,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config = testers.hasPkgConfigModules {
       package = finalAttrs.finalPackage;
     };
+    testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
   }
   // lib.optionalAttrs (ocamlPackages != null) { inherit (ocamlPackages) ocaml_expat; };
 

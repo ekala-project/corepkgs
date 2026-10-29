@@ -207,6 +207,7 @@ stdenv.mkDerivation (finalAttrs: {
       package = finalAttrs.finalPackage;
       versionCheck = true;
     };
+    tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
     updateScript = nix-update-script {
       extraArgs = [

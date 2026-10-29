@@ -196,6 +196,7 @@ let
           tests = {
             pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
             pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
+            testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
           };
           buildRootOnly = mkWithAttrs buildRootOnlyAttrs;
         };

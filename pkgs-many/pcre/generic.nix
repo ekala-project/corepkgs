@@ -15,6 +15,7 @@
   windows ? null,
   # Disable jit on Apple Silicon, https://github.com/zherczeg/sljit/issues/51
   enableJit ? !(stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64),
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -70,6 +71,8 @@ stdenv.mkDerivation (finalAttrs: {
     !(with stdenv.hostPlatform; isCygwin || isFreeBSD) && stdenv.hostPlatform == stdenv.buildPlatform;
   # XXX: test failure on Cygwin
   # we are running out of stack on both freeBSDs on Hydra
+
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   postFixup = ''
     moveToOutput bin/pcre-config "$dev"

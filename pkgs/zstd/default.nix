@@ -131,6 +131,7 @@ stdenv.mkDerivation (finalAttrs: {
       # Package tests (coherent with overrides)
 
       pkg-config = testers.hasPkgConfigModules { package = finalAttrs.finalPackage; };
+      testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
     }
     // lib.optionalAttrs (arrow-cpp != null) { inherit arrow-cpp; };
   };

@@ -149,7 +149,10 @@ stdenv.mkDerivation (finalAttrs: {
     done
   '';
 
-  passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  passthru.tests = {
+    pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
+  };
 
   meta = {
     homepage = "https://legacy.imagemagick.org/";

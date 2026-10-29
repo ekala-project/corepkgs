@@ -24,6 +24,7 @@
 
   gitUpdater,
   buildPackages,
+  testers,
 }:
 
 let
@@ -139,6 +140,7 @@ stdenv.mkDerivation (finalAttrs: {
         sqlite-analyzer
         sqlite-rsync
         ;
+      testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
     }
     // lib.optionalAttrs (tinysparql != null) { inherit tinysparql; };
 

@@ -6,6 +6,7 @@
   autoconf-archive,
   installShellFiles,
   libiconv,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -46,6 +47,8 @@ stdenv.mkDerivation (finalAttrs: {
   postInstall = ''
     installManPage man/trietool.1
   '';
+
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   meta = {
     homepage = "https://linux.thai.net/~thep/datrie/datrie.html";

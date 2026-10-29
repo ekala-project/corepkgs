@@ -290,6 +290,7 @@ stdenv.mkDerivation (finalAttrs: {
         php-curl = useThisCurl php.buildPecl.curl;
         pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
         pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
+        testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
         static = pkgsStatic.curl;
       }
       // lib.optionalAttrs (curlpp != null) { curlpp = useThisCurl curlpp; }

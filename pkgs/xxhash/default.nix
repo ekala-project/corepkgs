@@ -3,6 +3,7 @@
   stdenv,
   fetchFromGitHub,
   cmake,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -28,6 +29,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   # Using unofficial CMake build script to install CMake module files.
   cmakeDir = "../cmake_unofficial";
+
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   meta = {
     description = "Extremely fast hash algorithm";

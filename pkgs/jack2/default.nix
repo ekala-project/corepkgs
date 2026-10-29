@@ -21,6 +21,7 @@
   alsa-lib ? null,
 
   prefix ? "",
+  testers,
 }:
 
 let
@@ -113,6 +114,8 @@ stdenv.mkDerivation (finalAttrs: {
     substituteInPlace "$dev/lib/pkgconfig/jack.pc" \
       --replace-fail "$out/include" "$dev/include"
   '';
+
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   meta = {
     description = "JACK audio connection kit, version 2 with jackdbus";

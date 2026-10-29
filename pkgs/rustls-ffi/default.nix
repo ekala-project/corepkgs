@@ -58,6 +58,7 @@ stdenv.mkDerivation (finalAttrs: {
       rustls-ffi = finalAttrs.finalPackage;
     };
     pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
   };
 
   meta = {

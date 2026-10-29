@@ -32,6 +32,7 @@
   # Doesn't build on Darwin, only makes sense on systems which have pam
   withLastlog ? !stdenv.hostPlatform.isDarwin && lib.meta.availableOn stdenv.hostPlatform pam,
   gitUpdater,
+  testers,
 }:
 
 let
@@ -217,6 +218,7 @@ stdenv.mkDerivation (finalAttrs: {
     # https://github.com/util-linux/util-linux/commit/8886d84e25a457702b45194d69a47313f76dc6bc
     hasCol = stdenv.hostPlatform.libc == "glibc";
 
+    tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
   };
 
   meta = {

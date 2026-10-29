@@ -7,6 +7,7 @@
   perl,
   zlib,
   versionCheckHook,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -72,6 +73,8 @@ stdenv.mkDerivation (finalAttrs: {
   #   inherit (python3.pkgs) pikepdf;
   #   inherit cups-filters pdfmixtool;
   # };
+
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   meta = {
     homepage = "https://qpdf.sourceforge.io/";

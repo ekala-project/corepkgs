@@ -57,9 +57,12 @@ stdenv.mkDerivation (finalAttrs: {
 
   doCheck = false; # fails
 
-  passthru.tests.pkg-config = testers.hasPkgConfigModules {
-    package = finalAttrs.finalPackage;
-    versionCheck = true;
+  passthru.tests = {
+    pkg-config = testers.hasPkgConfigModules {
+      package = finalAttrs.finalPackage;
+      versionCheck = true;
+    };
+    testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
   };
 
   meta = {

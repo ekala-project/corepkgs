@@ -21,6 +21,7 @@
   libffi,
   libGL ? null,
   mesa ? null,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -74,6 +75,8 @@ stdenv.mkDerivation (finalAttrs: {
     // lib.optionalAttrs (stdenv.targetPlatform.useLLVM or false) {
       NIX_CFLAGS_COMPILE = "-DHAVE_SECURE_GETENV";
     };
+
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   meta = {
     description = "Implementation for VA-API (Video Acceleration API)";

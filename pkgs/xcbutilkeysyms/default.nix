@@ -5,6 +5,7 @@
   pkg-config,
   libxcb,
   xorgproto,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -29,6 +30,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   propagatedBuildInputs = [ libxcb ];
+
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   meta = {
     description = "Standard X key constants and conversion to/from keycodes";

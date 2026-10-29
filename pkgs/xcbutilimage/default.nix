@@ -7,6 +7,7 @@
   xorgproto,
   libxcb,
   xcbutil,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -35,6 +36,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   propagatedBuildInputs = [ libxcb ];
+
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   meta = {
     description = "XCB port of Xlib's XImage and XShmImage functions.";

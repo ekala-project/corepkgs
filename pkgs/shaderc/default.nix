@@ -71,6 +71,7 @@ stdenv.mkDerivation (finalAttrs: {
     package = finalAttrs.finalPackage;
     versionCheck = false;
   };
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   meta = {
     description = "Collection of tools, libraries and tests for shader compilation";

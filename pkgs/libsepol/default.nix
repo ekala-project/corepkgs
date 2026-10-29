@@ -4,6 +4,7 @@
   fetchurl,
   flex,
   libselinux,
+  testers,
 }:
 
 let
@@ -48,6 +49,7 @@ stdenv.mkDerivation (finalAttrs: {
     inherit se_url;
     tests = {
       inherit libselinux;
+      testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
     };
   };
 

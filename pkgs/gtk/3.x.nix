@@ -274,6 +274,7 @@ stdenv.mkDerivation (finalAttrs: {
         freeze = true;
       };
       tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
       wrapGAppsHook = wrapGAppsNoGuiHook.override { isGraphical = true; };
       inherit wrapGAppsNoGuiHook;
     };

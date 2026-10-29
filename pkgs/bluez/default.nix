@@ -186,6 +186,7 @@ stdenv.mkDerivation (finalAttrs: {
         package = finalAttrs.finalPackage;
         command = "bluetoothctl --version";
       };
+      testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
     };
     updateScript = gitUpdater {
       url = "https://git.kernel.org/pub/scm/bluetooth/bluez.git";

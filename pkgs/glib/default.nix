@@ -356,6 +356,7 @@ stdenv.mkDerivation (finalAttrs: {
         doCheck = true;
       });
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
       inherit cairo dconf pango;
     };
 

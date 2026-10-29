@@ -6,6 +6,7 @@
   libxcb,
   xorgproto,
   m4,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -33,6 +34,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   propagatedBuildInputs = [ libxcb ];
+
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   meta = {
     description = "XCB client and window-manager helpers for ICCCM & EWMH.";

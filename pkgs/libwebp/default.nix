@@ -96,6 +96,7 @@ stdenv.mkDerivation (finalAttrs: {
     inherit (python3.pkgs) pillow imread;
     haskell-webp = haskellPackages.webp;
     pkg-config = testers.hasPkgConfigModules { package = libwebp; };
+    testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
   }
   // lib.optionalAttrs (graphicsmagick != null) { inherit graphicsmagick; }
   // lib.optionalAttrs (opencv != null) { inherit opencv; }

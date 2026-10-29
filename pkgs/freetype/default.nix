@@ -117,6 +117,7 @@ stdenv.mkDerivation (finalAttrs: {
       ;
     inherit (python3.pkgs) freetype-py;
     pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
   }
   // lib.optionalAttrs (graphicsmagick != null) { inherit graphicsmagick; }
   // lib.optionalAttrs (qt5 != null) { qtbase = qt5.qtbase; }

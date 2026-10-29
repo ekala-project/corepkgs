@@ -46,8 +46,11 @@ stdenv.mkDerivation (finalAttrs: {
     cmake.configurePhaseHook
   ];
 
-  passthru.tests.pkg-config = testers.hasPkgConfigModules {
-    package = finalAttrs.finalPackage;
+  passthru.tests = {
+    pkg-config = testers.hasPkgConfigModules {
+      package = finalAttrs.finalPackage;
+    };
+    testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
   };
 
   meta = {

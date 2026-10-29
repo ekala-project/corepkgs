@@ -20,6 +20,7 @@
     lib.meta.availableOn stdenv.hostPlatform gobject-introspection
     && stdenv.hostPlatform.emulatorAvailable buildPackages,
   libunwind,
+  testers,
   withLibunwind ?
     lib.meta.availableOn stdenv.hostPlatform libunwind
     && lib.elem "libunwind" libunwind.meta.pkgConfigModules or [ ],
@@ -122,6 +123,8 @@ stdenv.mkDerivation (finalAttrs: {
     moveToOutput "lib/gstreamer-1.0/pkgconfig" "$dev"
     moveToOutput "share/bash-completion" "$bin"
   '';
+
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   setupHook = ./setup-hook.sh;
 

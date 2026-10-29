@@ -173,6 +173,7 @@ stdenv.mkDerivation (finalAttrs: {
       versionPolicy = "odd-unstable";
     };
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
   };
 
   meta = {
