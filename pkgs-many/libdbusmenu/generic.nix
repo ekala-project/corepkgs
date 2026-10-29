@@ -37,11 +37,14 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
-    glib
     dbus-glib
-    json-glib
   ]
   ++ lib.optional withGtk3 gtk3;
+
+  propagatedBuildInputs = [
+    glib
+    json-glib
+  ];
 
   patches = [
     ./requires-glib.patch
