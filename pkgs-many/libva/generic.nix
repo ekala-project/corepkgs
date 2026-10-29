@@ -58,10 +58,13 @@ stdenv.mkDerivation (finalAttrs: {
     libx11
     libxcb
     libxext
-    wayland
     libffi
   ]
   ++ lib.optional (!minimal && libGL != null) libGL;
+
+  propagatedBuildInputs = lib.optionals (!minimal) [
+    wayland
+  ];
 
   mesonEntries = lib.optionalAttrs (stdenv.hostPlatform.isLinux && mesa != null) {
     driverdir = "${mesa.driverLink or "/run/opengl-driver"}/lib/dri:/usr/lib/dri:/usr/lib32/dri";
@@ -87,9 +90,7 @@ stdenv.mkDerivation (finalAttrs: {
       "libva-drm"
     ]
     ++ lib.optionals (!minimal) [
-      "libva-glx"
       "libva-wayland"
-      "libva-x11"
     ];
     platforms = lib.platforms.unix;
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "intel" finalAttrs.version;
