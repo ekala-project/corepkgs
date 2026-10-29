@@ -132,6 +132,13 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Open source multimedia framework";
     homepage = "https://gstreamer.freedesktop.org";
     license = lib.licenses.lgpl2Plus;
+    pkgConfigModules = [
+      "gstreamer-1.0"
+      "gstreamer-base-1.0"
+      "gstreamer-check-1.0"
+      "gstreamer-controller-1.0"
+      "gstreamer-net-1.0"
+    ];
     platforms = lib.platforms.unix;
   };
 })

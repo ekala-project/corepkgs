@@ -202,6 +202,7 @@ stdenv.mkDerivation (finalAttrs: {
       license
       platforms
       ;
+    pkgConfigModules = [ "bluez" ];
     identifiers.cpeParts = lib.meta.cpeFullVersionWithVendor "bluez" finalAttrs.version;
   };
 })
