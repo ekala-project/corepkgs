@@ -73,6 +73,7 @@ stdenv.mkDerivation (finalAttrs: {
 
     tests = {
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
     }
     // lib.optionalAttrs (packageAtLeast "1.6") {
       pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };

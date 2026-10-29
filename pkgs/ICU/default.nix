@@ -81,6 +81,7 @@ let
     ];
 
     passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
     passthru.buildRootOnly = mkWithAttrs buildRootOnlyAttrs;
 
     meta = {

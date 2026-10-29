@@ -86,6 +86,7 @@ stdenv.mkDerivation (finalAttrs: {
     ffmpeg = ffmpeg.override { withZmq = true; };
     pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
     pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage { };
+    testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
   }
   // lib.optionalAttrs (cppzmq != null) { inherit cppzmq; }
   // lib.optionalAttrs (czmq != null) { inherit czmq; }

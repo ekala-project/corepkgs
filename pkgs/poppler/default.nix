@@ -26,6 +26,7 @@
   utils ? false,
   minimal ? false,
   suffix ? "glib",
+  testers,
 }:
 
 let
@@ -117,6 +118,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     inherit testData;
+    tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
   };
 
   meta = {

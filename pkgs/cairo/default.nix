@@ -134,6 +134,7 @@ stdenv.mkDerivation (
 
     passthru.tests = {
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
       inherit pango;
     };
 

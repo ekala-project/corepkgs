@@ -113,6 +113,7 @@ stdenv.mkDerivation (finalAttrs: {
       pkg-config = testers.hasPkgConfigModules {
         package = finalAttrs.finalPackage;
       };
+      testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
       unittests = runUnitTests finalAttrs.finalPackage;
     }
     // lib.optionalAttrs (libgeotiff != null) { inherit libgeotiff; }

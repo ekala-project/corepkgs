@@ -71,6 +71,7 @@ stdenv.mkDerivation (
       pkg-config-install = testers.pkg-config.testInstall finalAttrs.finalPackage {
         example = ./test-example.c;
       };
+      testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
     };
 
     meta = {

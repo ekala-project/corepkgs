@@ -5,6 +5,7 @@
   meson,
   ninja,
   pkg-config,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -37,6 +38,8 @@ stdenv.mkDerivation (finalAttrs: {
     polkit-agent = false;
     debuginfod = false;
   };
+
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   meta = {
     description = "Static library for Sysprof capture data generation";

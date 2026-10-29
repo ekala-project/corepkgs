@@ -171,6 +171,7 @@ stdenv'.mkDerivation (finalAttrs: {
         moduleNames = [ "LibXml2" ];
         package = finalAttrs.finalPackage;
       };
+      testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
       inherit libxslt fontconfig;
     };
   };

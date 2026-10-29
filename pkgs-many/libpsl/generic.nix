@@ -23,6 +23,7 @@
   buildPackages,
   publicsuffix-list,
   runUnitTests,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -113,6 +114,7 @@ stdenv.mkDerivation (finalAttrs: {
     ekapkgs-update.semver-strategy = "patch";
     tests = {
       unittests = runUnitTests finalAttrs.finalPackage;
+      testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
     };
   };
 

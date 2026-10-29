@@ -187,6 +187,7 @@ stdenv.mkDerivation (finalAttrs: {
       package = finalAttrs.finalPackage;
       version = lib.head (lib.splitString "-" finalAttrs.version);
     };
+    testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
   }
   // lib.optionalAttrs (nixos-icons != null) { inherit nixos-icons; };
 

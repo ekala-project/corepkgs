@@ -52,6 +52,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
   };
 
   env = lib.optionalAttrs stdenv.hostPlatform.isMinGW {

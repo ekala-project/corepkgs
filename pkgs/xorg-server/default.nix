@@ -188,6 +188,7 @@ stdenv.mkDerivation (finalAttrs: {
   passthru = {
     inherit (finalAttrs) version; # needed by virtualbox guest additions
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
   };
 
   meta = {

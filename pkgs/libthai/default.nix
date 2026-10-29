@@ -5,6 +5,7 @@
   installShellFiles,
   pkg-config,
   libdatrie,
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -32,6 +33,8 @@ stdenv.mkDerivation (finalAttrs: {
   postInstall = ''
     installManPage man/man3/*.3
   '';
+
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   meta = {
     homepage = "https://linux.thai.net/projects/libthai/";

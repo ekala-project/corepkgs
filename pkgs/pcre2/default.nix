@@ -47,6 +47,7 @@ stdenv.mkDerivation (finalAttrs: {
   passthru.tests = {
     inherit grep;
     pkg-config = testers.testMetaPkgConfig pcre2;
+    testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
   };
 
   meta = {

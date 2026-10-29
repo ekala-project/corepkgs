@@ -13,6 +13,7 @@
   vulkan-headers,
   addDriverRunpath,
   enableX11 ? (libXrandr != null),
+  testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -59,6 +60,8 @@ stdenv.mkDerivation (finalAttrs: {
     "out"
     "dev"
   ];
+
+  passthru.tests.testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
 
   meta = {
     description = "LunarG Vulkan loader";

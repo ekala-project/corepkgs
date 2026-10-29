@@ -36,7 +36,10 @@ stdenv.mkDerivation (finalAttrs: {
     udev
   ];
 
-  passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  passthru.tests = {
+    pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+    testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
+  };
 
   meta = {
     description = "Library for communicating with USB and Bluetooth HID devices";

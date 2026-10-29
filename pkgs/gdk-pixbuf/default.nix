@@ -161,6 +161,7 @@ stdenv.mkDerivation (finalAttrs: {
 
     tests = {
       pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+      testLink = testers.pkg-config.testLink { package = finalAttrs.finalPackage; };
     };
 
     # gdk_pixbuf_binarydir and gdk_pixbuf_moduledir variables from gdk-pixbuf-2.0.pc
