@@ -32,7 +32,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
     util-macros
   ];
-  buildInputs = [ xorgproto ];
+  propagatedBuildInputs = [ xorgproto ];
 
   passthru = {
     tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
