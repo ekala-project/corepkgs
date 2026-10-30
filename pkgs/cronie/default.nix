@@ -15,6 +15,8 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-8do3ShW6dgXPN4NH+WvItnjT18B2UmnIJCz+WweJxXE=";
   };
 
+  env.NIX_CFLAGS_COMPILE = "-std=gnu17";
+
   buildInputs = [
     linux-pam
   ];
