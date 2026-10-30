@@ -71,6 +71,8 @@ let
       "man"
     ];
 
+    env.NIX_CFLAGS_COMPILE = "-std=gnu17";
+
     cmakeEntries = {
       FORCE_UNSUPPORTED_COMPILER = "1";
       WITH_ROUTER = false;
