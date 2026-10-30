@@ -71,6 +71,7 @@ let
       "man"
     ];
 
+    # bundled tirpc has K&R-style function declarations
     env.NIX_CFLAGS_COMPILE = "-std=gnu17";
 
     cmakeEntries = {

@@ -15,6 +15,7 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-8do3ShW6dgXPN4NH+WvItnjT18B2UmnIJCz+WweJxXE=";
   };
 
+  # K&R-style function declarations are errors under GCC 15's C23 default
   env.NIX_CFLAGS_COMPILE = "-std=gnu17";
 
   buildInputs = [

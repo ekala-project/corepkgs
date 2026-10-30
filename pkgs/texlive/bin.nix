@@ -413,6 +413,7 @@ rec {
 
     hardeningDisable = [ "format" ];
 
+    # same C23 issues as core (auto-generated sources use 'bool' as a variable name)
     env.NIX_CFLAGS_COMPILE = "-std=gnu17";
 
     inherit (core) nativeBuildInputs depsBuildBuild;

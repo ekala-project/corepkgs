@@ -82,6 +82,7 @@ stdenv.mkDerivation {
     "JULIA_CPU_TARGET=generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1)"
   ];
 
+  # vendored GMP needs C17 (K&R decls); vendored LLVM needs <cstdint>
   env = {
     CFLAGS = "-std=gnu17";
     CXXFLAGS = "-include cstdint";
