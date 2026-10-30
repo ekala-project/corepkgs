@@ -28,6 +28,7 @@ stdenv.mkDerivation {
     find . ../include/opcode -type f -exec sed {} -i -e 's/"bfd.h"/<bfd.h>/' \;
   '';
 
+  # static_assert as array subscript trick breaks under GCC 15's C23 default
   env.NIX_CFLAGS_COMPILE = "-std=gnu17";
 
   depsBuildBuild = [ buildPackages.stdenv.cc ];

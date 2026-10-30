@@ -58,6 +58,7 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals numaSupport [ numactl ];
 
+  # GCC 15 no longer transitively includes <cstdint> in C++ headers
   env.CXXFLAGS = "-include cstdint";
 
   cmakeFlags = [ "-Wno-dev" ];

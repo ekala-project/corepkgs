@@ -115,6 +115,7 @@ matchedTcl.mkTclDerivation {
     zlib
   ];
 
+  # tk < 8.6 uses 'bool' as a parameter name, which is a keyword in C23
   env = lib.optionalAttrs (packageOlder "8.6") {
     NIX_CFLAGS_COMPILE = "-std=gnu17";
   };

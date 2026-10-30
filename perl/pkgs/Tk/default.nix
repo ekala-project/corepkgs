@@ -38,6 +38,7 @@ buildPerlPackage {
     libx11
     libpng
   ];
+  # K&R-style declarations in ClientWin.c are errors under GCC 15's C23 default
   env = lib.optionalAttrs stdenv.cc.isGNU {
     NIX_CFLAGS_COMPILE = toString [
       "-std=gnu17"

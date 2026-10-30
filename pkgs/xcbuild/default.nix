@@ -127,7 +127,7 @@ stdenv'.mkDerivation (finalAttrs: {
 
   env = {
     NIX_CFLAGS_COMPILE = "-Wno-error";
-    CXXFLAGS = "-include cstdint";
+    CXXFLAGS = "-include cstdint"; # GCC 15 no longer transitively includes <cstdint>
   };
 
   # CMake 4 dropped support of versions lower than 3.5, and versions

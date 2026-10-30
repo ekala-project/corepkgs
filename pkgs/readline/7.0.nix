@@ -22,6 +22,7 @@ stdenv.mkDerivation (finalAttrs: {
     "info"
   ];
 
+  # K&R-style function declarations are errors under GCC 15's C23 default
   env.NIX_CFLAGS_COMPILE = "-std=gnu17";
 
   propagatedBuildInputs = [ ncurses ];
