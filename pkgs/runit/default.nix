@@ -43,6 +43,8 @@ stdenv.mkDerivation (finalAttrs: {
     sed -i 's,-static,,g' src/Makefile
   '';
 
+  env.NIX_CFLAGS_COMPILE = "-std=gnu17";
+
   preBuild = ''
     cd src
 
