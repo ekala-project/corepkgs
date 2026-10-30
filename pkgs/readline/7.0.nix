@@ -22,6 +22,8 @@ stdenv.mkDerivation (finalAttrs: {
     "info"
   ];
 
+  env.NIX_CFLAGS_COMPILE = "-std=gnu17";
+
   propagatedBuildInputs = [ ncurses ];
 
   patchFlags = [ "-p0" ];
