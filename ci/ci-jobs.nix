@@ -1,4 +1,4 @@
 let
-  allPkgs = import ./packages.nix;
+  allPkgs = import ./packages.nix {};
 in
 allPkgs.buildable
