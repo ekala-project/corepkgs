@@ -28,6 +28,8 @@ stdenv.mkDerivation {
     find . ../include/opcode -type f -exec sed {} -i -e 's/"bfd.h"/<bfd.h>/' \;
   '';
 
+  env.NIX_CFLAGS_COMPILE = "-std=gnu17";
+
   depsBuildBuild = [ buildPackages.stdenv.cc ];
   nativeBuildInputs = [
     autoreconfHook
