@@ -115,6 +115,10 @@ matchedTcl.mkTclDerivation {
     zlib
   ];
 
+  env = lib.optionalAttrs (packageOlder "8.6") {
+    NIX_CFLAGS_COMPILE = "-std=gnu17";
+  };
+
   propagatedBuildInputs = [
     libxft
   ];
