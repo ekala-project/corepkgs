@@ -82,6 +82,11 @@ stdenv.mkDerivation {
     "JULIA_CPU_TARGET=generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1)"
   ];
 
+  env = {
+    CFLAGS = "-std=gnu17";
+    CXXFLAGS = "-include cstdint";
+  };
+
   # Julia's build system expects to build in-tree
   dontUseCmakeConfigure = true;
 
