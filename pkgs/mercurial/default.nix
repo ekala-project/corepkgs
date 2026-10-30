@@ -7,7 +7,8 @@
   gettext,
   installShellFiles,
   re2Support ? true,
-  rustSupport ? stdenv.hostPlatform.isLinux,
+  # PyO3 0.24 does not support Python 3.14+
+  rustSupport ? stdenv.hostPlatform.isLinux && lib.versionOlder python3Packages.python.version "3.14",
   cargo,
   rustPlatform,
   rustc,
