@@ -58,6 +58,8 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals numaSupport [ numactl ];
 
+  env.CXXFLAGS = "-include cstdint";
+
   cmakeFlags = [ "-Wno-dev" ];
 
   cmakeEntries = {
