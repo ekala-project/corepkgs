@@ -113,6 +113,9 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeDir = "../llvm";
 
+  # GCC 15 no longer transitively includes <cstdint> in C++ headers.
+  env.CXXFLAGS = "-include cstdint";
+
   cmakeEntries = {
     LLVM_ENABLE_PROJECTS = "clang;tapi";
     LLVM_EXTERNAL_PROJECTS = "tapi";
