@@ -104,11 +104,13 @@ stdenv'.mkDerivation (finalAttrs: {
       --replace-fail "/bin/sh" "sh"
   ''
   + lib.optionalString (!stdenv'.hostPlatform.isDarwin) ''
-    # Fix build on gcc-13 due to missing includes
+    # Fix build on gcc-13+ due to missing includes
     sed -e '1i #include <cstdint>' -i \
       Libraries/libutil/Headers/libutil/Permissions.h \
       Libraries/pbxbuild/Headers/pbxbuild/Tool/AuxiliaryFile.h \
-      Libraries/pbxbuild/Headers/pbxbuild/Tool/Invocation.h
+      Libraries/pbxbuild/Headers/pbxbuild/Tool/Invocation.h \
+      Libraries/plist/Headers/plist/Date.h \
+      Libraries/plist/Headers/plist/UID.h
 
     # Avoid a glibc >= 2.25 deprecation warning that gets fatal via -Werror.
     sed 1i'#include <sys/sysmacros.h>' \
@@ -123,7 +125,10 @@ stdenv'.mkDerivation (finalAttrs: {
 
   strictDeps = true;
 
-  env.NIX_CFLAGS_COMPILE = "-Wno-error";
+  env = {
+    NIX_CFLAGS_COMPILE = "-Wno-error";
+    CXXFLAGS = "-include cstdint";
+  };
 
   # CMake 4 dropped support of versions lower than 3.5, and versions
   # lower than 3.10 are deprecated.
