@@ -40,6 +40,7 @@ buildPerlPackage {
   ];
   env = lib.optionalAttrs stdenv.cc.isGNU {
     NIX_CFLAGS_COMPILE = toString [
+      "-std=gnu17"
       "-Wno-error=implicit-int"
       "-Wno-error=incompatible-pointer-types"
     ];
