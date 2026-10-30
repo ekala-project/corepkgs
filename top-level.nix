@@ -497,7 +497,7 @@ final: prev: with final; {
 
   procps = if stdenv.hostPlatform.isLinux then procps-ng else unixtools.procps;
 
-  default-gcc-version = 14;
+  default-gcc-version = 15;
   gcc = pkgs.${"gcc${toString default-gcc-version}"};
   gccFun = callPackage ./pkgs/gcc;
   gcc-unwrapped = gcc.cc;
