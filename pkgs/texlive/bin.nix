@@ -285,6 +285,10 @@ rec {
 
     hardeningDisable = [ "format" ];
 
+    # GCC 15 defaults to C23 where 'bool' is a keyword; auto-generated TeX
+    # sources (euptex0.c) use 'bool' as a variable name.
+    env.NIX_CFLAGS_COMPILE = "-std=gnu17";
+
     preConfigure = ''
       rm -r libs/{cairo,freetype2,gd,gmp,graphite2,harfbuzz,icu,libpaper,libpng} \
         libs/{lua53,luajit,mpfr,pixman,pplib,teckit,zlib,zziplib} \
@@ -408,6 +412,8 @@ rec {
     '';
 
     hardeningDisable = [ "format" ];
+
+    env.NIX_CFLAGS_COMPILE = "-std=gnu17";
 
     inherit (core) nativeBuildInputs depsBuildBuild;
     buildInputs = core.buildInputs ++ [
