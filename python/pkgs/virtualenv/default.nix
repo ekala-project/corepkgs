@@ -8,33 +8,33 @@
   filelock,
   hatch-vcs,
   hatchling,
-  importlib-metadata,
   platformdirs,
+  python-discovery,
 }:
 
 buildPythonPackage (finalAttrs: {
   pname = "virtualenv";
-  version = "20.33.1";
+  version = "21.10.0";
   pyproject = true;
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.9";
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;
-    hash = "sha256-G0RHjZ4mGz+4uqXnSgyjvA4F8hqjYWe/nL+FDlQnZbg=";
+    hash = "sha256-dBbLwXbYoGsMceK/ZXRbAIIqXCBN+aJHO5HY/Qbk9v0=";
   };
 
-  nativeBuildInputs = [
+  build-system = [
     hatch-vcs
     hatchling
   ];
 
-  propagatedBuildInputs = [
+  dependencies = [
     distlib
     filelock
     platformdirs
-  ]
-  ++ lib.optionals (pythonOlder "3.8") [ importlib-metadata ];
+    python-discovery
+  ];
 
   # nativeCheckInputs = [
   #   cython
