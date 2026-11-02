@@ -186,7 +186,23 @@ makeScopeWithSplicing' {
         ];
       };
 
-      libclang = callPackage ./clang { };
+      # GCC 15 ICEs on clang's template-heavy code at all optimisation
+      # levels (even -O1).  For LLVM >= 21 with a GCC host compiler,
+      # use clang 20 (which GCC 15 can still compile) as the build
+      # compiler instead.
+      libclang =
+        let
+          clangStdenv =
+            if
+              !stdenv.hostPlatform.useLLVM
+              && lib.versionAtLeast (lib.getVersion stdenv.cc.cc) "15"
+              && lib.versionAtLeast metadata.release_version "21"
+            then
+              overrideCC stdenv pkgs.llvm.v20.pkgs.clang
+            else
+              stdenv;
+        in
+        (newScope { stdenv = clangStdenv; }) ./clang { };
 
       clang-unwrapped = self.libclang;
 
