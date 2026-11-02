@@ -54,7 +54,13 @@ buildPythonPackage (finalAttrs: {
 
 ## Testing
 
-`testPaths` auto-generates `passthru.tests.python` and a `test_src` output:
+`passthru.tests.python` is auto-generated whenever a package has test inputs
+(`nativeCheckInputs` or `nativeTestOnlyCheckInputs`).
+
+### With `testPaths` (preferred)
+
+When `testPaths` is set, only the listed files/dirs are copied into a `test_src`
+output and used by the test derivation:
 
 ```nix
 nativeCheckInputs = [ pytestCheckHook ];
@@ -62,6 +68,25 @@ testPaths = [ "tests" ];
 ```
 
 For suites needing extra files: `testPaths = [ "tests" "src/helpers" "README.rst" ];`
+
+### Without `testPaths`
+
+When `testPaths` is omitted but check inputs exist, the test derivation uses
+the full source. This is useful when tests live alongside the source code.
+
+### Breaking circular dependencies
+
+For packages in the pytest dependency chain (e.g. `attrs`, `pluggy`), use
+`nativeTestOnlyCheckInputs` instead of `nativeCheckInputs`. These deps are
+completely invisible to the main derivation and only appear in the test
+derivation, avoiding cycles:
+
+```nix
+nativeTestOnlyCheckInputs = [ pytestCheckHook ];
+testPaths = [ "tests" ];
+```
+
+### Forwarded attributes
 
 These attributes are forwarded automatically to the test derivation:
 - `disabledTests`, `disabledTestPaths`, `enabledTestPaths`
@@ -89,16 +114,6 @@ disabledTests = [
 ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
   "test_linux_specific"
 ];
-```
-
-### Manual `tests.nix` (Fallback)
-
-When `testPaths` is not suitable (e.g., circular dependencies with pytest):
-
-```nix
-passthru.tests = {
-  pytest = callPackage ./tests.nix { };
-};
 ```
 
 ## Smoke Checks
