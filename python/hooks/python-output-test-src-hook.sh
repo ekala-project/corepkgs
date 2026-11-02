@@ -18,7 +18,7 @@ EOF
     # source root) into the test_src output, preserving directory structure.
     local p
     # shellcheck disable=SC2154
-    for p in ${testPaths}; do
+    for p in "${testPaths[@]}"; do
         if [[ -e "$p" ]]; then
             cp -R --parents "$p" "$test_src/"
         else
