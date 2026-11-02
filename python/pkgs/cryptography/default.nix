@@ -78,7 +78,6 @@ buildPythonPackage (finalAttrs: {
 
   passthru = {
     vectors = cryptography-vectors;
-    tests.unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
   };
 
   pythonImportsCheck = [ "cryptography" ];

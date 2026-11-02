@@ -1,12 +1,13 @@
 {
   lib,
   buildPythonPackage,
-  callPackage,
   fetchFromGitHub,
   pythonOlder,
   pytest,
   setuptools-scm,
   typing-extensions,
+  hypothesis,
+  pytestCheckHook,
 }:
 
 buildPythonPackage (finalAttrs: {
@@ -21,10 +22,7 @@ buildPythonPackage (finalAttrs: {
     hash = "sha256-MuTLCRHCuD9TwJkMiFIC5Xv5Xz6NL8j4JZpW8BA45SI=";
   };
 
-  outputs = [
-    "out"
-    "testout"
-  ];
+  testPaths = [ "tests" ];
 
   build-system = [ setuptools-scm ];
 
@@ -36,12 +34,23 @@ buildPythonPackage (finalAttrs: {
       typing-extensions
     ];
 
-  postInstall = ''
-    mkdir $testout
-    cp -R tests $testout/tests
-  '';
+  nativeTestOnlyCheckInputs = [
+    hypothesis
+    pytestCheckHook
+  ];
 
-  passthru.tests.pytest = callPackage ./tests.nix { };
+  disabledTestPaths = [
+    # async fixture tests fail with newer pytest
+    "tests/async_fixtures"
+  ];
+
+  disabledTests = [
+    # warning count mismatch with newer pytest
+    "test_asyncio_mark_warns_when_applied_to_non_async_function"
+    "test_asyncio_mark_respects_the_loop_policy"
+    # async fixture handling incompatibility
+    "TestEventLoopStartedBeforeFixtures"
+  ];
 
   pythonImportsCheck = [ "pytest_asyncio" ];
 

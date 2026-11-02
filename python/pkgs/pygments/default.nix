@@ -11,45 +11,36 @@
   wcag-contrast-ratio,
 }:
 
-let
-  pygments = buildPythonPackage (finalAttrs: {
-    pname = "pygments";
-    version = "2.21.0";
-    pyproject = true;
+buildPythonPackage (finalAttrs: {
+  pname = "pygments";
+  version = "2.21.0";
+  pyproject = true;
 
-    src = fetchPypi {
-      inherit (finalAttrs) pname version;
-      hash = "sha256-YQynUcm8JJKzjrmjin+8k+27stcYLtrzTmauST3uXIw=";
-    };
+  src = fetchPypi {
+    inherit (finalAttrs) pname version;
+    hash = "sha256-YQynUcm8JJKzjrmjin+8k+27stcYLtrzTmauST3uXIw=";
+  };
 
-    nativeBuildInputs = [ hatchling ];
+  nativeBuildInputs = [ hatchling ];
 
-    nativeCheckInputs = [
-      pytestCheckHook
-      wcag-contrast-ratio
-    ];
+  nativeCheckInputs = [
+    pytestCheckHook
+    wcag-contrast-ratio
+  ];
 
-    disabledTestPaths = [
-      # 5 lines diff, including one nix store path in 20000+ lines
-      "tests/examplefiles/bash/ltmain.sh"
-    ];
+  disabledTestPaths = [
+    # 5 lines diff, including one nix store path in 20000+ lines
+    "tests/examplefiles/bash/ltmain.sh"
+  ];
 
-    pythonImportsCheck = [ "pygments" ];
+  pythonImportsCheck = [ "pygments" ];
 
-    passthru.tests = {
-      check = pygments.overridePythonAttrs (_: {
-        doCheck = true;
-      });
-    };
-
-    meta = {
-      changelog = "https://github.com/pygments/pygments/releases/tag/${finalAttrs.version}";
-      homepage = "https://pygments.org/";
-      description = "Generic syntax highlighter";
-      mainProgram = "pygmentize";
-      license = lib.licenses.bsd2;
-      platforms = lib.platforms.all;
-    };
-  });
-in
-pygments
+  meta = {
+    changelog = "https://github.com/pygments/pygments/releases/tag/${finalAttrs.version}";
+    homepage = "https://pygments.org/";
+    description = "Generic syntax highlighter";
+    mainProgram = "pygmentize";
+    license = lib.licenses.bsd2;
+    platforms = lib.platforms.all;
+  };
+})

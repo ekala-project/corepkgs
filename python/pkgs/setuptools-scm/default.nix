@@ -1,7 +1,6 @@
 {
   lib,
   buildPythonPackage,
-  callPackage,
   fetchPypi,
   pythonOlder,
 
@@ -15,6 +14,13 @@
 
   # optional-dependencies
   rich ? null,
+
+  # test-only
+  pytestCheckHook,
+  git,
+  mercurial,
+  pip,
+  virtualenv,
 }:
 
 buildPythonPackage (finalAttrs: {
@@ -50,11 +56,20 @@ buildPythonPackage (finalAttrs: {
     rich = lib.optional (rich != null) rich;
   };
 
-  pythonImportsCheck = [ "setuptools_scm" ];
+  nativeTestOnlyCheckInputs = [
+    pytestCheckHook
+    pip
+    virtualenv
+    git
+    mercurial
+  ];
 
-  passthru.tests = {
-    pytest = callPackage ./tests.nix { };
-  };
+  disabledTests = [
+    # network access
+    "test_pip_download"
+  ];
+
+  pythonImportsCheck = [ "setuptools_scm" ];
 
   setupHook = ./setup-hook.sh;
 

@@ -171,10 +171,7 @@ buildPythonPackage (finalAttrs: {
     blasImplementation = blas.implementation;
     inherit cfg;
     coreIncludeDir = "${numpy_1}/${python.sitePackages}/numpy/core/include";
-    tests = {
-      unittests = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
-    }
-    // lib.optionalAttrs (sage != null) { inherit sage; };
+    tests = lib.optionalAttrs (sage != null) { inherit sage; };
   };
 
   # Disable test

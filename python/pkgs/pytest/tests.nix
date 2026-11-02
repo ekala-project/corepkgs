@@ -9,7 +9,7 @@ buildPythonPackage (finalAttrs: {
   inherit (pytest) version;
   pyproject = false;
 
-  src = pytest.testout;
+  src = pytest.test_src;
 
   dontBuild = true;
   dontInstall = true;

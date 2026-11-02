@@ -32,7 +32,7 @@ buildPythonPackage (finalAttrs: {
   buildAndTestSubdir = "crates/uv-build";
 
   # $src/.github/workflows/build-binaries.yml#L139
-  maturinBuildFlags = [ "--profile=minimal-size" ];
+  maturinBuildProfile = "minimal-size";
 
   pythonImportsCheck = [ "uv_build" ];
 

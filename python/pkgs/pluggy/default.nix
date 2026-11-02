@@ -4,7 +4,7 @@
   fetchFromGitHub,
   setuptools-scm,
   pythonOlder,
-  callPackage,
+  pytestCheckHook,
 }:
 
 buildPythonPackage (finalAttrs: {
@@ -24,9 +24,7 @@ buildPythonPackage (finalAttrs: {
 
   build-system = [ setuptools-scm ];
 
-  passthru.tests = {
-    pytest = callPackage ./tests.nix { };
-  };
+  nativeTestOnlyCheckInputs = [ pytestCheckHook ];
 
   pythonImportsCheck = [ "pluggy" ];
 

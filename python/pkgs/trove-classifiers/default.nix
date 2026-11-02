@@ -32,8 +32,6 @@ buildPythonPackage (finalAttrs: {
 
   pythonImportsCheck = [ "trove_classifiers" ];
 
-  passthru.tests.trove-classifiers = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
-
   meta = {
     description = "Canonical source for classifiers on PyPI";
     homepage = "https://github.com/pypa/trove-classifiers";

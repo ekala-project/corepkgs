@@ -108,10 +108,6 @@ buildPythonPackage (finalAttrs: {
       --zsh <($out/bin/pip completion --zsh --no-cache-dir)
   '';
 
-  passthru.tests = {
-    pytest = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
-  };
-
   pythonImportsCheck = [ "pip" ];
 
   meta = {

@@ -24,12 +24,6 @@ buildPythonPackage (finalAttrs: {
 
   pythonImportsCheck = [ "sortedcontainers" ];
 
-  passthru.tests = {
-    pytest = finalAttrs.finalPackage.overridePythonAttrs (_: {
-      doCheck = true;
-    });
-  };
-
   meta = {
     description = "Python Sorted Container Types: SortedList, SortedDict, and SortedSet";
     homepage = "https://grantjenks.com/docs/sortedcontainers/";

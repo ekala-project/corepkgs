@@ -33,8 +33,6 @@ buildPythonPackage (finalAttrs: {
 
   pythonImportsCheck = [ "calver" ];
 
-  passthru.tests.calver = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
-
   meta = {
     changelog = "https://github.com/di/calver/releases/tag/${finalAttrs.src.tag}";
     description = "Setuptools extension for CalVer package versions";
