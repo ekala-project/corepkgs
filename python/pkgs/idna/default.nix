@@ -3,6 +3,7 @@
   buildPythonPackage,
   fetchFromGitHub,
   flit-core,
+  hypothesis,
   pytestCheckHook,
 }:
 
@@ -22,7 +23,10 @@ buildPythonPackage (finalAttrs: {
 
   pythonImportsCheck = [ "idna" ];
 
-  nativeCheckInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [
+    hypothesis
+    pytestCheckHook
+  ];
 
   testPaths = [ "tests" ];
 

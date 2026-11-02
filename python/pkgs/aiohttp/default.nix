@@ -23,7 +23,7 @@
   attrs,
   backports-zstd ? null,
   frozenlist ? null,
-  multidict ? null,
+  multidict,
   propcache ? null,
   yarl ? null,
 
@@ -75,6 +75,10 @@ buildPythonPackage (finalAttrs: {
     cython
     pkgconfig
     setuptools
+  ];
+
+  nativeBuildInputs = [
+    multidict # tools/gen.py imports multidict at build time
   ];
 
   preBuild = ''

@@ -50,6 +50,14 @@ buildPythonPackage (finalAttrs: {
     "test_format_time"
   ];
 
+  disabledTestPaths = [
+    # freezegun is not available
+    "tests/messages/frontend/test_cli.py"
+    "tests/messages/frontend/test_extract.py"
+    "tests/messages/frontend/test_init.py"
+    "tests/test_dates.py"
+  ];
+
   pythonImportsCheck = [ "babel" ];
 
   meta = {

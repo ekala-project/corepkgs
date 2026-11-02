@@ -1,11 +1,12 @@
 {
   lib,
-  callPackage,
   buildPythonPackage,
   fetchPypi,
   pythonOlder,
   replaceVars,
   hatchling,
+  hypothesis,
+  pytestCheckHook,
 }:
 
 buildPythonPackage (finalAttrs: {
@@ -28,22 +29,14 @@ buildPythonPackage (finalAttrs: {
 
   nativeBuildInputs = [ hatchling ];
 
-  outputs = [
-    "out"
-    "testout"
+  testPaths = [ "tests" ];
+
+  nativeTestOnlyCheckInputs = [
+    hypothesis
+    pytestCheckHook
   ];
 
-  postInstall = ''
-    # Install tests as the tests output.
-    mkdir $testout
-    cp -R tests $testout
-  '';
-
   pythonImportsCheck = [ "attr" ];
-
-  passthru.tests = {
-    pytest = callPackage ./tests.nix { };
-  };
 
   meta = {
     description = "Python attributes without boilerplate";

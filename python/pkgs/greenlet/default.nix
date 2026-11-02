@@ -8,9 +8,8 @@
   setuptools,
 
   # tests
-  objgraph ? null,
+  objgraph,
   psutil,
-  python,
   unittestCheckHook,
 }:
 
@@ -27,29 +26,17 @@ buildPythonPackage (finalAttrs: {
   build-system = [ setuptools ];
 
   nativeCheckInputs = [
+    objgraph
     psutil
     unittestCheckHook
-  ]
-  ++ lib.optional (objgraph != null) objgraph;
+  ];
 
   # https://github.com/python-greenlet/greenlet/issues/395
   env.NIX_CFLAGS_COMPILE = lib.optionalString (
     stdenv.hostPlatform.isPower64 || stdenv.hostPlatform.isLoongArch64
   ) "-fomit-frame-pointer";
 
-  preCheck = ''
-    pushd ${placeholder "out"}/${python.sitePackages}
-  '';
-
   unittestFlagsArray = [ "greenlet.tests" ];
-
-  postCheck = ''
-    popd
-  '';
-
-  passthru.tests.pytest = finalAttrs.finalPackage.overridePythonAttrs (_: {
-    doCheck = true;
-  });
 
   pythonImportsCheck = [ "greenlet" ];
 

@@ -37,12 +37,6 @@ buildPythonPackage (finalAttrs: {
 
   pythonImportsCheck = [ "zipp" ];
 
-  passthru.tests = {
-    check = finalAttrs.finalPackage.overridePythonAttrs (_: {
-      doCheck = true;
-    });
-  };
-
   meta = {
     description = "Pathlib-compatible object wrapper for zip files";
     homepage = "https://github.com/jaraco/zipp";

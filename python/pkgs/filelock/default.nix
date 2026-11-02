@@ -32,7 +32,10 @@ buildPythonPackage (finalAttrs: {
     pytestCheckHook
   ];
 
-  testPaths = [ "tests" ];
+  testPaths = [
+    "tests"
+    "tasks" # capabilities module needed by conftest.py
+  ];
 
   pythonImportsCheck = [ "filelock" ];
 

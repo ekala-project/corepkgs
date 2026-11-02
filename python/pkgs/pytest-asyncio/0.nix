@@ -1,10 +1,11 @@
 {
   lib,
   buildPythonPackage,
-  callPackage,
   fetchFromGitHub,
   pytest,
   setuptools-scm,
+  hypothesis,
+  pytestCheckHook,
 }:
 
 buildPythonPackage (finalAttrs: {
@@ -19,21 +20,16 @@ buildPythonPackage (finalAttrs: {
     hash = "sha256-GEhFwwQCXwtqfSiew/sOvJYV3JREqOGD4fQONlRR/Mw=";
   };
 
-  outputs = [
-    "out"
-    "testout"
-  ];
+  testPaths = [ "tests" ];
 
   build-system = [ setuptools-scm ];
 
   buildInputs = [ pytest ];
 
-  postInstall = ''
-    mkdir $testout
-    cp -R tests $testout/tests
-  '';
-
-  passthru.tests.pytest = callPackage ./tests.nix { };
+  nativeTestOnlyCheckInputs = [
+    hypothesis
+    pytestCheckHook
+  ];
 
   pythonImportsCheck = [ "pytest_asyncio" ];
 

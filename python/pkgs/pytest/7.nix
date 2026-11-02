@@ -37,10 +37,7 @@ buildPythonPackage (finalAttrs: {
     hash = "sha256-LPAAWSLGrOSj4uyLQIDrDZdT/ckxB0FTMvUM6eeZQoA=";
   };
 
-  outputs = [
-    "out"
-    "testout"
-  ];
+  testPaths = [ "testing" ];
 
   nativeBuildInputs = [
     setuptools
@@ -70,12 +67,7 @@ buildPythonPackage (finalAttrs: {
     ];
   };
 
-  postInstall = ''
-    mkdir $testout
-    cp -R testing $testout/testing
-  '';
-
-  passthru.tests.pytest = callPackage ./tests.nix { pytest = finalAttrs.finalPackage; };
+  passthru.tests.python = callPackage ./tests.nix { pytest = finalAttrs.finalPackage; };
 
   # Remove .pytest_cache when using py.test in a Nix build
   setupHook = writeText "pytest-hook" ''

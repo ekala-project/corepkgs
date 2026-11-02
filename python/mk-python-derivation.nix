@@ -104,6 +104,7 @@ let
     "checkPhase"
     "checkInputs"
     "nativeCheckInputs"
+    "nativeTestOnlyCheckInputs"
     "doCheck"
     "doInstallCheck"
     "pyproject"
@@ -156,6 +157,7 @@ lib.extendMkDerivation {
     "checkPhase"
     "checkInputs"
     "nativeCheckInputs"
+    "nativeTestOnlyCheckInputs"
     "doCheck"
     "doInstallCheck"
     "pyproject"
@@ -179,6 +181,12 @@ lib.extendMkDerivation {
       # These are added to buildInputs when doCheck = true.
       checkInputs ? [ ],
       nativeCheckInputs ? [ ],
+
+      # Dependencies needed ONLY for the auto-generated test derivation.
+      # Never added to the main package's build inputs.  Use this to break
+      # circular dependencies (e.g. a package depended upon by pytest can
+      # list pytestCheckHook here without creating a cycle).
+      nativeTestOnlyCheckInputs ? [ ],
 
       # propagate build dependencies so in case we have A -> B -> C,
       # C can import package A propagated by B
@@ -259,7 +267,9 @@ lib.extendMkDerivation {
 
       meta ? { },
 
-      doCheck ? false,
+      # Default to true for test-only derivations (dontBuild + dontInstall with
+      # check inputs), matching the convention used by manual tests.nix files.
+      doCheck ? (attrs.dontBuild or false) && (attrs.dontInstall or false) && nativeCheckInputs != [ ],
 
       ...
     }@attrs:
@@ -292,6 +302,9 @@ lib.extendMkDerivation {
       withDistOutput = withDistOutput' format';
 
       withTestSrcOutput = testPaths != [ ];
+
+      # Auto-generate passthru.tests.python when there are any check inputs.
+      withAutoTests = testPaths != [ ] || nativeCheckInputs != [ ] || nativeTestOnlyCheckInputs != [ ];
 
       validatePythonMatches =
         let
@@ -509,11 +522,11 @@ lib.extendMkDerivation {
           forwardedTestHooks = lib.filterAttrs (n: _: attrs ? ${n}) (
             lib.genAttrs forwardedTestHookNames (n: attrs.${n} or null)
           );
-          autoTests = optionalAttrs withTestSrcOutput {
+          autoTests = optionalAttrs withAutoTests {
             python = stdenv.mkDerivation (
               {
                 name = "${name}-tests";
-                src = finalAttrs.finalPackage.test_src;
+                src = if withTestSrcOutput then finalAttrs.finalPackage.test_src else finalAttrs.finalPackage.src;
                 dontConfigure = true;
                 dontBuild = true;
                 # We still produce an empty `$out` because some preDist hooks
@@ -530,7 +543,8 @@ lib.extendMkDerivation {
                   python
                   finalAttrs.finalPackage
                 ]
-                ++ nativeCheckInputs;
+                ++ nativeCheckInputs
+                ++ nativeTestOnlyCheckInputs;
                 buildInputs = checkInputs;
               }
               // forwardedTestHooks

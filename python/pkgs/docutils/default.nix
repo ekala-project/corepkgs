@@ -22,8 +22,6 @@ buildPythonPackage (finalAttrs: {
 
   build-system = [ flit-core ];
 
-  passthru.tests.pytest = finalAttrs.finalPackage.overridePythonAttrs { doCheck = true; };
-
   nativeCheckInputs = [ pillow ];
 
   checkPhase = ''

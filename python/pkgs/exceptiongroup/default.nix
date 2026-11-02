@@ -34,6 +34,11 @@ buildPythonPackage (finalAttrs: {
 
   nativeCheckInputs = [ pytestCheckHook ];
 
+  disabledTests = lib.optionals (pythonAtLeast "3.14") [
+    # repr change in Python 3.14
+    "test_exceptions_mutate_original_sequence"
+  ];
+
   testPaths = [ "tests" ];
 
   doCheck = pythonAtLeast "3.11"; # infinite recursion with pytest

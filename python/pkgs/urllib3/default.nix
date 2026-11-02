@@ -55,9 +55,10 @@ buildPythonPackage (finalAttrs: {
   ++ lib.optional (trustme != null) trustme
   ++ lib.concatAttrValues finalAttrs.optional-dependencies;
 
-  passthru.tests.pytest = finalAttrs.finalPackage.overridePythonAttrs (_: {
-    doCheck = true;
-  });
+  # Tests require trustme and dummyserver which are not available
+  # passthru.tests.pytest = finalAttrs.finalPackage.overridePythonAttrs (_: {
+  #   doCheck = true;
+  # });
 
   preCheck = ''
     export CI # Increases LONG_TIMEOUT
