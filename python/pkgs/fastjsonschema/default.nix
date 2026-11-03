@@ -10,7 +10,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "fastjsonschema";
-  version = "2.21.1";
+  version = "2.22.3";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
@@ -20,7 +20,7 @@ buildPythonPackage (finalAttrs: {
     repo = "python-fastjsonschema";
     tag = "v${finalAttrs.version}";
     fetchSubmodules = true;
-    hash = "sha256-H/jmvm5U4RB9KuD5EgCedbc499Fl8L2S9Y5SXy51JP0=";
+    hash = "sha256-KbgY8wJW5BHo1EUZzY+dUlNN4Bk/8DFHxQHkVNHoHKA=";
   };
 
   build-system = [ setuptools ];
