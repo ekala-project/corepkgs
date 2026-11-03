@@ -36,7 +36,7 @@ let
     in
 
     let
-      version = "2.13.0";
+      version = "2.15.0";
     in
     stdenv.mkDerivation (
       {
@@ -49,7 +49,7 @@ let
           owner = "ARM-software";
           repo = "arm-trusted-firmware";
           tag = "v${version}";
-          hash = "sha256-rxm5RCjT/MyMCTxiEC8jQeFMrCggrb2DRbs/qDPXb20=";
+          hash = "sha256-pFisArv6snepJ1qWmjckbr0O2Jg4WMhUkN3exgdyb+c=";
         };
 
         patches = lib.optionals deleteHDCPBlobBeforeBuild [
