@@ -11,7 +11,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "pytest-rerunfailures";
-  version = "16.0.1";
+  version = "16.6.1";
   pyproject = true;
 
   disabled = pythonOlder "3.9";
@@ -20,7 +20,7 @@ buildPythonPackage (finalAttrs: {
     owner = "pytest-dev";
     repo = "pytest-rerunfailures";
     tag = finalAttrs.version;
-    hash = "sha256-4/BgvfVcs7MdULlhafZypNzzag4ITALStHI1tIoAPL4=";
+    hash = "sha256-TrqWqmOO9aBgx+sm4V4PV7Bqse6uB6Is3cJ136fPpbE=";
   };
 
   build-system = [ setuptools ];
