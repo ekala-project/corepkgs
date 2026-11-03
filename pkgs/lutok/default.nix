@@ -36,7 +36,7 @@ lib.fix (
   in
   stdenv.mkDerivation (finalAttrs: {
     pname = "lutok";
-    version = "0.4";
+    version = "0.6.3";
 
     outputs = [
       "out"
@@ -47,7 +47,7 @@ lib.fix (
       owner = "freebsd";
       repo = "lutok";
       tag = "lutok-${finalAttrs.version}";
-      hash = "sha256-awAFxx9q8dZ6JO1/mShjhJnOPTLn1wCT4VrB4rlgWyg=";
+      hash = "sha256-HpTs/BF0F3jFZrh6K5X6z6T9ySK/EsR/KZw1462RDTY=";
     };
 
     strictDeps = true;
@@ -71,6 +71,14 @@ lib.fix (
 
     checkInputs = [ atf' ];
     nativeCheckInputs = [ kyua' ];
+
+    # Test programs are built by "make check", not the default target.
+    # Override checkPhase to build and run tests together via make.
+    checkPhase = ''
+      runHook preCheck
+      make -j''${NIX_BUILD_CORES:-1} check
+      runHook postCheck
+    '';
 
     meta = {
       description = "Lightweight C++ API for Lua";
