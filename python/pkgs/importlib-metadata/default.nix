@@ -15,7 +15,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "importlib-metadata";
-  version = "9.0.1";
+  version = "10.1.0";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
@@ -23,7 +23,7 @@ buildPythonPackage (finalAttrs: {
   src = fetchPypi {
     pname = "importlib_metadata";
     inherit (finalAttrs) version;
-    hash = "sha256-q4MFgLwO89thzo+ucWOJ5UYrZ+AzAYurbY+A7xcXL5k=";
+    hash = "sha256-grBAR/oJeSwajP7d/gi+x55LE8KchGmw05SYYPYQF+g=";
   };
 
   postPatch = ''
