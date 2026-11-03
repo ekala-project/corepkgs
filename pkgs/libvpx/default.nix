@@ -73,13 +73,13 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libvpx";
-  version = "1.16.0";
+  version = "1.17.0";
 
   src = fetchFromGitHub {
     owner = "webmproject";
     repo = "libvpx";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-z1Ov3BHnAGuayeY4D86oTRiDfuZ2Wpc4ZD7pXGaakVI=";
+    hash = "sha256-1PBeHQSgBf5nT/IDL36VWBqiWLSHz/1XGM41gy49DsY=";
   };
 
   postPatch = ''
