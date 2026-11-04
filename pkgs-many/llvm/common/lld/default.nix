@@ -62,6 +62,18 @@ stdenv.mkDerivation (finalAttrs: {
     LLVM_TABLEGEN_EXE = "${buildLlvmPackages.tblgen}/bin/llvm-tblgen";
   };
 
+  cmakeBuildType = "Release";
+
+  # GCC 15 ICEs on template-heavy LLVM code at -O3; use -O1.
+  preConfigure = lib.optionalString (!stdenv.hostPlatform.useLLVM) ''
+    setCMakeEntry CMAKE_C_FLAGS_RELEASE "-O1 -DNDEBUG"
+    setCMakeEntry CMAKE_CXX_FLAGS_RELEASE "-O1 -DNDEBUG"
+  '';
+
+  env = lib.optionalAttrs (!stdenv.hostPlatform.useLLVM) {
+    NIX_CFLAGS_COMPILE = "-g0 --param ggc-min-expand=200 --param ggc-min-heapsize=819200";
+  };
+
   # Musl's default stack size is too small for lld to be able to link Firefox.
   LDFLAGS = lib.optionalString stdenv.hostPlatform.isMusl "-Wl,-z,stack-size=2097152";
 

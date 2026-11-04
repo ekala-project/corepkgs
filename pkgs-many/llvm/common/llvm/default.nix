@@ -397,6 +397,12 @@ stdenv.mkDerivation (
         check_version patch ${patch}
       '';
 
+    # Work around GCC 15 ICE (GC segfault) on template-heavy LLVM code.
+    # Large values reduce GC frequency, avoiding stack overflow in GC mark traversal.
+    env = lib.optionalAttrs (!stdenv.hostPlatform.useLLVM) {
+      NIX_CFLAGS_COMPILE = "--param ggc-min-expand=200 --param ggc-min-heapsize=819200";
+    };
+
     # E.g. Mesa uses the build-id as a cache key (see #93946):
     LDFLAGS = optionalString (
       enableSharedLibraries && !stdenv.hostPlatform.isDarwin
