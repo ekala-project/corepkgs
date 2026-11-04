@@ -1,7 +1,7 @@
 {
   default = {
-    version = "3.2.0";
-    src-hash = "sha256-SPxWCDt9hFQ8uRaaKLkpWp9oPhfcRkDBm5MarTgdmV4=";
+    version = "3.2.1";
+    src-hash = "sha256-CJFKco3RfZK9QS4Ft16TsFmAxte0j53RgmkWprwIdRE=";
     enableJpeg7 = false;
     enableJpeg8 = false;
   };

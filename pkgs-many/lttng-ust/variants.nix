@@ -8,9 +8,9 @@
   };
 
   v2_15 = rec {
-    version = "2.15.1";
+    version = "2.16.0";
     src-url = "https://github.com/lttng/lttng-ust/archive/refs/tags/v${version}.tar.gz";
-    src-hash = "sha256-3hjg4zIIO20zS6ojDjZttPFeJmSDywI493ZCWqNcWcA=";
+    src-hash = "sha256-5pxcRz4PDnR7Hiw3owe0K+OdxWscVfuD/t1d6A87xLI=";
     useAutoreconf = true;
     withManpages = true;
   };

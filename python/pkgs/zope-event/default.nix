@@ -8,15 +8,20 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "zope-event";
-  version = "5.0";
+  version = "5.1.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "zopefoundation";
     repo = "zope.event";
     tag = finalAttrs.version;
-    hash = "sha256-85jXSrploTcskdOBI84KGGf9Bno41ZTtT/TrbgmTxiA=";
+    hash = "sha256-B4DGCbPS4KNf1BFLeF7ousjIOehB0/8V+jXBQzS2ZN4=";
   };
+
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace-fail "setuptools == 78.1.1" "setuptools >= 78.1.1"
+  '';
 
   build-system = [ setuptools ];
 

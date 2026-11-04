@@ -29,13 +29,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "criu";
-  version = "4.1.1";
+  version = "4.2.2";
 
   src = fetchFromGitHub {
     owner = "checkpoint-restore";
     repo = "criu";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-SfpJskXX7r3jbAwgZl2qpa7j1M4i8/sV6rlAWiUEoQs=";
+    hash = "sha256-8m/rc8laLHV5w2hh+U5WfUQyDQqmjNvZlg/0yfqFBLY=";
   };
 
   depsBuildBuild = [
@@ -77,7 +77,7 @@ stdenv.mkDerivation (finalAttrs: {
       --replace "2>/dev/null" "" \
       --replace "-m custom.xsl" "-m custom.xsl --skip-validation -x ${docbook-xsl}/xml/xsl/docbook/manpages/docbook.xsl"
     substituteInPlace ./Makefile --replace "head-name := \$(shell git tag -l v\$(CRIU_VERSION))" "head-name = ${finalAttrs.version}.0"
-    ln -sf ${protobuf}/include/google/protobuf/descriptor.proto ./images/google/protobuf/descriptor.proto
+    substituteInPlace ./images/Makefile --replace "--proto_path=/usr/include" "--proto_path=${protobuf}/include"
   '';
 
   makeFlags =

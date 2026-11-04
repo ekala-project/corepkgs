@@ -6,8 +6,7 @@
 
   # build-system
   installShellFiles,
-  wheel,
-  setuptools,
+  flit-core,
 
   # docs
   sphinx,
@@ -29,14 +28,14 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "pip";
-  version = "25.0.1";
+  version = "26.2.2";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "pypa";
     repo = "pip";
     tag = finalAttrs.version;
-    hash = "sha256-V069rAL6U5KBnSc09LRCu0M7qQCH5NbMghVttlmIoRY=";
+    hash = "sha256-iH5O1kneYzoHpzbfgrJc/8gVr57CNX3/xpwel4ueNqE=";
   };
 
   postPatch = ''
@@ -47,8 +46,7 @@ buildPythonPackage (finalAttrs: {
 
   nativeBuildInputs = [
     installShellFiles
-    setuptools
-    wheel
+    flit-core
   ]
   ++ lib.optionals (pythonAtLeast "3.11") [
     # docs

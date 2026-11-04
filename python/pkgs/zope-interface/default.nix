@@ -7,20 +7,15 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "zope-interface";
-  version = "7.2";
+  version = "8.1.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "zopefoundation";
     repo = "zope.interface";
     tag = finalAttrs.version;
-    hash = "sha256-WrS/YHkEmV1G/Scg0xpyu2uFVWTWnEpajqNDvGioVgc=";
+    hash = "sha256-JDBfBlqQ2WbnF1fkPjL7brDPbPG0LYEAZ+/DBui3KYw=";
   };
-
-  postPatch = ''
-    substituteInPlace pyproject.toml \
-      --replace-fail "setuptools < 74" "setuptools"
-  '';
 
   build-system = [ setuptools ];
 

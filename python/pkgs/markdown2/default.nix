@@ -12,7 +12,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "markdown2";
-  version = "2.5.4";
+  version = "2.5.5";
   pyproject = true;
 
   disabled = pythonOlder "3.9";
@@ -21,7 +21,7 @@ buildPythonPackage (finalAttrs: {
     owner = "trentm";
     repo = "python-markdown2";
     tag = finalAttrs.version;
-    hash = "sha256-2w11vVzZUS6HzXmZT+Ag5rPqRnn/tlLnHL4xIDv0l+g=";
+    hash = "sha256-h0vzv59RsceTZSvFF9DX5D6YanAKMTG3cNc1napXMyI=";
   };
 
   build-system = [ setuptools ];

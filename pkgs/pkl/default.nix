@@ -8,12 +8,12 @@
 }:
 
 let
-  version = "0.32.1";
+  version = "0.32.2";
 
   srcs = {
     x86_64-linux = fetchurl {
       url = "https://github.com/apple/pkl/releases/download/${version}/pkl-linux-amd64";
-      hash = "sha256-MYC2LalcDK0dkE6btsX0qPkDJBPCHlMZS7kf8e5fMhE=";
+      hash = "sha256-h0x1SEx5rdd/sjRupKsuiHXuo1+3B4lL9UV6LfXQPe8=";
     };
     aarch64-linux = fetchurl {
       url = "https://github.com/apple/pkl/releases/download/${version}/pkl-linux-aarch64";

@@ -10,8 +10,8 @@ rec {
     implementation = "upstream";
     unwrapped = false;
     withAllTargets = false;
-    version = "2.46.1";
-    hash = "sha256-5t/jYBJt8l/+sgE1k7lFcqxxKhQz8h4ZxEytnkDTbNU=";
+    version = "2.47";
+    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
   v2_44 = {
     variant = "v2_44";

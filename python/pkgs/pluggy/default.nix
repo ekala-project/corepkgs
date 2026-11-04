@@ -9,7 +9,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "pluggy";
-  version = "1.6.0";
+  version = "1.7.0";
 
   disabled = pythonOlder "3.8";
 
@@ -19,7 +19,7 @@ buildPythonPackage (finalAttrs: {
     owner = "pytest-dev";
     repo = "pluggy";
     tag = finalAttrs.version;
-    hash = "sha256-pkQjPJuSASWmzwzp9H/UTJBQDr2r2RiofxpF135lAgc=";
+    hash = "sha256-wQr2dFG8gh58v9CbmNhLX3Znuj+JeBAm3SHXJXMztXA=";
   };
 
   build-system = [ setuptools-scm ];

@@ -32,13 +32,13 @@
 assert xarSupport -> libxml2 != null;
 stdenv.mkDerivation (finalAttrs: {
   pname = "libarchive";
-  version = "3.8.10";
+  version = "3.8.11";
 
   src = fetchFromGitHub {
     owner = "libarchive";
     repo = "libarchive";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-B2leEyMwSy7YSEMKSTsgfeBbKo4kOQPU0ME0XWuZMik=";
+    hash = "sha256-jkcTcc5w2mENlQIjgpcM1fJ7r9yGEJY7X6129nVuypQ=";
   };
 
   outputs = [
