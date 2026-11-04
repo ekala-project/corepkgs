@@ -10,14 +10,14 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "zipp";
-  version = "4.1.1";
+  version = "4.1.2";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "jaraco";
     repo = "zipp";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-yQXgsSUFzZ4LYDpsa9HZVJl7jNNIqCL11sVHvvcKWpg=";
+    hash = "sha256-JfW0hB9lyv8dJa3kxJw47gzDc/6XvVLvMyacEwEc1Zg=";
   };
 
   postPatch = ''

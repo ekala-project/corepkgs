@@ -43,7 +43,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "sphinx";
-  version = "9.1.1";
+  version = "9.2.0";
   pyproject = true;
 
   disabled = pythonOlder "3.11";
@@ -59,7 +59,7 @@ buildPythonPackage (finalAttrs: {
       mv tests/roots/test-images/{testimäge,testimæge}.png
       sed -i 's/testimäge/testimæge/g' tests/{test_build*.py,roots/test-images/index.rst}
     '';
-    hash = "sha256-0i+g+MGiF18Wibd19WWFgIHL/A5u1KxI9MpPu5tMbDE=";
+    hash = "sha256-+rtGXOc8U2hd0Z1N8Y+ZucdgYFpppequSZ8ph6jB8dA=";
   };
 
   build-system = [ flit-core ];

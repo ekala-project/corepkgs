@@ -2,7 +2,7 @@
   lib,
   python,
   fetchFromGitHub,
-  fetchpatch2,
+
   buildPythonPackage,
   cython,
   setuptools,
@@ -11,24 +11,15 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "pystemmer";
-  version = "2.2.0.1";
+  version = "3.1.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "snowballstem";
     repo = "pystemmer";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-ngPx95ybgJmndpNPBwCa3BCNsozRg+dlEw+nhlIwI58=";
+    hash = "sha256-GPPl6ioB9sB2y8G2hYfu2ksR+D9xNJjK6glMADLnr7M=";
   };
-
-  patches = [
-    (fetchpatch2 {
-      # relax cython constraint
-      name = "pystemmer-relax-cython.patch";
-      url = "https://github.com/snowballstem/pystemmer/commit/d3d423dc877b4f49e0ab1776f7edaff37feb6799.patch";
-      hash = "sha256-9K6gy/cLFPfW82XYHVVPXUbQhf8XyB4NUi4YqNtyWcw=";
-    })
-  ];
 
   build-system = [
     cython

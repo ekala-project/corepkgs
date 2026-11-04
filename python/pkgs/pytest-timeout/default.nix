@@ -10,14 +10,14 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "pytest-timeout";
-  version = "2.4.0";
+  version = "2.5.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "pytest-dev";
     repo = "pytest-timeout";
     tag = finalAttrs.version;
-    hash = "sha256-NGTy3Hua6yEMWXQDJQO2Z5DD3clXTZXEH6DNQBMSGtQ=";
+    hash = "sha256-9eoYrWPOBh7jA1vpQ7ODOTkAzeTh6EIydsEkSLTY8xw=";
   };
 
   build-system = [ setuptools ];

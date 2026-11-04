@@ -2,6 +2,7 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
+  hatch-fancy-pypi-readme,
   hatch-vcs,
   hatchling,
   pythonOlder,
@@ -9,19 +10,20 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "platformdirs";
-  version = "4.13.5";
+  version = "4.14.3";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "tox-dev";
     repo = "platformdirs";
     tag = finalAttrs.version;
-    hash = "sha256-94PFQuqqDdP90P3ifM5ZxyLi6Yo3V/J6ast5J/o8qkE=";
+    hash = "sha256-8/zTOfB1UxvvJcUUpV7++8fnLkkTF0TDLRtlohvPLjE=";
   };
 
   build-system = [
-    hatchling
+    hatch-fancy-pypi-readme
     hatch-vcs
+    hatchling
   ];
 
   pythonImportsCheck = [ "platformdirs" ];

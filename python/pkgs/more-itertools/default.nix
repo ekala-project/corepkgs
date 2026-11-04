@@ -4,25 +4,27 @@
   fetchFromGitHub,
   flit-core,
   pytestCheckHook,
-  six,
   stdenv,
 }:
 
 buildPythonPackage (finalAttrs: {
   pname = "more-itertools";
-  version = "11.1.0";
+  version = "11.2.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "more-itertools";
     repo = "more-itertools";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-fk2QRwOYgYfANtwRpEtGK5F+rRI2Gj25l0XaP9svJz8=";
+    hash = "sha256-bT+dDxPcrPYKEzsPYzKDJehZIpeJTqvheVhSG+ufmbo=";
   };
 
-  build-system = [ flit-core ];
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace-fail "flit_core >=4,<5" "flit_core >=3,<5"
+  '';
 
-  propagatedBuildInputs = [ six ];
+  build-system = [ flit-core ];
 
   nativeCheckInputs = [ pytestCheckHook ];
 

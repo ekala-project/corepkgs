@@ -10,13 +10,13 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "python-discovery";
-  version = "1.9.0";
+  version = "1.9.2";
   pyproject = true;
 
   src = fetchPypi {
     pname = "python_discovery";
     inherit (finalAttrs) version;
-    hash = "sha256-iL61flG5GcMPMDsFPsQTWSmMo0kZIDWwqALHY0eultc=";
+    hash = "sha256-3jl7nEsJpfuLtMUds8DacfuB0ig3GNdP0e+qv/wyr7w=";
   };
 
   build-system = [
