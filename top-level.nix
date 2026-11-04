@@ -1386,9 +1386,9 @@ final: prev: with final; {
               // {
                 inherit (prev.llvm) extendVariants variantArgs;
                 pkgs = scope;
-                v21 = llvmPackage;
+                v22 = llvmPackage;
                 variants = prev.llvm.variants // {
-                  v21 = llvmPackage;
+                  v22 = llvmPackage;
                 };
               };
           })
