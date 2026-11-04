@@ -109,7 +109,8 @@ let
     };
     getent = {
       linux = if stdenv.hostPlatform.libc == "glibc" then pkgs.libc.getent else pkgs.netbsd.getent;
-      darwin = pkgs.netbsd.getent;
+      # TODO: port netbsd.getent
+      darwin = pkgs.netbsd.getent or (throw "getent: netbsd.getent is not packaged yet");
       freebsd = pkgs.freebsd.getent;
       openbsd = pkgs.openbsd.getent;
     };
