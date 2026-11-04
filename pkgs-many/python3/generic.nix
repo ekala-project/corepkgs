@@ -80,40 +80,44 @@ let
       ;
   };
 
-  cpythonInterpreter = callPackage ../../python/cpython {
-    self = cpythonInterpreter;
-    inherit
-      sourceVersion
-      passthruFun
-      packageOverrides
-      enableGIL
-      withMinimalDeps
-      enableOptimizations
-      enableLTO
-      enableFramework
-      enableDebug
-      enableNoSemanticInterposition
-      static
-      stripBytecode
-      rebuildBytecode
-      reproducibleBuild
-      stripConfig
-      stripIdlelib
-      stripTests
-      stripTkinter
-      includeSiteCustomize
-      bluezSupport
-      mimetypesSupport
-      withExpat
-      withGdbm
-      withMpdecimal
-      withOpenssl
-      withReadline
-      withSqlite
-      ;
-    pythonAttr = pythonAttr';
-    hash = src-hash;
-  };
+  cpythonInterpreter = callPackage ../../python/cpython (
+    {
+      self = cpythonInterpreter;
+      inherit
+        sourceVersion
+        passthruFun
+        packageOverrides
+        enableGIL
+        withMinimalDeps
+        enableOptimizations
+        enableLTO
+        enableFramework
+        enableDebug
+        enableNoSemanticInterposition
+        static
+        stripBytecode
+        rebuildBytecode
+        reproducibleBuild
+        stripConfig
+        stripIdlelib
+        stripTests
+        stripTkinter
+        includeSiteCustomize
+        bluezSupport
+        mimetypesSupport
+        withExpat
+        withGdbm
+        withMpdecimal
+        withOpenssl
+        withReadline
+        withSqlite
+        ;
+      pythonAttr = pythonAttr';
+      hash = src-hash;
+    }
+    # The Darwin stdenv bootstrap overrides `zstd = null` to avoid infinite recursion.
+    // lib.optionalAttrs (packageArgs ? zstd) { inherit (packageArgs) zstd; }
+  );
 in
 cpythonInterpreter.overrideAttrs (oldAttrs: {
   ${if withMinimalDeps then "pname" else null} = "python3-minimal";
