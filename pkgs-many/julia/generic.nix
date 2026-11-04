@@ -83,9 +83,10 @@ stdenv.mkDerivation {
   ];
 
   # vendored GMP needs C17 (K&R decls); vendored LLVM needs <cstdint>
+  # --param flags work around GCC 15 ICE (GC segfault) compiling vendored LLVM
   env = {
     CFLAGS = "-std=gnu17";
-    CXXFLAGS = "-include cstdint";
+    CXXFLAGS = "-include cstdint --param ggc-min-expand=200 --param ggc-min-heapsize=819200";
   };
 
   # Julia's build system expects to build in-tree
