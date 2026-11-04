@@ -194,7 +194,9 @@ makeScopeWithSplicing' {
         let
           clangStdenv =
             if
-              !stdenv.hostPlatform.useLLVM
+              # Darwin always uses clang; don't rebuild its libclang with clang 20.
+              !stdenv.hostPlatform.isDarwin
+              && !stdenv.hostPlatform.useLLVM
               && lib.versionAtLeast (lib.getVersion stdenv.cc.cc) "15"
               && lib.versionAtLeast metadata.release_version "21"
             then
