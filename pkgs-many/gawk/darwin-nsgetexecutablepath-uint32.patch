@@ -1,0 +1,11 @@
+--- a/posix/gawkmisc.c
++++ b/posix/gawkmisc.c
+@@ -353,7 +353,7 @@
+ 			int status;
+ 			pid_t pid;
+ 			extern char **environ;
+-			size_t size = BUFSIZ;
++			uint32_t size = BUFSIZ;
+ 
+ 			memset(fullpath, 0, BUFSIZ);
+ 			n = _NSGetExecutablePath(fullpath, &size);

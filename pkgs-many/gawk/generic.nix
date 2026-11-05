@@ -42,7 +42,13 @@ stdenv.mkDerivation (finalAttrs: {
     hash = src-hash;
   };
 
-  patches = [ ./include-mach-o-dyld.patch ];
+  patches = [
+    ./include-mach-o-dyld.patch
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    # _NSGetExecutablePath takes a uint32_t *; clang rejects the size_t *.
+    ./darwin-nsgetexecutablepath-uint32.patch
+  ];
 
   # When we do build separate interactive version, it makes sense to always include man.
   outputs = [
