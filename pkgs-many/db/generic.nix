@@ -99,7 +99,9 @@ stdenv.mkDerivation (
       (if compat185 then "--enable-compat185" else "--disable-compat185")
     ]
     ++ lib.optional dbmSupport "--enable-dbm"
-    ++ lib.optional stdenv.hostPlatform.isFreeBSD "--with-pic";
+    ++ lib.optional stdenv.hostPlatform.isFreeBSD "--with-pic"
+    # clang rejects the K&R-style function definitions under C23.
+    ++ lib.optional stdenv.hostPlatform.isDarwin "ac_cv_prog_cc_c23=no";
 
     preConfigure = ''
       cd build_unix
