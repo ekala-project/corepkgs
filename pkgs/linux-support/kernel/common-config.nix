@@ -73,6 +73,8 @@ let
       # aarch64 defconfig since 5.13
       DEBUG_INFO_REDUCED = whenAtLeast "5.13" (option no);
       DEBUG_INFO_BTF = option yes;
+      # pahole crashes on some clang-generated DWARF when producing module BTF
+      DEBUG_INFO_BTF_MODULES = option no;
       # Allow loading modules with mismatched BTFs
       # FIXME: figure out how to actually make BTFs reproducible instead
       # See https://github.com/NixOS/nixpkgs/pull/181456 for details.
