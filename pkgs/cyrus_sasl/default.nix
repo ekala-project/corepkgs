@@ -77,13 +77,18 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals (stdenv.targetPlatform.useLLVM or false) [
     "--disable-sample"
     "CFLAGS=-DTIME_WITH_SYS_TIME"
-  ];
+  ]
+  # clang rejects the K&R-style function definitions under C23.
+  ++ lib.optional stdenv.hostPlatform.isDarwin "ac_cv_prog_cc_c23=no";
 
-  env = lib.optionalAttrs stdenv.cc.isGNU {
-    NIX_CFLAGS_COMPILE = toString [
-      "-Wno-error=implicit-function-declaration"
-      "-std=gnu17"
-    ];
+  env = lib.optionalAttrs (stdenv.cc.isGNU || stdenv.hostPlatform.isDarwin) {
+    NIX_CFLAGS_COMPILE = toString (
+      [
+        "-Wno-error=implicit-function-declaration"
+        "-std=gnu17"
+      ]
+      ++ lib.optional stdenv.hostPlatform.isDarwin "-Wno-error=incompatible-pointer-types"
+    );
   };
 
   installFlags = lib.optionals stdenv.hostPlatform.isDarwin [
