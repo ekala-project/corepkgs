@@ -16,6 +16,10 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-HLg+T3AuYLghGrXsTCr7qxsd7IAglFan0vr3WE7SJeo=";
   };
 
+  # The bundled getopt.h declares `int getopt();`, which conflicts with the
+  # SDK prototype under C23 (an empty parameter list means `void`).
+  configureFlags = lib.optionals stdenv.hostPlatform.isDarwin [ "ac_cv_prog_cc_c23=no" ];
+
   passthru = {
     tests = {
       version = testers.testVersion {
