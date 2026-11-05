@@ -55,6 +55,8 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Quick-n-dirty BSD licensed clone of the GNU libc backtrace facility";
     license = lib.licenses.bsd2;
     platforms = lib.platforms.unix;
+    # Darwin's libSystem provides execinfo; the Makefile only builds ELF shared objects.
+    badPlatforms = lib.platforms.darwin;
     homepage = "https://www.freshports.org/devel/libexecinfo";
   };
 })
