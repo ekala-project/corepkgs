@@ -96,6 +96,11 @@ stdenv.mkDerivation (finalAttrs: {
     # only build man pages and shell/IDE docs
     DOC_TARGETS = "man chunks";
     LANG = "C.UTF-8";
+  }
+  // lib.optionalAttrs stdenv.hostPlatform.isDarwin {
+    # crypto passes `ErlNifUInt64 *` (unsigned long) where OpenSSL expects
+    # `uint64_t *` (unsigned long long); both are 64-bit on darwin.
+    NIX_CFLAGS_COMPILE = "-Wno-error=incompatible-pointer-types";
   };
 
   nativeBuildInputs = [
