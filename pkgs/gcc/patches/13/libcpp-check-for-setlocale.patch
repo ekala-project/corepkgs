@@ -1,0 +1,38 @@
+Backport of "libcpp: Check for setlocale" (Roland McGrath, 2025-03-27)
+from the gcc-14 branch. Without it libcpp stubs out setlocale, which
+breaks against gettext's libintl.h on darwin.
+
+--- a/libcpp/config.in
++++ b/libcpp/config.in
+@@ -201,6 +201,9 @@
+ /* Define to 1 if you have the `putc_unlocked' function. */
+ #undef HAVE_PUTC_UNLOCKED
+ 
++/* Define to 1 if you have the `setlocale' function. */
++#undef HAVE_SETLOCALE
++
+ /* Define to 1 if you can assemble SSE4 insns. */
+ #undef HAVE_SSE4
+ 
+--- a/libcpp/configure
++++ b/libcpp/configure
+@@ -5970,7 +5970,7 @@
+ 
+ 
+ 
+-for ac_func in clearerr_unlocked feof_unlocked   ferror_unlocked fflush_unlocked fgetc_unlocked fgets_unlocked   fileno_unlocked fprintf_unlocked fputc_unlocked fputs_unlocked   fread_unlocked fwrite_unlocked getchar_unlocked getc_unlocked   putchar_unlocked putc_unlocked
++for ac_func in clearerr_unlocked feof_unlocked   ferror_unlocked fflush_unlocked fgetc_unlocked fgets_unlocked   fileno_unlocked fprintf_unlocked fputc_unlocked fputs_unlocked   fread_unlocked fwrite_unlocked getchar_unlocked getc_unlocked   putchar_unlocked putc_unlocked setlocale
+ do :
+   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
+--- a/libcpp/configure.ac
++++ b/libcpp/configure.ac
+@@ -81,7 +81,7 @@
+   fileno_unlocked fprintf_unlocked fputc_unlocked fputs_unlocked dnl
+   fread_unlocked fwrite_unlocked getchar_unlocked getc_unlocked dnl
+   putchar_unlocked putc_unlocked)
+-AC_CHECK_FUNCS(libcpp_UNLOCKED_FUNCS)
++AC_CHECK_FUNCS(libcpp_UNLOCKED_FUNCS setlocale)
+ AC_CHECK_DECLS([abort, asprintf, basename(char *), errno, getopt, vasprintf])
+ AC_CHECK_DECLS(m4_split(m4_normalize(libcpp_UNLOCKED_FUNCS)))
+ 

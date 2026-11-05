@@ -174,6 +174,9 @@ optionals noSysDirs (
 ]
 
 ## Darwin
+# libcpp's setlocale stub macro clashes with gettext's libintl.h
+++ optional (is13 && hostPlatform.isDarwin) ./13/libcpp-check-for-setlocale.patch
+
 # Use absolute path in GNAT dylib install names on Darwin
 ++ optionals (stdenv.hostPlatform.isDarwin && langAda) (
   {
