@@ -42,4 +42,9 @@ in
     version = allKernels."7.2".version;
     isLTS = allKernels."7.2".lts;
   };
+  v7_3 = {
+    branch = "7.3";
+    version = allKernels."7.3".version;
+    isLTS = allKernels."7.3".lts;
+  };
 }
