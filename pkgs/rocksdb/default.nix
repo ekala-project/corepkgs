@@ -19,13 +19,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "rocksdb";
-  version = "11.8.1";
+  version = "11.12";
 
   src = fetchFromGitHub {
     owner = "facebook";
     repo = "rocksdb";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-zjOo0H8/qA879Lcw5wHp2BZzOhl+/wYluxKD9RCfQ+0=";
+    hash = "sha256-eZAkdwDQviAZjFL7YnKpStroA3gyyRKuVZdQpyCR15Y=";
   };
 
   patches = lib.optional enableLiburing ./fix-findliburing.patch;

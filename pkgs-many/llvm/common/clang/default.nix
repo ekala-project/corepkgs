@@ -114,11 +114,11 @@ stdenv.mkDerivation (
         "${buildLlvmPackages.tblgen}/bin/clang-pseudo-gen";
     };
 
-    # GCC 14 ICEs (segfault in ggc_set_mark) on template-heavy TUs at -O3;
-    # override the CMake Release flags to use -O2 instead.
+    # GCC 15 ICEs on template-heavy TUs at -O2 (hash_table::expand crash
+    # during deep template instantiation); use -O1 to reduce compiler pressure.
     preConfigure = lib.optionalString (!stdenv.hostPlatform.useLLVM) ''
-      setCMakeEntry CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG"
-      setCMakeEntry CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG"
+      setCMakeEntry CMAKE_C_FLAGS_RELEASE "-O1 -DNDEBUG"
+      setCMakeEntry CMAKE_CXX_FLAGS_RELEASE "-O1 -DNDEBUG"
     '';
 
     postPatch = ''
@@ -177,11 +177,10 @@ stdenv.mkDerivation (
 
     env = lib.optionalAttrs (!stdenv.hostPlatform.useLLVM) {
       # GCC >= 12 triggers -Wmaybe-uninitialized warnings.
-      # GCC 14 also generates >4 GB .debug_info sections for clang's
-      # template-heavy TUs, overflowing 32-bit DWARF relocations;
-      # -gsplit-dwarf keeps per-TU debug info in .dwo files, sidestepping
-      # the limit while still producing usable debuginfo.
-      NIX_CFLAGS_COMPILE = "-Wno-maybe-uninitialized -gsplit-dwarf";
+      # -g0: GCC 15 with -gsplit-dwarf emits .ulub128 directives the assembler
+      # rejects; disable debug info entirely for compiler builds.
+      # --param flags work around GCC 15 ICE (GC segfault) on template-heavy code.
+      NIX_CFLAGS_COMPILE = "-Wno-maybe-uninitialized -g0 --param ggc-min-expand=200 --param ggc-min-heapsize=819200";
     };
 
     passthru = {

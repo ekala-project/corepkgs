@@ -36,6 +36,8 @@ buildPythonPackage (finalAttrs: {
     poetry-dynamic-versioning
   ];
 
+  pythonRelaxDeps = [ "marshmallow" ];
+
   dependencies = [
     typing-inspect
     marshmallow

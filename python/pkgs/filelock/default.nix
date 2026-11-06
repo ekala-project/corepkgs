@@ -2,6 +2,7 @@
   lib,
   buildPythonPackage,
   fetchPypi,
+  hatch-fancy-pypi-readme,
   hatch-vcs,
   hatchling,
   pytest-asyncio,
@@ -12,15 +13,16 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "filelock";
-  version = "4.2.4";
+  version = "4.2.7";
   pyproject = true;
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;
-    hash = "sha256-xthmNTXhZQ7kMFB7T/use0ZN1kt2R+oBEqn0BkmdFj0=";
+    hash = "sha256-Mfb346i28L2JEU0wxdUhjqHPtj5cSqaVt1WTFKIJvH8=";
   };
 
   build-system = [
+    hatch-fancy-pypi-readme
     hatch-vcs
     hatchling
   ];

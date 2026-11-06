@@ -9,11 +9,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "solc";
-  version = "0.8.37";
+  version = "0.8.38";
 
   src = fetchzip {
     url = "https://github.com/ethereum/solidity/releases/download/v${finalAttrs.version}/solidity_${finalAttrs.version}.tar.gz";
-    hash = "sha256-RQmyCTM8Fzkh3J7vkMKd6ZGcTojmSM4RjALaPsJ0rDE=";
+    hash = "sha256-oB9b86sNYV0xuGeLbfOvZub1Z3JviGUmj5VGv30bE9w=";
   };
 
   nativeBuildInputs = [

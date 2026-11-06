@@ -12,7 +12,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "xmlschema";
-  version = "4.2.0";
+  version = "4.3.2";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
@@ -21,7 +21,7 @@ buildPythonPackage (finalAttrs: {
     owner = "sissaschool";
     repo = "xmlschema";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-zwY0YXMlhQEPdHLPivwE9ZI9XoY9UVFHVLUOYNeq9Ew=";
+    hash = "sha256-OEQUq98n9dUKR8tWokboDhozBCczYCUlqI2qUGaTHtw=";
   };
 
   build-system = [ setuptools ];

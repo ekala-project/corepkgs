@@ -72,7 +72,8 @@ let
     ];
 
     # bundled tirpc has K&R-style function declarations
-    env.NIX_CFLAGS_COMPILE = "-std=gnu17";
+    # --param flags work around GCC 15 ICE (GC segfault) compiling perfschema
+    env.NIX_CFLAGS_COMPILE = "-std=gnu17 --param ggc-min-expand=200 --param ggc-min-heapsize=819200";
 
     cmakeEntries = {
       FORCE_UNSUPPORTED_COMPILER = "1";

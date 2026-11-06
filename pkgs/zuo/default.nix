@@ -8,13 +8,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "zuo";
-  version = "1.12";
+  version = "1.16";
 
   src = fetchFromGitHub {
     owner = "racket";
     repo = "zuo";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-BUJtAKB2tz04LhkCsDWBjgTTymU4U3Zcdm+RDYawfxQ=";
+    hash = "sha256-VxF6NfnACsEvrE3GNxuQ4sSh34bh4pkKEEKsxEWy2F0=";
   };
 
   depsBuildBuild = [ buildPackages.stdenv.cc ];

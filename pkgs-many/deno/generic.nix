@@ -73,6 +73,19 @@ rustPlatform.buildRustPackage {
     yq --inplace --input-format toml --output-format toml \
       '.profile.release.lto = false' \
       Cargo.toml
+
+    # Increase codegen-units and change opt-level from "z" to 2 to avoid
+    # unbounded rustc stack usage with size-opt levels on rustc 1.98.0
+    yq --inplace --input-format toml --output-format toml \
+      '.profile.release.codegen-units = 16 | .profile.release.opt-level = 2' \
+      Cargo.toml
+  ''
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
+    # Symlink lld as the default linker to avoid GNU ld segfault on massive link jobs.
+    # The Nix CC wrapper invokes ld via PATH, so putting lld first makes it the default.
+    mkdir -p $TMPDIR/ld-override
+    ln -s ${lib.getExe' lld "ld.lld"} $TMPDIR/ld-override/ld
+    export PATH="$TMPDIR/ld-override:$PATH"
   '';
 
   buildInputs = [
@@ -87,8 +100,8 @@ rustPlatform.buildRustPackage {
     protobuf
     installShellFiles
     makeBinaryWrapper
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isDarwin [ lld ];
+    lld
+  ];
 
   configureFlags = lib.optionals stdenv.cc.isClang [
     "--disable-multi-os-directory"
@@ -99,8 +112,12 @@ rustPlatform.buildRustPackage {
   buildNoDefaultFeatures = true;
   buildFeatures = build-features;
 
-  env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.cc.isClang "-Wno-unknown-warning-option";
+  env.NIX_CFLAGS_COMPILE =
+    (lib.optionalString stdenv.cc.isClang "-Wno-unknown-warning-option")
+    + (lib.optionalString stdenv.cc.isGNU " --param ggc-min-expand=200 --param ggc-min-heapsize=819200");
   env.RUSTY_V8_ARCHIVE = librusty_v8;
+  # rustc needs a larger stack for heavy optimization passes
+  env.RUST_MIN_STACK = "67108864";
 
   doCheck =
     stdenv.hostPlatform.isDarwin

@@ -8,14 +8,14 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "parso";
-  version = "0.8.5";
+  version = "0.8.7";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "davidhalter";
     repo = "parso";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-faSXCrOkybLr0bboF/8rPV/Humq8s158A3UOpdlYi0I=";
+    hash = "sha256-vpWoxLIvNt4QQh/r57iAvX3Zebet3mihb5efOWLhYI8=";
   };
 
   build-system = [ setuptools ];

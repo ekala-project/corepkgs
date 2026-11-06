@@ -10,14 +10,14 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "pycodestyle";
-  version = "2.14.0";
+  version = "2.15.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "PyCQA";
     repo = "pycodestyle";
     tag = finalAttrs.version;
-    hash = "sha256-1EEQp/QEulrdU9tTe28NerQ33IWlAiSlicpmNYciW88=";
+    hash = "sha256-o/OddDPcCB/tc6qQ0OAJ5UpXaVh3zL2n8Z9BqPIrGdQ=";
   };
 
   build-system = [ setuptools ];
@@ -35,7 +35,7 @@ buildPythonPackage (finalAttrs: {
     "setup.py"
   ];
 
-  # https://github.com/PyCQA/pycodestyle/blob/2.14.0/tox.ini#L16
+  # https://github.com/PyCQA/pycodestyle/blob/2.15.0/tox.ini#L16
   postCheck = ''
     ${python.interpreter} -m pycodestyle --statistics pycodestyle.py
   '';

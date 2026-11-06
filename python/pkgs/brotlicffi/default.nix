@@ -13,7 +13,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "brotlicffi";
-  version = "1.1.0.0";
+  version = "1.2.1.0";
   pyproject = true;
   disabled = pythonOlder "3.7";
 
@@ -21,7 +21,7 @@ buildPythonPackage (finalAttrs: {
     owner = "python-hyper";
     repo = "brotlicffi";
     tag = "v${finalAttrs.version}";
-    sha256 = "sha256-oW4y1WBJ7+4XwNwwSSR0qUqN03cZYXUYQ6EAwce9dzI=";
+    sha256 = "sha256-N2zxPLsCaXcLpthGvbaKerWayo3ZGMOQ0Is5cpgXGKA=";
   };
 
   build-system = [ setuptools ];

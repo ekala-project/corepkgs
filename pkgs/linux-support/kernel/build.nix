@@ -264,6 +264,9 @@ lib.makeOverridable (
       # avoid leaking Rust source file names into the final binary, which adds
       # a false dependency on rust-lib-src on targets with uncompressed kernels
       KRUSTFLAGS = lib.optionalString withRust "--remap-path-prefix ${rustPlatform.rustLibSrc}=/";
+
+      # rustc needs a larger stack to compile kernel Rust code (e.g. core.o)
+      RUST_MIN_STACK = lib.optionalString withRust "16777216";
     };
 
     makeFlags = [
