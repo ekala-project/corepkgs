@@ -574,7 +574,9 @@ final: prev: with final; {
       stdenv
     else
       stdenv.override {
-        cc = buildPackages.gcc;
+        # Rewrap so `stdenv.cc.override` reaches the cc-wrapper (as with a GNU
+        # stdenv) rather than the gcc-releases variant builder.
+        cc = buildPackages.wrapCC buildPackages.gcc.cc;
         allowedRequisites = null;
         # Remove libcxx/libcxxabi, and add clang for AS if on darwin (it uses
         # clang's internal assembler).
@@ -1384,9 +1386,9 @@ final: prev: with final; {
               // {
                 inherit (prev.llvm) extendVariants variantArgs;
                 pkgs = scope;
-                v21 = llvmPackage;
+                v22 = llvmPackage;
                 variants = prev.llvm.variants // {
-                  v21 = llvmPackage;
+                  v22 = llvmPackage;
                 };
               };
           })

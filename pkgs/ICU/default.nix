@@ -118,14 +118,14 @@ let
         --replace-fail 'TESTCASE_AUTO(TestExternalBreakEngineWithFakeYue);' ""
 
       # Add missing test data. It’s not included in the source release.
-      chmod u+w "$NIX_BUILD_TOP/source/icu"
-      tar -C "$NIX_BUILD_TOP/source" -axf ${lib.escapeShellArg icu.v78.src} icu/testdata
+      chmod u+w "$NIX_BUILD_TOP/${self.src.name}/icu"
+      tar -C "$NIX_BUILD_TOP/${self.src.name}" -axf ${lib.escapeShellArg icu.v78.src} icu/testdata
 
       # Otherwise `make install` is broken.
       substituteInPlace Makefile.in \
-        --replace-fail '$(top_srcdir)/../LICENSE' "$NIX_BUILD_TOP/source/icu/LICENSE"
+        --replace-fail '$(top_srcdir)/../LICENSE' "$NIX_BUILD_TOP/${self.src.name}/icu/LICENSE"
       substituteInPlace config/dist-data.sh \
-        --replace-fail "\''${top_srcdir}/../LICENSE" "$NIX_BUILD_TOP/source/icu/LICENSE"
+        --replace-fail "\''${top_srcdir}/../LICENSE" "$NIX_BUILD_TOP/${self.src.name}/icu/LICENSE"
 
       # Make sure this ICU build puts C++ symbols in a distinct namespace to avoid symbol clashes with other ICU
       # implementations (including both the system ICU and builds of the upstream ICU).

@@ -36,7 +36,12 @@ mkAppleDerivation {
   nativeBuildInputs = [ pkg-config ];
   buildInputs = [ zlib ];
 
-  env.NIX_CFLAGS_COMPILE = "-I${privateHeaders}/include";
+  env.NIX_CFLAGS_COMPILE = toString [
+    "-I${privateHeaders}/include"
+    # makewhatis types its zlib handles as `gzFile *`, but only ever passes the
+    # value returned by gzopen back to zlib.
+    "-Wno-error=incompatible-pointer-types"
+  ];
 
   postInstall = ''
     HOST_PATH='${lib.getBin shell_cmds}/bin' patchShebangs --host "$out/libexec"

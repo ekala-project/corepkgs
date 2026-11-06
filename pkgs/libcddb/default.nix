@@ -21,7 +21,7 @@ stdenv.mkDerivation (finalAttrs: {
     "ac_cv_func_realloc_0_nonnull=yes"
   ];
 
-  env = lib.optionalAttrs stdenv.cc.isGNU {
+  env = lib.optionalAttrs (stdenv.cc.isGNU || stdenv.hostPlatform.isDarwin) {
     NIX_CFLAGS_COMPILE = "-Wno-error=incompatible-pointer-types";
   };
 

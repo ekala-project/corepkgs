@@ -52,7 +52,11 @@ tcl.mkTclDerivation {
     makeWrapper
   ];
 
-  env = lib.optionalAttrs stdenv.cc.isGNU {
+  # configure would select -std=gnu23, under which clang rejects the K&R-style
+  # function definitions.
+  configureFlags = lib.optionals stdenv.hostPlatform.isDarwin [ "ac_cv_prog_cc_c23=no" ];
+
+  env = lib.optionalAttrs (stdenv.cc.isGNU || stdenv.hostPlatform.isDarwin) {
     NIX_CFLAGS_COMPILE = "-Wno-error=incompatible-pointer-types -std=gnu17";
   };
 
