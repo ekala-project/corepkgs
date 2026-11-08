@@ -11,4 +11,8 @@
     version = "15.2.0";
     majorMinorVersion = "15";
   };
+  v16 = {
+    version = "16.2.0";
+    majorMinorVersion = "16";
+  };
 }

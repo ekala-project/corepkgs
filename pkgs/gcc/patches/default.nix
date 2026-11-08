@@ -59,6 +59,16 @@ optionals noSysDirs (
   ]
   ++ (
     {
+      "16" = [
+        # Do not try looking for binaries and libraries in /lib and /usr/lib
+        ./13/no-sys-dirs-riscv.patch
+        # Mangle the nix store hash in __FILE__ to prevent unneeded runtime references
+        #
+        # TODO: Remove these and the `useMacroPrefixMap` conditional
+        # in `cc-wrapper` once <https://gcc.gnu.org/PR111527>
+        # is fixed.
+        ./13/mangle-NIX_STORE-in-__FILE__.patch
+      ];
       "15" = [
         # Do not try looking for binaries and libraries in /lib and /usr/lib
         ./13/no-sys-dirs-riscv.patch
@@ -167,6 +177,7 @@ optionals noSysDirs (
 # Use absolute path in GNAT dylib install names on Darwin
 ++ optionals (stdenv.hostPlatform.isDarwin && langAda) (
   {
+    "16" = [ ../patches/14/gnat-darwin-dylib-install-name-14.patch ];
     "15" = [ ../patches/14/gnat-darwin-dylib-install-name-14.patch ];
     "14" = [ ../patches/14/gnat-darwin-dylib-install-name-14.patch ];
     "13" = [ ./gnat-darwin-dylib-install-name-13.patch ];
@@ -179,6 +190,16 @@ optionals noSysDirs (
 # diffs from the Homebrew repo.
 ++ optionals canApplyIainsDarwinPatches (
   {
+    "16" = [
+      # Patches from https://github.com/iains/gcc-16-branch/compare/releases/gcc-16.2.0...gcc-16-2-darwin-pre-0
+      # 78d4ac73dd391005b895a6148cd9831e28e1208b is the merge base of gcc-16-2-darwin-pre-0 and releases/gcc-16.2.0
+      # 97f8cc058fcb386fda01ccba81202131bd8637c8 is the newest commit of gcc-16-2-darwin-pre-0
+      (fetchpatch {
+        name = "gcc-16-darwin-aarch64-support.patch";
+        url = "https://github.com/iains/gcc-16-branch/compare/78d4ac73dd391005b895a6148cd9831e28e1208b..97f8cc058fcb386fda01ccba81202131bd8637c8.diff";
+        hash = "sha256-k9EK5v0KzkJ+tuv2Q+wcPvCQT71RgQqDjXxYKa+IeQ4=";
+      })
+    ];
     "15" = [
       # Patches from https://github.com/iains/gcc-15-branch/compare/releases/gcc-15..gcc-15.1-darwin-rc1
       (fetchpatch {
