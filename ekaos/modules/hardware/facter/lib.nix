@@ -29,7 +29,7 @@ let
   collectDrivers = list: lib.foldl' (lst: value: lst ++ value.driver_modules or [ ]) [ ] list;
 
   # Deduplicate a list of strings
-  stringSet = list: builtins.attrNames (builtins.groupBy lib.id list);
+  stringSet = list: builtins.attrNames (lib.groupBy lib.id list);
 
   # Query if a facter report contains a GPU with the given PCI vendor ID
   hasGpuVendor =
