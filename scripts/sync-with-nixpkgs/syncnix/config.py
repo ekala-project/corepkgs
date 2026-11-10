@@ -249,6 +249,7 @@ IGNORE_SUFFIXES = (".md",)
 IGNORE_FILES = [
     ".gitignore",
     "LICENSE",
+    "fetch-locked.nix",
     "flake.lock",
     "flake.nix",
     "haskell/hackage-packages.nix",  # generated from Hackage; diffing it is noise
