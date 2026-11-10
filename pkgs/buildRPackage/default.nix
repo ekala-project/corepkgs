@@ -8,16 +8,12 @@
 
 {
   buildInputs ? [ ],
+  nativeBuildInputs ? [ ],
   ...
 }@attrs:
 
 stdenv.mkDerivation (
   {
-    buildInputs = buildInputs ++ [
-      R
-      gettext
-    ];
-
     configurePhase = ''
       export MAKEFLAGS+="''${enableParallelBuilding:+-j$NIX_BUILD_CORES}"
       export R_LIBS_SITE="$R_LIBS_SITE''${R_LIBS_SITE:+:}$out/library"
@@ -59,6 +55,15 @@ stdenv.mkDerivation (
   }
   // attrs
   // {
+    # Merged after attrs so a package's own inputs extend, rather than replace,
+    # the ones every R package needs. strictDeps is on by default, so R must be
+    # a native input for `R CMD INSTALL` to be on PATH; it stays in buildInputs
+    # for the headers and libR that compiled packages link against.
+    nativeBuildInputs = nativeBuildInputs ++ [ R ];
+    buildInputs = buildInputs ++ [
+      R
+      gettext
+    ];
     name = "r-${attrs.name or "${attrs.pname}-${attrs.version}"}";
   }
 )
