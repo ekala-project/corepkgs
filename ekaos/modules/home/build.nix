@@ -96,6 +96,21 @@ let
             ln -s ${source} $out/${escapeShellArg file.target}
           ''
         ) enabledFiles}
+
+        # Enable user units declaratively: for each unit's [Install]
+        # WantedBy= target, link the unit into <target>.wants/ so the user
+        # manager starts it at login, like `systemctl --user enable` would.
+        unitdir=$out/.config/systemd/user
+        if [ -d "$unitdir" ]; then
+          for unit in "$unitdir"/*.service "$unitdir"/*.socket "$unitdir"/*.timer "$unitdir"/*.path; do
+            [ -f "$unit" ] || continue
+            name=$(basename "$unit")
+            for target in $(sed -n '/^\[Install\]/,/^\[/s/^WantedBy[[:space:]]*=[[:space:]]*//p' "$unit"); do
+              mkdir -p "$unitdir/$target.wants"
+              ln -sfn "$(readlink "$unit")" "$unitdir/$target.wants/$name"
+            done
+          done
+        fi
       '';
 
   # Build the per-user package environment
@@ -140,14 +155,20 @@ let
       ${aliases}
     '';
 
-  # Build the manifest (JSON list of managed file targets)
+  # Build the manifest (JSON list of managed file targets). It lists every
+  # link in home-files, including generated ones such as unit .wants links,
+  # so the next activation can remove all of them.
   mkManifest =
-    userName: userCfg:
-    let
-      enabledFiles = filter (f: f.enable) (attrValues userCfg.file);
-      targets = map (f: f.target) enabledFiles;
-    in
-    pkgs.writeText "home-files-manifest-${userName}" (builtins.toJSON targets);
+    userName: homeFiles:
+    pkgs.runCommand "home-files-manifest-${userName}"
+      {
+        preferLocalBuild = true;
+        nativeBuildInputs = [ pkgs.jq ];
+      }
+      ''
+        cd ${homeFiles}
+        find . -type l | sed 's|^\./||' | LC_ALL=C sort | jq -R . | jq -cs . > $out
+      '';
 
   # Build the activation package for a single user
   mkHomeActivationPackage =
@@ -156,7 +177,7 @@ let
       homeFiles = mkHomeFiles userName userCfg;
       homePath = mkHomePath userName userCfg;
       sessionVars = mkSessionVars userName userCfg;
-      manifest = mkManifest userName userCfg;
+      manifest = mkManifest userName homeFiles;
 
       sortedScripts = sortActivationScripts userCfg.activation;
       activationBodies = concatMapStringsSep "\n" (
