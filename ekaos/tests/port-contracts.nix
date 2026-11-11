@@ -21,8 +21,6 @@
         ...
       }:
       {
-        boot.kernelPackages = pkgs.linuxPackages;
-
         virtualisation.enable = true;
 
         # Enable SSH (which declares port contracts)

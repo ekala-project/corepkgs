@@ -19,8 +19,6 @@
         ...
       }:
       {
-        boot.kernelPackages = pkgs.linuxPackages;
-
         virtualisation.enable = true;
       };
   };
