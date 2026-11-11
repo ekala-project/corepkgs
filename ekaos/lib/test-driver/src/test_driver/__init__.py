@@ -4,6 +4,7 @@ Python test driver for ekaos systems
 """
 
 from .machine import Machine
+from .vlan import stop_vlan
 from .logger import log, log_error, log_warning, log_success
 
 __all__ = [
@@ -43,6 +44,7 @@ def shutdown_all() -> None:
             machine.shutdown()
         except Exception as e:
             log_error(f"Error shutting down {machine.name}: {e}")
+    stop_vlan()
 
 
 class subtest:

@@ -27,6 +27,7 @@ let
     name: config:
     {
       peerHosts ? "",
+      index ? null,
     }:
     let
       # Import ekaos eval-config to build the system
@@ -42,7 +43,8 @@ let
               ]
               ++ lib.optional (peerHosts != "") {
                 networking.extraHosts = peerHosts;
-              };
+              }
+              ++ lib.optional (index != null) (import ./vlan.nix { inherit index; });
           };
     in
     {
@@ -107,6 +109,7 @@ in
     builtNodes =
       let
         nodeNames = attrNames config.nodes;
+        nodeIndex = listToAttrs (lib.imap1 (i: name: nameValuePair name i) nodeNames);
         # Generate /etc/hosts entries mapping each node name to a test IP
         # Uses 192.168.1.{index+1} for each VM in the test network
         nodeIPs = lib.imap1 (i: name: {
@@ -118,17 +121,22 @@ in
       in
       mapAttrs (
         name: nodeConfig:
-        buildNode name (
-          if isFunction config.defaults then
-            {
-              imports = [
-                nodeConfig
-                config.defaults
-              ];
-            }
-          else
-            nodeConfig
-        ) { peerHosts = allHostEntries; }
+        buildNode name
+          (
+            if isFunction config.defaults then
+              {
+                imports = [
+                  nodeConfig
+                  config.defaults
+                ];
+              }
+            else
+              nodeConfig
+          )
+          {
+            peerHosts = allHostEntries;
+            index = nodeIndex.${name};
+          }
       ) config.nodes;
   };
 }
