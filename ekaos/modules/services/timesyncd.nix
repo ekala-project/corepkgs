@@ -185,17 +185,21 @@ in
       mode = "0644";
     };
 
+    # A useradd at activation would be undone by the next generated
+    # /etc/passwd, so the user is declared
+    users.users.systemd-timesync = {
+      isSystemUser = true;
+      uid = 154;
+      group = "systemd-timesync";
+      description = "systemd Time Synchronization";
+    };
+    users.groups.systemd-timesync.gid = 154;
+
     # Create state directory
     system.activationScripts.timesyncd = stringAfter [ "etc" ] ''
       # Create timesyncd state directory
       mkdir -p /var/lib/systemd/timesync
       chmod 755 /var/lib/systemd/timesync
-
-      # Create timesync user if it doesn't exist
-      if ! getent passwd systemd-timesync >/dev/null 2>&1; then
-        useradd -r -s /sbin/nologin -d /var/lib/systemd/timesync \
-          -c "systemd Time Synchronization" systemd-timesync || true
-      fi
 
       # Set ownership
       chown -R systemd-timesync:systemd-timesync /var/lib/systemd/timesync || true

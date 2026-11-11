@@ -178,6 +178,15 @@ in
       }
     ];
 
+    # systemd-networkd runs as this user (User= in its unit)
+    users.users.systemd-network = {
+      isSystemUser = true;
+      uid = 152;
+      group = "systemd-network";
+      description = "systemd Network Management";
+    };
+    users.groups.systemd-network.gid = 152;
+
     # Add activation script to enable systemd-networkd
     system.activationScripts.networkd = stringAfter [ "etc" ] ''
       # Enable systemd-networkd
