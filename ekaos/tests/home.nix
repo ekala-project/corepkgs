@@ -130,6 +130,52 @@ let
       ];
       combined = combinedResult.activationPackage;
 
+      # Test 8: User units are enabled through [Install] links
+      unitText = install: ''
+        [Service]
+        ExecStart=/bin/true
+
+        [Install]
+        ${install}
+      '';
+      unitsResult = evalHome [
+        {
+          home.users.alice.file = {
+            ".config/systemd/user/wanted.service".text = unitText "WantedBy=default.target";
+            ".config/systemd/user/multi.service".text = unitText ''
+              WantedBy=a.target b.target
+                WantedBy = c.target
+            '';
+            ".config/systemd/user/reset.service".text = unitText ''
+              WantedBy=dropped.target
+              WantedBy=
+              WantedBy=kept.target
+            '';
+            ".config/systemd/user/required.service".text = unitText ''
+              RequiredBy=req.target
+              UpheldBy=up.target
+            '';
+            ".config/systemd/user/inst@.service".text = unitText ''
+              WantedBy=default.target
+              DefaultInstance=main
+            '';
+            ".config/systemd/user/noinst@.service".text = unitText "WantedBy=default.target";
+            ".config/systemd/user/plain.service".text = "[Service]\nExecStart=/bin/true\n";
+          };
+        }
+      ];
+      units = unitsResult.activationPackages.alice;
+
+      # Test 9: A unit directory linked as a whole still builds
+      unitDirResult = evalHome [
+        {
+          home.users.alice.file.".config/systemd/user".source = pkgs.writeTextDir "wanted.service" (
+            unitText "WantedBy=default.target"
+          );
+        }
+      ];
+      unitDir = unitDirResult.activationPackages.alice;
+
     in
     {
       inherit
@@ -138,6 +184,8 @@ let
         lang
         activation
         combined
+        units
+        unitDir
         ;
 
       all =
@@ -303,6 +351,51 @@ let
               echo "FAIL: combined: activate script missing" >> "$results"
               fail=$((fail + 1))
             }
+
+            # Test 8: User unit [Install] links
+            unitdir=${units}/home-files/.config/systemd/user
+            check_link() {
+              local name="$1" path="$2"
+              if [ -L "$unitdir/$path" ] && [ -f "$unitdir/$path" ]; then
+                echo "PASS: $name" >> "$results"
+                pass=$((pass + 1))
+              else
+                echo "FAIL: $name ($path missing)" >> "$results"
+                fail=$((fail + 1))
+              fi
+            }
+            check_no_link() {
+              local name="$1" path="$2"
+              if [ ! -e "$unitdir/$path" ] && [ ! -L "$unitdir/$path" ]; then
+                echo "PASS: $name" >> "$results"
+                pass=$((pass + 1))
+              else
+                echo "FAIL: $name ($path should not exist)" >> "$results"
+                fail=$((fail + 1))
+              fi
+            }
+
+            check_link "units: WantedBy" default.target.wants/wanted.service
+            check_link "units: several targets on one line (1)" a.target.wants/multi.service
+            check_link "units: several targets on one line (2)" b.target.wants/multi.service
+            check_link "units: indented WantedBy" c.target.wants/multi.service
+            check_no_link "units: empty WantedBy= resets" dropped.target.wants/reset.service
+            check_link "units: target after reset" kept.target.wants/reset.service
+            check_link "units: RequiredBy" req.target.requires/required.service
+            check_link "units: UpheldBy" up.target.upholds/required.service
+            check_link "units: template uses DefaultInstance" default.target.wants/inst@main.service
+            check_no_link "units: template not linked as-is" default.target.wants/inst@.service
+            check_no_link "units: template without DefaultInstance" default.target.wants/noinst@.service
+            check_no_link "units: no [Install] section" default.target.wants/plain.service
+
+            check "units: manifest has wants link" \
+              ${units}/home-files-manifest ".config/systemd/user/default.target.wants/wanted.service"
+            check "units: manifest has requires link" \
+              ${units}/home-files-manifest ".config/systemd/user/req.target.requires/required.service"
+
+            # Test 9: Unit directory linked as a whole
+            check "unitDir: manifest has the directory link" \
+              ${unitDir}/home-files-manifest '".config/systemd/user"'
 
             echo "" >> "$results"
             echo "Standalone results: $pass passed, $fail failed" >> "$results"
