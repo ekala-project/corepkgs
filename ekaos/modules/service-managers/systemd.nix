@@ -22,6 +22,10 @@ let
     name: service: service.enable == true && service.command != null
   ) config.users.services;
 
+  # Switch-engine keys (X-RestartIfChanged, ...). Services pass them through
+  # their untyped `systemd` attrset, e.g. services.foo.systemd.stopIfChanged.
+  switchKeys = import ../../lib/systemd-switch-keys.nix { inherit lib pkgs; };
+
   # Targets that pull in a generated unit. Shared by the [Install] section and
   # the declarative enablement links so the two cannot drift apart.
   systemWantedBy = serviceCfg: (serviceCfg.systemd or { }).wantedBy or [ "multi-user.target" ];
@@ -73,8 +77,10 @@ let
         ${concatMapStringsSep "\n" (d: "Wants=${d}") wants}
         ${concatMapStringsSep "\n" (d: "Requires=${d}") requires}
         ${concatMapStringsSep "\n" (d: "Before=${d}") before}
+        ${switchKeys.unitLines name systemdCfg}
 
         [Service]
+        ${switchKeys.serviceLines systemdCfg}
         Type=${serviceConfig.Type or "simple"}
         ExecStart=${execStart}
         ${optionalString (
@@ -143,8 +149,10 @@ let
         ${concatMapStringsSep "\n" (d: "Wants=${d}") wants}
         ${concatMapStringsSep "\n" (d: "Requires=${d}") requires}
         ${concatMapStringsSep "\n" (d: "Before=${d}") before}
+        ${switchKeys.unitLines name systemdCfg}
 
         [Service]
+        ${switchKeys.serviceLines systemdCfg}
         Type=${serviceConfig.Type or "simple"}
         ExecStart=${execStart}
         ${optionalString (

@@ -15,6 +15,32 @@ with lib;
 let
   cfg = config.systemd;
 
+  switchKeys = import ../../lib/systemd-switch-keys.nix { inherit lib pkgs; };
+
+  # Options read by the switch engine (see lib/systemd-switch-keys.nix).
+  stopOnRemovalOption = mkOption {
+    type = types.bool;
+    default = true;
+    description = "Whether to stop the unit when it is removed from the configuration on switch.";
+  };
+
+  onlyManualStartOption = mkOption {
+    type = types.bool;
+    default = false;
+    description = "Whether the switch engine must never start or restart this unit itself.";
+  };
+
+  triggersOption =
+    what:
+    mkOption {
+      type = types.listOf types.unspecified;
+      default = [ ];
+      description = ''
+        Values that ${what} the unit on switch when they change, even if the
+        unit file itself did not.
+      '';
+    };
+
   # Type for systemd unit configuration (serviceConfig, socketConfig, etc.)
   unitConfigType = types.attrsOf (
     types.oneOf [
@@ -92,8 +118,46 @@ let
       restartIfChanged = mkOption {
         type = types.bool;
         default = true;
-        description = "Whether to restart on configuration change.";
+        description = ''
+          Whether to restart the service on switch when its unit changed.
+          When false the service keeps running the old configuration until
+          it is restarted by other means.
+        '';
       };
+
+      reloadIfChanged = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Whether to reload instead of restart the service on switch when its
+          unit changed. Takes precedence over restartIfChanged.
+        '';
+      };
+
+      stopIfChanged = mkOption {
+        type = types.bool;
+        default = true;
+        description = ''
+          Whether a changed service is stopped before activation and started
+          afterwards. When false it is restarted after activation instead,
+          which keeps it running across the activation script (useful for
+          services such as sshd).
+        '';
+      };
+
+      notSocketActivated = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Whether the switch engine must restart this service directly even if
+          a socket of the same name exists, instead of restarting the socket.
+        '';
+      };
+
+      restartTriggers = triggersOption "restart";
+      reloadTriggers = triggersOption "reload";
+      stopOnRemoval = stopOnRemovalOption;
+      onlyManualStart = onlyManualStartOption;
 
       environment = mkOption {
         type = types.attrsOf types.str;
@@ -135,6 +199,9 @@ let
         default = [ ];
         description = "Targets that want this socket.";
       };
+
+      stopOnRemoval = stopOnRemovalOption;
+      onlyManualStart = onlyManualStartOption;
 
       listenStreams = mkOption {
         type = types.listOf types.str;
@@ -193,6 +260,9 @@ let
         default = [ ];
         description = "Targets that want this timer.";
       };
+
+      stopOnRemoval = stopOnRemovalOption;
+      onlyManualStart = onlyManualStartOption;
 
       timerConfig = mkOption {
         type = unitConfigType;
@@ -275,8 +345,10 @@ let
       ${concatMapStringsSep "\n" (d: "Requires=${d}") svc.requires}
       ${concatMapStringsSep "\n" (d: "BindsTo=${d}") svc.bindsTo}
       ${concatMapStringsSep "\n" (d: "Conflicts=${d}") svc.conflicts}
+      ${switchKeys.unitLines name svc}
 
       [Service]
+      ${switchKeys.serviceLines svc}
       ${optionalString (svc.script != null) "ExecStart=${execStart}"}
       ${concatStringsSep "\n" (
         mapAttrsToList (k: v: "${k}=${toString v}") (
@@ -300,6 +372,7 @@ let
     pkgs.writeText "${name}.socket" ''
       [Unit]
       ${optionalString (sock.description != "") "Description=${sock.description}"}
+      ${switchKeys.unitLines name sock}
 
       [Socket]
       ${concatMapStringsSep "\n" (s: "ListenStream=${s}") sock.listenStreams}
@@ -326,6 +399,7 @@ let
     pkgs.writeText "${name}.timer" ''
       [Unit]
       ${optionalString (tmr.description != "") "Description=${tmr.description}"}
+      ${switchKeys.unitLines name tmr}
 
       [Timer]
       ${concatStringsSep "\n" (mapAttrsToList (k: v: "${k}=${toString v}") tmr.timerConfig)}
@@ -333,6 +407,54 @@ let
       [Install]
       ${concatMapStringsSep "\n" (t: "WantedBy=${t}") tmr.wantedBy}
     '';
+
+  # Switch-engine settings for units this configuration does not generate
+  # (units shipped by packages), written as drop-ins.
+  switchOverrideOptions = {
+    options = {
+      restartIfChanged = mkOption {
+        type = types.bool;
+        default = true;
+        description = "See systemd.services.<name>.restartIfChanged.";
+      };
+      reloadIfChanged = mkOption {
+        type = types.bool;
+        default = false;
+        description = "See systemd.services.<name>.reloadIfChanged.";
+      };
+      stopIfChanged = mkOption {
+        type = types.bool;
+        default = true;
+        description = "See systemd.services.<name>.stopIfChanged.";
+      };
+      stopOnReconfiguration = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Whether the switch engine stops this unit (usually a target) before activation.";
+      };
+      restartTriggers = triggersOption "restart";
+      reloadTriggers = triggersOption "reload";
+      stopOnRemoval = stopOnRemovalOption;
+      onlyManualStart = onlyManualStartOption;
+    };
+  };
+
+  mkSwitchOverride =
+    unit: ov:
+    let
+      unitLines = switchKeys.unitLines unit ov;
+      serviceLines = switchKeys.serviceLines ov;
+    in
+    pkgs.writeText "${unit}-ekaos-switch.conf" (
+      optionalString (unitLines != "") ''
+        [Unit]
+        ${unitLines}
+      ''
+      + optionalString (hasSuffix ".service" unit && serviceLines != "") ''
+        [Service]
+        ${serviceLines}
+      ''
+    );
 
   # Filter to enabled services
   enabledSystemServices = filterAttrs (_: svc: svc.enable) cfg.services;
@@ -395,6 +517,24 @@ in
     };
 
     # Timers
+    systemd.switchOverrides = mkOption {
+      type = types.attrsOf (types.submodule switchOverrideOptions);
+      default = { };
+      example = literalExpression ''
+        {
+          "getty@.service".restartIfChanged = false;
+          "dbus.service".reloadIfChanged = true;
+          "local-fs.target".stopOnReconfiguration = true;
+        }
+      '';
+      description = ''
+        Switch-engine settings for system units that are not generated by
+        this configuration, keyed by full unit name (templates apply to all
+        instances). Each entry becomes the drop-in
+        /etc/systemd/system/<unit>.d/50-ekaos-switch.conf.
+      '';
+    };
+
     systemd.timers = mkOption {
       type = types.attrsOf (types.submodule timerOptions);
       default = { };
@@ -484,6 +624,16 @@ in
             source = mkServiceUnit name svc;
           }
         ) enabledSystemServices
+      ))
+
+      # Switch-engine drop-ins for package units
+      (listToAttrs (
+        mapAttrsToList (
+          unit: ov:
+          nameValuePair "systemd/system/${unit}.d/50-ekaos-switch.conf" {
+            source = mkSwitchOverride unit ov;
+          }
+        ) cfg.switchOverrides
       ))
 
       # Generated system timer units
