@@ -230,14 +230,6 @@ let
       "IOTty"
       "IPCRun"
     ];
-    # pkgs-many/nix/ components take `nix-fetchers-c`, which nix 2.28 does not
-    # have.
-    "nix.v2_28" = [
-      "nix-everything"
-      "nix-fetchers-tests"
-      "nix-flake-c"
-      "nix-flake-tests"
-    ];
   };
 
   # Many variants carry their own package set (`python3.v3_12.pkgs`,
