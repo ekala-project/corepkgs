@@ -20,7 +20,8 @@ fi
 
 # Nix's evaluation warnings (deprecated syntax, unclear path literals, ...) are
 # errors here: they are cheap to fix and easy to accumulate unnoticed otherwise.
-if grep -q '^warning:' "$stderr"; then
+# Recent Nix prints `builtins.warn` (and so `lib.warn`) as `evaluation warning:`.
+if grep -qE '^(evaluation )?warning:' "$stderr"; then
   cat "$stderr" >&2
   echo
   echo "Evaluation emitted the warnings above; fix them or the job stays red."
