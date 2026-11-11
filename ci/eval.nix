@@ -1,5 +1,6 @@
 # Evaluates every package in the repository: each top-level attribute, plus
-# every variant of each `pkgs-many` package.
+# every variant of each `pkgs-many` package and every package in that
+# variant's own package set.
 #
 # Variants live one level down (`cmake.v4`), so enumerating attribute names
 # alone reaches only the default one. Their names come from the `variants`

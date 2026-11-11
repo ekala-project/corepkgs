@@ -3,6 +3,9 @@
 # through attribute sets marked with `recurseIntoAttrs` (i.e. those that set
 # `recurseForDerivations = true`).
 #
+# `targets` also includes every package in each variant's own package set
+# (`lua.v5_1.pkgs`, `python3.v3_12.pkgs`, ...); `buildable` does not.
+#
 # Variants live one level down (`cmake.v4`), so enumerating attribute names
 # alone reaches only the default one. Their names come from the `variants`
 # passthru rather than `pkgs-many/*/variants.nix`, so CI checks the same public
@@ -185,9 +188,94 @@ let
     }) (builtins.attrNames variants)
   ) manyVariantNames;
 
+  # Variant package sets that are known to fail evaluation. Each entry is a
+  # real bug: drop it in the PR that fixes it.
+  #
+  # Whole sets, as `<package>.<variant>`.
+  brokenVariantSets = [
+    # python/python2/mk-python-derivation.nix takes `update-python-libraries`,
+    # which is not packaged.
+    "pypy.pypy27"
+    "pypy.v2_7"
+    # Packages in the set look up `python316`, which is not defined.
+    "python3.v3_16"
+  ];
+
+  # Individual packages, keyed by `<package>` (every variant) or
+  # `<package>.<variant>`.
+  brokenVariantPackages = {
+    linux = [
+      # Missing dependencies, not packaged in corepkgs.
+      "ajantv2" # libajantv2
+      "ax99100" # dos2unix
+      "bcachefs" # bcachefs-tools
+      "dpdk" # dpdk
+      "mstflint_access" # mstflint
+      "oci-seccomp-bpf-hook" # oci-seccomp-bpf-hook
+      "sheep-net" # basiliskii
+      "sysdig" # luajit
+      # pkgs/linux-support/pkgs/chipsec/default.nix uses `brotli` without
+      # taking it as an argument.
+      "chipsec"
+      # pkgs/linux-support/pkgs/zfs/generic.nix takes `linuxPackages`, which
+      # the kernel package set does not provide.
+      "zfs_2_3"
+      "zfs_2_4"
+      "zfs_unstable"
+    ];
+    lua = [
+      # pkgs-many/lua/hooks/default.nix takes `busted` and `luarocks`, which
+      # the Lua package sets do not provide.
+      "bustedCheckHook"
+      "luarocksCheckHook"
+    ];
+    perl = [
+      # Invalid `meta`.
+      "ImageMagick"
+      # `version` is used in `src` without `finalAttrs` or `rec`.
+      "IOTty"
+      "IPCRun"
+    ];
+    # pkgs-many/nix/ components take `nix-fetchers-c`, which nix 2.28 does not
+    # have.
+    "nix.v2_28" = [
+      "nix-everything"
+      "nix-fetchers-tests"
+      "nix-flake-c"
+      "nix-flake-tests"
+    ];
+  };
+
+  # Many variants carry their own package set (`python3.v3_12.pkgs`,
+  # `lua.v5_1.pkgs`, `perl.v5_40.pkgs`, ...). Only the default variant's set is
+  # reachable from the top level, and not as a set marked `recurseIntoAttrs`, so
+  # without this a package that is broken against any interpreter would slip
+  # through.
+  variantSetPairs = lib.concatMap (
+    name:
+    let
+      variants = variantsOf name;
+    in
+    lib.concatMap (
+      vname:
+      let
+        set = builtins.tryEval (variants.${vname}.pkgs or null);
+        broken = brokenVariantPackages.${name} or [ ] ++ brokenVariantPackages."${name}.${vname}" or [ ];
+      in
+      if builtins.elem "${name}.${vname}" brokenVariantSets then
+        [ ]
+      else if set.success && builtins.isAttrs set.value then
+        collectRecursive "${name}.${vname}.pkgs" (builtins.removeAttrs set.value broken)
+      else
+        [ ]
+    ) (builtins.attrNames variants)
+  ) manyVariantNames;
+
   allPairs = topLevel ++ variantPairs;
 
-  targets = map (pair: pair.value) allPairs;
+  # Variant package sets are evaluated but not built: building every package
+  # against every interpreter and kernel would multiply the CI build load.
+  targets = map (pair: pair.value) (allPairs ++ variantSetPairs);
 in
 {
   inherit probe targets;

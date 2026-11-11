@@ -30,4 +30,4 @@ fi
 # `{"evaluated":N}` -- extract the integer without needing a JSON parser.
 count="$(sed -E 's/.*"evaluated":([0-9]+).*/\1/' <<<"$result")"
 
-echo "All $count packages evaluate (top-level attributes plus pkgs-many variants)."
+echo "All $count packages evaluate (top-level attributes plus pkgs-many variants and their package sets)."
