@@ -60,7 +60,11 @@ class Machine:
         self._listener.bind(sock_path)
         self._listener.listen(1)
 
-        env = dict(os.environ, EKAOS_TEST_SHELL_SOCKET=sock_path)
+        env = dict(
+            os.environ,
+            EKAOS_TEST_SHELL_SOCKET=sock_path,
+            EKAOS_VM_STATE_DIR=self._state_dir,
+        )
         self.process = subprocess.Popen(
             [self.vm_script],
             # Kept open (but idle) so send_console()/console_interact()
