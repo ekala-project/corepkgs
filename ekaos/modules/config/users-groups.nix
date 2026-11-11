@@ -511,7 +511,18 @@ in
     '';
 
     # Add shadow package for user/group management tools
-    environment.systemPackages = [ pkgs.shadow ];
+    # su is in its own output; it needs to be setuid for non-root users
+    environment.systemPackages = [
+      pkgs.shadow
+      pkgs.shadow.su
+    ];
+    security.wrappers.su = {
+      source = "${pkgs.shadow.su}/bin/su";
+      owner = "root";
+      group = "root";
+      setuid = true;
+      permissions = "u+rx,g+x,o+x";
+    };
 
     # Register default login shells
     environment.shells = [

@@ -419,6 +419,7 @@ in
         netcat
         curl
         which
+        getent
       ];
       defaultText = literalExpression "[ pkgs.coreutils pkgs.util-linux ... ]";
       description = ''
