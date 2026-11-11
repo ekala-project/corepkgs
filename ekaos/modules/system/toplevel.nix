@@ -429,14 +429,11 @@ in
 
     environment.pathsToLink = mkOption {
       type = types.listOf types.str;
-      default = [
-        "/bin"
-        "/sbin"
-        "/lib"
-        "/share"
-        "/etc"
-      ];
-      description = "List of directories to be symlinked in /run/current-system/sw.";
+      default = [ ];
+      description = ''
+        Directories to be symlinked in /run/current-system/sw, in addition
+        to /bin, /sbin, /lib, /share and /etc.
+      '';
     };
   };
 
@@ -450,6 +447,16 @@ in
     system.build.runit = mkServiceManagerVariant "runit";
     system.build.launchd = mkServiceManagerVariant "launchd";
     system.build.rcd = mkServiceManagerVariant "rcd";
+
+    # Defined here rather than as the option default, so that modules
+    # adding directories don't drop these
+    environment.pathsToLink = [
+      "/bin"
+      "/sbin"
+      "/lib"
+      "/share"
+      "/etc"
+    ];
 
     # Build system path from packages
     system.path = pkgs.buildEnv {
