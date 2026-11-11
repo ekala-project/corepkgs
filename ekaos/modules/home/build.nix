@@ -283,13 +283,18 @@ let
         #!${pkgs.runtimeShell}
         set -e
         echo "ekaos home: activating all user homes..."
+        failed=0
         ${concatStringsSep "\n" (
           mapAttrsToList (userName: userCfg: ''
             echo "  Activating home for ${userName}..."
             ${mkHomeActivationPackage userName userCfg}/activate 2>&1 || \
-              echo "  WARNING: home activation failed for ${userName}"
+              { echo "  ERROR: home activation failed for ${userName}" >&2; failed=1; }
           '') usersWithHome
         )}
+        if [ "$failed" -ne 0 ]; then
+          echo "ekaos home: one or more activations failed." >&2
+          exit 1
+        fi
         echo "ekaos home: all activations complete."
         ACTIVATE
         chmod +x $out/activate
