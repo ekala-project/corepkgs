@@ -192,6 +192,10 @@ in
   };
 
   config = mkIf cfg.enable {
+    # The VM disk image is EFI and is built with installBootLoader = true,
+    # which needs a bootloader that provides system.build.installBootLoader.
+    boot.loader.systemd-boot.enable = mkDefault true;
+
     # Ensure serial console is configured in kernel params
     boot.kernelParams = mkIf cfg.serialConsole [
       "console=ttyS0,115200"
