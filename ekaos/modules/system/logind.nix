@@ -65,6 +65,16 @@ in
   };
 
   config = mkIf cfg.enable {
+    # Restarting logind would end every session; it supports reload.
+    # user-runtime-dir@ is managed by logind itself.
+    systemd.switchOverrides = {
+      "systemd-logind.service".reloadIfChanged = true;
+      "user-runtime-dir@.service" = {
+        stopIfChanged = false;
+        restartIfChanged = false;
+      };
+    };
+
     # Default settings
     services.logind.settings = {
       KillUserProcesses = mkDefault false;

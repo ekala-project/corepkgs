@@ -103,6 +103,8 @@ in
       systemd = {
         after = [ "local-fs.target" ];
         wantedBy = [ "multi-user.target" ];
+        # Restarting the system bus takes down everything attached to it.
+        reloadIfChanged = true;
       };
     };
 

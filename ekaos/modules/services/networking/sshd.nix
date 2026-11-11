@@ -280,6 +280,10 @@ in
       systemd = {
         after = [ "network.target" ];
         wantedBy = [ "multi-user.target" ];
+        # Restart after activation instead of stopping first, so a switch
+        # run over SSH keeps its connection.
+        stopIfChanged = false;
+        restartTriggers = [ sshdConfig ];
       };
     };
 
