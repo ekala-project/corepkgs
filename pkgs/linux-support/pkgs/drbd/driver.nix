@@ -20,8 +20,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   hardeningDisable = [ "pic" ];
 
-  nativeBuildInputs = [
-    kernel.moduleBuildDependencies
+  nativeBuildInputs = kernel.moduleBuildDependencies ++ [
     flex
     coccinelle
     python3
