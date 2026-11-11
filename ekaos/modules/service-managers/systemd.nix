@@ -15,6 +15,17 @@ let
     systemd = config.systemd.package;
   };
 
+  # Render free-form unit keys; lists repeat the key, as systemd allows
+  unitKeyLines =
+    attrs:
+    concatStringsSep "\n" (
+      flatten (
+        mapAttrsToList (
+          k: v: map (x: "${k}=${if isBool x then (if x then "yes" else "no") else toString x}") (toList v)
+        ) attrs
+      )
+    );
+
   cfg = config.serviceManager.systemd;
 
   # Filter to only include enabled services with command set
@@ -66,6 +77,7 @@ let
 
       # Service config overrides
       serviceConfig = systemdCfg.serviceConfig or { };
+      unitConfig = systemdCfg.unitConfig or { };
 
     in
     pkgs.writeTextFile {
@@ -77,6 +89,7 @@ let
         ${concatMapStringsSep "\n" (d: "Wants=${d}") wants}
         ${concatMapStringsSep "\n" (d: "Requires=${d}") requires}
         ${concatMapStringsSep "\n" (d: "Before=${d}") before}
+        ${unitKeyLines unitConfig}
 
         [Service]
         Type=${serviceConfig.Type or "simple"}
@@ -141,6 +154,7 @@ let
       wantedBy = systemdCfg.wantedBy or [ "default.target" ];
 
       serviceConfig = systemdCfg.serviceConfig or { };
+      unitConfig = systemdCfg.unitConfig or { };
 
     in
     pkgs.writeTextFile {
@@ -152,6 +166,7 @@ let
         ${concatMapStringsSep "\n" (d: "Wants=${d}") wants}
         ${concatMapStringsSep "\n" (d: "Requires=${d}") requires}
         ${concatMapStringsSep "\n" (d: "Before=${d}") before}
+        ${unitKeyLines unitConfig}
 
         [Service]
         Type=${serviceConfig.Type or "simple"}
