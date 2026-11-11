@@ -69,6 +69,19 @@ in
           python3
           coreutils
         ];
+
+        systemd.services.http-server = {
+          description = "ekaos test HTTP server";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "network.target" ];
+          environment.PORT = "8080";
+          serviceConfig = {
+            ExecStart = "${serverScript}";
+            Restart = "on-failure";
+            # Unbuffered so the startup line reaches the journal immediately
+            Environment = "PYTHONUNBUFFERED=1";
+          };
+        };
       };
   };
 

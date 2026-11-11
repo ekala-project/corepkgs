@@ -68,10 +68,6 @@
     # Wait for multi-user target
     machine.wait_for_unit("multi-user.target")
 
-    # WORKAROUND: Manually run activation script since it's not being called during boot
-    # This is needed because the test driver doesn't properly boot the system
-    machine.succeed("if [ -f /run/booted-system/activate ]; then /run/booted-system/activate || true; fi")
-    machine.succeed("if [ -f /run/current-system/activate ]; then /run/current-system/activate || true; fi")
 
     # Test that getty services are running
     machine.wait_for_unit("getty@tty1.service")

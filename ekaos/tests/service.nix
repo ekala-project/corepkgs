@@ -20,6 +20,30 @@
       }:
       {
         virtualisation.enable = true;
+
+        environment.systemPackages = [ pkgs.curl ];
+
+        systemd.services.test-service = {
+          description = "ekaos test oneshot service";
+          wantedBy = [ "multi-user.target" ];
+          script = "echo test-service ran";
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = "yes";
+          };
+        };
+
+        systemd.services.test-webserver = {
+          description = "ekaos test web server";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "network.target" ];
+          script = ''
+            mkdir -p /run/test-webserver
+            echo "hello from ekaos" > /run/test-webserver/index.html
+            exec ${pkgs.python3}/bin/python3 -m http.server 8080 \
+              --bind 127.0.0.1 --directory /run/test-webserver
+          '';
+        };
       };
   };
 
@@ -41,7 +65,8 @@
     machine.wait_for_open_port(8080)
 
     # Test that we can connect to the web server
-    machine.succeed("curl -f http://localhost:8080/")
+    out = machine.succeed("curl -fsS http://127.0.0.1:8080/")
+    assert "hello from ekaos" in out, out
 
     # Test service restart
     machine.succeed("systemctl restart test-webserver.service")
