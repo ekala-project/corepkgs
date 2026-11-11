@@ -16,7 +16,6 @@
       { config, pkgs, ... }:
       {
         # Minimal system configuration
-        boot.kernelPackages = pkgs.linuxPackages;
         boot.loader.systemd-boot.enable = true;
 
         # Enable QEMU guest for testing

@@ -24,7 +24,6 @@ let
           serviceManager.systemd.enable = lib.mkDefault true;
 
           # Minimal system config to satisfy module requirements
-          boot.kernelPackages = pkgs.linuxPackages;
           fileSystems."/" = {
             device = "/dev/null";
             fsType = "ext4";

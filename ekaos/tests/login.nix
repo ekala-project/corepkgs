@@ -20,8 +20,6 @@
         ...
       }:
       {
-        boot.kernelPackages = pkgs.linuxPackages;
-
         virtualisation.enable = true;
 
         # Enable getty (should be enabled by default, but explicit here)

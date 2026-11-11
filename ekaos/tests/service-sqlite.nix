@@ -113,7 +113,6 @@ in
           }
         ];
 
-        boot.kernelPackages = pkgs.linuxPackages;
         virtualisation.enable = true;
 
         # Add required packages to environment

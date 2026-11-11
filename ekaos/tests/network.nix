@@ -20,8 +20,6 @@
         ...
       }:
       {
-        boot.kernelPackages = pkgs.linuxPackages;
-
         virtualisation.enable = true;
 
         # Basic networking configuration

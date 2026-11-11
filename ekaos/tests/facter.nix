@@ -18,7 +18,6 @@ let
       modules = [
         {
           serviceManager.systemd.enable = lib.mkDefault true;
-          boot.kernelPackages = pkgs.linuxPackages;
           fileSystems."/" = {
             device = "/dev/null";
             fsType = "ext4";
