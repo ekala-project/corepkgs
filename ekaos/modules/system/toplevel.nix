@@ -11,6 +11,10 @@
 with lib;
 
 let
+  # Version of the contract between this toplevel and the ekaos switch
+  # engine. The engine refuses toplevels with a version it does not know.
+  switchContractVersion = 1;
+
   # Generate bootspec (boot.json) for the system
   bootspecJson = pkgs.writeText "bootspec.json" (
     builtins.toJSON (
@@ -112,10 +116,13 @@ let
     ln -s ${config.system.path} $out/sw
     ln -s ${config.systemd.package} $out/systemd
 
-    # Link bootloader installer if available
-    ${optionalString (config.system.build ? installBootLoader) ''
-      ln -s ${config.system.build.installBootLoader} $out/bin/install-bootloader
-    ''}
+    # Bootloader installer; always present so the switch engine can call it
+    # unconditionally (it warns when no bootloader is configured).
+    ln -s ${config.system.build.installBootLoader} $out/bin/install-bootloader
+
+    # Version of the toplevel layout and unit keys the switch engine reads
+    # (see ekaos/lib/systemd-switch-keys.nix). Bump on incompatible changes.
+    echo -n "${toString switchContractVersion}" > $out/ekaos-switch-version
 
     # Write version information
     echo -n "${config.system.ekaos.version}" > $out/ekaos-version
@@ -280,6 +287,19 @@ in
       type = types.str;
       default = "multi-user.target";
       description = "The default systemd target to boot into.";
+    };
+
+    system.build.installBootLoader = mkOption {
+      type = types.package;
+      internal = true;
+      default = pkgs.writeShellScript "no-bootloader" ''
+        echo "warning: no bootloader is configured; this generation will not be added to the boot menu" >&2
+      '';
+      defaultText = literalExpression "a script that only prints a warning";
+      description = ''
+        Script that installs the bootloader for a toplevel, called as
+        `install-bootloader <toplevel>`. Bootloader modules set it.
+      '';
     };
 
     system.build.toplevel = mkOption {
