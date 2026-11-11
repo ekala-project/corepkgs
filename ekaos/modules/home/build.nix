@@ -97,17 +97,38 @@ let
           ''
         ) enabledFiles}
 
-        # Enable user units declaratively: for each unit's [Install]
-        # WantedBy= target, link the unit into <target>.wants/ so the user
-        # manager starts it at login, like `systemctl --user enable` would.
+        # Enable user units declaratively, like `systemctl --user enable`:
+        # link each unit into <target>.wants/, .requires/ or .upholds/ for
+        # its [Install] WantedBy=, RequiredBy= and UpheldBy= targets.
+        #
+        # Skipped when the unit directory (or a parent) is linked from the
+        # store as a whole: it is read-only, so no links can be added.
         unitdir=$out/.config/systemd/user
-        if [ -d "$unitdir" ]; then
+        if [ -d "$unitdir" ] && [ "$(readlink -f "$unitdir")" = "$unitdir" ]; then
           for unit in "$unitdir"/*.service "$unitdir"/*.socket "$unitdir"/*.timer "$unitdir"/*.path; do
             [ -f "$unit" ] || continue
             name=$(basename "$unit")
-            for target in $(sed -n '/^\[Install\]/,/^\[/s/^WantedBy[[:space:]]*=[[:space:]]*//p' "$unit"); do
-              mkdir -p "$unitdir/$target.wants"
-              ln -sfn "$(readlink "$unit")" "$unitdir/$target.wants/$name"
+            links=$(awk -f ${./unit-install-links.awk} "$unit")
+
+            # A template (foo@.service) is enabled as its DefaultInstance=
+            # (foo@<instance>.service); without one, there is nothing to link.
+            linkname=$name
+            case "$name" in
+              *@.*)
+                instance=$(echo "$links" | sed -n 's/^instance //p')
+                if [ -z "$instance" ]; then
+                  echo "warning: $name is a template without DefaultInstance=, not enabling" >&2
+                  continue
+                fi
+                linkname="''${name%@.*}@$instance.''${name##*.}"
+                ;;
+            esac
+
+            echo "$links" | while read -r kind target; do
+              [ "$kind" = instance ] && continue
+              [ -n "$target" ] || continue
+              mkdir -p "$unitdir/$target.$kind"
+              ln -sfn "$(readlink "$unit")" "$unitdir/$target.$kind/$linkname"
             done
           done
         fi
@@ -167,7 +188,7 @@ let
       }
       ''
         cd ${homeFiles}
-        find . -type l | sed 's|^\./||' | LC_ALL=C sort | jq -R . | jq -cs . > $out
+        find . -type l | sed 's|^\./||' | LC_ALL=C sort | jq -Rnc '[inputs]' > $out
       '';
 
   # Build the activation package for a single user
