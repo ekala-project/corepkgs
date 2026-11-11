@@ -53,6 +53,9 @@ let
     # Create essential directories
     mkdir -p /tmp /var/log /var/tmp
     chmod 1777 /tmp /var/tmp
+    # Many daemons still write pid files to /var/run. tmpfiles' var.conf
+    # makes the same link, but only once systemd-tmpfiles-setup runs.
+    ln -sfn /run /var/run
 
     # Run the activation script
     echo "Running activation script..."

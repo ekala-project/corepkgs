@@ -256,6 +256,35 @@ in
           '';
         }
 
+        # systemd's own tmpfiles.d snippets, which it would otherwise look
+        # for under /usr/lib. The set NixOS installs; var.conf provides
+        # the /var/run -> /run link.
+        (listToAttrs (
+          map
+            (
+              conf:
+              nameValuePair "tmpfiles.d/${conf}" {
+                source = "${config.systemd.package}/example/tmpfiles.d/${conf}";
+              }
+            )
+            [
+              "credstore.conf"
+              "home.conf"
+              "journal-nocow.conf"
+              "portables.conf"
+              "provision.conf"
+              "static-nodes-permissions.conf"
+              "systemd.conf"
+              "systemd-nologin.conf"
+              "systemd-nspawn.conf"
+              "systemd-pstore.conf"
+              "systemd-tmp.conf"
+              "tmp.conf"
+              "var.conf"
+              "x11.conf"
+            ]
+        ))
+
         # Preset policy for first-boot unit enablement.  The 00- prefix gives
         # this file higher priority than the upstream 90-systemd.preset.
         #
