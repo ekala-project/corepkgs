@@ -173,9 +173,15 @@ in
           "sysinit.target"
         ];
         after = [ "systemd-remount-fs.service" ];
-        conflicts = [ "shutdown.target" ];
-        conditionVirtualization = "!container";
-        conditionCapability = "CAP_SYS_TIME";
+        # As upstream's unit: it starts before sysinit.target, so the
+        # default After=basic.target would be an ordering cycle
+        unitConfig = {
+          DefaultDependencies = false;
+          Conflicts = "shutdown.target";
+          Before = "shutdown.target";
+          ConditionVirtualization = "!container";
+          ConditionCapability = "CAP_SYS_TIME";
+        };
       };
     };
 
