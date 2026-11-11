@@ -196,10 +196,24 @@ in
     # which needs a bootloader that provides system.build.installBootLoader.
     boot.loader.systemd-boot.enable = mkDefault true;
 
-    # Ensure serial console is configured in kernel params
-    boot.kernelParams = mkIf cfg.serialConsole [
-      "console=ttyS0,115200"
+    # The kernel builds virtio and ext4 as modules, so the root filesystem of
+    # the disk image can only be mounted from an initrd. The image's root
+    # filesystem UUID is make-disk-image's deterministic default.
+    boot.initrd.enable = mkDefault true;
+    boot.initrd.availableKernelModules = [
+      "virtio_pci"
+      "virtio_blk"
+      "ext4"
+    ];
+
+    boot.kernelParams = [
+      "root=UUID=F222513B-DED1-49FA-B591-20CE86A2FE7F"
+    ]
+    ++ optionals cfg.serialConsole [
+      # The last console= becomes /dev/console, so put the serial port
+      # last: unit output sent to the console then reaches the boot log.
       "console=tty1"
+      "console=ttyS0,115200"
     ];
 
     # Build targets for VM
