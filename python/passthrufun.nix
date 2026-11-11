@@ -31,6 +31,8 @@
 assert lib.assertMsg (pythonPackagesExtensions == [ ]) "pythonPackagesExtensions is not supported";
 
 let
+  python2PackagesRemoved = "The Python 2 package sets (python2.pkgs, python2Packages, pypy2.pkgs) have been removed: they diverged too far from the PyPI ecosystem to maintain. The python2 and pypy2 interpreters are still available.";
+
   autoCalledOverlay = lib.packageSets.mkAutoCalledPackageDir ./pkgs;
   pythonPackages =
     let
@@ -134,7 +136,11 @@ rec {
     inherit (pythonPackages) requiredPythonModules;
   };
   withPackages = import ./with-packages.nix { inherit buildEnv pythonPackages; };
-  pkgs = pythonPackages;
+  # The Python 2 package set has diverged too far from PyPI to maintain: most
+  # packages no longer support Python 2, and the shared package tree does not
+  # build against it. The interpreters themselves stay available, and so does
+  # `withPackages (ps: [ ])`, which PyPy's bootstrap uses.
+  pkgs = if isPy2 then throw python2PackagesRemoved else pythonPackages;
   interpreter = "${self}/bin/${executable}";
   inherit
     executable
