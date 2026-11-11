@@ -45,6 +45,8 @@ let
             }
           ''
         ) etc'}
+
+        ${config.environment.etcBuildCommands}
       '';
 
 in
@@ -116,6 +118,21 @@ in
       type = types.package;
       internal = true;
       description = "The /etc directory for the system.";
+    };
+
+    environment.etcBuildCommands = mkOption {
+      type = types.lines;
+      default = "";
+      internal = true;
+      description = ''
+        Shell commands appended to the /etc derivation's build script, run
+        after all `environment.etc` entries have been linked into `$out/etc`.
+
+        Used for entries that can only be computed at build time, such as
+        linking unit files shipped by packages or creating relative
+        `.wants/` symlinks, which `environment.etc.<name>.source` cannot
+        express.
+      '';
     };
   };
 
