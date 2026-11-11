@@ -44,6 +44,11 @@ let
     || (stdenv.hostPlatform.isMips && stdenv.hostPlatform.is64bit)
   );
 
+  # CONFIG_MEMORY_HOTPLUG_DEFAULT_ONLINE was replaced by the
+  # CONFIG_MHP_DEFAULT_ONLINE_TYPE_* choice in 6.14, and the change was
+  # backported to 6.12.110.
+  hasMhpDefaultOnlineType = kernelAtLeast "6.14" || (kernelAtLeast "6.12.110" && kernelOlder "6.13");
+
   forceRust = features.rust or false;
   # Architecture support collected from HAVE_RUST Kconfig definitions and the following table:
   # https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/rust/arch-support.rst
@@ -1444,8 +1449,8 @@ let
             ACPI_HOTPLUG_CPU = yes;
             ACPI_HOTPLUG_MEMORY = yes;
             MEMORY_HOTPLUG = yes;
-            MEMORY_HOTPLUG_DEFAULT_ONLINE = whenOlder "6.14" yes;
-            MHP_DEFAULT_ONLINE_TYPE_ONLINE_AUTO = whenAtLeast "6.14" yes;
+            MEMORY_HOTPLUG_DEFAULT_ONLINE = lib.mkIf (!hasMhpDefaultOnlineType) yes;
+            MHP_DEFAULT_ONLINE_TYPE_ONLINE_AUTO = lib.mkIf hasMhpDefaultOnlineType yes;
             MEMORY_HOTREMOVE = lib.mkIf (
               with stdenv.hostPlatform;
               isLoongArch64 || isPower || isS390 || isx86 || isAarch64 || (kernelAtLeast "6.11" && isRiscV)
