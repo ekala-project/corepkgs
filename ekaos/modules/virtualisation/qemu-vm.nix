@@ -24,6 +24,7 @@ let
     installBootLoader = true;
     touchEFIVars = false; # LKL doesn't support EFI, vars created at runtime
     label = config.system.ekaos.label;
+    inherit (cfg) additionalPaths;
   };
 
   # QEMU command builder
@@ -145,6 +146,15 @@ in
         type = types.int;
         default = 8192;
         description = "Disk size in MB.";
+      };
+
+      additionalPaths = mkOption {
+        type = types.listOf types.package;
+        default = [ ];
+        description = ''
+          Store paths to copy into the disk image's store, with their
+          closures, beyond the system itself.
+        '';
       };
 
       enableNetwork = mkOption {
