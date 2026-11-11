@@ -79,6 +79,13 @@ in
   };
 
   config = mkIf cfg.enable {
+    # Restarting a getty on switch would kill the session on that tty.
+    systemd.switchOverrides = {
+      "getty@.service".restartIfChanged = false;
+      "serial-getty@.service".restartIfChanged = false;
+      "autovt@.service".restartIfChanged = false;
+    };
+
     # Inject getty service unit files directly into /etc/systemd/system
     environment.etc = mkMerge [
       # Create getty service units for each tty

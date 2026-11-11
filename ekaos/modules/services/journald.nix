@@ -304,6 +304,15 @@ in
   config = mkIf cfg.enable {
     # Note: systemd-journald binary is already built into systemd package
 
+    systemd.switchOverrides = {
+      "systemd-journald.service" = {
+        stopIfChanged = false;
+        restartTriggers = [ journaldConf ];
+      };
+      "systemd-journald@.service".stopIfChanged = false;
+      "systemd-journal-flush.service".restartIfChanged = false;
+    };
+
     # Install journald configuration
     environment.etc."systemd/journald.conf" = {
       source = journaldConf;
