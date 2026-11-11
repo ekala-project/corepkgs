@@ -215,8 +215,18 @@ let
         else
           svc.serviceConfig.ExecStart or "";
       envLines = mapAttrsToList (k: v: "Environment=\"${k}=${v}\"") svc.environment;
+      # systemd does not expand variables in Environment=, so the PATH is
+      # spelled out: the requested packages, then the system profile.
       pathStr = optionalString (svc.path != [ ]) (
-        "Environment=\"PATH=${concatMapStringsSep ":" (p: "${p}/bin") svc.path}:$PATH\""
+        "Environment=\"PATH=${
+          concatStringsSep ":" [
+            (makeBinPath svc.path)
+            (makeSearchPathOutput "bin" "sbin" svc.path)
+            "/run/wrappers/bin"
+            "/run/current-system/sw/bin"
+            "/run/current-system/sw/sbin"
+          ]
+        }\""
       );
     in
     pkgs.writeText "${name}.service" ''
