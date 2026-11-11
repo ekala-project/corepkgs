@@ -19,6 +19,7 @@ import threading
 import time
 from typing import Optional, Tuple
 from .logger import log, log_error
+from .vlan import vlan_socket
 
 READY_MARKER = b"ekaos-backdoor-ready"
 
@@ -59,7 +60,14 @@ class Machine:
         self._listener.bind(sock_path)
         self._listener.listen(1)
 
-        env = dict(os.environ, EKAOS_TEST_SHELL_SOCKET=sock_path)
+        env = dict(
+            os.environ,
+            EKAOS_TEST_SHELL_SOCKET=sock_path,
+            EKAOS_VM_STATE_DIR=self._state_dir,
+        )
+        vde = vlan_socket()
+        if vde is not None:
+            env["EKAOS_TEST_VDE_SOCKET"] = vde
         self.process = subprocess.Popen(
             [self.vm_script],
             stdin=subprocess.DEVNULL,

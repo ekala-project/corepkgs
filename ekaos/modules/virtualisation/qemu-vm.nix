@@ -42,9 +42,17 @@ let
       exit 1
     fi
 
-    # Create a writable copy of EFI vars in /tmp
-    # (EFI vars must be writable, but files in /nix/store are read-only)
-    EFI_VARS_DIR=$(mktemp -d /tmp/ekaos-efi-vars.XXXXXX)
+    # Create a writable copy of EFI vars
+    # (EFI vars must be writable, but files in /nix/store are read-only).
+    # With EKAOS_VM_STATE_DIR set, the caller owns that directory and its
+    # cleanup; otherwise a temporary directory is removed when QEMU exits.
+    if [ -n "''${EKAOS_VM_STATE_DIR:-}" ]; then
+      EFI_VARS_DIR="$EKAOS_VM_STATE_DIR"
+      OWN_STATE_DIR=
+    else
+      EFI_VARS_DIR=$(mktemp -d "''${TMPDIR:-/tmp}/ekaos-efi-vars.XXXXXX")
+      OWN_STATE_DIR=1
+    fi
     EFI_VARS="$EFI_VARS_DIR/efi-vars.fd"
 
     if [ -f "$EFI_VARS_TEMPLATE" ]; then
@@ -56,9 +64,6 @@ let
       cp "${pkgs.OVMF.variables}" "$EFI_VARS"
       chmod u+w "$EFI_VARS"
     fi
-
-    # Cleanup on exit
-    trap "rm -rf $EFI_VARS_DIR" EXIT
 
     # QEMU arguments
     QEMU_OPTS=(
@@ -113,7 +118,13 @@ let
     echo "EFI Vars: $EFI_VARS"
     echo ""
 
-    exec ${pkgs.qemu}/bin/qemu-system-x86_64 "''${QEMU_OPTS[@]}"
+    if [ -z "$OWN_STATE_DIR" ]; then
+      exec ${pkgs.qemu}/bin/qemu-system-x86_64 "''${QEMU_OPTS[@]}"
+    fi
+
+    # Not exec'd so the temporary state directory can be removed afterwards.
+    trap 'rm -rf "$EFI_VARS_DIR"' EXIT
+    ${pkgs.qemu}/bin/qemu-system-x86_64 "''${QEMU_OPTS[@]}"
   '';
 
   runVM = pkgs.writeScript "run-${config.system.ekaos.label}-vm" qemuCmd;
