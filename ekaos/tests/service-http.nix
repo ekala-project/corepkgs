@@ -40,6 +40,9 @@ let
             else:
                 super().do_GET()
 
+    # Rebind across restarts while earlier connections sit in TIME_WAIT
+    socketserver.TCPServer.allow_reuse_address = True
+
     with socketserver.TCPServer(("", PORT), RequestHandler) as httpd:
         print(f"Server running on port {PORT}")
         httpd.serve_forever()
