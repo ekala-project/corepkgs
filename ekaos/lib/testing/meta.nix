@@ -45,6 +45,7 @@ with lib;
         Automatically includes:
         - nodes: Built node configurations
         - driver: Test driver package
+        - driverInteractive: Test driver that starts in a python REPL
       '';
     };
 
@@ -64,6 +65,7 @@ with lib;
     passthru = {
       inherit (config) nodes;
       driver = config.driver;
+      driverInteractive = config.driverInteractive;
     };
   };
 }
