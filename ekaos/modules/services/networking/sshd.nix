@@ -283,6 +283,15 @@ in
       };
     };
 
+    # Privilege separation user; sshd refuses to start without it
+    users.users.sshd = {
+      isSystemUser = true;
+      uid = 74;
+      group = "sshd";
+      description = "SSH privilege separation user";
+    };
+    users.groups.sshd.gid = 74;
+
     # Install sshd configuration
     environment.etc."ssh/sshd_config".source = sshdConfig;
 

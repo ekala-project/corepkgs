@@ -117,10 +117,11 @@ in
     # Create messagebus user and group
     users.users.messagebus = {
       isSystemUser = true;
+      uid = 4;
       group = "messagebus";
       description = "D-Bus system message bus daemon user";
     };
-    users.groups.messagebus = { };
+    users.groups.messagebus.gid = 4;
 
     # Add dbus tools to system packages
     environment.systemPackages = [ cfg.package ];

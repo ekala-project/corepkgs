@@ -187,10 +187,11 @@ in
     # Create resolve user
     users.users.${cfg.user} = {
       isSystemUser = true;
+      uid = mkDefault 153;
       group = cfg.user;
       description = "systemd Resolver";
     };
-    users.groups.${cfg.user} = { };
+    users.groups.${cfg.user}.gid = mkDefault 153;
 
     # Ensure state directory exists
     system.activationScripts.resolved = stringAfter [ "etc" "users" ] ''
