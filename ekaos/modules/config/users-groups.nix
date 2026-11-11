@@ -331,14 +331,25 @@ let
       hashedPass =
         if user.hashedPassword or null != null then
           user.hashedPassword
-        else if user.initialPassword or null != null then
-          # Use mkpasswd from whois package to hash password
-          # For now, use a simple hash - in production, use proper hashing
-          user.initialPassword # INSECURE: This should be hashed
+        # initialPassword is hashed at activation (setInitialPasswords);
+        # until then the account stays locked
         else
           "!"; # Locked account
     in
     "${user.name}:${hashedPass}:1::::: "
+  ) allUsers;
+
+  # Hash each initialPassword into /etc/shadow. A plaintext value in the
+  # hash field never matches, and would sit in a root-readable file.
+  setInitialPasswords = concatMapStringsSep "\n" (
+    user:
+    optionalString (user.hashedPassword or null == null && user.initialPassword or null != null) ''
+      hash=$(printf '%s' ${escapeShellArg user.initialPassword} | ${pkgs.openssl}/bin/openssl passwd -6 -stdin)
+      (umask 077; ${pkgs.gawk}/bin/awk -F: -v OFS=: -v user=${escapeShellArg user.name} -v hash="$hash" \
+        '$1 == user { $2 = hash } { print }' /etc/shadow > /etc/shadow.new)
+      chmod --reference=/etc/shadow /etc/shadow.new
+      mv /etc/shadow.new /etc/shadow
+    ''
   ) allUsers;
 
   # Generate home directory creation script
@@ -500,6 +511,9 @@ in
 
       # Set up SSH authorized keys
       ${setupSSHKeys}
+
+      # Hash the initial passwords into /etc/shadow
+      ${setInitialPasswords}
 
       # Ensure /var/empty exists for system users
       mkdir -p /var/empty
