@@ -58,7 +58,15 @@ let
 
         shell = mkOption {
           type = types.either types.str types.package;
-          default = "/run/current-system/sw/bin/bash";
+          default =
+            if config.isSystemUser then
+              "/run/current-system/sw/bin/nologin"
+            else
+              "/run/current-system/sw/bin/bash";
+          defaultText = literalExpression ''
+            if isSystemUser then "/run/current-system/sw/bin/nologin"
+            else "/run/current-system/sw/bin/bash"
+          '';
           example = literalExpression "pkgs.zsh";
           description = ''
             The user's login shell.
@@ -241,6 +249,27 @@ let
       name = "dialout";
       gid = 13;
     }
+    # Groups systemd's tmpfiles.d snippets and udev rules refer to
+    {
+      name = "utmp";
+      gid = 29;
+    }
+    {
+      name = "input";
+      gid = 174;
+    }
+    {
+      name = "kvm";
+      gid = 302;
+    }
+    {
+      name = "render";
+      gid = 303;
+    }
+    {
+      name = "sgx";
+      gid = 304;
+    }
     {
       name = "users";
       gid = 100;
@@ -252,8 +281,19 @@ let
   ];
 
   # Merge system and user-defined users/groups
-  allUsers = systemUsers ++ users;
-  allGroups = systemGroups ++ groups;
+  # The built-in users and groups are defined through the options below,
+  # so a module's users.users.root or users.groups.wheel merges with them
+  allUsers = users;
+  allGroups = groups;
+
+  # Built-in values yield to any definition. The user submodule already
+  # sets group with mkDefault, so that one needs a higher priority.
+  asDefaults =
+    entry:
+    mapAttrs (k: v: if k == "group" then mkOverride 900 v else mkDefault v) (
+      removeAttrs entry [ "name" ]
+    );
+  builtinsOf = entries: listToAttrs (map (e: nameValuePair e.name (asDefaults e)) entries);
 
   # Generate passwd file
   passwdContent = concatMapStringsSep "\n" (
@@ -408,6 +448,9 @@ in
   };
 
   config = {
+    users.users = builtinsOf systemUsers;
+    users.groups = builtinsOf systemGroups;
+
     # Generate /etc/passwd, /etc/group, /etc/shadow
     environment.etc = {
       "passwd" = {
