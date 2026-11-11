@@ -111,7 +111,9 @@ class Machine:
 
         while True:
             line = self._read_line(deadline)
-            if line.strip() == READY_MARKER:
+            # OVMF and the boot loader also draw on the virtio console, so
+            # the marker can follow their escape codes on the same line.
+            if line.strip().endswith(READY_MARKER):
                 break
 
         self.booted = True
