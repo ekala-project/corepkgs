@@ -94,8 +94,6 @@ in
         ) (range 1 cfg.ttyCount)
       ))
 
-      # multi-user.target.wants/ symlinks are created by the getty activation script below
-
       # Ensure required systemd services are available
       # Units live under example/ in the systemd package (moved from lib/ during build)
       {
@@ -107,20 +105,12 @@ in
       }
     ];
 
-    # Add activation script to create getty service symlinks
-    system.activationScripts.getty = stringAfter [ "etc" ] ''
-      # Create getty service symlinks for multi-user.target
-      mkdir -p /etc/systemd/system/multi-user.target.wants
-      ${concatMapStringsSep "\n" (
+    # Pull each getty into multi-user.target
+    systemd.install.system = listToAttrs (
+      map (
         ttyNumber:
-        let
-          ttyName = "tty${toString ttyNumber}";
-        in
-        ''
-          ln -sf ../getty@${ttyName}.service \
-                 /etc/systemd/system/multi-user.target.wants/getty@${ttyName}.service
-        ''
-      ) (range 1 cfg.ttyCount)}
-    '';
+        nameValuePair "getty@tty${toString ttyNumber}.service" { wantedBy = [ "multi-user.target" ]; }
+      ) (range 1 cfg.ttyCount)
+    );
   };
 }
