@@ -133,6 +133,17 @@ with lib;
       '';
     };
 
+    system.modulesTree = mkOption {
+      type = types.package;
+      internal = true;
+      readOnly = true;
+      description = ''
+        The kernel modules of the kernel and of boot.extraModulePackages,
+        with a combined depmod index. Linked as `$toplevel/kernel-modules`,
+        where kmod looks for it through /run/booted-system.
+      '';
+    };
+
     system.boot.loader.kernelFile = mkOption {
       type = types.str;
       internal = true;
@@ -145,6 +156,48 @@ with lib;
   };
 
   config = mkMerge [
+    {
+      system.modulesTree =
+        let
+          kernel = config.boot.kernelPackages.kernel;
+        in
+        if config.boot.extraModulePackages == [ ] then
+          kernel.modules
+        else
+          # Merges the trees and re-runs depmod over the result, failing if
+          # a module package was built for a different kernel version.
+          (pkgs.aggregateModules ([ kernel.modules ] ++ config.boot.extraModulePackages)).override {
+            name = "${kernel.name}-modules";
+          };
+    }
+
+    # Loaded by systemd-modules-load.service, part of sysinit.target.
+    (mkIf (config.boot.kernelModules != [ ]) {
+      environment.etc."modules-load.d/ekaos.conf".text = concatLines config.boot.kernelModules;
+    })
+
+    # Drop-ins rather than systemd.services, which would replace the
+    # upstream units wholesale.
+    (mkIf (config.serviceManager.systemd.enable or false) {
+      # Many modules in boot.kernelModules are "nice to have" (added by
+      # hardware detection or optional services); a missing one should not
+      # fail the unit and degrade the system.
+      environment.etc."systemd/system/systemd-modules-load.service.d/ekaos.conf".text = ''
+        [Service]
+        SuccessExitStatus=0 1
+      '';
+
+      # Upstream checks /lib/modules/%v/modules.devname, which does not
+      # exist here; without this, static nodes such as /dev/fuse,
+      # /dev/loop-control and /dev/net/tun are never created ahead of
+      # module loading.
+      environment.etc."systemd/system/kmod-static-nodes.service.d/ekaos.conf".text = ''
+        [Unit]
+        ConditionFileNotEmpty=
+        ConditionFileNotEmpty=/run/booted-system/kernel-modules/lib/modules/%v/modules.devname
+      '';
+    })
+
     # Set kernel console log level
     (mkIf (config.boot.consoleLogLevel != 4) {
       boot.kernelParams = [ "loglevel=${toString config.boot.consoleLogLevel}" ];

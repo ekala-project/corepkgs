@@ -208,6 +208,10 @@ let
     # Generate bootspec (boot.json)
     ${pkgs.jq}/bin/jq --arg toplevel "$out" --arg init "$out/init" --arg initrd "$out/initrd" '."org.nixos.bootspec.v1".toplevel = $toplevel | ."org.nixos.bootspec.v1".init = $init | ."org.nixos.bootspec.v1".initrd = $initrd' < ${bootspecJson} > $out/boot.json
 
+    # kmod and udev look for modules under /run/booted-system/kernel-modules
+    # (and /run/current-system/kernel-modules); /lib/modules does not exist.
+    ln -s ${config.system.modulesTree} $out/kernel-modules
+
     # Create extra dependencies file for GC roots
     mkdir -p $out/extra-dependencies
     ln -s ${config.boot.kernelPackages.kernel} $out/extra-dependencies/kernel
