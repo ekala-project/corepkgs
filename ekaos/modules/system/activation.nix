@@ -68,6 +68,17 @@ let
     in
     sort scriptNames [ ];
 
+  # Reconciles /etc/systemd/{system,user} against /etc/static
+  syncUnitDir = pkgs.writeShellScript "ekaos-sync-unit-dir" ''
+    export PATH=${
+      lib.makeBinPath [
+        pkgs.coreutils
+        pkgs.findutils
+      ]
+    }
+    ${builtins.readFile ./sync-unit-dir.sh}
+  '';
+
   # Build the activation script
   activationScript =
     let
@@ -160,15 +171,37 @@ in
             mkdir -p /etc
           fi
 
-          # Copy files from /etc/static to /etc, overwriting any existing files
+          # Copy files from /etc/static to /etc, overwriting any existing files.
+          # The systemd unit directories are excluded: they are reconciled
+          # below so that administrator state survives activation.
           if [ -d /etc/static ]; then
-            cp -rfL /etc/static/* /etc/
+            for entry in /etc/static/*; do
+              if [ "''${entry##*/}" = systemd ] && [ -d "$entry" ]; then
+                mkdir -p /etc/systemd
+                for sub in "$entry"/*; do
+                  case "''${sub##*/}" in
+                    system | user) continue ;;
+                  esac
+                  cp -rfL "$sub" /etc/systemd/
+                done
+              else
+                cp -rfL "$entry" /etc/
+              fi
+            done
           fi
 
           # Copies keep the read-only store mode; apply the declared ones
           ${concatMapStrings (f: ''
             chmod ${f.mode} /etc/${escapeShellArg f.target}
           '') etcWithMode}
+
+          # Staging directories from the old imperative package-unit linking
+          rm -rf /etc/systemd/system-packages /etc/systemd/user-packages
+
+          # Reconcile the unit directories: links into /etc/static are
+          # managed by the configuration, everything else is left alone.
+          ${syncUnitDir} /etc/static/systemd/system /etc/systemd/system
+          ${syncUnitDir} /etc/static/systemd/user /etc/systemd/user
         '';
         supportsDryActivation = true;
       };
