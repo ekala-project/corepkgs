@@ -5,9 +5,12 @@
   stdenv,
 }:
 
+let
+  version = "1.20";
+in
 buildPerlPackage {
   pname = "IO-Tty";
-  version = "1.20";
+  inherit version;
   src = fetchurl {
     url = "mirror://cpan/authors/id/T/TO/TODDR/IO-Tty-${version}.tar.gz";
     hash = "sha256-sVMJ/IViOJMonLmyuI36ntHmkVa3XymThVOkW+bXMK8=";

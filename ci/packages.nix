@@ -224,9 +224,6 @@ let
     perl = [
       # Invalid `meta`.
       "ImageMagick"
-      # `version` is used in `src` without `finalAttrs` or `rec`.
-      "IOTty"
-      "IPCRun"
     ];
   };
 
