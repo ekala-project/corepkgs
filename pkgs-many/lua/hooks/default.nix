@@ -13,20 +13,33 @@ in
     You can customize the call by setting "bustedFlags" and prevent the test from running by setting "dontBustedCheck"
   */
   bustedCheckHook = callPackage (
-    { busted }:
-    makeSetupHook {
-      name = "busted-check-hook";
-      propagatedBuildInputs = [
-        busted
-      ];
-    } ./busted-check-hook.sh
+    # busted is not packaged here; package sets layered on top (lua-pkgs)
+    # provide it. Throw rather than abort without it, so the hook is still
+    # catchable when only corepkgs is evaluated.
+    {
+      busted ? null,
+    }:
+    if busted == null then
+      throw "bustedCheckHook: busted is not in this Lua package set"
+    else
+      makeSetupHook {
+        name = "busted-check-hook";
+        propagatedBuildInputs = [
+          busted
+        ];
+      } ./busted-check-hook.sh
   ) { };
 
   luarocksCheckHook = callPackage (
-    { luarocks }:
+    # Package sets layered on top (lua-pkgs) provide a full `luarocks`; fall
+    # back to the bootstrap one that every luarocks build already uses.
+    {
+      luarocks ? null,
+      luarocks_bootstrap,
+    }:
     makeSetupHook {
       name = "luarocks-check-hook";
-      propagatedBuildInputs = [ luarocks ];
+      propagatedBuildInputs = [ (if luarocks == null then luarocks_bootstrap else luarocks) ];
     } ./luarocks-check-hook.sh
   ) { };
 

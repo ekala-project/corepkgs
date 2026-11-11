@@ -223,12 +223,6 @@ let
       "zfs_2_4"
       "zfs_unstable"
     ];
-    lua = [
-      # pkgs-many/lua/hooks/default.nix takes `busted` and `luarocks`, which
-      # the Lua package sets do not provide.
-      "bustedCheckHook"
-      "luarocksCheckHook"
-    ];
     perl = [
       # Invalid `meta`.
       "ImageMagick"
