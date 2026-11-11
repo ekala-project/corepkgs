@@ -345,6 +345,15 @@ in
       net-tools
     ];
 
+    # ping opens a raw socket, so users need it through a wrapper with
+    # CAP_NET_RAW, as on NixOS
+    security.wrappers.ping = {
+      owner = "root";
+      group = "root";
+      capabilities = "cap_net_raw+p";
+      source = "${pkgs.iputils.out}/bin/ping";
+    };
+
     # Write /etc/hostid if networking.hostId is set
     environment.etc."hostid" = mkIf (cfg.hostId != null) {
       source = pkgs.runCommand "gen-hostid" { } ''
