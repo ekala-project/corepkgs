@@ -188,19 +188,9 @@ let
     }) (builtins.attrNames variants)
   ) manyVariantNames;
 
-  # Variant package sets that are known to fail evaluation. Each entry is a
+  # Packages in variant package sets that are known to fail evaluation, keyed
+  # by `<package>` (every variant) or `<package>.<variant>`. Each entry is a
   # real bug: drop it in the PR that fixes it.
-  #
-  # Whole sets, as `<package>.<variant>`.
-  brokenVariantSets = [
-    # python/python2/mk-python-derivation.nix takes `update-python-libraries`,
-    # which is not packaged.
-    "pypy.pypy27"
-    "pypy.v2_7"
-  ];
-
-  # Individual packages, keyed by `<package>` (every variant) or
-  # `<package>.<variant>`.
   brokenVariantPackages = {
     linux = [
       # Missing dependencies, not packaged in corepkgs.
@@ -236,9 +226,7 @@ let
         set = builtins.tryEval (variants.${vname}.pkgs or null);
         broken = brokenVariantPackages.${name} or [ ] ++ brokenVariantPackages."${name}.${vname}" or [ ];
       in
-      if builtins.elem "${name}.${vname}" brokenVariantSets then
-        [ ]
-      else if set.success && builtins.isAttrs set.value then
+      if set.success && builtins.isAttrs set.value then
         collectRecursive "${name}.${vname}.pkgs" (builtins.removeAttrs set.value broken)
       else
         [ ]
