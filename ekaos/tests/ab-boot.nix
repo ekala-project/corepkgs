@@ -5,6 +5,22 @@
 
 { pkgs, ... }:
 
+let
+  # A second generation: the same system under a new store path, whose
+  # bootspec points at itself. nix-env does not add a generation for
+  # the path the newest one already has, so gen 1 cannot be reused.
+  secondGeneration =
+    toplevel:
+    pkgs.runCommand "ekaos-system-gen2" { nativeBuildInputs = [ pkgs.jq ]; } ''
+      cp -a ${toplevel} $out
+      chmod u+w $out
+      rm $out/boot.json
+      jq --arg old ${toplevel} --arg new $out \
+        'walk(if type == "string" and startswith($old) then $new + .[($old | length):] else . end)' \
+        ${toplevel}/boot.json > $out/boot.json
+      echo 2 > $out/ab-generation
+    '';
+in
 {
   name = "ab-boot";
 
@@ -27,6 +43,7 @@
 
         virtualisation.enable = true;
         virtualisation.enableNetwork = true;
+        virtualisation.additionalPaths = [ (secondGeneration config.system.build.toplevel) ];
       };
   };
 
@@ -35,6 +52,7 @@
     let
       installerPath = nodes.machine.config.system.build.installBootLoader;
       toplevelPath = nodes.machine.config.system.build.toplevel;
+      gen2Path = secondGeneration toplevelPath;
     in
     ''
       machine.start()
@@ -61,9 +79,7 @@
       assert "+" not in entries, f"boot counting suffix still present after blessing gen 1: {entries}"
 
       # -- Create generation 2 and install its boot entry --
-      # Register the same system closure as a new generation.
-      # nix-env --set always increments the generation number.
-      machine.succeed("nix-env -p /nix/var/nix/profiles/system --set ${toplevelPath}")
+      machine.succeed("nix-env -p /nix/var/nix/profiles/system --set ${gen2Path}")
 
       # Verify generation 2 was created
       machine.succeed("test -L /nix/var/nix/profiles/system-2-link")
@@ -71,7 +87,7 @@
 
       # Run the bootloader installer to write new boot entries.
       # This creates a boot-counted entry (+3-0) for the new default generation.
-      machine.succeed("NIXOS_INSTALL_BOOTLOADER=1 ${installerPath} ${toplevelPath}")
+      machine.succeed("NIXOS_INSTALL_BOOTLOADER=1 ${installerPath} ${gen2Path}")
 
       # -- The new generation's entry should have a boot counting suffix --
       entries = machine.succeed("ls /boot/loader/entries/").strip()
@@ -82,7 +98,7 @@
       # In a real boot, systemd-boot loads the new generation and the initrd
       # sets /run/booted-system. Here we fake it so the bless-boot script
       # can find the matching entry.
-      machine.succeed("ln -sfn ${toplevelPath} /run/booted-system")
+      machine.succeed("ln -sfn ${gen2Path} /run/booted-system")
 
       # -- Run the bless-boot script to mark generation 2 as good --
       machine.succeed("${nodes.machine.config.services.ekaos-bless-boot.command}")
