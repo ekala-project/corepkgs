@@ -92,6 +92,11 @@ in
   # This module only defines the options.
 
   config = mkIf (enabledTimers != { }) {
+    # Enable the timers declaratively (matches WantedBy= in the generated unit)
+    systemd.install.system = mkIf (config.serviceManager.systemd.enable or false) (
+      mapAttrs' (name: _: nameValuePair "${name}.timer" { wantedBy = [ "timers.target" ]; }) enabledTimers
+    );
+
     # For systemd: generate timer + service unit files
     # This is done here for now since the systemd service manager module
     # doesn't yet consume timers. Future: move to service-managers/systemd.nix.
