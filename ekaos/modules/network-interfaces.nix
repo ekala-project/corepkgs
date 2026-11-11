@@ -178,13 +178,7 @@ in
       }
     ];
 
-    # Add activation script to enable systemd-networkd
-    system.activationScripts.networkd = stringAfter [ "etc" ] ''
-      # Enable systemd-networkd
-      echo "Enabling systemd-networkd..."
-      mkdir -p /etc/systemd/system/multi-user.target.wants
-      ln -sf ../systemd-networkd.service \
-             /etc/systemd/system/multi-user.target.wants/systemd-networkd.service
-    '';
+    # Enable systemd-networkd
+    systemd.install.system."systemd-networkd.service".wantedBy = [ "multi-user.target" ];
   };
 }

@@ -22,6 +22,11 @@ let
     name: service: service.enable == true && service.command != null
   ) config.users.services;
 
+  # Targets that pull in a generated unit. Shared by the [Install] section and
+  # the declarative enablement links so the two cannot drift apart.
+  systemWantedBy = serviceCfg: (serviceCfg.systemd or { }).wantedBy or [ "multi-user.target" ];
+  userWantedBy = serviceCfg: (serviceCfg.systemd or { }).wantedBy or [ "default.target" ];
+
   # Generate a systemd unit file for a service
   mkSystemdUnit =
     name: serviceCfg:
@@ -53,7 +58,7 @@ let
       wants = systemdCfg.wants or [ ];
       requires = systemdCfg.requires or [ ];
       before = systemdCfg.before or [ ];
-      wantedBy = systemdCfg.wantedBy or [ "multi-user.target" ];
+      wantedBy = systemWantedBy serviceCfg;
 
       # Service config overrides
       serviceConfig = systemdCfg.serviceConfig or { };
@@ -124,7 +129,7 @@ let
       wants = systemdCfg.wants or [ ];
       requires = systemdCfg.requires or [ ];
       before = systemdCfg.before or [ ];
-      wantedBy = systemdCfg.wantedBy or [ "default.target" ];
+      wantedBy = userWantedBy serviceCfg;
 
       serviceConfig = systemdCfg.serviceConfig or { };
 
@@ -210,6 +215,15 @@ in
 
     # Systemd configuration
     {
+      # Enable the generated units declaratively; [Install] alone is inert.
+      systemd.install.system = mapAttrs' (
+        name: serviceCfg: nameValuePair "${name}.service" { wantedBy = systemWantedBy serviceCfg; }
+      ) enabledServices;
+
+      systemd.install.user = mapAttrs' (
+        name: serviceCfg: nameValuePair "${name}.service" { wantedBy = userWantedBy serviceCfg; }
+      ) enabledUserServices;
+
       # Add systemd units to /etc
       environment.etc = mkMerge [
         # Copy systemd unit files
