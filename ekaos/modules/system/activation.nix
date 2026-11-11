@@ -67,6 +67,17 @@ let
     sort scriptNames [ ];
 
   # Reconciles /etc/systemd/{system,user} against /etc/static
+  pruneEtc = pkgs.writeShellScript "ekaos-prune-etc" ''
+    export PATH=${
+      lib.makeBinPath [
+        pkgs.coreutils
+        pkgs.findutils
+        pkgs.diffutils
+      ]
+    }
+    ${builtins.readFile ./prune-etc.sh}
+  '';
+
   syncUnitDir = pkgs.writeShellScript "ekaos-sync-unit-dir" ''
     export PATH=${
       lib.makeBinPath [
@@ -157,8 +168,11 @@ in
         deps = [ ];
         text = ''
           echo "Setting up /etc..."
-          # Link /etc to the system configuration
+          # Remember the previous generation's tree so files it installed
+          # and this one dropped can be pruned below.
+          oldEtcStatic=
           if [ -L /etc/static ]; then
+            oldEtcStatic=$(readlink -f /etc/static)
             rm /etc/static
           fi
           ln -sfn ${config.system.build.etc}/etc /etc/static
@@ -186,6 +200,12 @@ in
                 cp -rfL "$entry" /etc/
               fi
             done
+          fi
+
+          # Remove files the previous generation installed and this one no
+          # longer provides (administrator changes are kept).
+          if [ -n "$oldEtcStatic" ]; then
+            ${pruneEtc} "$oldEtcStatic" /etc/static /etc
           fi
 
           # Staging directories from the old imperative package-unit linking
