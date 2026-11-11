@@ -214,9 +214,6 @@ let
       "oci-seccomp-bpf-hook" # oci-seccomp-bpf-hook
       "sheep-net" # basiliskii
       "sysdig" # luajit
-      # pkgs/linux-support/pkgs/chipsec/default.nix uses `brotli` without
-      # taking it as an argument.
-      "chipsec"
       # pkgs/linux-support/pkgs/zfs/generic.nix takes `linuxPackages`, which
       # the kernel package set does not provide.
       "zfs_2_3"
