@@ -6,7 +6,8 @@
   writableTmpDirAsHomeHook,
 
   nix-fetchers,
-  nix-fetchers-c,
+  # Only exists from 2.29; every use below is gated on that version.
+  nix-fetchers-c ? null,
   nix-store-test-support,
 
   libgit2,
