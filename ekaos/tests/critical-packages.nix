@@ -81,9 +81,9 @@
     print("Cron job executed successfully!")
 
     # Test 3: timesyncd is running
-    print("Testing systemd-timesyncd...")
-    machine.wait_for_unit("systemd-timesyncd.service")
-    machine.succeed("systemctl status systemd-timesyncd.service")
+    print("Testing timesyncd...")
+    machine.wait_for_unit("timesyncd.service")
+    machine.succeed("systemctl is-active timesyncd.service")
 
     # Check timesyncd configuration
     machine.succeed("test -f /etc/systemd/timesyncd.conf")
