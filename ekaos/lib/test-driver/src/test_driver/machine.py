@@ -20,6 +20,7 @@ import threading
 import time
 from typing import Optional, Tuple
 from .logger import log
+from .vlan import vlan_socket
 
 READY_MARKER = b"ekaos-backdoor-ready"
 
@@ -65,6 +66,9 @@ class Machine:
             EKAOS_TEST_SHELL_SOCKET=sock_path,
             EKAOS_VM_STATE_DIR=self._state_dir,
         )
+        vde = vlan_socket()
+        if vde is not None:
+            env["EKAOS_TEST_VDE_SOCKET"] = vde
         self.process = subprocess.Popen(
             [self.vm_script],
             # Kept open (but idle) so send_console()/console_interact()
