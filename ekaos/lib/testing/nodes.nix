@@ -14,6 +14,7 @@ with lib;
 let
   # Base modules that all test nodes should include
   testBaseModules = (import ../../modules/module-list.nix) ++ [
+    ./backdoor.nix
     {
       # Test-specific configuration
       virtualisation.enable = true;

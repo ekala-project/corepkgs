@@ -26,6 +26,9 @@ let
     # Add test driver to path
     sys.path.insert(0, "${testDriverPkg}/${pkgs.python3.sitePackages}")
 
+    # socat backs Machine.shell_interact()
+    os.environ["PATH"] = "${pkgs.socat}/bin:" + os.environ.get("PATH", "")
+
     # Set environment variables for test script
     os.environ["TEST_SCRIPT"] = "${config.testScriptFile}"
     os.environ["TEST_NAME"] = "${config.name}"
