@@ -45,6 +45,7 @@ let
     # Set environment variables for test script
     os.environ["TEST_SCRIPT"] = "${config.testScriptFile}"
     os.environ["TEST_NAME"] = "${config.name}"
+    os.environ["EKAOS_TEST_VDE_SWITCH"] = "${pkgs.vde2}/bin/vde_switch"
 
     from test_driver import shutdown_all
 
