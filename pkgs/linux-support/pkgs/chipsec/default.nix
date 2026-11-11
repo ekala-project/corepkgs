@@ -38,8 +38,10 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
   ++ lib.optionals withDriver kernel.moduleBuildDependencies;
 
   build-system = [ python3.pkgs.setuptools ];
-  dependencies = with python3.pkgs; [
-    brotli
+  # TODO(corepkgs): brotli and distro come from python-packages; corepkgs'
+  # own Python set does not have them.
+  dependencies = lib.optionals (python3.pkgs ? brotli) [
+    python3.pkgs.brotli
   ];
 
   # Marker file preventing driver from being built
@@ -47,9 +49,11 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
     touch README.NO_KERNEL_DRIVER
   '';
 
-  nativeCheckInputs = with python3.pkgs; [
-    distro
-    pytestCheckHook
+  nativeCheckInputs = [
+    python3.pkgs.pytestCheckHook
+  ]
+  ++ lib.optionals (python3.pkgs ? distro) [
+    python3.pkgs.distro
   ];
 
   # Otherwise chipsec tries and fails import "tpm_cmd"
@@ -82,5 +86,6 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
     homepage = "https://github.com/chipsec/chipsec";
     platforms = if withDriver then [ "x86_64-linux" ] else with lib.platforms; linux ++ darwin;
     mainProgram = "chipsec_main";
+    broken = !(python3.pkgs ? brotli);
   };
 })
