@@ -34,16 +34,25 @@ let
     with open("${config.testScriptFile}", "r") as f:
         test_code = f.read()
 
+    from test_driver import shutdown_all
+
+    status = 0
     try:
         exec(test_code)
-        print("\n=== Test '${config.name}' PASSED ===")
-        sys.exit(0)
+    except SystemExit as e:
+        status = e.code or 0
     except Exception as e:
         print(f"\n=== Test '${config.name}' FAILED ===")
         print(f"Error: {e}")
         import traceback
         traceback.print_exc()
-        sys.exit(1)
+        status = 1
+    finally:
+        shutdown_all()
+
+    if status == 0:
+        print("\n=== Test '${config.name}' PASSED ===")
+    sys.exit(status)
   '';
 
 in
