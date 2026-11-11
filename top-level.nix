@@ -863,6 +863,7 @@ final: prev: with final; {
   python313 = python3.v3_13;
   python314 = python3.v3_14;
   python315 = python3.v3_15;
+  python316 = python3.v3_16;
   python3Minimal = python3.minimal;
 
   pythonInterpreters = callPackage ./python { inherit config; };

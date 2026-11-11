@@ -197,8 +197,6 @@ let
     # which is not packaged.
     "pypy.pypy27"
     "pypy.v2_7"
-    # Packages in the set look up `python316`, which is not defined.
-    "python3.v3_16"
   ];
 
   # Individual packages, keyed by `<package>` (every variant) or
