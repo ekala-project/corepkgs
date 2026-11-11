@@ -120,6 +120,16 @@ with lib;
       mv /bin/.sh.tmp /bin/sh
     '';
 
+    # /usr/bin/env for #!/usr/bin/env scripts, as on NixOS. It is also the
+    # only thing in /usr, which systemd units such as systemd-update-done
+    # expect to exist.
+    system.activationScripts.usrbinenv = stringAfter [ "etc" ] ''
+      mkdir -p /usr/bin
+      chmod 0755 /usr /usr/bin
+      ln -sfn ${pkgs.coreutils}/bin/env /usr/bin/.env.tmp
+      mv /usr/bin/.env.tmp /usr/bin/env
+    '';
+
     # Generate /etc/shells from environment.shells
     environment.etc.shells = mkIf (config.environment.shells != [ ]) {
       text =
