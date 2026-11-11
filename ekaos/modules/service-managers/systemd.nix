@@ -10,6 +10,11 @@
 with lib;
 
 let
+  unitPath = import ../../lib/unit-path.nix {
+    inherit lib pkgs;
+    systemd = config.systemd.package;
+  };
+
   cfg = config.serviceManager.systemd;
 
   # Filter to only include enabled services with command set
@@ -44,6 +49,10 @@ let
 
       # Environment variables
       envVars = mapAttrsToList (k: v: "Environment=\"${k}=${v}\"") (serviceCfg.environment or { });
+      pathLine = unitPath.environmentLine {
+        packages = serviceCfg.path or [ ];
+        environment = serviceCfg.environment or { };
+      };
 
       # Systemd-specific options
       systemdCfg = serviceCfg.systemd or { };
@@ -88,6 +97,7 @@ let
           serviceCfg.workingDirectory or null != null
         ) "WorkingDirectory=${serviceCfg.workingDirectory}"}
         ${concatStringsSep "\n" envVars}
+        ${pathLine}
         ${concatStringsSep "\n" (mapAttrsToList (k: v: "${k}=${toString v}") serviceConfig)}
 
         [Install]
@@ -117,6 +127,10 @@ let
           "${serviceCfg.command} ${concatStringsSep " " serviceCfg.args}";
 
       envVars = mapAttrsToList (k: v: "Environment=\"${k}=${v}\"") serviceCfg.environment;
+      pathLine = unitPath.environmentLine {
+        packages = serviceCfg.path or [ ];
+        inherit (serviceCfg) environment;
+      };
 
       systemdCfg = serviceCfg.systemd;
 
@@ -156,6 +170,7 @@ let
           serviceCfg.workingDirectory != null
         ) "WorkingDirectory=${serviceCfg.workingDirectory}"}
         ${concatStringsSep "\n" envVars}
+        ${pathLine}
         ${concatStringsSep "\n" (mapAttrsToList (k: v: "${k}=${toString v}") serviceConfig)}
 
         [Install]

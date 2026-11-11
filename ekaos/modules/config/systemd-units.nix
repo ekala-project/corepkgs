@@ -13,6 +13,11 @@
 with lib;
 
 let
+  unitPath = import ../../lib/unit-path.nix {
+    inherit lib pkgs;
+    systemd = config.systemd.package;
+  };
+
   cfg = config.systemd;
 
   # Type for systemd unit configuration (serviceConfig, socketConfig, etc.)
@@ -217,17 +222,10 @@ let
       envLines = mapAttrsToList (k: v: "Environment=\"${k}=${v}\"") svc.environment;
       # systemd does not expand variables in Environment=, so the PATH is
       # spelled out: the requested packages, then the system profile.
-      pathStr = optionalString (svc.path != [ ]) (
-        "Environment=\"PATH=${
-          concatStringsSep ":" [
-            (makeBinPath svc.path)
-            (makeSearchPathOutput "bin" "sbin" svc.path)
-            "/run/wrappers/bin"
-            "/run/current-system/sw/bin"
-            "/run/current-system/sw/sbin"
-          ]
-        }\""
-      );
+      pathStr = unitPath.environmentLine {
+        packages = svc.path;
+        inherit (svc) environment;
+      };
     in
     pkgs.writeText "${name}.service" ''
       [Unit]
