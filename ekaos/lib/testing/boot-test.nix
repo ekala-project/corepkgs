@@ -21,6 +21,9 @@
   name,
   configuration,
   expectedTargets ? [ "multi-user.target" ],
+  # Strings that must appear verbatim in the serial console log. Lets a test
+  # configuration run its own checks in a unit and report the verdict.
+  expectedOutput ? [ ],
   timeout ? 120,
 }:
 
@@ -207,6 +210,15 @@ pkgs.runCommand "ekaos-boot-test-${name}"
         echo "WARN: ${target} — could not confirm (may use different display name)"
       fi
     '') expectedTargets}
+
+    ${lib.concatMapStringsSep "\n" (text: ''
+      if grep -qF ${lib.escapeShellArg text} $TMPDIR/boot-clean.log; then
+        echo ${lib.escapeShellArg "PASS: output contains '${text}'"}
+      else
+        echo ${lib.escapeShellArg "FAIL: output is missing '${text}'"}
+        failed=1
+      fi
+    '') expectedOutput}
 
     if [ "$failed" = "1" ]; then
       echo ""
