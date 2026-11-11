@@ -182,12 +182,6 @@ in
       session   include     system-auth
     '';
 
-    # Ensure wheel group exists (should be created by users-groups module)
-    # but we make it explicit here
-    users.groups.wheel = mkDefault {
-      gid = 10;
-    };
-
     # Set up sudoers directory for drop-in files
     system.activationScripts.sudo = {
       deps = [ "etc" ];
