@@ -102,10 +102,6 @@
     # Wait for multi-user target
     server.wait_for_unit("multi-user.target")
 
-    # WORKAROUND: Manually run activation script since it's not being called during boot
-    # This is needed because the test driver doesn't properly boot the system
-    server.succeed("if [ -f /run/booted-system/activate ]; then /run/booted-system/activate || true; fi")
-    server.succeed("if [ -f /run/current-system/activate ]; then /run/current-system/activate || true; fi")
 
     print("=" * 60)
     print("PHASE 2 NETWORK TESTS")
@@ -156,8 +152,8 @@
 
     # ===== SSH SERVICE =====
     print("\n[TEST] SSH service...")
-    server.wait_for_unit("sshd.service")
-    server.succeed("systemctl is-active sshd.service")
+    server.wait_for_unit("openssh.service")
+    server.succeed("systemctl is-active openssh.service")
     print("✓ SSH daemon is running")
 
     # Check SSH configuration

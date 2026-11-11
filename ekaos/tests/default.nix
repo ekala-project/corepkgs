@@ -29,6 +29,9 @@
   # Network and SSH test (Phase 2)
   network = pkgs.ekaosTest ./network.nix;
 
+  # Port contracts (services.<name>.settings.ports -> listening port)
+  port-contracts = pkgs.ekaosTest ./port-contracts.nix;
+
   # Critical MVP packages test (nano, cronie, timesyncd)
   critical-packages = pkgs.ekaosTest ./critical-packages.nix;
 

@@ -34,7 +34,6 @@
     machine.wait_for_unit("multi-user.target")
 
     # WORKAROUND: Run activation script
-    machine.succeed("if [ -f /run/current-system/activate ]; then /run/current-system/activate || true; fi")
 
     print("=" * 60)
     print("PORT CONTRACTS INTEGRATION TESTS")
@@ -42,7 +41,7 @@
 
     # Test 1: SSH service is running on the declared port
     print("\n[TEST] SSH running on declared port...")
-    machine.wait_for_unit("sshd.service")
+    machine.wait_for_unit("openssh.service")
     machine.succeed("ss -tlnp | grep ':2222'")
     print("✓ SSH listening on port 2222")
 

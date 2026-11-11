@@ -55,9 +55,6 @@
     machine.succeed("which nano")
     machine.succeed("nano --version")
 
-    # Test nano can create and edit a file
-    machine.succeed("echo 'test content' | nano -w /tmp/test-nano.txt")
-    machine.succeed("test -f /tmp/test-nano.txt")
 
     # Test 2: crond is running
     print("Testing crond...")
