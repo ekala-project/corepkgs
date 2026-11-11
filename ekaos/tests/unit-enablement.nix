@@ -1,7 +1,7 @@
 # Declarative unit enablement and /etc/systemd/system reconciliation.
 #
-# Boots a VM and, from a oneshot unit that runs after multi-user.target,
-# checks that:
+# Boots a VM and, from a unit that runs once boot has finished, checks
+# that:
 #   - units with wantedBy are pulled in at boot without `systemctl enable`
 #   - administrator state (`systemctl enable`, `systemctl mask --force`,
 #     drop-ins) survives re-activation
@@ -36,6 +36,10 @@ let
     sys=/etc/systemd/system
     static=/etc/static/systemd/system
     failures=0
+
+    # Run once boot is complete: powering off earlier cancels the boot
+    # transaction, and systemd never logs "Startup finished".
+    systemctl is-system-running --wait >/dev/null || true
 
     check() {
       if eval "$2"; then
@@ -115,7 +119,8 @@ mkBootTest {
       after = [ "multi-user.target" ];
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
-        Type = "oneshot";
+        # Not oneshot: the boot transaction must not wait for the checks.
+        Type = "exec";
         ExecStart = "${checker}";
         StandardOutput = "journal+console";
         StandardError = "journal+console";
