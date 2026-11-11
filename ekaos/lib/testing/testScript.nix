@@ -18,22 +18,17 @@ let
     '') config.builtNodes
   );
 
-  # Full test script with machine definitions
-  fullTestScript = ''
-    #!/usr/bin/env python3
-    # Auto-generated ekaosTest script
+  # Machine definitions, run before the test script or the interactive
+  # REPL. Its globals are the namespace the test script runs in.
+  testPrelude = ''
+    # Auto-generated ekaosTest prelude
 
+    import os
     import sys
     from test_driver import Machine, register_machine, start_all, shutdown_all, subtest
 
     # Define machines
     ${machinesPython}
-
-    # User test script
-    ${config.testScriptString}
-
-    # Cleanup
-    sys.exit(0)
   '';
 
 in
@@ -76,6 +71,12 @@ in
       internal = true;
       description = "Test script written to file";
     };
+
+    testPreludeFile = mkOption {
+      type = types.package;
+      internal = true;
+      description = "Machine definitions run before the test script or REPL";
+    };
   };
 
   config = {
@@ -83,7 +84,7 @@ in
     testScriptString =
       if isFunction config.testScript then config.testScript config.builtNodes else config.testScript;
 
-    # Write test script to a file
-    testScriptFile = pkgs.writeText "test-script.py" fullTestScript;
+    testScriptFile = pkgs.writeText "test-script.py" config.testScriptString;
+    testPreludeFile = pkgs.writeText "test-prelude.py" testPrelude;
   };
 }

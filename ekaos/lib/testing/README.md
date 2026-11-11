@@ -59,6 +59,26 @@ nix-build -E '(import ./. {}).ekaosTest ./my-test.nix'
 nix-build ekaos/tests -A simple
 ```
 
+### Running Tests Interactively
+
+```bash
+nix-build ekaos/tests -A simple.driverInteractive
+./result/bin/ekaos-test-driver
+```
+
+This drops into a Python REPL (ptpython) with the machines defined but
+the test script not yet run. Useful entry points:
+
+- `start_all()` or any command such as `machine.succeed("...")`, which
+  boots the machine on first use
+- `test_script()` runs the test script against the current machines
+- `machine.shell_interact()` attaches the terminal to the guest root shell
+- `machine.console_interact()` types on the serial console (Ctrl-D returns)
+
+Ctrl-C while a command runs also reaches QEMU and kills the VMs. History
+is kept in `.ekaos-test-history` in the current directory. The regular
+driver accepts the same mode via `--interactive`.
+
 ## Test Structure
 
 ### Test Attributes
@@ -154,6 +174,9 @@ Each node in your test becomes a `Machine` object with these methods:
 
 #### Console Interaction
 
+- **`send_console(chars)`**: Type on the serial console (e.g. in emergency mode)
+- **`console_interact()`**: Forward the terminal to the serial console (interactive driver only)
+- **`shell_interact(address=None)`**: Attach the terminal to the guest root shell (interactive driver only)
 - **`send_key(key)`**: Send key to VM (e.g., "enter", "ctrl-alt-delete")
 - **`wait_for_text(text, timeout=900)`**: Wait for text to appear on console
 - **`wait_for_console_text(text, timeout=900)`**: Alias for wait_for_text

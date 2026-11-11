@@ -14,6 +14,7 @@ import shlex
 import shutil
 import socket
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -62,7 +63,9 @@ class Machine:
         env = dict(os.environ, EKAOS_TEST_SHELL_SOCKET=sock_path)
         self.process = subprocess.Popen(
             [self.vm_script],
-            stdin=subprocess.DEVNULL,
+            # Kept open (but idle) so send_console()/console_interact()
+            # can type on the serial console.
+            stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env=env,
@@ -86,6 +89,9 @@ class Machine:
         """Wait for QEMU to connect and the guest shell to come up"""
         if self.shell is not None:
             return
+        # Like the NixOS driver, the first command boots the machine.
+        if self.process is None:
+            self.start()
         if not self.is_up():
             raise Exception(f"Machine '{self.name}' is not running")
         assert self._listener is not None
@@ -164,6 +170,8 @@ class Machine:
         for s in (self.shell, self._listener):
             if s is not None:
                 s.close()
+        if self.process is not None and self.process.stdin is not None:
+            self.process.stdin.close()
         self.shell = None
         self._listener = None
         self._buf = b""
@@ -375,3 +383,38 @@ class Machine:
         except KeyboardInterrupt:
             # Let users leave the session without failing the test.
             pass
+
+    def send_console(self, chars: str) -> None:
+        r"""
+        Type on the serial console (QEMU's stdin)
+
+        Works without the backdoor shell, e.g. for systemd emergency mode:
+        `send_console("\n\nsystemctl default\n")`.
+        """
+        self._write_console(chars.encode())
+
+    def _write_console(self, data: bytes) -> None:
+        if not self.is_up():
+            raise Exception(f"Machine '{self.name}' is not running")
+        assert self.process is not None and self.process.stdin is not None
+        self.process.stdin.write(data)
+        self.process.stdin.flush()
+
+    def console_interact(self) -> None:
+        """
+        Forward terminal input to the serial console (for test development)
+
+        Meant for the interactive driver, not for tests. Console output
+        shows up line-wise in the serial log. Ctrl-D returns to the REPL;
+        Ctrl-C also reaches QEMU and kills the VM.
+        """
+        log(f"[{self.name}] Terminal is ready (there is no prompt)")
+        while True:
+            try:
+                char = sys.stdin.buffer.read(1)
+            except KeyboardInterrupt:
+                break
+            if char == b"":  # Ctrl-D
+                log(f"[{self.name}] Closing connection to the console")
+                break
+            self._write_console(char)
