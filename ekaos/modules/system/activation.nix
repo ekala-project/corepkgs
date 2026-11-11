@@ -10,6 +10,8 @@
 with lib;
 
 let
+  etcWithMode = filter (f: f.enable && f.mode != null) (attrValues config.environment.etc);
+
   # Activation script type
   activationScriptType = types.submodule {
     options = {
@@ -162,6 +164,11 @@ in
           if [ -d /etc/static ]; then
             cp -rfL /etc/static/* /etc/
           fi
+
+          # Copies keep the read-only store mode; apply the declared ones
+          ${concatMapStrings (f: ''
+            chmod ${f.mode} /etc/${escapeShellArg f.target}
+          '') etcWithMode}
         '';
         supportsDryActivation = true;
       };
