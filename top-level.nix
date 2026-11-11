@@ -407,6 +407,13 @@ final: prev: with final; {
 
   makeDBusConf = callPackage ./pkgs/dbus/make-dbus-conf.nix { };
 
+  aggregateModules =
+    modules:
+    callPackage ./pkgs/kmod/aggregator.nix {
+      inherit (buildPackages) kmod;
+      inherit modules;
+    };
+
   fetchpatch =
     callPackage ./pkgs/fetchpatch {
       # 0.3.4 would change hashes: https://github.com/NixOS/nixpkgs/issues/25154
