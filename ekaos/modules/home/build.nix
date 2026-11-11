@@ -190,54 +190,92 @@ let
         EKAOS_STATE_DIR="$HOME/.config/ekaos"
         EKAOS_GEN_DIR="$EKAOS_STATE_DIR/generations"
         MANIFEST_FILE="$EKAOS_STATE_DIR/home-files-manifest"
-        THIS="$(cd "$(dirname "$0")" && pwd)"
+        ON_REPLACED_FILE=${userCfg.onReplacedFile}
+        # Physical path, so links made from it point into the store even
+        # when activate is run through a symlink such as ./result.
+        THIS="$(cd "$(dirname "$0")" && pwd -P)"
 
         echo "ekaos home: activating for $(whoami)..."
 
-        # Create state directories
-        mkdir -p "$EKAOS_STATE_DIR"
-        mkdir -p "$EKAOS_GEN_DIR"
+        # Activation only replaces a path that is missing or is a symlink
+        # into the store, i.e. one an earlier activation created. Anything
+        # else was put there by the user and is left alone.
+        is_replaceable() {
+          local path="$HOME/$1"
+          if [ -L "$path" ]; then
+            case "$(readlink "$path")" in
+              ${builtins.storeDir}/*) return 0 ;;
+            esac
+            return 1
+          fi
+          if [ ! -e "$path" ]; then
+            return 0
+          fi
+          # Older activations copied session-vars.sh here as a read-only
+          # file. That copy came from the store, not from the user.
+          [ "$1" = .config/ekaos/session-vars.sh ] && [ -f "$path" ] && [ ! -w "$path" ]
+        }
 
-        # Update profile symlink
-        if [ -d "$THIS/home-path" ] || [ -L "$THIS/home-path" ]; then
-          ln -sfn "$(readlink -f "$THIS/home-path")" "$HOME/.ekaos-profile"
-          echo "  Updated ~/.ekaos-profile"
+        # Every path this generation links into $HOME (relative to $HOME),
+        # and the store path each one points to.
+        targets=(.ekaos-profile)
+        sources=("$(readlink -f "$THIS/home-path")")
+        while IFS= read -r link; do
+          targets+=("''${link#./}")
+          sources+=("$(readlink -f "$THIS/home-files/$link")")
+        done < <(cd "$THIS/home-files" && find . -type l)
+        targets+=(.config/ekaos/session-vars.sh)
+        sources+=("$THIS/session-vars.sh")
+
+        # Find replaced paths before changing anything, so that "fail"
+        # leaves the home directory untouched.
+        replaced=()
+        for rel in "''${targets[@]}"; do
+          if ! is_replaceable "$rel"; then
+            replaced+=("$rel")
+          fi
+        done
+
+        if [ "''${#replaced[@]}" -gt 0 ]; then
+          case "$ON_REPLACED_FILE" in
+            fail)
+              echo "ekaos home: these paths have been replaced and are not links into the nix store:" >&2
+              printf '  ~/%s\n' "''${replaced[@]}" >&2
+              echo "Move or remove them and activate again, or set" >&2
+              echo "home.users.${userName}.onReplacedFile to \"warn\" or \"silent\" to leave them in place." >&2
+              exit 1
+              ;;
+            warn)
+              printf '  WARNING: ~/%s has been replaced and is not a link into the nix store; leaving it in place\n' \
+                "''${replaced[@]}" >&2
+              ;;
+          esac
         fi
 
-        # Remove stale symlinks from previous manifest
+        mkdir -p "$EKAOS_STATE_DIR" "$EKAOS_GEN_DIR"
+
+        # Remove links from the previous generation that this one no
+        # longer manages. Paths the user has replaced are left alone.
         if [ -f "$MANIFEST_FILE" ]; then
-          for old_target in $(${pkgs.jq}/bin/jq -r '.[]' "$MANIFEST_FILE" 2>/dev/null); do
-            target_path="$HOME/$old_target"
-            if [ -L "$target_path" ]; then
-              rm -f "$target_path"
+          while IFS= read -r old; do
+            if [ ! -L "$THIS/home-files/$old" ] && is_replaceable "$old"; then
+              rm -f "$HOME/$old"
             fi
-          done
+          done < <(${pkgs.jq}/bin/jq -r '.[]' "$MANIFEST_FILE" 2>/dev/null)
         fi
 
-        # Create new symlinks from home-files into HOME
-        if [ -d "$THIS/home-files" ]; then
-          cd "$THIS/home-files"
-          find . -type l | while IFS= read -r link; do
-            rel="''${link#./}"
-            mkdir -p "$HOME/$(dirname "$rel")"
+        for i in "''${!targets[@]}"; do
+          rel="''${targets[$i]}"
+          if is_replaceable "$rel"; then
+            mkdir -p "$(dirname "$HOME/$rel")"
+            ln -sfn "''${sources[$i]}" "$HOME/$rel"
+          fi
+        done
+        echo "  Linked home files"
 
-            dest="$HOME/$rel"
-            if [ -e "$dest" ] && [ ! -L "$dest" ]; then
-              echo "  WARNING: $rel exists and is not a symlink, backing up"
-              mv "$dest" "$dest.ekaos-backup"
-            fi
-
-            ln -sfn "$(readlink -f "$link")" "$dest"
-          done
-          echo "  Linked home files"
-        fi
-
-        # Write new manifest
-        cp "$THIS/home-files-manifest" "$MANIFEST_FILE"
-
-        # Install session-vars.sh
-        cp "$THIS/session-vars.sh" "$EKAOS_STATE_DIR/session-vars.sh"
-        echo "  Installed session-vars.sh"
+        # The manifest is internal state, so it is always replaced. Use
+        # install rather than cp: older activations left a read-only copy.
+        ${pkgs.coreutils}/bin/install -m 0644 "$THIS/home-files-manifest" "$MANIFEST_FILE"
 
         # Run user activation scripts
         ${activationBodies}
@@ -255,9 +293,6 @@ let
         echo "ekaos home: activation complete."
         ACTIVATE
         chmod +x $out/activate
-
-        substituteInPlace $out/activate \
-          --replace '#!${pkgs.runtimeShell}' '#!${pkgs.runtimeShell}'
       '';
 
   # All users that have home configuration

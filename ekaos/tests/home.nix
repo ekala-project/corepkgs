@@ -837,6 +837,196 @@ let
       '';
     };
 
+  # ── Activation tests (run activate against a scratch $HOME) ────────
+
+  activationTests =
+    let
+      dir = pkgs.writeTextDir "x" "store";
+
+      gen1Module = {
+        home.users.alice = {
+          sessionVariables.EDITOR = "vim";
+          file.".gitconfig".text = "gen1";
+          file.".config/old/conf".text = "old";
+          file.".config/dir".source = dir;
+        };
+      };
+
+      gen2Module = {
+        home.users.alice = {
+          sessionVariables.EDITOR = "vim";
+          file.".gitconfig".text = "gen2";
+          file.".config/new/conf".text = "new";
+          file.".config/dir".source = dir;
+        };
+      };
+
+      mkGen = modules: (evalHome modules).activationPackages.alice;
+      gen1 = mkGen [ gen1Module ];
+      gen2 = mkGen [ gen2Module ];
+      genFail = mkGen [
+        gen2Module
+        { home.users.alice.onReplacedFile = "fail"; }
+      ];
+      genSilent = mkGen [
+        gen2Module
+        { home.users.alice.onReplacedFile = "silent"; }
+      ];
+    in
+    {
+      inherit
+        gen1
+        gen2
+        genFail
+        genSilent
+        ;
+
+      all = pkgs.runCommand "home-activation-tests" { } ''
+        mkdir -p $out
+        results=$out/test-results.txt
+
+        pass=0
+        fail=0
+
+        expect() {
+          local name="$1"
+          shift
+          if "$@"; then
+            echo "PASS: $name" >> "$results"
+            pass=$((pass + 1))
+          else
+            echo "FAIL: $name" >> "$results"
+            fail=$((fail + 1))
+          fi
+        }
+
+        not() { ! "$@"; }
+        absent() { [ ! -e "$1" ] && [ ! -L "$1" ]; }
+        in_store() {
+          case "$(readlink "$1")" in
+            ${builtins.storeDir}/*) return 0 ;;
+          esac
+          return 1
+        }
+
+        # Start a scenario with an empty home directory
+        fresh() {
+          export HOME=$TMPDIR/$1
+          mkdir -p "$HOME"
+        }
+
+        # Run a generation's activate script; output goes to $HOME.log
+        run() {
+          rc=0
+          "$1/activate" > "$HOME.log" 2>&1 || rc=$?
+        }
+
+        # Replace a managed link with a file the user owns
+        user_file() {
+          rm "$HOME/$1"
+          echo mine > "$HOME/$1"
+        }
+
+        echo "=== Activation tests ===" > "$results"
+        echo "" >> "$results"
+
+        # A second activation replaces the first
+        fresh upgrade
+        run ${gen1}
+        expect "upgrade: first activation succeeds" test "$rc" = 0
+        expect "upgrade: .gitconfig links into the store" in_store "$HOME/.gitconfig"
+        expect "upgrade: session-vars.sh links into the store" \
+          in_store "$HOME/.config/ekaos/session-vars.sh"
+        expect "upgrade: .ekaos-profile links into the store" in_store "$HOME/.ekaos-profile"
+        run ${gen2}
+        expect "upgrade: second activation succeeds" test "$rc" = 0
+        expect "upgrade: .gitconfig updated" grep -qx gen2 "$HOME/.gitconfig"
+        expect "upgrade: new file linked" in_store "$HOME/.config/new/conf"
+        expect "upgrade: dropped file removed" absent "$HOME/.config/old/conf"
+        expect "upgrade: generation 2 recorded" test -L "$HOME/.config/ekaos/generations/2"
+        expect "upgrade: no warnings" not grep -q WARNING "$HOME.log"
+
+        # Read-only copies of the state files, left by older activations,
+        # are replaced. Skipped as root, where nothing is read-only.
+        if [ "$(id -u)" != 0 ]; then
+          fresh legacy
+          run ${gen1}
+          state=$HOME/.config/ekaos
+          rm "$state/session-vars.sh" "$state/home-files-manifest"
+          install -m 0444 ${gen1}/session-vars.sh "$state/session-vars.sh"
+          install -m 0444 ${gen1}/home-files-manifest "$state/home-files-manifest"
+          run ${gen2}
+          expect "legacy: activation over read-only copies succeeds" test "$rc" = 0
+          expect "legacy: session-vars.sh now links into the store" \
+            in_store "$state/session-vars.sh"
+          expect "legacy: manifest is writable" test -w "$state/home-files-manifest"
+          expect "legacy: manifest updated" \
+            cmp -s ${gen2}/home-files-manifest "$state/home-files-manifest"
+          expect "legacy: no warnings" not grep -q WARNING "$HOME.log"
+        fi
+
+        # Default (warn): replaced paths are kept and reported
+        fresh warn
+        run ${gen1}
+        user_file .gitconfig
+        rm "$HOME/.config/dir"
+        mkdir "$HOME/.config/dir"
+        echo mine > "$HOME/.config/dir/x"
+        ln -sfn "$TMPDIR/elsewhere" "$HOME/.config/old/conf"
+        run ${gen2}
+        expect "warn: activation succeeds" test "$rc" = 0
+        expect "warn: replaced file kept" grep -qx mine "$HOME/.gitconfig"
+        expect "warn: replaced directory kept" grep -qx mine "$HOME/.config/dir/x"
+        expect "warn: user symlink at a dropped path kept" \
+          test "$(readlink "$HOME/.config/old/conf")" = "$TMPDIR/elsewhere"
+        expect "warn: warns about .gitconfig" grep -q 'WARNING: ~/.gitconfig ' "$HOME.log"
+        expect "warn: warns about .config/dir" grep -q 'WARNING: ~/.config/dir ' "$HOME.log"
+        expect "warn: other files still linked" in_store "$HOME/.config/new/conf"
+        expect "warn: no backup made" absent "$HOME/.gitconfig.ekaos-backup"
+        expect "warn: generation 2 recorded" test -L "$HOME/.config/ekaos/generations/2"
+
+        # fail: report replaced paths and change nothing
+        fresh fail
+        run ${gen1}
+        user_file .gitconfig
+        run ${genFail}
+        expect "fail: activation fails" not test "$rc" = 0
+        expect "fail: lists the replaced path" grep -q '~/.gitconfig' "$HOME.log"
+        expect "fail: replaced file kept" grep -qx mine "$HOME/.gitconfig"
+        expect "fail: nothing new linked" absent "$HOME/.config/new/conf"
+        expect "fail: dropped file not removed yet" in_store "$HOME/.config/old/conf"
+        expect "fail: no generation recorded" absent "$HOME/.config/ekaos/generations/2"
+
+        # silent: replaced paths are kept without a message
+        fresh silent
+        run ${gen1}
+        user_file .gitconfig
+        run ${genSilent}
+        expect "silent: activation succeeds" test "$rc" = 0
+        expect "silent: replaced file kept" grep -qx mine "$HOME/.gitconfig"
+        expect "silent: no warnings" not grep -q WARNING "$HOME.log"
+
+        # Running activate through a symlink (e.g. ./result) still links
+        # into the store, so the next activation can replace those links
+        fresh symlink
+        ln -s ${gen1} "$TMPDIR/result"
+        run "$TMPDIR/result"
+        expect "symlink: activation succeeds" test "$rc" = 0
+        expect "symlink: session-vars.sh links into the store" \
+          in_store "$HOME/.config/ekaos/session-vars.sh"
+        expect "symlink: generation links into the store" \
+          in_store "$HOME/.config/ekaos/generations/1"
+
+        echo "" >> "$results"
+        echo "Activation results: $pass passed, $fail failed" >> "$results"
+
+        if [ "$fail" -gt 0 ]; then
+          cat "$results" >&2
+          exit 1
+        fi
+      '';
+    };
+
   # ── Devshell integration tests ─────────────────────────────────────
 
   devshellTests =
@@ -913,6 +1103,7 @@ in
   standalone = standaloneTests;
   backward-compat = backwardCompatTests;
   programs = programTests;
+  activation = activationTests;
   devshell = devshellTests;
 
   # Run all tests
@@ -929,6 +1120,9 @@ in
     echo "" >> $out/test-results.txt
 
     cat ${programTests.all}/test-results.txt >> $out/test-results.txt
+    echo "" >> $out/test-results.txt
+
+    cat ${activationTests.all}/test-results.txt >> $out/test-results.txt
     echo "" >> $out/test-results.txt
 
     cat ${devshellTests.all}/test-results.txt >> $out/test-results.txt

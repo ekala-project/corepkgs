@@ -89,6 +89,32 @@ let
           '';
         };
 
+        onReplacedFile = mkOption {
+          type = types.enum [
+            "fail"
+            "warn"
+            "silent"
+          ];
+          default = "warn";
+          description = ''
+            What activation does when a path it manages in the home
+            directory has been replaced by the user.
+
+            Activation only replaces a path that is missing or is a
+            symlink into the nix store. Anything else (a regular file,
+            a directory, or a symlink pointing outside the store) is
+            treated as the user's and is never overwritten or removed.
+            This applies to managed files, ~/.ekaos-profile and
+            ~/.config/ekaos/session-vars.sh.
+
+            - `fail`: list every replaced path and stop before changing
+              anything.
+            - `warn`: leave replaced paths in place and print a warning
+              for each one.
+            - `silent`: leave replaced paths in place without a message.
+          '';
+        };
+
         stateVersion = mkOption {
           type = types.str;
           default = "24.11";
