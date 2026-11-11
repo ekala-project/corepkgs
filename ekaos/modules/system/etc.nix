@@ -185,7 +185,8 @@ in
         # /etc/profile: system-wide environment and startup programs
 
         # Set up PATH
-        export PATH="/run/current-system/sw/bin:/run/wrappers/bin:/usr/bin:/bin"
+        # Wrappers come first, so the setuid and capability copies win
+        export PATH="/run/wrappers/bin:/run/current-system/sw/bin:/usr/bin:/bin"
 
         # Locale (from i18n.defaultLocale)
         if [ -f /etc/locale.conf ]; then
