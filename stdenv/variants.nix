@@ -11,7 +11,15 @@
   nixpkgsFun,
   overlays,
 }:
-self: super: {
+self: super:
+let
+  # `super.config` is the evaluated config, so it also holds the renamed
+  # `allowUnfreePackages` option (default.nix). Passing it back in defines that
+  # option again, and every re-import warns about the rename.
+  # `licenses.accept` carries the value.
+  configWithoutRenamedOptions = builtins.removeAttrs super.config [ "allowUnfreePackages" ];
+in
+{
   pkgsLLVM = nixpkgsFun {
     overlays = [
       (self': super': {
@@ -84,7 +92,7 @@ self: super: {
   # Full package set with rocm on cuda off
   # Mostly useful for asserting pkgs.pkgsRocm.torchWithRocm == pkgs.torchWithRocm and similar
   pkgsRocm = nixpkgsFun {
-    config = super.config // {
+    config = configWithoutRenamedOptions // {
       cudaSupport = false;
       rocmSupport = true;
     };
@@ -93,7 +101,7 @@ self: super: {
   # Full package set with cuda on rocm off
   # Mostly useful for asserting pkgs.pkgsCuda.torchWithCuda == pkgs.torchWithCuda and similar
   pkgsCuda = nixpkgsFun {
-    config = super.config // {
+    config = configWithoutRenamedOptions // {
       cudaSupport = true;
       rocmSupport = false;
     };
