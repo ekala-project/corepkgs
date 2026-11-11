@@ -17,17 +17,20 @@ let
     serviceDirectories = cfg.packages;
   };
 
+  useSystemd = config.serviceManager.systemd.enable;
+
 in
 
 {
   options.services.dbus = {
     enable = mkOption {
       type = types.bool;
-      default = false;
+      default = config.services.logind.enable;
+      defaultText = literalExpression "config.services.logind.enable";
       description = ''
         Whether to start the D-Bus message bus daemon. Required by many
         system services including systemd-logind, NetworkManager,
-        and PolicyKit.
+        and PolicyKit, so it is on whenever logind is.
       '';
     };
 
@@ -38,8 +41,10 @@ in
     };
 
     command = mkOption {
-      type = types.str;
+      type = types.nullOr types.str;
       internal = true;
+      # Stays null on systemd, which runs the upstream units instead
+      default = null;
       description = "Command to run (set automatically).";
     };
 
@@ -85,51 +90,69 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
-    services.dbus = {
-      command = "${cfg.package}/bin/dbus-daemon";
-      args = [
-        "--system"
-        "--nofork"
-        "--nopidfile"
-        "--address=unix:path=/run/dbus/system_bus_socket"
-      ];
+  config = mkIf cfg.enable (mkMerge [
+    # Without systemd, run the daemon as a portable service
+    (mkIf (!useSystemd) {
+      services.dbus = {
+        command = "${cfg.package}/bin/dbus-daemon";
+        args = [
+          "--system"
+          "--nofork"
+          "--nopidfile"
+          "--address=unix:path=/run/dbus/system_bus_socket"
+        ];
 
-      packages = [
+        systemd = {
+          after = [ "local-fs.target" ];
+          wantedBy = [ "multi-user.target" ];
+        };
+      };
+
+    })
+
+    # On systemd, use the upstream socket-activated units, so that units
+    # ordered after dbus.socket (systemd-logind, ...) find the bus
+    (mkIf useSystemd {
+      environment.etc = {
+        "systemd/system/dbus.socket".source = "${cfg.package}/etc/systemd/system/dbus.socket";
+        "systemd/system/dbus.service".source = "${cfg.package}/etc/systemd/system/dbus.service";
+        "systemd/system/sockets.target.wants/dbus.socket".source =
+          "${cfg.package}/etc/systemd/system/dbus.socket";
+      };
+    })
+
+    {
+      # Activation files and policies from the bus and the system profile
+      services.dbus.packages = [
         cfg.package
         config.system.path
       ];
 
-      systemd = {
-        after = [ "local-fs.target" ];
-        wantedBy = [ "multi-user.target" ];
+      # Install D-Bus configuration directory
+      environment.etc."dbus-1".source = configDir;
+
+      environment.pathsToLink = [
+        "/etc/dbus-1"
+        "/share/dbus-1"
+      ];
+
+      # Create messagebus user and group
+      users.users.messagebus = {
+        isSystemUser = true;
+        uid = 4;
+        group = "messagebus";
+        description = "D-Bus system message bus daemon user";
       };
-    };
+      users.groups.messagebus.gid = 4;
 
-    # Install D-Bus configuration directory
-    environment.etc."dbus-1".source = configDir;
+      # Add dbus tools to system packages
+      environment.systemPackages = [ cfg.package ];
 
-    environment.pathsToLink = [
-      "/etc/dbus-1"
-      "/share/dbus-1"
-    ];
-
-    # Create messagebus user and group
-    users.users.messagebus = {
-      isSystemUser = true;
-      uid = 4;
-      group = "messagebus";
-      description = "D-Bus system message bus daemon user";
-    };
-    users.groups.messagebus.gid = 4;
-
-    # Add dbus tools to system packages
-    environment.systemPackages = [ cfg.package ];
-
-    # Create runtime directory
-    system.activationScripts.dbus = stringAfter [ "etc" "users" ] ''
-      mkdir -p /run/dbus
-      chmod 755 /run/dbus
-    '';
-  };
+      # Create runtime directory
+      system.activationScripts.dbus = stringAfter [ "etc" "users" ] ''
+        mkdir -p /run/dbus
+        chmod 755 /run/dbus
+      '';
+    }
+  ]);
 }
