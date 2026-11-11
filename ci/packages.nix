@@ -221,10 +221,6 @@ let
       "zfs_2_4"
       "zfs_unstable"
     ];
-    perl = [
-      # Invalid `meta`.
-      "ImageMagick"
-    ];
   };
 
   # Many variants carry their own package set (`python3.v3_12.pkgs`,
