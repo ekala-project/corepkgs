@@ -43,4 +43,7 @@
 
   # Lightweight boot tests (no disk image, 9p nix store)
   boot-to-multiuser = import ./boot-to-multiuser.nix { inherit pkgs; };
+
+  # Declarative unit enablement and unit directory reconciliation
+  unit-enablement = import ./unit-enablement.nix { inherit pkgs; };
 }
