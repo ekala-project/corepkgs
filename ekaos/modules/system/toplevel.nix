@@ -22,7 +22,6 @@ let
           init = "@init@"; # Will be substituted
           toplevel = "@toplevel@"; # Will be substituted
           label = config.system.ekaos.label;
-          inherit (config.system.ekaos) version;
           initrd = "@initrd@"; # Will be substituted
         };
       }
