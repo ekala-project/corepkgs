@@ -1182,15 +1182,12 @@ rec {
       ])
       // {
         interpreter =
-          if pythonPackages != pkgs.pypy2.pkgs || pythonPackages != pkgs.pypy3.pkgs then
-            if libraries == [ ] then
-              python.interpreter
-            else if (lib.isFunction libraries) then
-              (python.withPackages libraries).interpreter
-            else
-              (python.withPackages (ps: libraries)).interpreter
+          if libraries == [ ] then
+            python.interpreter
+          else if (lib.isFunction libraries) then
+            (python.withPackages libraries).interpreter
           else
-            python.interpreter;
+            (python.withPackages (ps: libraries)).interpreter;
         check = optionalString (python.isPy3k && doCheck) (
           writeDash "pythoncheck.sh" ''
             exec ${buildPythonPackages.flake8}/bin/flake8 --show-source ${ignoreAttribute} "$1"
@@ -1200,21 +1197,17 @@ rec {
     ) name;
 
   /**
-    writePyPy2 takes a name an attributeset with libraries and some pypy2 sourcecode and
-    returns an executable
+    writePyPy2 takes a name an attributeset and some pypy2 sourcecode and returns
+    an executable. `libraries` is not supported: the Python 2 package sets have
+    been removed.
 
     # Examples
     :::{.example}
     ## `pkgs.writers.writePyPy2` usage example
 
     ```nix
-    writePyPy2 "test_pypy2" { libraries = [ pkgs.pypy2Packages.enum ]; } ''
-      from enum import Enum
-
-      class Test(Enum):
-          a = "success"
-
-      print Test.a
+    writePyPy2 "test_pypy2" { } ''
+      print "success"
     ''
     ```
 
