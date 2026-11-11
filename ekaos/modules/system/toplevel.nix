@@ -69,7 +69,7 @@ let
     if [ -n "$EKAOS_INSTALL_BOOTLOADER" ] || [ -n "$NIXOS_INSTALL_BOOTLOADER" ]; then
       if [ -x $out/bin/install-bootloader ]; then
         echo "Installing bootloader..."
-        $out/bin/install-bootloader $out || true
+        $out/bin/install-bootloader $out
       fi
 
       # Write boot entry directly (fallback for fresh installs without generations)
