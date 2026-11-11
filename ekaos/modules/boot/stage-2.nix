@@ -40,6 +40,12 @@ let
     specialMount "proc" "/proc" "nosuid,noexec,nodev" "proc"
     specialMount "sysfs" "/sys" "nosuid,noexec,nodev" "sysfs"
     specialMount "devtmpfs" "/dev" "mode=0755,nosuid,size=${config.boot.devSize}" "devtmpfs"
+    # devtmpfs has no /dev/fd; bash process substitution in the activation
+    # scripts needs it. systemd would only create these later.
+    ln -sfn /proc/self/fd /dev/fd
+    ln -sfn /proc/self/fd/0 /dev/stdin
+    ln -sfn /proc/self/fd/1 /dev/stdout
+    ln -sfn /proc/self/fd/2 /dev/stderr
     specialMount "devpts" "/dev/pts" "mode=0620,gid=3,nosuid,noexec" "devpts"
     specialMount "tmpfs" "/run" "mode=0755,nosuid,nodev,size=${config.boot.runSize}" "tmpfs"
     specialMount "tmpfs" "/dev/shm" "mode=1777,nosuid,nodev,size=${config.boot.devShmSize}" "tmpfs"
