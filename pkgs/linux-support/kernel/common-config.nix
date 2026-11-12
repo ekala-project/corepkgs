@@ -14,6 +14,8 @@
   lib,
   stdenv,
   version,
+  kernelAtLeast,
+  kernelOlder,
   rustAvailable,
 
   features ? { },
@@ -46,7 +48,7 @@ let
   # Architecture support collected from HAVE_RUST Kconfig definitions and the following table:
   # https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/rust/arch-support.rst
   rustByDefault = (
-    lib.versionAtLeast version "6.12"
+    kernelAtLeast "6.12"
     && (
       stdenv.hostPlatform.isx86_64
       || stdenv.hostPlatform.isLoongArch64
@@ -101,7 +103,7 @@ let
       LOCKUP_DETECTOR = yes;
       SOFTLOCKUP_DETECTOR = yes;
       HARDLOCKUP_DETECTOR = lib.mkIf (
-        with stdenv.hostPlatform; isPower || isx86 || lib.versionAtLeast version "6.5"
+        with stdenv.hostPlatform; isPower || isx86 || kernelAtLeast "6.5"
       ) yes;
 
       # Enable streaming logs to a remote device over a network
@@ -504,7 +506,7 @@ let
           || isS390x
           || isx86_64
           || isAarch64
-          || (lib.versionAtLeast version "6.11" && isRiscV64)
+          || (kernelAtLeast "6.11" && isRiscV64)
         );
       in
       {
@@ -555,10 +557,10 @@ let
         # Enable AMD secure display when available
         DRM_AMD_SECURE_DISPLAY = lib.mkIf (
           with stdenv.hostPlatform;
-          (lib.versionAtLeast version "5.13" && (isx86 || isPower64))
-          || (lib.versionAtLeast version "6.2" && isAarch64 && !stdenv.cc.isClang)
-          || (lib.versionAtLeast version "6.5" && isLoongArch64 && !stdenv.cc.isClang)
-          || (lib.versionAtLeast version "6.10" && isRiscV64 && !stdenv.cc.isClang)
+          (kernelAtLeast "5.13" && (isx86 || isPower64))
+          || (kernelAtLeast "6.2" && isAarch64 && !stdenv.cc.isClang)
+          || (kernelAtLeast "6.5" && isLoongArch64 && !stdenv.cc.isClang)
+          || (kernelAtLeast "6.10" && isRiscV64 && !stdenv.cc.isClang)
         ) yes;
 
         # Enable AMD image signal processor
@@ -1102,8 +1104,7 @@ let
 
         KERNEL_ZSTD = lib.mkIf (
           with stdenv.hostPlatform;
-          (isMips || isS390 || isx86 || (lib.versionAtLeast version "6.1" && isAarch64 || isLoongArch64))
-          && useZstd
+          (isMips || isS390 || isx86 || (kernelAtLeast "6.1" && isAarch64 || isLoongArch64)) && useZstd
         ) yes;
 
         HID_BATTERY_STRENGTH = yes;
@@ -1150,9 +1151,7 @@ let
         # enable support for device trees and overlays
         OF = option yes;
         # OF_OVERLAY breaks v5.10 on x86_64, see https://github.com/NixOS/nixpkgs/issues/403985
-        OF_OVERLAY = lib.mkIf (!(lib.versionOlder version "5.15" && stdenv.hostPlatform.isx86_64)) (
-          option yes
-        );
+        OF_OVERLAY = lib.mkIf (!(kernelOlder "5.15" && stdenv.hostPlatform.isx86_64)) (option yes);
 
         # Enable initrd support.
         BLK_DEV_INITRD = yes;
@@ -1277,7 +1276,7 @@ let
           || isS390x
           || isx86_64
           || isAarch64
-          || (lib.versionAtLeast version "6.11" && isRiscV64)
+          || (kernelAtLeast "6.11" && isRiscV64)
         ) yes;
 
         PSI = yes;
@@ -1352,7 +1351,7 @@ let
           || isS390x
           || isx86_64
           || isAarch64
-          || (lib.versionAtLeast version "6.11" && isRiscV64)
+          || (kernelAtLeast "6.11" && isRiscV64)
         ) yes;
 
         # required for P2P DMABUF
@@ -1449,12 +1448,7 @@ let
             MHP_DEFAULT_ONLINE_TYPE_ONLINE_AUTO = whenAtLeast "6.14" yes;
             MEMORY_HOTREMOVE = lib.mkIf (
               with stdenv.hostPlatform;
-              isLoongArch64
-              || isPower
-              || isS390
-              || isx86
-              || isAarch64
-              || (lib.versionAtLeast version "6.11" && isRiscV)
+              isLoongArch64 || isPower || isS390 || isx86 || isAarch64 || (kernelAtLeast "6.11" && isRiscV)
             ) yes;
             HOTPLUG_CPU = yes;
             MIGRATION = yes;
