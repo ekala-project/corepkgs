@@ -24,7 +24,6 @@ with lib;
   isoImage.enable = true;
 
   # Boot configuration
-  boot.initrd.enable = true;
   boot.initrd.compressor = "zstd";
 
   # Broad hardware support for installation media

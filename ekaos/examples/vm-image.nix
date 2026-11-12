@@ -27,7 +27,6 @@
   boot.kernelPackages = pkgs.linuxPackages_6_12;
 
   # Initrd for loading virtio modules before root mount
-  boot.initrd.enable = true;
   boot.initrd.availableKernelModules = [
     "virtio_pci"
     "virtio_blk"

@@ -350,7 +350,7 @@ let
 
 in
 
-pkgs.makeInitrd {
+pkgs.linux.makeInitrd {
   contents = [
     {
       object = bootStage1;

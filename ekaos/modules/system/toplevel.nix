@@ -23,9 +23,6 @@ let
           toplevel = "@toplevel@"; # Will be substituted
           label = config.system.ekaos.label;
           inherit (config.system.ekaos) version;
-        }
-        // optionalAttrs config.boot.initrd.enable {
-          # Include initrd in bootspec when enabled
           initrd = "@initrd@"; # Will be substituted
         };
       }
@@ -84,10 +81,7 @@ let
         # Copy kernel
         cp $out/extra-dependencies/kernel/${config.system.boot.loader.kernelFile} "$bootMount/ekaos/vmlinuz" 2>/dev/null || true
 
-        # Copy initrd if available
-        if [ -f "$out/initrd" ]; then
-          cp $out/initrd "$bootMount/ekaos/initrd"
-        fi
+        cp $out/initrd "$bootMount/ekaos/initrd"
 
         # Write loader config
         cat > "$bootMount/loader/loader.conf" << 'LOADEREOF'
@@ -100,7 +94,7 @@ let
         cat > "$bootMount/loader/entries/ekaos.conf" << ENTRYEOF
     title   ekaos
     linux   /ekaos/vmlinuz
-    $([ -f "$out/initrd" ] && echo "initrd  /ekaos/initrd")
+    initrd  /ekaos/initrd
     options init=$out/init ${toString config.boot.kernelParams}
     ENTRYEOF
       fi
@@ -132,10 +126,7 @@ let
     echo -n "systemd ${toString config.systemd.package.interfaceVersion}" > $out/init-interface-version
     echo -n "${pkgs.stdenv.hostPlatform.system}" > $out/system
 
-    # Copy initrd if enabled
-    ${optionalString config.boot.initrd.enable ''
-      cp ${config.system.build.initrd}/initrd $out/initrd
-    ''}
+    cp ${config.system.build.initrd}/initrd $out/initrd
 
     # Build UKI if requested
     ${optionalString (builtins.elem "uki" config.boot.loader.efi.type) ''
@@ -190,10 +181,8 @@ let
             kernelFile="${config.boot.kernelPackages.kernel}/${config.system.boot.loader.kernelFile}"
             linux_size=$(stat -c%s "$kernelFile")
 
-            ${optionalString config.boot.initrd.enable ''
-              # .initrd section
-              vma_initrd=$(( (vma_linux + linux_size + align - 1) / align * align ))
-            ''}
+            # .initrd section
+            vma_initrd=$(( (vma_linux + linux_size + align - 1) / align * align ))
 
             objcopy \
               --add-section .osrel=uki-os-release.txt --set-section-flags .osrel=readonly,data \
@@ -202,10 +191,8 @@ let
               --change-section-vma .cmdline=$vma_cmdline \
               --add-section .linux="$kernelFile" --set-section-flags .linux=readonly,data \
               --change-section-vma .linux=$vma_linux \
-              ${optionalString config.boot.initrd.enable ''
-                --add-section .initrd=$out/initrd --set-section-flags .initrd=readonly,data \
-                --change-section-vma .initrd=$vma_initrd \
-              ''} \
+              --add-section .initrd=$out/initrd --set-section-flags .initrd=readonly,data \
+              --change-section-vma .initrd=$vma_initrd \
               "$stub" \
               $out/uki.efi
 
@@ -213,14 +200,12 @@ let
     ''}
 
     # Generate bootspec (boot.json)
-    ${pkgs.jq}/bin/jq --arg toplevel "$out" --arg init "$out/init" ${optionalString config.boot.initrd.enable ''--arg initrd "$out/initrd"''} '."org.nixos.bootspec.v1".toplevel = $toplevel | ."org.nixos.bootspec.v1".init = $init ${optionalString config.boot.initrd.enable ''| ."org.nixos.bootspec.v1".initrd = $initrd''}' < ${bootspecJson} > $out/boot.json
+    ${pkgs.jq}/bin/jq --arg toplevel "$out" --arg init "$out/init" --arg initrd "$out/initrd" '."org.nixos.bootspec.v1".toplevel = $toplevel | ."org.nixos.bootspec.v1".init = $init | ."org.nixos.bootspec.v1".initrd = $initrd' < ${bootspecJson} > $out/boot.json
 
     # Create extra dependencies file for GC roots
     mkdir -p $out/extra-dependencies
     ln -s ${config.boot.kernelPackages.kernel} $out/extra-dependencies/kernel
-    ${optionalString config.boot.initrd.enable ''
-      ln -s ${config.system.build.initrd} $out/extra-dependencies/initrd
-    ''}
+    ln -s ${config.system.build.initrd} $out/extra-dependencies/initrd
   '';
 
   # The top-level system derivation

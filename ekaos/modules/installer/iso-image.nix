@@ -192,9 +192,6 @@ in
       }
     ];
 
-    # Enable initrd for the live boot sequence
-    boot.initrd.enable = true;
-
     # Kernel modules needed for ISO live boot
     boot.initrd.availableKernelModules = [
       "iso9660"

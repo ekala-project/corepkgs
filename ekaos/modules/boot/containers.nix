@@ -36,7 +36,6 @@ with lib;
     # When running as a container, disable hardware-related boot settings
     (mkIf config.boot.isContainer {
       boot.kernelModules = mkForce [ ];
-      boot.initrd.enable = mkDefault false;
       boot.loader.systemd-boot.enable = mkDefault false;
     })
 

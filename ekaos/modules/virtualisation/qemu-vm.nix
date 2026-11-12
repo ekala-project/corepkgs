@@ -209,7 +209,6 @@ in
     # The kernel builds virtio and ext4 as modules, so the root filesystem of
     # the disk image can only be mounted from an initrd. The image's root
     # filesystem UUID is make-disk-image's deterministic default.
-    boot.initrd.enable = mkDefault true;
     boot.initrd.availableKernelModules = [
       "virtio_pci"
       "virtio_blk"
