@@ -22,7 +22,7 @@ let
     systemd = config.systemd.package;
     nix = pkgs.nix;
     timeout = cfg.timeout;
-    editor = if cfg.editor then "True" else "False";
+    editor = if cfg.editor then "1" else "0";
     configurationLimit = cfg.configurationLimit;
     inherit (cfg) consoleMode graceful;
 

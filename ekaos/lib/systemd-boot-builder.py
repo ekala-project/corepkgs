@@ -31,7 +31,7 @@ REBOOT_FOR_BITLOCKER = "@rebootForBitlocker@" == "1"  # noqa: PLR0133
 CAN_TOUCH_EFI_VARIABLES = "@canTouchEfiVariables@"
 GRACEFUL = "@graceful@"
 STORE_DIR = "@storeDir@"
-EFI_TYPE = json.loads("@efiType@")  # e.g. ["efi"] or ["uki"] or ["efi", "uki"]
+EFI_TYPE = json.loads('@efiType@')  # e.g. ["efi"] or ["uki"] or ["efi", "uki"]
 AB_ENABLED = "@abEnabled@" == "1"  # noqa: PLR0133
 AB_BOOT_COUNT_TRIES = int("@abBootCountTries@") if AB_ENABLED else 0
 
@@ -356,6 +356,10 @@ def install_bootloader(args: argparse.Namespace) -> None:
 
     if os.getenv("NIXOS_INSTALL_GRUB") == "1":
         warnings.warn("NIXOS_INSTALL_GRUB env var deprecated, use NIXOS_INSTALL_BOOTLOADER", DeprecationWarning)
+        os.environ["NIXOS_INSTALL_BOOTLOADER"] = "1"
+
+    # ekaos' switch-to-configuration and disk images use the ekaos name.
+    if os.getenv("EKAOS_INSTALL_BOOTLOADER") == "1":
         os.environ["NIXOS_INSTALL_BOOTLOADER"] = "1"
 
     # flags to pass to bootctl install/update
