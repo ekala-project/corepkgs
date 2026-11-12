@@ -4,8 +4,8 @@ ekaos is a minimal, bootable Linux system builder using Nix. It provides a clean
 
 ## Features
 
-- **Minimal boot path**: UEFI → systemd-boot → kernel → stage-2 init → systemd
-- **Two-stage boot**: Optional initramfs for LUKS encryption, LVM, custom modules
+- **Two-stage boot**: UEFI → systemd-boot → kernel → initramfs (stage-1) → stage-2 init → systemd
+- **Initramfs**: Always part of the system generation; handles LUKS encryption, LVM, custom modules
 - **Modular configuration**: NixOS-inspired module system
 - **Service management**: Integrates with the ekaos unified service interface (services/)
 - **systemd-boot**: Modern UEFI bootloader with automatic boot entry generation
@@ -25,6 +25,7 @@ nix-build ekaos -A system
 ./result/
 ├── init                    # Stage-2 init script
 ├── boot.json              # Bootspec document
+├── initrd                 # Initramfs (stage-1)
 ├── etc/                   # System configuration
 ├── sw/                    # System packages
 ├── systemd/               # Systemd package
@@ -98,20 +99,8 @@ ekaos/
 
 ## Boot Process
 
-### Without Initramfs (Direct Boot)
-
-1. **UEFI Firmware** loads systemd-boot from ESP
-2. **systemd-boot** reads boot entries from `/boot/loader/entries/`
-3. **Kernel** loads with `init=/nix/store/.../init` parameter
-4. **Stage-2 Init** (`init` script):
-   - Mounts special filesystems (/proc, /sys, /dev, /run)
-   - Mounts /nix/store as read-only
-   - Runs activation script
-   - Records booted system in `/run/booted-system`
-   - Execs systemd as PID 1
-5. **Systemd** starts services and reaches `multi-user.target`
-
-### With Initramfs (Two-Stage Boot)
+`system.build.toplevel` is a bootable system generation, so it always
+includes the initramfs and its boot entry references it.
 
 1. **UEFI Firmware** loads systemd-boot from ESP
 2. **systemd-boot** reads boot entries from `/boot/loader/entries/`
@@ -155,12 +144,10 @@ environment.systemPackages = [ pkgs.vim pkgs.git ];
 
 ### Initramfs (initrd) Options
 
-ekaos supports two-stage boot with initramfs for advanced scenarios:
+The initramfs is always built; these options configure what it contains:
 
 ```nix
 boot.initrd = {
-  enable = true;  # Enable initramfs (stage-1 boot)
-
   # Kernel modules to load in stage-1
   availableKernelModules = [
     # SATA controllers
@@ -202,7 +189,7 @@ boot.initrd = {
 };
 ```
 
-**When to use initramfs:**
+**Configure the initramfs for:**
 - Encrypted root filesystem (LUKS)
 - LVM root filesystem
 - Software RAID

@@ -25,7 +25,6 @@ mkBootTest {
   configuration =
     { config, pkgs, ... }:
     {
-      boot.initrd.enable = true;
       boot.initrd.availableKernelModules = [
         "virtio_pci"
         "virtio_blk"

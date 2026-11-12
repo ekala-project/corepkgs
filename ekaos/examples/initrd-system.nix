@@ -25,10 +25,8 @@
     "quiet"
   ];
 
-  # Enable initramfs for two-stage boot
+  # Initramfs (stage-1) configuration
   boot.initrd = {
-    enable = true;
-
     # Kernel modules to load in stage-1
     availableKernelModules = [
       # SATA controllers

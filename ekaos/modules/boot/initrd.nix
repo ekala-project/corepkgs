@@ -1,5 +1,8 @@
 # Initramfs (initrd) configuration for ekaos
-# Provides stage-1 boot support for advanced scenarios
+# Stage-1 boot: loads modules, unlocks devices and mounts the root filesystem
+# before handing off to stage-2. The initrd is always part of
+# system.build.toplevel; outputs that do not boot (e.g. containers) simply do
+# not reference it.
 
 {
   config,
@@ -18,25 +21,6 @@ in
 {
   options = {
     boot.initrd = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Whether to enable initramfs (initial ramdisk).
-
-          When enabled, the system boots through a two-stage process:
-          1. Stage-1: Initramfs mounts root and loads modules
-          2. Stage-2: Real init (systemd) starts
-
-          Required for:
-          - Encrypted root filesystem (LUKS)
-          - LVM root filesystem
-          - Software RAID
-          - Network root filesystem (iSCSI, NFS)
-          - Non-standard root filesystem types
-        '';
-      };
-
       availableKernelModules = mkOption {
         type = types.listOf types.str;
         default = [ ];
@@ -218,7 +202,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
+  config = {
     # Default kernel modules for common hardware
     boot.initrd.availableKernelModules = mkIf cfg.includeDefaultModules [
       # SATA/PATA
