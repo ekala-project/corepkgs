@@ -113,8 +113,12 @@ let
         // features
       ) kernelPatches;
 
+      baseVersion = lib.head (lib.splitString "-rc" version);
+
       commonStructuredConfig = import ./common-config.nix {
         inherit lib stdenv version;
+        kernelAtLeast = lib.versionAtLeast baseVersion;
+        kernelOlder = lib.versionOlder baseVersion;
         rustAvailable = lib.meta.availableOn stdenv.hostPlatform rustc-unwrapped;
 
         features = kernelFeatures; # Ensure we know of all extra patches, etc.
