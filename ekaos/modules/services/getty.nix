@@ -18,7 +18,10 @@ let
     Description=Getty on ${ttyName}
     Documentation=man:agetty(8) man:systemd-getty-generator(8)
     After=systemd-user-sessions.service plymouth-quit-wait.service systemd-vconsole-setup.service
-    Requires=systemd-vconsole-setup.service
+    # Wants, not Requires: udev reruns console setup whenever a console
+    # device appears, and Requires would restart every getty with it,
+    # killing the sessions on them.
+    Wants=systemd-vconsole-setup.service
 
     [Service]
     ExecStart=-${pkgs.util-linux}/bin/agetty --noclear --keep-baud ${ttyName} 115200,38400,9600 $TERM
