@@ -69,10 +69,11 @@
     machine.wait_for_unit("multi-user.target")
 
 
-    # Test that getty services are running
-    machine.wait_for_unit("getty@tty1.service")
-    machine.succeed("systemctl is-active getty@tty1.service")
-    machine.succeed("systemctl is-active getty@tty2.service")
+    # Test that getty services are running. Wait for each: udev restarts
+    # systemd-vconsole-setup when the console device appears, and the
+    # gettys, which require it, restart with it.
+    for tty in range(1, 7):
+        machine.wait_for_unit(f"getty@tty{tty}.service")
 
     # Check that /etc/passwd was created with our users
     machine.succeed("grep -q '^root:' /etc/passwd")
