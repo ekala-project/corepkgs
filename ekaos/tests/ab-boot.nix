@@ -87,6 +87,8 @@ in
 
       # Run the bootloader installer to write new boot entries.
       # This creates a boot-counted entry (+3-0) for the new default generation.
+      # Uses the NIXOS_ name on purpose: it is an alias for EKAOS_INSTALL_BOOTLOADER,
+      # which the disk image build already covers.
       machine.succeed("NIXOS_INSTALL_BOOTLOADER=1 ${installerPath} ${gen2Path}")
 
       # -- The new generation's entry should have a boot counting suffix --

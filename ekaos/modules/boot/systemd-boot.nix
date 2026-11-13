@@ -13,6 +13,10 @@ let
 
   abCfg = config.boot.ab;
 
+  # Prefix for boot entries, UKIs and the EFI directory. Only entries with
+  # this prefix are managed, so other distros sharing the ESP are left alone.
+  distroName = "ekaos";
+
   # Wrap the systemd-boot-builder.py script with substitutions
   systemdBootBuilder = pkgs.substituteAll {
     src = ../../lib/systemd-boot-builder.py;
@@ -30,8 +34,8 @@ let
     bootMountPoint = config.boot.loader.efi.efiSysMountPoint;
     canTouchEfiVariables = if config.boot.loader.efi.canTouchEfiVariables then "1" else "0";
     efiType = builtins.toJSON config.boot.loader.efi.type;
-    nixosDir = "EFI/ekaos";
-    distroName = "ekaos";
+    inherit distroName;
+    distroDir = "EFI/${distroName}";
     rebootForBitlocker = "0";
     storeDir = builtins.storeDir;
 

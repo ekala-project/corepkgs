@@ -9,7 +9,6 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import warnings
 import json
 from typing import NamedTuple, Any, Sequence
 from dataclasses import dataclass
@@ -19,7 +18,7 @@ from pathlib import Path
 EFI_SYS_MOUNT_POINT = Path("@efiSysMountPoint@")
 BOOT_MOUNT_POINT = Path("@bootMountPoint@")
 LOADER_CONF = EFI_SYS_MOUNT_POINT / "loader/loader.conf"  # Always stored on the ESP
-NIXOS_DIR = Path("@nixosDir@".strip("/")) # Path relative to the XBOOTLDR or ESP mount point
+DISTRO_DIR = Path("@distroDir@".strip("/")) # Path relative to the XBOOTLDR or ESP mount point
 TIMEOUT = "@timeout@"
 EDITOR = "@editor@" == "1" # noqa: PLR0133
 CONSOLE_MODE = "@consoleMode@"
@@ -95,7 +94,7 @@ options {kernel_params}
 
 def generation_conf_filename(profile: str | None, generation: int, specialisation: str | None) -> str:
     pieces = [
-        "nixos",
+        DISTRO_NAME,
         profile or None,
         "generation",
         str(generation),
@@ -142,7 +141,7 @@ def bootspec_from_json(bootspec_json: dict[str, Any]) -> BootSpec:
     specialisations = bootspec_json.get('org.nixos.specialisation.v1', {})
     specialisations = {k: bootspec_from_json(v) for k, v in specialisations.items()}
     systemdBootExtension = bootspec_json.get('org.nixos.systemd-boot', {})
-    sortKey = systemdBootExtension.get('sortKey', 'nixos')
+    sortKey = systemdBootExtension.get('sortKey', DISTRO_NAME)
     devicetree = systemdBootExtension.get('devicetree')
     uki = systemdBootExtension.get('uki')
 
@@ -171,7 +170,7 @@ def copy_from_file(file: Path, dry_run: bool = False) -> Path:
     store_file_path = file.resolve()
     suffix = store_file_path.name
     store_subdir = store_file_path.relative_to(STORE_DIR).parts[0]
-    efi_file_path = NIXOS_DIR / (f"{suffix}.efi" if suffix == store_subdir else f"{store_subdir}-{suffix}.efi")
+    efi_file_path = DISTRO_DIR / (f"{suffix}.efi" if suffix == store_subdir else f"{store_subdir}-{suffix}.efi")
     if not dry_run:
         copy_if_not_exists(store_file_path, BOOT_MOUNT_POINT / efi_file_path)
     return efi_file_path
@@ -229,7 +228,7 @@ def write_entry(profile: str | None, generation: int, specialisation: str | None
 
 def generation_uki_filename(profile: str | None, generation: int, specialisation: str | None) -> str:
     pieces = [
-        "ekaos",
+        DISTRO_NAME,
         profile or None,
         "generation",
         str(generation),
@@ -278,8 +277,9 @@ def get_generations(profile: str | None = None) -> list[SystemIdentifier]:
 
 
 def remove_old_entries(gens: list[SystemIdentifier]) -> None:
-    rex_profile = re.compile(r"^nixos-(.*)-generation-.*\.conf$")
-    rex_generation = re.compile(r"^nixos.*-generation-([0-9]+)(-specialisation-.*)?\.conf$")
+    distro = re.escape(DISTRO_NAME)
+    rex_profile = re.compile(rf"^{distro}-(.*)-generation-.*\.conf$")
+    rex_generation = re.compile(rf"^{distro}.*-generation-([0-9]+)(-specialisation-.*)?\.conf$")
     known_paths = []
     for gen in gens:
         bootspec = get_bootspec(gen.profile, gen.generation)
@@ -291,8 +291,8 @@ def remove_old_entries(gens: list[SystemIdentifier]) -> None:
     # Clean up old BLS Type #1 entries
     if "efi" in EFI_TYPE:
         # Match both regular entries and boot-counted entries (+N-M suffix)
-        rex_counted = re.compile(r"^(nixos.*-generation-[0-9]+(?:-specialisation-[^+]*)?)\+\d+-\d+\.conf$")
-        for path in (BOOT_MOUNT_POINT / "loader/entries").glob("nixos*-generation-[1-9]*", case_sensitive=False):
+        rex_counted = re.compile(rf"^({distro}.*-generation-[0-9]+(?:-specialisation-[^+]*)?)\+\d+-\d+\.conf$")
+        for path in (BOOT_MOUNT_POINT / "loader/entries").glob(f"{DISTRO_NAME}*-generation-[1-9]*", case_sensitive=False):
             # Strip boot counting suffix for generation extraction
             name = path.name
             counted_match = rex_counted.match(name)
@@ -309,7 +309,7 @@ def remove_old_entries(gens: list[SystemIdentifier]) -> None:
                 continue
             if (prof, gen_number, None) not in gens:
                 path.unlink()
-        for path in (BOOT_MOUNT_POINT / NIXOS_DIR).iterdir():
+        for path in (BOOT_MOUNT_POINT / DISTRO_DIR).iterdir():
             if path.name not in known_paths and not path.is_dir():
                 path.unlink()
 
@@ -323,17 +323,17 @@ def remove_old_entries(gens: list[SystemIdentifier]) -> None:
                 bootspec = get_bootspec(gen.profile, gen.generation)
                 for specialisation in bootspec.specialisations.keys():
                     known_uki_names.add(generation_uki_filename(gen.profile, gen.generation, specialisation))
-            for path in uki_dir.glob("ekaos-*.efi"):
+            for path in uki_dir.glob(f"{DISTRO_NAME}-*.efi"):
                 if path.name not in known_uki_names:
                     path.unlink()
 
 
 def cleanup_esp() -> None:
-    for path in (EFI_SYS_MOUNT_POINT / "loader/entries").glob("nixos*"):
+    for path in (EFI_SYS_MOUNT_POINT / "loader/entries").glob(f"{DISTRO_NAME}*"):
         path.unlink()
-    nixos_dir = EFI_SYS_MOUNT_POINT / NIXOS_DIR
-    if nixos_dir.is_dir():
-        shutil.rmtree(nixos_dir)
+    distro_dir = EFI_SYS_MOUNT_POINT / DISTRO_DIR
+    if distro_dir.is_dir():
+        shutil.rmtree(distro_dir)
 
 
 def get_profiles() -> list[str]:
@@ -354,13 +354,9 @@ def install_bootloader(args: argparse.Namespace) -> None:
             raise
         machine_id = None
 
-    if os.getenv("NIXOS_INSTALL_GRUB") == "1":
-        warnings.warn("NIXOS_INSTALL_GRUB env var deprecated, use NIXOS_INSTALL_BOOTLOADER", DeprecationWarning)
-        os.environ["NIXOS_INSTALL_BOOTLOADER"] = "1"
-
-    # ekaos' switch-to-configuration and disk images use the ekaos name.
-    if os.getenv("EKAOS_INSTALL_BOOTLOADER") == "1":
-        os.environ["NIXOS_INSTALL_BOOTLOADER"] = "1"
+    # EKAOS_INSTALL_BOOTLOADER and NIXOS_INSTALL_BOOTLOADER are interchangeable,
+    # so NixOS tooling and habits keep working.
+    install_requested = "1" in (os.getenv("EKAOS_INSTALL_BOOTLOADER"), os.getenv("NIXOS_INSTALL_BOOTLOADER"))
 
     # flags to pass to bootctl install/update
     bootctl_flags = []
@@ -374,7 +370,7 @@ def install_bootloader(args: argparse.Namespace) -> None:
     if GRACEFUL == "1":
         bootctl_flags.append("--graceful")
 
-    if os.getenv("NIXOS_INSTALL_BOOTLOADER") == "1":
+    if install_requested:
         # bootctl uses fopen() with modes "wxe" and fails if the file exists.
         LOADER_CONF.unlink(missing_ok=True)
 
@@ -409,7 +405,7 @@ def install_bootloader(args: argparse.Namespace) -> None:
         available_match = re.search(r"^\((.*)\)$", available_out)
 
         if installed_match is None:
-            raise Exception("Could not find any previously installed systemd-boot. If you are switching to systemd-boot from a different bootloader, you need to run `nixos-rebuild switch --install-bootloader`")
+            raise Exception("Could not find any previously installed systemd-boot. If you are switching to systemd-boot from a different bootloader, you need to run `EKAOS_INSTALL_BOOTLOADER=1 switch-to-configuration boot`")
 
         if available_match is None:
             raise Exception("could not determine systemd-boot version")
@@ -426,7 +422,7 @@ def install_bootloader(args: argparse.Namespace) -> None:
             )
 
     if "efi" in EFI_TYPE:
-        (BOOT_MOUNT_POINT / NIXOS_DIR).mkdir(parents=True, exist_ok=True)
+        (BOOT_MOUNT_POINT / DISTRO_DIR).mkdir(parents=True, exist_ok=True)
         (BOOT_MOUNT_POINT / "loader/entries").mkdir(parents=True, exist_ok=True)
     if "uki" in EFI_TYPE:
         (EFI_SYS_MOUNT_POINT / "EFI/Linux").mkdir(parents=True, exist_ok=True)
