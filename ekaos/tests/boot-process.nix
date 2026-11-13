@@ -34,8 +34,15 @@
     machine.wait_for_unit("multi-user.target")
     print("✓ multi-user.target reached")
 
-    # Verify systemd is running
-    machine.succeed("systemctl is-system-running")
+    # Verify systemd is running. multi-user.target is reached before
+    # startup finishes, so wait for the boot to settle; a degraded system
+    # still fails.
+    rc, state = machine.execute(
+        "systemctl is-system-running --wait", check_return=False, timeout=300
+    )
+    if rc != 0:
+        print(machine.succeed("systemctl list-units --failed --no-pager"))
+    assert rc == 0, f"system is {state.strip()}, not running"
 
     # Check that basic system services are active
     machine.succeed("systemctl is-active systemd-journald.service")
