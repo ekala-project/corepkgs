@@ -159,6 +159,14 @@
     # Verify systemd-user-sessions service exists
     machine.succeed("systemctl status systemd-user-sessions.service || true")
 
+    # Console setup reruns whenever udev sees a console device; the
+    # gettys, and the sessions on them, must survive it
+    machine.wait_for_unit("getty@tty2.service")
+    getty = machine.succeed("systemctl show -p MainPID --value getty@tty2.service").strip()
+    machine.succeed("systemctl restart systemd-vconsole-setup.service")
+    after = machine.succeed("systemctl show -p MainPID --value getty@tty2.service").strip()
+    assert after == getty, f"restarting vconsole setup restarted getty@tty2 ({getty} -> {after})"
+
     print("All login functionality tests passed!")
 
     # Shutdown
