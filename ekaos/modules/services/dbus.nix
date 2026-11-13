@@ -105,6 +105,8 @@ in
         systemd = {
           after = [ "local-fs.target" ];
           wantedBy = [ "multi-user.target" ];
+          # As in upstream's dbus.service
+          serviceConfig.ExecReload = "${cfg.package}/bin/dbus-send --print-reply --system --type=method_call --dest=org.freedesktop.DBus / org.freedesktop.DBus.ReloadConfig";
         };
       };
 
@@ -122,6 +124,10 @@ in
     })
 
     {
+      # Restarting the system bus takes down everything attached to it. A
+      # drop-in, so it holds for whichever dbus.service is installed.
+      systemd.switchOverrides."dbus.service".reloadIfChanged = true;
+
       # Activation files and policies from the bus and the system profile
       services.dbus.packages = [
         cfg.package
