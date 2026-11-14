@@ -295,12 +295,89 @@ let
     );
   builtinsOf = entries: listToAttrs (map (e: nameValuePair e.name (asDefaults e)) entries);
 
+  # Ids. /etc/passwd and /etc/group are generated here, with no allocation
+  # state on disk, so an id must not depend on which other accounts exist.
+  # System accounts therefore need a static one (modules take theirs from
+  # ids.uids/ids.gids). Normal users and other groups without one are
+  # numbered from 1000 by name, skipping every id that is taken.
+  firstFree = taken: n: if elem n taken then firstFree taken (n + 1) else n;
+  allocate =
+    taken: names:
+    (foldl'
+      (
+        acc: name:
+        let
+          id = firstFree acc.taken acc.next;
+        in
+        {
+          taken = acc.taken ++ [ id ];
+          next = id + 1;
+          ids = acc.ids // {
+            ${name} = id;
+          };
+        }
+      )
+      {
+        inherit taken;
+        next = 1000;
+        ids = { };
+      }
+      (sort lessThan names)
+    ).ids;
+
+  # Groups that are a system user's primary group: these hold the
+  # service's files too, so they need a static id like the user
+  systemGroupNames = unique (map (u: u.group) (filter (u: u.isSystemUser) allUsers));
+
+  missingUid = filter (u: u.uid == null && u.isSystemUser) allUsers;
+  missingGid = filter (g: g.gid == null && elem g.name systemGroupNames) allGroups;
+  missingIdMessages =
+    map (
+      u: "users.users.${u.name} is a system user without a uid; set uid, or add it to ids.uids"
+    ) missingUid
+    ++ map (
+      g: "users.groups.${g.name} is a system user's group without a gid; set gid, or add it to ids.gids"
+    ) missingGid;
+  # passwd and group need every id, and are evaluated before the
+  # assertions are checked, so report all the missing ones at once
+  missingIds = throw "\nMissing ids:\n${concatMapStringsSep "\n" (m: "- ${m}") missingIdMessages}";
+
+  allocatedUids = allocate (filter (id: id != null) (map (u: u.uid) allUsers)) (
+    map (u: u.name) (filter (u: u.uid == null && !u.isSystemUser) allUsers)
+  );
+  allocatedGids = allocate (filter (id: id != null) (map (g: g.gid) allGroups)) (
+    map (g: g.name) (filter (g: g.gid == null && !elem g.name systemGroupNames) allGroups)
+  );
+
+  uidOf = user: if user.uid != null then user.uid else allocatedUids.${user.name} or missingIds;
+  gidOf = group: if group.gid != null then group.gid else allocatedGids.${group.name} or missingIds;
+
+  # The gid of a user's primary group
+  primaryGid =
+    user:
+    let
+      group = findFirst (g: g.name == user.group) null allGroups;
+    in
+    if group == null then 100 else gidOf group;
+
+  duplicates =
+    idOf: entries:
+    let
+      byId = groupBy (e: toString (idOf e)) entries;
+    in
+    filterAttrs (_: es: length es > 1) byId;
+  duplicateMessages =
+    kind: dups:
+    mapAttrsToList (
+      id: es: "${kind} ${concatMapStringsSep ", " (e: e.name) es} share the id ${id}"
+    ) dups;
+
   # Generate passwd file
   passwdContent = concatMapStringsSep "\n" (
     user:
     let
-      uid = if user.uid != null then toString user.uid else "1000";
-      gid = toString (findFirst (g: g.name == user.group) { gid = 100; } allGroups).gid;
+      uid = toString (uidOf user);
+      gid = toString (primaryGid user);
       home = user.homeDirectory or "/var/empty";
       shell = user.shell or "/run/current-system/sw/bin/bash";
       description = user.description or "";
@@ -312,7 +389,7 @@ let
   groupContent = concatMapStringsSep "\n" (
     group:
     let
-      gid = if group.gid != null then toString group.gid else "1000";
+      gid = toString (gidOf group);
       members = concatStringsSep "," (
         group.members or [ ]
         ++ (filter (m: m != "") (
@@ -356,8 +433,8 @@ let
   createHomeDirs = concatMapStringsSep "\n" (
     user:
     let
-      uid = if user.uid != null then toString user.uid else "1000";
-      gid = toString (findFirst (g: g.name == user.group) { gid = 100; } allGroups).gid;
+      uid = toString (uidOf user);
+      gid = toString (primaryGid user);
     in
     optionalString (user.createHome or false) ''
       if [ ! -d "${user.homeDirectory}" ]; then
@@ -373,8 +450,8 @@ let
     user:
     let
       keys = user.openssh.authorizedKeys.keys or [ ];
-      uid = if user.uid != null then toString user.uid else "1000";
-      gid = toString (findFirst (g: g.name == user.group) { gid = 100; } allGroups).gid;
+      uid = toString (uidOf user);
+      gid = toString (primaryGid user);
     in
     optionalString (keys != [ ]) ''
       if [ ! -d "${user.homeDirectory}/.ssh" ]; then
@@ -461,6 +538,22 @@ in
   config = {
     users.users = builtinsOf systemUsers;
     users.groups = builtinsOf systemGroups;
+
+    assertions =
+      map
+        (message: {
+          assertion = false;
+          inherit message;
+        })
+        (
+          missingIdMessages
+          ++ duplicateMessages "users" (
+            duplicates uidOf (filter (u: u.uid != null || !u.isSystemUser) allUsers)
+          )
+          ++ duplicateMessages "groups" (
+            duplicates gidOf (filter (g: g.gid != null || !elem g.name systemGroupNames) allGroups)
+          )
+        );
 
     # Generate /etc/passwd, /etc/group, /etc/shadow
     environment.etc = {
