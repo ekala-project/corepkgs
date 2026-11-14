@@ -236,10 +236,11 @@ with lib;
     (mkIf config.security.tpm2.enable {
       users.users.${config.security.tpm2.tssUser} = {
         isSystemUser = true;
+        uid = mkDefault config.ids.uids.tss;
         group = config.security.tpm2.tssGroup;
         description = "TPM2 Software Stack user";
       };
-      users.groups.${config.security.tpm2.tssGroup} = { };
+      users.groups.${config.security.tpm2.tssGroup}.gid = mkDefault config.ids.gids.tss;
     })
 
     # PKI

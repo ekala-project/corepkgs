@@ -223,10 +223,11 @@ in
 
     users.users.dnsmasq = {
       isSystemUser = true;
+      uid = mkDefault config.ids.uids.dnsmasq;
       group = "dnsmasq";
       description = "dnsmasq daemon user";
     };
-    users.groups.dnsmasq = { };
+    users.groups.dnsmasq.gid = mkDefault config.ids.gids.dnsmasq;
 
     system.activationScripts.dnsmasq = stringAfter [ "etc" ] ''
       mkdir -m 755 -p ${stateDir}

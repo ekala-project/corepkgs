@@ -356,10 +356,11 @@ in
     # Create named user and group
     users.users.${cfg.user} = {
       isSystemUser = true;
+      uid = mkDefault config.ids.uids.bind;
       group = cfg.user;
       description = "BIND DNS server user";
     };
-    users.groups.${cfg.user} = { };
+    users.groups.${cfg.user}.gid = mkDefault config.ids.gids.bind;
 
     # Install configuration
     environment.etc."bind/named.conf".source = namedConf;

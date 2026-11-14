@@ -331,10 +331,11 @@ in
     # Create unbound user and group
     users.users.${cfg.user} = {
       isSystemUser = true;
+      uid = mkDefault config.ids.uids.unbound;
       group = cfg.user;
       description = "Unbound DNS resolver user";
     };
-    users.groups.${cfg.user} = { };
+    users.groups.${cfg.user}.gid = mkDefault config.ids.gids.unbound;
 
     # Set system resolver to use Unbound
     networking.nameservers = mkIf cfg.resolveLocalQueries (mkBefore [ "127.0.0.1" ]);

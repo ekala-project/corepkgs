@@ -240,7 +240,7 @@ in
     # I2C
     (mkIf cfg.i2c.enable {
       boot.kernelModules = [ "i2c-dev" ];
-      users.groups.${cfg.i2c.group} = { };
+      users.groups.${cfg.i2c.group}.gid = mkDefault config.ids.gids.i2c;
     })
 
     # Install combined firmware and set up kernel firmware path

@@ -494,6 +494,7 @@ in
         nix-ssh = {
           description = "Nix SSH store user";
           isSystemUser = true;
+          uid = mkDefault config.ids.uids.nix-ssh;
           group = "nogroup";
           shell = "${cfg.package}/bin/nix-store --serve ${optionalString cfg.sshServe.write "--write"}";
           openssh.authorizedKeys.keys = cfg.sshServe.keys;

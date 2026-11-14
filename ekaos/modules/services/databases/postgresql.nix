@@ -272,11 +272,12 @@ in
     # Create postgres user and group
     users.users.${cfg.user} = {
       isSystemUser = true;
+      uid = mkDefault config.ids.uids.postgres;
       homeDirectory = cfg.dataDir;
       group = cfg.user;
       description = "PostgreSQL server user";
     };
-    users.groups.${cfg.user} = { };
+    users.groups.${cfg.user}.gid = mkDefault config.ids.gids.postgres;
 
     # Initialize database and ensure databases/users
     system.activationScripts.postgresql =

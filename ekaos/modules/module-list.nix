@@ -200,6 +200,7 @@
 
   # Miscellaneous
   ./misc/assertions.nix # Assertion checking
+  ./misc/ids.nix # Static ids of the accounts modules create
   ./misc/defaults.nix # System defaults (including default service manager)
 
   # Virtualisation

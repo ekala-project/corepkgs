@@ -114,7 +114,7 @@ in
       "kvm-amd"
     ];
 
-    users.groups.libvirt = { };
+    users.groups.libvirt.gid = mkDefault config.ids.gids.libvirt;
 
     environment.systemPackages = [ cfg.package ];
 
