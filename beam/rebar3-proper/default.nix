@@ -9,7 +9,7 @@ buildRebar3 (finalAttrs: {
   version = "0.12.1";
 
   src = fetchHex {
-    pkg = finalAttrs.name;
+    pkg = "rebar3_proper";
     inherit (finalAttrs) version;
     sha256 = "1f174fb6h2071wr7qbw9aqqvnglzsjlylmyi8215fhrmi38w94b6";
   };
