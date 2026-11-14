@@ -160,7 +160,7 @@ in
   };
 
   config = mkIf cfg.enable {
-    users.groups.docker = { };
+    users.groups.docker.gid = mkDefault config.ids.gids.docker;
 
     environment.systemPackages = [ cfg.package ] ++ cfg.extraPackages;
 

@@ -327,11 +327,12 @@ in
     # Create redis user and group
     users.users.${cfg.user} = {
       isSystemUser = true;
+      uid = mkDefault config.ids.uids.redis;
       homeDirectory = cfg.dataDir;
       group = cfg.user;
       description = "Redis server user";
     };
-    users.groups.${cfg.user} = { };
+    users.groups.${cfg.user}.gid = mkDefault config.ids.gids.redis;
 
     # Add redis-cli to system packages
     environment.systemPackages = [ cfg.package ];

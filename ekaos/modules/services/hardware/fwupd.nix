@@ -178,9 +178,10 @@ in
 
     users.users.fwupd-refresh = {
       isSystemUser = true;
+      uid = lib.mkDefault config.ids.uids.fwupd-refresh;
       group = "fwupd-refresh";
       description = "Firmware update refresh user";
     };
-    users.groups.fwupd-refresh = { };
+    users.groups.fwupd-refresh.gid = lib.mkDefault config.ids.gids.fwupd-refresh;
   };
 }
