@@ -29,6 +29,9 @@
   # Network and SSH test (Phase 2)
   network = pkgs.ekaosTest ./network.nix;
 
+  # Two nodes on the shared test network
+  multi-node = pkgs.ekaosTest ./multi-node.nix;
+
   # Port contracts (services.<name>.settings.ports -> listening port)
   port-contracts = pkgs.ekaosTest ./port-contracts.nix;
 
