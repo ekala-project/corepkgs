@@ -30,12 +30,16 @@
 
 {
   checkMeta ? false,
+  # iets evaluates in pure mode, where `builtins.currentSystem` does not
+  # exist, so the system has to be passed explicitly.
+  system ? "x86_64-linux",
 }:
 
 let
   lib = import ../lib.nix { };
 
   pkgs = import ../. {
+    inherit system;
     config = {
       aliases.nixpkgs = false;
       inherit checkMeta;
