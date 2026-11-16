@@ -509,7 +509,9 @@ lib.fix (
 
       setupCompileFlags="${concatStringsSep " " setupCompileFlags}"
       configureFlagsArray=("''${configureFlags[@]}")
-      configureFlags="${concatStringsSep " " defaultConfigureFlags}"
+      # An array, so that the --extra-*-dirs appended below survive under
+      # __structuredAttrs (expanding "$configureFlags" yields only element 0).
+      configureFlags=(${concatStringsSep " " defaultConfigureFlags})
     ''
     + ''
       for p in "''${pkgsBuildBuild[@]}" "''${pkgsBuildHost[@]}" "''${pkgsBuildTarget[@]}"; do
@@ -586,8 +588,8 @@ lib.fix (
 
     configurePhase = ''
 
-      echo configureFlags: $configureFlags "''${configureFlagsArray[@]}"
-      ${setupCommand} configure $configureFlags "''${configureFlagsArray[@]}" 2>&1 | ${coreutils}/bin/tee "$NIX_BUILD_TOP/cabal-configure.log"
+      echo configureFlags: "''${configureFlags[@]}" "''${configureFlagsArray[@]}"
+      ${setupCommand} configure "''${configureFlags[@]}" "''${configureFlagsArray[@]}" 2>&1 | ${coreutils}/bin/tee "$NIX_BUILD_TOP/cabal-configure.log"
       ${lib.optionalString (!allowInconsistentDependencies) ''
         if grep -E -q -z 'Warning:.*depends on multiple versions' "$NIX_BUILD_TOP/cabal-configure.log"; then
           echo >&2 "*** abort because of serious configure-time warning from Cabal"
