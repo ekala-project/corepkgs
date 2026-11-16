@@ -15,7 +15,7 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "aws-c-auth";
-  version = "1.0.3";
+  version = "1.1.0";
 
   outputs = [
     "out"
@@ -26,7 +26,7 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "awslabs";
     repo = "aws-c-auth";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-8IippdrMhTuIuRAodlfgPHrXsqQIML681JhzI4QHgUU=";
+    hash = "sha256-j1o3UvTP9r4sODHy/FxNFVCCkxy9RxBXi71ThpnZAkw=";
   };
 
   nativeBuildInputs = [
