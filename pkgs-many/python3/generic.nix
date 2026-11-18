@@ -120,7 +120,7 @@ let
   );
 in
 cpythonInterpreter.overrideAttrs (oldAttrs: {
-  ${if withMinimalDeps then "pname" else null} = "python3-minimal";
+  extensions = lib.optionals withMinimalDeps [ "minimal" ];
   passthru =
     (oldAttrs.passthru or { })
     // mkVariantPassthru variantArgs
