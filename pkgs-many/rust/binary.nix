@@ -141,7 +141,11 @@ rec {
     };
   };
 
-  rustc = callPackage ./rustc-wrapper { inherit rustc-unwrapped; };
+  rustc = callPackage ./rustc-wrapper {
+    inherit rustc-unwrapped;
+    # This compiler only bootstraps rustc and cargo; keep it out of the cache.
+    compilerLauncher = null;
+  };
 
   cargo = stdenv.mkDerivation {
     pname = "cargo-${versionType}";
