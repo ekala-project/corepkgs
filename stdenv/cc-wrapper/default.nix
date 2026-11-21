@@ -29,6 +29,15 @@
   isZig ? cc.isZig or false,
   isArocc ? cc.isArocc or false,
   isCcache ? cc.isCcache or false,
+
+  # A program the wrapped C/C++ drivers exec through, as
+  # `<launcher> <compiler> <args...>`, after every flag has been added
+  # (ccache, sccache and ekacache's `ec` all take this form). It runs where the
+  # wrapper runs, so it must be built for this stdenv's build platform. A
+  # stdenv carrying `ekacache` (`stdenvAdapters.withEkacache`) launches every
+  # compiler it wraps through `ec`.
+  compilerLauncher ?
+    if stdenvNoCC ? ekacache && !stdenvNoCC.isCross then stdenvNoCC.ekacache else null,
   grep ? null,
   expand-response-params,
   libcxx ? null,
@@ -118,6 +127,9 @@ let
   #
   # TODO(@Ericson2314) Make unconditional, or optional but always true by default.
   targetPrefix = optionalString (targetPlatform != hostPlatform) (targetPlatform.config + "-");
+
+  launcherExe =
+    if lib.isDerivation compilerLauncher then lib.getExe compilerLauncher else compilerLauncher;
 
   ccVersion = getVersion cc;
   ccName = removePrefix targetPrefix (getName cc);
@@ -427,6 +439,7 @@ stdenvNoCC.mkDerivation {
       isGNU
       isClang
       isZig
+      compilerLauncher
       ;
 
     emacsBufferSetup = pkgs: ''
@@ -475,7 +488,10 @@ stdenvNoCC.mkDerivation {
       local dst="$1"
       local wrapper="$2"
       export prog="$3"
-      export use_response_file_by_default=${if isClang && !isCcache then "1" else "0"}
+      export use_response_file_by_default=${
+        # A launcher cannot see through `@file`, so it gets the arguments.
+        if isClang && !isCcache && compilerLauncher == null then "1" else "0"
+      }
       substituteAll "$wrapper" "$out/bin/$dst"
       chmod +x "$out/bin/$dst"
     }
@@ -547,6 +563,28 @@ stdenvNoCC.mkDerivation {
       wrap ${targetPrefix}cpp $wrapper $ccPath/${targetPrefix}cpp
     elif [ -e $ccPath/cpp ]; then
       wrap ${targetPrefix}cpp $wrapper $ccPath/cpp
+    fi
+  ''
+
+  # Exec the C and C++ drivers wrapped above through the launcher. It sees the
+  # final argv, so anything it keys on includes the flags the wrapper added.
+  # cpp, gfortran and the rest keep running the compiler directly.
+  + optionalString (compilerLauncher != null) ''
+    launch() {
+      local dst="$out/bin/$1" prog="$2"
+      substituteInPlace "$dst" \
+        --replace-fail "    exec $prog " "    exec ${launcherExe} $prog " \
+        --replace-fail "    $prog \"@" "    ${launcherExe} $prog \"@"
+    }
+    if [ -e $ccPath/${targetPrefix}gcc ]; then
+      launch ${targetPrefix}gcc $ccPath/${targetPrefix}gcc
+    elif [ -e $ccPath/clang ]; then
+      launch ${targetPrefix}clang $ccPath/clang
+    fi
+    if [ -e $ccPath/${targetPrefix}g++ ]; then
+      launch ${targetPrefix}g++ $ccPath/${targetPrefix}g++
+    elif [ -e $ccPath/clang++ ]; then
+      launch ${targetPrefix}clang++ $ccPath/clang++
     fi
   ''
 

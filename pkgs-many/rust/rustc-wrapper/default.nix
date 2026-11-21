@@ -5,8 +5,17 @@
   sysroot ? null,
   stdenvNoCC,
   shell ? stdenvNoCC.shell,
+  # A program rustc execs through, as `<launcher> <rustc> <args...>`, after the
+  # wrapper's flags are added. It runs where the wrapper runs, so it must be
+  # built for this stdenv's build platform. A stdenv carrying `ekacache`
+  # (`stdenvAdapters.withEkacache`) launches rustc through its `ec`.
+  compilerLauncher ?
+    if stdenvNoCC ? ekacache && !stdenvNoCC.isCross then stdenvNoCC.ekacache else null,
 }:
 let
+  launcherExe =
+    if lib.isDerivation compilerLauncher then lib.getExe compilerLauncher else compilerLauncher;
+
   sysrootFlag = lib.optionalString (sysroot != null) "--sysroot ${sysroot}";
 
   # Upstream rustc still assumes that musl = static[1].  The fix for
@@ -46,6 +55,7 @@ runCommand "${rustc-unwrapped.pname}-wrapper-${rustc-unwrapped.version}"
         badTargetPlatforms
         ;
       unwrapped = rustc-unwrapped;
+      inherit compilerLauncher;
     };
 
     meta = rustc-unwrapped.meta // {
@@ -53,24 +63,32 @@ runCommand "${rustc-unwrapped.pname}-wrapper-${rustc-unwrapped.version}"
       priority = 10;
     };
   }
-  ''
-    mkdir -p $out/bin
-    ln -s ${rustc-unwrapped}/bin/* $out/bin
-    rm $out/bin/{rustc,rustdoc}
-    substitute ${./rustc-wrapper.sh} $out/bin/rustc \
-      --replace-fail "@shell@" ${lib.escapeShellArg shell} \
-      --replace-fail "@sysrootFlag@" ${lib.escapeShellArg sysrootFlag} \
-      --replace-fail "@defaultArgs@" ${lib.escapeShellArg defaultArgs} \
-      --replace-fail "@prog@" ${lib.escapeShellArg rustc-unwrapped}/bin/rustc \
-      --replace-fail "@extraFlagsVar@" "NIX_RUSTFLAGS"
-    substitute ${./rustc-wrapper.sh} $out/bin/rustdoc \
-      --replace-fail "@shell@" ${lib.escapeShellArg shell} \
-      --replace-fail "@sysrootFlag@" ${lib.escapeShellArg sysrootFlag} \
-      --replace-fail "@defaultArgs@" ${lib.escapeShellArg defaultArgs} \
-      --replace-fail "@prog@" ${lib.escapeShellArg rustc-unwrapped}/bin/rustdoc \
-      --replace-fail "@extraFlagsVar@" "NIX_RUSTDOCFLAGS"
-    chmod +x $out/bin/{rustc,rustdoc}
-    ${lib.concatMapStrings (output: "ln -s ${rustc-unwrapped.${output}} \$${output}\n") (
-      lib.remove "out" rustc-unwrapped.outputs
-    )}
-  ''
+  (
+    ''
+      mkdir -p $out/bin
+      ln -s ${rustc-unwrapped}/bin/* $out/bin
+      rm $out/bin/{rustc,rustdoc}
+      substitute ${./rustc-wrapper.sh} $out/bin/rustc \
+        --replace-fail "@shell@" ${lib.escapeShellArg shell} \
+        --replace-fail "@sysrootFlag@" ${lib.escapeShellArg sysrootFlag} \
+        --replace-fail "@defaultArgs@" ${lib.escapeShellArg defaultArgs} \
+        --replace-fail "@prog@" ${lib.escapeShellArg rustc-unwrapped}/bin/rustc \
+        --replace-fail "@extraFlagsVar@" "NIX_RUSTFLAGS"
+      substitute ${./rustc-wrapper.sh} $out/bin/rustdoc \
+        --replace-fail "@shell@" ${lib.escapeShellArg shell} \
+        --replace-fail "@sysrootFlag@" ${lib.escapeShellArg sysrootFlag} \
+        --replace-fail "@defaultArgs@" ${lib.escapeShellArg defaultArgs} \
+        --replace-fail "@prog@" ${lib.escapeShellArg rustc-unwrapped}/bin/rustdoc \
+        --replace-fail "@extraFlagsVar@" "NIX_RUSTDOCFLAGS"
+      chmod +x $out/bin/{rustc,rustdoc}
+      ${lib.concatMapStrings (output: "ln -s ${rustc-unwrapped.${output}} \$${output}\n") (
+        lib.remove "out" rustc-unwrapped.outputs
+      )}
+    ''
+    # Only rustc goes through the launcher; rustdoc output is not cacheable.
+    + lib.optionalString (compilerLauncher != null) ''
+      substituteInPlace $out/bin/rustc \
+        --replace-fail ${lib.escapeShellArg "exec ${rustc-unwrapped}/bin/rustc "} \
+          ${lib.escapeShellArg "exec ${launcherExe} ${rustc-unwrapped}/bin/rustc "}
+    ''
+  )

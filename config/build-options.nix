@@ -88,6 +88,20 @@ in
       feature = "set `__contentAddressed` to true by default";
     };
 
+    ekacache.enable = mkMassRebuild {
+      feature = "cache C, C++, Rust and cgo-free Go compilation through ekacache (`ec`)";
+      description = ''
+        Whether to cache C, C++, Rust and cgo-free Go compilation through
+        ekacache (`ec`) while building nixpkgs packages. The final stdenv's
+        compilers, the compilers wrapped in that package set, and
+        buildGoModule's GOCACHEPROG go through `ec`, which talks to an `ecd`
+        daemon on `/nix/var/nix/ekacache/socket`. The host has to run `ecd`
+        and expose that directory to builds with
+        `extra-sandbox-paths = /nix/var/nix/ekacache`; without a reachable
+        `ecd`, builds run uncached.
+      '';
+    };
+
     cudaSupport = mkMassRebuild {
       feature = "build packages with CUDA support by default";
     };

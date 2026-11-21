@@ -6,6 +6,15 @@
   stdenv,
 }:
 
+let
+  # Set by `stdenvAdapters.withEkacache`. It runs on the build platform, as go
+  # does. GOCACHEPROG needs Go 1.24.
+  ekacache =
+    if stdenv ? ekacache && lib.getName go == "go" && lib.versionAtLeast go.version "1.24" then
+      stdenv.ekacache
+    else
+      null;
+in
 lib.extendMkDerivation {
   constructDrv = stdenv.mkDerivation;
   excludeDrvArgNames = [
@@ -260,6 +269,19 @@ lib.extendMkDerivation {
                   cp -r --reflink=auto "$goModules" vendor
                 ''
             }
+          ''
+          + lib.optionalString (ekacache != null) ''
+            # Share Go's build cache through ecd. cgo builds are left out: Go
+            # keys a cgo compile on CGO_*FLAGS and the C compiler's version
+            # line, not on the NIX_* flags cc-wrapper adds.
+            if [[ ''${CGO_ENABLED:-1} == 0 && -z ''${GOCACHEPROG:-} ]]; then
+              ekacacheSock=''${EKACACHE_SOCK-${ekacache.socket}}
+              if [[ -n $ekacacheSock && -e $ekacacheSock ]]; then
+                export GOCACHEPROG=${ekacache}/libexec/ekacache/gocacheprog
+                # Run the tests instead of replaying cached `go test` results.
+                export GOFLAGS="$GOFLAGS -count=1"
+              fi
+            fi
           ''
           + ""
         );
