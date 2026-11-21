@@ -59,6 +59,17 @@ let
       }
       .${localSystem.system} or stagesNative;
 
+  # `config.ekacache.enable`: one more native stage, rebuilding the package set
+  # with its compilers launched through ekacache's `ec`. `ec` comes from the
+  # stage below, so it never has to build itself. Cross and custom stdenvs
+  # build on top of this stage, and so are launched too.
+  ekacacheStage = vanillaPackages: {
+    inherit (bootArgs) config overlays;
+    stdenv = vanillaPackages.stdenvAdapters.withEkacache vanillaPackages.ekacache vanillaPackages.stdenv;
+  };
+
+  nativeStages = bootStages ++ lib.optional (config.ekacache.enable or false) ekacacheStage;
+
   stagesCross = import ./cross {
     inherit
       lib
@@ -67,8 +78,8 @@ let
       config
       overlays
       crossOverlays
-      bootStages
       ;
+    bootStages = nativeStages;
   };
 
   replaceStdenvStage = vanillaPackages: {
@@ -80,6 +91,6 @@ in
 if useCrossStdenv then
   stagesCross
 else if useCustomStdenv then
-  bootStages ++ [ replaceStdenvStage ]
+  nativeStages ++ [ replaceStdenvStage ]
 else
-  bootStages
+  nativeStages

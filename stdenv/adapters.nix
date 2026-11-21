@@ -60,6 +60,39 @@ rec {
       hasCC = cc != null;
     };
 
+  # Cache compilation through ekacache's `ec`. The stdenv's C/C++ compiler is
+  # re-wrapped to exec through `ec`, and `ekacache` is recorded on the stdenv.
+  # From there cc-wrapper and rustc-wrapper launch the compilers they wrap
+  # through it, and buildGoModule points GOCACHEPROG at it. `ekacache` must not
+  # be built with the result, or it would have to build itself;
+  # `config.ekacache.enable` takes it from the stage below. Builds still work
+  # when no `ecd` is reachable.
+  withEkacache =
+    ekacache: stdenv:
+    let
+      cc = if stdenv.hasCC then stdenv.cc.override { compilerLauncher = ekacache; } else stdenv.cc;
+    in
+    stdenv.override (old: {
+      allowedRequisites = null;
+      inherit cc;
+      extraAttrs = old.extraAttrs or { } // {
+        inherit ekacache;
+      };
+      # Only applies when the result builds a package set.
+      overrides =
+        self: super:
+        let
+          prev = (old.overrides or (_: _: { })) self super;
+        in
+        prev
+        // {
+          inherit ekacache;
+        }
+        // lib.optionalAttrs (prev ? gcc) {
+          gcc = cc;
+        };
+    });
+
   # Add some arbitrary packages to buildInputs for specific packages.
   # Used to override packages in stdenv like Make.  Should not be used
   # for other dependencies.
