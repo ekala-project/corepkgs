@@ -7,13 +7,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "spirv-headers";
-  version = "1.4.363.0";
+  version = "2026.08.0";
 
   src = fetchFromGitHub {
     owner = "KhronosGroup";
     repo = "SPIRV-Headers";
-    tag = "vulkan-sdk-${finalAttrs.version}";
-    hash = "sha256-PTD3GxQnENDngl6bf9YCmCVmvRgdBZczBosFCOCYEXU=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-HvdKHnraSSWBriVgiNfhnC60moYRseDb3aRxxoANX1I=";
   };
 
   nativeBuildInputs = [
