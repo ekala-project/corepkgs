@@ -9,13 +9,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "inih";
-  version = "58";
+  version = "63";
 
   src = fetchFromGitHub {
     owner = "benhoyt";
     repo = "inih";
     tag = "r${finalAttrs.version}";
-    hash = "sha256-b2f6hQvkmWgni/zdfv3I1b9ypd7zSyEBv/JVBA6K7/w=";
+    hash = "sha256-HiVkrWzCzthwNNTxPVJnlcQ+o+gQW2sIRitZGJvWVmU=";
   };
 
   nativeBuildInputs = [
