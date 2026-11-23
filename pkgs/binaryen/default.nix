@@ -8,13 +8,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "binaryen";
-  version = "131";
+  version = "133";
 
   src = fetchFromGitHub {
     owner = "WebAssembly";
     repo = "binaryen";
     tag = "version_${finalAttrs.version}";
-    hash = "sha256-7x4I34sWNJIz0X7orJtjU4BQ1CLbIFtkUTqdy5MrxX0=";
+    hash = "sha256-ip10rXDnBfgSLrc4q8TXGckGnyq4SSoXQKoCU/KQIE8=";
   };
 
   nativeBuildInputs = [
