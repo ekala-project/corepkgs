@@ -8,7 +8,7 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "vulkan-headers";
-  version = "1.4.341.0";
+  version = "1.4.369";
 
   nativeBuildInputs = [
     cmake
@@ -23,8 +23,8 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "KhronosGroup";
     repo = "Vulkan-Headers";
-    tag = "vulkan-sdk-${finalAttrs.version}";
-    hash = "sha256-R/t0mAhNX+jREDVIFnv0agB9qtcnRb06K4OHtLRxWow=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-TovDv0Aj7HI5FtTFfGuLmjlMt79djZsuyKpGG2lsaoU=";
   };
 
   meta = {
