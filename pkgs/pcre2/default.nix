@@ -13,11 +13,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "pcre2";
-  version = "10.46";
+  version = "10.49";
 
   src = fetchurl {
     url = "https://github.com/PhilipHazel/pcre2/releases/download/pcre2-${finalAttrs.version}/pcre2-${finalAttrs.version}.tar.bz2";
-    hash = "sha256-FfvFq6a+7gsXrssEYCrjlDI5OroevY45t8q/fbiDKZ8=";
+    hash = "sha256-U8FW4bpBaiDajmU5XaoTLaDYDnaRBCTKyj/Nrngx04Q=";
   };
 
   nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ];
