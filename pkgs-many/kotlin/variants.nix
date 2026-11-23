@@ -5,7 +5,7 @@
     src-hash = "sha256-oRgZew3lX/qyvI1c0DpeOQM8+1M4PWkxvHYd7AeEiRo=";
   };
   v2_4 = {
-    version = "2.4.20";
-    src-hash = "sha256-WenKdMeQTvLBIrEhFJN2c8zOaN6CCmY/DtZsz4eZ4Lc=";
+    version = "2.4.21";
+    src-hash = "sha256-fMFA522vQWoEJKVVf5mv18qJ69Rj6hEBJh4+AcM+dc0=";
   };
 }
