@@ -18,13 +18,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "hwloc";
-  version = "2.14.0";
+  version = "2.16.0-1-1.6.3";
 
   src = fetchFromGitHub {
     owner = "open-mpi";
     repo = "hwloc";
-    tag = "hwloc-${finalAttrs.version}";
-    hash = "sha256-lbh8tkKeUcHta7/q9TuHQhccyWjkBgrC5fVifFJqQyY=";
+    tag = "android-${finalAttrs.version}";
+    hash = "sha256-pXGyPv1Wx82WXGibOvhVXe9ziSr1T72L8WXci0Rfi6A=";
   };
 
   configureFlags = [
