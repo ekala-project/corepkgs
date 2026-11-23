@@ -7,11 +7,11 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "iana-etc";
-  version = "20250505";
+  version = "20261119";
 
   src = fetchzip {
     url = "https://github.com/Mic92/iana-etc/releases/download/${finalAttrs.version}/iana-etc-${finalAttrs.version}.tar.gz";
-    sha256 = "sha256-p+VTQMtuhMu64bPK86dRMA7qpk8PtlgI+/vAuiyljXw=";
+    sha256 = "sha256-04vmpLHaUuM++U0o6wYkY72wX8Hc/BGqeFOEb6Ro0NY=";
   };
 
   installPhase = ''
