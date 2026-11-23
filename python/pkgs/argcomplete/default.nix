@@ -9,7 +9,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "argcomplete";
-  version = "3.7.2";
+  version = "3.8.0";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
@@ -18,7 +18,7 @@ buildPythonPackage (finalAttrs: {
     owner = "kislyuk";
     repo = "argcomplete";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-WKIhWlftH9xgdklljAOmW4XYMbclGrCFTtsxws2FRzg=";
+    hash = "sha256-dKlIqqvA2/eoNvCbU+aN3jQA641k/hzhtKdCKNhzrJs=";
   };
 
   build-system = [
