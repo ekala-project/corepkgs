@@ -6,7 +6,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "types-psutil";
-  version = "7.2.2.20260906";
+  version = "7.2.2.20261122";
   format = "wheel";
 
   src = fetchPypi {
@@ -15,7 +15,7 @@ buildPythonPackage (finalAttrs: {
     format = "wheel";
     dist = "py3";
     python = "py3";
-    hash = "sha256-2wC69/lsP2NCHE09aNNzkjCUoN/d8T6SLFxfvEJIgVk=";
+    hash = "sha256-7mDUfN227KzmiutTJrzkf+9wagD3KN9+wn2uMdTthHI=";
   };
 
   pythonImportsCheck = [ "psutil-stubs" ];
