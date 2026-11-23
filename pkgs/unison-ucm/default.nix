@@ -15,7 +15,7 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "unison-code-manager";
-  version = "1.5.0";
+  version = "2.0.2";
 
   src =
     {
@@ -25,7 +25,7 @@ stdenv.mkDerivation (finalAttrs: {
       };
       x86_64-linux = fetchurl {
         url = "https://github.com/unisonweb/unison/releases/download/release/${finalAttrs.version}/ucm-linux-x64.tar.gz";
-        hash = "sha256-/LLtYoTh9puhDE6Kgo3WVxDwnPHujLh25zKqnvVmz/Q=";
+        hash = "sha256-+6xitO85OKNfGOddavJUiDboln7FyRzd8FAvlYFoI/4=";
       };
     }
     .${stdenv.hostPlatform.system} or (throw "Unsupported platform ${stdenv.hostPlatform.system}");
