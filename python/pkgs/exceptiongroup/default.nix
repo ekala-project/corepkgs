@@ -11,14 +11,14 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "exceptiongroup";
-  version = "1.3.1";
+  version = "1.3.2";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit (finalAttrs) pname version;
-    hash = "sha256-i0EkMsYFWwt9FMMQAArpM1LtZ1T3D6j3w0FB+RxOMhk=";
+    hash = "sha256-yoLmnwy1Nfvek0iFdEtnZpo+/d1Q/nvADTOYg5/K3ew=";
   };
 
   postPatch = ''
