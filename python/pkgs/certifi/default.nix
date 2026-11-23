@@ -10,7 +10,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "certifi";
-  version = "2026.10.23";
+  version = "2026.11.20";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
@@ -19,7 +19,7 @@ buildPythonPackage (finalAttrs: {
     owner = "certifi";
     repo = "python-certifi";
     tag = finalAttrs.version;
-    hash = "sha256-uESJgC07To+bUePmwi180SCtAzAZkmEn1UolTWpB4X0=";
+    hash = "sha256-0wu2HR9JgE4TONyzLT0d/+Kt1CSeFFTNyOboZhhcJJU=";
   };
 
   patches = [
