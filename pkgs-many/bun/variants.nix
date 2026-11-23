@@ -9,11 +9,11 @@
   };
 
   v1_4 = {
-    version = "1.4.4";
+    version = "1.4.5";
     hashes = {
       "aarch64-darwin" = "sha256-gK/UwGm0am+o8+xSC+vHUKeEPkqNW5WD0prUNsAKNAM=";
-      "aarch64-linux" = "sha256-VDKLvC2cjgyfiSxUTWbFeoO4QTnjSQnl7oF1jxrI/ac=";
-      "x86_64-linux" = "sha256-v4zL+ysLgBWeD5ptFcVTF63YB3U028YTCj7bUvzLOVw=";
+      "aarch64-linux" = "sha256-GGVqO/DqVkH1eWrkITt1JVV5pwoP3tLzN5M3hVaM34Q=";
+      "x86_64-linux" = "sha256-lFWbO1KJlaSUUvnyQEzsdPLv19BuCgAKjNIUsCw2Zus=";
     };
   };
 }
